@@ -1,0 +1,19 @@
+version: '2'
+
+services:
+  blockcypher-callbacks:
+    build:
+      context: .
+      dockerfile: ./servers/blockcypher/Dockerfile
+    ports:
+      - 8000:8000
+    expose:
+      - "8000"
+  websockets:
+    build:
+      context: .
+      dockerfile: ./servers/websocket/Dockerfile
+    ports:
+      - 3000:3000
+    expose:
+      - "3000"

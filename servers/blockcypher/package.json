@@ -1,0 +1,23 @@
+{
+  "name": "dash-payment-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "dash-payment-service": "getnewaddress.js"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.1",
+    "hapi": "^16.4.3",
+    "sequelize": "^4.1.0",
+    "sqlite3": "^3.1.8",
+    "superagent": "^3.5.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
