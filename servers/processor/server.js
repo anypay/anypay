@@ -7,6 +7,7 @@ const Invoice = require('../../lib/models/invoice');
 amqp.connect(AMQP_URL).then(conn => {
 
 	return conn.createChannel().then(channel => {
+		console.log('channel connected');
 		return channel.assertQueue(QUEUE, {durable: true}).then(() => {
 
 		  channel.consume(QUEUE, message => {
@@ -16,7 +17,7 @@ amqp.connect(AMQP_URL).then(conn => {
 				let outputsProcessed = 0;
 				let outputMatched = false;
 
-				//console.log(webhook);
+				console.log(webhook);
 				webhook.outputs.forEach(output => {
 					let address = output.addresses[0];
 
@@ -42,7 +43,7 @@ amqp.connect(AMQP_URL).then(conn => {
 							.then(() => {
 							  outputsProcessed += 1;
 								channel.ack(message);
-								channel.sendToQueue('invoices:paid', new Buffer(invoice.uid));
+								channel.sendToQueue('invoices:paid', Buffer.from(invoice.uid));
 								outputMatched = true;
 							});
 						} else {
