@@ -39,8 +39,9 @@ server.route({
     method: 'POST',
     path:'/invoices', 
     handler: function (request, reply) {
+        console.log('create invoice', request.payload);
 
-				DashInvoice.generate(request.amount)
+				DashInvoice.generate(request.payload.amount)
 				 	.then(invoice => {
 				  	reply(invoice);
 				  })
