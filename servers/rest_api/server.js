@@ -16,9 +16,12 @@ WebhookHandler.on('webhook', payload => {
 });
 
 const server = new Hapi.Server();
-server.connection({ 
-    host: 'localhost', 
-    port: process.env.PORT || 8000 
+server.connection({
+    host: process.env.HOST || 'localhost',
+    port: process.env.PORT || 8000,
+    routes: {
+      cors: true
+    }
 });
 
 server.route({
@@ -26,7 +29,7 @@ server.route({
     path:'/invoices/:id', 
     handler: function (request, reply) {
 
-				Invoice.findAll()
+				Invoice.findOne().where({ uid: request.params.id })
 					.then(reply)
 					.catch(console.warn);
     }
