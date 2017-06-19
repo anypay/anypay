@@ -32,6 +32,6 @@ services:
   webapp:
     build:
       context: .
-      dockerfile: ./servers/webapp/anypay-dash/Dockerfile
+      dockerfile: ./servers/webapp/ember/Dockerfile
     ports:
       - 5678:80
