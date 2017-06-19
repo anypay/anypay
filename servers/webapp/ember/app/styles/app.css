@@ -1,0 +1,111 @@
+* {
+    margin: 0;
+  color: white;
+}
+html, body {
+    height: 100%;
+}
+
+#home {
+  text-align:center;
+  margin-top:10em;
+}
+
+#home img {
+  width: 150px;
+}
+
+#home h1, p {
+  padding:1em;
+}
+
+#home .get-started, .link-to-new-invoice {
+  border: 1px solid white;
+  margin:2em;
+  padding:2em;
+}
+
+.bottom {
+  border-top:1px solid white;
+  position:fixed;
+  bottom:0px;
+  width:100%;
+}
+
+#calculator-pad {
+  margin: 0 auto;
+  margin-left:5em;
+  width: 100%;
+}
+
+#calculator-pad div {
+  width:25%;
+  float:left;
+  font-size:30px;
+  font-weight:bold;
+  text-align:center;
+  padding:1em 0.5em;
+  border:1px solid #ccc;
+}
+
+#invoice-amount, #invoice-collect {
+  text-align:center;
+  font-size: 3em;
+  padding:1em;
+}
+
+#invoice-collect {
+  margin-top: 3em;
+}
+
+.background {
+
+background: #06266f;
+}
+
+.background2 {
+  background: rgba(73,155,234,1);
+  background: -moz-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1)
+  100%);
+  background: -webkit-gradient(left top, right top, color-stop(0%,
+  rgba(73,155,234,1)), color-stop(100%, rgba(32,124,229,1)));
+  background: -webkit-linear-gradient(left, rgba(73,155,234,1) 0%,
+  rgba(32,124,229,1) 100%);
+  background: -o-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1)
+  100%);
+  background: -ms-linear-gradient(left, rgba(73,155,234,1) 0%, rgba(32,124,229,1)
+  100%);
+  background: linear-gradient(to right, rgba(73,155,234,1) 0%, rgba(32,124,229,1)
+  100%);
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#499bea',
+  endColorstr='#207ce5', GradientType=1 );
+}
+
+#invoice-collect img {
+  width:50px;
+}
+
+.loading-spinner {
+  margin-left: 21em;
+  margin-top: 12em;
+}
+
+#qrcode {
+  text-align:center;
+  margin: 0 auto;
+  background-color:white;
+  padding:1em;
+  width: 256px;
+  margin-top:12em;
+}
+
+.paid {
+  background-color: green;
+  text-align:center;
+  margin-top: 10em;
+}
+
+.paid h1 {
+  font-size:100px;
+}
+
