@@ -3,7 +3,7 @@ import Ember from 'ember';
 function subscribe(invoice) {
 
   console.log("subscribe", invoice.uid);
-  var socket = io('http://149.56.89.142:3000');
+  var socket = io('https://ws.dash.anypay.global');
   socket.on('invoice:paid', function (data) {
     console.log('invoice:paid', data);
     window.location = `/paid/${invoice.amount}`

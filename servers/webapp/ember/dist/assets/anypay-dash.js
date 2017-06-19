@@ -322,7 +322,7 @@ define('anypay-dash/routes/invoice', ['exports', 'ember'], function (exports, _e
   function subscribe(invoice) {
 
     console.log("subscribe", invoice.uid);
-    var socket = io('http://149.56.89.142:3000');
+    var socket = io('https://ws.dash.anypay.global');
     socket.on('invoice:paid', function (data) {
       console.log('invoice:paid', data);
       window.location = '/paid/' + invoice.amount;
@@ -437,7 +437,7 @@ catch(err) {
 /* jshint ignore:start */
 
 if (!runningTests) {
-  require("anypay-dash/app")["default"].create({"name":"anypay-dash","version":"0.0.0+4d278ad1"});
+  require("anypay-dash/app")["default"].create({"name":"anypay-dash","version":"0.0.0+86c493ab"});
 }
 
 /* jshint ignore:end */
