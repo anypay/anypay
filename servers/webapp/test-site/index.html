@@ -58,13 +58,20 @@
         <div class="col-md-4">
         </div>
         <div class="col-md-4">
-          <h2>Enter Dash Amount</h2>
-          <form >
-            <input name="amount" type="number" placeholder="dash amount"></input>
-          </form>
-          <br/>
-          <p><a class="btn btn-default" href="#" role="button">Generate</a></p>
-       </div>
+          <div id="payment-form">
+            <h2>Enter Dash Amount</h2>
+            <form >
+              <input id="amount" name="amount" type="text" placeholder="dash amount"></input>
+            </form>
+            <br/>
+            <p><a class="btn btn-default" href="#" role="button">Generate</a></p>
+           </div>
+           <br/><br/>
+           <div style="display:none; font-size:50px;
+           font-weight:bold;"id="paid">PAID!</div>
+           <div id="qrcode"></div>
+           <div id="address"></div>
+         </div>
         <div class="col-md-4">
         </div>
       </div>
@@ -75,6 +82,9 @@
         <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
 
         <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/vendor/qrcode.min.js"></script>
+        <script src="js/vendor/socket.io.min.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
         <script src="js/main.js"></script>
 

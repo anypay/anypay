@@ -29,3 +29,9 @@ services:
     build:
       context: .
       dockerfile: ./servers/processor/Dockerfile
+  webapp:
+    build:
+      context: .
+      dockerfile: ./servers/webapp/anypay-dash/Dockerfile
+    ports:
+      - 5678:80
