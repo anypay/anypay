@@ -53,7 +53,7 @@ const validate = function (request, username, password, callback) {
   }})
   .then(accessToken => {
     if (accessToken) {
-      return callback(null, true, { accessToken: accessToken[0] });
+      return callback(null, true, { accessToken: accessToken });
     } else {
       return callback(null, false);
     }
@@ -71,17 +71,23 @@ server.register(Basic, (err) => {
 
   server.route({
       method: 'GET',
-      path:'/invoices/:id', 
-      handler: authorize(function (request, reply) {
+      path:'/invoices/{invoice_id}',
+      handler: function (request, reply) {
+        console.log("get invoices");
+        console.log(request.auth.credentials);
 
-          Invoice.findOne().where({
-            uid: request.params.id,
-            account_id: request.auth.credentials.account_id
-          })
-          .then(invoice => {
-          })
-          .catch(console.warn);
-      })
+        Invoice.findOne({where: {
+          uid: request.params.invoice_id
+        }})
+        .then(invoice => {
+          if (invoice) {
+            reply(invoice);
+          } else {
+            reply().code(404);
+          }
+        })
+        .catch(error => reply({error}).code(500));
+      }
   });
 
   server.route({
@@ -90,15 +96,65 @@ server.register(Basic, (err) => {
       config: {
         auth: 'simple',
         handler: function (request, reply) {
+          console.log(request.auth.credentials);
 
-          DashInvoice.generate(request.payload.amount)
+          DashInvoice.generate({
+            dash_amount: request.payload.amount,
+            account_id: request.auth.credentials.accessToken.account_id
+          })
             .then(invoice => {
+              console.log('generated dash invoice', invoice);
               reply(invoice);
             })
-            .catch(console.warn);
+            .catch(error => {
+              console.error('error generating invoice', error);
+              reply({error}).code(500)
+            });
         }
       }
   });
+
+  server.route({
+    method: 'POST',
+    path: '/accounts',
+    handler: (request, reply) => {
+
+      Account.create({
+        email: request.payload.email
+      })
+      .then(account => {
+        reply(account);
+      })
+      .catch(error => {
+        reply({ error: error }).code(500);
+      });
+    }
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/accounts/:account_uid/confirmation',
+    handler: (request, reply) => {
+      // email confirmation link
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/access_tokens',
+    handler: (request, reply) => {
+
+      AccessToken.create({
+        account_id: request.payload.account_id
+      })
+      .then(accessToken => {
+        reply(accessToken);
+      })
+      .catch(error => {
+        reply({ error }).code(500);
+      });
+    }
+  })
 });
 
 if (require.main === module) {
