@@ -101,7 +101,10 @@ server.register(Basic, err => {
   server.route({
     method: "GET",
     path: "/invoices",
-    handler: InvoicesController.index
+    config: {
+      auth: 'token',
+      handler: InvoicesController.index
+    }
   })
 
   server.route({
