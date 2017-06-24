@@ -1,9 +1,12 @@
 "use strict";
 
 const Hapi = require("hapi");
+
 const Invoice = require("../../lib/models/invoice");
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
+const PairToken = require("../../lib/models/pair_token");
+
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
@@ -13,6 +16,7 @@ const DashInvoice = require("../../lib/dash_invoice");
 const Basic = require("hapi-auth-basic");
 const bcrypt = require("bcrypt");
 const owasp = require('owasp-password-strength-test');
+const InvoicesController = require('./handlers/invoices');
 
 const WebhookHandler = new EventEmitter();
 
@@ -56,6 +60,7 @@ const validateToken = function(request, username, password, callback) {
   })
     .then(accessToken => {
       if (accessToken) {
+        request.account_id = accessToken.account_id;
         return callback(null, true, { accessToken: accessToken });
       } else {
         return callback(null, false);
@@ -90,6 +95,50 @@ server.register(Basic, err => {
           }
         })
         .catch(error => reply({ error }).code(500));
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/invoices",
+    handler: InvoicesController.index
+  })
+
+  server.route({
+    method: "POST",
+    path: "/pair_tokens",
+    config: {
+      auth: 'token',
+      handler: (request, reply) => {
+        PairToken.create({
+          account_id: request.account_id
+        }) 
+        .then(pairToken => {
+          reply(pairToken);
+        })
+        .catch(error => {
+          reply({ error: error }).code(500);
+        });
+      }
+    }
+  })
+
+  server.route({
+    method: "GET",
+    path: "/pair_tokens",
+    config: {
+      auth: 'token',
+      handler: (request, reply) => {
+        PairToken.findAll({ where: {
+          account_id: request.account_id
+        }})
+        .then(pairTokens => {
+           reply({ pair_tokens: pairTokens });
+        })
+        .catch(error => {
+          reply({ error: error }).code(500);
+        });
+      }
     }
   });
 
