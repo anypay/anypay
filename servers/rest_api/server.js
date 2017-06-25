@@ -231,6 +231,21 @@ server.register(Basic, err => {
       }
 	  }
   });
+
+  server.route({
+    method: "GET",
+    path: "/account",
+    config: {
+      auth: "token",
+      handler: (request, reply) => {
+        let accountId = request.auth.credentials.accessToken.account_id;
+
+        Account.findOne({ where: { id: accountId }})
+          .then(reply)
+          .catch(error => { reply({ error: error.message }).code(500) });
+      }
+	  }
+  });
 });
 
 if (require.main === module) {
