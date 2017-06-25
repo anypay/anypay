@@ -10,7 +10,11 @@ const PairToken = require("../../lib/models/pair_token");
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
+
 const DashCore = require("../../lib/dashcore");
+const DashPayoutAddress = require("../../lib/dash/payout_address");
+
+
 const Blockcypher = require("../../lib/blockcypher");
 const DashInvoice = require("../../lib/dash_invoice");
 const Basic = require("hapi-auth-basic");
@@ -205,6 +209,25 @@ server.register(Basic, err => {
       handler: (request, reply) => {
 
         reply(request.auth.credentials.accessToken);
+      }
+	  }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/payout_address",
+    config: {
+      auth: "token",
+      handler: (request, reply) => {
+        let accountId = request.auth.credentials.accessToken.account_id;
+
+        DashPayoutAddress.save(accountId, request.payload.address)
+          .then(() => {
+             reply({success: true}).code(200);
+          })
+          .catch(error => {
+             reply({error: error.message}).code(500);
+          });
       }
 	  }
   });
