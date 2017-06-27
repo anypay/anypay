@@ -29,6 +29,10 @@ services:
     build:
       context: .
       dockerfile: ./servers/processor/Dockerfile
+  payouts-cron:
+    build:
+      context: .
+      dockerfile: ./servers/dash_payouts/Dockerfile
   webapp:
     build:
       context: .
