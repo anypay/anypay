@@ -38,7 +38,8 @@ amqp.connect(AMQP_URL).then(conn => {
 						if (invoice.amount == output.value / 100000000.00) {
 							console.log('invoice amount matches');
 							invoice.updateAttributes({
-								status: 'paid'
+								status: 'paid',
+                paidAt: new Date()
 							})
 							.then(() => {
 							  outputsProcessed += 1;

@@ -6,6 +6,7 @@ const Invoice = require("../../lib/models/invoice");
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const PairToken = require("../../lib/models/pair_token");
+const DashPayout = require("../../lib/models/dash_payout");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -241,6 +242,21 @@ server.register(Basic, err => {
         let accountId = request.auth.credentials.accessToken.account_id;
 
         Account.findOne({ where: { id: accountId }})
+          .then(reply)
+          .catch(error => { reply({ error: error.message }).code(500) });
+      }
+	  }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/dash_payouts",
+    config: {
+      auth: "token",
+      handler: (request, reply) => {
+        let accountId = request.auth.credentials.accessToken.account_id;
+
+        DashPayout.findAll({ where: { account_id: accountId }})
           .then(reply)
           .catch(error => { reply({ error: error.message }).code(500) });
       }
