@@ -158,7 +158,7 @@ server.register(Basic, err => {
       handler: function(request, reply) {
 
         DashInvoice.generate({
-          dash_amount: request.payload.amount,
+          dollar_amount: request.payload.amount,
           account_id: request.auth.credentials.accessToken.account_id
         })
           .then(invoice => {
