@@ -2,7 +2,7 @@ import Ember from 'ember';
 import Invoice from '../models/invoice';
 
 function generateInvoice(amount, callback) {
-  amount = (amount / 190).toFixed(5); 
+  // amount provided denominated in dollars
 
   Ember.$.ajax({
     method: 'POST',
