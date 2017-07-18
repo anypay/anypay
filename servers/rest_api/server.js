@@ -8,6 +8,8 @@ const Account = require("../../lib/models/account");
 const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
 
+const BalancesController = require("./handlers/balances");
+
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
@@ -246,6 +248,15 @@ server.register(Basic, err => {
           .catch(error => { reply({ error: error.message }).code(500) });
       }
 	  }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/balances",
+    config: {
+      auth: "token",
+      handler: BalancesController.index
+    }
   });
 
   server.route({
