@@ -7,15 +7,16 @@ const DASH_PAYOUT_QUEUE = 'dash:payouts';
 
 const Invoice = require('../../lib/models/invoice');
 const DashPayout = require('../../lib/models/dash_payout');
-
+const Dashcore = require('../../lib/dashcore');
 
 function DashPayoutConsumer(channel) {
 
   return function(message) {
+    let payoutId
 
     try {
       // receive payoutId  on the message queue
-      let payoutId = parseInt(message.content.toString())
+      payoutId = parseInt(message.content.toString())
     } catch(error) {
       // invalid message format
 
@@ -23,24 +24,48 @@ function DashPayoutConsumer(channel) {
       return;
     }
 
-    DashPayout.findOne({ where: { id: payoutId }})
-      .then(payout => {
-        if (!payout) { 
-          channel.ack(message);
+    log.info("dash:payout:id", payoutId);
+
+    DashPayout.findOne({ where: {
+      id: payoutId,
+      status: 'unpaid',
+      completedAt: {
+        $eq: null
+      }
+    }})
+    .then(payout => {
+      if (!payout) { 
+        log.error('dash:payout:missing', payoutId);
+        channel.ack(message);
+        return;
+      }
+      log.info('dash:payout:found', payout.toJSON());
+      log.info('dash:sendPayment', payout.address, payout.amount);
+      Dashcore.sendPayment(payout.address, parseFloat(payout.amount)).then(paymentHash => {
+        if (!paymentHash) {
+          log.error('dash:payout', payout);
+          channel.nack(message);
           return;
         }
-        if (payout.status === 'unpaid') {
-          // send payout to dash address
-          // if fails, requeue message (nack)
-        } else {
+        log.info('dash:payout:hash', paymentHash);
+        payout.payment_hash = paymentHash;
+        payout.completedAt = new Date();
+        payout.status = 'paid';
+        payout.save().then(() => {
+          log.info("payout:complete")
           channel.ack(message);
-          return;
-        }
+        })
       })
       .catch(error => {
-
-        channel.nack(message); // requeue message
+        log.info('dash:payout:error', error.message);
+        channel.nack(message);
+        return;
       });
+    })
+    .catch(error => {
+
+      channel.nack(message); // requeue message
+    });
   }
 }
 
