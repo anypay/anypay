@@ -85,6 +85,7 @@ amqp.connect(AMQP_URL).then(conn => {
 		channel.assertQueue(QUEUE, {durable: true}).then(() => {
 
       return channel.assertQueue(CONFIRMED_TX_QUEUE, {durable: true})
+    })
 
     .then(() => {
 
