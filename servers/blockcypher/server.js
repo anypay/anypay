@@ -4,6 +4,7 @@ const log = require("winston");
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
+const CONFIRMED_TX_QUEUE = "blockcypher:webhooks:tx-confirmation";
 
 const server = new Hapi.Server();
 
@@ -60,7 +61,33 @@ amqp.connect(AMQP_URL).then(conn => {
 			}
 		});
 
+    server.route({
+			method: 'POST',
+			path:'/blockcypher/webhooks/tx-confirmation', 
+			handler: function (request, reply) {
+
+        log.info("blockcypher:callback:tx-confirmation", request.payload);
+
+				let message = JSON.stringify(request.payload);
+
+				let sent = channel.sendToQueue(CONFIRMED_TX_QUEUE, new Buffer(message));
+
+        if (!sent) {
+          log.error('amqp:send:error', message);
+          reply().code(500);
+        } else {
+          log.info('amqp:sent', message);
+          reply();
+        }
+			}
+		});
+
 		channel.assertQueue(QUEUE, {durable: true}).then(() => {
+
+      return channel.assertQueue(CONFIRMED_TX_QUEUE, {durable: true})
+
+    .then(() => {
+
         log.info('amqp:queue:asserted', QUEUE);
 
 				server.start((err) => {
