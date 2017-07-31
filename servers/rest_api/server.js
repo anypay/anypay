@@ -9,6 +9,7 @@ const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
 
 const BalancesController = require("./handlers/balances");
+const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -256,6 +257,24 @@ server.register(Basic, err => {
     config: {
       auth: "token",
       handler: BalancesController.index
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/extended_public_keys",
+    config: {
+      auth: "token",
+      handler: ExtendedPublicKeysController.show
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/extended_public_keys",
+    config: {
+      auth: "token",
+      handler: ExtendedPublicKeysController.create
     }
   });
 
