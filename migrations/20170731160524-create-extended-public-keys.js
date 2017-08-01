@@ -12,7 +12,7 @@ module.exports = {
       xpubkey: {
         type: Sequelize.STRING,
         allowNull: false
-      }
+      },
       nonce: {
         type: Sequelize.INTEGER,
         defaultValue: 0
