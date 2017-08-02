@@ -265,7 +265,7 @@ server.register(Basic, err => {
     path: "/extended_public_keys",
     config: {
       auth: "token",
-      handler: ExtendedPublicKeysController.show
+      handler: ExtendedPublicKeysController.index
     }
   });
 

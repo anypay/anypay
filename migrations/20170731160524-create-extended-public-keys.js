@@ -17,6 +17,12 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 0
       },
+      createdAt: {
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        type: Sequelize.DATE
+      },
       account_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
