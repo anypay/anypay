@@ -164,14 +164,14 @@ server.register(Basic, err => {
           dollar_amount: request.payload.amount,
           account_id: request.auth.credentials.accessToken.account_id
         })
-          .then(invoice => {
-            console.log("generated dash invoice", invoice);
-            reply(invoice);
-          })
-          .catch(error => {
-            console.error("error generating invoice", error);
-            reply({ error }).code(500);
-          });
+        .then(invoice => {
+          console.log("generated dash invoice", invoice);
+          reply(invoice);
+        })
+        .catch(error => {
+          console.error("error generating invoice", error);
+          reply({ error }).code(500);
+        });
       }
     }
   });
