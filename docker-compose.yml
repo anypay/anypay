@@ -39,3 +39,5 @@ services:
       dockerfile: ./servers/webapp/ember/Dockerfile
     ports:
       - 5678:80
+  postgres:
+    image: postgres
