@@ -39,3 +39,7 @@ services:
       dockerfile: ./servers/webapp/ember/Dockerfile
     ports:
       - 5678:80
+  instantsend-monitor:
+    build:
+      context: .
+      dockerfile: ./processes/dash_monitor/Dockerfile
