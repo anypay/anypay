@@ -41,7 +41,10 @@ function DashPayoutConsumer(channel) {
       }
       log.info('dash:payout:found', payout.toJSON());
       log.info('dash:sendPayment', payout.address, payout.amount);
-      Dashcore.sendPayment(payout.address, parseFloat(payout.amount)).then(paymentHash => {
+
+      let amount = parseFloat(payout.amount).toFixed(6);
+
+      Dashcore.sendPayment(payout.address, amount).then(paymentHash => {
         if (!paymentHash) {
           log.error('dash:payout', payout);
           channel.nack(message);
@@ -57,6 +60,7 @@ function DashPayoutConsumer(channel) {
         })
       })
       .catch(error => {
+        console.log(error);
         log.info('dash:payout:error', error.message);
         channel.nack(message);
         return;
