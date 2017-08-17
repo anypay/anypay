@@ -44,7 +44,9 @@ Poller.vent.on('instantsend:received', data => {
               conn.createChannel().then(channel => {
                 channel.sendToQueue('invoices:paid', Buffer.from(invoice.uid))
                 console.log('sent to invoices:paid', invoice.uid);
-                conn.close();
+                setTimeout(() => {
+                  conn.close();
+                }, 10000);
               });
             });
           });
