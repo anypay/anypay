@@ -6,6 +6,8 @@ const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
 const CONFIRMED_TX_QUEUE = "blockcypher:webhooks:tx-confirmation";
 
+const Slack = require('../../lib/slack/notifier');
+
 const server = new Hapi.Server();
 
 server.connection({ 
@@ -57,6 +59,11 @@ amqp.connect(AMQP_URL).then(conn => {
         } else {
           log.info('amqp:sent', message);
           reply();
+					try {
+						Slack.notify("blockcypher:dash:tx-confirmation", request.payload.hash);
+					} catch(error) {
+						log.error('error sending slack notification');
+					}	
         }
 			}
 		});
@@ -76,6 +83,11 @@ amqp.connect(AMQP_URL).then(conn => {
           log.error('amqp:send:error', message);
           reply().code(500);
         } else {
+					try {
+						Slack.notify("blockcypher:dash:tx-confirmation", request.payload.hash);
+					} catch(error) {
+						log.error('error sending slack notification');
+					}	
           log.info('amqp:sent', message);
           reply();
         }
