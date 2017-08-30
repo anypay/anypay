@@ -9,6 +9,8 @@ const Invoice = require('../../lib/models/invoice');
 const DashPayout = require('../../lib/models/dash_payout');
 const Dashcore = require('../../lib/dashcore');
 
+const Slack = require('../../lib/slack/notifier');
+
 function DashPayoutConsumer(channel) {
 
   return function(message) {
@@ -119,6 +121,7 @@ function BlockcypherWebhookConsumer(channel) {
               channel.ack(message);
               channel.sendToQueue('invoices:paid', Buffer.from(invoice.uid));
               outputMatched = true;
+							Slack.notify(`invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`);
             });
           } else {
             outputsProcessed += 1;
