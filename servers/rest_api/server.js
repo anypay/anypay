@@ -10,6 +10,7 @@ const DashPayout = require("../../lib/models/dash_payout");
 
 const BalancesController = require("./handlers/balances");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
+const PairTokensController = require("./handlers/pair_tokens");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -291,6 +292,14 @@ server.register(Basic, err => {
           .catch(error => { reply({ error: error.message }).code(500) });
       }
 	  }
+  });
+
+  server.route({
+    method: "POST",
+    path: '/pair_tokens/{uid}',
+    config: {
+      handler: PairTokensController.claim
+    }
   });
 });
 

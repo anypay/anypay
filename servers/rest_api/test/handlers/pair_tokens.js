@@ -1,4 +1,11 @@
-'use strict'; const assert = require("assert"); process.env.DATABASE_URL = "postgres://stevenzeiler:@127.0.0.1/anypay_dash_test"; const Account = require("../../../../lib/models/account"); const AccessToken = require("../../../../lib/models/access_token"); const Chance = require('chance'), chance = new Chance(); const Database = require("../../../../lib/database");
+'use strict'; const assert = require("assert");
+//process.env.DATABASE_URL = "postgres://stevenzeiler:@127.0.0.1/anypay_dash_test"
+const Account = require("../../../../lib/models/account");
+const AccessToken = require("../../../../lib/models/access_token");
+const PairToken = require("../../../../lib/models/pair_token");
+const Chance = require('chance');
+const chance = new Chance();
+const Database = require("../../../../lib/database");
 const server = require('../../server');
 const bcrypt = require('bcrypt');
 
@@ -62,6 +69,63 @@ describe("PairToken HTTP API", () => {
       assert(pairTokens[0].uid);
       assert(pairTokens[0].id);
       done()
+    });
+  });
+
+  it("POST /pair_tokens/:token should claim a pair token", done => {
+    let deviceName = chance.name();
+
+    PairToken.create({
+      account_id: account.id
+    })
+    .then(pairToken => {
+
+      server.inject({
+        method: 'POST',
+        url: `/pair_tokens/${pairToken.uid}`,
+        payload: {
+          device_name: deviceName
+        }
+      }, response => {
+        console.log(response.payload);
+        let accessToken = JSON.parse(response.payload).accessToken;
+        let pairToken = JSON.parse(response.payload).pairToken;
+        assert(accessToken.uid);
+        assert.strictEqual(pairToken.device_name, deviceName);
+        assert.strictEqual(pairToken.access_token_id, accessToken.id);
+        done();
+      });
+    });
+  });
+
+  it("POST /pair_tokens/:token should reject a token already claimed", done => {
+    let deviceName = chance.name();
+
+    PairToken.create({
+      account_id: account.id
+    })
+    .then(pairToken => {
+
+      server.inject({
+        method: 'POST',
+        url: `/pair_tokens/${pairToken.uid}`,
+        payload: {
+          device_name: deviceName
+        }
+      }, response => {
+
+        server.inject({
+          method: 'POST',
+          url: `/pair_tokens/${pairToken.uid}`,
+          payload: {
+            device_name: deviceName
+          }
+        }, response => {
+          let resp = JSON.parse(response.payload);
+          assert.strictEqual(resp.error, 'pair token already claimed');
+          done();
+        });
+      });
     });
   });
 });
