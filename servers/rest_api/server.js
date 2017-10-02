@@ -189,6 +189,15 @@ server.register(Basic, err => {
 
   server.route({
     method: "POST",
+    path: "/bitcoin/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
     path: "/accounts",
     handler: (request, reply) => {
 
