@@ -1,8 +1,10 @@
 const amqp = require('amqplib');
 const log = require('winston');
+const Blockcypher = require('../../lib/blockcypher');
 
 const AMQP_URL          = 'amqp://blockcypher.anypay.global';
 const QUEUE             = 'blockcypher:webhooks';
+const BITCOIN_QUEUE     = 'blockcypher:bitcoin:webhooks';
 const DASH_PAYOUT_QUEUE = 'dash:payouts';
 
 const Invoice = require('../../lib/models/invoice');
@@ -135,6 +137,54 @@ function BlockcypherWebhookConsumer(channel) {
   }
 }
 
+function BitcoinWebhookConsumer(channel) {
+
+  return function(message) {
+    let webhook;
+
+    try {
+      webhook = JSON.parse(message.content.toString());
+    } catch(error) {
+      log.error("invalid webhook message format");
+      channel.ack(message);
+      return;
+    }
+
+    if (!webhook.input_address) {
+      log.error("no input_address in webhook, invalid format");
+      channel.ack(message);
+      return
+    }
+
+    let address = webhook.input_address;
+
+    Invoice.findOne({ where: {
+      address: address,
+      status: 'unpaid'
+    }}).then(invoice => {
+      if (!invoice) {
+        channel.ack(message)
+      } else {
+        if (invoice.amount >= (webhook.value+Blockcypher.FEE) / 100000000.00) {
+          console.log('invoice amount matches');
+          invoice.updateAttributes({
+            status: 'paid',
+            paidAt: new Date()
+          })
+          .then(() => {
+            channel.ack(message);
+            channel.sendToQueue('invoices:paid', Buffer.from(invoice.uid));
+            outputMatched = true;
+            Slack.notify(`invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`);
+          });
+        } else {
+          channel.ack(message);
+        }
+      }
+    });
+  }
+}
+
 amqp.connect(AMQP_URL).then(conn => {
 
 	return conn.createChannel().then(channel => {
@@ -147,6 +197,12 @@ amqp.connect(AMQP_URL).then(conn => {
       channel.consume(DASH_PAYOUT_QUEUE, consumer, {noAck: false});
     });
 
+    channel.assertQueue(BITCOIN_QUEUE, {durable: true}).then(() => {
+
+      let consumer = BitcoinWebhookConsumer(channel);
+
+      channel.consume(BITCOIN_QUEUE, consumer, {noAck: false});
+    });
 
 		channel.assertQueue(QUEUE, {durable: true}).then(() => {
 
