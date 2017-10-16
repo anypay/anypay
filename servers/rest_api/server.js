@@ -11,6 +11,9 @@ const DashPayout = require("../../lib/models/dash_payout");
 const BalancesController = require("./handlers/balances");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
 const PairTokensController = require("./handlers/pair_tokens");
+const ZcashInvoicesController = require("./handlers/zcash_invoices");
+const DashInvoicesController = require("./handlers/dash_invoices");
+const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -174,6 +177,33 @@ server.register(Basic, err => {
           reply({ error }).code(500);
         });
       }
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/zcash/invoices",
+    config: {
+      auth: "token",
+      handler: ZcashInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/dash/invoices",
+    config: {
+      auth: "token",
+      handler: DashInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/bitcoin/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinInvoicesController.create
     }
   });
 

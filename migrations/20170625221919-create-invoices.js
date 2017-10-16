@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('invoices', {
+  up: function(queryInterface, Sequelize) {
+    return queryInterface.createTable("invoices", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -24,8 +24,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'accounts',
-          key: 'id'
+          model: "accounts",
+          key: "id"
         }
       },
       access_token: {
@@ -43,10 +43,16 @@ module.exports = {
       paidAt: {
         type: Sequelize.DATE
       },
+      createdAt: {
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        type: Sequelize.DATE
+      }
     });
   },
 
-  down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('invoices');
+  down: function(queryInterface, Sequelize) {
+    return queryInterface.dropTable("invoices");
   }
 };

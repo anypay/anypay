@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-
-    return queryInterface.createTable('dash_payouts', {
+  up: function(queryInterface, Sequelize) {
+    return queryInterface.createTable("dash_payouts", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -17,8 +16,8 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'accounts',
-          key: 'id'
+          model: "accounts",
+          key: "id"
         }
       },
       amount: {
@@ -36,11 +35,11 @@ module.exports = {
       },
       updatedAt: {
         type: Sequelize.DATE
-      },
+      }
     });
   },
 
-  down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('dash_payouts');
+  down: function(queryInterface, Sequelize) {
+    return queryInterface.dropTable("dash_payouts");
   }
 };

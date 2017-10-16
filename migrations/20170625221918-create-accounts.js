@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-    return queryInterface.createTable('accounts', {
+  up: function(queryInterface, Sequelize) {
+    return queryInterface.createTable("accounts", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -21,11 +21,17 @@ module.exports = {
       },
       dash_payout_address: {
         type: Sequelize.STRING
+      },
+      createdAt: {
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        type: Sequelize.DATE
       }
     });
   },
 
-  down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('accounts');
+  down: function(queryInterface, Sequelize) {
+    return queryInterface.dropTable("accounts");
   }
 };
