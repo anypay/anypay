@@ -5,6 +5,7 @@ const Blockcypher = require("../../lib/blockcypher");
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
+const DASH_QUEUE = "blockcypher:dash:webhooks";
 const DASH_PAYOUT_QUEUE = "dash:payouts";
 
 const Invoice = require("../../lib/models/invoice");
@@ -144,8 +145,11 @@ function BlockcypherWebhookConsumer(channel) {
 
 function BitcoinWebhookConsumer(channel) {
   return function(message) {
+    console.log("bitcoin webhook")
+    console.log('message',message);
     let webhook;
 
+    console.log('content', message.content.toString());
     try {
       webhook = JSON.parse(message.content.toString());
     } catch (error) {
@@ -153,6 +157,7 @@ function BitcoinWebhookConsumer(channel) {
       channel.ack(message);
       return;
     }
+    console.log('webhook',webhook);
 
     if (!webhook.input_address) {
       log.error("no input_address in webhook, invalid format");
@@ -180,6 +185,7 @@ function BitcoinWebhookConsumer(channel) {
             })
             .then(() => {
               channel.ack(message);
+              console.log("invoices:paid", Buffer.from(invoice.uid));
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
@@ -202,6 +208,12 @@ amqp.connect(AMQP_URL).then(conn => {
       let consumer = DashPayoutConsumer(channel);
 
       channel.consume(DASH_PAYOUT_QUEUE, consumer, { noAck: false });
+    });
+
+    channel.assertQueue(DASH_QUEUE, { durable: true }).then(() => {
+      let consumer = BitcoinWebhookConsumer(channel);
+
+      channel.consume(DASH_QUEUE, consumer, { noAck: false });
     });
 
     channel.assertQueue(BITCOIN_QUEUE, { durable: true }).then(() => {
