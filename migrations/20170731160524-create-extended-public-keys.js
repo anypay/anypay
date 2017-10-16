@@ -1,9 +1,8 @@
-'use strict';
+"use strict";
 
 module.exports = {
-  up: function (queryInterface, Sequelize) {
-
-    return queryInterface.createTable('extended_public_keys', {
+  up: function(queryInterface, Sequelize) {
+    return queryInterface.createTable("extended_public_keys", {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -27,14 +26,14 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'accounts',
-          key: 'id'
+          model: "accounts",
+          key: "id"
         }
       }
     });
   },
 
-  down: function (queryInterface, Sequelize) {
-    return queryInterface.dropTable('extended_public_keys');
+  down: function(queryInterface, Sequelize) {
+    return queryInterface.dropTable("extended_public_keys");
   }
 };
