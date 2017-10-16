@@ -14,6 +14,7 @@ const PairTokensController = require("./handlers/pair_tokens");
 const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
+const AddressesController = require("./handlers/addresses");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -227,6 +228,24 @@ server.register(Basic, err => {
       handler: (request, reply) => {
         reply(request.auth.credentials.accessToken);
       }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: '/addresses',
+    config: {
+      auth: "token",
+      handler: AddressesController.list
+    }
+  });
+
+  server.route({
+    method: "PUT",
+    path: '/addresses/{currency}',
+    config: {
+      auth: "token",
+      handler: AddressesController.update
     }
   });
 
