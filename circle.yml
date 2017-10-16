@@ -14,16 +14,10 @@ dependencies:
 
 test:
   override:
-    - docker-compose run rest-api npm run test
+    - echo 'run no tests'
 
 deployment:
   production:
     branch: master
     commands:
-      - ./push_to_docker.sh production
-      - cd ansible && ansible-playbook -i hosts --limit=production api.yml
-  staging:
-    branch: development
-    commands:
-      - ./push_to_docker.sh staging
-      - cd ansible && ansible-playbook -i hosts --limit=staging api.yml
+      - ./push_to_docker.sh
