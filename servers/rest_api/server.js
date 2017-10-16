@@ -12,6 +12,7 @@ const BalancesController = require("./handlers/balances");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
 const PairTokensController = require("./handlers/pair_tokens");
 const ZcashInvoicesController = require("./handlers/zcash_invoices");
+const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 
 const AccountLogin = require("../../lib/account_login");
@@ -185,6 +186,15 @@ server.register(Basic, err => {
     config: {
       auth: "token",
       handler: ZcashInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/dash/invoices",
+    config: {
+      auth: "token",
+      handler: DashInvoicesController.create
     }
   });
 

@@ -21,6 +21,12 @@ module.exports = {
       },
       dash_payout_address: {
         type: Sequelize.STRING
+      },
+      createdAt: {
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        type: Sequelize.DATE
       }
     });
   },
