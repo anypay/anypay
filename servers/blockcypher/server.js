@@ -5,6 +5,7 @@ const log = require("winston");
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
+const DASH_QUEUE = "blockcypher:dash:webhooks";
 const CONFIRMED_TX_QUEUE = "blockcypher:webhooks:tx-confirmation";
 
 const Slack = require("../../lib/slack/notifier");
@@ -64,6 +65,34 @@ amqp
               Slack.notify(
                 "blockcypher:bitcoin:tx-confirmation",
                 request.payload.hash
+              );
+            } catch (error) {
+              log.error("error sending slack notification");
+            }
+          }
+        }
+      });
+
+      server.route({
+        method: "POST",
+        path: "/dash/webhooks",
+        handler: function(request, reply) {
+          log.info("dash:blockcypher:callback", request.payload);
+
+          let message = JSON.stringify(request.payload);
+
+          let sent = channel.sendToQueue(DASH_QUEUE, new Buffer(message));
+
+          if (!sent) {
+            log.error("amqp:send:error", message);
+            reply().code(500);
+          } else {
+            log.info("amqp:sent", message);
+            reply();
+            try {
+              Slack.notify(
+                "blockcypher:dash:broadcast",
+                `https://blockchain.info/tx/${request.payload.hash}`
               );
             } catch (error) {
               log.error("error sending slack notification");
