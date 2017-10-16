@@ -22,13 +22,12 @@ const EventEmitter = require("events").EventEmitter;
 const DashCore = require("../../lib/dashcore");
 const DashPayoutAddress = require("../../lib/dash/payout_address");
 
-
 const Blockcypher = require("../../lib/blockcypher");
 const DashInvoice = require("../../lib/dash_invoice");
 const Basic = require("hapi-auth-basic");
 const bcrypt = require("bcrypt");
-const owasp = require('owasp-password-strength-test');
-const InvoicesController = require('./handlers/invoices');
+const owasp = require("owasp-password-strength-test");
+const InvoicesController = require("./handlers/invoices");
 
 const WebhookHandler = new EventEmitter();
 
@@ -46,19 +45,18 @@ server.connection({
 });
 
 const validatePassword = function(request, username, password, callback) {
-
   if (!username || !password) {
     return callback(null, false);
   }
 
-	AccountLogin.withEmailPassword(username, password)
-		.then(accessToken => {
+  AccountLogin.withEmailPassword(username, password)
+    .then(accessToken => {
       return callback(null, true, { accessToken });
-		})
-		.catch(error => {
-        return callback(error, false);
-		});
-}
+    })
+    .catch(error => {
+      return callback(error, false);
+    });
+};
 
 const validateToken = function(request, username, password, callback) {
   if (!username) {
@@ -93,7 +91,6 @@ server.register(Basic, err => {
     method: "GET",
     path: "/invoices/{invoice_id}",
     handler: function(request, reply) {
-
       Invoice.findOne({
         where: {
           uid: request.params.invoice_id
@@ -114,45 +111,47 @@ server.register(Basic, err => {
     method: "GET",
     path: "/invoices",
     config: {
-      auth: 'token',
+      auth: "token",
       handler: InvoicesController.index
     }
-  })
+  });
 
   server.route({
     method: "POST",
     path: "/pair_tokens",
     config: {
-      auth: 'token',
+      auth: "token",
       handler: (request, reply) => {
         PairToken.create({
           account_id: request.account_id
-        }) 
-        .then(pairToken => {
-          reply(pairToken);
         })
-        .catch(error => {
-          reply({ error: error }).code(500);
-        });
+          .then(pairToken => {
+            reply(pairToken);
+          })
+          .catch(error => {
+            reply({ error: error }).code(500);
+          });
       }
     }
-  })
+  });
 
   server.route({
     method: "GET",
     path: "/pair_tokens",
     config: {
-      auth: 'token',
+      auth: "token",
       handler: (request, reply) => {
-        PairToken.findAll({ where: {
-          account_id: request.account_id
-        }})
-        .then(pairTokens => {
-           reply({ pair_tokens: pairTokens });
+        PairToken.findAll({
+          where: {
+            account_id: request.account_id
+          }
         })
-        .catch(error => {
-          reply({ error: error }).code(500);
-        });
+          .then(pairTokens => {
+            reply({ pair_tokens: pairTokens });
+          })
+          .catch(error => {
+            reply({ error: error }).code(500);
+          });
       }
     }
   });
@@ -163,19 +162,18 @@ server.register(Basic, err => {
     config: {
       auth: "token",
       handler: function(request, reply) {
-
         DashInvoice.generate({
           dollar_amount: request.payload.amount,
           account_id: request.auth.credentials.accessToken.account_id
         })
-        .then(invoice => {
-          console.log("generated dash invoice", invoice);
-          reply(invoice);
-        })
-        .catch(error => {
-          console.error("error generating invoice", error);
-          reply({ error }).code(500);
-        });
+          .then(invoice => {
+            console.log("generated dash invoice", invoice);
+            reply(invoice);
+          })
+          .catch(error => {
+            console.error("error generating invoice", error);
+            reply({ error }).code(500);
+          });
       }
     }
   });
@@ -211,20 +209,18 @@ server.register(Basic, err => {
     method: "POST",
     path: "/accounts",
     handler: (request, reply) => {
-
-			bcrypt.hash(request.payload.password, 10, (error, hash) => {
-
+      bcrypt.hash(request.payload.password, 10, (error, hash) => {
         Account.create({
           email: request.payload.email,
           password_hash: hash
         })
-        .then(account => {
-          reply(account);
-        })
-        .catch(error => {
-          reply({ error: error }).code(500);
-        });
-			})
+          .then(account => {
+            reply(account);
+          })
+          .catch(error => {
+            reply({ error: error }).code(500);
+          });
+      });
     }
   });
 
@@ -242,10 +238,9 @@ server.register(Basic, err => {
     config: {
       auth: "password",
       handler: (request, reply) => {
-
         reply(request.auth.credentials.accessToken);
       }
-	  }
+    }
   });
 
   server.route({
@@ -258,13 +253,13 @@ server.register(Basic, err => {
 
         DashPayoutAddress.save(accountId, request.payload.address)
           .then(() => {
-             reply({success: true}).code(200);
+            reply({ success: true }).code(200);
           })
           .catch(error => {
-             reply({error: error.message}).code(500);
+            reply({ error: error.message }).code(500);
           });
       }
-	  }
+    }
   });
 
   server.route({
@@ -275,11 +270,13 @@ server.register(Basic, err => {
       handler: (request, reply) => {
         let accountId = request.auth.credentials.accessToken.account_id;
 
-        Account.findOne({ where: { id: accountId }})
+        Account.findOne({ where: { id: accountId } })
           .then(reply)
-          .catch(error => { reply({ error: error.message }).code(500) });
+          .catch(error => {
+            reply({ error: error.message }).code(500);
+          });
       }
-	  }
+    }
   });
 
   server.route({
@@ -317,16 +314,18 @@ server.register(Basic, err => {
       handler: (request, reply) => {
         let accountId = request.auth.credentials.accessToken.account_id;
 
-        DashPayout.findAll({ where: { account_id: accountId }})
+        DashPayout.findAll({ where: { account_id: accountId } })
           .then(reply)
-          .catch(error => { reply({ error: error.message }).code(500) });
+          .catch(error => {
+            reply({ error: error.message }).code(500);
+          });
       }
-	  }
+    }
   });
 
   server.route({
     method: "POST",
-    path: '/pair_tokens/{uid}',
+    path: "/pair_tokens/{uid}",
     config: {
       handler: PairTokensController.claim
     }
