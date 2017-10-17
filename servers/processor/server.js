@@ -200,6 +200,62 @@ function BitcoinWebhookConsumer(channel) {
   };
 }
 
+function DashWebhookConsumer(channel) {
+  return function(message) {
+    console.log("dash webhook")
+    console.log('message',message);
+    let webhook;
+
+    try {
+      webhook = JSON.parse(message.content.toString());
+    } catch (error) {
+      log.error("invalid webhook message format");
+      channel.ack(message);
+      return;
+    }
+    console.log('webhook',webhook);
+
+    if (!webhook.input_address) {
+      log.error("no input_address in webhook, invalid format");
+      channel.ack(message);
+      return;
+    }
+
+    let address = webhook.input_address;
+
+    Invoice.findOne({
+      where: {
+        address: address,
+        status: "unpaid"
+      }
+    }).then(invoice => {
+      if (!invoice) {
+        channel.ack(message);
+      } else {
+        if (invoice.amount >= (webhook.value + Blockcypher.DASH_FEE) / 100000000.0) {
+          console.log("invoice amount matches");
+          invoice
+            .updateAttributes({
+              status: "paid",
+              paidAt: new Date()
+            })
+            .then(() => {
+              channel.ack(message);
+              console.log("invoices:paid", Buffer.from(invoice.uid));
+              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+              outputMatched = true;
+              Slack.notify(
+                `invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`
+              );
+            });
+        } else {
+          channel.ack(message);
+        }
+      }
+    });
+  };
+}
+
 amqp.connect(AMQP_URL).then(conn => {
   return conn.createChannel().then(channel => {
     console.log("channel connected");
@@ -211,7 +267,7 @@ amqp.connect(AMQP_URL).then(conn => {
     });
 
     channel.assertQueue(DASH_QUEUE, { durable: true }).then(() => {
-      let consumer = BitcoinWebhookConsumer(channel);
+      let consumer = DashWebhookConsumer(channel);
 
       channel.consume(DASH_QUEUE, consumer, { noAck: false });
     });
