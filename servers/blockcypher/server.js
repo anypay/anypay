@@ -3,10 +3,8 @@ const amqp = require("amqplib");
 const log = require("winston");
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
-const QUEUE = "blockcypher:webhooks";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
 const DASH_QUEUE = "blockcypher:dash:webhooks";
-const CONFIRMED_TX_QUEUE = "blockcypher:webhooks:tx-confirmation";
 
 const server = new Hapi.Server();
 
@@ -83,56 +81,14 @@ amqp
         }
       });
 
-      server.route({
-        method: "POST",
-        path: "/blockcypher/webhooks",
-        handler: function(request, reply) {
-          log.info("blockcypher:callback", request.payload);
-
-          let message = JSON.stringify(request.payload);
-
-          let sent = channel.sendToQueue(QUEUE, new Buffer(message));
-
-          if (!sent) {
-            log.error("amqp:send:error", message);
-            reply().code(500);
-          } else {
-            log.info("amqp:sent", message);
-            reply();
-          }
-        }
-      });
-
-      server.route({
-        method: "POST",
-        path: "/blockcypher/webhooks/tx-confirmation",
-        handler: function(request, reply) {
-          log.info("blockcypher:callback:tx-confirmation", request.payload);
-
-          let message = JSON.stringify(request.payload);
-
-          let sent = channel.sendToQueue(
-            CONFIRMED_TX_QUEUE,
-            new Buffer(message)
-          );
-
-          if (!sent) {
-            log.error("amqp:send:error", message);
-            reply().code(500);
-          } else {
-            log.info("amqp:sent", message);
-            reply();
-          }
-        }
-      });
-
       channel
-        .assertQueue(QUEUE, { durable: true })
+        .assertQueue(BITCOIN_QUEUE, { durable: true })
         .then(() => {
-          return channel.assertQueue(CONFIRMED_TX_QUEUE, { durable: true });
+          log.info("amqp:bitcoin_queue:asserted", QUEUE);
+          return channel.assertQueue(DASH_QUEUE, { durable: true });
         })
         .then(() => {
-          log.info("amqp:queue:asserted", QUEUE);
+          log.info("amqp:dash_queue:asserted", QUEUE);
 
           server.start(err => {
             if (err) {
@@ -144,3 +100,4 @@ amqp
     });
   })
   .catch(log.error);
+

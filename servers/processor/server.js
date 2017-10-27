@@ -6,158 +6,24 @@ const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
 const DASH_QUEUE = "blockcypher:dash:webhooks";
-const DASH_PAYOUT_QUEUE = "dash:payouts";
 
 const Invoice = require("../../lib/models/invoice");
-const DashPayout = require("../../lib/models/dash_payout");
 const Dashcore = require("../../lib/dashcore");
 
 const Slack = require("../../lib/slack/notifier");
 
-function DashPayoutConsumer(channel) {
-  return function(message) {
-    let payoutId;
-
-    try {
-      // receive payoutId  on the message queue
-      payoutId = parseInt(message.content.toString());
-    } catch (error) {
-      // invalid message format
-
-      channel.ack(message);
-      return;
-    }
-
-    log.info("dash:payout:id", payoutId);
-
-    DashPayout.findOne({
-      where: {
-        id: payoutId,
-        status: "unpaid",
-        completedAt: {
-          $eq: null
-        }
-      }
-    })
-      .then(payout => {
-        if (!payout) {
-          log.error("dash:payout:missing", payoutId);
-          channel.ack(message);
-          return;
-        }
-        log.info("dash:payout:found", payout.toJSON());
-        log.info("dash:sendPayment", payout.address, payout.amount);
-
-        let amount = parseFloat(payout.amount).toFixed(6);
-
-        Dashcore.sendPayment(payout.address, amount)
-          .then(paymentHash => {
-            if (!paymentHash) {
-              log.error("dash:payout", payout);
-              channel.nack(message);
-              return;
-            }
-            log.info("dash:payout:hash", paymentHash);
-            payout.payment_hash = paymentHash;
-            payout.completedAt = new Date();
-            payout.status = "paid";
-            payout.save().then(() => {
-              log.info("payout:complete");
-              channel.ack(message);
-            });
-          })
-          .catch(error => {
-            console.log(error);
-            log.info("dash:payout:error", error.message);
-            channel.nack(message);
-            return;
-          });
-      })
-      .catch(error => {
-        channel.nack(message); // requeue message
-      });
-  };
-}
-
-function BlockcypherWebhookConsumer(channel) {
-  return function(message) {
-    let webhook;
-
-    try {
-      webhook = JSON.parse(message.content.toString());
-    } catch (error) {
-      log.error("invalid webhook message format");
-      channel.ack(message);
-      return;
-    }
-
-    if (!webhook.outputs) {
-      log.error("no outputs in webhook, invalid format");
-      channel.ack(message);
-      return;
-    }
-
-    let outputsProcessed = 0;
-    let outputMatched = false;
-
-    webhook.outputs.forEach(output => {
-      let address = output.addresses[0];
-
-      Invoice.findOne({
-        where: {
-          address: address,
-          status: "unpaid"
-        }
-      }).then(invoice => {
-        if (!invoice) {
-          outputsProcessed += 1;
-          if (outputsProcessed == webhook.outputs.length) {
-            channel.ack(message);
-          }
-        } else {
-          if (invoice.amount >= output.value / 100000000.0) {
-            console.log("invoice amount matches");
-            invoice
-              .updateAttributes({
-                status: "paid",
-                paidAt: new Date()
-              })
-              .then(() => {
-                outputsProcessed += 1;
-                channel.ack(message);
-                channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-                outputMatched = true;
-                Slack.notify(
-                  `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-                );
-              });
-          } else {
-            outputsProcessed += 1;
-            if (!outputMatched && outputsProcessed === webhook.outputs.length) {
-              channel.ack(message);
-            }
-          }
-        }
-      });
-    });
-  };
-}
-
 function BitcoinWebhookConsumer(channel) {
   return function(message) {
-    console.log("bitcoin webhook")
-    console.log('message',message);
     let webhook;
 
-    console.log('content', message.content.toString());
     try {
       webhook = JSON.parse(message.content.toString());
+      log.info('blockcypher:bitcoin:webhook',webhook);
     } catch (error) {
       log.error("invalid webhook message format");
       channel.ack(message);
       return;
     }
-    console.log('webhook',webhook);
 
     if (!webhook.input_address) {
       log.error("no input_address in webhook, invalid format");
@@ -176,8 +42,13 @@ function BitcoinWebhookConsumer(channel) {
       if (!invoice) {
         channel.ack(message);
       } else {
-        if (invoice.amount >= (webhook.value + Blockcypher.FEE) / 100000000.0) {
-          console.log("invoice amount matches");
+
+        let minimumAmount = (webhook.value + Blockcypher.FEE) / 100000000.00000;
+
+        if (invoice.amount >= minimumAmount) {
+
+          log.info(`amount:${invoice.amount} | required:${minimumAmount}`);
+
           invoice
             .updateAttributes({
               status: "paid",
@@ -185,7 +56,7 @@ function BitcoinWebhookConsumer(channel) {
             })
             .then(() => {
               channel.ack(message);
-              console.log("invoices:paid", Buffer.from(invoice.uid));
+              log.info("invoices:paid", Buffer.from(invoice.uid));
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
@@ -202,18 +73,16 @@ function BitcoinWebhookConsumer(channel) {
 
 function DashWebhookConsumer(channel) {
   return function(message) {
-    console.log("dash webhook")
-    console.log('message',message);
     let webhook;
 
     try {
       webhook = JSON.parse(message.content.toString());
+      log.info('blockcypher:dash:webhook',webhook);
     } catch (error) {
       log.error("invalid webhook message format");
       channel.ack(message);
       return;
     }
-    console.log('webhook',webhook);
 
     if (!webhook.input_address) {
       log.error("no input_address in webhook, invalid format");
@@ -232,8 +101,11 @@ function DashWebhookConsumer(channel) {
       if (!invoice) {
         channel.ack(message);
       } else {
-        if (invoice.amount >= (webhook.value + Blockcypher.DASH_FEE) / 100000000.0) {
-          console.log("invoice amount matches");
+        let minimumAmount = (webhook.value + Blockcypher.DASH_FEE) / 100000000.00000;
+        if (invoice.amount >= minimumAmount) {
+
+          log.info(`amount:${invoice.amount} | required:${minimumAmount}`);
+
           invoice
             .updateAttributes({
               status: "paid",
@@ -241,7 +113,7 @@ function DashWebhookConsumer(channel) {
             })
             .then(() => {
               channel.ack(message);
-              console.log("invoices:paid", Buffer.from(invoice.uid));
+              log.info("invoices:paid", Buffer.from(invoice.uid));
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
@@ -258,13 +130,7 @@ function DashWebhookConsumer(channel) {
 
 amqp.connect(AMQP_URL).then(conn => {
   return conn.createChannel().then(channel => {
-    console.log("channel connected");
-
-    channel.assertQueue(DASH_PAYOUT_QUEUE, { durable: true }).then(() => {
-      let consumer = DashPayoutConsumer(channel);
-
-      channel.consume(DASH_PAYOUT_QUEUE, consumer, { noAck: false });
-    });
+    log.info("amqp:channel:connected");
 
     channel.assertQueue(DASH_QUEUE, { durable: true }).then(() => {
       let consumer = DashWebhookConsumer(channel);
@@ -276,12 +142,6 @@ amqp.connect(AMQP_URL).then(conn => {
       let consumer = BitcoinWebhookConsumer(channel);
 
       channel.consume(BITCOIN_QUEUE, consumer, { noAck: false });
-    });
-
-    channel.assertQueue(QUEUE, { durable: true }).then(() => {
-      let consumer = BlockcypherWebhookConsumer(channel);
-
-      channel.consume(QUEUE, consumer, { noAck: false });
     });
   });
 });
