@@ -8,8 +8,6 @@ const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
 const DASH_QUEUE = "blockcypher:dash:webhooks";
 const CONFIRMED_TX_QUEUE = "blockcypher:webhooks:tx-confirmation";
 
-const Slack = require("../../lib/slack/notifier");
-
 const server = new Hapi.Server();
 
 server.connection({
@@ -61,14 +59,6 @@ amqp
           } else {
             log.info("amqp:sent", message);
             reply();
-            try {
-              Slack.notify(
-                "blockcypher:bitcoin:tx-confirmation",
-                request.payload.hash
-              );
-            } catch (error) {
-              log.error("error sending slack notification");
-            }
           }
         }
       });
@@ -89,14 +79,6 @@ amqp
           } else {
             log.info("amqp:sent", message);
             reply();
-            try {
-              Slack.notify(
-                "blockcypher:dash:broadcast",
-                `https://blockchain.info/tx/${request.payload.hash}`
-              );
-            } catch (error) {
-              log.error("error sending slack notification");
-            }
           }
         }
       });
@@ -117,14 +99,6 @@ amqp
           } else {
             log.info("amqp:sent", message);
             reply();
-            try {
-              Slack.notify(
-                "blockcypher:dash:tx-confirmation",
-                request.payload.hash
-              );
-            } catch (error) {
-              log.error("error sending slack notification");
-            }
           }
         }
       });
@@ -146,14 +120,6 @@ amqp
             log.error("amqp:send:error", message);
             reply().code(500);
           } else {
-            try {
-              Slack.notify(
-                "blockcypher:dash:tx-confirmation",
-                request.payload.hash
-              );
-            } catch (error) {
-              log.error("error sending slack notification");
-            }
             log.info("amqp:sent", message);
             reply();
           }
