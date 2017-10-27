@@ -43,11 +43,11 @@ function BitcoinWebhookConsumer(channel) {
         channel.ack(message);
       } else {
 
-        let minimumAmount = (webhook.value + Blockcypher.FEE) / 100000000.00000;
+        let paidAmount = (webhook.value + Blockcypher.FEE) / 100000000.00000;
 
-        if (invoice.amount >= minimumAmount) {
+        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
 
-          log.info(`amount:${invoice.amount} | required:${minimumAmount}`);
+        if (paidAmount >= invoice.amount) {
 
           invoice
             .updateAttributes({
@@ -56,7 +56,7 @@ function BitcoinWebhookConsumer(channel) {
             })
             .then(() => {
               channel.ack(message);
-              log.info("invoices:paid", Buffer.from(invoice.uid));
+              log.info("invoices:paid", invoice.uid);
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
@@ -101,10 +101,12 @@ function DashWebhookConsumer(channel) {
       if (!invoice) {
         channel.ack(message);
       } else {
-        let minimumAmount = (webhook.value + Blockcypher.DASH_FEE) / 100000000.00000;
-        if (invoice.amount >= minimumAmount) {
 
-          log.info(`amount:${invoice.amount} | required:${minimumAmount}`);
+        let paidAmount = (webhook.value + Blockcypher.DASH_FEE) / 100000000.00000;
+
+        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
+
+        if (paidAmount >= invoice.amount) }
 
           invoice
             .updateAttributes({
@@ -113,7 +115,7 @@ function DashWebhookConsumer(channel) {
             })
             .then(() => {
               channel.ack(message);
-              log.info("invoices:paid", Buffer.from(invoice.uid));
+              log.info("invoices:paid", invoice.uid);
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
