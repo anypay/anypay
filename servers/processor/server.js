@@ -115,7 +115,7 @@ function BlockcypherWebhookConsumer(channel) {
             channel.ack(message);
           }
         } else {
-          if (invoice.amount == output.value / 100000000.0) {
+          if (invoice.amount >= output.value / 100000000.0) {
             console.log("invoice amount matches");
             invoice
               .updateAttributes({
@@ -128,7 +128,7 @@ function BlockcypherWebhookConsumer(channel) {
                 channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
                 outputMatched = true;
                 Slack.notify(
-                  `invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`
+                  `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
                 );
               });
           } else {
@@ -189,7 +189,7 @@ function BitcoinWebhookConsumer(channel) {
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
-                `invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`
+                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
               );
             });
         } else {
@@ -245,7 +245,7 @@ function DashWebhookConsumer(channel) {
               channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
               outputMatched = true;
               Slack.notify(
-                `invoice:paid https://dash.anypay.global/invoices/${invoice.uid}`
+                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
               );
             });
         } else {
