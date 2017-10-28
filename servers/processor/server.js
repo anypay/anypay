@@ -103,10 +103,9 @@ function DashWebhookConsumer(channel) {
       } else {
 
         let paidAmount = (webhook.value + Blockcypher.DASH_FEE) / 100000000.00000;
+        log.info(`paid:${paidAmount} | required:${invoice.amount}`);
 
-        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
-
-        if (paidAmount >= invoice.amount) }
+        if (paidAmount >= invoice.amount) {
 
           invoice
             .updateAttributes({

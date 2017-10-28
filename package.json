@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "amqplib": "^0.5.1",
+    "async": "^2.5.0",
     "bcrypt": "^1.0.2",
     "bcrypt-nodejs": "0.0.3",
     "bitcore-lib-dash": "^0.13.21",

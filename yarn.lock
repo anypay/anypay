@@ -170,7 +170,7 @@ async-promise-queue@^1.0.3:
     async "^2.4.1"
     debug "^2.6.8"
 
-async@^2.4.1:
+async@^2.4.1, async@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/async/-/async-2.5.0.tgz#843190fd6b7357a0b9e1c956edddd5ec8462b54d"
   dependencies:
