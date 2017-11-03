@@ -1,4 +1,5 @@
 const Account = require('../../lib/models/account');
+const database = require('../../lib/database');
 const assert = require('assert');
 const Chance = require('chance');
 const chance = new Chance();
@@ -31,6 +32,10 @@ describe('Account Model', () => {
       assert(account.uid);
       done();
     });
+  });
+
+  after(() => {
+    database.close();
   });
 });
 
