@@ -16,6 +16,8 @@ const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 const AddressesController = require("./handlers/addresses");
 
+const CoinsController = require("./handlers/coins");
+
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
@@ -326,6 +328,15 @@ server.register(Basic, err => {
             reply({ error: error.message }).code(500);
           });
       }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/coins",
+    config: {
+      auth: "token",
+      handler: CoinsController.list
     }
   });
 

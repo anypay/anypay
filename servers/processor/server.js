@@ -43,7 +43,7 @@ function BitcoinWebhookConsumer(channel) {
         channel.ack(message);
       } else {
 
-        let paidAmount = (webhook.value + Blockcypher.FEE) / 100000000.00000;
+        let paidAmount = (webhook.value + Blockcypher.BITCOIN_FEE) / 100000000.00000;
 
         log.info(`required:${invoice.amount} | paid:${paidAmount}`);
 
