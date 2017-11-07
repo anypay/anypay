@@ -107,7 +107,7 @@ function DashWebhookConsumer(channel) {
 
         if (paidAmount >= invoice.amount) {
 
-          invoice
+          return invoice
             .updateAttributes({
               status: "paid",
               paidAt: new Date()
@@ -125,6 +125,9 @@ function DashWebhookConsumer(channel) {
           channel.ack(message);
         }
       }
+    })
+    .catch(error => {
+      channel.nack(message);
     });
   };
 }
