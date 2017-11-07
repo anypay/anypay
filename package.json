@@ -36,7 +36,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha test/**",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api"
   },
   "keywords": [],
