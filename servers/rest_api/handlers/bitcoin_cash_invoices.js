@@ -1,4 +1,4 @@
-const ZcashInvoice = require("../../../lib/zcash/invoice");
+const BitcoinCashInvoice = require("../../../lib/bitcoin_cash/invoice");
 
 module.exports.create = function(request, reply) {
   let dollarAmount = request.payload.amount;
