@@ -10,6 +10,11 @@ Configuration of the application is done via environment variables
 - DATABASE_URL
 - AMQP_URL
 
+## Enabling Features
+
+- set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
+for bitcoin cash
+
 ## Running the Tests
 
 Ideally every piece of the application will have accompanying tests to increase

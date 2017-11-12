@@ -1635,6 +1635,10 @@ figlet@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/figlet/-/figlet-1.2.0.tgz#6c46537378fab649146b5a6143dda019b430b410"
 
+flipit@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/flipit/-/flipit-2.0.3.tgz#be7e7caa8f5b10655cf4da64388ad7be2dd62871"
+
 forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
