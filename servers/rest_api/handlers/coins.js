@@ -12,6 +12,11 @@ function CoinsFromAccount(account) {
       code: 'DASH',
       name: 'dash',
       enabled: false
+    },
+    'BCH': {
+      code: 'BCH',
+      name: 'bitcoin cash',
+      enabled: false
     }
   };
 
@@ -21,6 +26,10 @@ function CoinsFromAccount(account) {
 
   if (account.dash_payout_address) {
     coins['DASH'].enabled = true;
+  }
+
+  if (account.bitcoin_cash_address) {
+    coins['BCH'].enabled = true;
   }
 
   return coins;

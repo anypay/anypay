@@ -9,6 +9,7 @@ Configuration of the application is done via environment variables
 - BLOCKCYPHER_DASH_FEE
 - DATABASE_URL
 - AMQP_URL
+- FORWADING_SERVICE_URL
 
 ## Enabling Features
 
