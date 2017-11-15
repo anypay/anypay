@@ -1,8 +1,12 @@
 {
-  "name": "dash-payment-service",
+  "name": "payment-service",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/anypay/payment-service.git"
+  },
   "bin": {
     "dash-payment-service": "getnewaddress.js"
   },
