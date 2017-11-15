@@ -9,6 +9,12 @@ Configuration of the application is done via environment variables
 - BLOCKCYPHER_DASH_FEE
 - DATABASE_URL
 - AMQP_URL
+- FORWADING_SERVICE_URL
+
+## Enabling Features
+
+- set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
+for bitcoin cash
 
 ## Running the Tests
 

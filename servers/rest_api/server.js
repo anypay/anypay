@@ -34,6 +34,9 @@ const InvoicesController = require("./handlers/invoices");
 
 const WebhookHandler = new EventEmitter();
 
+const log = require('winston');
+const Features = require('../../lib/features');
+
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
 });
@@ -167,6 +170,23 @@ server.register(Basic, err => {
       handler: DashInvoicesController.create
     }
   });
+
+  if (Features.isEnabled('BITCOINCASH')) {
+    log.info('Bitcoin Cash Enabled');
+
+    const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
+
+    server.route({
+      method: "POST",
+      path: "/bitcoin_cash/invoices",
+      config: {
+        auth: "token",
+        handler: BitcoinCashInvoicesController.create
+      }
+    });
+  } else {
+    log.info('Bitcoin Cash Disabled');
+  }
 
   server.route({
     method: "POST",
