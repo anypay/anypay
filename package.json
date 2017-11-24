@@ -37,7 +37,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "mocha test/**",
-    "docker:build": "rm -rf node_modules && docker-compose build rest-api"
+    "docker:build": "rm -rf node_modules && docker-compose build rest-api",
+    "apidoc": "apidoc -i ./servers/rest_api/handlers/ -o apidoc/",
+    "apidoc:serve": "cd apidoc/ && serve ."
   },
   "keywords": [],
   "author": "",

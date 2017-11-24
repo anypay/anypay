@@ -29,7 +29,7 @@ function CoinsFromAccount(account) {
 /**
  * @api {get} /coins Request User Supported Coins
  * @apiName GetCoins
- * @apiGroup Coin
+ * @apiGroup Coins
  *
  * @apiError AccountNotFound No Account was found with access_token provided
  *
@@ -68,4 +68,3 @@ module.exports.list = function(request, reply) {
     reply({ error: error.message }).code(500);
   });
 }
-

@@ -15,8 +15,8 @@ const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 const AddressesController = require("./handlers/addresses");
-
 const CoinsController = require("./handlers/coins");
+const AccountsController = require("./handlers/accounts");
 
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
@@ -93,21 +93,7 @@ server.register(Basic, err => {
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    handler: function(request, reply) {
-      Invoice.findOne({
-        where: {
-          uid: request.params.invoice_id
-        }
-      })
-        .then(invoice => {
-          if (invoice) {
-            reply(invoice);
-          } else {
-            reply().code(404);
-          }
-        })
-        .catch(error => reply({ error }).code(500));
-    }
+    handler: InvoicesController.show
   });
 
   server.route({
@@ -124,17 +110,7 @@ server.register(Basic, err => {
     path: "/pair_tokens",
     config: {
       auth: "token",
-      handler: (request, reply) => {
-        PairToken.create({
-          account_id: request.account_id
-        })
-          .then(pairToken => {
-            reply(pairToken);
-          })
-          .catch(error => {
-            reply({ error: error }).code(500);
-          });
-      }
+      handler: PairTokensController.create
     }
   });
 
@@ -198,20 +174,7 @@ server.register(Basic, err => {
   server.route({
     method: "POST",
     path: "/accounts",
-    handler: (request, reply) => {
-      bcrypt.hash(request.payload.password, 10, (error, hash) => {
-        Account.create({
-          email: request.payload.email,
-          password_hash: hash
-        })
-          .then(account => {
-            reply(account);
-          })
-          .catch(error => {
-            reply({ error: error }).code(500);
-          });
-      });
-    }
+    handler: AccountsController.create
   });
 
   server.route({
@@ -256,17 +219,7 @@ server.register(Basic, err => {
     path: "/payout_address",
     config: {
       auth: "token",
-      handler: (request, reply) => {
-        let accountId = request.auth.credentials.accessToken.account_id;
-
-        DashPayoutAddress.save(accountId, request.payload.address)
-          .then(() => {
-            reply({ success: true }).code(200);
-          })
-          .catch(error => {
-            reply({ error: error.message }).code(500);
-          });
-      }
+      handler: DashPayoutAddress.update
     }
   });
 

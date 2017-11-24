@@ -6,6 +6,23 @@ function ReplyError(error) {
   reply({error: erorr.message});
 }
 
+/**
+ * @api {GET} /balances Get Balances
+ * @apiName Get Balances
+ * @apiGroup Balances
+ *
+ * @apiParam {String} address Dash Payout Address
+ *
+ * @apiSuccess {String} newAddress New Dash Payout Address
+ *
+ * @apiSuccessExample {json} Success-Response:
+ *     HTTP/1.1 200 OK
+ *     {
+ *       DASH: 14.512 DASH
+ *     }
+ *
+ * @apiError 404 NoAddressesFound No address was found for user
+ */
 
 module.exports.index = function(request, reply) {
   console.log('index', request.account_id);
@@ -49,4 +66,3 @@ module.exports.create = function(request, reply) {
     reply({error: erorr.message});
   });
 }
-
