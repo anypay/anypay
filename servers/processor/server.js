@@ -213,6 +213,5 @@ amqp.connect(AMQP_URL).then(conn => {
       let consumer = LitecoinWebhookConsumer(channel);
 
       channel.consume(LITECOIN_QUEUE, consumer, { noAck: false });
-    });
   });
 });
