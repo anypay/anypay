@@ -71,6 +71,65 @@ function BitcoinWebhookConsumer(channel) {
   };
 }
 
+function LitecoinWebhookConsumer(channel) {
+  return function(message) {
+    let webhook;
+
+    try {
+      webhook = JSON.parse(message.content.toString());
+      log.info('blockcypher:litecoin:webhook',webhook);
+    } catch (error) {
+      log.error("invalid webhook message format");
+      channel.ack(message);
+      return;
+    }
+
+    if (!webhook.input_address) {
+      log.error("no input_address in webhook, invalid format");
+      channel.ack(message);
+      return;
+    }
+
+    let address = webhook.input_address;
+
+    Invoice.findOne({
+      where: {
+        address: address,
+        status: "unpaid"
+      }
+    }).then(invoice => {
+      if (!invoice) {
+        channel.ack(message);
+      } else {
+
+        let paidAmount = (webhook.value + Blockcypher.LITECOIN_FEE) / 100000000.00000;
+
+        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
+
+        if (paidAmount >= invoice.amount) {
+
+          invoice
+            .updateAttributes({
+              status: "paid",
+              paidAt: new Date()
+            })
+            .then(() => {
+              channel.ack(message);
+              log.info("invoices:paid", invoice.uid);
+              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+              outputMatched = true;
+              Slack.notify(
+                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
+              );
+            });
+        } else {
+          channel.ack(message);
+        }
+      }
+    });
+  };
+}
+
 function DashWebhookConsumer(channel) {
   return function(message) {
     let webhook;
@@ -146,6 +205,12 @@ amqp.connect(AMQP_URL).then(conn => {
       let consumer = BitcoinWebhookConsumer(channel);
 
       channel.consume(BITCOIN_QUEUE, consumer, { noAck: false });
+
     });
+
+    channel.assertQueue(LITECOIN_QUEUE, { durable: true }).then(() => {
+      let consumer = LitecoinWebhookConsumer(channel);
+
+      channel.consume(LITECOIN_QUEUE, consumer, { noAck: false });
   });
 });

@@ -4,6 +4,7 @@ const log = require("winston");
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
+const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
 const DASH_QUEUE = "blockcypher:dash:webhooks";
 
 const server = new Hapi.Server();
@@ -50,6 +51,26 @@ amqp
           let message = JSON.stringify(request.payload);
 
           let sent = channel.sendToQueue(BITCOIN_QUEUE, new Buffer(message));
+
+          if (!sent) {
+            log.error("amqp:send:error", message);
+            reply().code(500);
+          } else {
+            log.info("amqp:sent", message);
+            reply();
+          }
+        }
+      });
+
+      server.route({
+        method: "POST",
+        path: "/litecoin/webhooks",
+        handler: function(request, reply) {
+          log.info("litecoin:blockcypher:callback", request.payload);
+
+          let message = JSON.stringify(request.payload);
+
+          let sent = channel.sendToQueue(LITECOIN_QUEUE, new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
