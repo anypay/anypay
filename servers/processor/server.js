@@ -5,6 +5,7 @@ const Blockcypher = require("../../lib/blockcypher");
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
 const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
+const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
 const DASH_QUEUE = "blockcypher:dash:webhooks";
 
 const Invoice = require("../../lib/models/invoice");
@@ -212,5 +213,6 @@ amqp.connect(AMQP_URL).then(conn => {
       let consumer = LitecoinWebhookConsumer(channel);
 
       channel.consume(LITECOIN_QUEUE, consumer, { noAck: false });
+    });
   });
 });
