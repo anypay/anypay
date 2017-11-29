@@ -105,11 +105,11 @@ amqp
       channel
         .assertQueue(BITCOIN_QUEUE, { durable: true })
         .then(() => {
-          log.info("amqp:bitcoin_queue:asserted", QUEUE);
+          log.info("amqp:bitcoin_queue:asserted", BITCOIN_QUEUE);
           return channel.assertQueue(DASH_QUEUE, { durable: true });
         })
         .then(() => {
-          log.info("amqp:dash_queue:asserted", QUEUE);
+          log.info("amqp:dash_queue:asserted", BITCOIN_QUEUE);
 
           server.start(err => {
             if (err) {
