@@ -22,6 +22,11 @@ function CoinsFromAccount(account) {
       code: 'LTC',
       name: 'litecoin',
       enabled: false
+    },
+    'DOGE': {
+      code: 'DOGE',
+      name: 'dogecoin',
+      enabled: false
     }
   };
 
@@ -43,6 +48,10 @@ function CoinsFromAccount(account) {
   // TODO Remove the litecoin_enabled account flag once fully supported
   if (account.litecoin_address && account.litecoin_enabled) {
     coins['LTC'].enabled = true;
+  }
+
+  if (account.dogecoin_address && account.dogecoin_enabled) {
+    coins['DOGE'].enabled = true;
   }
 
   return coins;
