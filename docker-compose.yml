@@ -33,12 +33,6 @@ services:
     build:
       context: .
       dockerfile: ./servers/dash_payouts/Dockerfile
-  webapp:
-    build:
-      context: .
-      dockerfile: ./servers/webapp/ember/Dockerfile
-    ports:
-      - 5678:80
   instantsend-monitor:
     build:
       context: .
