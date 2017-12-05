@@ -15,6 +15,7 @@ const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
+const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
 
 const CoinsController = require("./handlers/coins");
@@ -222,6 +223,15 @@ server.register(Basic, err => {
     config: {
       auth: "token",
       handler: LitecoinInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/dogecoin/invoices",
+    config: {
+      auth: "token",
+      handler: DogecoinInvoicesController.create
     }
   });
 
