@@ -46,6 +46,7 @@ function CoinsFromAccount(account) {
 
   // Ensure extra flag for beta release of litecoin
   // TODO Remove the litecoin_enabled account flag once fully supported
+<<<<<<< HEAD
   if (account.litecoin_address && account.litecoin_enabled) {
     coins['LTC'].enabled = true;
   }
@@ -54,6 +55,12 @@ function CoinsFromAccount(account) {
     coins['DOGE'].enabled = true;
   }
 
+=======
+  if (account.litecoin_cash_address && account.litecoin_enabled) {
+    coins['LTC'].enabled = true;
+  }
+
+>>>>>>> 45c8a55102f3e63d32e6c74f3162bc8be11d658f
   return coins;
 }
 
