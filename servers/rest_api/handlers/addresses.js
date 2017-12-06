@@ -43,6 +43,18 @@ module.exports.update = function(request, reply) {
       bitcoin_cash_address: address
     };
     break; 
+  case 'LTC':
+    updateParams = {
+      litecoin_address: address,
+      litecoin_enabled: true
+    };
+    break;
+  case 'DOGE':
+    updateParams = {
+      dogecoin_address: address,
+      dogecoin_enabled: false
+    };
+    break;
   default:
   }
 
