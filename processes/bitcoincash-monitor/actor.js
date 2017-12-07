@@ -57,4 +57,3 @@ payment|${payment.amount}`);
 
 })();
 
-
