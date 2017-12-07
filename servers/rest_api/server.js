@@ -180,7 +180,7 @@ server.register(Basic, err => {
 
     server.route({
       method: "POST",
-      path: "/bitcoin_cash/invoices",
+      path: "/bitcoin-cash/invoices",
       config: {
         auth: "token",
         handler: BitcoinCashInvoicesController.create
