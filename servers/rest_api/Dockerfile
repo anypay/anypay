@@ -1,4 +1,4 @@
-FROM node:7.1.0-onbuild
+FROM node:8.9.0
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -12,3 +12,4 @@ RUN npm install
 COPY . /usr/src/app
 
 CMD ["node", "servers/rest_api/server.js"]
+
