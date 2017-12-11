@@ -12,15 +12,79 @@ const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 const Invoice = require("../../lib/models/invoice");
 const Dashcore = require("../../lib/dashcore");
 
+class InvoiceNotFoundError extends Error {}
+class InvoiceUnderpaidError extends Error {}
+class InvoiceOverPaidError extends Error {}
+
 const Slack = require("../../lib/slack/notifier");
 
-function BitcoinWebhookConsumer(channel) {
-  return function(message) {
+async function findMatchingInvoice(currency, amount, address) {
+  if (fee == undefined) {
+    fee = 0;
+  }
+
+  var invoice = await Invoice.findOne({
+    where: {
+      currency: currency,
+      address: address,
+      status: "unpaid"
+    }
+  })
+
+  if (!invoice ) {
+    throw new InvoiceNotFoundError({currency, amount, address});
+  }
+
+  if (amount >= invoice.amount) {
+
+    return invoice;
+
+  } else {
+
+    throw new InvoiceUnderpaidError({uid: invoice.uid, currency, amount, address});
+  }
+}
+
+async function handlePayment(address, amount, currency) {
+
+  return async function(channel) {
+
+    try {
+
+      var invoice = await findMatchingInvoice(currency, amount, address);
+
+      log.info(`required:${invoice.amount} | paid:${paidAmount}`);
+
+      await invoice.updateAttributes({
+        status: "paid",
+        paidAt: new Date()
+      })
+
+      log.info("invoices:paid", invoice.uid);
+
+      await channel.ack(message);
+
+      await channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+
+      Slack.notify(
+        `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
+      );
+
+    } catch(error) {
+
+      log.error(error.message);
+      channel.ack(message);
+    }
+  }
+}
+
+async function parseWebhookMessage(message, coin, blockcypherFee) {
+
     let webhook;
 
     try {
       webhook = JSON.parse(message.content.toString());
-      log.info('blockcypher:bitcoin:webhook',webhook);
+      log.info(`blockcypher:${coin}:webhook`,webhook);
     } catch (error) {
       log.error("invalid webhook message format");
       channel.ack(message);
@@ -29,247 +93,62 @@ function BitcoinWebhookConsumer(channel) {
 
     if (!webhook.input_address) {
       log.error("no input_address in webhook, invalid format");
-      channel.ack(message);
+      await channel.ack(message);
       return;
     }
 
     let address = webhook.input_address;
 
-    Invoice.findOne({
-      where: {
-        address: address,
-        status: "unpaid"
-      }
-    }).then(invoice => {
-      if (!invoice) {
-        channel.ack(message);
-      } else {
-
-        let paidAmount = (webhook.value + Blockcypher.BITCOIN_FEE) / 100000000.00000;
-
-        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
-
-        if (paidAmount >= invoice.amount) {
-
-          invoice
-            .updateAttributes({
-              status: "paid",
-              paidAt: new Date()
-            })
-            .then(() => {
-              channel.ack(message);
-              log.info("invoices:paid", invoice.uid);
-              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-              outputMatched = true;
-              Slack.notify(
-                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-              );
-            });
-        } else {
-          channel.ack(message);
-        }
-      }
-    });
-  };
+    var amount = (webhook.value + blockcypherFee) / 100000000.00000;
+    
+    return { address, amount };
 }
 
-function LitecoinWebhookConsumer(channel) {
+function WebhookConsumer(currency, channel) {
   return function(message) {
-    let webhook;
+    var payment = parsePaymentWebhook(message, currency.name, currency.fee);
 
-    try {
-      webhook = JSON.parse(message.content.toString());
-      log.info('blockcypher:litecoin:webhook',webhook);
-    } catch (error) {
-      log.error("invalid webhook message format");
-      channel.ack(message);
-      return;
-    }
-
-    if (!webhook.input_address) {
-      log.error("no input_address in webhook, invalid format");
-      channel.ack(message);
-      return;
-    }
-
-    let address = webhook.input_address;
-
-    Invoice.findOne({
-      where: {
-        address: address,
-        status: "unpaid"
-      }
-    }).then(invoice => {
-      if (!invoice) {
-        channel.ack(message);
-      } else {
-
-        let paidAmount = (webhook.value + Blockcypher.LITECOIN_FEE) / 100000000.00000;
-
-        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
-
-        if (paidAmount >= invoice.amount) {
-
-          invoice
-            .updateAttributes({
-              status: "paid",
-              paidAt: new Date()
-            })
-            .then(() => {
-              channel.ack(message);
-              log.info("invoices:paid", invoice.uid);
-              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-              outputMatched = true;
-              Slack.notify(
-                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-              );
-            });
-        } else {
-          channel.ack(message);
-        }
-      }
-    });
+    handlePayment(payment.address, payment.amount, currency.code)(channel);
   };
 }
 
-function DogecoinWebhookConsumer(channel) {
-  return function(message) {
-    let webhook;
-
-    try {
-      webhook = JSON.parse(message.content.toString());
-      log.info('blockcypher:dogecoin:webhook',webhook);
-    } catch (error) {
-      log.error("invalid webhook message format");
-      channel.ack(message);
-      return;
-    }
-
-    if (!webhook.input_address) {
-      log.error("no input_address in webhook, invalid format");
-      channel.ack(message);
-      return;
-    }
-
-    let address = webhook.input_address;
-
-    Invoice.findOne({
-      where: {
-        address: address,
-        status: "unpaid"
-      }
-    }).then(invoice => {
-      if (!invoice) {
-        channel.ack(message);
-      } else {
-
-        let paidAmount = (webhook.value + Blockcypher.DOGECOIN_FEE) / 100000000.00000;
-
-        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
-
-        if (paidAmount >= invoice.amount) {
-
-          invoice
-            .updateAttributes({
-              status: "paid",
-              paidAt: new Date()
-            })
-            .then(() => {
-              channel.ack(message);
-              log.info("invoices:paid", invoice.uid);
-              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-              outputMatched = true;
-              Slack.notify(
-                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-              );
-            });
-        } else {
-          channel.ack(message);
-        }
-      }
-    });
-  };
-}
-
-function DashWebhookConsumer(channel) {
-  return function(message) {
-    let webhook;
-
-    try {
-      webhook = JSON.parse(message.content.toString());
-      log.info('blockcypher:dash:webhook',webhook);
-    } catch (error) {
-      log.error("invalid webhook message format");
-      channel.ack(message);
-      return;
-    }
-
-    if (!webhook.input_address) {
-      log.error("no input_address in webhook, invalid format");
-      channel.ack(message);
-      return;
-    }
-
-    let address = webhook.input_address;
-
-    Invoice.findOne({
-      where: {
-        address: address,
-        status: "unpaid"
-      }
-    }).then(invoice => {
-      if (!invoice) {
-        channel.ack(message);
-      } else {
-
-        let paidAmount = (webhook.value + Blockcypher.DASH_FEE) / 100000000.00000;
-        log.info(`paid:${paidAmount} | required:${invoice.amount}`);
-
-        if (paidAmount >= invoice.amount) {
-
-          return invoice
-            .updateAttributes({
-              status: "paid",
-              paidAt: new Date()
-            })
-            .then(() => {
-              channel.ack(message);
-              log.info("invoices:paid", invoice.uid);
-              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-              outputMatched = true;
-              Slack.notify(
-                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-              );
-            });
-        } else {
-          channel.ack(message);
-        }
-      }
-    })
-    .catch(error => {
-      channel.nack(message);
-    });
-  };
-}
+var currencies = [
+  {
+    code: 'BTC',
+    name: 'bitcoin',
+    queue: BITCOIN_QUEUE,
+    fee: Blockcypher.BITCOIN_FEE
+  },
+  {
+    code: 'LTC',
+    name: 'litecoin',
+    queue: LITECOIN_QUEUE,
+    fee: Blockcypher.LITECOIN_FEE
+  },
+  {
+    code: 'DOGE',
+    name: 'dogecoin',
+    queue: DOGECOIN_QUEUE,
+    fee: Blockcypher.DOGECOIN_FEE
+  },
+  {
+    code: 'DASH',
+    name: 'dash',
+    queue: DASH_QUEUE,
+    fee: Blockcypher.DASH_FEE
+  }
+];
 
 amqp.connect(AMQP_URL).then(conn => {
   return conn.createChannel().then(async channel => {
     log.info("amqp:channel:connected");
 
-    await channel.assertQueue(DASH_QUEUE, { durable: true })
-    let dashConsumer = DashWebhookConsumer(channel);
-    channel.consume(DASH_QUEUE, dashConsumer, { noAck: false });
+    currencies.forEach(async (currency) => {
 
-    await channel.assertQueue(BITCOIN_QUEUE, { durable: true })
-    let bitcoinConsumer = BitcoinWebhookConsumer(channel);
-    channel.consume(BITCOIN_QUEUE, bitcoinConsumer, { noAck: false });
+      await channel.assertQueue(currency.queue, { durable: true })
+      let consumer = WebhookConsumer(currency, channel);
+      channel.consume(currency.queue, consumer, { noAck: false });
 
-    await channel.assertQueue(LITECOIN_QUEUE, { durable: true })
-    let litecoinConsumer = LitecoinWebhookConsumer(channel);
-    channel.consume(LITECOIN_QUEUE, litecoinConsumer, { noAck: false });
-
-    await channel.assertQueue(DOGECOIN_QUEUE, { durable: true })
-    let dogecoinConsumer = DogecoinWebhookConsumer(channel);
-    channel.consume(DOGECOIN_QUEUE, dogecoinConsumer, { noAck: false });
+    });
   });
 });
