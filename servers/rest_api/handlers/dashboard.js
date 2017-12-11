@@ -5,7 +5,7 @@ const sequelize=require('../../../lib/database');
                 let currentDate=new Date();
                 let currentYear=currentDate.getFullYear();
                 let currentMonth=currentDate.getMonth()+1;
-                let currentDay=currentDate.getDate()+1;
+                let currentDay=currentDate.getDate();
                 let targetDate=currentYear+'-'+currentMonth+'-'+currentDay+'T00:00:00.0Z';
                 sequelize.query(`select*
                         from invoices
