@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "amqplib": "^0.5.1",
+    "apidoc": "^0.17.6",
     "async": "^2.5.0",
     "bcrypt": "^1.0.2",
     "bcrypt-nodejs": "0.0.3",
