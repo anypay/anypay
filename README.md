@@ -31,7 +31,7 @@ psql
 postgres> create database anypay_test;
 ```
 
-Then export the `DATABASE_URL` connection string as an environment variable. 
+Then export the `DATABASE_URL` connection string as an environment variable.
 
 ```
 export DATABASE_URL=postgres://postgres:@127.0.0.1:5432/anypay_test
@@ -53,7 +53,7 @@ Finally install the javascript testing framework `mocha`
 npm install -g mocha
 ```
 
-#### Runnig The Tests
+#### Running The Tests
 
 Now you can run the tests with `npm test`!
 
@@ -65,3 +65,11 @@ on all tests under the `/test` directory of the project.
 For more information on how to write tests, please see
 [https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
 
+#### Run the APIDOC
+
+apidoc -i servers/rest_api/handlers -o apidoc/
+
+
+#### Run the Payment-Service
+
+node servers/rest_api/server.js

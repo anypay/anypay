@@ -6,26 +6,31 @@ function CoinsFromAccount(account) {
     'BTC': {
       code: 'BTC',
       name: 'bitcoin',
+      fee: 0.0005,
       enabled: false
     },
     'DASH': {
       code: 'DASH',
       name: 'dash',
+      fee: 0.0005,
       enabled: false
     },
     'BCH': {
       code: 'BCH',
       name: 'bitcoin cash',
+      fee: 0.0005,
       enabled: false
     },
     'LTC': {
       code: 'LTC',
       name: 'litecoin',
+      fee: 0.0005,
       enabled: false
     },
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
+      fee: 2,
       enabled: false
     }
   };
@@ -99,4 +104,3 @@ module.exports.list = function(request, reply) {
     reply({ error: error.message }).code(500);
   });
 }
-
