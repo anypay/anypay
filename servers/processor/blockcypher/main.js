@@ -1,6 +1,9 @@
 const amqp = require("amqplib");
 const log = require("winston");
-const Blockcypher = require("../../lib/blockcypher");
+const Blockcypher = require("../../../lib/blockcypher");
+const Invoice = require("../../../lib/models/invoice");
+const Dashcore = require("../../../lib/dashcore");
+const Slack = require("../../../lib/slack/notifier");
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
@@ -9,81 +12,17 @@ const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
 const DASH_QUEUE     = "blockcypher:dash:webhooks";
 const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 
-const Invoice = require("../../lib/models/invoice");
-const Dashcore = require("../../lib/dashcore");
+const PAYMENT_QUEUE  = "anypay:payments:received";
 
 class InvoiceNotFoundError extends Error {}
 class InvoiceUnderpaidError extends Error {}
 class InvoiceOverPaidError extends Error {}
 
-const Slack = require("../../lib/slack/notifier");
-
-async function findMatchingInvoice(currency, amount, address) {
-  if (fee == undefined) {
-    fee = 0;
-  }
-
-  var invoice = await Invoice.findOne({
-    where: {
-      currency: currency,
-      address: address,
-      status: "unpaid"
-    }
-  })
-
-  if (!invoice ) {
-    throw new InvoiceNotFoundError({currency, amount, address});
-  }
-
-  if (amount >= invoice.amount) {
-
-    return invoice;
-
-  } else {
-
-    throw new InvoiceUnderpaidError({uid: invoice.uid, currency, amount, address});
-  }
-}
-
-async function handlePayment(address, amount, currency) {
-
-  return async function(channel) {
-
-    try {
-
-      var invoice = await findMatchingInvoice(currency, amount, address);
-
-      log.info(`required:${invoice.amount} | paid:${paidAmount}`);
-
-      await invoice.updateAttributes({
-        status: "paid",
-        paidAt: new Date()
-      })
-
-      log.info("invoices:paid", invoice.uid);
-
-      await channel.ack(message);
-
-      await channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
-
-      Slack.notify(
-        `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
-      );
-
-    } catch(error) {
-
-      log.error(error.message);
-      channel.ack(message);
-    }
-  }
-}
-
 async function parseWebhookMessage(message, coin, blockcypherFee) {
 
     let webhook;
 
-    try {
-      webhook = JSON.parse(message.content.toString());
+    try { webhook = JSON.parse(message.content.toString());
       log.info(`blockcypher:${coin}:webhook`,webhook);
     } catch (error) {
       log.error("invalid webhook message format");
@@ -105,10 +44,16 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
 }
 
 function WebhookConsumer(currency, channel) {
-  return function(message) {
-    var payment = parsePaymentWebhook(message, currency.name, currency.fee);
+  return async function(message) {
+    var payment = await parseWebhookMessage(message, currency.name, currency.fee);
 
-    handlePayment(payment.address, payment.amount, currency.code)(channel);
+    await channel.sendToQueue(PAYMENT_QUEUE, new Buffer(JSON.stringify({
+      address: payment.address,
+      currency: currency.code,
+      amount: payment.amount
+    })));
+
+    await channel.ack(message);
   };
 }
 
