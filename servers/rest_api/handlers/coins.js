@@ -38,19 +38,15 @@ function CoinsFromAccount(account) {
     coins['DASH'].enabled = true;
   }
 
-  // Ensure extra flag for beta release of bitcoin cash
-  // TODO Remove the bitcoin_cash_enabled account flag once fully supported
-  if (account.bitcoin_cash_address && account.bitcoin_cash_enabled) {
+  if (account.bitcoin_cash_address) {
     coins['BCH'].enabled = true;
   }
 
-  // Ensure extra flag for beta release of litecoin
-  // TODO Remove the litecoin_enabled account flag once fully supported
   if (account.litecoin_address) {
     coins['LTC'].enabled = true;
   }
 
-  if (account.dogecoin_address && account.dogecoin_enabled) {
+  if (account.dogecoin_address) {
     coins['DOGE'].enabled = true;
   }
 
