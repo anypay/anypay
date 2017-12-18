@@ -11,4 +11,4 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 
-CMD ["node", "servers/processor/server.js"]
+CMD ["node", "servers/processor/payments/main.js"]
