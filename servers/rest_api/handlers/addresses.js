@@ -55,7 +55,6 @@ module.exports.update = function(request, reply) {
       dogecoin_enabled: false
     };
     break;
-  default:
   }
 
   if (!updateParams) {
