@@ -12,6 +12,21 @@ function CoinsFromAccount(account) {
       code: 'DASH',
       name: 'dash',
       enabled: false
+    },
+    'BCH': {
+      code: 'BCH',
+      name: 'bitcoin cash',
+      enabled: false
+    },
+    'LTC': {
+      code: 'LTC',
+      name: 'litecoin',
+      enabled: false
+    },
+    'DOGE': {
+      code: 'DOGE',
+      name: 'dogecoin',
+      enabled: false
     }
   };
 
@@ -21,6 +36,18 @@ function CoinsFromAccount(account) {
 
   if (account.dash_payout_address) {
     coins['DASH'].enabled = true;
+  }
+
+  if (account.bitcoin_cash_address) {
+    coins['BCH'].enabled = true;
+  }
+
+  if (account.litecoin_address) {
+    coins['LTC'].enabled = true;
+  }
+
+  if (account.dogecoin_address) {
+    coins['DOGE'].enabled = true;
   }
 
   return coins;

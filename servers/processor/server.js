@@ -4,8 +4,10 @@ const Blockcypher = require("../../lib/blockcypher");
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "blockcypher:webhooks";
-const BITCOIN_QUEUE = "blockcypher:bitcoin:webhooks";
-const DASH_QUEUE = "blockcypher:dash:webhooks";
+const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
+const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
+const DASH_QUEUE     = "blockcypher:dash:webhooks";
+const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 
 const Invoice = require("../../lib/models/invoice");
 const Dashcore = require("../../lib/dashcore");
@@ -44,6 +46,124 @@ function BitcoinWebhookConsumer(channel) {
       } else {
 
         let paidAmount = (webhook.value + Blockcypher.BITCOIN_FEE) / 100000000.00000;
+
+        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
+
+        if (paidAmount >= invoice.amount) {
+
+          invoice
+            .updateAttributes({
+              status: "paid",
+              paidAt: new Date()
+            })
+            .then(() => {
+              channel.ack(message);
+              log.info("invoices:paid", invoice.uid);
+              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+              outputMatched = true;
+              Slack.notify(
+                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
+              );
+            });
+        } else {
+          channel.ack(message);
+        }
+      }
+    });
+  };
+}
+
+function LitecoinWebhookConsumer(channel) {
+  return function(message) {
+    let webhook;
+
+    try {
+      webhook = JSON.parse(message.content.toString());
+      log.info('blockcypher:litecoin:webhook',webhook);
+    } catch (error) {
+      log.error("invalid webhook message format");
+      channel.ack(message);
+      return;
+    }
+
+    if (!webhook.input_address) {
+      log.error("no input_address in webhook, invalid format");
+      channel.ack(message);
+      return;
+    }
+
+    let address = webhook.input_address;
+
+    Invoice.findOne({
+      where: {
+        address: address,
+        status: "unpaid"
+      }
+    }).then(invoice => {
+      if (!invoice) {
+        channel.ack(message);
+      } else {
+
+        let paidAmount = (webhook.value + Blockcypher.LITECOIN_FEE) / 100000000.00000;
+
+        log.info(`required:${invoice.amount} | paid:${paidAmount}`);
+
+        if (paidAmount >= invoice.amount) {
+
+          invoice
+            .updateAttributes({
+              status: "paid",
+              paidAt: new Date()
+            })
+            .then(() => {
+              channel.ack(message);
+              log.info("invoices:paid", invoice.uid);
+              channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+              outputMatched = true;
+              Slack.notify(
+                `invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
+              );
+            });
+        } else {
+          channel.ack(message);
+        }
+      }
+    });
+  };
+}
+
+function DogecoinWebhookConsumer(channel) {
+  return function(message) {
+    let webhook;
+
+    try {
+      webhook = JSON.parse(message.content.toString());
+      log.info('blockcypher:dogecoin:webhook',webhook);
+    } catch (error) {
+      log.error("invalid webhook message format");
+      channel.ack(message);
+      return;
+    }
+
+    if (!webhook.input_address) {
+      log.error("no input_address in webhook, invalid format");
+      channel.ack(message);
+      return;
+    }
+
+    let address = webhook.input_address;
+
+    Invoice.findOne({
+      where: {
+        address: address,
+        status: "unpaid"
+      }
+    }).then(invoice => {
+      if (!invoice) {
+        channel.ack(message);
+      } else {
+
+        let paidAmount = (webhook.value + Blockcypher.DOGECOIN_FEE) / 100000000.00000;
 
         log.info(`required:${invoice.amount} | paid:${paidAmount}`);
 
@@ -133,19 +253,23 @@ function DashWebhookConsumer(channel) {
 }
 
 amqp.connect(AMQP_URL).then(conn => {
-  return conn.createChannel().then(channel => {
+  return conn.createChannel().then(async channel => {
     log.info("amqp:channel:connected");
 
-    channel.assertQueue(DASH_QUEUE, { durable: true }).then(() => {
-      let consumer = DashWebhookConsumer(channel);
+    await channel.assertQueue(DASH_QUEUE, { durable: true })
+    let dashConsumer = DashWebhookConsumer(channel);
+    channel.consume(DASH_QUEUE, dashConsumer, { noAck: false });
 
-      channel.consume(DASH_QUEUE, consumer, { noAck: false });
-    });
+    await channel.assertQueue(BITCOIN_QUEUE, { durable: true })
+    let bitcoinConsumer = BitcoinWebhookConsumer(channel);
+    channel.consume(BITCOIN_QUEUE, bitcoinConsumer, { noAck: false });
 
-    channel.assertQueue(BITCOIN_QUEUE, { durable: true }).then(() => {
-      let consumer = BitcoinWebhookConsumer(channel);
+    await channel.assertQueue(LITECOIN_QUEUE, { durable: true })
+    let litecoinConsumer = LitecoinWebhookConsumer(channel);
+    channel.consume(LITECOIN_QUEUE, litecoinConsumer, { noAck: false });
 
-      channel.consume(BITCOIN_QUEUE, consumer, { noAck: false });
-    });
+    await channel.assertQueue(DOGECOIN_QUEUE, { durable: true })
+    let dogecoinConsumer = DogecoinWebhookConsumer(channel);
+    channel.consume(DOGECOIN_QUEUE, dogecoinConsumer, { noAck: false });
   });
 });

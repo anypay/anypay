@@ -22,14 +22,16 @@ module.exports.list = function(request, reply) {
 
 
   let accountId = request.auth.credentials.accessToken.account_id;
-  console.log('LIST', accountId);
 
   Account.find({ where: { id: accountId }})
     .then(account => {
-        console.log('found account', account);
+
       reply({
         'BTC': account.bitcoin_payout_address,
-        'DASH': account.dash_payout_address
+        'DASH': account.dash_payout_address,
+        'BCH': account.bitcoin_cash_address,
+        'LTC': account.litecoin_address,
+        'DOGE': account.dogecoin_address
       });
     })
     .catch(error => {
@@ -70,8 +72,23 @@ module.exports.update = function(request, reply) {
     updateParams = {
       bitcoin_payout_address: address
     };
+    break; 
+  case 'BCH':
+    updateParams = {
+      bitcoin_cash_address: address
+    };
+    break; 
+  case 'LTC':
+    updateParams = {
+      litecoin_address: address,
+      litecoin_enabled: true
+    };
     break;
-  default:
+  case 'DOGE':
+    updateParams = {
+      dogecoin_address: address,
+      dogecoin_enabled: true
+    break;
   }
 
   if (!updateParams) {

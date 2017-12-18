@@ -7,9 +7,7 @@ machine:
 
 dependencies:
   pre:
-    - sudo curl -L https://github.com/docker/compose/releases/download/1.17.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
-    - docker-compose build rest-api
-    #- docker-compose up -d postgres && sleep 3;
+    - docker build -t paymentservice_rest-api .
 
 test:
   override:
@@ -20,3 +18,9 @@ deployment:
     branch: master
     commands:
       - ./push_to_docker.sh
+      - ssh defaultuser@api.anypay.global "/home/defaultuser/restart_rest_api.sh"
+  staging:
+    branch: staging
+    commands:
+      - ./push_to_docker_staging.sh
+      - ssh defaultuser@api.staging.anypay.global "/home/defaultuser/restart_rest_api_staging.sh"

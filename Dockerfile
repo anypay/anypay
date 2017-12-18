@@ -12,4 +12,3 @@ RUN npm install
 COPY . /usr/src/app
 
 CMD ["node", "servers/rest_api/server.js"]
-

@@ -14,6 +14,8 @@ const PairTokensController = require("./handlers/pair_tokens");
 const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
+const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
+const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
 const CoinsController = require("./handlers/coins");
 const AccountsController = require("./handlers/accounts");
@@ -33,6 +35,9 @@ const owasp = require("owasp-password-strength-test");
 const InvoicesController = require("./handlers/invoices");
 
 const WebhookHandler = new EventEmitter();
+
+const log = require('winston');
+const Features = require('../../lib/features');
 
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
@@ -144,6 +149,23 @@ server.register(Basic, err => {
     }
   });
 
+  if (Features.isEnabled('BITCOINCASH')) {
+    log.info('Bitcoin Cash Enabled');
+
+    const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
+
+    server.route({
+      method: "POST",
+      path: "/bitcoin-cash/invoices",
+      config: {
+        auth: "token",
+        handler: BitcoinCashInvoicesController.create
+      }
+    });
+  } else {
+    log.info('Bitcoin Cash Disabled');
+  }
+
   server.route({
     method: "POST",
     path: "/zcash/invoices",
@@ -168,6 +190,24 @@ server.register(Basic, err => {
     config: {
       auth: "token",
       handler: BitcoinInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/litecoin/invoices",
+    config: {
+      auth: "token",
+      handler: LitecoinInvoicesController.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/dogecoin/invoices",
+    config: {
+      auth: "token",
+      handler: DogecoinInvoicesController.create
     }
   });
 
