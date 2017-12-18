@@ -37,3 +37,7 @@ services:
     build:
       context: .
       dockerfile: ./processes/dash_monitor/Dockerfile
+  bitcoincash-monitor:
+    build:
+      context: .
+      dockerfile: ./processes/bitcoincash-monitor/Dockerfile
