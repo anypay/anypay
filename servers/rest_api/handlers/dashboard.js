@@ -32,8 +32,12 @@ const sequelize=require('../../../lib/database');
          */
 
         module.exports.index=function(request, reply) {
-        //let accountId=14;
-        let currentDate=new Date();
+        if ([41, 14, 125, 177].indexOf(request.auth.credentials.accessToken.account_id)<0){
+        reply({ user: 'normal' });
+                return true;
+        };
+                //let accountId=14;
+                let currentDate=new Date();
                 let currentYear=currentDate.getFullYear();
                 //let currentMonth=currentDate.getMonth()+1;
                 //let currentDay=currentDate.getDate();
