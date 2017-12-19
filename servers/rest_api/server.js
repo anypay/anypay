@@ -111,9 +111,14 @@ server.register(Basic, err => {
         })
         .then(invoice => {
           if (invoice) {
+            invoice = invoice.toJSON();
+
             if (invoice.currency === 'BTC') {
-              var fee = 0.002;
+
               invoice.cost = 0.002;
+              log.debug(`currency is BTC, setting cost to ${invoice.cost}`);
+            } else {
+              log.debug("currency not BTC, not setting cost");
             }
             reply(invoice);
           } else {
