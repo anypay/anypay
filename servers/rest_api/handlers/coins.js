@@ -3,11 +3,6 @@ const _ = require('underscore');
 
 function CoinsFromAccount(account) {
   var coins = {
-    'BTC': {
-      code: 'BTC',
-      name: 'bitcoin',
-      enabled: false
-    },
     'DASH': {
       code: 'DASH',
       name: 'dash',
@@ -26,6 +21,11 @@ function CoinsFromAccount(account) {
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
+      enabled: false
+    },
+    'BTC': {
+      code: 'BTC',
+      name: 'bitcoin',
       enabled: false
     }
   };
@@ -99,4 +99,3 @@ module.exports.list = function(request, reply) {
     reply({ error: error.message }).code(500);
   });
 }
-
