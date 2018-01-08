@@ -3,11 +3,6 @@ const _ = require('underscore');
 
 function CoinsFromAccount(account) {
   var coins = {
-    'BTC': {
-      code: 'BTC',
-      name: 'bitcoin',
-      enabled: false
-    },
     'DASH': {
       code: 'DASH',
       name: 'dash',
@@ -26,7 +21,12 @@ function CoinsFromAccount(account) {
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
->>>>>>> 5b67b6580e74a9bedd555b9fc4f1b43008da1d75
+      enabled: false
+    },
+    'BTC': {
+      code: 'BTC',
+      name: 'bitcoin',
+      enabled: false
     }
   };
 
@@ -38,14 +38,10 @@ function CoinsFromAccount(account) {
     coins['DASH'].enabled = true;
   }
 
-  // Ensure extra flag for beta release of bitcoin cash
-  // TODO Remove the bitcoin_cash_enabled account flag once fully supported
-  if (account.bitcoin_cash_address && account.bitcoin_cash_enabled) {
+  if (account.bitcoin_cash_address) {
     coins['BCH'].enabled = true;
   }
 
-  // Ensure extra flag for beta release of litecoin
-  // TODO Remove the litecoin_enabled account flag once fully supported
   if (account.litecoin_address) {
     coins['LTC'].enabled = true;
   }
@@ -99,4 +95,3 @@ module.exports.list = function(request, reply) {
     reply({ error: error.message }).code(500);
   });
 }
-

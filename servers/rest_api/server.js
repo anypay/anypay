@@ -59,62 +59,77 @@ const validatePassword = function(request, username, password, callback) {
 
   AccountLogin.withEmailPassword(username, password)
     .then(accessToken => {
-      return callback(null, true, { accessToken });
+      return callback(null, true, {
+        accessToken
+      });
     })
     .catch(error => {
       return callback(error, false);
     });
 };
-
 const validateToken = function(request, username, password, callback) {
   if (!username) {
     return callback(null, false);
   }
 
   AccessToken.findOne({
-    where: {
-      uid: username
-    }
-  })
+      where: {
+        uid: username
+      }
+    })
     .then(accessToken => {
       if (accessToken) {
         request.account_id = accessToken.account_id;
-        return callback(null, true, { accessToken: accessToken });
+        return callback(null, true, {
+          accessToken: accessToken
+        });
       } else {
         return callback(null, false);
       }
     })
     .catch(callback);
 };
-
 server.register(Basic, err => {
   if (err) {
     throw err;
   }
 
-  server.auth.strategy("token", "basic", { validateFunc: validateToken });
-  server.auth.strategy("password", "basic", { validateFunc: validatePassword });
-
+  server.auth.strategy("token", "basic", {
+    validateFunc: validateToken
+  });
+  server.auth.strategy("password", "basic", {
+    validateFunc: validatePassword
+  });
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
     handler: function(request, reply) {
       Invoice.findOne({
-        where: {
-          uid: request.params.invoice_id
-        }
-      })
+          where: {
+            uid: request.params.invoice_id
+          }
+        })
         .then(invoice => {
           if (invoice) {
+            invoice = invoice.toJSON();
+
+            if (invoice.currency === 'BTC') {
+
+              invoice.cost = 0.002;
+              log.debug(`currency is BTC, setting cost to ${invoice.cost}`);
+            } else {
+              log.debug("currency not BTC, not setting cost");
+            }
             reply(invoice);
           } else {
             reply().code(404);
           }
         })
-        .catch(error => reply({ error }).code(500));
+        .catch(error => reply({
+          error
+        }).code(500));
     }
   });
-
   server.route({
     method: "GET",
     path: "/invoices",

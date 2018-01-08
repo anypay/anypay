@@ -25,10 +25,14 @@ services:
       - 3000:3000
     expose:
       - "3000"
+  blockcypher-processor:
+    build:
+      context: .
+      dockerfile: ./servers/processor/blockcypher/Dockerfile
   payment-processor:
     build:
       context: .
-      dockerfile: ./servers/processor/Dockerfile
+      dockerfile: ./servers/processor/payments/Dockerfile
   payouts-cron:
     build:
       context: .
