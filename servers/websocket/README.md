@@ -6,7 +6,9 @@ Each websocket message has two parameters, which are both strings. For some mess
 
 ## Invoice Paid
 
-<String>:<String>
+The websocket servers connects to rabbitmq (amqp) and consumes messages in the `invoices:paid` queue.
+
+String:String
 
 ```
 "invoice:paid" => "76665faf-22f6-4688-8d40-fe32296662db"
@@ -14,7 +16,9 @@ Each websocket message has two parameters, which are both strings. For some mess
 
 ## Invoice Underpaid
 
-<String>:<JSON>
+The websocket servers connects to rabbitmq (amqp) and consumes messages in the `invoices:underpaid` queue.
+
+String:JSON
 
 ```
 "invoice:underpaid": {
