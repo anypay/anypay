@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+const Account = require('../lib/models/account');
+
+program
+  .option('-a --account <account_id>', 'account for which to generate invoice');
+
+program
+  .description('generate invoice such as "createinvoice 10 USD BCH"')
+  .command('createinvoice <denomition_amount> <denomination> <currency>')
+  .option('-a --account_id <account_id>', 'account for which to generate invoice')
+  .action(async(denominationAmount, denomination, currency, options) => {
+    if (!options.account_id) {
+      console.error('account_id option required');
+      process.exit(1);
+    }
+
+    var account = await Account.findOne({ where: { id: options.account_id }})
+
+    if (!account) {
+      console.error(`account with id ${options.account_id} not found`);
+      process.exit(1);
+    }
+
+    console.log(`generate a ${currency} invoice for {denominationAmount} {denomination}`);
+    process.exit(0);
+  });
+
+program.parse(process.argv);
+
