@@ -7,6 +7,7 @@ const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
 const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
 const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 const DASH_QUEUE     = "blockcypher:dash:webhooks";
+const ETHEREUM_QUEUE     = "blockcypher:ethereum:webhooks";
 
 const server = new Hapi.Server();
 
@@ -123,6 +124,26 @@ amqp
         }
       });
 
+      server.route({
+        method: "POST",
+        path: "/ethereum/webhooks",
+        handler: function(request, reply) {
+          log.info("ethereum:blockcypher:callback", request.payload);
+
+          let message = JSON.stringify(request.payload);
+
+          let sent = channel.sendToQueue(ETHEREUM_QUEUE, new Buffer(message));
+
+          if (!sent) {
+            log.error("amqp:send:error", message);
+            reply().code(500);
+          } else {
+            log.info("amqp:sent", message);
+            reply();
+          }
+        }
+      });
+
       await channel.assertQueue(BITCOIN_QUEUE, { durable: true });
       log.info("amqp:bitcoin:queue:asserted", BITCOIN_QUEUE);
 
@@ -134,6 +155,9 @@ amqp
 
       await channel.assertQueue(DOGECOIN_QUEUE, { durable: true });
       log.info("amqp:dogecoin:queue:asserted", DOGECOIN_QUEUE);
+
+      await channel.assertQueue(ETHEREUM_QUEUE, { durable: true });
+      log.info("amqp:ethereum:queue:asserted", ETHEREUM_QUEUE);
 
       server.start(err => {
         if (err) {
