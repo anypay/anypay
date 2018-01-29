@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const program = require('commander');
-//const Account = require('../lib/models/account');
+const Account = require('../lib/models/account');
 const InvoiceService = require('../lib/invoice_service');
 const prettyjson = require('prettyjson');
 
@@ -13,7 +13,7 @@ program
   .command('createinvoice <denomition_amount> <denomination> <currency>')
   .option('-a --account_id <account_id>', 'account for which to generate invoice')
   .action(async(denominationAmount, denomination, currency, options) => {
-    /*
+
     if (!options.account_id) {
       console.error('account_id option required');
       process.exit(1);
@@ -25,18 +25,17 @@ program
       console.error(`account with id ${options.account_id} not found`);
       process.exit(1);
     }
-    */
 
     try {
       let invoice = await InvoiceService.generate({
         denomination: denomination,
         amount: denominationAmount,
         currency: currency,
-	account_id: options.account_id
+      	account_id: options.account_id
       })
 
       console.log('invoice generated');
-      console.log(prettyjson.render(invoice, {noColor:false}));
+      console.log(prettyjson.render(invoice.toJSON(), {noColor:false}));
 
     } catch(error) {
       console.error('error generating invoice', error.message)
