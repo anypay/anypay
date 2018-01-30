@@ -79,17 +79,17 @@ function PaymentConsumer(channel) {
 
     handlePayment(payment.address, payment.amount, payment.currency)(channel, message);
   };
-}
+};
 
-amqp.connect(AMQP_URL).then(conn => {
-  return conn.createChannel().then(async channel => {
-    log.info("amqp:channel:connected");
+amqp.connect(AMQP_URL).then(async (conn) => {
 
-    await channel.assertQueue(PAYMENT_QUEUE, { durable: true })
+  var channel = await conn.createChannel();
 
-    let consumer = PaymentConsumer(channel);
+	log.info("amqp:channel:connected");
 
-    channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
+	await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
 
-  });
+	let consumer = PaymentConsumer(channel);
+
+	channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
 });
