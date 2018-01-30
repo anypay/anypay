@@ -18,7 +18,7 @@ server.connection({
 
 amqp
   .connect(AMQP_URL)
-  .then(async conn => {
+  .then(async (conn) => {
     log.info("amqp:connected", AMQP_URL);
 
     conn.on("error", error => {
@@ -31,7 +31,7 @@ amqp
       process.exit(1);
     });
 
-    return conn.createChannel().then(async channel => {
+    return conn.createChannel().then(async (channel) => {
       log.info("amqp:channel:created");
 
       channel.on("error", error => {
@@ -91,8 +91,9 @@ amqp
           log.info("dogecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
+					var buffer = new Buffer(message);
 
-          let sent = channel.sendToQueue(DOGECOIN_QUEUE, new Buffer(message));
+          let sent = channel.sendToQueue(DOGECOIN_QUEUE, buffer);
 
           if (!sent) {
             log.error("amqp:send:error", message);

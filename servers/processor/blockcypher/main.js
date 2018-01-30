@@ -85,7 +85,7 @@ var currencies = [
 ];
 
 amqp.connect(AMQP_URL).then(conn => {
-  return conn.createChannel().then(async channel => {
+  return conn.createChannel().then(async (channel) => {
     log.info("amqp:channel:connected");
 
     currencies.forEach(async (currency) => {
