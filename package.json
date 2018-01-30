@@ -37,15 +37,19 @@
     "socket.io-client": "^2.0.3",
     "sqlite3": "^3.1.8",
     "superagent": "^3.5.2",
-    "typescript": "^2.6.1",
+    "typescript": "^1.8.0",
+    "typings": "^2.1.1",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1",
     "winston": "^2.3.1",
     "ws": "^3.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/mocha": "^2.2.47",
+    "ts-node": "^4.1.0"
+  },
   "scripts": {
-    "test": "mocha test/**",
+    "test": "mocha --compilers ts:ts-node/register test/**",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api"
   },
   "keywords": [],
