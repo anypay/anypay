@@ -91,7 +91,7 @@ amqp
           log.info("dogecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
-					var buffer = new Buffer(message);
+          var buffer = new Buffer(message);
 
           let sent = channel.sendToQueue(DOGECOIN_QUEUE, buffer);
 
