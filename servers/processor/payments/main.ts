@@ -1,0 +1,143 @@
+const amqp = require("amqplib");
+const log = require("winston");
+const Blockcypher = require("../../../lib/blockcypher");
+const Invoice = require("../../../lib/models/invoice");
+const Slack = require("../../../lib/slack/notifier");
+
+import {Connection, Channel, Message} from "amqplib"; 
+import {paymentSchema} from '../../../jsonschema/payment';
+import {Validator} from 'jsonschema';
+
+import {
+  handlePaid,
+  handleUnderpaid,
+  handleOverpaid
+} from '../../../lib/payment_processor';
+
+import {Payment} from '../../../types/interfaces';
+
+const AMQP_URL = "amqp://blockcypher.anypay.global";
+const PAYMENT_QUEUE  = "anypay:payments:received";
+const validator = new Validator();
+
+function handlePayment(payment: Payment) {
+
+	/*
+		1. Query unpaid invoices for the specific amount.
+			- Mark invoice as paid
+		2. If not found, query for most recent unpaid invoice for that amount.
+			- Mark invoice as underpaid
+			- Set the paid amount
+		3. If not found, throw an Exception, this should not be happening.
+
+	*/
+
+  return async function(channel: Channel, message: Message) {
+		var invoice;
+
+    try {
+
+			invoice = await Invoice.findOne({
+				where: {
+					currency: payment.currency,
+					address: payment.address,
+					status: "unpaid",
+					amount: payment.amount
+				}
+			});
+
+			if (invoice) {
+				// Unpaid invoice found exactly matching amount
+
+				invoice = await handlePaid(invoice, payment);
+
+				log.info("invoices:paid", invoice.uid);
+
+				await channel.ack(message);
+
+				await channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+
+				Slack.notify(
+					`invoice:paid https://pos.anypay.global/invoices/${invoice.uid}`
+				);
+
+				return;
+
+			} else {
+
+				invoice = await Invoice.findOne({
+					where: {
+						currency: payment.currency,
+						address: payment.address,
+						status: "unpaid"
+					}
+				});
+
+				if (invoice) {
+
+					if (payment.amount < invoice.amount) {
+						// Underpaid
+						invoice = await handleUnderpaid(invoice, payment);
+
+						log.info("invoices:underpaid", invoice.uid);
+
+						await channel.ack(message);
+
+						await channel.sendToQueue("invoices:underpaid", Buffer.from(invoice.uid));
+
+						Slack.notify(
+							`invoice:underpaid https://pos.anypay.global/invoices/${invoice.uid}`
+						);
+
+					} else {
+						// Overpaid
+						invoice = await handleOverpaid(invoice, payment);
+
+						log.info("invoices:overpaid", invoice.uid);
+
+						await channel.ack(message);
+
+						await channel.sendToQueue("invoices:paid", Buffer.from(invoice.uid));
+
+						Slack.notify(
+							`invoice:overpaid https://pos.anypay.global/invoices/${invoice.uid}`
+						);
+					}
+
+				} else {
+
+					throw new Error('no unpaid invoice found matching currency and address');
+				}
+			}
+
+    } catch(error) {
+
+      log.error(error.message);
+      log.error(error);
+      channel.ack(message);
+    }
+  }
+}
+
+function PaymentConsumer(channel: Channel) {
+  return async function(message: Message) {
+
+    var payment = JSON.parse(message.content.toString());
+
+    // TODO: Validate data with JSONSchema
+    handlePayment(payment)(channel, message);
+  };
+}
+
+amqp.connect(AMQP_URL).then(async (conn: Connection) => {
+
+  let channel: Channel = await conn.createChannel()
+
+  log.info("amqp:channel:connected");
+
+  await channel.assertQueue(PAYMENT_QUEUE, { durable: true })
+
+  let consumer = PaymentConsumer(channel);
+
+  channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
+});

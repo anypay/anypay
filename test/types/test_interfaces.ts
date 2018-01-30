@@ -1,4 +1,5 @@
-import {Invoice} from '../../types/interfaces'
+import {Invoice} from '../../types/interfaces';
+import "mocha";
 
 describe("Interfaces", () => {
 

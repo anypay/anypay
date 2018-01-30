@@ -26,6 +26,7 @@
     "flipit": "^2.0.3",
     "hapi": "^16.4.3",
     "hapi-auth-basic": "^4.2.0",
+    "jsonschema": "^1.2.2",
     "owasp-password-strength-test": "^1.3.0",
     "pg": "^6.2.4",
     "postgresql": "0.0.1",
@@ -37,7 +38,6 @@
     "socket.io-client": "^2.0.3",
     "sqlite3": "^3.1.8",
     "superagent": "^3.5.2",
-    "typescript": "^1.8.0",
     "typings": "^2.1.1",
     "underscore": "^1.8.3",
     "uuid": "^3.0.1",
@@ -45,12 +45,16 @@
     "ws": "^3.0.0"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.5.6",
     "@types/mocha": "^2.2.47",
-    "ts-node": "^4.1.0"
+    "mocha": "^5.0.0",
+    "ts-node": "^4.1.0",
+    "typescript": "^2.6.2"
   },
   "scripts": {
     "test": "mocha --compilers ts:ts-node/register test/**",
-    "docker:build": "rm -rf node_modules && docker-compose build rest-api"
+    "docker:build": "rm -rf node_modules && docker-compose build rest-api",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
