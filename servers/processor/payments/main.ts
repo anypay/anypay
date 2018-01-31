@@ -9,9 +9,7 @@ import {paymentSchema} from '../../../jsonschema/payment';
 import {Validator} from 'jsonschema';
 
 import {
-  handlePaid,
-  handleUnderpaid,
-  handleOverpaid
+  handlePayment,
 } from '../../../lib/payment_processor';
 
 import {Payment} from '../../../types/interfaces';
@@ -20,7 +18,7 @@ const AMQP_URL = "amqp://blockcypher.anypay.global";
 const PAYMENT_QUEUE  = "anypay:payments:received";
 const validator = new Validator();
 
-function handlePayment(payment: Payment) {
+function handlePaymentMessage(payment: Payment) {
 
 	/*
     1. Query unpaid invoices for the specific amount.
@@ -76,7 +74,7 @@ function PaymentConsumer(channel: Channel) {
     var payment = JSON.parse(message.content.toString());
 
     // TODO: Validate data with JSONSchema
-    handlePayment(payment)(channel, message);
+    handlePaymentMessage(payment)(channel, message);
   };
 }
 
