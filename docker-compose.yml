@@ -25,10 +25,14 @@ services:
       - 3000:3000
     expose:
       - "3000"
+  blockcypher-processor:
+    build:
+      context: .
+      dockerfile: ./servers/processor/blockcypher/Dockerfile
   payment-processor:
     build:
       context: .
-      dockerfile: ./servers/processor/Dockerfile
+      dockerfile: ./servers/processor/payments/Dockerfile
   payouts-cron:
     build:
       context: .
@@ -37,3 +41,7 @@ services:
     build:
       context: .
       dockerfile: ./processes/dash_monitor/Dockerfile
+  bitcoincash-monitor:
+    build:
+      context: .
+      dockerfile: ./processes/bitcoincash-monitor/Dockerfile

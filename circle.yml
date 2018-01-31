@@ -22,3 +22,5 @@ deployment:
     branch: staging
     commands:
       - ./push_to_docker_staging.sh
+      - ssh defaultuser@api.staging.anypay.global "/home/defaultuser/restart_rest_api_staging.sh"
+

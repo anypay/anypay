@@ -1,4 +1,4 @@
-FROM node:9.4.0
+FROM node:8.9.1-onbuild
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -11,6 +11,5 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 
-# Build the project from typscript source
-RUN npm run build
+CMD ["node", "servers/processor/blockcypher/main.js"]
 
