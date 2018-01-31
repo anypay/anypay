@@ -4,6 +4,8 @@ const bitcoreDash = require('bitcore-lib-dash');
 const PaymentProcessor = require('../../lib/payment_processor');
 const Invoice = require('../../lib/models/invoice');
 
+import * as assert from 'assert';
+
 describe("Handling Underpayment with PaymentProcessor", () => {
 
 	const chance = new Chance();
@@ -17,7 +19,7 @@ describe("Handling Underpayment with PaymentProcessor", () => {
 			amount: 1,
 			currency: 'DASH',
 			address: address,
-			account_id: chance.integer()
+			account_id: 1
 		});
 
 		let payment = {
