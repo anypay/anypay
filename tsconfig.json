@@ -4,7 +4,8 @@
     "allowJs": true,
     "module": "commonjs",
     "outDir": "dist",
-    "sourceMap": false
+		"sourceMap": true,
+		"sourceRoot": "."
   },
   "exclude": [
     "node_modules",
