@@ -12,6 +12,9 @@ describe("Interfaces", () => {
       }
 
       var invoice = CheckValidInvoice({
+        id: 5,
+        account_id: 5,
+        uid: '12345',
         currency: 'BCH',
         amount: 0.1,
         address: 'somevalidaddress',
