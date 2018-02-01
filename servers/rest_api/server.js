@@ -17,6 +17,7 @@ const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
 const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
 const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
+const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
 
 const CoinsController = require("./handlers/coins");
 
@@ -188,22 +189,15 @@ server.register(Basic, err => {
     }
   });
 
-  if (Features.isEnabled('BITCOINCASH')) {
-    log.info('Bitcoin Cash Enabled');
 
-    const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
-
-    server.route({
-      method: "POST",
-      path: "/bitcoin-cash/invoices",
-      config: {
-        auth: "token",
-        handler: BitcoinCashInvoicesController.create
-      }
-    });
-  } else {
-    log.info('Bitcoin Cash Disabled');
-  }
+  server.route({
+    method: "POST",
+    path: "/bitcoin-cash/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinCashInvoicesController.create
+    }
+  });
 
   server.route({
     method: "POST",
