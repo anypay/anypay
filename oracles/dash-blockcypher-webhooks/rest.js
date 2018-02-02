@@ -38,6 +38,7 @@ function handleBlockcypherTx(tx, channel) {
 amqp
   .connect(AMQP_URL)
   .then(async (conn) => {
+
     logger.info("amqp:connected", AMQP_URL);
 
     conn.on("error", error => {
@@ -50,47 +51,49 @@ amqp
       process.exit(1);
     });
 
-  // Add the route
-  server.route({
-      method: 'POST',
-      path:'/oracles/dash-blockcypher-webhooks', 
-      handler: function (request, h) {
-          //logger.info('payload', request.payload);
+    var channel = await conn.createChannel();
 
-          handleBlockcypherTx(request.payload, channel);
+    // Add the route
+    server.route({
+        method: 'POST',
+        path:'/oracles/dash-blockcypher-webhooks', 
+        handler: function (request, h) {
+            //logger.info('payload', request.payload);
 
-          return 'success';
-      }
-  });
-  /*
+            handleBlockcypherTx(request.payload, channel);
 
-  server.route({
-      method: 'POST',
-      path:'/oracles/dash-blockcypher-webhooks/{address}', 
-      handler: function (request, h) {
+            return 'success';
+        }
+    });
+    /*
 
-          handleBlockcypherTx(request.payload);
+    server.route({
+        method: 'POST',
+        path:'/oracles/dash-blockcypher-webhooks/{address}', 
+        handler: function (request, h) {
 
-          return 'success';
-      }
-  });
-  */
+            handleBlockcypherTx(request.payload);
 
-  // Start the server
-  async function start() {
+            return 'success';
+        }
+    });
+    */
 
-      try {
-          await server.start();
-      }
-      catch (err) {
-          console.log(err);
-          process.exit(1);
-      }
+    // Start the server
+    async function start() {
 
-      console.log('Server running at:', server.info.uri);
-  };
+        try {
+            await server.start();
+        }
+        catch (err) {
+            console.log(err);
+            process.exit(1);
+        }
 
-  start();
+        console.log('Server running at:', server.info.uri);
+    };
+
+    start();
 
 });
 
