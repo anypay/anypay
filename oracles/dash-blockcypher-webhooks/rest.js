@@ -9,12 +9,43 @@ const server = Hapi.server({
     port: restPort 
 });
 
+function handleBlockcypherTx(tx) {
+  //logger.info('blockcypher:webhook', tx);
+
+  var outputs = tx.outputs.map(output => {
+    return {
+      currency: 'DASH',
+      amount: parseFloat(output.value) / 100000000,
+      address: output.addresses[0],
+      hash: tx.hash
+    }
+  });
+
+  outputs.map(output => {
+    logger.info('output', output);
+  })
+}
+
 // Add the route
 server.route({
     method: 'POST',
     path:'/oracles/dash-blockcypher-webhooks', 
     handler: function (request, h) {
-        logger.info('blockcypher:webhook', request.payload);
+        //logger.info('payload', request.payload);
+
+        handleBlockcypherTx(request.payload);
+
+        return 'success';
+    }
+});
+
+server.route({
+    method: 'POST',
+    path:'/oracles/dash-blockcypher-webhooks/{address}', 
+    handler: function (request, h) {
+
+        handleBlockcypherTx(request.payload);
+
         return 'success';
     }
 });
