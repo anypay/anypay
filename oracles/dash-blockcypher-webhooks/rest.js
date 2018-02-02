@@ -14,7 +14,7 @@ const server = Hapi.server({
     port: restPort 
 });
 
-function handleBlockcypherTx(tx) {
+function handleBlockcypherTx(tx, channel) {
   //logger.info('blockcypher:webhook', tx);
 
   var outputs = tx.outputs.map(output => {
@@ -57,7 +57,7 @@ amqp
       handler: function (request, h) {
           //logger.info('payload', request.payload);
 
-          handleBlockcypherTx(request.payload);
+          handleBlockcypherTx(request.payload, channel);
 
           return 'success';
       }
