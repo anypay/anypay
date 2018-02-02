@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 let jayson = require('jayson');
 let logger = require('winston');
 let hapi = require('hapi');
