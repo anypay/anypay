@@ -29,7 +29,7 @@
     "figlet": "^1.2.0",
     "flipit": "^2.0.3",
     "hapi": "^17.2.0",
-    "hapi-auth-basic": "^4.2.0",
+    "hapi-auth-basic": "^5.0.0",
     "jayson": "^2.0.5",
     "jsonschema": "^1.2.2",
     "level": "^2.1.2",

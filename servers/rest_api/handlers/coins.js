@@ -78,20 +78,15 @@ function CoinsFromAccount(account) {
  *       }]
  *     }
  */
-module.exports.list = function(request, reply) {
+module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
+  var account = await Account.find({ where: { id: accountId }})
 
-  Account.find({ where: { id: accountId }}).then(account => {
+  let accountCoins = CoinsFromAccount(account);
 
-    let accountCoins = CoinsFromAccount(account);
-
-    reply({
-      'coins': _.values(accountCoins)
-    });
-  })
-  .catch(error => {
-    reply({ error: error.message }).code(500);
-  });
+  return {
+    'coins': _.values(accountCoins)
+  };
 }

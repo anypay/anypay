@@ -1,6 +1,6 @@
 const DashInvoice = require("../../../lib/dash/invoice");
 
-module.exports.create = function(request, reply) {
+module.exports.create = async function(request, reply) {
 
   if (!request.payload || !request.payload.amount) {
     reply({ error: 'amount required (dollars)' });
@@ -12,11 +12,12 @@ module.exports.create = function(request, reply) {
 
   console.log('dash invoice generate!!!')
 
-  DashInvoice.generate(dollarAmount, accountId).then(invoice => {
-    reply(invoice);
-  })
-  .catch(error => {
-    reply({ error: error.message }).code(500);
-  });
+  try {
+    var invoice = await DashInvoice.generate(dollarAmount, accountId);
+  } catch(error) {
+    return { error: error.message };
+  }
+
+  return invoice;
 }
 
