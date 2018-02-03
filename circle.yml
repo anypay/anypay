@@ -6,7 +6,7 @@ machine:
 
 dependencies:
   pre:
-    - docker build -t paymentservice_rest-api .
+    - docker build -t payment-service
 
 test:
   override:
