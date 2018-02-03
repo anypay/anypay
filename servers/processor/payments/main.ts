@@ -19,6 +19,7 @@ const PAYMENT_QUEUE  = "anypay:payments:received";
 const validator = new Validator();
 
 function handlePaymentMessage(payment: Payment) {
+  console.log('handle payment', payment);
 
 	/*
     1. Query unpaid invoices for the specific amount.
