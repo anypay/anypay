@@ -50,22 +50,26 @@ const server = new Hapi.Server({
   }
 });
 
-const validatePassword = function(request, username, password, callback) {
+const validatePassword = async function(request, username, password, h) {
   if (!username || !password) {
-    return callback(null, false);
+    return {
+      isValid: false
+    };
   }
 
-  AccountLogin.withEmailPassword(username, password)
-    .then(accessToken => {
-      return callback(null, true, { accessToken });
-    })
-    .catch(error => {
-      return callback(error, false);
-    });
+  var accessToken = await AccountLogin.withEmailPassword(username, password);
+
+  return {
+    isValid: true,
+    accessToken
+  };
 };
+
 const validateToken = async function(request, username, password, h) {
   if (!username) {
-    return callback(null, false);
+    return {
+      isValid: false
+    };
   }
 
   var accessToken = await AccessToken.findOne({
