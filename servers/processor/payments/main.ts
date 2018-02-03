@@ -35,7 +35,7 @@ function handlePaymentMessage(payment: Payment) {
 
     try {
 
-      var invoice = await Invoice.findOne({
+      invoice = await Invoice.findOne({
         where: {
           currency: payment.currency,
           address: payment.address,
@@ -45,11 +45,15 @@ function handlePaymentMessage(payment: Payment) {
 
       if (invoice) {
 
+        invoice = invoice.toJSON();
+        console.log("INVOICE", invoice);
+
         invoice = await handlePayment(invoice, payment);
 
 				log.info("invoices:paid", invoice.uid);
 
         await channel.ack(message);
+        await channel.sendToQueue('invoices:paid', new Buffer(invoice.uid));
 
         Slack.notify(
           `invoice:${invoice.status} https://pos.anypay.global/invoices/${invoice.uid}`
