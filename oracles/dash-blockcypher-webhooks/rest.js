@@ -4,7 +4,7 @@ const restPort = process.env.REST_PORT || '12334';
 const logger = require('winston');
 const amqp = require("amqplib");
 
-const AMQP_QUEUE = 'anypay:payment:received';
+const AMQP_QUEUE = 'anypay:payments:received';
 
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 
