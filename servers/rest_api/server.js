@@ -59,10 +59,17 @@ const validatePassword = async function(request, username, password, h) {
 
   var accessToken = await AccountLogin.withEmailPassword(username, password);
 
-  return {
-    isValid: true,
-    accessToken
-  };
+  if (accessToken) {
+
+    return {
+      isValid: true,
+      credentials: { accessToken }
+    };
+  } else {
+    return {
+      isValid: false
+    }
+  }
 };
 
 const validateToken = async function(request, username, password, h) {
