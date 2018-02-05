@@ -2,6 +2,20 @@ const PairToken = require('../../../lib/models/pair_token');
 const AccessToken = require('../../../lib/models/access_token');
 const log = require('winston');
 
+module.exports.show = async (request, reply) => {
+  return PairToken.findAll({
+    where: {
+      account_id: request.account_id
+    }
+  })
+}
+module.exports.create = async (request, reply) => {
+  return PairToken.create({
+    account_id: request.account_id
+  })
+}
+
+
 module.exports.claim = (request, reply) => {
 
   if (!request.payload.device_name) {

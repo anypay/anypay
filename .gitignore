@@ -2,3 +2,5 @@ node_modules/
 *.swo
 *.swp
 .sqlite
+nbproject/
+dist/

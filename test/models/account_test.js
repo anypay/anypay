@@ -34,6 +34,35 @@ describe('Account Model', () => {
     });
   });
 
+  it('should reject an invalid bitcoin cash address', async () => {
+
+    try {
+      let account = await Account.create({
+        email: chance.email(),
+        bitcoin_cash_address: 'invalidaddress'
+      })
+
+      assert(!account.id);
+      if (account.id) { throw new Error('should not be valid') }
+
+    } catch(error) {
+      console.error(error.message);
+      assert(error);
+    }
+
+  });
+  it('should accept a valid bitcoin cash address', async () => {
+    var address = '13RS85NrE4TyHCVeuZu6d2N55nHGunNgCp';
+
+    let account = await Account.create({
+      email: chance.email(),
+      bitcoin_cash_address: address
+    })
+
+    assert(account.id > 0);
+    assert.strictEqual(account.bitcoin_cash_address, address);
+  });
+
   after(() => {
     database.close();
   });
