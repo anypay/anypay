@@ -164,6 +164,14 @@ async function Server() {
       handler: BitcoinCashInvoicesController.create
     }
   });
+  server.route({
+    method: "POST",
+    path: "/bitcoin-cash/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinCashInvoicesController.create
+    }
+  });
 
   server.route({
     method: "POST",

@@ -11,17 +11,21 @@ module.exports.create = async function(request, reply) {
   let dollarAmount = request.payload.amount;
   let accountId = request.auth.credentials.accessToken.account_id;
 
+  log.info('bitcoincash:invoice:create',
+    `amount:${dollarAmount},account_id:${accountId}`
+  );
+
   try {
 
     let invoice = await BitcoinCashInvoice.generate(dollarAmount, accountId)
 
-    log.info('invoice generated', invoice.toJSON());
+    log.info('bitcoincash:invoice:created', invoice.toJSON());
 
     return invoice;
 
   } catch(error) {
 
-    log.error('error generating invoice', error.msg);
+    log.error('error:bitcoincash:invoice:generate', error.msg);
 
     return Boom.badRequest(error);
   }
