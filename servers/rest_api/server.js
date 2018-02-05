@@ -57,7 +57,14 @@ const validatePassword = async function(request, username, password, h) {
     };
   }
 
-  var accessToken = await AccountLogin.withEmailPassword(username, password);
+  try {
+    var accessToken = await AccountLogin.withEmailPassword(username, password);
+  } catch(error) {
+    return {
+      isValid: false,
+      error: error.message
+    }
+  }
 
   if (accessToken) {
 
