@@ -1,20 +1,29 @@
 const BitcoinCashInvoice = require("../../../lib/bitcoin_cash/invoice");
+const Boom = require('boom');
+const log = require('winston');
 
-module.exports.create = function(request, reply) {
+module.exports.create = async function(request, reply) {
 
   if (!request.payload || !request.payload.amount) {
-    reply({ error: 'amount required (dollars)' });
-    return;
+    return Boom.badRequest(new Error('amount required (dollars)'));
   }
 
   let dollarAmount = request.payload.amount;
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  BitcoinCashInvoice.generate(dollarAmount, accountId).then(invoice => {
-    reply(invoice);
-  })
-  .catch(error => {
-    reply({ error: error.message }).code(500);
-  });
+  try {
+
+    let invoice = await BitcoinCashInvoice.generate(dollarAmount, accountId)
+
+    log.info('invoice generated', invoice.toJSON());
+
+    return invoice;
+
+  } catch(error) {
+
+    log.error('error generating invoice', error.msg);
+
+    return Boom.badRequest(error);
+  }
 }
 

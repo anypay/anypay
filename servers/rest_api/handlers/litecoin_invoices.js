@@ -1,20 +1,28 @@
 const LitecoinInvoice = require("../../../lib/litecoin/invoice");
 const log = require('winston');
+const Boom = require('boom');
 
-module.exports.create = function(request, reply) {
+module.exports.create = async function(request, reply) {
   let dollarAmount = request.payload.amount;
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  log.info('litecoin:invoice:generate', {
-    amount: dollarAmount,
-    account_id: accountId
-  });
+  log.info('litecoin:invoice:generate',
+    `amount:${dollarAmount},account_id:${accountId}`
+  );
 
-  LitecoinInvoice.generate(dollarAmount, accountId).then(invoice => {
-    reply(invoice);
-  })
-  .catch(error => {
-    reply({ error: error.message }).code(500);
-  });
+  try {
+
+    let invoice = await LitecoinInvoice.generate(dollarAmount, accountId);
+
+    log.info('litecoin:invoice:generated', invoice.toJSON());
+
+    return invoice;
+
+  } catch(error){
+
+    log.error('error:litecoin:invoice:generate', error.message);
+
+    return Boom.badRequest(error);
+  }
 }
 

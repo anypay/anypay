@@ -1,5 +1,6 @@
 const Invoice = require("../../../lib/models/invoice");
 const log = require('winston');
+const Boom = require('boom');
 
 module.exports.index = async (request, reply) => {
 
