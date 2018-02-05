@@ -1,6 +1,8 @@
 const Account = require('../../../lib/models/account');;
 const bcrypt = require('bcrypt');
 const log = require('winston');
+const Slack = require('../../../lib/slack/notifier');
+const Boom = require('boom');
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -19,10 +21,24 @@ module.exports.create = async (request, reply) => {
 
   let passwordHash = await hash(request.payload.password);
 
-  return Account.create({
-    email: request.payload.email,
-    password_hash: passwordHash
-  });
+  try {
+    let account = await Account.create({
+      email: request.payload.email,
+      password_hash: passwordHash
+    });
+
+    Slack.notify(`account:created | ${account.email}`);
+
+    return account;
+
+  } catch(error) {
+
+    log.error(`account ${email} already registered`);
+
+    return Boom.badRequest(
+      new Error(`account ${email} already registered`)
+    );
+  }
 }
 
 
