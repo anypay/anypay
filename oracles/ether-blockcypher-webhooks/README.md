@@ -31,7 +31,7 @@ The following environment variables can be set, with defaults:
 - REST_PORT (12334)
 - DB_PATH (/var/anypay/oracles/ether-blockcypher-webhook.db)
 - AMQP_URL (amqp://guest:guest@blockcypher.anypay.global:5672/)
-- BLOCKCYPHER_WEBHOOK_URL (https://api.anypay.global/oracles/ether-blockcypher-webhooks)
+- BLOCKCYPHER_ETHER_WEBHOOK_URL (https://api.anypay.global/oracles/ether-blockcypher-webhooks)
 - BLOCKCYPHER_TOKEN * must be provided, no default
 
 ## JSON RPC Interface

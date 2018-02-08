@@ -1,7 +1,7 @@
 const http = require("superagent");
 
 const token = process.env.BLOCKCYPHER_TOKEN;
-const webhookUrl = process.env.BLOCKCYPHER_WEBHOOK_URL ||
+const webhookUrl = process.env.BLOCKCYPHER_ETHER_WEBHOOK_URL ||
   'https://blockcypher.anypay.global/ether-blockcypher-webhooks'
 
 if (!token) {
