@@ -14,7 +14,7 @@ const server = Hapi.server({
 });
 
 function handleBlockcypherTx(tx, channel) {
-  //logger.info('blockcypher:webhook', tx);
+  logger.info('blockcypher:webhook', tx);
 
   var outputs = tx.outputs.map(output => {
     return {
@@ -55,7 +55,7 @@ amqp
     // Add the route
     server.route({
         method: 'POST',
-        path:'/oracles/eth-blockcypher-webhooks', 
+        path:'/oracles/ether-blockcypher-webhooks',
         handler: function (request, h) {
             //logger.info('payload', request.payload);
 
@@ -64,19 +64,6 @@ amqp
             return 'success';
         }
     });
-    /*
-
-    server.route({
-        method: 'POST',
-        path:'/oracles/dash-blockcypher-webhooks/{address}', 
-        handler: function (request, h) {
-
-            handleBlockcypherTx(request.payload);
-
-            return 'success';
-        }
-    });
-    */
 
     // Start the server
     async function start() {
