@@ -12,7 +12,7 @@ module.exports.index = async (request, reply) => {
     }
   });
 
-  return invoices;
+  return { invoices };
 };
 
 module.exports.show = async function(request, reply) {
