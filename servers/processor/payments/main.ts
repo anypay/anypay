@@ -53,7 +53,7 @@ function handlePaymentMessage(payment: Payment) {
 				log.info("invoices:paid", invoice.uid);
 
         await channel.ack(message);
-        await channel.sendToQueue('invoices:paid', new Buffer(invoice.uid));
+        await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
         Slack.notify(
           `invoice:${invoice.status} https://pos.anypay.global/invoices/${invoice.uid}`
