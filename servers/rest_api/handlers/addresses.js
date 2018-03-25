@@ -44,6 +44,11 @@ module.exports.update = async function(request, reply) {
       litecoin_enabled: true
     };
     break;
+  case 'XRP':
+    updateParams = {
+      ripple_address: address
+    };
+    break;
   case 'DOGE':
     updateParams = {
       dogecoin_address: address,

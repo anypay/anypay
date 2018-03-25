@@ -91,7 +91,18 @@ const validateToken = async function(request, username, password, h) {
       uid: username
     }
   })
+  var account = await Account.findOne({
+    where: {
+      id: accessToken.account_id
+    }
+  })
   if (accessToken) {
+		var account = await Account.findOne({
+			where: {
+				id: accessToken.account_id
+			}
+		})
+		request.account = account;
     request.account_id = accessToken.account_id;
 
     return {
@@ -146,14 +157,6 @@ async function Server() {
     config: {
       auth: "token",
       handler: PairTokensController.show
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/invoices",
-    config: {
-      auth: "token",
-      handler: DashInvoicesController.create
     }
   });
   server.route({
@@ -319,6 +322,14 @@ async function Server() {
     config: {
       auth: "token",
       handler: CoinsController.list
+    }
+  });
+  server.route({
+    method: "POST",
+    path: "/invoices",
+    config: {
+      auth: "token",
+      handler: InvoicesController.create
     }
   });
   server.route({
