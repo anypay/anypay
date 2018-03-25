@@ -23,6 +23,11 @@ function CoinsFromAccount(account) {
       name: 'litecoin',
       enabled: false
     },
+    'XRP': {
+      code: 'XRP',
+      name: 'ripple',
+      enabled: false
+    },
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
@@ -44,6 +49,10 @@ function CoinsFromAccount(account) {
 
   if (account.litecoin_address) {
     coins['LTC'].enabled = true;
+  }
+
+  if (account.ripple_address) {
+    coins['XRP'].enabled = true;
   }
 
   if (account.dogecoin_address && account.dogecoin_enabled) {
