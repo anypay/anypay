@@ -175,6 +175,14 @@ async function Server() {
       handler: BitcoinCashInvoicesController.create
     }
   });
+  server.route({
+    method: "POST",
+    path: "/bch/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinCashInvoicesController.create
+    }
+  });
 
   server.route({
     method: "POST",
@@ -202,6 +210,14 @@ async function Server() {
   });
   server.route({
     method: "POST",
+    path: "/btc/invoices",
+    config: {
+      auth: "token",
+      handler: BitcoinInvoicesController.create
+    }
+  });
+  server.route({
+    method: "POST",
     path: "/litecoin/invoices",
     config: {
       auth: "token",
@@ -210,7 +226,23 @@ async function Server() {
   });
   server.route({
     method: "POST",
+    path: "/ltc/invoices",
+    config: {
+      auth: "token",
+      handler: LitecoinInvoicesController.create
+    }
+  });
+  server.route({
+    method: "POST",
     path: "/dogecoin/invoices",
+    config: {
+      auth: "token",
+      handler: DogecoinInvoicesController.create
+    }
+  });
+  server.route({
+    method: "POST",
+    path: "/doge/invoices",
     config: {
       auth: "token",
       handler: DogecoinInvoicesController.create
