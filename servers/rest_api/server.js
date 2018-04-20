@@ -6,6 +6,8 @@ const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
+const HapiSwagger = require("hapi-swagger");
+const Pack = require('../../package');
 
 const AccountsController = require("./handlers/accounts");
 const AccessTokensController = require("./handlers/access_tokens");
@@ -35,8 +37,6 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const log = require("winston");
 const Features = require("../../lib/features");
-
-console.log("IN THE FILE");
 
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
@@ -119,19 +119,34 @@ const validateToken = async function(request, username, password, h) {
 async function Server() {
 
   await server.register(require('hapi-auth-basic'));
+  await server.register(require('inert'));
+  await server.register(require('vision'));
+  const swaggerOptions = server.register({
+    plugin: HapiSwagger,
+    options: {
+      info: {
+        title: 'Anypay API Documentation',
+        version: Pack.version,
+      }
+    }
+  })
 
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    handler: InvoicesController.show
+    config: {
+      tags: ['api'],
+      handler: InvoicesController.show
+    }
   });
   server.route({
     method: "GET",
     path: "/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: InvoicesController.index
     }
   });
@@ -140,6 +155,7 @@ async function Server() {
     path: "/dashboard",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: DashBoardController.index
     }
   });
@@ -148,6 +164,7 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: PairTokensController.create
     }
   });
@@ -156,6 +173,7 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: PairTokensController.show
     }
   });
@@ -164,6 +182,7 @@ async function Server() {
     path: "/bitcoin_cash/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BitcoinCashInvoicesController.create
     }
   });
@@ -172,6 +191,7 @@ async function Server() {
     path: "/bitcoin-cash/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BitcoinCashInvoicesController.create
     }
   });
@@ -180,6 +200,7 @@ async function Server() {
     path: "/bch/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BitcoinCashInvoicesController.create
     }
   });
@@ -189,6 +210,7 @@ async function Server() {
     path: "/zcash/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: ZcashInvoicesController.create
     }
   });
@@ -197,6 +219,7 @@ async function Server() {
     path: "/dash/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: DashInvoicesController.create
     }
   });
@@ -205,6 +228,7 @@ async function Server() {
     path: "/bitcoin/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BitcoinInvoicesController.create
     }
   });
@@ -213,6 +237,7 @@ async function Server() {
     path: "/btc/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BitcoinInvoicesController.create
     }
   });
@@ -221,6 +246,7 @@ async function Server() {
     path: "/litecoin/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: LitecoinInvoicesController.create
     }
   });
@@ -229,6 +255,7 @@ async function Server() {
     path: "/ltc/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: LitecoinInvoicesController.create
     }
   });
@@ -237,6 +264,7 @@ async function Server() {
     path: "/dogecoin/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: DogecoinInvoicesController.create
     }
   });
@@ -245,6 +273,7 @@ async function Server() {
     path: "/doge/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: DogecoinInvoicesController.create
     }
   });
@@ -252,6 +281,9 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts",
+    config: {
+      tags: ['api']
+    },
     handler: AccountsController.create
   });
 
@@ -267,6 +299,7 @@ async function Server() {
     path: "/access_tokens",
     config: {
       auth: "password",
+      tags: ['api'],
       handler: AccessTokensController.create
     }
   });
@@ -275,6 +308,7 @@ async function Server() {
     path: "/addresses",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: AddressesController.list
     }
   });
@@ -283,6 +317,7 @@ async function Server() {
     path: "/addresses/{currency}",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: AddressesController.update
     }
   });
@@ -291,6 +326,7 @@ async function Server() {
     path: "/payout_address",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: async (request, reply) => {
 
         let accountId = request.auth.credentials.accessToken.account_id;
@@ -306,6 +342,7 @@ async function Server() {
     path: "/account",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: AccountsController.show
     }
   });
@@ -314,6 +351,7 @@ async function Server() {
     path: "/balances",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: BalancesController.index
     }
   });
@@ -322,6 +360,7 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: ExtendedPublicKeysController.index
     }
   });
@@ -330,6 +369,7 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: ExtendedPublicKeysController.create
     }
   });
@@ -338,6 +378,7 @@ async function Server() {
     path: "/dash_payouts",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: (request, reply) => {
         let accountId = request.auth.credentials.accessToken.account_id;
         DashPayout.findAll({ where: { account_id: accountId } })
@@ -352,6 +393,7 @@ async function Server() {
     method: "GET",
     path: "/coins",
     config: {
+      tags: ['api'],
       auth: "token",
       handler: CoinsController.list
     }
@@ -361,6 +403,7 @@ async function Server() {
     path: "/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: InvoicesController.create
     }
   });
@@ -368,6 +411,7 @@ async function Server() {
     method: "POST",
     path: "/pair_tokens/{uid}",
     config: {
+      tags: ['api'],
       handler: PairTokensController.claim
     }
   });

@@ -31,6 +31,8 @@
     "flipit": "^2.0.3",
     "hapi": "^17.2.0",
     "hapi-auth-basic": "^5.0.0",
+    "hapi-swagger": "^9.1.1",
+    "inert": "^5.1.0",
     "jayson": "^2.0.5",
     "jsonschema": "^1.2.2",
     "level": "^2.1.2",
@@ -50,6 +52,7 @@
     "typings": "^2.1.1",
     "underscore": "^1.8.3",
     "uuid": "^3.2.1",
+    "vision": "^5.3.2",
     "winston": "^2.4.0",
     "ws": "^3.0.0"
   },
