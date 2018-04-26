@@ -1,4 +1,5 @@
 "use strict";
+require('dotenv').config();
 const logger = require('winston');
 const Hapi = require("hapi");
 const Invoice = require("../../lib/models/invoice");
@@ -8,6 +9,7 @@ const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
 
 const AccountsController = require("./handlers/accounts");
+const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
 const BalancesController = require("./handlers/balances");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
@@ -35,6 +37,7 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const log = require("winston");
 const Features = require("../../lib/features");
+const Joi = require('joi');
 
 console.log("IN THE FILE");
 
@@ -369,6 +372,27 @@ async function Server() {
     path: "/pair_tokens/{uid}",
     config: {
       handler: PairTokensController.claim
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/password-resets",
+    config: {
+      handler: PasswordsController.reset
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/password-resets/{uid}",
+    config: {
+      handler: PasswordsController.claim,
+      validate: {
+        payload: {
+          password: Joi.string().min(1)
+        }
+      }
     }
   });
 
