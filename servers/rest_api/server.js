@@ -37,6 +37,7 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const log = require("winston");
 const Features = require("../../lib/features");
+const Joi = require('joi');
 
 console.log("IN THE FILE");
 
@@ -379,6 +380,19 @@ async function Server() {
     path: "/password-resets",
     config: {
       handler: PasswordsController.reset
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/password-resets/{uid}",
+    config: {
+      handler: PasswordsController.claim,
+      validate: {
+        payload: {
+          password: Joi.string().min(1)
+        }
+      }
     }
   });
 
