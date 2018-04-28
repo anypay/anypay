@@ -8,7 +8,6 @@ const Account = require("../../lib/models/account");
 const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
 const HapiSwagger = require("hapi-swagger");
-const Pack = require('../../package');
 
 const AccountsController = require("./handlers/accounts");
 const PasswordsController = require("./handlers/passwords");
@@ -129,7 +128,7 @@ async function Server() {
     options: {
       info: {
         title: 'Anypay API Documentation',
-        version: Pack.version,
+        version: '1.0.1',
       }
     }
   })
