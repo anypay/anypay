@@ -151,9 +151,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
       },
       handler: InvoicesController.index
     }
@@ -165,9 +165,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
       },
       handler: DashBoardController.index
     }
@@ -188,9 +188,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
       },
       handler: PairTokensController.show
     }
@@ -202,11 +202,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: BitcoinCashInvoicesController.create
@@ -220,11 +220,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: ZcashInvoicesController.create
@@ -237,11 +237,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: DashInvoicesController.create
@@ -254,11 +254,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: BitcoinInvoicesController.create
@@ -271,11 +271,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: LitecoinInvoicesController.create
@@ -288,11 +288,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          amount: Joi.number()
+          amount: Joi.number().required()
         }
       },
       handler: DogecoinInvoicesController.create
@@ -305,12 +305,9 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
         payload: {
-          email: Joi.string().email(),
-          password: Joi.string()
+          email: Joi.string().email().required(),
+          password: Joi.string().required()
         }
       },
       handler: AccountsController.create
@@ -331,9 +328,9 @@ async function Server() {
       auth: "password",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
       },
       handler: AccessTokensController.create
     }
@@ -345,9 +342,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
       },
       handler: AddressesController.list
     }
@@ -359,14 +356,14 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         params: {
-          currency: Joi.string()
+          currency: Joi.string().required()
         },
         payload: {
-          address: Joi.string()
+          address: Joi.string().required()
         }
       },
       handler: AddressesController.update
@@ -379,9 +376,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
       },
       handler: AccountsController.show
     }
@@ -393,9 +390,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
       },
       handler: ExtendedPublicKeysController.index
     }
@@ -407,11 +404,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          xpubkey: Joi.string()
+          xpubkey: Joi.string().required()
         }
       },
       handler: ExtendedPublicKeysController.create
@@ -424,9 +421,9 @@ async function Server() {
       tags: ['api'],
       auth: "token",
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
       },
       handler: CoinsController.list
     }
@@ -439,12 +436,12 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.create,
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        },
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
         payload: {
-          currency: Joi.string(),
-          amount: Joi.number().positive()
+          currency: Joi.string().required(),
+          amount: Joi.number().positive().required()
         }
       }
     }
@@ -455,9 +452,9 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        headers: {
-          'Authorization': Joi.string().regex(/^(Basic) \w+/g)
-        }
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
       },
       handler: PairTokensController.claim
     }
@@ -471,7 +468,7 @@ async function Server() {
       handler: PasswordsController.reset,
       validate: {
         payload: {
-          email: Joi.string().email()
+          email: Joi.string().email().required()
         }
       }
     }
@@ -485,7 +482,7 @@ async function Server() {
       handler: PasswordsController.claim,
       validate: {
         payload: {
-          password: Joi.string().min(1)
+          password: Joi.string().min(1).required()
         }
       }
     }
