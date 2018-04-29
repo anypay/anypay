@@ -123,6 +123,10 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
+const kBasicAuthorizationAllowOtherHeaders = Joi.object({
+    authorization: Joi.string().regex(/^(Basic) \w+/g).required()
+}).unknown()
+
 async function Server() {
 
   await server.register(require('hapi-auth-basic'));
@@ -155,9 +159,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: InvoicesController.index
     }
@@ -169,9 +171,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: DashBoardController.index
     }
@@ -192,9 +192,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: PairTokensController.show
     }
@@ -206,9 +204,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -224,9 +220,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -241,9 +235,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -258,9 +250,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -275,9 +265,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -292,9 +280,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           amount: Joi.number().required()
         }
@@ -332,9 +318,7 @@ async function Server() {
       auth: "password",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: AccessTokensController.create
     }
@@ -346,9 +330,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: AddressesController.list
     }
@@ -360,9 +342,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         params: {
           currency: Joi.string().required()
         },
@@ -380,9 +360,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: AccountsController.show
     }
@@ -394,9 +372,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: ExtendedPublicKeysController.index
     }
@@ -408,9 +384,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           xpubkey: Joi.string().required()
         }
@@ -425,9 +399,7 @@ async function Server() {
       tags: ['api'],
       auth: "token",
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: CoinsController.list
     }
@@ -440,9 +412,7 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.create,
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: {
           currency: Joi.string().required(),
           amount: Joi.number().positive().required()
@@ -456,9 +426,7 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: PairTokensController.claim
     }
