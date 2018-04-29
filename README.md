@@ -16,6 +16,18 @@ Configuration of the application is done via environment variables
 - set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
 for bitcoin cash
 
+## Generating API Documenation
+
+To generate API documenation locally with swagger you must run the REST API process.
+
+First set the DATABASE_URL to a valid postgresql database, as outlined below.
+
+Then run `node servers/rest_api/server.js` and navigate your browser to `http://localhost:8000/documentation`.
+
+The JSON schema used to generate Swagger clients is then available at `http://localhost:8000/swagger.json`.
+
+Setting the `PORT` environment variable to something other than 8000 will allow use of a different http port.
+
 ## Running the Tests
 
 Ideally every piece of the application will have accompanying tests to increase
