@@ -124,7 +124,7 @@ const validateToken = async function(request, username, password, h) {
 };
 
 const kBasicAuthorizationAllowOtherHeaders = Joi.object({
-    authorization: Joi.string().regex(/^(Basic) \w+/g).required()
+  authorization: Joi.string().regex(/^(Basic) \w+/g).required()
 }).unknown()
 
 async function Server() {
@@ -149,8 +149,14 @@ async function Server() {
     path: "/invoices/{invoice_id}",
     config: {
       tags: ['api'],
-      handler: InvoicesController.show
-    }
+      handler: InvoicesController.show,
+      validate: {
+        headers: kBasicAuthorizationAllowOtherHeaders,
+      },
+      response: {
+        schema: Invoice.Response
+      },
+    },
   });
   server.route({
     method: "GET",
@@ -161,7 +167,12 @@ async function Server() {
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: InvoicesController.index
+      handler: InvoicesController.index,
+      response: {
+        schema: Joi.object({
+          invoices: Joi.array().items(Invoice.Response)
+        }).label('InvoiceIndex')
+      }
     }
   });
   server.route({
