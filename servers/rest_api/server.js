@@ -7,6 +7,7 @@ const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const PairToken = require("../../lib/models/pair_token");
 const DashPayout = require("../../lib/models/dash_payout");
+const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
 const PasswordsController = require("./handlers/passwords");
@@ -38,8 +39,6 @@ const WebhookHandler = new EventEmitter();
 const log = require("winston");
 const Features = require("../../lib/features");
 const Joi = require('joi');
-
-console.log("IN THE FILE");
 
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
@@ -122,19 +121,39 @@ const validateToken = async function(request, username, password, h) {
 async function Server() {
 
   await server.register(require('hapi-auth-basic'));
+  await server.register(require('inert'));
+  await server.register(require('vision'));
+  const swaggerOptions = server.register({
+    plugin: HapiSwagger,
+    options: {
+      info: {
+        title: 'Anypay API Documentation',
+        version: '1.0.1',
+      }
+    }
+  })
 
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    handler: InvoicesController.show
+    config: {
+      tags: ['api'],
+      handler: InvoicesController.show
+    }
   });
   server.route({
     method: "GET",
     path: "/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+      },
       handler: InvoicesController.index
     }
   });
@@ -143,6 +162,12 @@ async function Server() {
     path: "/dashboard",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+      },
       handler: DashBoardController.index
     }
   });
@@ -151,6 +176,7 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
+      tags: ['api'],
       handler: PairTokensController.create
     }
   });
@@ -159,23 +185,13 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+      },
       handler: PairTokensController.show
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/bitcoin_cash/invoices",
-    config: {
-      auth: "token",
-      handler: BitcoinCashInvoicesController.create
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/bitcoin-cash/invoices",
-    config: {
-      auth: "token",
-      handler: BitcoinCashInvoicesController.create
     }
   });
   server.route({
@@ -183,15 +199,33 @@ async function Server() {
     path: "/bch/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: BitcoinCashInvoicesController.create
     }
   });
 
   server.route({
     method: "POST",
-    path: "/zcash/invoices",
+    path: "/zec/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: ZcashInvoicesController.create
     }
   });
@@ -200,15 +234,16 @@ async function Server() {
     path: "/dash/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: DashInvoicesController.create
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/bitcoin/invoices",
-    config: {
-      auth: "token",
-      handler: BitcoinInvoicesController.create
     }
   });
   server.route({
@@ -216,15 +251,16 @@ async function Server() {
     path: "/btc/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: BitcoinInvoicesController.create
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/litecoin/invoices",
-    config: {
-      auth: "token",
-      handler: LitecoinInvoicesController.create
     }
   });
   server.route({
@@ -232,15 +268,16 @@ async function Server() {
     path: "/ltc/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: LitecoinInvoicesController.create
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/dogecoin/invoices",
-    config: {
-      auth: "token",
-      handler: DogecoinInvoicesController.create
     }
   });
   server.route({
@@ -248,6 +285,15 @@ async function Server() {
     path: "/doge/invoices",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
       handler: DogecoinInvoicesController.create
     }
   });
@@ -255,7 +301,16 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts",
-    handler: AccountsController.create
+    config: {
+      tags: ['api'],
+      validate: {
+        payload: {
+          email: Joi.string().email().required(),
+          password: Joi.string().required()
+        }
+      },
+      handler: AccountsController.create
+    },
   });
 
   server.route({
@@ -270,6 +325,12 @@ async function Server() {
     path: "/access_tokens",
     config: {
       auth: "password",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
+      },
       handler: AccessTokensController.create
     }
   });
@@ -278,6 +339,12 @@ async function Server() {
     path: "/addresses",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
+      },
       handler: AddressesController.list
     }
   });
@@ -286,22 +353,19 @@ async function Server() {
     path: "/addresses/{currency}",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        params: {
+          currency: Joi.string().required()
+        },
+        payload: {
+          address: Joi.string().required()
+        }
+      },
       handler: AddressesController.update
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/payout_address",
-    config: {
-      auth: "token",
-      handler: async (request, reply) => {
-
-        let accountId = request.auth.credentials.accessToken.account_id;
-
-        await DashPayoutAddress.save(accountId, request.payload.address)
-
-        return { success: true };
-      }
     }
   });
   server.route({
@@ -309,15 +373,13 @@ async function Server() {
     path: "/account",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
+      },
       handler: AccountsController.show
-    }
-  });
-  server.route({
-    method: "GET",
-    path: "/balances",
-    config: {
-      auth: "token",
-      handler: BalancesController.index
     }
   });
   server.route({
@@ -325,6 +387,12 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
+      },
       handler: ExtendedPublicKeysController.index
     }
   });
@@ -333,29 +401,29 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          xpubkey: Joi.string().required()
+        }
+      },
       handler: ExtendedPublicKeysController.create
-    }
-  });
-  server.route({
-    method: "GET",
-    path: "/dash_payouts",
-    config: {
-      auth: "token",
-      handler: (request, reply) => {
-        let accountId = request.auth.credentials.accessToken.account_id;
-        DashPayout.findAll({ where: { account_id: accountId } })
-          .then(reply)
-          .catch(error => {
-            reply({ error: error.message }).code(500);
-          });
-      }
     }
   });
   server.route({
     method: "GET",
     path: "/coins",
     config: {
+      tags: ['api'],
       auth: "token",
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown()
+      },
       handler: CoinsController.list
     }
   });
@@ -364,13 +432,29 @@ async function Server() {
     path: "/invoices",
     config: {
       auth: "token",
-      handler: InvoicesController.create
+      tags: ['api'],
+      handler: InvoicesController.create,
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+        payload: {
+          currency: Joi.string().required(),
+          amount: Joi.number().positive().required()
+        }
+      }
     }
   });
   server.route({
     method: "POST",
     path: "/pair_tokens/{uid}",
     config: {
+      tags: ['api'],
+      validate: {
+        headers: Joi.object({
+          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
+        }).unknown(),
+      },
       handler: PairTokensController.claim
     }
   });
@@ -379,7 +463,13 @@ async function Server() {
     method: "POST",
     path: "/password-resets",
     config: {
-      handler: PasswordsController.reset
+      tags: ['api'],
+      handler: PasswordsController.reset,
+      validate: {
+        payload: {
+          email: Joi.string().email().required()
+        }
+      }
     }
   });
 
@@ -387,10 +477,11 @@ async function Server() {
     method: "POST",
     path: "/password-resets/{uid}",
     config: {
+      tags: ['api'],
       handler: PasswordsController.claim,
       validate: {
         payload: {
-          password: Joi.string().min(1)
+          password: Joi.string().min(1).required()
         }
       }
     }
