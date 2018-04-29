@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=9.11"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/anypay/payment-service.git"
