@@ -234,9 +234,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
       handler: BitcoinCashInvoicesController.create
     }
@@ -250,11 +248,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
-      handler: ZcashInvoicesController.create
+      handler: ZcashInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -265,11 +262,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
-      handler: DashInvoicesController.create
+      handler: DashInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -280,11 +276,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
-      handler: BitcoinInvoicesController.create
+      handler: BitcoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -295,11 +290,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
-      handler: LitecoinInvoicesController.create
+      handler: LitecoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -310,11 +304,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          amount: Joi.number().required()
-        }
+        payload: Invoice.Request,
       },
-      handler: DogecoinInvoicesController.create
+      handler: DogecoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
 
@@ -429,7 +422,8 @@ async function Server() {
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders
       },
-      handler: CoinsController.list
+      handler: CoinsController.list,
+      plugins: responsesWithSuccess({ model: CoinsController.CoinsIndexResponse }),
     }
   });
   server.route({

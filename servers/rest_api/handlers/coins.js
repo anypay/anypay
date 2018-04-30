@@ -1,4 +1,5 @@
 const Account = require("../../../lib/models/account");
+const Joi = require('joi');
 const _ = require('underscore');
 
 function CoinsFromAccount(account) {
@@ -99,3 +100,13 @@ module.exports.list = async function(request, reply) {
     'coins': _.values(accountCoins)
   };
 }
+
+const Coin = Joi.object({
+  code: Joi.string().required(),
+  name: Joi.string().required(),
+  enabled: Joi.boolean().required(),
+}).label('Coin')
+
+module.exports.CoinsIndexResponse = Joi.object({
+  coins: Joi.array().items(Coin).label('Coins')
+}).label('CoinsIndexResponse');
