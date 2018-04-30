@@ -7,8 +7,17 @@ machine:
     DATABASE_URL: postgresql://ubuntu:@127.0.0.1:5432/circle_test
 
 dependencies:
+  override:
+    - yarn
+  cache_directories:
+    - ~/.cache/yarn
   pre:
     - docker build -t payment-service .
+
+test:
+  override:
+    - yarn db:migrate
+    - yarn test
 
 deployment:
   production:
