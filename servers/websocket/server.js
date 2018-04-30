@@ -1,6 +1,5 @@
 const server = require("http").createServer();
 const uuid = require("uuid");
-const _ = require("underscore");
 const amqp = require("amqplib");
 const AMQP_URL = "amqp://blockcypher.anypay.global";
 const QUEUE = "invoices:paid";
@@ -33,8 +32,8 @@ function unsubscribeClient(client) {
   let invoice = subscriptions[client.uid];
 
   if (invoices[invoice]) {
-    invoices[invoice] = _.reject(invoices[invoice], c => {
-      return c.uid === client.uid;
+    invoices[invoice] = invoices[invoice].filter(c => {
+      return c.uid !== client.uid;
     });
   }
   delete subscriptions[client.uid];
