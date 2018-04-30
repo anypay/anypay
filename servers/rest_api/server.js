@@ -175,6 +175,9 @@ async function Server() {
       handler: InvoicesController.show,
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
+        params: {
+          invoice_id: Joi.string().required()
+        },
       },
       plugins: responsesWithSuccess({ model: Invoice.Resposne })
     },
@@ -435,11 +438,9 @@ async function Server() {
       handler: InvoicesController.create,
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          currency: Joi.string().required(),
-          amount: Joi.number().positive().required()
-        }
-      }
+        payload: Invoice.Request,
+      },
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
