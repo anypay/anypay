@@ -1,6 +1,7 @@
 const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 const Account = require("../../../lib/models/account");
 const Boom = require('boom');
+const Joi = require('joi');
 
 module.exports.list = async function(request, reply) {
 
@@ -69,3 +70,12 @@ module.exports.update = async function(request, reply) {
   }
 }
 
+module.exports.PayoutAddresses = Joi.object({
+  BTC: Joi.string(),
+  DASH: Joi.string(),
+  BCH: Joi.string(),
+}).label('PayoutAddresses');
+
+module.exports.PayoutAddressUpdate = Joi.object({
+  address: Joi.string().required(),
+}).label('PayoutAddressUpdate');

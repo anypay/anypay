@@ -357,9 +357,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: AddressesController.list
+      handler: AddressesController.list,
+      plugins: responsesWithSuccess({ model: AddressesController.PayoutAddresses }),
     }
   });
   server.route({
@@ -373,11 +374,10 @@ async function Server() {
         params: {
           currency: Joi.string().required()
         },
-        payload: {
-          address: Joi.string().required()
-        }
+        payload: AddressesController.PayoutAddressUpdate,
       },
-      handler: AddressesController.update
+      handler: AddressesController.update,
+      plugins: responsesWithSuccess({ model: Account.Response })
     }
   });
   server.route({
