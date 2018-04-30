@@ -67,7 +67,7 @@
     "typescript": "^2.6.2"
   },
   "scripts": {
-    "test": "mocha --compilers ts:ts-node/register test/**",
+    "test": "mocha --compilers ts:ts-node/register test/**/*.js test/*.js",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate"
