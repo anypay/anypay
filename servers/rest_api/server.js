@@ -409,11 +409,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: {
-          xpubkey: Joi.string().required()
-        }
+        payload: ExtendedPublicKeysController.ExtendedPublicKey
       },
-      handler: ExtendedPublicKeysController.create
+      handler: ExtendedPublicKeysController.create,
+      plugins: responsesWithSuccess({ model: ExtendedPublicKeysController.ExtendedPublicKey }),
     }
   });
   server.route({
