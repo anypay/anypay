@@ -461,10 +461,9 @@ async function Server() {
       tags: ['api'],
       handler: PasswordsController.reset,
       validate: {
-        payload: {
-          email: Joi.string().email().required()
-        }
-      }
+        payload: PasswordsController.PasswordReset,
+      },
+      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
     }
   });
 
@@ -475,10 +474,9 @@ async function Server() {
       tags: ['api'],
       handler: PasswordsController.claim,
       validate: {
-        payload: {
-          password: Joi.string().min(1).required()
-        }
-      }
+        payload: PasswordsController.PasswordResetClaim,
+      },
+      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
     }
   });
 
