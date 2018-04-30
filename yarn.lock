@@ -903,9 +903,9 @@ base64id@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/base64id/-/base64id-1.0.0.tgz#47688cb99bb6804f0e06d3e763b1c32e57d8e6b6"
 
-bchaddrjs@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/bchaddrjs/-/bchaddrjs-0.1.4.tgz#8b180c1db77f4ec188680e58271fae2ce7475ba2"
+bchaddrjs@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/bchaddrjs/-/bchaddrjs-0.2.1.tgz#8c2f1582e24e5ca11687ae19e2463543cfa0dd24"
   dependencies:
     bs58check "^2.1.1"
     cashaddrjs "^0.2.7"
