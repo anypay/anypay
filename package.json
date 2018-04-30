@@ -67,6 +67,7 @@
     "typescript": "^2.6.2"
   },
   "scripts": {
+    "start": "node servers/rest_api/server.js",
     "test": "mocha --require ts-node/register test/**/*.js test/*.js",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
