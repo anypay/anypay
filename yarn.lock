@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@types/amqplib@^0.5.6":
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/@types/amqplib/-/amqplib-0.5.6.tgz#75ce568f8ebd71f0b0247f9fc7feaf7d337d480f"
+"@types/amqplib@^0.5.7":
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/@types/amqplib/-/amqplib-0.5.7.tgz#06e569f367546399b2bd96f393a9cc6c20eb794f"
   dependencies:
     "@types/bluebird" "*"
     "@types/events" "*"
@@ -22,9 +22,9 @@
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-1.0.5.tgz#ef9f12277233399c7f32086818a56a84c8952f8f"
 
-"@types/mocha@^2.2.47":
-  version "2.2.47"
-  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-2.2.47.tgz#30bbd880834d4af0f609025f282a69b8d4458f06"
+"@types/mocha@^5.2.0":
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/@types/mocha/-/mocha-5.2.0.tgz#b3c8e69f038835db1a7fdc0b3d879fc50506e29e"
 
 "@types/node@*":
   version "8.0.34"
