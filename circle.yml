@@ -5,6 +5,8 @@ machine:
     - docker
   environment:
     DATABASE_URL: postgresql://ubuntu:@127.0.0.1:5432/anypay_test
+  node:
+    version: 9.4.0
 
 database:
   override:
