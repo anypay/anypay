@@ -324,12 +324,10 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        payload: {
-          email: Joi.string().email().required(),
-          password: Joi.string().required()
-        }
+        payload: Account.Credentials,
       },
-      handler: AccountsController.create
+      handler: AccountsController.create,
+      plugins: responsesWithSuccess({ model: Account.Response }),
     },
   });
 
@@ -391,7 +389,8 @@ async function Server() {
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders
       },
-      handler: AccountsController.show
+      handler: AccountsController.show,
+      plugins: responsesWithSuccess({ model: Account.Response }),
     }
   });
   server.route({
