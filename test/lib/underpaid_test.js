@@ -3,6 +3,7 @@ const bitcoreDash = require('bitcore-lib-dash');
 
 const PaymentProcessor = require('../../lib/payment_processor');
 const Invoice = require('../../lib/models/invoice');
+const Account = require('../../lib/models/account');
 
 import * as assert from 'assert';
 
@@ -14,12 +15,15 @@ describe("Handling Underpayment with PaymentProcessor", () => {
 		const address = new DashAddress().toString();
 		const amountPaid = 0.95;
 
+		const account = await Account.create({
+			email: chance.email()
+		});
 		var invoice = await Invoice.create({
 			dollar_amount: 1000,
 			amount: 1,
 			currency: 'DASH',
 			address: address,
-			account_id: 1
+			account_id: account.id
 		});
 
 		let payment = {
@@ -42,4 +46,3 @@ class DashAddress {
 		return privateKey.toAddress();
 	}
 }
-
