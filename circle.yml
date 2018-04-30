@@ -8,10 +8,6 @@ dependencies:
   pre:
     - docker build -t payment-service .
 
-test:
-  override:
-    - echo 'run no tests'
-
 deployment:
   production:
     branch: master
@@ -23,4 +19,3 @@ deployment:
     commands:
       - ./push_to_docker_staging.sh
       - ssh defaultuser@api.staging.anypay.global "/home/defaultuser/restart_rest_api_staging.sh"
-
