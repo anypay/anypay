@@ -15,7 +15,7 @@
     "async": "^2.5.0",
     "aws-sdk": "^2.229.1",
     "bchaddrjs": "^0.1.4",
-    "bcrypt": "^1.0.2",
+    "bcrypt": "^2.0.1",
     "bcrypt-nodejs": "0.0.3",
     "bitcore-lib": "^0.15.0",
     "bitcore-lib-dash": "^0.13.21",
