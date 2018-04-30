@@ -127,6 +127,29 @@ const kBasicAuthorizationAllowOtherHeaders = Joi.object({
   authorization: Joi.string().regex(/^(Basic) \w+/g).required()
 }).unknown()
 
+const kBadRequestSchema = Joi.object({
+  statusCode: Joi.number().integer().required(),
+  error: Joi.string().required(),
+  message: Joi.string().required(),
+}).label('BoomError')
+
+function responsesWithSuccess({ model }) {
+  return {
+    'hapi-swagger': {
+      responses: {
+        200: {
+          description: 'Success',
+          schema: model
+        },
+        400: {
+          description: 'Bad Request',
+          schema: kBadRequestSchema,
+        },
+      },
+    },
+  }
+}
+
 async function Server() {
 
   await server.register(require('hapi-auth-basic'));
@@ -153,9 +176,7 @@ async function Server() {
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      response: {
-        schema: Invoice.Response
-      },
+      plugins: responsesWithSuccess({ model: Invoice.Resposne })
     },
   });
   server.route({
@@ -168,11 +189,7 @@ async function Server() {
         headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: InvoicesController.index,
-      response: {
-        schema: Joi.object({
-          invoices: Joi.array().items(Invoice.Response)
-        }).label('InvoiceIndex')
-      }
+      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
   });
   server.route({
@@ -184,7 +201,8 @@ async function Server() {
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: DashBoardController.index
+      handler: DashBoardController.index,
+      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
   });
   server.route({
