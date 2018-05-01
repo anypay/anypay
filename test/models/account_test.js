@@ -6,32 +6,20 @@ const chance = new Chance();
 
 describe('Account Model', () => {
 
-  it('should turn email to lower case when creating new account', done => {
+  it('should turn email to lower case when creating new account', async () => {
+    const email = chance.email();
 
-    let email = chance.email().toUpperCase();
-
-    let downcasedEmail = email.toLowerCase();
-
-    Account.create({
-      email: email
+    const account = await Account.create({
+      email: email.toUpperCase()
     })
-    .then(account => {
-      console.log('original email', email);
-      console.log('saved email', downcasedEmail);
-      assert.strictEqual(account.email, downcasedEmail);
-      done();
-    });
+    assert.strictEqual(account.email, email.toLowerCase());
   });
 
-  it('should automatically generate a uid', done => {
-
-    Account.create({
+  it('should automatically generate a uid', async () => {
+    const account = await Account.create({
       email: chance.email()
     })
-    .then(account => {
-      assert(account.uid);
-      done();
-    });
+    assert(account.uid);
   });
 
   it('should reject an invalid bitcoin cash address', async () => {
@@ -67,4 +55,3 @@ describe('Account Model', () => {
     database.close();
   });
 });
-
