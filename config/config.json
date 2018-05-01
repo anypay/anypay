@@ -1,15 +1,15 @@
 {
-    "development": {
+  "development": {
     "username": "postgres",
-    "password": "ok",
+    "password": null,
     "database": "anypay_development",
     "host": "127.0.0.1",
     "dialect": "postgresql"
   },
   "test": {
-    "username": "stevenzeiler",
+    "username": "postgres",
     "password": null,
-    "database": "anypay_dash_test",
+    "database": "anypay_test",
     "host": "127.0.0.1",
     "dialect": "postgresql"
   },
