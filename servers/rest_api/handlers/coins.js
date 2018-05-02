@@ -1,5 +1,4 @@
 const Account = require("../../../lib/models/account");
-const _ = require('underscore');
 
 function CoinsFromAccount(account) {
   var coins = {
@@ -96,6 +95,6 @@ module.exports.list = async function(request, reply) {
   let accountCoins = CoinsFromAccount(account);
 
   return {
-    'coins': _.values(accountCoins)
+    'coins': Object.values(accountCoins)
   };
 }
