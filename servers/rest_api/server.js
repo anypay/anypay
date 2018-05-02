@@ -478,7 +478,7 @@ async function Server() {
     }
   });
 
-  return;
+  return server;
 }
 
 if (require.main === module) {
@@ -491,7 +491,9 @@ if (require.main === module) {
     await server.start();
     console.log("Server running at:", server.info.uri);
   });
-} else {
-  // module is required, export server
-  module.exports = server;
+}
+
+module.exports = {
+  Server: Server,
+  server: server
 }

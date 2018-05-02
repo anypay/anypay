@@ -11,11 +11,12 @@ module.exports.list = async function(request, reply) {
   return {
     'BTC': account.bitcoin_payout_address,
     'DASH': account.dash_payout_address,
-    'BCH': account.bitcoin_cash_address
+    'BCH': account.bitcoin_cash_address,
+    'ZEC': account.zcash_t_address
   };
 };
 
-module.exports.update = async function(request, reply) {
+module.exports.update = function(request, reply) {
   let currency = request.params.currency;
   let address = request.payload.address;
   let accountId = request.auth.credentials.accessToken.account_id;
@@ -49,6 +50,11 @@ module.exports.update = async function(request, reply) {
       ripple_address: address
     };
     break;
+  case 'ZEC':
+    updateParams = {
+      zcash_t_address: address
+    };
+    break;
   case 'DOGE':
     updateParams = {
       dogecoin_address: address,
@@ -63,9 +69,7 @@ module.exports.update = async function(request, reply) {
     return Boom.badRequest('valid currency and address must be provided');
 
   } else {
-    var invoice = await Account.update(updateParams, {where: { id: accountId }})
-
-    return invoice;
+    return Account.update(updateParams, {where: { id: accountId }}).catch((err) => (console.info(err)));
   }
 }
 
