@@ -97,7 +97,7 @@ module.exports.list = async function(request, reply) {
   let accountCoins = CoinsFromAccount(account);
 
   return {
-    'coins': _.values(accountCoins)
+    'coins': Object.values(accountCoins)
   };
 }
 

@@ -1,4 +1,3 @@
-const _ = require('underscore');
 const password = require("../../../lib/password")
 const PasswordReset = require("../../../lib/models/password_resets");
 const Joi = require('joi');
