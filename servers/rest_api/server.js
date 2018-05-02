@@ -3,6 +3,7 @@ require('dotenv').config();
 const Hapi = require("hapi");
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
+const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
