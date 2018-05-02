@@ -33,6 +33,11 @@ function CoinsFromAccount(account) {
       code: 'DOGE',
       name: 'dogecoin',
       enabled: false
+    },
+    'ZEC': {
+      code: 'ZEC',
+      name: 'zcash',
+      enabled: false
     }
   };
 
@@ -54,6 +59,10 @@ function CoinsFromAccount(account) {
 
   if (account.ripple_address) {
     coins['XRP'].enabled = true;
+  }
+
+  if (account.zcash_t_address) {
+    coins['ZEC'].enabled = true;
   }
 
   if (account.dogecoin_address && account.dogecoin_enabled) {
