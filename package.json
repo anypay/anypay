@@ -52,6 +52,7 @@
     "superagent": "^3.5.2",
     "typescript": "^2.7.1",
     "typings": "^2.1.1",
+    "underscore": "^1.9.0",
     "uuid": "^3.2.1",
     "vision": "^5.3.2",
     "winston": "^2.4.0",
