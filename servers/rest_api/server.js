@@ -1,18 +1,13 @@
 "use strict";
 require('dotenv').config();
-const logger = require('winston');
 const Hapi = require("hapi");
-const Invoice = require("../../lib/models/invoice");
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
-const PairToken = require("../../lib/models/pair_token");
-const DashPayout = require("../../lib/models/dash_payout");
 const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
-const BalancesController = require("./handlers/balances");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
 const PairTokensController = require("./handlers/pair_tokens");
 const ZcashInvoicesController = require("./handlers/zcash_invoices");
@@ -26,18 +21,9 @@ const CoinsController = require("./handlers/coins");
 const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
-const DashCore = require("../../lib/dashcore");
-const DashPayoutAddress = require("../../lib/dash/payout_address");
-const Blockcypher = require("../../lib/blockcypher");
-const DashInvoice = require("../../lib/dash_invoice");
-const Basic = require("hapi-auth-basic");
-const bcrypt = require("bcrypt");
-const owasp = require("owasp-password-strength-test");
 const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
-const log = require("winston");
-const Features = require("../../lib/features");
 const Joi = require('joi');
 
 WebhookHandler.on("webhook", payload => {
