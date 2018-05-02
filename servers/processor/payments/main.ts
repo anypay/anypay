@@ -40,7 +40,8 @@ function handlePaymentMessage(payment: Payment) {
           currency: payment.currency,
           address: payment.address,
           status: "unpaid"
-        }
+        },
+        order: [['createdAt', 'DESC']]
       });
 
       if (invoice) {
