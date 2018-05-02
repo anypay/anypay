@@ -161,7 +161,6 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.show,
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         params: {
           invoice_id: Joi.string().required()
         },
