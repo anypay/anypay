@@ -1,11 +1,6 @@
 const sequelize = require('../../../lib/database');
 const ExtendedPublicKey = require('../../../lib/models/extended_public_key');
-
-function ReplyError(error) {
-  console.error(error.message);
-  reply({error: erorr.message});
-}
-
+const Joi = require('joi');
 
 module.exports.index = function(request, reply) {
   console.log('index', request.account_id);
@@ -50,3 +45,6 @@ module.exports.create = function(request, reply) {
   });
 }
 
+module.exports.ExtendedPublicKey = Joi.object({
+  xpubkey: Joi.string().required(),
+}).label('ExtendedPublicKey');

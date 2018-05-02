@@ -1,4 +1,7 @@
+const Invoice = require('../../../lib/models/invoice');
 const sequelize = require('../../../lib/database');
+const Joi = require('joi');
+
 module.exports.index = function(request, reply) {
   let accountId = 14;
   let currentDate = new Date();
@@ -24,3 +27,8 @@ module.exports.index = function(request, reply) {
       }).code(500);
     });
 }
+
+module.exports.IndexResponse = Joi.object({
+    invoices: Joi.array().items(Invoice.Response).required().label('Invoices'),
+    targetDate: Joi.date(),
+}).label('InvoiceIndexResponse');

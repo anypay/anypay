@@ -109,6 +109,33 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
+const kBasicAuthorizationAllowOtherHeaders = Joi.object({
+  authorization: Joi.string().regex(/^(Basic) \w+/g).required()
+}).unknown()
+
+const kBadRequestSchema = Joi.object({
+  statusCode: Joi.number().integer().required(),
+  error: Joi.string().required(),
+  message: Joi.string().required(),
+}).label('BoomError')
+
+function responsesWithSuccess({ model }) {
+  return {
+    'hapi-swagger': {
+      responses: {
+        200: {
+          description: 'Success',
+          schema: model
+        },
+        400: {
+          description: 'Bad Request',
+          schema: kBadRequestSchema,
+        },
+      },
+    },
+  }
+}
+
 async function Server() {
 
   await server.register(require('hapi-auth-basic'));
@@ -131,8 +158,15 @@ async function Server() {
     path: "/invoices/{invoice_id}",
     config: {
       tags: ['api'],
-      handler: InvoicesController.show
-    }
+      handler: InvoicesController.show,
+      validate: {
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        params: {
+          invoice_id: Joi.string().required()
+        },
+      },
+      plugins: responsesWithSuccess({ model: Invoice.Resposne })
+    },
   });
   server.route({
     method: "GET",
@@ -141,11 +175,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: InvoicesController.index
+      handler: InvoicesController.index,
+      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
   });
   server.route({
@@ -155,11 +188,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: DashBoardController.index
+      handler: DashBoardController.index,
+      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
   });
   server.route({
@@ -178,9 +210,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: PairTokensController.show
     }
@@ -192,12 +222,8 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
       handler: BitcoinCashInvoicesController.create
     }
@@ -210,14 +236,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
-      handler: ZcashInvoicesController.create
+      handler: ZcashInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -227,14 +250,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
-      handler: DashInvoicesController.create
+      handler: DashInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -244,14 +264,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
-      handler: BitcoinInvoicesController.create
+      handler: BitcoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -261,14 +278,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
-      handler: LitecoinInvoicesController.create
+      handler: LitecoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -278,14 +292,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          amount: Joi.number().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
       },
-      handler: DogecoinInvoicesController.create
+      handler: DogecoinInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
 
@@ -295,12 +306,10 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        payload: {
-          email: Joi.string().email().required(),
-          password: Joi.string().required()
-        }
+        payload: Account.Credentials,
       },
-      handler: AccountsController.create
+      handler: AccountsController.create,
+      plugins: responsesWithSuccess({ model: Account.Response }),
     },
   });
 
@@ -318,9 +327,7 @@ async function Server() {
       auth: "password",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: AccessTokensController.create
     }
@@ -332,11 +339,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
-      handler: AddressesController.list
+      handler: AddressesController.list,
+      plugins: responsesWithSuccess({ model: AddressesController.PayoutAddresses }),
     }
   });
   server.route({
@@ -346,17 +352,14 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
         params: {
           currency: Joi.string().required()
         },
-        payload: {
-          address: Joi.string().required()
-        }
+        payload: AddressesController.PayoutAddressUpdate,
       },
-      handler: AddressesController.update
+      handler: AddressesController.update,
+      plugins: responsesWithSuccess({ model: Account.Response })
     }
   });
   server.route({
@@ -366,11 +369,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
-      handler: AccountsController.show
+      handler: AccountsController.show,
+      plugins: responsesWithSuccess({ model: Account.Response }),
     }
   });
   server.route({
@@ -380,9 +382,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
       handler: ExtendedPublicKeysController.index
     }
@@ -394,14 +394,11 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          xpubkey: Joi.string().required()
-        }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: ExtendedPublicKeysController.ExtendedPublicKey
       },
-      handler: ExtendedPublicKeysController.create
+      handler: ExtendedPublicKeysController.create,
+      plugins: responsesWithSuccess({ model: ExtendedPublicKeysController.ExtendedPublicKey }),
     }
   });
   server.route({
@@ -411,11 +408,10 @@ async function Server() {
       tags: ['api'],
       auth: "token",
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown()
+        headers: kBasicAuthorizationAllowOtherHeaders
       },
-      handler: CoinsController.list
+      handler: CoinsController.list,
+      plugins: responsesWithSuccess({ model: CoinsController.CoinsIndexResponse }),
     }
   });
   server.route({
@@ -426,14 +422,10 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.create,
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
-        payload: {
-          currency: Joi.string().required(),
-          amount: Joi.number().positive().required()
-        }
-      }
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
+      },
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
   server.route({
@@ -442,9 +434,7 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        headers: Joi.object({
-          'authorization': Joi.string().regex(/^(Basic) \w+/g).required()
-        }).unknown(),
+        headers: kBasicAuthorizationAllowOtherHeaders,
       },
       handler: PairTokensController.claim
     }
@@ -457,10 +447,9 @@ async function Server() {
       tags: ['api'],
       handler: PasswordsController.reset,
       validate: {
-        payload: {
-          email: Joi.string().email().required()
-        }
-      }
+        payload: PasswordsController.PasswordReset,
+      },
+      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
     }
   });
 
@@ -471,10 +460,9 @@ async function Server() {
       tags: ['api'],
       handler: PasswordsController.claim,
       validate: {
-        payload: {
-          password: Joi.string().min(1).required()
-        }
-      }
+        payload: PasswordsController.PasswordResetClaim,
+      },
+      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
     }
   });
 
