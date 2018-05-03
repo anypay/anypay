@@ -21,6 +21,12 @@ export interface Invoice {
   paidAt?: Date;
 }
 
+export interface Oracle {
+  name: string;
+  registerAddress: (address: string) => Promise<string>;
+  deregisterAddress: (address: string) => Promise<boolean>;
+}
+
 export interface AccountInvoice extends Invoice {
   account_id: number;
 }
