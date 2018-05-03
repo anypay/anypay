@@ -19,7 +19,7 @@ describe("Interfaces", () => {
 
         },
         deregisterAddress: async (address) => {
-          return address;
+          return true;
 
         }
       })
