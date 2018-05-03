@@ -12,7 +12,6 @@ export class Oracles {
   }
 
   registerOracle(oracle: Oracle) {
-    console.log('register oracle!', oracle);
 
     if (this.oracles[oracle.name]) {
       log.info('oracle already registered', oracle.name);
