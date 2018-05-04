@@ -1,17 +1,8 @@
 import {Oracle} from '../../types/interfaces';
+import {BaseOracle} from './base';
 
-export class ZcashDirect implements Oracle {
+export class ZcashDirect extends BaseOracle implements Oracle {
 
   name: string = 'zcash:direct';
-
-  registerAddress(address: string): Promise<string> {
-
-    return Promise.resolve(address);
-  };
-
-  deregisterAddress(address: string): Promise<boolean> {
-
-    return Promise.resolve(true);
-  };
 }
 

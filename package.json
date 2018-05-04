@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@types/bluebird": "^3.5.20",
+    "@types/node": "^10.0.3",
     "amqplib": "^0.5.2",
     "async": "^2.5.0",
     "aws-sdk": "^2.229.1",
@@ -67,7 +68,7 @@
   },
   "scripts": {
     "start": "ts-node servers/rest_api/server.js",
-    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js",
+    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate"

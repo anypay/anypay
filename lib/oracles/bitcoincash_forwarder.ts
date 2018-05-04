@@ -1,17 +1,23 @@
 import {Oracle} from '../../types/interfaces';
+import {getNewAddress} from '../bitcoin_cash/forwarding_address_service';
+const assert = require("assert");
 
 export class BitcoinCashForwarder implements Oracle {
 
   name: string = 'bitcoincash:forwarder';
 
-  registerAddress(address: string): Promise<string> {
+  async registerAddress(address: string): Promise<string> {
 
-    return Promise.resolve(address);
+    let result = await getNewAddress(address);
+
+    return result.input;
   };
 
-  deregisterAddress(address: string): Promise<boolean> {
+  async deregisterAddress(address: string): Promise<boolean> {
 
-    return Promise.resolve(true);
+    // not implemented yet in bitcoin cash forwarding address service
+
+    return false;
   };
 }
 

@@ -4,14 +4,14 @@ export class EthereumBlockcypherDirect implements Oracle {
 
   name: string = 'ethereum:blockcypher:direct';
 
-  registerAddress(address: string): Promise<string> {
+  async registerAddress(address: string): Promise<string> {
 
-    return Promise.resolve(address);
+    return address;
   };
 
-  deregisterAddress(address: string): Promise<boolean> {
+  async deregisterAddress(address: string): Promise<boolean> {
 
-    return Promise.resolve(true);
+    return true;
   };
 }
 
