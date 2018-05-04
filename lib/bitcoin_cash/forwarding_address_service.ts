@@ -7,15 +7,16 @@ const BitcoinCashPrice = require('./price');
 
 const FORWADING_SERVICE_URL = process.env.FORWARDING_SERVICE_URL || 'http://127.0.0.1:8000';
 
-module.exports.getNewAddress = function getNewAddress(merchantAddress) {
+interface Binding {
+  input: string;
+  destination: string;
+}
+
+export function getNewAddress(merchantAddress: string): Promise<Binding> {
 
   return new Promise((resolve, reject) => {
     if (!merchantAddress) {
       reject(new Error('merchant address not provided'));
-    }
-
-    if (!Features.isEnabled("BITCOINCASH")) {
-      reject(new Error('Bitcoin Cash Not Enabled'));
     }
 
     http

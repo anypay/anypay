@@ -23,7 +23,6 @@ describe("Interfaces", () => {
         status: 'unpaid'
       });
 
-      console.log(invoice);
     });
 
   });

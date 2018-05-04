@@ -4,10 +4,11 @@ const BitcoinCashAddressService = require('./forwarding_address_service');
 const Features = require('../features');
 const log = require('winston');
 
+import {oracles} from '../';
+
 const BitcoinCashPrice = require('./price');
 
 module.exports.generate = async function generate(dollarAmount, accountId) {
-
 
   let account = await Account.findOne({ where: { id: accountId }})
 
@@ -16,15 +17,16 @@ module.exports.generate = async function generate(dollarAmount, accountId) {
     throw new Error('no bitcoin cash payout address');
   }
 
-  let address = await BitcoinCashAddressService
-    .getNewAddress(account.bitcoin_cash_address);
+  let oracle = oracles.getOracle('bitcoincash:forwarder');
+
+  let address = await oracle.registerAddress(account.bitcoin_cash_address)
 
   let bitcoinCashAmount = BitcoinCashPrice
     .convertDollarsToBitcoinCash(dollarAmount)
     .toFixed(5);
 
   let invoice = await Invoice.create({
-    address: address.input,
+    address: address,
     amount: bitcoinCashAmount,
     currency: 'BCH',
     dollar_amount: dollarAmount,
