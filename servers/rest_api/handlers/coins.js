@@ -4,14 +4,15 @@ const _ = require('underscore');
 
 function CoinsFromAccount(account) {
   var coins = {
-    'BCH': {
-      code: 'BCH',
-      name: 'bitcoin cash',
-      enabled: false
-    },
+
     'DASH': {
       code: 'DASH',
       name: 'dash',
+      enabled: false
+    },
+    'BCH': {
+      code: 'BCH',
+      name: 'bitcoin cash',
       enabled: false
     },
     'BTC': {
