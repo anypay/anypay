@@ -27,6 +27,8 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
+const Fixer = require('../../lib/fixer');
+
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
 });
@@ -463,6 +465,21 @@ async function Server() {
         payload: PasswordsController.PasswordResetClaim,
       },
       plugins: responsesWithSuccess({ model: PasswordsController.Success }),
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/base_currencies",
+    config: {
+      tags: ['api'],
+      handler: async (request, h) => {
+
+        var currencies = await Fixer.getCurrencies();
+
+        return currencies;
+
+      }
     }
   });
 
