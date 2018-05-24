@@ -32,6 +32,7 @@
     "commander": "^2.13.0",
     "cron": "^1.2.1",
     "dotenv": "^5.0.0",
+    "eventemitter2": "^5.0.1",
     "figlet": "^1.2.0",
     "flipit": "^2.0.3",
     "hapi": "^17.4.0",
@@ -64,7 +65,7 @@
     "@types/amqplib": "^0.5.7",
     "@types/mocha": "^5.2.0",
     "mocha": "^5.1.1",
-    "ts-node": "^6.0.2"
+    "ts-node": "^6.0.5"
   },
   "scripts": {
     "start": "ts-node servers/rest_api/server.js",
