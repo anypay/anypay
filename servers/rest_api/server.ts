@@ -29,21 +29,17 @@ const Joi = require('joi');
 
 const Fixer = require('../../lib/fixer');
 
-WebhookHandler.on("webhook", payload => {
-  console.log("payload", payload);
+import {events} from '../../lib/core';
+import {notify} from '../../lib/slack/notifier';
+
+events.on('address:set', async (changeset) => {
+
+  await notify(`address:set:${JSON.stringify(changeset)}`);
+
 });
 
-const server = new Hapi.Server({
-  host: process.env.HOST || "localhost",
-  port: process.env.PORT || 8000,
-  routes: {
-    cors: true,
-    validate: {
-      options: {
-        stripUnknown: true
-      }
-    }
-  }
+WebhookHandler.on("webhook", payload => {
+  console.log("payload", payload);
 });
 
 const validatePassword = async function(request, username, password, h) {
@@ -140,6 +136,19 @@ function responsesWithSuccess({ model }) {
 }
 
 async function Server() {
+
+  var server = new Hapi.Server({
+    host: process.env.HOST || "localhost",
+    port: process.env.PORT || 8000,
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      }
+    }
+  });
 
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
@@ -490,7 +499,7 @@ if (require.main === module) {
   // main module, sync database & start server
   sequelize.sync().then(async () => {
 
-    await Server();
+    var server = await Server();
 
     // Start the server
     await server.start();
@@ -498,7 +507,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = {
-  Server: Server,
-  server: server
-}
+export { Server }

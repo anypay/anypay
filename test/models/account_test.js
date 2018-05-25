@@ -63,8 +63,5 @@ describe('Account Model', () => {
     assert.strictEqual(account.bitcoin_cash_address, address);
   });
 
-  after(() => {
-    database.close();
-  });
 });
 
