@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@types/bluebird": "^3.5.20",
-    "@types/node": "^10.0.3",
     "amqplib": "^0.5.2",
     "async": "^2.5.0",
     "aws-sdk": "^2.229.1",
@@ -64,6 +63,8 @@
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
     "@types/mocha": "^5.2.0",
+    "@types/node": "^10.1.2",
+    "@types/sequelize": "^4.27.20",
     "mocha": "^5.1.1",
     "ts-node": "^6.0.5"
   },
