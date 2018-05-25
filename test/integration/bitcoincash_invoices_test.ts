@@ -22,13 +22,10 @@ describe("Creating Bitcoin Cash Invoices Via REST", async () => {
         password_hash: await hash(chance.word()),
         bitcoin_cash_address: '13RS85NrE4TyHCVeuZu6d2N55nHGunNgCp'
       })
-      console.log("account:created", account);
 
       accessToken = await AccessToken.create({
         account_id: account.id
       })
-
-      console.log('accessToken:created', accessToken);
 
     } catch(error) {
       console.error('ERROR', error.message);

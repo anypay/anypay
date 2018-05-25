@@ -16,7 +16,6 @@ module.exports.create = async function(request, reply) {
   );
 
   try {
-
     let invoice = await BitcoinCashInvoice.generate(dollarAmount, accountId)
 
     log.info('bitcoincash:invoice:created', invoice.toJSON());
