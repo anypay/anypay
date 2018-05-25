@@ -1,4 +1,4 @@
-import {Server, server} from '../../servers/rest_api/server';
+import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 import {hash} from '../../lib/password';
 
@@ -10,11 +10,11 @@ import * as Chance from 'chance';
 const chance = new Chance();
 
 describe("Creating Bitcoin Cash Invoices Via REST", async () => {
-  var accessToken;
+  var accessToken, server;
   
   before(async () => {
     await Database.sync();
-    await Server();
+    server = await Server();
 
     var account = await Account.create({
       email: chance.email(),
