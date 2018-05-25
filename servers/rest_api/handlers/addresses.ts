@@ -2,6 +2,8 @@ const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 const Account = require("../../../lib/models/account");
 const Boom = require('boom');
 const Joi = require('joi');
+import { setAddress } from '../../../lib/core';
+import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
 
 module.exports.list = async function(request, reply) {
 
@@ -17,61 +19,27 @@ module.exports.list = async function(request, reply) {
   };
 };
 
-module.exports.update = function(request, reply) {
+module.exports.update = async function(request, reply) {
   let currency = request.params.currency;
   let address = request.payload.address;
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  var updateParams;
+  let changeset = new AddressChangeSet(accountId, currency.toUpperCase(), address);
 
-  switch(currency) {
-  case 'DASH':
-    updateParams = {
-      dash_payout_address: address
-    };
-    break; 
-  case 'BTC':
-    updateParams = {
-      bitcoin_payout_address: address
-    };
-    break; 
-  case 'BCH':
-    updateParams = {
-      bitcoin_cash_address: address
-    };
-    break; 
-  case 'LTC':
-    updateParams = {
-      litecoin_address: address,
-      litecoin_enabled: true
-    };
-    break;
-  case 'XRP':
-    updateParams = {
-      ripple_address: address
-    };
-    break;
-  case 'ZEC':
-    updateParams = {
-      zcash_t_address: address
-    };
-    break;
-  case 'DOGE':
-    updateParams = {
-      dogecoin_address: address,
-      dogecoin_enabled: false
-    };
-    break;
-  default:
-  }
+  try {
 
-  if (!updateParams) {
+    await setAddress(changeset);
+
+    let account = Account.findOne({ where: { id: accountId }}); 
+
+    return account;
+
+  } catch(error) {
 
     return Boom.badRequest('valid currency and address must be provided');
 
-  } else {
-    return Account.update(updateParams, {where: { id: accountId }}).catch((err) => (console.info(err)));
-  }
+  };
+
 }
 
 module.exports.PayoutAddresses = Joi.object({

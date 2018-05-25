@@ -57,6 +57,24 @@ describe("Anypay Core", () => {
 
     });
 
+    it("setAddress should set a BTC address", async () => {
+
+      let addressChangeset = new AddressChangeSet(
+        account.id,
+        'BTC',
+        '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K'
+      );
+
+      await setAddress(addressChangeset); 
+
+      account = await Account.findOne({ where: {
+        id: account.id
+      }});
+
+      assert.strictEqual(account.bitcoin_payout_address, addressChangeset.address);
+
+    });
+
     it("#unsetAddress should emit an event", (done) => {
 
       events.once('address:unset', changeset => {
