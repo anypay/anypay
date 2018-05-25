@@ -3,7 +3,7 @@ const http = require("superagent");
 
 const SLACK_URL = 'https://hooks.slack.com/services/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'
 
-module.exports.notify = function(message) {
+export function notify(message: string) {
 
   http
     .post(SLACK_URL)

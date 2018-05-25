@@ -29,6 +29,15 @@ const Joi = require('joi');
 
 const Fixer = require('../../lib/fixer');
 
+import {events} from '../../lib/core';
+import {notify} from '../../lib/slack/notifier';
+
+events.on('address:set', async (changeset) => {
+
+  await notify(`address:set:${JSON.stringify(changeset)}`);
+
+});
+
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
 });
@@ -498,6 +507,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = {
-  Server: Server
-}
+export { Server }
