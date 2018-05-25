@@ -1,4 +1,4 @@
-import {Server, server} from '../../servers/rest_api/server';
+import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 
 const Database = require("../../lib/database");
@@ -7,10 +7,12 @@ import * as Chance from 'chance';
 const chance = new Chance();
 
 describe("Creating Bitcoin Cash Invoices Via REST", async () => {
+
+  var server;
   
   before(async () => {
     await Database.sync();
-    await Server();
+    server = await Server();
   });
 
   it("GET /base_currencies should return a list of base currencies", async () => {
