@@ -27,6 +27,8 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
+import * as monthlyChartsController from './handlers/monthly_totals';
+
 const Fixer = require('../../lib/fixer');
 
 import {events} from '../../lib/core';
@@ -489,6 +491,51 @@ async function Server() {
         return currencies;
 
       }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/usd",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.usd
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/btc",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.btc
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/dash",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.dash
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/bch",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.bch
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/total",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.total
     }
   });
 
