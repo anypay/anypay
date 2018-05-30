@@ -15,7 +15,13 @@ function forCurrencyForAccount(accountId: number)  {
 
     var result = await database.query(query);
 
-    return result[0];
+    return result[0].map(res => {
+      return {
+        month: res.mon,
+        year: res.yyyy,
+        total: parseFloat(res.total)
+      }
+    });
   }
 }
 
