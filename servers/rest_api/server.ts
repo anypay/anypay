@@ -28,6 +28,7 @@ const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
 import * as monthlyChartsController from './handlers/monthly_totals';
+import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 
 const Fixer = require('../../lib/fixer');
 
@@ -536,6 +537,16 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: monthlyChartsController.total
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/account/totals/monthly/{currency}",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: accountMonthlyChartsController.byCurrency
     }
   });
 
