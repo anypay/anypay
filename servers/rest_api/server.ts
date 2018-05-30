@@ -52,14 +52,8 @@ const validatePassword = async function(request, username, password, h) {
     };
   }
 
-  try {
-    var accessToken = await AccountLogin.withEmailPassword(username, password);
-  } catch(error) {
-    return {
-      isValid: false,
-      error: error.message
-    }
-  }
+  var accessToken = await AccountLogin.withEmailPassword(username, password);
+
 
   if (accessToken) {
 
@@ -67,10 +61,44 @@ const validatePassword = async function(request, username, password, h) {
       isValid: true,
       credentials: { accessToken }
     };
+
   } else {
-    return {
-      isValid: false
+    var account = await Account.findOne({
+      where: {
+        email: username
+      }
+    });
+    console.log("ACCOUNT", account);
+
+    if (!account) {
+
+      return {
+        isValid: false
+      }
     }
+
+    var accessToken = await AccessToken.findOne({
+      where: {
+        account_id: account.id,
+        uid: password
+      }
+    })
+
+    if (accessToken) {
+
+      return {
+        isValid: true,
+        credentials: { accessToken }
+      };
+
+    } else {
+
+      return {
+        isValid: false
+      }
+
+    }
+
   }
 };
 
