@@ -52,7 +52,7 @@
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "superagent": "^3.5.2",
-    "typescript": "^2.7.1",
+    "typescript": "^2.7.2",
     "typings": "^2.1.1",
     "underscore": "^1.9.0",
     "uuid": "^3.2.1",
@@ -64,7 +64,6 @@
     "@types/amqplib": "^0.5.7",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.2",
-    "@types/sequelize": "^4.27.20",
     "mocha": "^5.1.1",
     "ts-node": "^6.0.5"
   },
