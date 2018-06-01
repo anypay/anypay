@@ -1,5 +1,5 @@
 import * as Account from './account';
-import {DashBackMerchant} from './dash_back_merchant';
+var DashBackMerchant = require('./dash_back_merchant');
 
 export {
   Account,

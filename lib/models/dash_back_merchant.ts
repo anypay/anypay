@@ -24,5 +24,5 @@ var DashBackMerchant = sequelize.define('DashBackMerchant', {
   tableName: 'dash_back_merchants'
 });
 
-export { DashBackMerchant };
+module.exports = DashBackMerchant;
 
