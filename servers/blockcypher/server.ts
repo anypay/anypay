@@ -1,25 +1,34 @@
 const Hapi = require("hapi");
 const amqp = require("amqplib");
 const log = require("winston");
+require('dotenv').config();
 
-const AMQP_URL = "amqp://blockcypher.anypay.global";
+const AMQP_URL = process.env.AMQP_URL;
 const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
 const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
 const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 const DASH_QUEUE     = "blockcypher:dash:webhooks";
 const ETHEREUM_QUEUE     = "blockcypher:ethereum:webhooks";
 
-const server = new Hapi.Server();
+const Boom = require('boom');
 
-server.connection({
-  host: "0.0.0.0",
-  port: process.env.PORT || 8000
+var server = new Hapi.Server({
+  host: process.env.HOST || "localhost",
+  port: process.env.PORT || 8000,
+  routes: {
+    cors: true,
+    validate: {
+      options: {
+        stripUnknown: true
+      }
+    }
+  }
 });
 
 amqp
   .connect(AMQP_URL)
   .then(async (conn) => {
-    log.info("amqp:connected", AMQP_URL);
+    log.info("amqp:connected");
 
     conn.on("error", error => {
       log.error("amqp:connection:error", error);
@@ -47,7 +56,7 @@ amqp
       server.route({
         method: "POST",
         path: "/bitcoin/webhooks",
-        handler: function(request, reply) {
+        handler: function(request, h) {
           log.info("bitcoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -56,10 +65,10 @@ amqp
 
           if (!sent) {
             log.error("amqp:send:error", message);
-            reply().code(500);
+            throw Boom.badRequest();
           } else {
             log.info("amqp:sent", message);
-            reply();
+            return;
           }
         }
       });
@@ -67,7 +76,7 @@ amqp
       server.route({
         method: "POST",
         path: "/litecoin/webhooks",
-        handler: function(request, reply) {
+        handler: function(request, h) {
           log.info("litecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -76,10 +85,10 @@ amqp
 
           if (!sent) {
             log.error("amqp:send:error", message);
-            reply().code(500);
+            throw Boom.badRequest();
           } else {
             log.info("amqp:sent", message);
-            reply();
+            return;
           }
         }
       });
@@ -87,7 +96,7 @@ amqp
       server.route({
         method: "POST",
         path: "/dogecoin/webhooks",
-        handler: function(request, reply) {
+        handler: function(request, h) {
           log.info("dogecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -97,10 +106,10 @@ amqp
 
           if (!sent) {
             log.error("amqp:send:error", message);
-            reply().code(500);
+            throw Boom.badRequest();
           } else {
             log.info("amqp:sent", message);
-            reply();
+            return;
           }
         }
       });
@@ -108,7 +117,7 @@ amqp
       server.route({
         method: "POST",
         path: "/dash/webhooks",
-        handler: function(request, reply) {
+        handler: function(request, h) {
           log.info("dash:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -117,10 +126,10 @@ amqp
 
           if (!sent) {
             log.error("amqp:send:error", message);
-            reply().code(500);
+            throw Boom.badRequest();
           } else {
             log.info("amqp:sent", message);
-            reply();
+            return;
           }
         }
       });
@@ -128,7 +137,7 @@ amqp
       server.route({
         method: "POST",
         path: "/ethereum/webhooks",
-        handler: function(request, reply) {
+        handler: function(request, h) {
           log.info("ethereum:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -137,10 +146,11 @@ amqp
 
           if (!sent) {
             log.error("amqp:send:error", message);
-            reply().code(500);
+            throw Boom.badRequest();
+
           } else {
             log.info("amqp:sent", message);
-            reply();
+            return;
           }
         }
       });
