@@ -63,7 +63,8 @@ function handlePaymentMessage(payment: Payment) {
 
       } else {
 
-        throw new Error('no unpaid invoice found matching currency and address');
+        log.error('no unpaid invoice found matching currency and address');
+        channel.ack(message);
       }
 
     } catch(error) {
@@ -91,7 +92,8 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
 
   log.info("amqp:channel:connected");
 
-  await channel.assertQueue(PAYMENT_QUEUE, { durable: true })
+  await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
+  await channel.assertExchange('anypay:invoices', 'fanout');
 
   let consumer = PaymentConsumer(channel);
 
