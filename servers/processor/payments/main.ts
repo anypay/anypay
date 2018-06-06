@@ -1,3 +1,4 @@
+require('dotenv').config();
 const amqp = require("amqplib");
 const log = require("winston");
 const Blockcypher = require("../../../lib/blockcypher");
@@ -14,7 +15,7 @@ import {
 
 import {Payment} from '../../../types/interfaces';
 
-const AMQP_URL = "amqp://blockcypher.anypay.global";
+const AMQP_URL = process.env.AMQP_URL;
 const PAYMENT_QUEUE  = "anypay:payments:received";
 const validator = new Validator();
 

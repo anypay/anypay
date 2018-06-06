@@ -1,18 +1,19 @@
-const amqp = require("amqplib");
-const log = require("winston");
-const Blockcypher = require("../../../lib/blockcypher");
-const Invoice = require("../../../lib/models/invoice");
-const Dashcore = require("../../../lib/dashcore");
-const Slack = require("../../../lib/slack/notifier");
+require('dotenv').config();
+import amqp = require("amqplib");
+var log = require("winston");
+var Blockcypher = require("../../../lib/blockcypher");
+var Invoice = require("../../../lib/models/invoice");
+var Dashcore = require("../../../lib/dashcore");
+var Slack = require("../../../lib/slack/notifier");
 
-const AMQP_URL = "amqp://blockcypher.anypay.global";
-const QUEUE = "blockcypher:webhooks";
-const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
-const LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
-const DASH_QUEUE     = "blockcypher:dash:webhooks";
-const DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
+var AMQP_URL = process.env.AMQP_URL;
+var QUEUE = "blockcypher:webhooks";
+var BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
+var LITECOIN_QUEUE = "blockcypher:litecoin:webhooks";
+var DASH_QUEUE     = "blockcypher:dash:webhooks";
+var DOGECOIN_QUEUE = "blockcypher:dogecoin:webhooks";
 
-const PAYMENT_QUEUE  = "anypay:payments:received";
+var PAYMENT_QUEUE  = "anypay:payments:received";
 
 class InvoiceNotFoundError extends Error {}
 class InvoiceUnderpaidError extends Error {}
@@ -26,14 +27,12 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
       log.info(`blockcypher:${coin}:webhook`,webhook);
     } catch (error) {
       log.error("invalid webhook message format");
-      channel.ack(message);
-      return;
+      throw error;
     }
 
     if (!webhook.input_address) {
       log.error("no input_address in webhook, invalid format");
-      await channel.ack(message);
-      return;
+      throw new Error('no input_address');
     }
 
     let address = webhook.input_address;
@@ -45,7 +44,15 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
 
 function WebhookConsumer(currency, channel) {
   return async function(message) {
-    var payment = await parseWebhookMessage(message, currency.name, currency.fee);
+    try {
+    
+      var payment = await parseWebhookMessage(message, currency.name, currency.fee);
+
+    } catch(error) {
+
+      log.error(error.message);
+      await channel.ack(message);
+    }
 
     await channel.sendToQueue(PAYMENT_QUEUE, new Buffer(JSON.stringify({
       address: payment.address,
