@@ -51,7 +51,7 @@ function CoinsFromAccount(account) {
   }
 
   if (account.bitcoin_cash_address) {
-    coins['BCH'].enabled = true;
+    //coins['BCH'].enabled = true;
   }
 
   if (account.litecoin_address) {
@@ -63,7 +63,7 @@ function CoinsFromAccount(account) {
   }
 
   if (account.zcash_t_address) {
-    coins['ZEC'].enabled = true;
+    //coins['ZEC'].enabled = true;
   }
 
   if (account.dogecoin_address && account.dogecoin_enabled) {
