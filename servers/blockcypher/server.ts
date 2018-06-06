@@ -169,13 +169,18 @@ amqp
 
       await channel.assertQueue(ETHEREUM_QUEUE, { durable: true });
       log.info("amqp:ethereum:queue:asserted", ETHEREUM_QUEUE);
+      
+      try {
 
-      server.start(err => {
-        if (err) {
-          throw err;
-        }
+        await server.start();
         log.info("server:started", server.info.uri);
-      });
+
+      } catch(err) {
+
+        console.error(err.message);
+        process.exit(1);
+      }
+
     });
   })
   .catch(log.error);
