@@ -27,23 +27,22 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
+import * as monthlyChartsController from './handlers/monthly_totals';
+import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
+
 const Fixer = require('../../lib/fixer');
+
+import {events} from '../../lib/core';
+import {notify} from '../../lib/slack/notifier';
+
+events.on('address:set', async (changeset) => {
+
+  await notify(`address:set:${JSON.stringify(changeset)}`);
+
+});
 
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
-});
-
-const server = new Hapi.Server({
-  host: process.env.HOST || "localhost",
-  port: process.env.PORT || 8000,
-  routes: {
-    cors: true,
-    validate: {
-      options: {
-        stripUnknown: true
-      }
-    }
-  }
 });
 
 const validatePassword = async function(request, username, password, h) {
@@ -53,14 +52,8 @@ const validatePassword = async function(request, username, password, h) {
     };
   }
 
-  try {
-    var accessToken = await AccountLogin.withEmailPassword(username, password);
-  } catch(error) {
-    return {
-      isValid: false,
-      error: error.message
-    }
-  }
+  var accessToken = await AccountLogin.withEmailPassword(username, password);
+
 
   if (accessToken) {
 
@@ -68,10 +61,44 @@ const validatePassword = async function(request, username, password, h) {
       isValid: true,
       credentials: { accessToken }
     };
+
   } else {
-    return {
-      isValid: false
+    var account = await Account.findOne({
+      where: {
+        email: username
+      }
+    });
+    console.log("ACCOUNT", account);
+
+    if (!account) {
+
+      return {
+        isValid: false
+      }
     }
+
+    var accessToken = await AccessToken.findOne({
+      where: {
+        account_id: account.id,
+        uid: password
+      }
+    })
+
+    if (accessToken) {
+
+      return {
+        isValid: true,
+        credentials: { accessToken }
+      };
+
+    } else {
+
+      return {
+        isValid: false
+      }
+
+    }
+
   }
 };
 
@@ -140,6 +167,19 @@ function responsesWithSuccess({ model }) {
 }
 
 async function Server() {
+
+  var server = new Hapi.Server({
+    host: process.env.HOST || "localhost",
+    port: process.env.PORT || 8000,
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      }
+    }
+  });
 
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
@@ -483,6 +523,61 @@ async function Server() {
     }
   });
 
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/usd",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.usd
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/btc",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.btc
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/dash",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.dash
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/bch",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.bch
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/total",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.total
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/account/totals/monthly/{currency}",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: accountMonthlyChartsController.byCurrency
+    }
+  });
+
   return server;
 }
 
@@ -490,7 +585,7 @@ if (require.main === module) {
   // main module, sync database & start server
   sequelize.sync().then(async () => {
 
-    await Server();
+    var server = await Server();
 
     // Start the server
     await server.start();
@@ -498,7 +593,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = {
-  Server: Server,
-  server: server
-}
+export { Server }
