@@ -30,7 +30,7 @@ deployment:
     branch: master
     commands:
       - ./push_to_docker.sh
-      - ssh defaultuser@api.anypay.global "/home/defaultuser/restart_rest_api.sh"
+      - ssh root@api.anypay.global "sudo chef-client -o 'recipe[anypay_api::default]'"
   staging:
     branch: staging
     commands:
