@@ -38,8 +38,10 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
     let address = webhook.input_address;
 
     var amount = (webhook.value + blockcypherFee) / 100000000.00000;
+
+    let hash = webhook.input_transaction_hash;
     
-    return { address, amount };
+    return { address, amount, hash };
 }
 
 function WebhookConsumer(currency, channel) {
@@ -57,7 +59,8 @@ function WebhookConsumer(currency, channel) {
     await channel.sendToQueue(PAYMENT_QUEUE, new Buffer(JSON.stringify({
       address: payment.address,
       currency: currency.code,
-      amount: payment.amount
+      amount: payment.amount,
+      hash: payment.hash
     })));
 
     await channel.ack(message);
