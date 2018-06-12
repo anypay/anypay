@@ -3,6 +3,7 @@ const amqp = require("amqplib");
 const log = require("winston");
 const Blockcypher = require("../../../lib/blockcypher");
 const Invoice = require("../../../lib/models/invoice");
+const Account = require("../../../lib/models/account");
 const Slack = require("../../../lib/slack/notifier");
 
 import {Connection, Channel, Message} from "amqplib"; 
@@ -57,8 +58,12 @@ function handlePaymentMessage(payment: Payment) {
         await channel.ack(message);
         await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
+        let account = await Account.findOne({
+          id: invoice.account_id
+        });
+
         Slack.notify(
-          `invoice:${invoice.status} https://pos.anypay.global/invoices/${invoice.uid}`
+          `invoice:${invoice.status} ${account.email} https://pos.anypay.global/invoices/${invoice.uid}`
         );
 
       } else {
