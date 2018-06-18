@@ -15,6 +15,7 @@ const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
+const BitcoinLightningInvoicesController = require("./handlers/bitcoin_lightning_invoices");
 const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
 const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
@@ -282,6 +283,20 @@ async function Server() {
         payload: Invoice.Request,
       },
       handler: ZcashInvoicesController.create,
+      plugins: responsesWithSuccess({ model: Invoice.Response }),
+    }
+  });
+  server.route({
+    method: "POST",
+    path: "/btc.lightning/invoices",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        headers: kBasicAuthorizationAllowOtherHeaders,
+        payload: Invoice.Request,
+      },
+      handler: BitcoinLightningInvoicesController.create,
       plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
