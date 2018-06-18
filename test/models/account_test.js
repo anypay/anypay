@@ -63,5 +63,17 @@ describe('Account Model', () => {
     assert.strictEqual(account.bitcoin_cash_address, address);
   });
 
+  it("should allow setting a lightning network account uri", async () => {
+    var uri = '13RS85NrE4TyHCVeuZu6d2N55nHGunNgCp@10.0.0.1:54343';
+
+    let account = await Account.create({
+      email: chance.email(),
+      lightning_uri: uri
+    })
+
+    assert(account.id > 0);
+    assert.strictEqual(account.lightning_uri, uri);
+  });
+
 });
 

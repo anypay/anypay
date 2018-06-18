@@ -39,6 +39,11 @@ function CoinsFromAccount(account) {
       code: 'ZEC',
       name: 'zcash',
       enabled: false
+    },
+    'BTC.lightning': {
+      code: 'BTC',
+      name: 'BTC Lightning',
+      enabled: false
     }
   };
 
@@ -68,6 +73,10 @@ function CoinsFromAccount(account) {
 
   if (account.dogecoin_address && account.dogecoin_enabled) {
     coins['DOGE'].enabled = true;
+  }
+
+  if (account.lightning_uri) {
+    coins['BTC.lightning'].enabled = true;
   }
 
   return coins;
