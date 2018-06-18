@@ -15,7 +15,7 @@ const ZcashInvoicesController = require("./handlers/zcash_invoices");
 const DashInvoicesController = require("./handlers/dash_invoices");
 const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
 const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
-import * as BitcoinLightningInvoicesController from "./handlers/bitcoin_lightning_invoices.ts";
+const BitcoinLightningInvoicesController = require("./handlers/bitcoin_lightning_invoices");
 const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
 const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
