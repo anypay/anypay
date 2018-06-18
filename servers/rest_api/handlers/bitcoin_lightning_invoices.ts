@@ -1,4 +1,4 @@
-import {create} = require("../../../lib/lightning/invoice");
+import {create} from "../../../lib/lightning/invoice";
 const Boom = require('boom');
 const log = require('winston');
 
