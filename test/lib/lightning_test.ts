@@ -11,10 +11,12 @@ describe("Lightning Library", () => {
   describe('Generating Lightning Invoice Without Save', async () => {
 
     it("#generateLightningInvoice should generate a new invoice", async () => {
+      if (process.env.LIGHTNING_SERVICE) {
 
-      let lightningInvoice = await generateLightningInvoice(10);
+        let lightningInvoice = await generateLightningInvoice(10);
 
-      console.log(lightningInvoice);
+        console.log(lightningInvoice);
+      }
 
       return;
 
@@ -25,18 +27,20 @@ describe("Lightning Library", () => {
   describe('Generating Lightning Invoice With Save', async () => {
 
     it("#create should genreate and save an invoice", async () => {
-      let account = await Account.create({ email: chance.email() })
-      console.log('account', account);
-      let amount = 10;
+      if (process.env.LIGHTNING_SERVICE) {
+        let account = await Account.create({ email: chance.email() })
+        console.log('account', account);
+        let amount = 10;
 
-      try {
-      let invoiceRecord = await create(amount, account.id);
+        try {
+        let invoiceRecord = await create(amount, account.id);
 
-        console.log('invoice created', invoiceRecord);
-      } catch(error) {
-        console.log('invoice error');
-        console.error(error.message);
-        throw error;
+          console.log('invoice created', invoiceRecord);
+        } catch(error) {
+          console.log('invoice error');
+          console.error(error.message);
+          throw error;
+        }
       }
 
       return;
