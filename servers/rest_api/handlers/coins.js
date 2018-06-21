@@ -68,7 +68,7 @@ function CoinsFromAccount(account) {
   }
 
   if (account.zcash_t_address) {
-    //coins['ZEC'].enabled = true;
+    coins['ZEC'].enabled = true;
   }
 
   if (account.dogecoin_address && account.dogecoin_enabled) {
