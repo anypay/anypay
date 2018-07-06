@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 import * as Account from '../models/account';
+import * as AccessToken from '../models/access_token';
 
 export async function registerAccount(email: string, password: string): Promise<any>{
 
@@ -11,6 +12,16 @@ export async function registerAccount(email: string, password: string): Promise<
   });
 
   return account;
+}
+
+export async function createAccessToken(accountId: number): Promise<any> {
+
+  let accessToken = AccessToken.create({
+    account_id: accountId
+  });
+
+  return accessToken;
+
 }
 
 function hash(password) {

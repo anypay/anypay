@@ -17,6 +17,19 @@ module.exports.update = async function(request, h) {
 
 };
 
+module.exports.show = async function(request, h) {
+
+  let accountId = request.auth.credentials.accessToken.account_id;
+
+  let denomination = await settings.getDenomination(accountId);
+
+  return {
+    success: true,
+    denomination
+  }
+
+};
+
 module.exports.DenominationUpdate = Joi.object({
   denomination: Joi.string()
 }).label('DenominationUpdate');
