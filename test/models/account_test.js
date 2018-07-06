@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const Account = require('../../lib/models/account');
 const database = require('../../lib/database');
 const assert = require('assert');
@@ -73,6 +75,17 @@ describe('Account Model', () => {
 
     assert(account.id > 0);
     assert.strictEqual(account.lightning_uri, uri);
+  });
+
+  it("should store the default denomination currency", async () => {
+
+    let account = await Account.create({
+      email: chance.email(),
+      denomination: 'VEF'
+    });
+
+    assert(account.id > 0);
+    assert.strictEqual(account.denomination, 'VEF');
   });
 
 });
