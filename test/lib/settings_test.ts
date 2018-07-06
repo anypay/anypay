@@ -20,7 +20,7 @@ describe("Settings", () => {
       let email = chance.email();
       let password = chance.word();
 
-      account = await models.accounts.create({ email, password });
+      account = await models.Account.create({ email, password });
     });
 
     it("setDenomination should set the denomination", async () => {
