@@ -7,6 +7,7 @@ const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
+const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
 const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
@@ -520,6 +521,15 @@ async function Server() {
         payload: PasswordsController.PasswordResetClaim,
       },
       plugins: responsesWithSuccess({ model: PasswordsController.Success }),
+    }
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/settings/denomination",
+    config: {
+      tags: ['api'],
+      handler: DenominationsController.update
     }
   });
 
