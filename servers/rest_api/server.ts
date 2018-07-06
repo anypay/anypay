@@ -529,7 +529,18 @@ async function Server() {
     path: "/settings/denomination",
     config: {
       tags: ['api'],
+      auth: "token",
       handler: DenominationsController.update
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/settings/denomination",
+    config: {
+      tags: ['api'],
+      auth: "token",
+      handler: DenominationsController.show
     }
   });
 
