@@ -141,6 +141,7 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
+// Unused
 const kBasicAuthorizationAllowOtherHeaders = Joi.object({
   authorization: Joi.string().regex(/^(Basic) \w+/g).required()
 }).unknown()
@@ -161,6 +162,10 @@ function responsesWithSuccess({ model }) {
         },
         400: {
           description: 'Bad Request',
+          schema: kBadRequestSchema,
+        },
+        401: {
+          description: 'Unauthorized',
           schema: kBadRequestSchema,
         },
       },
@@ -192,7 +197,15 @@ async function Server() {
       info: {
         title: 'Anypay API Documentation',
         version: '1.0.1',
-      }
+      },
+      securityDefinitions: {
+        simple: {
+          type: 'basic',
+        },
+      },
+      security: [{
+        simple: [],
+      }],
     }
   })
 
@@ -209,7 +222,7 @@ async function Server() {
           invoice_id: Joi.string().required()
         },
       },
-      plugins: responsesWithSuccess({ model: Invoice.Resposne })
+      plugins: responsesWithSuccess({ model: Invoice.Response })
     },
   });
   server.route({
@@ -218,9 +231,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-      },
       handler: InvoicesController.index,
       plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
@@ -231,9 +241,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-      },
       handler: DashBoardController.index,
       plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
@@ -253,9 +260,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-      },
       handler: PairTokensController.show
     }
   });
@@ -266,7 +270,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: BitcoinCashInvoicesController.create
@@ -280,7 +283,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: ZcashInvoicesController.create,
@@ -308,7 +310,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: DashInvoicesController.create,
@@ -322,7 +323,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: BitcoinInvoicesController.create,
@@ -336,7 +336,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: LitecoinInvoicesController.create,
@@ -350,7 +349,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: DogecoinInvoicesController.create,
@@ -384,10 +382,8 @@ async function Server() {
     config: {
       auth: "password",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders
-      },
-      handler: AccessTokensController.create
+      handler: AccessTokensController.create,
+      plugins: responsesWithSuccess({ model: AccessToken.Response })
     }
   });
   server.route({
@@ -396,9 +392,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-      },
       handler: AddressesController.list,
       plugins: responsesWithSuccess({ model: AddressesController.PayoutAddresses }),
     }
@@ -410,7 +403,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         params: {
           currency: Joi.string().required()
         },
@@ -426,9 +418,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders
-      },
       handler: AccountsController.show,
       plugins: responsesWithSuccess({ model: Account.Response }),
     }
@@ -439,9 +428,6 @@ async function Server() {
     config: {
       auth: "token",
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders
-      },
       handler: ExtendedPublicKeysController.index
     }
   });
@@ -452,7 +438,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: ExtendedPublicKeysController.ExtendedPublicKey
       },
       handler: ExtendedPublicKeysController.create,
@@ -465,9 +450,6 @@ async function Server() {
     config: {
       tags: ['api'],
       auth: "token",
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders
-      },
       handler: CoinsController.list,
       plugins: responsesWithSuccess({ model: CoinsController.CoinsIndexResponse }),
     }
@@ -480,7 +462,6 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.create,
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       plugins: responsesWithSuccess({ model: Invoice.Response }),
@@ -491,9 +472,6 @@ async function Server() {
     path: "/pair_tokens/{uid}",
     config: {
       tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-      },
       handler: PairTokensController.claim
     }
   });
