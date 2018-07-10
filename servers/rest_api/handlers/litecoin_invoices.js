@@ -1,6 +1,6 @@
-const LitecoinInvoice = require("../../../lib/litecoin/invoice");
 const log = require('winston');
 const Boom = require('boom');
+import {generateInvoice} from '../../../lib/invoice';
 
 module.exports.create = async function(request, reply) {
   let dollarAmount = request.payload.amount;
@@ -12,7 +12,7 @@ module.exports.create = async function(request, reply) {
 
   try {
 
-    let invoice = await LitecoinInvoice.generate(dollarAmount, accountId);
+    let invoice = await generateInvoice(accountId, denominationAmount, 'LTC');
 
     log.info('litecoin:invoice:generated', invoice.toJSON());
 
