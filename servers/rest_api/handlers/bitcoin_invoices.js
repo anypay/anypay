@@ -1,18 +1,18 @@
-const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 const Boom = require('boom');
 const log = require('winston');
+import {generateInvoice} from '../../../lib/invoice';
 
 module.exports.create = async function(request, reply) {
-  let dollarAmount = request.payload.amount;
+  let denominationAmount = request.payload.amount;
   let accountId = request.auth.credentials.accessToken.account_id;
 
   log.info('generate bitcoin core invoice',
-    `amount:${dollarAmount},account_id:${accountId}`
+    `amount:${denominationAmount},account_id:${accountId}`
   );
 
   try {
 
-    let invoice = await BitcoinInvoice.generate(dollarAmount, accountId)
+    let invoice = await generateInvoice(accountId, denominationAmount, 'BTC');
 
     log.info('generated bitcoin core invoice', invoice.toJSON());
 
