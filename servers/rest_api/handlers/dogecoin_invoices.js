@@ -1,20 +1,20 @@
-const DogecoinInvoice = require("../../../lib/dogecoin/invoice");
+import {generateInvoice} from '../../../lib/invoice';
 
 import * as Boom from 'boom';
 import * as log from 'winston';
 
 module.exports.create = async function(request, h) {
-  let dollarAmount = request.payload.amount;
+  let denominationAmount = request.payload.amount;
   let accountId = request.auth.credentials.accessToken.account_id;
 
   log.info('dogecoin:invoice:generate', {
-    amount: dollarAmount,
+    amount: denominationAmount,
     account_id: accountId
   });
   
   try {
 
-    let invoice = await DogecoinInvoice.generate(dollarAmount, accountId);
+    let invoice = await generateInvoice(accountId, denominationAmount, 'DOGE');
 
     return invoice;
 
