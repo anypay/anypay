@@ -1,4 +1,9 @@
 import * as DashAddressService from './dash/address_service';
+import * as LitecoinAddressService from './litecoin/address_service';
+import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
+import * as BitcoinAddressService from './bitcoin/address_service';
+import * as DogecoinAddressService from './dogecoin/address_service';
+import * as ZcashAddressService from './zcash/address_service';
 import * as Account from './models/account';
 import * as Invoice from './models/invoice';
 import {convert} from './prices';
@@ -28,6 +33,36 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
     case 'DASH':
 
       address = await DashAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'BTC':
+
+      address = await BitcoinAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'LTC':
+
+      address = await LitecoinAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'BCH':
+
+      address = await BitcoinCashAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'DOGE':
+
+      address = await DogecoinAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'ZEC':
+
+      address = await ZcashAddressService.getNewAddress(accountId);
 
       break;
   }
@@ -60,17 +95,52 @@ export async function generateInvoice(accountId: number, denominationAmountValue
     denominationAmount: {
       currency: address.currency,
       value: denominationAmountValue
+  }
+
+  if (!address) {
+    throw new Error(`unable to generate address for ${currency}`);
+  }
+
+  return {
+    currency,
+    value: address
+  }
+
+};
+
+export async function generateInvoice(accountId: number, denominationAmountValue: number, invoiceCurrency: string): Promise<any> {
+
+  var account = await Account.findOne({ where: { id: accountId }});
+
+  let invoiceAmount = await convert({
+    currency: account.denomination,
+    value: denominationAmountValue
+  }, invoiceCurrency);
+
+  let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
+
+  let invoiceChangeset: InvoiceChangeset = {
+    accountId,
+    address: address.value,
+    denominationAmount: {
+      currency: address.currency,
+      value: denominationAmountValue
     },
     invoiceAmount
-  }
+  };
 
   var invoice = await Invoice.create({
     address: invoiceChangeset.address,
-    amount: invoiceChangeset.invoiceAmount.value,
-    currency: invoiceChangeset.invoiceAmount.currency,
-    dollar_amount: invoiceChangeset.denominationAmount.value,
+    invoice_amount: invoiceChangeset.invoiceAmount.value,
+    invoice_currency: invoiceChangeset.invoiceAmount.currency,
+    denomination_currency: invoiceChangeset.denominationAmount.currency,
+    denomination_amount: invoiceChangeset.denominationAmount.value,
     account_id: invoiceChangeset.accountId,
-    status: 'unpaid'
+    status: 'unpaid',
+
+    amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
+    currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
+    dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
   return invoice;

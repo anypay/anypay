@@ -1,4 +1,3 @@
-const DashInvoice = require("../../../lib/dash/invoice");
 const log = require('winston');
 const Boom = require('boom');
 
