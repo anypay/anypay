@@ -1,5 +1,10 @@
 import {EventEmitter2} from 'eventemitter2';
-import {AddressChangeSet} from './types/address_change_set';
+
+import {
+  AddressChangeSet,
+  DenominationChangeset
+} from './types/address_change_set';
+
 const Account = require("../models/account");
 
 import * as logger from "winston";
@@ -124,6 +129,17 @@ export async function unsetAddress(changeset: AddressChangeSet) {
   events.emit('address:unset', changeset);
 
 };
+
+export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
+
+  var res = await Account.update({
+    denomination: changeset.currency
+  }, {where: { id: changeset.account_id }});
+
+  events.emit('denomination:set', changeset);
+
+  return;
+}
 
 export { events, logger };
 
