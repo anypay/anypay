@@ -29,23 +29,21 @@ describe("Anypay Core", () => {
 
       });
 
-      let addressChangeset = new AddressChangeSet(
-        account.id,
-        'DASH',
-        'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      );
-
-      setAddress(addressChangeset); 
+      setAddress({
+        account_id: account.id,
+        currency: 'DASH',
+        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      }); 
 
     });
 
     it("setAddress should set a DASH address", async () => {
 
-      let addressChangeset = new AddressChangeSet(
-        account.id,
-        'DASH',
-        'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      );
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'DASH',
+        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      };
 
       await setAddress(addressChangeset); 
 
@@ -59,11 +57,11 @@ describe("Anypay Core", () => {
 
     it("setAddress should set a BTC address", async () => {
 
-      let addressChangeset = new AddressChangeSet(
-        account.id,
-        'BTC',
-        '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K'
-      );
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'BTC',
+        address: '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K'
+      };
 
       await setAddress(addressChangeset); 
 
@@ -84,23 +82,23 @@ describe("Anypay Core", () => {
 
       });
 
-      let addressChangeset = new AddressChangeSet(
-        account.id,
-        'DASH',
-        'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      );
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'DASH',
+        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      };
 
-      unsetAddress(addressChangeset); 
+      unsetAddress(addressChangeset);
 
     });
 
     it("unsetAddress should remove a DASH address", async () => {
 
-      let addressChangeset = new AddressChangeSet(
-        account.id,
-        'DASH',
-        'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      );
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'DASH',
+        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      };
 
       await unsetAddress(addressChangeset); 
 

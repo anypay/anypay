@@ -1,15 +1,18 @@
 
-export class AddressChangeSet {
+interface AddressChangeSet {
   account_id: number;
   currency: string;
   address: string;
-  metadata: string;
+  metadata?: string;
+}
 
-  constructor(accountId: number, currency: string, address: string, metadata?: string) {
-    this.account_id = accountId;
-    this.currency = currency;
-    this.address = address;
-    this.metadata = metadata;
-  }
+interface DenominationChangeset {
+  account_id: number;
+  currency: string;
+}
+
+export {
+  AddressChangeSet,
+  DenominationChangeset 
 }
 

@@ -93,37 +93,7 @@ export async function generateInvoice(accountId: number, denominationAmountValue
     accountId,
     address: address.value,
     denominationAmount: {
-      currency: address.currency,
-      value: denominationAmountValue
-  }
-
-  if (!address) {
-    throw new Error(`unable to generate address for ${currency}`);
-  }
-
-  return {
-    currency,
-    value: address
-  }
-
-};
-
-export async function generateInvoice(accountId: number, denominationAmountValue: number, invoiceCurrency: string): Promise<any> {
-
-  var account = await Account.findOne({ where: { id: accountId }});
-
-  let invoiceAmount = await convert({
-    currency: account.denomination,
-    value: denominationAmountValue
-  }, invoiceCurrency);
-
-  let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
-
-  let invoiceChangeset: InvoiceChangeset = {
-    accountId,
-    address: address.value,
-    denominationAmount: {
-      currency: address.currency,
+      currency: account.denomination,
       value: denominationAmountValue
     },
     invoiceAmount
