@@ -33,6 +33,9 @@ function handlePaymentMessage(payment: Payment) {
   */
 
   return async function(channel: Channel, message: Message) {
+
+    await channel.publish('anypay', 'payments', new Buffer(JSON.stringify(payment)));
+
 		var invoice;
 
     try {
@@ -98,6 +101,7 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
   log.info("amqp:channel:connected");
 
   await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
+  await channel.assertExchange('anypay', 'fanout');
   await channel.assertExchange('anypay:invoices', 'fanout');
 
   let consumer = PaymentConsumer(channel);
