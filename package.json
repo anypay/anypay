@@ -21,6 +21,7 @@
     "bchaddrjs": "^0.2.1",
     "bcrypt": "^2.0.1",
     "bcrypt-nodejs": "0.0.3",
+    "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-lib": "^0.15.0",
     "bitcore-lib-dash": "^0.13.21",
     "bluebird": "^3.5.0",
@@ -58,7 +59,8 @@
     "uuid": "^3.2.1",
     "vision": "^5.3.2",
     "winston": "^2.4.0",
-    "ws": "^3.0.0"
+    "ws": "^3.0.0",
+    "zeromq": "^4.6.0"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
