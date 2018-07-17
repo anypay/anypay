@@ -48,6 +48,7 @@
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
     "qrcode-terminal": "^0.11.0",
+    "redis": "^2.8.0",
     "sequelize": "^4.37.6",
     "sequelize-cli": "^4.0.0",
     "socket.io": "^2.0.3",
