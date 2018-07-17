@@ -8,7 +8,6 @@ require("dotenv").config();
 
 const port = process.env.PORT || 28332;
 const RpcClient = require('bitcoind-rpc-dash');
-const bitcore = require('bitcore');
 const amqp = require('amqplib');
 
 const PAYMENT_QUEUE  = "anypay:payments:received";
@@ -34,7 +33,7 @@ sock.subscribe('hashtx');
 sock.subscribe('rawtx');
 console.log(`Worker connected to ${process.env.ZEROMQ_HOST}`);
 
-(async function() {
+async function start() {
 
   var conn = await amqp.connect(process.env.AMQP_URL)
 
@@ -86,15 +85,11 @@ console.log(`Worker connected to ${process.env.ZEROMQ_HOST}`);
       }
   });
 
-})();
-
-async function handleRawtx(rawtx: string): Promise<any> {
-
-
 }
 
-async function handleHashtx(txhash: string): Promise<any> {
+export { start };
 
-
+if (require.main === module) {
+  start();
 }
 
