@@ -1,14 +1,14 @@
 const JsonRpc = require('../lib/jsonrpc');
-const Hapi = require('hapi');
+import * as Hapi from 'hapi';
 
-const amqp     = require('amqplib');
-const AMQP_URL = 'amqp://blockcypher.anypay.global';
-const AMQP_QUEUE = 'anypay:payment:received';
+import * as amqp from 'amqplib';
+let AMQP_URL = 'amqp://blockcypher.anypay.global';
+let AMQP_QUEUE = 'anypay:payment:received';
 
 const SEND_BITCOIN_CASH_QUEUE = 'bitcoincash:payment:send';
 
-const redis = require("redis");
-const bluebird = require('bluebird');
+import * as redis from 'redis';
+import * as bluebird from 'bluebird';
 
 bluebird.promisifyAll(redis.RedisClient.prototype);
 bluebird.promisifyAll(redis.Multi.prototype);
