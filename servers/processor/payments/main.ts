@@ -87,7 +87,11 @@ function handlePaymentMessage(payment: Payment) {
 function PaymentConsumer(channel: Channel) {
   return async function(message: Message) {
 
-    var payment = JSON.parse(message.content.toString());
+    var msgString = message.content.toString();
+
+    log.info('raw message string', msgString);
+
+    var payment = JSON.parse(msgString);
 
     // TODO: Validate data with JSONSchema
     handlePaymentMessage(payment)(channel, message);
