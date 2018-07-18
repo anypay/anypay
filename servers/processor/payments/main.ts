@@ -91,10 +91,20 @@ function PaymentConsumer(channel: Channel) {
 
     log.info('raw message string', msgString);
 
-    var payment = JSON.parse(msgString);
+    try {
 
-    // TODO: Validate data with JSONSchema
-    handlePaymentMessage(payment)(channel, message);
+      var payment = JSON.parse(msgString);
+
+      // TODO: Validate data with JSONSchema
+      handlePaymentMessage(payment)(channel, message);
+
+    } catch(error) {
+
+      log.error('error parsing json from message', msgString);
+
+      await channel.ack(message);
+
+    }
   };
 }
 

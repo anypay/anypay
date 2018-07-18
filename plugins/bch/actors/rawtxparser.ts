@@ -41,24 +41,23 @@ async function start(): Promise<any> {
 
         if (err) {
 
-          console.log('decoded raw tx error', err);
+          console.log(`decoded raw tx error ${rawtx}`, err);
 
           return channel.ack(msg);
 
         } else {
 
-          console.log('decoded raw tx', JSON.stringify(txjson));
+          console.log(`decoded raw tx ${rawtx}`, JSON.stringify(txjson));
 
           try {
-            console.log(txjson);
 
             var payments = rawTxToPayment(txjson);
-            console.log(payments);
             
             for (var i=0; i < payments.length; i++) {
               let payment = payments[i];
+              console.log('payment', payment);
 
-              await channel.sendToQueue(PAYMENT_QUEUE, new Buffer(
+              await channel.publish('anypay', 'bch:payments', new Buffer(
                 JSON.stringify(payment)
               ));
             }
