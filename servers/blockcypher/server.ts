@@ -117,12 +117,12 @@ amqp
       server.route({
         method: "POST",
         path: "/dash/webhooks",
-        handler: function(request, h) {
+        handler: async function(request, h) {
           log.info("dash:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
 
-          let sent = channel.sendToQueue(DASH_QUEUE, new Buffer(message));
+          let sent = await channel.sendToQueue(DASH_QUEUE, new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -131,6 +131,8 @@ amqp
             log.info("amqp:sent", message);
             return;
           }
+
+          return;
         }
       });
 
