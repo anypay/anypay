@@ -76,6 +76,7 @@
     "processor:blockcypher:start": "ts-node servers/processor/blockcypher/main.ts",
     "processor:payments:start": "ts-node servers/processor/payments/main.ts",
     "bch:monitor:zeromq": "ts-node plugins/bch/actors/zeromqmonitor.ts",
+    "ws:server": "ts-node servers/websocket/server.js",
     "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",

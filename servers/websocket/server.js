@@ -1,8 +1,9 @@
 const server = require("http").createServer();
 const uuid = require("uuid");
 const amqp = require("amqplib");
-const AMQP_URL = "amqp://blockcypher.anypay.global";
-const QUEUE = "invoices:paid";
+const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
+
+require('dotenv').config();
 
 const io = require("socket.io")(server);
 
@@ -63,6 +64,11 @@ server.listen(PORT, () => {
   console.log(`Serving Websockets on Port ${PORT}`);
 });
 
+const AMQP_URL = process.env.AMQP_URL;
+if (!AMQP_URL) {
+    throw new Error("AMQP_URL environment variable must be set");
+}
+
 amqp.connect(AMQP_URL).then(conn => {
   console.log("amqp:connected", AMQP_URL);
 
@@ -73,6 +79,7 @@ amqp.connect(AMQP_URL).then(conn => {
       channel.consume(
         QUEUE,
         message => {
+          console.log('message', message.content.toString());
           handleInvoicePaid(message.content.toString());
           channel.ack(message);
         },

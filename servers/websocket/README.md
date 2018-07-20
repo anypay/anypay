@@ -32,3 +32,12 @@ String:JSON
   "payment_url": "https://chainz.cryptoid.info/dash/tx.dws?59bfc242f73993dcda64c80cdb32072b55b5118167c5dca713697b7eb38829e1.htm"
 }
 ```
+
+## Configuration
+
+The following environment variables may be set:
+
+- AMQP_URL
+- AMQP_QUEUE
+
+The AMQP_QUEUE variable indicates which queue will be consumed by the actors
