@@ -10,17 +10,28 @@ const port = process.env.PORT || 28332;
 const RpcClient = require('bitcoind-rpc-dash');
 const amqp = require('amqplib');
 
-const PAYMENT_QUEUE  = "anypay:payments:received";
-
+let events = {
+  bind: {
+    'bch.rawtx': {
+      queue: process.env.AMQP_QUEUE || 'bch:rawtx'
+    }
+  },
+  publish: {
+    'bch.payments': {
+      exchange: process.env.AMQP_EXCHANGE || 'anypay',
+      routingkey: process.env.AMQP_ROUTING_KEY || 'bch.payments'
+    }
+  }
+}
 
 async function start(): Promise<any> {
 
   var rpc = new RpcClient({
     protocol: 'http',
-    user: process.env.RPC_USER,
-    pass: process.env.RPC_PASSWORD,
-    host: process.env.RPC_HOST,
-    port: process.env.RPC_PORT
+    user: process.env.BCH_RPC_USER,
+    pass: process.env.BCH_RPC_PASSWORD,
+    host: process.env.BCH_RPC_HOST,
+    port: process.env.BCH_RPC_PORT
   });
 
   var conn = await amqp.connect(process.env.AMQP_URL)
@@ -29,9 +40,7 @@ async function start(): Promise<any> {
 
   var channel = await conn.createChannel();
 
-  await channel.assertQueue(PAYMENT_QUEUE, { durable: true })
-
-  channel.consume('bch:rawtx', (msg) => {
+  channel.consume(events.bind['bch.rawtx'].queue, (msg) => {
 
     let rawtx = msg.content.toString('hex');
 
@@ -57,9 +66,11 @@ async function start(): Promise<any> {
               let payment = payments[i];
               console.log('payment', payment);
 
-              await channel.publish('anypay', 'bch:payments', new Buffer(
-                JSON.stringify(payment)
-              ));
+              await channel.publish(
+                events.publish['bch.payments'].exchange,
+                events.publish['bch.payments'].routingkey,
+                new Buffer(JSON.stringify(payment))
+              );
             }
 
             channel.ack(msg); 

@@ -11,7 +11,8 @@ function rawTxToPayment(message) {
     return {
       hash,
       amount: vout.value,
-      address: vout.scriptPubKey.addresses[0]
+      address: vout.scriptPubKey.addresses[0],
+      currency: 'BCH'
     }
   });
 }
