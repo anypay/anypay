@@ -3,7 +3,7 @@ import * as assert from 'assert';
 
 describe("BitcoinCashForwarder Oracle", () => {
 
-  it("should be named 'bitcoincash:forwarder'", () => {
+  it.skip("should be named 'bitcoincash:forwarder'", () => {
 
     let oracle = new BitcoinCashForwarder();
 
@@ -11,7 +11,7 @@ describe("BitcoinCashForwarder Oracle", () => {
 
   });
 
-  it("#registerAddress should return a new address", async () => {
+  it.skip("#registerAddress should return a new address", async () => {
 
     let oracle = new BitcoinCashForwarder();
 
