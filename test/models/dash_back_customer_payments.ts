@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {
   Account,
   DashBackMerchant,
@@ -28,6 +30,10 @@ describe('DashBackCustomerPayment Model', () => {
     let invoice = await Invoice.create({
       currency: 'DASH',
       dollar_amount: 300,
+      invoice_amount: 1,
+      invoice_currency: 'DASH',
+      denomination_currency: 'USD',
+      denomination_amount: 300,
       amount: 1,
       address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5',
       account_id: account.id
