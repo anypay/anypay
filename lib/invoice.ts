@@ -1,4 +1,4 @@
-import * as DashAddressService from './dash/address_service';
+import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as BitcoinAddressService from './bitcoin/address_service';
@@ -86,6 +86,8 @@ export async function generateInvoice(accountId: number, denominationAmountValue
     currency: account.denomination,
     value: denominationAmountValue
   }, invoiceCurrency);
+
+  console.log('invoiceAmount', invoiceAmount);
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
 
