@@ -77,7 +77,7 @@
     "processor:payments:start": "ts-node servers/processor/payments/main.ts",
     "bch:monitor:zeromq": "ts-node plugins/bch/actors/zeromqmonitor.ts",
     "ws:server": "ts-node servers/websocket/server.js",
-    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js --exit",
+    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js --timeout=10000 --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate"

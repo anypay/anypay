@@ -3,6 +3,8 @@ const Account = require('../models/account');
 const DashAddressService = require('./forwarding_address_service');
 const jayson = require('jayson');
 
+import {convert} from '../prices';
+
 const DashPrice = require('./price');
 
 var rpcClient = jayson.client.http({ host: '149.56.89.142', port: 12333 });
@@ -17,7 +19,8 @@ function addAddress(address) {
   });
 }
 
-module.exports.generate = async function generate(dollarAmount, accountId) {
+module.exports.generate = async function generate(dollarAmount, accountId):
+Promise<any> {
 
   var account = await Account.findOne({ where: { id: accountId }})
 
@@ -31,12 +34,19 @@ module.exports.generate = async function generate(dollarAmount, accountId) {
 
   console.log('dash address generated', address);
 
-  let dashAmount = DashPrice.convertDollarsToDash(dollarAmount).toFixed(5);
+  //let dashAmount = DashPrice.convertDollarsToDash(dollarAmount).toFixed(5);
+
+  const denominationAmount = {
+    currency: 'USD',
+    value: dollarAmount
+  }; 
+
+  let dashAmount = await convert(denominationAmount, 'DASH');
 
   var invoice = await Invoice.create({
     address: address,
-    amount: dashAmount,
-    currency: 'DASH',
+    amount: dashAmount.value,
+    currency: dashAmount.currency,
     dollar_amount: dollarAmount,
     account_id: accountId,
     status: 'unpaid'

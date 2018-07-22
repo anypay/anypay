@@ -1,13 +1,10 @@
-const ZcashInvoice = require("../../../lib/zcash/invoice");
+import {generateInvoice} from '../../../lib/invoice';
 
-module.exports.create = function(request, h) {
-  const dollarAmount = request.payload.amount;
+module.exports.create = async function(request, h) {
+  const denominationAmount = request.payload.amount;
   const accountId = request.auth.credentials.accessToken.account_id;
-  const encrypted = request.payload.encrypted;
 
-  return ZcashInvoice.generate({
-    dollar_amount: dollarAmount,
-    account_id: accountId,
-    encrypted: encrypted
-  });
+  let invoice = await generateInvoice(accountId, denominationAmount, 'ZEC');
+
+  return invoice;
 }

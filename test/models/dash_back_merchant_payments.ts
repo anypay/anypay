@@ -28,6 +28,10 @@ describe('DashBackMerchantPayment Model', () => {
     let invoice = await Invoice.create({
       currency: 'DASH',
       dollar_amount: 300,
+      invoice_currency: 'DASH',
+      invoice_amount: 1,
+      denomination_currency: 'USD',
+      denomination_amount: 300,
       amount: 1,
       address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5',
       account_id: account.id

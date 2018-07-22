@@ -24,7 +24,11 @@ module.exports.update = async function(request, reply) {
   let address = request.payload.address;
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let changeset = new AddressChangeSet(accountId, currency.toUpperCase(), address);
+  let changeset = {
+    account_id: accountId,
+    currency: currency.toUpperCase(),
+    address: address
+  };
 
   try {
 
