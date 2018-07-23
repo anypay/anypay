@@ -592,6 +592,15 @@ async function Server() {
     }
   });
 
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/count",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.count
+    }
+  });
+
   return server;
 }
 

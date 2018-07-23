@@ -1,5 +1,6 @@
 import * as database from '../../../lib/database';
 import * as logger from 'winston';
+import {globalTotalsForCurrency} from '../../../lib/totals/monthly';
 
 export async function usd() {
 
@@ -119,5 +120,14 @@ export async function total() {
 
     throw error;
   }
+}
+
+export async function count() {
+
+  let dashCountsByMonth = await globalTotalsForCurrency('DASH');
+
+  return {
+    'DASH': dashCountsByMonth
+  };
 }
 
