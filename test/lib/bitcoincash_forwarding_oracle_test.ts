@@ -11,7 +11,7 @@ describe("BitcoinCashForwarder Oracle", () => {
 
   });
 
-  it("#registerAddress should return a new address", async () => {
+  it.skip("#registerAddress should return a new address", async () => {
 
     let oracle = new BitcoinCashForwarder();
 
