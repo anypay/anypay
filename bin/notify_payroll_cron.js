@@ -1,7 +1,7 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 
 require("dotenv").config();
-import * as amqp from 'amqplib';
+var amqp = require('amqplib');
 
 (async function() {
 
