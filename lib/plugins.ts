@@ -40,7 +40,7 @@ class Plugins {
 
     let plugin = new Plugin(currency, this.plugins[currency]);
 
-    return plugin;
+    return plugin.plugin;
 
   }
 
@@ -56,7 +56,7 @@ class Plugin {
   constructor(currency: string, plugin?: any) {
 
     this.currency = currency;
-    this.plugin = plugin
+    this.plugin = plugin;
   }
   
 }
