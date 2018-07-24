@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 import {plugins} from '../../lib/plugins';
 import * as assert from 'assert';
 

@@ -1,5 +1,6 @@
 
 import configurePlugins from "../config/plugins";
+import * as assert from 'assert';
 
 class Plugins {
 
@@ -13,7 +14,20 @@ class Plugins {
 
     let pluginsConfig = configurePlugins();
 
-    this.plugins = pluginsConfig.plugins;
+    Object.keys(pluginsConfig).forEach(key => {
+      let plugin = pluginsConfig[key];
+
+      if (plugin) {
+
+        assert(
+          (typeof plugin.createInvoice) === 'function',
+          'plugin must implement createInvoice'
+        );
+      }
+
+    });
+
+    this.plugins = pluginsConfig;
   }
 
   async findForCurrency(currency: string) {

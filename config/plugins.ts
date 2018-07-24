@@ -3,25 +3,22 @@ export default function() {
 
   return {
 
-    "plugins": {
+    "BTC": require('../plugins/btc'),
 
-      "BTC": require('../plugins/btc'),
+    "BCH": require('../plugins/bch'),
 
-      "BCH": require('../plugins/bch'),
+    "ZEN": false,
 
-      "ZEN": false,
+    "ZEC": require('../plugins/zec'),
 
-      "ZEC": require('../plugins/zec'),
+    "DASH": require('../plugins/dash'),
 
-      "DASH": require('../plugins/dash'),
+    "LTC": require('../plugins/ltc'),
 
-      "LTC": require('../plugins/ltc'),
+    "XRP": require('../plugins/xrp'),
 
-      "XRP": require('../plugins/xrp'),
+    "DOGE": require('../plugins/doge')
 
-      "DOGE": require('../plugins/doge')
-
-    }
   }
 }
 
