@@ -1,4 +1,5 @@
 var JSONRPC = require('./lib/jsonrpc');
+import {generateInvoice} from '../../lib/invoice';
 
 var rpc = new JSONRPC();
 
@@ -17,4 +18,19 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
   }
 
 }
+
+async function createInvoice(accountId: number, amount: number) {
+
+  let invoice = await generateInvoice(accountId, amount, 'BCH');
+
+  return invoice;
+
+}
+
+const currency = 'BCH';
+
+export {
+  currency,
+  createInvoice
+};
 

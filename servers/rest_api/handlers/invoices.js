@@ -3,6 +3,8 @@ const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import {plugins} from '../../../lib/plugins';
+
 module.exports.index = async (request, reply) => {
 
   log.info(`controller:invoices,action:index`);
@@ -18,6 +20,13 @@ module.exports.index = async (request, reply) => {
 
 module.exports.create = async (request, reply) => {
 
+  /*
+
+    Dynamicallly look up coin and corresponding plugin given the currency
+    provided.
+
+  */
+
   log.info(`controller:invoices,action:create`);
 
 	if (!request.payload.currency) {
@@ -32,35 +41,22 @@ module.exports.create = async (request, reply) => {
 
 	log.info('amount is greater than zero')
 
-  if (request.payload.currency === 'XRP') {
+  try {
 
-		if (request.account.ripple_address) {
+    let plugin = await plugins.findForCurrency(request.payload.currency);
 
-			try {
+    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
-				let invoice = await Invoice.create({
-					currency: 'XRP',
-					account_id: request.account.id,
-					address: request.account.ripple_address,
-					dollar_amount: request.payload.amount,
-					amount: 1
-				})
+    return invoice;
 
-				return {
-					invoice: invoice
-				}	
+  } catch(error) {
 
-			} catch(error) {
-				throw Boom.badRequest(error.message)
-			}
+    throw Boom.badRequest(error.message);
 
+    log.error(error.message);
 
-		} else {
-			throw Boom.badRequest('no ripple address set for account')
-		}
-	} else {
-		throw Boom.badRequest('currency not supported')
-	}
+  }
+
 };
 
 module.exports.show = async function(request, reply) {
