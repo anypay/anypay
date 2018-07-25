@@ -19,11 +19,18 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
 
 }
 
-export async function createInvoice(accountId: number, amount: number) {
+async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'BCH');
 
   return invoice;
 
 }
+
+const currency = 'BCH';
+
+export {
+  currency,
+  createInvoice
+};
 
