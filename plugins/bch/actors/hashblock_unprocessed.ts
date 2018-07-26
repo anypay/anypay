@@ -13,6 +13,8 @@ async function start() {
 
   let channel = await connection.createChannel();
 
+  await channel.prefetch(3);
+
   channel.consume(queue, async (message) => {
     
     let content = message.content.toString('hex');

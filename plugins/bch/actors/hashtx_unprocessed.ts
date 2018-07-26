@@ -9,17 +9,19 @@ const queue = 'anypay.bch.hashtx';
 
 async function start() {
 
-  let connection = await amqp.connect(process.env.AMQP_URL); 
+  const connection = await amqp.connect(process.env.AMQP_URL); 
 
-  let channel = await connection.createChannel();
+  const channel = await connection.createChannel();
+
+  await channel.prefetch(3);
 
   channel.consume(queue, async (message) => {
 
     let content = message.content.toString('hex');
     
-    console.log('hashtx', content);
+    console.log('anypay.bch.hashtx', content);
 
-    channel.ack(message);
+    await channel.ack(message);
 
     await notifySlack(queue, content);
 
