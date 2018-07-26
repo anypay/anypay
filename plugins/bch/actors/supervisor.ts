@@ -1,5 +1,12 @@
 require('dotenv').config();
 
-require('./rawtxparser').start();
 require('./zeromqmonitor').start();
+
+require('./hashblock_unprocessed').start();
+
+require('./rawblock_unprocessed').start();
+
+require('./hashtx_unprocessed').start();
+
+require('./rawtx_unprocessed').start();
 

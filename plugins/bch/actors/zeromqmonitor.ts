@@ -1,32 +1,7 @@
-import * as zmq from 'zeromq';
-
-var sock = zmq.socket('sub');
-
-import {rawTxToPayment} from '../lib/rawtx_to_payment';
-
 require("dotenv").config();
 
-const port = process.env.PORT || 28332;
-
-const RpcClient = require('bitcoind-rpc-dash');
-
-const amqp = require('amqplib');
-
-const PAYMENT_QUEUE  = "anypay:payments:received";
-
-var rpc = new RpcClient({
-
-  protocol: 'http',
-
-  user: process.env.RPC_USER,
-
-  pass: process.env.RPC_PASSWORD,
-
-  host: process.env.RPC_HOST,
-
-  port: process.env.RPC_PORT
-
-});
+import * as zmq from 'zeromq';
+import * as amqp from 'amqplib';
 
 /*
  *
@@ -49,13 +24,9 @@ if (!process.env.ZEROMQ_URL) {
 
 }
 
+var sock = zmq.socket('sub');
+
 sock.connect(process.env.ZEROMQ_URL);
-
-sock.subscribe('rawtx');
-
-console.log(`zeromq socket connected to ${process.env.ZEROMQ_URL}`);
-
-console.log(`zeromq socket subscribed to rawtx`);
 
 /*
  * Actor Events are published from actors to the AMQP message broker
@@ -64,54 +35,74 @@ console.log(`zeromq socket subscribed to rawtx`);
  * This zeromqmonitor module publishes the following events:
  *
  *  - bch.rawtx
- *
+ *  - bch.rawblock
+ *  - bch.hashtx
+ *  - bch.hashblock
+ */
+
+const events = [
+
+  'rawtx',
+
+  'rawblock',
+
+  'hashtx',
+
+  'hashblock'
+
+];
+
+events.forEach(event => {
+
+  sock.subscribe(event);
+
+  console.log(`zeromq socket subscribed to ${event}`);
+
+});
+
+/*
  * bch.rawtx event indicates to the system that the bitcoincash full
  * node has received a valid transaction on the p2p network. This
  * actor publishes the raw transaction data buffer to AMQP.
  *
- * bch.rawtx may be configured by providing the AMQP_BINDING_KEY and
+ * bch.rawtx may be configured by providing the AMQP_ROUTING_KEY and
  * AMQP_EXCHANGE environment variables at runtime.
  *
  */
 
-let events = {
-
-  'bch.rawtx': {
-
-    exchange: process.env.AMQP_EXCHANGE || 'anypay',
-
-    bindingkey: process.env.AMQP_BINDING_KEY || 'bch:ratx'
-
-  }
-
-};
+const exchange = process.env.AMQP_EXCHANGE || 'anypay.bch';
 
 async function start() {
 
-  var conn = await amqp.connect(process.env.AMQP_URL)
+  const conn = await amqp.connect(process.env.AMQP_URL);
 
   console.log('amqp connected');
 
-  var channel = await conn.createChannel();
+  const channel = await conn.createChannel();
+
+  events.forEach(async event => {
+
+    await channel.assertQueue(`anypay.bch.${event}`);
+    await channel.bindQueue(`anypay.bch.${event}`, exchange, `bch.${event}`);
+
+  });
 
   sock.on('message', async function(topic, msg){
 
-    switch(topic.toString()) {
+    let event = `bch.${topic.toString()}`;
 
-      case 'rawtx':
+    console.log("publish event", event);
 
-        await channel.publish(events['bch.rawtx'].exchange, events['bch.rawtx'].bindingkey, msg);
+    await channel.publish(exchange, event, msg);
 
-        console.log(`bch:rawtx ${msg.toString('hex')}`);
+    console.log(`${event} ${msg.toString('hex')}`);
 
-      }
   });
 
 }
 
 export {
-  start,
-  events
+  start
 };
 
 if (require.main === module) {
