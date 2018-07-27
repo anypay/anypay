@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 import * as Account from '../models/account';
 import * as AccessToken from '../models/access_token';
+import {getSupportedCoins} from './supported_coins';
 
 export async function registerAccount(email: string, password: string): Promise<any>{
 
@@ -32,5 +33,9 @@ function hash(password) {
       resolve(hash);
     })
   });
+}
+
+export {
+  getSupportedCoins
 }
 
