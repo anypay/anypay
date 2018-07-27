@@ -54,7 +54,13 @@ function CoinsFromAccount(account) {
   }
 
   if (account.bitcoin_cash_address) {
-    //coins['BCH'].enabled = true;
+
+    if (account.bitcoin_cash_enabled) {
+
+      coins['BCH'].enabled = true;
+
+    }
+
   }
 
   if (account.litecoin_address) {
