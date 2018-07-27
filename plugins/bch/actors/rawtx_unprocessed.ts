@@ -13,7 +13,7 @@ async function start() {
 
   let channel = await connection.createChannel();
 
-  await channel.prefetch(3);
+  await channel.prefetch(1);
 
   channel.consume(queue, async (message) => {
     
