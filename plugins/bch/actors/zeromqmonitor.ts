@@ -83,6 +83,7 @@ async function start() {
   events.forEach(async event => {
 
     await channel.assertQueue(`anypay.bch.${event}`);
+
     await channel.bindQueue(`anypay.bch.${event}`, exchange, `bch.${event}`);
 
   });
