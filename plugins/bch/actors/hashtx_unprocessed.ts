@@ -16,7 +16,7 @@ async function start() {
 
   const channel = await connection.createChannel();
 
-  await channel.prefetch(3);
+  await channel.prefetch(1);
 
   await channel.assertQueue('anypay.bch.tx');
 
