@@ -1,8 +1,15 @@
 
-function rawTxToPayment(message) {
-  var hash = message.result.txid;
+interface Payment {
+  hash: string;
+  amount: number;
+  address: string;
+  currency: string;
+}
 
-  return message.result.vout.filter(vout => {
+function rawTxToPayment(message): Payment[] {
+  var hash = message.txid;
+
+  return message.vout.filter(vout => {
 
     return (!!vout.scriptPubKey.addresses);
 

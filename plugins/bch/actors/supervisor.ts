@@ -10,3 +10,5 @@ require('./hashtx_unprocessed').start();
 
 require('./rawtx_unprocessed').start();
 
+require('./transaction_unprocessed').start();
+
