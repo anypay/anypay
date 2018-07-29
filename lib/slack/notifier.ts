@@ -5,6 +5,8 @@ const SLACK_URL = 'https://hooks.slack.com/services/T7NS5H415/B7QRQ76PN/dH2DAqb9
 
 export function notify(message: string) {
 
+  if (process.env.NODE_ENV != 'test') {
+
   http
     .post(SLACK_URL)
     .send({
@@ -17,4 +19,5 @@ export function notify(message: string) {
         log.info("slack:notified", response.body);
       }
     });
+  }
 }
