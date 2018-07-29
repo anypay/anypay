@@ -29,6 +29,8 @@ const DashBoardController = require("./handlers/dashboard");
 const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
+import {createLinks} from './handlers/links_controller';
+
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 
@@ -598,6 +600,15 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: monthlyChartsController.count
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/links",
+    config: {
+      tags: ['api'],
+      handler: createLinks
     }
   });
 
