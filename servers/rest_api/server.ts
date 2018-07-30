@@ -30,6 +30,7 @@ const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
+import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
@@ -609,6 +610,15 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: createLinks
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/dashback/totals/alltime",
+    config: {
+      tags: ['api'],
+      handler: dashbackTotalsAlltime
     }
   });
 
