@@ -24,7 +24,7 @@ export async function getCustomerTotalsAllTime(): Promise<number> {
 export async function getMerchantTotalsAllTime(): Promise<number> {
 
   let merchantPayments = await database.query(
-    `select sum(amount) from dash_back_customer_payments`
+    `select sum(amount) from dash_back_merchant_payments`
   );
 
   let amount = parseFloat(merchantPayments[0][0].sum);
