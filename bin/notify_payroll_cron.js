@@ -28,21 +28,28 @@ const payrollQuery = `SELECT
 
   payroll.forEach(async account => {
 
-    const DAYS_PER_MONTH = 30.4167
+    if (account.active) {
 
-    account.base_monthly_amount = parseFloat(account.base_monthly_amount);
+      const DAYS_PER_MONTH = 30.4167;
 
-    account.base_daily_amount = account.base_monthly_amount / DAYS_PER_MONTH;
+      account.base_monthly_amount = parseFloat(account.base_monthly_amount);
 
-    let message = new Buffer(JSON.stringify(account));
+      account.base_daily_amount = parseFloat(account.base_monthly_amount) / DAYS_PER_MONTH;
 
-    await chan.publish('anypay.payroll', 'daily', message);
+      let message = new Buffer(JSON.stringify(account));
 
-    console.log('amqp.published', account);
+      await chan.publish('anypay.payroll', 'daily', message);
+
+      console.log('amqp.published', account);
+
+    }
 
   });
 
-  setTimeout(() => conn.close(), 5000);
+  setTimeout(() => {
+    conn.close();
+    process.exit();
+  }, 5000);
 
 })();
 

@@ -7,6 +7,8 @@ WORKDIR /usr/src/app
 COPY package.json /usr/src/app/
 
 RUN npm install
+RUN npm install -g typescript
+RUN npm install -g ts-node
 
 # Bundle app source
 COPY . /usr/src/app
