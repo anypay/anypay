@@ -103,7 +103,7 @@ function payrollAccountToPendingPayroll(payrollAccount): PendingPayroll {
 
   return {
     address: payrollAccount.dash_payout_address,
-    amount: payrollAccount.base_daily_amount,
+    amount: payrollAccount.base_daily_amount.toFixed(5),
     email: payrollAccount.email
   }
 }
