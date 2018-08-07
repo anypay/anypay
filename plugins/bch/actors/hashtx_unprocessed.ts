@@ -24,17 +24,28 @@ async function start() {
 
   channel.consume(queue, async (message) => {
 
-    let content = message.content.toString('hex');
-    
-    console.log('anypay.bch.hashtx', content);
+    try {
 
-    let tx = await lookupHashTx(content);
+      let content = message.content.toString('hex');
+      
+      console.log('anypay.bch.hashtx', content);
 
-    await channel.publish(exchange, 'bch.tx', new Buffer(JSON.stringify(tx)));
+      let tx = await lookupHashTx(content);
 
-    await channel.ack(message);
+      await channel.publish(exchange, 'bch.tx', new Buffer(JSON.stringify(tx)));
 
-    await notifySlack(queue, content);
+      await channel.ack(message);
+
+      await notifySlack(queue, content);
+
+    } catch(error) {
+
+      console.error('error', error.message);
+
+      return channel.ack(message);
+
+
+    }
 
   });
 
