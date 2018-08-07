@@ -5,7 +5,7 @@ import * as amqp from 'amqplib';
 
 /*
  *
- * Bitcoin Cash full node payment monitoring with Zeromq. This
+ * ZenCash full node payment monitoring with Zeromq. This
  * actor establishes a zeromq socket connection with the bitcoin
  * cash full node over tcp, from which raw transaction information
  * is streamed in real time.
