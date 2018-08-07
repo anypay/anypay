@@ -23,32 +23,50 @@ async function start() {
   await channel.bindQueue(`anypay.bch.tx`, exchange, `bch.tx`);
 
   channel.consume(queue, async (message) => {
+    var tx;
+
+    let content = message.content.toString('hex');
+    
+    console.log('anypay.bch.hashtx', content);
 
     try {
 
-      let content = message.content.toString('hex');
-      
-      console.log('anypay.bch.hashtx', content);
+      tx = await lookupHashTx(content);
 
-      let tx = await lookupHashTx(content);
+    } catch(error) {
+
+      console.error(`error looking up tx ${content}`);
+    }
+      
+    try {
 
       await channel.publish(exchange, 'bch.tx', new Buffer(JSON.stringify(tx)));
 
       await channel.ack(message);
 
-      await notifySlack(queue, content);
-
     } catch(error) {
 
-      console.error('error', error.message);
+      console.error('errorZ', error.message);
 
-      return channel.ack(message);
+      await channel.ack(message);
 
+      return;
 
     }
 
+    await notifySlack(queue, content);
+
+
   });
 
+}
+
+function pause(ms) {
+  return new Promise(resolve => {
+    setTimeout(function() {
+      resolve();
+    }, ms);
+  });
 }
 
 export {
