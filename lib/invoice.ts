@@ -4,6 +4,7 @@ import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as BitcoinAddressService from './bitcoin/address_service';
 import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
+import * as ZencashAddressService from './zencash/address_service';
 import * as Account from './models/account';
 import * as Invoice from './models/invoice';
 import {convert} from './prices';
@@ -63,6 +64,12 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
     case 'ZEC':
 
       address = await ZcashAddressService.getNewAddress(accountId);
+
+      break;
+
+    case 'ZEN':
+
+      address = await ZencashAddressService.getNewAddress(accountId);
 
       break;
   }
