@@ -1,5 +1,7 @@
 import { logger, events, setAddress, unsetAddress } from '../../lib/core';
 import { AddressChangeSet } from '../../lib/core/types/address_change_set';
+
+import * as models from '../../lib/models';
 import * as Account from '../../lib/models/account';
 import * as Chance from 'chance';
 import * as assert from 'assert';
@@ -8,17 +10,18 @@ var chance = new Chance();
 
 describe("Anypay Core", () => {
 
-  describe("Updating Account Address", () => {
-    var account;
+  var account;
 
-    before(async function() {
-      let email = chance.email().toUpperCase();
+  before(async function() {
+    let email = chance.email().toUpperCase();
 
-      account = await Account.create({
-        email: email
-      });
-
+    account = await Account.create({
+      email: email
     });
+
+  });
+
+  describe("Updating Account Address", () => {
 
     it("#setAddress should emit an event", (done) => {
 
@@ -107,6 +110,48 @@ describe("Anypay Core", () => {
       }});
 
       assert(!account.dash_payout_address);
+
+    });
+
+  });
+
+  describe("Setting A Dynamic Address Not In Hardcoded List", () => {
+
+    it("#setAddress should set a ZEN ZenCash address", async () => {
+
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'ZEN',
+        address: 'ZojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      };
+
+      await setAddress(addressChangeset); 
+
+      var address = await models.Address.findOne({ where: {
+        account_id: account.id,
+        currency: 'ZEN'
+      }});
+
+      assert.strictEqual(address.value, addressChangeset.address);
+
+    });
+
+    it("#unsetAddress should set a ZEN ZenCash address", async () => {
+
+      let addressChangeset = {
+        account_id: account.id,
+        currency: 'ZEN',
+        address: 'ZojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      };
+
+      await unsetAddress(addressChangeset); 
+
+      var address = await models.Address.findOne({ where: {
+        account_id: account.id,
+        currency: 'ZEN'
+      }});
+
+      assert(!address);
 
     });
 

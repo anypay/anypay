@@ -5,6 +5,8 @@ import {
   DenominationChangeset
 } from './types/address_change_set';
 
+import * as models from '../models';
+
 const Account = require("../models/account");
 
 import * as logger from "winston";
@@ -64,14 +66,37 @@ export async function setAddress(changeset: AddressChangeSet) {
   default:
   }
 
-  if (!updateParams) {
+  if (updateParams) {
 
-    throw new Error('valid currency and address must be provided');
+    var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
+
+  } else {
+
+    var address = await models.Address.findOne({ where: {
+      account_id: changeset.account_id,
+      currency: changeset.currency
+    }});
+
+    if (address) {
+
+      console.log(`${changeset.currency} address already set`);
+
+      await address.update({
+        value: changeset.address
+      });
+
+    } else {
+
+      address = await models.Address.create({
+        account_id: changeset.account_id,
+        currency: changeset.currency,
+        value: changeset.address
+      });
+
+    }
 
   }
 
-  var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
-  
   events.emit('address:set', changeset);
 
 };
@@ -119,12 +144,20 @@ export async function unsetAddress(changeset: AddressChangeSet) {
   default:
   }
 
-  if (!updateParams) {
+  if (updateParams) {
 
-    throw new Error('valid currency and address must be provided');
+    var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
+
+  } else {
+
+    var address = await models.Address.findOne({ where: {
+      account_id: changeset.account_id,
+      currency: changeset.currency
+    }});
+
+    await address.destroy({ force: true });
+
   }
-
-  var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
 
   events.emit('address:unset', changeset);
 
