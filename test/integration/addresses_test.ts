@@ -47,7 +47,7 @@ describe("Setting Addresses Via REST", async () => {
         }
       })
 
-      assert.strictEqual(response.result.dash_payout_address, address);
+      assert.strictEqual(response.result.value, address);
 
     } catch(error) {
 
@@ -72,7 +72,7 @@ describe("Setting Addresses Via REST", async () => {
         }
       })
 
-      assert.strictEqual(response.result.bitcoin_payout_address, address);
+      assert.strictEqual(response.result.value, address);
 
     } catch(error) {
 
@@ -97,13 +97,41 @@ describe("Setting Addresses Via REST", async () => {
         }
       })
 
-      assert.strictEqual(response.result.ripple_address, address);
+      assert.strictEqual(response.result.value, address);
 
     } catch(error) {
 
       console.error('ERROR', error.message);
       throw error;
     }
+  });
+
+  it("PUT /addresses/zen should set the ZEN address", async () => {
+
+    try {
+
+      var address = 'znjqSXSH2SbkdLUwrkem7pGSAJUbjzzPWg6';
+
+      let response = await server.inject({
+        method: 'PUT',
+        url: '/addresses/zen',
+        payload: {
+          address: address
+        },
+        headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
+      })
+
+      assert.strictEqual(response.result.currency, 'ZEN');
+      assert.strictEqual(response.result.value, address);
+
+    } catch(error) {
+
+      console.error('ERROR', error.message);
+      throw error;
+    }
+
   });
 
 })
