@@ -34,5 +34,27 @@ describe("Supported Coins For Account", () => {
 
   });
 
+  describe("Setting Arbitrary Address", () => {
+
+    it("should that address in the list", async () => {
+
+      let account = await registerAccount(chance.email(), chance.word());
+      
+      await setAddress({
+        account_id: account.id,
+        currency: "ZEN",
+        address: "znjqSXSH2SbkdLUwrkem7pGSAJUbjzzPWg6"
+      });
+
+      let coins = await getSupportedCoins(account.id);
+
+      console.log("coins", coins);
+
+      assert(coins['ZEN']);
+
+    });
+
+  });
+
 });
 

@@ -1,4 +1,4 @@
-import {Account} from '../models';
+import {Account, Address} from '../models';
 
 function CoinsFromAccount(account) {
   var coins = {
@@ -91,6 +91,22 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
   let account = await Account.find({ where: { id: accountId }})
 
   let accountCoins = CoinsFromAccount(account);
+
+  let addresses = await Address.findAll({
+
+    where: { account_id: accountId  }
+
+  });
+
+  addresses.forEach(address => {
+
+    accountCoins[address.currency] = {
+      code: address.currency,
+      name: address.currency,
+      enabled: true
+    }
+
+  });
 
   return accountCoins;
 
