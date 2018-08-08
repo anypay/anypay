@@ -1,5 +1,5 @@
 
-const http = require('superagent');
+import * as http from 'superagent';
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY
 
