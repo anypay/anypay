@@ -7,7 +7,7 @@ export default function() {
 
     "BCH": require('../plugins/bch'),
 
-    "ZEN": false,
+    "ZEN": require('../plugins/zen'),
 
     "ZEC": require('../plugins/zec'),
 
