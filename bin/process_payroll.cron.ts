@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 import {sendPayment} from '../lib/dashcore';
+import {convert} from '../lib/prices';
 
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-east-1'});
@@ -16,6 +17,9 @@ const queue = 'payroll.pending';
   let conn = await amqp.connect(process.env.AMQP_URL);
   let channel = await conn.createChannel();
 
+  await channel.assertQueue('payroll.pending');
+  await channel.bindQueue('payroll.pending', 'anypay.payroll', 'daily');
+
   channel.consume(queue, async (message) => {
 
     try {
@@ -24,7 +28,7 @@ const queue = 'payroll.pending';
 
       console.log("send payroll!", content);
 
-      let pendingPayroll = payrollAccountToPendingPayroll(content);
+      let pendingPayroll = await payrollAccountToPendingPayroll(content);
 
       console.log('pendingPayroll', pendingPayroll);
 
@@ -95,15 +99,24 @@ async function sendPaymentAndEmail() {
 
 interface PendingPayroll {
   address: string;
+  currency: string;
   amount: number;
   email: string;
 }
 
-function payrollAccountToPendingPayroll(payrollAccount): PendingPayroll {
+async function payrollAccountToPendingPayroll(payrollAccount): Promise<PendingPayroll> {
+
+  let conversion = await convert({
+    currency: payrollAccount.base_currency,
+    value: payrollAccount.base_daily_amount
+  }, 'DASH');
+
+  console.log('conversion', conversion);
 
   return {
     address: payrollAccount.dash_payout_address,
-    amount: payrollAccount.base_daily_amount.toFixed(5),
+    currency: conversion.currency,
+    amount: parseFloat(conversion.value.toFixed(5)),
     email: payrollAccount.email
   }
 }
