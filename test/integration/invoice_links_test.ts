@@ -35,7 +35,7 @@ describe("Looking Up Invoice Links via REST", async () => {
 
   });
 
-  it("POST /links should return currency options", async () => {
+  it.skip("POST /links should return currency options", async () => {
 
     try {
 
