@@ -118,12 +118,8 @@ const validateToken = async function(request, username, password, h) {
     where: {
       uid: username
     }
-  })
-  var account = await Account.findOne({
-    where: {
-      id: accessToken.account_id
-    }
-  })
+  });
+
   if (accessToken) {
 		var account = await Account.findOne({
 			where: {
