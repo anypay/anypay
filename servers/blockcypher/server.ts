@@ -127,14 +127,18 @@ amqp
           await channel.publish('blockcypher', 'callback.dash', new Buffer(message));
 
           if (!sent) {
+
             log.error("amqp:send:error", message);
+
             throw Boom.badRequest();
+
           } else {
+
             log.info("amqp:sent", message);
-            return;
+
           }
 
-          return;
+          return true;
         }
       });
 
