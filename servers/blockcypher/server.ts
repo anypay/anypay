@@ -61,7 +61,7 @@ amqp
 
           let message = JSON.stringify(request.payload);
 
-          let sent = channel.sendToQueue(BITCOIN_QUEUE, new Buffer(message));
+          let sent = await channel.sendToQueue(BITCOIN_QUEUE, new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -81,7 +81,7 @@ amqp
 
           let message = JSON.stringify(request.payload);
 
-          let sent = channel.sendToQueue(LITECOIN_QUEUE, new Buffer(message));
+          let sent = await channel.sendToQueue(LITECOIN_QUEUE, new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -102,7 +102,8 @@ amqp
           let message = JSON.stringify(request.payload);
 					var buffer = new Buffer(message);
 
-          let sent = channel.sendToQueue(DOGECOIN_QUEUE, buffer);
+          let sent = await channel.sendToQueue(DOGECOIN_QUEUE, buffer);
+          await channel.publish('blockcypher', 'callback.doge', new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -122,7 +123,8 @@ amqp
 
           let message = JSON.stringify(request.payload);
 
-          let sent = await channel.sendToQueue(DASH_QUEUE, new Buffer(message));
+          let sent = await await channel.sendToQueue(DASH_QUEUE, new Buffer(message));
+          await channel.publish('blockcypher', 'callback.dash', new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -144,7 +146,7 @@ amqp
 
           let message = JSON.stringify(request.payload);
 
-          let sent = channel.sendToQueue(ETHEREUM_QUEUE, new Buffer(message));
+          let sent = await channel.sendToQueue(ETHEREUM_QUEUE, new Buffer(message));
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -156,6 +158,9 @@ amqp
           }
         }
       });
+
+      await channel.assertExchange('blockcypher', 'direct');
+      log.info('amqp.exchange.asserted', 'blockcypher');
 
       await channel.assertQueue(BITCOIN_QUEUE, { durable: true });
       log.info("amqp:bitcoin:queue:asserted", BITCOIN_QUEUE);
