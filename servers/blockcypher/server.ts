@@ -56,7 +56,7 @@ amqp
       server.route({
         method: "POST",
         path: "/bitcoin/webhooks",
-        handler: function(request, h) {
+        handler: async function(request, h) {
           log.info("bitcoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -76,7 +76,7 @@ amqp
       server.route({
         method: "POST",
         path: "/litecoin/webhooks",
-        handler: function(request, h) {
+        handler: async function(request, h) {
           log.info("litecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -96,7 +96,7 @@ amqp
       server.route({
         method: "POST",
         path: "/dogecoin/webhooks",
-        handler: function(request, h) {
+        handler: async function(request, h) {
           log.info("dogecoin:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
@@ -141,7 +141,7 @@ amqp
       server.route({
         method: "POST",
         path: "/ethereum/webhooks",
-        handler: function(request, h) {
+        handler: async function(request, h) {
           log.info("ethereum:blockcypher:callback", request.payload);
 
           let message = JSON.stringify(request.payload);
