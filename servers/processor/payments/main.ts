@@ -16,6 +16,10 @@ import {
 
 import {Payment} from '../../../types/interfaces';
 
+// START SWEEPER CRON PROCESS
+
+require('../../../processes/sweeper/actor');
+
 const AMQP_URL = process.env.AMQP_URL;
 const PAYMENT_QUEUE  = "anypay:payments:received";
 const validator = new Validator();
