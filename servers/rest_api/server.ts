@@ -34,6 +34,7 @@ import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
+import * as totals from './handlers/totals';
 
 const Fixer = require('../../lib/fixer');
 
@@ -615,6 +616,15 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: dashbackTotalsAlltime
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/merchants",
+    config: {
+      tags: ['api'],
+      handler: totals.merchants
     }
   });
 

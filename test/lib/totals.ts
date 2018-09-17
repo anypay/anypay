@@ -1,6 +1,9 @@
+require('dotenv').config();
+
 import * as assert from 'assert';
 import * as Database from "../../lib/database";
 import {monthly} from '../../lib/totals';
+import {totalMerchants} from '../../lib/totals';
 
 describe("Monthly Totals By Account", () => {
 
@@ -40,6 +43,20 @@ describe("Monthly Totals By Account", () => {
 
       assert(totals.length >= 0);
     });
+
+  });
+
+});
+
+describe("Total Merchants", () => {
+
+  it("totalMerchants should return the total number of merchants", async () => {
+
+    let total = await totalMerchants();
+
+    console.log('total', total);
+
+    assert(total > 0);
 
   });
 
