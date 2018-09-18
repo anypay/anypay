@@ -1,6 +1,7 @@
 import * as database from '../../../lib/database';
 import * as logger from 'winston';
 import {globalTotalsForCurrency} from '../../../lib/totals/monthly';
+import {monthly} from '../../../lib/totals';
 
 export async function usd() {
 
@@ -129,5 +130,20 @@ export async function count() {
   return {
     'DASH': dashCountsByMonth
   };
+}
+
+export async function totalTransactionsByCoin(req, h) {
+
+  console.log("PARAMS", req.params);
+
+  let coin = req.params.coin.toUpperCase();
+
+  let totals = await monthly.totalTransactionsByCoin(coin);
+
+  let response = {};
+
+  response[coin] = totals;
+
+  return response;
 }
 
