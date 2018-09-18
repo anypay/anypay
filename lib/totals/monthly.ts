@@ -79,4 +79,47 @@ export function forAccount(accountId: number) {
   }
 }
 
+export async function totalTransactions() {
+
+  const query = `select extract(month from "createdAt") as mon,
+    extract(year from "createdAt") as yyyy,
+    sum(1) as "total"
+    from invoices
+    where status = 'paid'
+    group by 1,2;`;
+
+  var result = await database.query(query);
+
+  return result[0].map(res => {
+    return {
+      month: res.mon,
+      year: res.yyyy,
+      total: parseFloat(res.total)
+    }
+  });
+
+}
+
+
+export async function totalTransactionsByCoin(coin: string) {
+
+  const query = `select extract(month from "createdAt") as mon,
+    extract(year from "createdAt") as yyyy,
+    sum(1) as "total"
+    from invoices
+    where status = 'paid'
+    and currency = '${coin}'
+    group by 1,2;`;
+
+  var result = await database.query(query);
+
+  return result[0].map(res => {
+    return {
+      month: res.mon,
+      year: res.yyyy,
+      total: parseFloat(res.total)
+    }
+  });
+
+}
 

@@ -46,6 +46,32 @@ describe("Monthly Totals By Account", () => {
 
   });
 
+  describe("total number of transactions by month", () => {
+
+    it("#totalTransactions should return total transactions by month", async () => {
+
+      let result = await monthly.totalTransactions(); 
+
+      assert(result.length > 12);
+
+    });
+
+    it("totalTransactionsByCoin should aggregate by coin by month", async () => {
+
+      let result = await monthly.totalTransactionsByCoin('DASH');
+
+      console.log('total DASH transactions by month', result);
+
+      result.map(month => {
+
+        assert(month.total >= 0);
+
+      });
+
+    })
+
+  });
+
 });
 
 describe("Total Merchants", () => {

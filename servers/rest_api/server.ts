@@ -566,6 +566,15 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/totals/monthly/transactions/{coin}",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.totalTransactionsByCoin
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/totals/monthly/bch",
     config: {
       tags: ['api'],
