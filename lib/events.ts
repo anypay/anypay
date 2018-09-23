@@ -6,11 +6,12 @@ import {connect} from 'amqplib';
 let emitter = new EventEmitter();
 
 const exchange = 'anypay.events';
-const routingkey = 'invoice.created';
 
 let events = [
 
-  'invoice.created'
+  'invoice.created',
+
+  'invoice.requested'
 
 ];
 
@@ -19,6 +20,8 @@ let events = [
   let amqp = await connect(process.env.AMQP_URL);
 
   let channel = await amqp.createChannel();
+
+  console.log('amqp channel created');
 
   await channel.assertExchange(exchange, 'direct');
 
@@ -31,6 +34,8 @@ let events = [
       let message = JSON.stringify(data);
 
       await channel.publish(exchange, event, new Buffer(message));
+
+      console.log(`published to amqp ${exchange}.${event}`, message)
 
     });
 

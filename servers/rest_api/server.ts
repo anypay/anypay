@@ -31,6 +31,7 @@ const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
 import {dashbackTotalsAlltime} from './handlers/dashback_controller';
+import {dashbackTotalsByMonth} from './handlers/dashback_controller';
 
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
@@ -625,6 +626,15 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: dashbackTotalsAlltime
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/dashback/totals/monthly",
+    config: {
+      tags: ['api'],
+      handler: dashbackTotalsByMonth
     }
   });
 
