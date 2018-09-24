@@ -1,12 +1,12 @@
 const http = require("superagent");
 import {Payment,Invoice} from '../../types/interfaces';
-/*export async function createInvoice(accountId: number, amount: number) {
+export async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'DOGE');
 
   return invoice;
 
-}*/
+}
 
 export async function getAddressPayments(invoice:Invoice){
 let payments: Payment[]=[];
