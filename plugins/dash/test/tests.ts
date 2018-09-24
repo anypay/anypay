@@ -1,5 +1,7 @@
+require('dotenv').config();
+
 import {Payment,Invoice} from '../../../types/interfaces';
-import {getAddressPayments} from '../index';
+import {checkAddressForPayments} from '../index';
 const assert = require("assert");
 const payment: Payment = {
     currency:"dash",
@@ -40,12 +42,8 @@ const badInvoice: Invoice = {
 
 describe("Manual invoice address check", () => {
   it("should return payment struct for every recieved transaction from invoice address", async() =>{
-    let payments: Payment[]  = await getAddressPayments(invoice);
+    let payments: Payment[]  = await checkAddressForPayments(invoice.address,"DASH");
     assert(payments[0].hash == invoice.hash)
   });
-  it("should not return payment struct for unpaid transactions", async () =>{
-    let payments: Payment[]  = await getAddressPayments(badInvoice);
-    assert(payments == null)
-   });	
 });
 
