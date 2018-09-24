@@ -1,4 +1,5 @@
-const http = require("superagent");
+const http = require("superagent")
+import {generateInvoice} from '../../lib/invoice';;
 import {Payment,Invoice} from '../../types/interfaces';
 export async function createInvoice(accountId: number, amount: number) {
 
