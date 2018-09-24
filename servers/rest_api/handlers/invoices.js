@@ -3,6 +3,7 @@ const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
 
 module.exports.index = async (request, reply) => {
@@ -73,7 +74,9 @@ module.exports.show = async function(request, reply) {
 
   if (invoice) {
 
-    log.info('invoice found', invoice.toJSON());
+    log.info('invoice.requested', invoice.toJSON());
+
+    emitter.emit('invoice.requested', invoice.toJSON()); 
 
     return invoice;
 

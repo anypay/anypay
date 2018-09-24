@@ -1,6 +1,16 @@
 
-import {getCustomerTotalsAllTime} from '../../../lib/dashback';
-import {getMerchantTotalsAllTime} from '../../../lib/dashback';
+import {
+
+  getCustomerTotalsAllTime,
+
+  getMerchantTotalsAllTime,
+
+  getCustomerTotalsByMonth,
+
+  getMerchantTotalsByMonth 
+
+} from '../../../lib/dashback';
+
 
 export async function dashbackTotalsAlltime() {
 
@@ -25,3 +35,24 @@ export async function dashbackTotalsAlltime() {
   }
 
 }
+
+export async function dashbackTotalsByMonth() {
+
+  let customers = await getCustomerTotalsByMonth();
+
+  let merchants = await getMerchantTotalsByMonth();
+
+  return {
+
+    totals: {
+
+      customers,
+
+      merchants
+
+    }
+
+  }
+
+}
+
