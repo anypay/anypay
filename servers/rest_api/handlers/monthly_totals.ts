@@ -55,7 +55,8 @@ export async function dash() {
 
   const query = `select extract(month from "createdAt") as mon,
     extract(year from "createdAt") as yyyy,
-    sum("amount") as "dash"
+    sum("amount") as "dash",
+    sum(1) as "payments"
     from invoices
     where status = 'paid'
     and currency = 'DASH'
