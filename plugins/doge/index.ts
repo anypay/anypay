@@ -9,27 +9,19 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
-export async function getAddressPayments(invoice:Invoice){
-let payments: Payment[]=[];
-  let prom =  new Promise<Payment[]>( async (resolve,reject)=>{
-  try {
-    let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${invoice.currency.toUpperCase()}/${invoice.address}`)
-    console.log(`https://chain.so/api/v2/get_tx_received/${invoice.currency.toUpperCase()}/${invoice.address}`)
+export async function checkAddressForPayments(address:string,currency:string){
+    let payments: Payment[]=[];
+    console.log(`https://chain.so/api/v2/get_tx_received/currency/address`)
+    let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${currency}/${address}`)
       for (let tx of resp.body.data.txs){
         let p: Payment = { 
-          currency: invoice.currency,
-          address: resp.body.address,
+          currency: currency,
+          address: resp.body.data.address,
           amount: tx.value,
           hash: tx.txid
         };  
         payments.push(p)
       }
-        resolve(payments);
-    }  
-    catch(error) {
-      resolve(null)
-    }
-  });
-  return prom 
+  return payments 
 }
 

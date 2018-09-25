@@ -3,33 +3,24 @@ import {generateInvoice} from '../../lib/invoice';;
 import {Payment,Invoice} from '../../types/interfaces';
 export async function createInvoice(accountId: number, amount: number) {
 
-  let invoice = await generateInvoice(accountId, amount, 'DOGE');
+  let invoice = await generateInvoice(accountId, amount, 'LTC');
 
   return invoice;
 
 }
 
-export async function getAddressPayments(invoice:Invoice){
+export async function checkAddressForPayments(address:string, currency:string){
 let payments: Payment[]=[];
-  let prom =  new Promise<Payment[]>( async (resolve,reject)=>{
-  try {
-    let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${invoice.currency.toUpperCase()}/${invoice.address}`)
-    console.log(`https://chain.so/api/v2/get_tx_received/${invoice.currency.toUpperCase()}/${invoice.address}`)
+    let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${currency}/${address}`)
       for (let tx of resp.body.data.txs){
         let p: Payment = { 
-          currency: invoice.currency,
-          address: resp.body.address,
+          currency: currency,
+          address: address,
           amount: tx.value,
           hash: tx.txid
         };  
         payments.push(p)
       }
-        resolve(payments);
-    }  
-    catch(error) {
-      resolve(null)
-    }
-  });
-  return prom 
+   return payments;
 }
 
