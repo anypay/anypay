@@ -11,6 +11,10 @@ Configuration of the application is done via environment variables
 - AMQP_URL
 - FORWADING_SERVICE_URL
 
+### Optional Environmente Variables
+
+- BLOCKCYPHER_CALLBACKS_BASE (used for staging/testing of blockcypher)
+
 ## Enabling Features
 
 - set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
