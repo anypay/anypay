@@ -1,13 +1,24 @@
+require("dotenv").config();
 
 import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
+import {connect, Channel} from 'amqplib';
 
 class Plugins {
 
   plugins: any;
 
+  channel?: Channel;
+
   constructor() {
     this.load();
+  }
+
+  async connectAmqp() {
+    let connection = await connect(process.env.AMQP_URL);
+    this.channel = await connection.createChannel();
+
+    await this.channel.assertExchange('anypay.payments', 'direct');
   }
 
   load() {
@@ -44,6 +55,22 @@ class Plugins {
 
   }
 
+  async checkAddressForPayments(address: string, currency: string) {
+
+    if(!this.plugins[currency].checkAddressForPayments){
+	throw new Error('plugin does not implement checkAddressForPayments')
+    }
+
+    let payments = await this.plugins[currency].checkAddressForPayments(address, currency);
+
+    payments.forEach(payment => {
+
+      console.log(payment)
+      this.channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
+    })
+
+ }
+
 }
 
 class Plugin {
@@ -64,6 +91,12 @@ class Plugin {
 const plugins = new Plugins();
 
 plugins.load();
+
+(async function() {
+
+  await plugins.connectAmqp();
+
+})()
 
 export {plugins};
 
