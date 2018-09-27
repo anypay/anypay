@@ -5,7 +5,7 @@ const uuid = require('uuid')
 
 import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
-
+import {emitter} from '../../../lib/events';
 module.exports.index = async (request, reply) => {
 
   log.info(`controller:invoices,action:index`);
@@ -78,6 +78,8 @@ module.exports.show = async function(request, reply) {
 
     emitter.emit('invoice.requested', invoice.toJSON()); 
 
+    emitter.emit('invoice.requested', invoice.toJSON());
+
     return invoice;
 
   } else {
@@ -88,3 +90,11 @@ module.exports.show = async function(request, reply) {
   }
 
 }
+
+emitter.on('invoice.requested', async (invoice) => {
+
+  await plugins.checkAddressForPayments(invoice.address, invoice.currency);
+
+})
+
+

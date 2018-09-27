@@ -67,7 +67,7 @@
     "@types/amqplib": "^0.5.7",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.2",
-    "mocha": "^5.1.1",
+    "mocha": "^5.2.0",
     "ts-node": "^6.0.5"
   },
   "scripts": {
@@ -78,7 +78,7 @@
     "bch:monitor:zeromq": "ts-node plugins/bch/actors/zeromqmonitor.ts",
     "bch:monitor:supervisor": "ts-node plugins/bch/actors/supervisor.ts",
     "ws:server": "ts-node servers/websocket/server.js",
-    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js --timeout=10000 --exit",
+    "test": "mocha --require ts-node/register test/**/*.ts test/**/*.js plugins/**/test/*.ts --timeout=10000 --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate"
