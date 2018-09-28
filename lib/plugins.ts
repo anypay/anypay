@@ -65,7 +65,10 @@ class Plugins {
 
     payments.forEach(payment => {
 
-      console.log(payment)
+      payment.amount = parseFloat(payment.amount);
+
+      console.log('payment found', payment);
+
       this.channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
     })
 
