@@ -42,6 +42,7 @@
     "jayson": "^2.0.5",
     "joi": "^13.2.0",
     "jsonschema": "^1.2.2",
+    "jsonwebtoken": "^8.3.0",
     "level": "^2.1.2",
     "moment": "^2.22.1",
     "pg": "^6.2.4",
