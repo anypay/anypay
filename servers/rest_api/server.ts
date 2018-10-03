@@ -1,6 +1,6 @@
 "use strict";
 require('dotenv').config();
-const Hapi = require("hapi");
+import * as Hapi from "hapi";
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const Invoice = require("../../lib/models/invoice");
@@ -51,6 +51,28 @@ events.on('address:set', async (changeset) => {
 WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
 });
+
+import * as jwt from '../../lib/jwt';
+
+const validateAdminToken = async function(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
+
+  try {
+
+    let token = await jwt.verifyToken(username);
+
+    return {
+      isValid: true,
+      token
+    }
+
+  } catch(error) {
+
+    return {
+      isValid: false
+    }
+
+  }
+}
 
 const validatePassword = async function(request, username, password, h) {
   if (!username || !password) {
@@ -212,6 +234,7 @@ async function Server() {
 
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
+  server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
@@ -644,6 +667,21 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: totals.merchants
+    }
+  });
+  
+  server.route({
+    method: "GET",
+    path: "/sudo/tokenvalidations",
+    config: {
+      auth: "adminwebtoken",
+      tags: ['api'],
+      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+        return {
+          token: req.auth.token
+        };
+      }
     }
   });
 
