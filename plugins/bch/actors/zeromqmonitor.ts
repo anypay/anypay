@@ -42,13 +42,13 @@ sock.connect(process.env.ZEROMQ_URL);
 
 const events = [
 
-  'rawtx',
+  //'rawtx',
 
-  'rawblock',
+  //'rawblock',
 
-  'hashtx',
+  'hashtx'//,
 
-  'hashblock'
+  //'hashblock'
 
 ];
 
@@ -94,7 +94,9 @@ async function start() {
 
     console.log("publish event", event);
 
-    await channel.publish(exchange, event, msg);
+    await channel.publish(exchange, event, msg, {
+      expiration: 10000 // expires after ten seconds
+    });
 
     console.log(`${event} ${msg.toString('hex')}`);
 
