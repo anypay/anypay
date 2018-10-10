@@ -18,28 +18,30 @@
  * Environment Variables
  * ---------------------
  *
+ * required:
+ *
  * - AMQP_URL_NEW
  * - AMQP_URL_OLD
- * - AMQP_EXCHANGE_OLD
- * - AMQP_EXCHANGE_NEW
+ *
+ * optional:
+ *
  * - AMQP_QUEUE_NEW
  * - AMQP_QUEUE_OLD
  *
  */
 
+require('dotenv').config();
+
 import {connect, Channel, Connection} from 'amqplib';
 
-var newAMQPConnection: Connection;
-
-var oldAMQPConnection: Connection;
-
-const AMQP_QUEUE_NEW = process.env.AMQP_QUEUE_NEW || '';
+const AMQP_QUEUE_NEW = process.env.AMQP_QUEUE_NEW || 'invoices:paid';
+const AMQP_QUEUE_OLD = process.env.AMQP_QUEUE_OLD || 'invoices:paid';
 
 async function start() {
 
-  newAMQPConnection: Connection = await connect(process.env.AMQP_URL_NEW);
+  let newAMQPConnection: Connection = await connect(process.env.AMQP_URL_NEW);
 
-  oldAMQPConnection: Connection = await connect(process.env.AMQP_URL_OLD);
+  let oldAMQPConnection: Connection = await connect(process.env.AMQP_URL_OLD);
 
   let oldChannel: Channel = await oldAMQPConnection.createChannel();
 
@@ -47,7 +49,9 @@ async function start() {
 
   newChannel.consume(AMQP_QUEUE_NEW, async (msg) => {
 
-    await oldChannel.sendToQueue(AMQP_EXCHANGE_OLD, AMQP_QUEUE_OLD);
+    console.log('new channel message', msg.content.toString());
+
+    await oldChannel.sendToQueue(AMQP_QUEUE_OLD, msg.content);
 
     await newChannel.ack(msg);
   
