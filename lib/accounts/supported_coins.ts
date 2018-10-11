@@ -6,37 +6,44 @@ function CoinsFromAccount(account) {
     'DASH': {
       code: 'DASH',
       name: 'dash',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/dash.png'
     },
     'BCH': {
       code: 'BCH',
       name: 'bitcoin cash',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/bch.png'
     },
     'BTC': {
       code: 'BTC',
       name: 'bitcoin',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/btc.png'
     },
     'LTC': {
       code: 'LTC',
       name: 'litecoin',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/ltc.png'
     },
     'XRP': {
       code: 'XRP',
       name: 'ripple',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/xrp.png'
     },
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/doge.png'
     },
     'ZEC': {
       code: 'ZEC',
       name: 'zcash',
-      enabled: false
+      enabled: false,
+      icon: 'https://pos.anypay.global/zec.png'
     },
     'BTC.lightning': {
       code: 'BTC',
