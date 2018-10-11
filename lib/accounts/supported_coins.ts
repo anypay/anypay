@@ -105,7 +105,7 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
       code: address.currency,
       name: address.currency,
       enabled: true,
-      icon: `https://pos.anypay.global/${address.currency}.png`
+      icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`
     }
 
   });
