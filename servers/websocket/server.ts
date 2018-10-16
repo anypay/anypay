@@ -1,6 +1,6 @@
-const server = require("http").createServer();
+let server = require("http").createServer();
 const uuid = require("uuid");
-const amqp = require("amqplib");
+import * as amqp from "amqplib";
 const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
 
 require('dotenv').config();
@@ -69,22 +69,35 @@ if (!AMQP_URL) {
     throw new Error("AMQP_URL environment variable must be set");
 }
 
-amqp.connect(AMQP_URL).then(conn => {
+(async function() {
+
+  let conn = await amqp.connect(AMQP_URL);
+
   console.log("amqp:connected", AMQP_URL);
 
-  return conn.createChannel().then(channel => {
-    console.log("channel:created");
+  let channel = await conn.createChannel();
 
-    channel.assertQueue(QUEUE).then(() => {
-      channel.consume(
-        QUEUE,
-        message => {
-          console.log('message', message.content.toString());
-          handleInvoicePaid(message.content.toString());
-          channel.ack(message);
-        },
-        { noAck: false }
-      );
-    });
+  console.log("channel:created");
+
+  await channel.assertQueue(QUEUE);
+
+  await channel.bindQueue(QUEUE, 'anypay:invoices', 'invoice:paid');
+
+  console.log(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
+
+  channel.consume(QUEUE, message => {
+
+    console.log('message', message.content.toString());
+
+    handleInvoicePaid(message.content.toString());
+
+    channel.ack(message);
+
+  }, {
+
+    noAck: false
+
   });
-});
+
+})();
+
