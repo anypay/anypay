@@ -35,4 +35,4 @@ deployment:
     branch: staging
     commands:
       - ./push_to_docker_staging.sh
-      - ssh defaultuser@api.staging.anypay.global "/home/defaultuser/restart_rest_api_staging.sh"
+      - ssh chef@api.staging.anypay.global "sudo chef-client -o 'recipe[anypay_api::api_staging]'"

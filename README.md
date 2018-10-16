@@ -9,7 +9,9 @@ Configuration of the application is done via environment variables
 - BLOCKCYPHER_DASH_FEE
 - DATABASE_URL
 - AMQP_URL
-- FORWADING_SERVICE_URL
+- FORWARDING_SERVICE_URL
+- JSONWEBTOKEN_PUBKEY_PATH
+- JSONWEBTOKEN_PRIVATE_KEY_PATH
 
 ## Enabling Features
 
