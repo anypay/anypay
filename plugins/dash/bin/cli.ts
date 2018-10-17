@@ -23,8 +23,6 @@ program
         amount: amountPaid,
         hash: balance.txrefs[0].tx_hash
       };
-
-      await handlePayment(invoice, payment);
       
       console.log(payment);
 
