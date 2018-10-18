@@ -6,6 +6,8 @@ import {Payment} from '../../../types/interfaces';
 
 import * as amqp from 'amqplib';
 
+import { connection, channel } from './amqp';
+
 const routing_key = 'payment';
 
 const exchange = 'anypay.payments';
@@ -93,12 +95,7 @@ async function getAddressDetails(address:string):Promise<any>{
 
 }
 
-
 export async function bitbox_checkAddressForPayments(address:string){
-
-  const connection = await amqp.connect(process.env.AMQP_URL);
-
-  const channel = await connection.createChannel();  
 
   let payments: Payment[]=[]
 
