@@ -1,4 +1,6 @@
+
 var JSONRPC = require('./lib/jsonrpc');
+
 import {generateInvoice} from '../../lib/invoice';
 
 var rpc = new JSONRPC();
@@ -27,10 +29,29 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
+async function validateAddress(address: string): Promise<string> {
+
+  let resp = await rpc.call('validateaddress', [address]);
+
+  if (!resp.result.isvalid) {
+
+    throw new Error('Invalid BCH address');
+
+  }
+
+  return resp.result.address;
+
+}
+
 const currency = 'BCH';
 
 export {
+
   currency,
-  createInvoice
+
+  createInvoice,
+
+  validateAddress
+
 };
 

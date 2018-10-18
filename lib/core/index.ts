@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import {EventEmitter2} from 'eventemitter2';
+import {plugins} from '../plugins';
 
 import {
   AddressChangeSet,
@@ -31,9 +31,27 @@ logger.configure({
     ]
 });
 
+import {EventEmitter2} from 'eventemitter2';
+
 const events = new EventEmitter2(); 
 
 export async function setAddress(changeset: AddressChangeSet) {
+
+  try {
+
+    let plugin = await plugins.findForCurrency(changeset.currency);
+
+    if (plugin.validateAddress) {
+
+      changeset.address = await plugin.validateAddress(changeset.address);
+
+    }
+
+  } catch(error) {
+
+    console.error('unable to validate address with plugin');
+
+  }
 
   var updateParams;
 
