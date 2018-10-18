@@ -1,7 +1,10 @@
+require('dotenv').config();
 
 var JSONRPC = require('./lib/jsonrpc');
 
 import {generateInvoice} from '../../lib/invoice';
+
+import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
 var rpc = new JSONRPC();
 
@@ -43,6 +46,15 @@ async function validateAddress(address: string): Promise<string> {
 
 }
 
+async function checkAddressForPayments(address:string,currency:string){
+
+  let txs = await bitbox_checkAddressForPayments(address)
+
+  console.log(txs)
+
+  return(txs)
+}
+
 const currency = 'BCH';
 
 export {
@@ -50,6 +62,8 @@ export {
   currency,
 
   createInvoice,
+
+  checkAddressForPayments,
 
   validateAddress
 
