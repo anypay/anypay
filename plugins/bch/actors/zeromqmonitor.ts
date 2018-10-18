@@ -80,6 +80,8 @@ async function start() {
 
   const channel = await conn.createChannel();
 
+  await channel.assertExchange(exchange, 'direct');
+
   events.forEach(async event => {
 
     await channel.assertQueue(`anypay.bch.${event}`);
