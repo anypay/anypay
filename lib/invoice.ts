@@ -5,8 +5,9 @@ import * as BitcoinAddressService from './bitcoin/address_service';
 import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
-import * as Account from './models/account';
-import * as Invoice from './models/invoice';
+
+import * as models from './models';
+
 import {convert} from './prices';
 
 interface Amount {
@@ -87,7 +88,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
 export async function generateInvoice(accountId: number, denominationAmountValue: number, invoiceCurrency: string): Promise<any> {
 
-  var account = await Account.findOne({ where: { id: accountId }});
+  var account = await models.Account.findOne({ where: { id: accountId }});
 
   let invoiceAmount = await convert({
     currency: account.denomination,
@@ -108,7 +109,7 @@ export async function generateInvoice(accountId: number, denominationAmountValue
     invoiceAmount
   };
 
-  var invoice = await Invoice.create({
+  var invoice = await models.Invoice.create({
     address: invoiceChangeset.address,
     invoice_amount: invoiceChangeset.invoiceAmount.value,
     invoice_currency: invoiceChangeset.invoiceAmount.currency,

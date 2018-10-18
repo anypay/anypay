@@ -1,13 +1,14 @@
 const bcrypt = require('bcrypt');
-import * as Account from '../models/account';
-import * as AccessToken from '../models/access_token';
+
+import * as models from '../models';
+
 import {getSupportedCoins} from './supported_coins';
 
 export async function registerAccount(email: string, password: string): Promise<any>{
 
   let passwordHash = await hash(password);
 
-  let account = await Account.create({
+  let account = await models.Account.create({
     email: email,
     password_hash: passwordHash
   });
@@ -17,7 +18,7 @@ export async function registerAccount(email: string, password: string): Promise<
 
 export async function createAccessToken(accountId: number): Promise<any> {
 
-  let accessToken = AccessToken.create({
+  let accessToken = models.AccessToken.create({
     account_id: accountId
   });
 
