@@ -1,10 +1,10 @@
 import * as Blockcypher from './blockcypher';
-import * as Account from '../models/account';
+import * as models from '../models';
 import * as log from 'winston';
 
 export async function getNewAddress(accountId: number): Promise<string> {
 
-  const account = await Account.findOne({ where: { id: accountId }});
+  const account = await models.Account.findOne({ where: { id: accountId }});
 
   const address = account.dogecoin_address;
 

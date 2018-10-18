@@ -30,7 +30,7 @@ deployment:
     branch: master
     commands:
       - ./push_to_docker.sh
-      - ssh root@api.anypay.global "/opt/api.anypay.global/redeploy.sh"
+      - ssh chef@api.anypay.global "sudo chef-client -o 'recipe[anypay_api::default]'"
   staging:
     branch: staging
     commands:

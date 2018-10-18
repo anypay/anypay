@@ -33,6 +33,8 @@ import {createLinks} from './handlers/links_controller';
 import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 import {dashbackTotalsByMonth} from './handlers/dashback_controller';
 
+import {createConversion} from '../../lib/prices';
+
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 import * as totals from './handlers/totals';
@@ -681,6 +683,28 @@ async function Server() {
         return {
           token: req.auth.token
         };
+      }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
+    config: {
+      tags: ['api'],
+      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+        let inputAmount = {
+
+          currency: req.params.oldcurrency,
+
+          value: req.params.oldamount
+
+        };
+
+        let conversion = await createConversion(inputAmount, req.params.newcurrency);
+
+        return {conversion};
       }
     }
   });
