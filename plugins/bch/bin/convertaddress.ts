@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import * as JSONRPC from '../lib/jsonrpc';
+var JSONRPC = require('../lib/jsonrpc');
 
 var rpc = new JSONRPC();
 
