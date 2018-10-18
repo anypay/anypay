@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-const JSONRPC = require('../lib/jsonrpc');
+var JSONRPC = require('../lib/jsonrpc');
 
 var rpc = new JSONRPC();
 
