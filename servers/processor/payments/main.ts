@@ -119,8 +119,14 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
   log.info("amqp:channel:connected");
 
   await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
+
   await channel.assertExchange('anypay', 'fanout');
+
+  await channel.assertExchange('anypay.payments', 'direct');
+
   await channel.assertExchange('anypay:invoices', 'fanout');
+
+  await channel.bindQueue(PAYMENT_QUEUE, 'anypay.payments', 'payment');
 
   let consumer = PaymentConsumer(channel);
 
