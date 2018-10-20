@@ -6,6 +6,7 @@ var DashBackMerchantPayment = require('./dash_back_merchant_payment');
 var DashBackCustomerPayment = require('./dash_back_customer_payment');
 var MerchantBountyReward = require('./merchant_bounty_reward');
 var Invoice = require('./invoice');
+var PaymentForward = require('./payment_forward');
 
 export {
   Account,
@@ -15,6 +16,7 @@ export {
   DashBackCustomerPayment,
   MerchantBountyReward,
   Invoice,
-  Address
+  Address,
+  PaymentForward
 };
 

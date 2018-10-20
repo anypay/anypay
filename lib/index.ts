@@ -4,6 +4,7 @@ var Account = require('./models/account');
 import {configureOracles} from '../config/oracles';
 
 import * as accounts from './accounts';
+import * as forwards from './forwards';
 import * as settings from './settings';
 import * as prices from './prices';
 import * as models from './models';
@@ -15,6 +16,7 @@ export {
   models,
   accounts,
   settings,
-  prices
+  prices,
+  forwards
 }
 

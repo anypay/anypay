@@ -1,6 +1,6 @@
 import {sweepUnpaid} from '../../lib/core';
 
-(async function() {
+async function start() {
 
   var CronJob = require('cron').CronJob;
 
@@ -16,5 +16,15 @@ import {sweepUnpaid} from '../../lib/core';
 
   console.log('start cron to sweep unpaid invoices every minute');
 
-})();
+}
+
+export {
+  start
+};
+
+if (require.main === module) {
+
+  start();
+
+}
 
