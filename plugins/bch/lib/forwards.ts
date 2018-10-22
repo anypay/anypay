@@ -1,6 +1,8 @@
 
 import { log } from '../../../lib/logger';
 
+import { models } from '../../../lib';
+
 import { forwards } from '../../../lib';
 
 var JSONRPC = require('./jsonrpc');
@@ -58,6 +60,18 @@ export async function forwardPayment(payment: Payment) {
     currency: 'BCH'
 
   });
+
+  let existingPaymentForwardOutput = await models.PaymentForwardOutputPayment.findOne({ where: {
+
+    payment_forward_id: paymentForward.id
+
+  }});
+
+  if (existingPaymentForwardOutput) {
+
+    throw new Error(`payment already forwarded: ${payment.hash}`);
+
+  }
 
   let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
 
