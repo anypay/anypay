@@ -14,6 +14,8 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
 
   let paymentForward = await forwards.setupPaymentForward(settlementAddress);
 
+  console.log('bch.paymentforward.created', paymentForward.toJSON());
+
   return paymentForward.input_address;
 
 }
