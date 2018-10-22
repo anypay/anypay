@@ -1,5 +1,7 @@
 const http = require("superagent");
 
+import { log } from '../../../lib/logger';
+
 // make requests to bitcoin cash RPC interface
 
 // BCH_USER
@@ -10,6 +12,9 @@ const http = require("superagent");
 class JsonRpc {
 
   call(method, params) {
+
+    log.info(`bch.rpc.call.${method}`, params);
+
     return new Promise((resolve, reject) => {
       http
         .post(`http://${process.env.BCH_RPC_HOST}:${process.env.BCH_RPC_PORT}`)

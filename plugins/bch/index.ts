@@ -6,21 +6,15 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
+import * as forwards from './lib/forwards';
+
 var rpc = new JSONRPC();
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
 
-  let response = await rpc.call('validateaddress', [settlementAddress]);
+  let paymentForward = await forwards.setupPaymentForward(settlementAddress);
 
-  if (response.result.isvalid) {
-
-    return response.result.address;
-
-  } else {
-
-    throw new Error(`invalid address ${settlementAddress}`);
-
-  }
+  return paymentForward.input_address;
 
 }
 
@@ -65,7 +59,9 @@ export {
 
   checkAddressForPayments,
 
-  validateAddress
+  validateAddress,
+
+  forwards
 
 };
 

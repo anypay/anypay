@@ -6,6 +6,8 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import * as bch from '../plugins/bch';
+
 import * as models from './models';
 
 import {convert} from './prices';
@@ -52,7 +54,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      address = await BitcoinCashAddressService.getNewAddress(accountId);
+      let account = await models.Account.findOne({ where: { id: accountId }});
+
+      address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
 
       break;
 
