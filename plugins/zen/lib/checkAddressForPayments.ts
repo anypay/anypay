@@ -26,25 +26,25 @@ export async function anypay_checkAddressForPayments(address:string, currency:st
 
       let tx = await rpc.getTransaction(resp.transactions[i])
  
-       for( let j=0; j<tx.vout.length;j++){
+      for( let j=0; j<tx.vout.length;j++){
   
-         let p: Payment  = {
+        let p: Payment  = {
   
-           hash: resp.transactions[i],
+          hash: resp.transactions[i],
   
-           amount: tx.vout[j].value,
+          amount: tx.vout[j].value,
  
-           address: address,
+          address: address,
   
-           currency: 'ZEN'
+          currency: 'ZEN'
  
-           }
+        }
 
-          console.log(p)
+        console.log(p)
     
-          channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
+        channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
 
-          payments.push(p)
+        payments.push(p)
     
       }
 
@@ -57,3 +57,4 @@ export async function anypay_checkAddressForPayments(address:string, currency:st
   return(payments)
 
 }
+
