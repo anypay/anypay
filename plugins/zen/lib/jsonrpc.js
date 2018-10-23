@@ -29,6 +29,39 @@ class JsonRpc {
         });
     });
   }
+
+    getAddress(address){
+        return new Promise((resolve, reject) => {
+          http
+            .get('https://explorer.zensystem.io/insight-api-zen/addr/'+address)
+                .timeout({
+                    response: 5000,
+                    deadline: 10000,
+                })
+                .send().end((error, resp)=>{
+                if (error) { return reject(error) }
+                    resolve(resp.body);
+                })
+
+        })
+    }
+    getTransaction(tx){
+        return new Promise((resolve,reject)=>{
+           http
+            .get('https://explorer.zensystem.io/insight-api-zen/tx/'+tx)
+                .timeout({
+                    response: 5000,
+                    deadline: 10000,
+                })
+                .send().end((err, resp)=>{
+                if(err){
+                    console.log(tx)
+                    return reject(err)}
+                    resolve(resp.body);
+                })
+        })
+
+    }
 }
 
 module.exports = JsonRpc;
