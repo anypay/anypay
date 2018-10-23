@@ -4,8 +4,6 @@ require("dotenv").config();
 
 import {Payment} from '../../../types/interfaces';
 
-import * as amqp from 'amqplib';
-
 import { connection, channel } from './amqp';
 
 const routing_key = 'payment';
@@ -18,8 +16,44 @@ var rpc = new JSONRPC();
 
 export async function anypay_checkAddressForPayments(address:string, currency:string){
 
-let resp = await rpc.call('gettransaction', ['07321cba0486a942a36afd8f15243fc78d346e494ae0d4dea126b19f469bc334'])
+  let resp = await rpc.getAddress(address)
 
-  console.log(resp)
+  let payments: Payment[]=[]
+
+  try{
+
+    for(let i = 0; i<resp.transactions.length;i++){
+
+      let tx = await rpc.getTransaction(resp.transactions[i])
+ 
+       for( let j=0; j<tx.vout.length;j++){
+  
+         let p: Payment  = {
+  
+           hash: resp.transactions[i],
+  
+           amount: tx.vout[j].value,
+ 
+           address: address,
+  
+           currency: 'ZEN'
+ 
+           }
+
+          console.log(p)
+    
+          channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
+
+          payments.push(p)
+    
+      }
+
+    }
+
+  }
+
+  catch(err){console.log(err)}
+
+  return(payments)
 
 }
