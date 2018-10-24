@@ -2,6 +2,7 @@ const Hapi = require("hapi");
 const amqp = require("amqplib");
 const log = require("winston");
 require('dotenv').config();
+import {statsd} from '../../lib/statsd'
 
 const AMQP_URL = process.env.AMQP_URL;
 const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";
@@ -59,14 +60,16 @@ amqp
         handler: async function(request, h) {
           log.info("bitcoin:blockcypher:callback", request.payload);
 
+          statsd.increment('POST_/bitcoin/webhooks')
+
           let message = JSON.stringify(request.payload);
 
           let sent = await channel.sendToQueue(BITCOIN_QUEUE, new Buffer(message));
 
-          if (!sent) {
+	  if (!sent) {
             log.error("amqp:send:error", message);
             throw Boom.badRequest();
-          } else {
+	    } else {
             log.info("amqp:sent", message);
             return;
           }
@@ -79,14 +82,18 @@ amqp
         handler: async function(request, h) {
           log.info("litecoin:blockcypher:callback", request.payload);
 
+          statsd.increment('POST_/litecoin/webhooks')
+
           let message = JSON.stringify(request.payload);
 
           let sent = await channel.sendToQueue(LITECOIN_QUEUE, new Buffer(message));
 
+          statsd.timing('POST_/litecoin/webhooks', new Date().getTime()-start)
+
           if (!sent) {
             log.error("amqp:send:error", message);
             throw Boom.badRequest();
-          } else {
+	    } else {
             log.info("amqp:sent", message);
             return;
           }
@@ -99,11 +106,13 @@ amqp
         handler: async function(request, h) {
           log.info("dogecoin:blockcypher:callback", request.payload);
 
+	  statsd.increment('POST_/dogecoin/webhooks')
+
           let message = JSON.stringify(request.payload);
 					var buffer = new Buffer(message);
-
           let sent = await channel.sendToQueue(DOGECOIN_QUEUE, buffer);
           await channel.publish('blockcypher', 'callback.doge', new Buffer(message));
+
 
           if (!sent) {
             log.error("amqp:send:error", message);
@@ -120,6 +129,8 @@ amqp
         path: "/dash/webhooks",
         handler: async function(request, h) {
           log.info("dash:blockcypher:callback", request.payload);
+
+          statsd.increment('POST_/dash/webhooks')
 
           let message = JSON.stringify(request.payload);
 
@@ -147,6 +158,9 @@ amqp
         path: "/ethereum/webhooks",
         handler: async function(request, h) {
           log.info("ethereum:blockcypher:callback", request.payload);
+
+          statsd.increment('POST_/ethereum/webhooks')
+
 
           let message = JSON.stringify(request.payload);
 
