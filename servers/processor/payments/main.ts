@@ -9,6 +9,7 @@ const Slack = require("../../../lib/slack/notifier");
 import {Connection, Channel, Message} from "amqplib"; 
 import {paymentSchema} from '../../../jsonschema/payment';
 import {Validator} from 'jsonschema';
+import {statsd} from '../../lib/statsd'
 
 import {
   handlePayment,
@@ -26,6 +27,7 @@ const validator = new Validator();
 
 function handlePaymentMessage(payment: Payment) {
   console.log('handle payment', payment);
+  statsd.increment('handlePaymentMessage')
 
 	/*
     1. Query unpaid invoices for the specific amount.
@@ -43,7 +45,7 @@ function handlePaymentMessage(payment: Payment) {
 		var invoice;
 
     try {
-
+      
       invoice = await Invoice.findOne({
         where: {
           currency: payment.currency,
@@ -54,6 +56,8 @@ function handlePaymentMessage(payment: Payment) {
       });
 
       if (invoice) {
+
+        statsd.increment('handlePaymentMessage_invoiceFound') 
 
         invoice = invoice.toJSON();
         console.log("INVOICE", invoice);
@@ -76,6 +80,9 @@ function handlePaymentMessage(payment: Payment) {
       } else {
 
         log.error('no unpaid invoice found matching currency and address');
+      
+	statsd.increment('handlePaymentMessage_invoiceNotFound')
+
         channel.ack(message);
       }
 
