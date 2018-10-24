@@ -85,6 +85,8 @@ describe('BCH Payment Forwards', () => {
 
     let paymentForwardOutputPayment = await forwards.forwardPayment(payment);
 
+    paymentForwardOutputPayment = await forwards.forwardPayment(payment);
+
     assert(!paymentForwardOutputPayment, 'payment should not be forwarded twice');
 
   });
