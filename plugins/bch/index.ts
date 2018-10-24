@@ -10,7 +10,7 @@ import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
 import * as forwards from './lib/forwards';
 
-import {client} from '../../lib/statsd'
+import {statsd} from '../../lib/statsd'
 
 var rpc = new JSONRPC();
 
@@ -22,9 +22,9 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
 
   log.info('bch.paymentforward.created', paymentForward.toJSON());
 
-  client.timing('BCH_generateInvoiceAddress', new Date().getTime()-start)
+  statsd.timing('BCH_generateInvoiceAddress', new Date().getTime()-start)
 
-  client.increment('BCH_generateInvoiceAddress')
+  statsd.increment('BCH_generateInvoiceAddress')
 
   return paymentForward.input_address;
 
@@ -36,9 +36,9 @@ async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'BCH');
 
-  client.timing('BCH_createInvoice', new Date().getTime()-start)
+  statsd.timing('BCH_createInvoice', new Date().getTime()-start)
 
-  client.increment('BCH_createInvoice')
+  statsd.increment('BCH_createInvoice')
 
   return invoice;
 
@@ -46,7 +46,7 @@ async function createInvoice(accountId: number, amount: number) {
 
 async function validateAddress(address: string): Promise<string> {
 
-  client.increment('validateAddress')
+  statsd.increment('validateAddress')
 
   let start = new Date().getTime()
 
@@ -54,13 +54,13 @@ async function validateAddress(address: string): Promise<string> {
 
   if (!resp.result.isvalid) {
    
-    client.increment('Invalid_BCH_Address')
+    statsd.increment('Invalid_BCH_Address')
 
     throw new Error('Invalid BCH address');
 
   }
 
-  client.timing('BCH_validateAddress', new Date().getTime()-start)
+  statsd.timing('BCH_validateAddress', new Date().getTime()-start)
 
   return resp.result.address;
 
@@ -74,9 +74,9 @@ async function checkAddressForPayments(address:string,currency:string){
 
   console.log(txs)
 
-  client.timing('BCH_checkAddressForPayments', new Date().getTime()-start)
+  statsd.timing('BCH_checkAddressForPayments', new Date().getTime()-start)
 
-  client.increment('BCH_checkAddressForPayments')
+  statsd.increment('BCH_checkAddressForPayments')
 
   return(txs)
 }

@@ -1,6 +1,6 @@
 import {generateInvoice} from '../../lib/invoice';
 
-import {client} from '../../lib/statsd'
+import {statsd} from '../../lib/statsd'
 
 export async function createInvoice(accountId: number, amount: number) {
   
@@ -8,9 +8,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'XRP');
   
-  client.timing('XRP_createInvoice', new Date().getTime()-start)
+  statsd.timing('XRP_createInvoice', new Date().getTime()-start)
 
-  client.increment('XRP_createInvoice')
+  statsd.increment('XRP_createInvoice')
 
   return invoice;
 

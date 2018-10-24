@@ -4,7 +4,7 @@ import * as chainSoAPI from '../../lib/chainSoAPI';
 
 import {Invoice} from '../../types/interfaces';
 
-import {client} from '../../lib/statsd' 
+import {statsd} from '../../lib/statsd' 
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -12,9 +12,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'BTC');
 
-  client.timing('BTC_createInvoice', new Date().getTime()-start)
+  statsd.timing('BTC_createInvoice', new Date().getTime()-start)
 
-  client.increment('ZEN_createInvoice')
+  statsd.increment('ZEN_createInvoice')
 
   return invoice;
 
@@ -26,9 +26,9 @@ export async function checkAddressForPayments(address:string, currency:string){
 
   let payments = await chainSoAPI.checkAddressForPayments(address,currency);
 
-  client.timing('BTC_checkAddressForPayments', new Date().getTime()-start)
+  statsd.timing('BTC_checkAddressForPayments', new Date().getTime()-start)
 
-  client.increment('BTC_checkAddressForPayments')
+  statsd.increment('BTC_checkAddressForPayments')
 
   return payments;
 }

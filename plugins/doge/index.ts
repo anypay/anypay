@@ -4,7 +4,7 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {Payment,Invoice} from '../../types/interfaces';
 
-import {client} from '../../lib/statsd'
+import {statsd} from '../../lib/statsd'
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -12,9 +12,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'DOGE');
 
-  client.timing('DOGE_createInvoice', new Date().getTime()-start)
+  statsd.timing('DOGE_createInvoice', new Date().getTime()-start)
   
-  client.increment('DOGE_createInvoice')
+  statsd.increment('DOGE_createInvoice')
 
   return invoice;
 
@@ -48,9 +48,9 @@ export async function checkAddressForPayments(address:string,currency:string){
 
       }
 
-      client.timing('DOGE_checkAddressForPayments', new Date().getTime()-start)
+      statsd.timing('DOGE_checkAddressForPayments', new Date().getTime()-start)
 
-      client.increment('DOGE_checkAddressForPayments')
+      statsd.increment('DOGE_checkAddressForPayments')
     
       return payments 
 }

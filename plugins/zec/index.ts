@@ -4,7 +4,7 @@ import {Payment,Invoice} from '../../types/interfaces';
 
 const http = require("superagent");
 
-import {client} from '../../lib/statsd'
+import {statsd} from '../../lib/statsd'
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -12,9 +12,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'ZEC');
 
-  client.timing('ZEC_createInvoice', new Date().getTime()-start)
+  statsd.timing('ZEC_createInvoice', new Date().getTime()-start)
 
-  client.increment('ZEC_createInvoice')
+  statsd.increment('ZEC_createInvoice')
 
   return invoice;
 
@@ -48,9 +48,9 @@ export async function checkAddressForPayments(address:string,currency:string){
 
       }
 
-    client.timing('ZEC_checkAddressForPayments', new Date().getTime()-start)
+    statsd.timing('ZEC_checkAddressForPayments', new Date().getTime()-start)
 
-    client.increment('ZEC_checkAddressForPayments')
+    statsd.increment('ZEC_checkAddressForPayments')
     
     return payments 
 }
