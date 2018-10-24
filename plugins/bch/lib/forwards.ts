@@ -52,6 +52,8 @@ export async function setupPaymentForward(outputAddress: string) {
 }
 
 export async function forwardPayment(payment: Payment) {
+  
+  log.info('forwards.getpaymentforwardbyinput', payment.address);
 
   let paymentForward = await forwards.getPaymentForwardByInput({
 
@@ -61,6 +63,18 @@ export async function forwardPayment(payment: Payment) {
 
   });
 
+  if (!paymentForward) {
+
+    log.info(`no payment forward found for ${payment.address}`);
+
+    return;
+
+  } else {
+    
+    log.info(`yes payment forward found for ${payment.address} - ${paymentForward.output_address}`);
+
+  }
+
   let existingPaymentForwardOutput = await models.PaymentForwardOutputPayment.findOne({ where: {
 
     payment_forward_id: paymentForward.id
@@ -69,9 +83,13 @@ export async function forwardPayment(payment: Payment) {
 
   if (existingPaymentForwardOutput) {
 
-    throw new Error(`payment already forwarded: ${payment.hash}`);
+    log.info(`payment already forwarded ${payment.hash}`);
+
+    return;
 
   }
+
+  log.info('about to forward payment', payment.hash);
 
   let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
 
