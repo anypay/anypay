@@ -26,7 +26,9 @@ async function start() {
 
   channel.consume(queue, async (message) => {
     
-    let content = message.content.toString('hex');
+    let content = message.content.toString();
+
+    log.info('amqp.message.content', content);
 
     let payment = JSON.parse(content);
     
@@ -41,6 +43,8 @@ async function start() {
     }
 
     try {
+
+      log.info('try to forward payment');
 
       await forwardPayment(payment);
 

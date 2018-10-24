@@ -76,6 +76,12 @@ export async function getPaymentForwardByInput(inputAddress: InputAddress) {
   
   }});
 
+  if (!record) {
+
+    return;
+
+  }
+
   log.info('paymentforward:retrieved', record.toJSON());
 
   emitter.emit('paymentforward:retrieved', record.toJSON());

@@ -4,6 +4,8 @@ var JSONRPC = require('./lib/jsonrpc');
 
 import {generateInvoice} from '../../lib/invoice';
 
+import {log} from '../../lib/logger';
+
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
 import * as forwards from './lib/forwards';
@@ -14,7 +16,7 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
 
   let paymentForward = await forwards.setupPaymentForward(settlementAddress);
 
-  console.log('bch.paymentforward.created', paymentForward.toJSON());
+  log.info('bch.paymentforward.created', paymentForward.toJSON());
 
   return paymentForward.input_address;
 
