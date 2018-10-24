@@ -54,7 +54,7 @@ async function validateAddress(address: string): Promise<string> {
 
   if (!resp.result.isvalid) {
    
-    client.increment('Invalid_BCH_Address)
+    client.increment('Invalid_BCH_Address')
 
     throw new Error('Invalid BCH address');
 
