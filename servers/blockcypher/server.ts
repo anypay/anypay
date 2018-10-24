@@ -88,8 +88,6 @@ amqp
 
           let sent = await channel.sendToQueue(LITECOIN_QUEUE, new Buffer(message));
 
-          statsd.timing('POST_/litecoin/webhooks', new Date().getTime()-start)
-
           if (!sent) {
             log.error("amqp:send:error", message);
             throw Boom.badRequest();

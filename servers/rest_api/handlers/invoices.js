@@ -93,6 +93,8 @@ module.exports.show = async function(request, reply) {
 
 emitter.on('invoice.requested', async (invoice) => {
 
+  statsd.increment('invoice requested')
+
   await plugins.checkAddressForPayments(invoice.address, invoice.currency);
 
 })
