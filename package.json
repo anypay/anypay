@@ -46,6 +46,7 @@
     "jsonwebtoken": "^8.3.0",
     "level": "^2.1.2",
     "moment": "^2.22.1",
+    "node-statsd": "^0.1.1",
     "pg": "^6.2.4",
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
