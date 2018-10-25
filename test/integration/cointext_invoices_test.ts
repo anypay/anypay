@@ -6,6 +6,8 @@ import * as assert from 'assert';
 import {hash} from '../../lib/password';
 import * as Database from '../../lib/database';
 
+import {setAddress} from '../../lib/core';
+
 import {
   settings,
   models,
@@ -23,6 +25,12 @@ describe("Creating Cointext invoice", async () => {
     server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());
+
+    await setAddress({
+      account_id: account.id,
+      currency: 'BCH',
+      address: 'bitcoincash:qqdg7dyhx5ulan73pr2dvm03upatussskyseckns7e'
+    }); 
 
     accessToken = await accounts.createAccessToken(account.id);
 
