@@ -1,5 +1,15 @@
 const http = require("superagent")
 
+const bch = require('bitcoincashjs');
+
+const Address = bch.Address;
+
+const fromString = Address.fromString;
+
+const BitpayFormat = Address.BitpayFormat;
+
+const CashAddrFormat = Address.CashAddrFormat;
+
 require("dotenv").config();
 
 import {Payment} from '../../../types/interfaces';
@@ -37,6 +47,23 @@ async function getCashAddress(address:string):Promise<any>{
        });
 
     })
+
+}
+
+export function getLegacyAddressFromCashAddress(address:string):string{
+  
+  try{
+  
+    let cashaddr = fromString( address, 'livenet', 'pubkeyhash', CashAddrFormat);
+
+      return cashaddr.toString()
+    
+    }
+    catch(err){
+     
+      return "Invalid Cash Address"
+
+    }
 
 }
 
