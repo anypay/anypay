@@ -38,7 +38,7 @@ import {createConversion} from '../../lib/prices';
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 import * as totals from './handlers/totals';
-import { models } from './lib'
+import { models } from '../../lib'
 import {generateCoinTextInvoice} from '../../plugins/bch/index'
 
 
@@ -711,20 +711,16 @@ async function Server() {
       }
     }
   });
-
-  return server;
-}
-
-server.route({
-  method: "POST"
-  path: "invoice/{uid}/cointext_payments,
-  config: {
+  server.route({
+    method: "POST",
+    path: "invoice/{uid}/cointext_payments",
+    config: {
       tags: ['api'],
       handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
       let invoice = await models.Invoice.findOne({ where: {
       
-        uid: uid
+        uid: req.params.uid
 
       }})
 
@@ -732,9 +728,11 @@ server.route({
 
       }
     }
+  });
 
+  return server;
+}
 
-})
 if (require.main === module) {
   // main module, sync database & start server
   sequelize.sync().then(async () => {
