@@ -14,12 +14,6 @@ import { createCoinTextInvoice } from '../../lib/cointext'
 
 import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
-import { connection, channel } from './lib/amqp'
-
-const routing_key = 'cointext';
-
-const exchange = 'anypay.payments';
-
 var rpc = new JSONRPC();
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -68,8 +62,6 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
   let legacy = getLegacyAddressFromCashAddress(address)
   
   let invoice =  await createCoinTextInvoice(legacy, amount, currency)
-
-  //  channel.publish(exchange, routing_key, new Buffer(JSON.stringify(invoice)));
 
   return invoice
 }

@@ -61,7 +61,7 @@ export function getLegacyAddressFromCashAddress(address:string):string{
     }
     catch(err){
      
-      return "Invalid Cash Address"
+      return address
 
     }
 
