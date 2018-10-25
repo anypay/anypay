@@ -16,13 +16,13 @@ describe("Converting Bitcoin cash addresses", () => {
     
     });
 
-  it ("should return an error on invalid cash address", () => {
+  it ("should return legacy address from a legacy address", () => {
 
     let address = '1MF7A5H2nHYYJMieouip2SkZiFZMBKqSZe';
 
     let legacy = getLegacyAddressFromCashAddress(address);
 
-    assert(legacy, 'Invalid Cash Address')
+    assert(legacy, address)
 
   });
 

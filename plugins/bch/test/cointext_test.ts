@@ -12,7 +12,9 @@ describe("Cointext invoices", () => {
 
     let invoice =  await generateCoinTextInvoice(address, 46000, 'BCH')
 
-    //    assert(invoice.network, 'main')
+    console.log(invoice)
+
+    //assert(JSON.parse(invoice).network, 'main')
 
     });
 
