@@ -713,7 +713,7 @@ async function Server() {
   });
   server.route({
     method: "POST",
-    path: "invoice/{uid}/cointext_payments",
+    path: "/invoice/{uid}/cointext_payments",
     config: {
       tags: ['api'],
       handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
