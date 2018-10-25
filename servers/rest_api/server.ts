@@ -724,18 +724,7 @@ async function Server() {
 
       }})
 
-        let cointext = await createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
-  
-	let cointextInvoice = {
-
-  	  "id":invoice.account_id,
-          "invoice_uid": req.params.uid,
-	  "payment_id":cointext.payment_id
-   
-	}
-
-	return cointextInvoice
-
+        return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
 	 
       }
     }
