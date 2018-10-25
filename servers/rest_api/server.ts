@@ -39,7 +39,7 @@ import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 import * as totals from './handlers/totals';
 import { models } from '../../lib'
-import {generateCoinTextInvoice} from '../../plugins/bch/index'
+import {createCoinTextInvoice} from '../../lib/cointext'
 
 
 const Fixer = require('../../lib/fixer');
@@ -713,7 +713,7 @@ async function Server() {
   });
   server.route({
     method: "POST",
-    path: "/invoice/{uid}/cointext_payments",
+    path: "/invoices/{uid}/cointext_payments",
     config: {
       tags: ['api'],
       handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
@@ -724,8 +724,8 @@ async function Server() {
 
       }})
 
-        return await generateCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
-
+        return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
+	 
       }
     }
   });
