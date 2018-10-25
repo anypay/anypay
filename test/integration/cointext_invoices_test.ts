@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {generateInvoice} from '../../lib/invoice'
 import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
@@ -30,20 +32,17 @@ describe("Creating Cointext invoice", async () => {
 
     //CREATE AN INVOICE 
     let invoice = await generateInvoice(account.id, 1, 'BCH')
- 
-    console.log(invoice)
 
+    console.log('invoice GENERATED', invoice.toJSON());
+ 
     try {
 
       let response = await server.inject({
         method: 'POST',
-	url: '/invoices/${invoice.uid}/cointext_payments',
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
+        url: `/invoices/${invoice.uid}/cointext_payments`,
       });
 
-      console.log('cointext invoice: ', responsei.result);
+      console.log('cointext invoice: ', response.result);
 
       // assert(response.result.coins);
 
