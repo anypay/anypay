@@ -43,7 +43,7 @@ describe("Creating Cointext invoice", async () => {
         }
       });
 
-      console.log('cointext invoice: ', responsei.result);
+      console.log('cointext invoice: ', response);
 
       // assert(response.result.coins);
 
