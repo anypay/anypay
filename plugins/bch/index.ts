@@ -12,6 +12,10 @@ import * as forwards from './lib/forwards';
 
 import {statsd} from '../../lib/statsd'
 
+import { createCoinTextInvoice } from '../../lib/cointext'
+
+import { getLegacyAddressFromCashAddress } from './lib/bitbox'
+
 var rpc = new JSONRPC();
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -81,6 +85,15 @@ async function checkAddressForPayments(address:string,currency:string){
   return(txs)
 }
 
+async function generateCoinTextInvoice( address:string, amount:number, currency:string ){
+
+  let legacy = getLegacyAddressFromCashAddress(address)
+  
+  let invoice =  await createCoinTextInvoice(legacy, amount, currency)
+
+  return invoice
+}
+
 const currency = 'BCH';
 
 export {
@@ -92,6 +105,8 @@ export {
   checkAddressForPayments,
 
   validateAddress,
+
+  generateCoinTextInvoice,
 
   forwards
 

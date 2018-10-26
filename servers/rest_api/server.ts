@@ -38,6 +38,9 @@ import {createConversion} from '../../lib/prices';
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
 import * as totals from './handlers/totals';
+import { models } from '../../lib'
+import {createCoinTextInvoice} from '../../lib/cointext'
+
 
 const Fixer = require('../../lib/fixer');
 
@@ -705,6 +708,24 @@ async function Server() {
         let conversion = await createConversion(inputAmount, req.params.newcurrency);
 
         return {conversion};
+      }
+    }
+  });
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/cointext_payments",
+    config: {
+      tags: ['api'],
+      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+      let invoice = await models.Invoice.findOne({ where: {
+      
+        uid: req.params.uid
+
+      }})
+
+        return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
+	 
       }
     }
   });
