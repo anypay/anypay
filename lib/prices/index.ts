@@ -1,6 +1,7 @@
 
 import { getLegacyPrices } from './legacy';
 import { getCryptoPrices } from './crypto';
+import { getPriceOfOneDollarInVES } from './ves';
 
 const MAX_DECIMALS = 5;
 
@@ -19,7 +20,11 @@ async function getAllPrices() {
   let legacyPrices = await getLegacyPrices();
   let cryptoPrices = await getCryptoPrices();
 
-  return Object.assign(legacyPrices, cryptoPrices);
+  let prices = Object.assign(legacyPrices, cryptoPrices);
+
+  prices['VES'] = await getPriceOfOneDollarInVES() * legacyPrices['USD'];
+
+  return prices;
 };
 
 async function createConversion(inputAmount: Amount, outputCurrency: string): Promise<Conversion> {
@@ -48,6 +53,7 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 };
 
 export {
-  convert, createConversion
+  convert, createConversion,
+  getAllPrices
 };
 
