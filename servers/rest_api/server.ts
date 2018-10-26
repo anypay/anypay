@@ -33,7 +33,8 @@ import {createLinks} from './handlers/links_controller';
 import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 import {dashbackTotalsByMonth} from './handlers/dashback_controller';
 
-import {createConversion} from '../../lib/prices';
+import {createConversion } from '../../lib/prices';
+import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
 
 import * as monthlyChartsController from './handlers/monthly_totals';
 import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
@@ -559,6 +560,8 @@ async function Server() {
       handler: async (request, h) => {
 
         var currencies = await Fixer.getCurrencies();
+
+        currencies.rates['VES'] = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
 
         return currencies;
 
