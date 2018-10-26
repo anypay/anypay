@@ -9,7 +9,7 @@ const Slack = require("../../../lib/slack/notifier");
 import {Connection, Channel, Message} from "amqplib"; 
 import {paymentSchema} from '../../../jsonschema/payment';
 import {Validator} from 'jsonschema';
-import {statsd} from '../../../lib/statsd'
+import {statsd} from '../../../lib/stats/statsd'
 
 import {
   handlePayment,

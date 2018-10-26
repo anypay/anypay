@@ -2,7 +2,7 @@ const Hapi = require("hapi");
 const amqp = require("amqplib");
 const log = require("winston");
 require('dotenv').config();
-import {statsd} from '../../lib/statsd'
+import {statsd} from '../../lib/stats/statsd'
 
 const AMQP_URL = process.env.AMQP_URL;
 const BITCOIN_QUEUE  = "blockcypher:bitcoin:webhooks";

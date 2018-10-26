@@ -14,7 +14,7 @@ import { createCoinTextInvoice } from '../../lib/cointext'
 
 import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
-import {statsd} from '../../lib/statsd'
+import {statsd} from '../../lib/stats/statsd'
 
 var rpc = new JSONRPC();
 

@@ -4,7 +4,7 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {anypay_checkAddressForPayments} from './lib/checkAddressForPayments'
 
-import {statsd} from '../../lib/statsd'
+import {statsd} from '../../lib/stats/statsd'
 
 export async function createInvoice(accountId: number, amount: number) {
 

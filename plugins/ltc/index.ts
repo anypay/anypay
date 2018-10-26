@@ -4,7 +4,7 @@ import {generateInvoice} from '../../lib/invoice';;
 
 import {Payment,Invoice} from '../../types/interfaces';
 
-import {statsd} from '../../lib/statsd'
+import {statsd} from '../../lib/stats/statsd'
 
 export async function createInvoice(accountId: number, amount: number) {
 
