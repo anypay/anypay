@@ -6,8 +6,10 @@
 
 const Invoice = require("../../lib/models/invoice");
 const DashPayout = require("../../lib/models/dash_payout");
+import {statsd} from '../../lib/stats/statsd'
 
 function createPayout(accountId) {
+  statsd.increment('Dash_createPayout')
   return new Promise((resolve, reject) => {
     // Find latest payout for account
     DashPayout.findOne({
