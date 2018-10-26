@@ -60,7 +60,7 @@ function CoinsFromAccount(account) {
     coins['DASH'].enabled = true;
   }
 
-  if (account.bitcoin_cash_address && account.bitcoin_cash_enabled) {
+  if (account.bitcoin_cash_address) {
     coins['BCH'].enabled = true;
   }
 
