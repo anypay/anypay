@@ -1,10 +1,10 @@
 let StatsD = require('node-statsd')
 
-let client = new StatsD();
+let statsd = new StatsD();
 
 export {
  
-  client
+  statsd
 
 }
 
