@@ -1,7 +1,7 @@
 
 import { getLegacyPrices } from './legacy';
 import { getCryptoPrices } from './crypto';
-import { getVESPrice } from '../localbitcoins';
+import { getVESPrice } from './localbitcoins';
 
 const MAX_DECIMALS = 5;
 
