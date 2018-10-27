@@ -1,7 +1,7 @@
 
 import { getLegacyPrices } from './legacy';
 import { getCryptoPrices } from './crypto';
-import { getPriceOfOneDollarInVES } from './ves';
+import { getVESPrice } from '../localbitcoins';
 
 const MAX_DECIMALS = 5;
 
@@ -22,7 +22,7 @@ async function getAllPrices() {
 
   let prices = Object.assign(legacyPrices, cryptoPrices);
 
-  prices['VES'] = await getPriceOfOneDollarInVES() * legacyPrices['USD'];
+  prices['VES'] = await getVESPrice();
 
   return prices;
 };
