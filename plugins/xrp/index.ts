@@ -39,9 +39,12 @@ async function checkAddressForPayments(address:string, currency:string){
    let payments: Payment[]=[];
 
    let resp = await http.get(`https://data.ripple.com/v2/accounts/${address}/transactions`)
+
    
-   for(let i=0;i<resp.body.transactions.length;i++){
-	   
+   for(let i=resp.body.transactions.length-1; i>-1;i--){
+
+console.log(resp.body.transactions[i])   
+     if( i < resp.body.transactions.length - 25 ){ break }
 
      if(resp.body.transactions[i].tx.TransactionType == 'Payment'){
 
@@ -49,12 +52,17 @@ async function checkAddressForPayments(address:string, currency:string){
 
      let amount = resp.body.transactions[i].tx.Amount
 
-       if( typeof(resp.body.transactions[i].tx.Amount.currency) != 'undefined'){
+      if( typeof(resp.body.transactions[i].tx.Amount.currency) != 'undefined'){
 
-         amount = resp.body.transactions[i].Amount.value
          currency = 'XRP.'+resp.body.transactions[i].tx.Amount.currency
 
        }
+        if( typeof(resp.body.transactions[i].tx.Amount.value) != 'undefined' ){
+
+         amount = resp.body.transactions[i].tx.Amount.value
+
+       }
+
        let p: Payment = {
       
          currency: currency,
@@ -67,7 +75,7 @@ async function checkAddressForPayments(address:string, currency:string){
        payments.push(p)
 
        channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
-
+       
       }
           
     }
