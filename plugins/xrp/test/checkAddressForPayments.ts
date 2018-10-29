@@ -8,7 +8,7 @@ describe("Checking address for payments", () => {
 
   it ("should return an array of payments", async () => {
 
-    let address = 'rHaans8PtgwbacHvXAL3u6TG28gTAtCwr8';
+    let address = 'r3pzYrVu7oruSJh1jhACmb6wRDkTWVw1JJ';
 
     let payments = await checkAddressForPayments(address, 'XRP');
 

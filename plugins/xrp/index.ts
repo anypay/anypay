@@ -26,7 +26,13 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function checkAddressForPayments(address:string, currency:string){
+
+   await sleep(1500)
 
    let start = new Date().getTime()
       
@@ -36,13 +42,24 @@ async function checkAddressForPayments(address:string, currency:string){
    
    for(let i=0;i<resp.body.transactions.length;i++){
 	   
+
      if(resp.body.transactions[i].tx.TransactionType == 'Payment'){
 
+     let currency = 'XRP'
+
+     let amount = resp.body.transactions[i].tx.Amount
+
+       if( typeof(resp.body.transactions[i].tx.Amount.currency) != 'undefined'){
+
+         amount = resp.body.transactions[i].Amount.value
+         currency = 'XRP.'+resp.body.transactions[i].tx.Amount.currency
+
+       }
        let p: Payment = {
       
-         currency: resp.body.transactions[i].tx.Amount.currency,
+         currency: currency,
 	 address: resp.body.transactions[i].tx.Account,
-	 amount: resp.body.transactions[i].tx.Amount.value,
+	 amount: amount,
 	 hash: resp.body.transactions[i].hash
 
        }
