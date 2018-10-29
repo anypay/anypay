@@ -21,7 +21,11 @@ module.exports.list = async function(request, reply) {
 
     'BCH': account.bitcoin_cash_address,
 
-    'ZEC': account.zcash_t_address
+    'ZEC': account.zcash_t_address,
+
+    'LTC': account.litecoin_address,
+
+    'DOGE': account.dogecoin_address
 
   };
 
