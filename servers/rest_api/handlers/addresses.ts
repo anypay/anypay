@@ -23,7 +23,9 @@ module.exports.list = async function(request, reply) {
 
     'ZEC': account.zcash_t_address,
 
-    'LTC': account.litecoin_address
+    'LTC': account.litecoin_address,
+
+    'DOGE': account.dogecoin_address
 
   };
 
