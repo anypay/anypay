@@ -66,7 +66,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
       let xrp_account = await models.Account.findOne({ where: { id: accountId }});
 
-      address = xrp.generateInvoiceAddress(xrp_account.xrp_address);
+      address = xrp.generateInvoiceAddress(xrp_account.ripple_address);
 
       break;
 
