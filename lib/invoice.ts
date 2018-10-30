@@ -8,6 +8,8 @@ import * as ZencashAddressService from './zencash/address_service';
 
 import * as bch from '../plugins/bch';
 
+import * as xrp from '../plugins/xrp';
+
 import * as models from './models';
 
 import {convert} from './prices';
@@ -57,6 +59,14 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
       let account = await models.Account.findOne({ where: { id: accountId }});
 
       address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
+
+      break;
+
+    case 'XRP':
+
+      let xrp_account = await models.Account.findOne({ where: { id: accountId }});
+
+      address = xrp.generateInvoiceAddress(xrp_account.xrp_address);
 
       break;
 
