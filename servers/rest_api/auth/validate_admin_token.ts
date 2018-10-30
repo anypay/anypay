@@ -12,7 +12,7 @@ export async function validateAdminToken (request, username, password, h) {
 
   }
 
-  var accessToken = await modelsAccessToken.findOne({
+  var accessToken = await models.AccessToken.findOne({
 
     where: {
 
@@ -50,7 +50,7 @@ export async function validateAdminToken (request, username, password, h) {
 
     } else {
 
-      return isValid: false
+      return { isValid: false }
 
     }
 

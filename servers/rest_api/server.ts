@@ -384,7 +384,7 @@ async function Server() {
       tags: ['api'],
       handler: InvoicesController.create,
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
