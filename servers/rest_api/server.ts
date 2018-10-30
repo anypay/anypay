@@ -1,9 +1,7 @@
 "use strict";
 require('dotenv').config();
 import * as Hapi from "hapi";
-const AccessToken = require("../../lib/models/access_token");
-const Account = require("../../lib/models/account");
-const Invoice = require("../../lib/models/invoice");
+
 const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
@@ -21,7 +19,6 @@ const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
 const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
 const CoinsController = require("./handlers/coins");
-const AccountLogin = require("../../lib/account_login");
 const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
 const InvoicesController = require("./handlers/invoices");
@@ -58,117 +55,11 @@ WebhookHandler.on("webhook", payload => {
   console.log("payload", payload);
 });
 
-import * as jwt from '../../lib/jwt';
 
-const validateAdminToken = async function(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
-
-  try {
-
-    let token = await jwt.verifyToken(username);
-
-    return {
-      isValid: true,
-      token
-    }
-
-  } catch(error) {
-
-    return {
-      isValid: false
-    }
-
-  }
-}
-
-const validatePassword = async function(request, username, password, h) {
-  if (!username || !password) {
-    return {
-      isValid: false
-    };
-  }
-
-  var accessToken = await AccountLogin.withEmailPassword(username, password);
-
-
-  if (accessToken) {
-
-    return {
-      isValid: true,
-      credentials: { accessToken }
-    };
-
-  } else {
-    var account = await Account.findOne({
-      where: {
-        email: username
-      }
-    });
-    console.log("ACCOUNT", account);
-
-    if (!account) {
-
-      return {
-        isValid: false
-      }
-    }
-
-    var accessToken = await AccessToken.findOne({
-      where: {
-        account_id: account.id,
-        uid: password
-      }
-    })
-
-    if (accessToken) {
-
-      return {
-        isValid: true,
-        credentials: { accessToken }
-      };
-
-    } else {
-
-      return {
-        isValid: false
-      }
-
-    }
-
-  }
-};
-
-const validateToken = async function(request, username, password, h) {
-  if (!username) {
-    return {
-      isValid: false
-    };
-  }
-
-  var accessToken = await AccessToken.findOne({
-    where: {
-      uid: username
-    }
-  });
-
-  if (accessToken) {
-		var account = await Account.findOne({
-			where: {
-				id: accessToken.account_id
-			}
-		})
-		request.account = account;
-    request.account_id = accessToken.account_id;
-
-    return {
-      isValid: true,
-      credentials: { accessToken: accessToken }
-    }
-  } else {
-    return {
-      isValid: false
-    }
-  }
-};
+import { validateAdminToken } from './auth/validate_admin_token';
+import { validateAdminJWT } from './auth/validate_admin_jwt';
+import { validatePassword } from './auth/validate_password';
+import { validateToken } from './auth/validate_token';
 
 // Unused
 const kBasicAuthorizationAllowOtherHeaders = Joi.object({
@@ -240,7 +131,8 @@ async function Server() {
 
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
-  server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
+  server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminJWT });
+  server.auth.strategy("admintoken", "basic", { validate: validateAdminToken });
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
@@ -252,7 +144,7 @@ async function Server() {
           invoice_id: Joi.string().required()
         },
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response })
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     },
   });
   server.route({
@@ -300,7 +192,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: BitcoinCashInvoicesController.create
     }
@@ -313,10 +205,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: ZcashInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
@@ -327,10 +219,10 @@ async function Server() {
       tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: BitcoinLightningInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
@@ -340,10 +232,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: DashInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
@@ -353,10 +245,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: BitcoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
@@ -366,10 +258,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: LitecoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
@@ -379,10 +271,10 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
       handler: DogecoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
 
@@ -392,10 +284,10 @@ async function Server() {
     config: {
       tags: ['api'],
       validate: {
-        payload: Account.Credentials,
+        payload: models.Account.Credentials,
       },
       handler: AccountsController.create,
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
@@ -413,7 +305,7 @@ async function Server() {
       auth: "password",
       tags: ['api'],
       handler: AccessTokensController.create,
-      plugins: responsesWithSuccess({ model: AccessToken.Response })
+      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
   server.route({
@@ -439,7 +331,7 @@ async function Server() {
         payload: AddressesController.PayoutAddressUpdate,
       },
       handler: AddressesController.update,
-      plugins: responsesWithSuccess({ model: Account.Response })
+      plugins: responsesWithSuccess({ model: models.Account.Response })
     }
   });
   server.route({
@@ -449,7 +341,7 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       handler: AccountsController.show,
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
   server.route({
@@ -494,7 +386,7 @@ async function Server() {
       validate: {
         payload: Invoice.Request,
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
   server.route({
