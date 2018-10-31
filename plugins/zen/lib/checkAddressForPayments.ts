@@ -25,16 +25,19 @@ export async function anypay_checkAddressForPayments(address:string, currency:st
     for(let i = 0; i<resp.transactions.length;i++){
 
       let tx = await rpc.getTransaction(resp.transactions[i])
- 
+
+
       for( let j=0; j<tx.vout.length;j++){
-  
+
+	if(tx.vout[j].scriptPubKey.addresses[0] != address ){continue}	
+
         let p: Payment  = {
   
           hash: resp.transactions[i],
   
           amount: tx.vout[j].value,
  
-          address: address,
+          address: tx.vout[j].scriptPubKey.addresses[0],
   
           currency: 'ZEN'
  
