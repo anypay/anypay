@@ -16,7 +16,7 @@ const exchange = 'anypay.payments';
 
 async function generateInvoiceAddress(settlementAddress:string){
 
-  return settlementAddress+'?dt='+(Math.random() * 1000000000000).toString()
+  return settlementAddress+'?dt='+Math.floor(Math.random() * (1000000000000 - 0) + 0)
 
 }
 
