@@ -11,11 +11,13 @@
 
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
+import * as zecPaymentForwarder from '../plugins/zec/actors/payment_forwarder';
 
 async function start() {
 
   await bchPaymentForwarder.start();
   await zenPaymentForwarder.start();
+  await zecPaymentForwarder.start();
 
 }
 

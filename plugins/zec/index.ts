@@ -6,6 +6,26 @@ const http = require("superagent");
 
 import {statsd} from '../../lib/stats/statsd'
 
+import { log } from '../../lib/logger';
+
+import * as forwards from './lib/forwards';
+
+
+export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
+
+   let start = new Date().getTime()
+
+   let paymentForward = await forwards.setupPaymentForward(settlementAddress);
+
+   log.info('zec.paymentforward.created', paymentForward.toJSON());
+
+   statsd.timing('ZEC_generateInvoiceAddress', new Date().getTime()-start)
+
+   statsd.increment('ZEC_generateInvoiceAddress')
+
+   return paymentForward.input_address;
+ }
+
 export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
