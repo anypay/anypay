@@ -38,12 +38,14 @@ const badInvoice: Invoice = {
     hash:"351c32abae05ad73f41cff7c11137241aa7a1f0e71c707fdab5794ae15edd469"
 }
 
-
-
 describe("Manual invoice address check", () => {
   it("should return payment struct for every recieved transaction from invoice address", async() =>{
-    let payments: Payment[]  = await checkAddressForPayments(invoice.address,"DASH");
+    let payments: Payment[]  = await checkAddressForPayments("XhiNxnCJwpwpYrjT6Z9M2YSoNBvurQAmAE","DASH");
+    console.log(payments)
     assert(payments[0].hash == invoice.hash)
   });
+   it("should return payment struct for every recieved transaction from invoice address", async() =>{
+    let payments: Payment[]  = await checkAddressForPayments("XvHmcqFwq3XP4ckW9do2gQhC9U4Sq484WR","DASH");
+    console.log(payments)
+  });
 });
-

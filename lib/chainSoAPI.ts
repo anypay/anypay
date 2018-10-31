@@ -1,4 +1,12 @@
 const http = require("superagent");
+import * as amqp from 'amqplib';
+
+import { connection, channel } from './amqp';
+
+const routing_key = 'payment';
+
+const exchange = 'anypay.payments';
+
 import {Payment,Invoice} from '../types/interfaces';
 
 //@param invoice - an existing invoice
@@ -15,6 +23,7 @@ export async function checkAddressForPayments(address:string, currency:string): 
           hash: tx.txid
         };  
         payments.push(p)
+	channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
        }
   return payments 
 }
