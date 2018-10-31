@@ -28,7 +28,7 @@ export async function ripple_restAPI_checkAddressForPayments(address:string){
 
       if( typeof(resp.body.transactions[i].tx.Amount.currency) != 'undefined'){
 
-         currency = 'XRP.'+resp.body.transactions[i].tx.Amount.currency
+         currency = 'XRP.'+resp.body.transactions[i].tx.Amount.currency+"."+resp.body.transactions[i].tx.Amount.issuer
 
        }
         if( typeof(resp.body.transactions[i].tx.Amount.value) != 'undefined' ){
