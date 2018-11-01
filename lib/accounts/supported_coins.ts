@@ -7,43 +7,50 @@ function CoinsFromAccount(account) {
       code: 'DASH',
       name: 'dash',
       enabled: false,
-      icon: 'https://pos.anypay.global/dash.png'
+      icon: 'https://pos.anypay.global/dash.png',
+      address: account.dash_payout_address
     },
     'BCH': {
       code: 'BCH',
       name: 'bitcoin cash',
       enabled: false,
-      icon: 'https://pos.anypay.global/bch.png'
+      icon: 'https://pos.anypay.global/bch.png',
+      address: account.bitcoin_cash_address
     },
     'BTC': {
       code: 'BTC',
       name: 'bitcoin',
       enabled: false,
-      icon: 'https://pos.anypay.global/btc.png'
+      icon: 'https://pos.anypay.global/btc.png',
+      address: account.bitcoin_payout_address
     },
     'LTC': {
       code: 'LTC',
       name: 'litecoin',
       enabled: false,
-      icon: 'https://pos.anypay.global/ltc.png'
+      icon: 'https://pos.anypay.global/ltc.png',
+      address: account.litecoin_address
     },
     'XRP': {
       code: 'XRP',
       name: 'ripple',
       enabled: false,
-      icon: 'https://pos.anypay.global/xrp.png'
+      icon: 'https://pos.anypay.global/xrp.png',
+      address: account.ripple_address
     },
     'DOGE': {
       code: 'DOGE',
       name: 'dogecoin',
       enabled: false,
-      icon: 'https://pos.anypay.global/doge.png'
+      icon: 'https://pos.anypay.global/doge.png',
+      address: account.dogecoin_address
     },
     'ZEC': {
       code: 'ZEC',
       name: 'zcash',
       enabled: false,
-      icon: 'https://pos.anypay.global/zec.png'
+      icon: 'https://pos.anypay.global/zec.png',
+      address: account.zcash_address
     },
     'BTC.lightning': {
       code: 'BTC',
@@ -105,7 +112,8 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
       code: address.currency,
       name: address.currency,
       enabled: true,
-      icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`
+      icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`,
+      address: address.value
     }
 
   });
