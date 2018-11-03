@@ -8,6 +8,7 @@ import * as forwards from './forwards';
 import * as settings from './settings';
 import * as prices from './prices';
 import * as models from './models';
+import { log } from './logger';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -17,6 +18,7 @@ export {
   accounts,
   settings,
   prices,
-  forwards
+  forwards,
+  log
 }
 

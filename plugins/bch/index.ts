@@ -108,7 +108,9 @@ export {
 
   generateCoinTextInvoice,
 
-  forwards
+  forwards,
+
+  rpc
 
 };
 
