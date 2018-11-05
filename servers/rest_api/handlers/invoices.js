@@ -1,4 +1,5 @@
 const Invoice = require("../../../lib/models/invoice");
+const Account = require("../../../lib/models/account");
 const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')

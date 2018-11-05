@@ -305,20 +305,6 @@ async function Server() {
       handler: BitcoinCashInvoicesController.create
     }
   });
-
-  server.route({
-    method: "POST",
-    path: "/zec/invoices",
-    config: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: ZcashInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
-    }
-  });
   server.route({
     method: "POST",
     path: "/btc.lightning/invoices",
