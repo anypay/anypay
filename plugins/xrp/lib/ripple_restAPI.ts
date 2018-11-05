@@ -8,6 +8,8 @@ const routing_key = 'payment';
 
 const exchange = 'anypay.payments';
 
+const WebSocket = require('ws');
+
 export async function ripple_restAPI_checkAddressForPayments(address:string){
 
   let payments: Payment[]=[];
@@ -61,3 +63,74 @@ export async function ripple_restAPI_checkAddressForPayments(address:string){
   })
 
 }
+
+export async function rippleLib_checkAddressForPayments(address:string){
+
+  let payments: Payment[]=[];
+
+  let ws = new WebSocket('wss://s2.ripple.com:443')
+  
+  ws.on('open', function open() {
+  
+    let req = {
+      "id": 2,
+      "command": "account_tx",
+      "account": address,
+      "ledger_index_min": -1,
+      "ledger_index_max": -1,
+      "binary": false,
+      "limit": 10,
+      "forward": false
+    }
+    
+    ws.send(JSON.stringify(req));
+  });
+  ws.on('message', function incoming(data) {
+   
+    let res = JSON.parse(data);
+
+    for( let i = 0; i<res.result.transactions.length;i++){
+	      
+      let currency = "XRP"
+	
+      let amount = 0
+	
+      if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
+    
+        amount = res.result.transactions[i].tx.Amount
+	  
+      }
+      
+      else{   
+       
+        currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
+
+	amount = res.result.transactions[i].tx.Amount.value
+          
+      }
+
+      let p: Payment = {
+
+        currency: currency,
+        address: res.result.transactions[i].tx.Destinationi,
+        amount: amount,
+        hash: res.result.transactions[i].tx.hash
+
+      }
+
+      payments.push(p)
+
+      channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
+
+    }
+
+  })
+
+  ws.on('close', function close() {
+    console.log('disconnected');
+   });
+
+   return payments;
+
+}
+
