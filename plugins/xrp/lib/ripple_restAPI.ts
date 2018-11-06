@@ -92,50 +92,64 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
   ws.on('message',(data)=>{
 
-    let res = JSON.parse(data);
+    try{ 
 
-    for( let i = 0; i<res.result.transactions.length;i++){
+      let res = JSON.parse(data);
 
-      if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
-
-      let currency = "XRP"
-
-      let amount = 0
-
-      if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
-
-        amount = res.result.transactions[i].tx.Amount
-
-      }
-
-      else{
-
-        currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
-
-        amount = res.result.transactions[i].tx.Amount.value
-
-      }
-
-      let receiveAddress = res.result.transactions[i].tx.Destination
-
-      if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
+      if( typeof(res.result) == 'undefined'){return}
       
-        receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
+      for( let i = 0; i<res.result.transactions.length;i++){
+
+        if( typeof(res.result.transactions[i].tx) == 'undefined'){continue}
+        
+	if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
+
+        let currency = "XRP"
+
+        let amount = 0
+
+        if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
+
+          amount = res.result.transactions[i].tx.Amount
+
+        }
+
+        else{
+
+          currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
+
+          amount = res.result.transactions[i].tx.Amount.value
+
+        }
+
+        let receiveAddress = res.result.transactions[i].tx.Destination
+
+        if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
+      
+          receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
      
-      }
+        }
       
-      let p: Payment = {
+        let p: Payment = {
 
-        currency: currency,
-        address: receiveAddress,
-        amount: amount,
-        hash: res.result.transactions[i].tx.hash
+          currency: currency,
+          address: receiveAddress,
+          amount: amount,
+          hash: res.result.transactions[i].tx.hash
 
-      }
+        }
 
-      payments.push(p)
+        payments.push(p)
 
-      channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
+	console.log(p)
+
+        channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
+
+	}
+    }
+    catch(err){
+
+      console.log(err)
 
     }
 
@@ -143,8 +157,5 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
 
   ws.on('close',()=>{console.log})
-
-
-  return payments;
 
 }
