@@ -89,14 +89,6 @@ export async function forwardPayment(payment: Payment) {
 
   }
 
-  log.info('about to forward payment', payment.hash);
-
-  let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
-
-  log.info('bch.forwardpayment.result', rpcResult);
-
-  let txid = rpcResult.result;
-
   let paymentForwardInputPayment = await forwards.createPaymentForwardInputPayment(paymentForward.id, {
 
     amount: payment.amount,
@@ -104,6 +96,14 @@ export async function forwardPayment(payment: Payment) {
     txid: payment.hash
 
   });
+
+  log.info('about to forward payment', payment.hash);
+
+  let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
+
+  log.info('bch.forwardpayment.result', rpcResult);
+
+  let txid = rpcResult.result;
 
   let paymentForwardOutputPayment = await forwards.createPaymentForwardOutputPayment(
     
