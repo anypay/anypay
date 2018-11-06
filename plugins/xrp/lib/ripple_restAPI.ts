@@ -4,11 +4,11 @@ const http = require("superagent");
 
 import { connection, channel } from './amqp';
 
+const WebSocket = require('ws');
+
 const routing_key = 'payment';
 
 const exchange = 'anypay.payments';
-
-const WebSocket = require('ws');
 
 export async function ripple_restAPI_checkAddressForPayments(address:string){
 
@@ -68,11 +68,8 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
   let payments: Payment[]=[];
 
-  let ws = new WebSocket('wss://s2.ripple.com:443')
-  
-  ws.on('open', function open() {
-  
-    let req = {
+  let req = {
+
       "id": 2,
       "command": "account_tx",
       "account": address,
@@ -81,38 +78,54 @@ export async function rippleLib_checkAddressForPayments(address:string){
       "binary": false,
       "limit": 10,
       "forward": false
-    }
-    
-    ws.send(JSON.stringify(req));
-  });
-  ws.on('message', function incoming(data) {
-   
+  }
+ 
+  let ws = new WebSocket('wss://s2.ripple.com:443')
+  
+  ws.on('open',()=>{
+
+     ws.send(JSON.stringify(req));
+
+  })
+
+  ws.on('message',(data)=>{
+
     let res = JSON.parse(data);
 
     for( let i = 0; i<res.result.transactions.length;i++){
-	      
+
+      if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
+
       let currency = "XRP"
-	
+
       let amount = 0
-	
+
       if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
-    
+
         amount = res.result.transactions[i].tx.Amount
-	  
+
       }
-      
-      else{   
-       
+
+      else{
+
         currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
 
-	amount = res.result.transactions[i].tx.Amount.value
-          
+        amount = res.result.transactions[i].tx.Amount.value
+
       }
 
+      let receiveAddress = res.result.transactions[i].tx.Destination
+
+      if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
+      
+        receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
+     
+      }
+      
       let p: Payment = {
 
         currency: currency,
-        address: res.result.transactions[i].tx.Destinationi,
+        address: receiveAddress,
         amount: amount,
         hash: res.result.transactions[i].tx.hash
 
@@ -126,11 +139,10 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
   })
 
-  ws.on('close', function close() {
-    console.log('disconnected');
-   });
 
-   return payments;
+  ws.on('close',()=>{console.log})
+
+
+  return payments;
 
 }
-
