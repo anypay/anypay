@@ -50,6 +50,8 @@ export async function ripple_restAPI_checkAddressForPayments(address:string){
 
        payments.push(p)
 
+       console.log(p)
+
        channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
 
       }
