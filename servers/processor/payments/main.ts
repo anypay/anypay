@@ -70,7 +70,9 @@ function handlePaymentMessage(payment: Payment) {
         await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
         let account = await Account.findOne({
-          id: invoice.account_id
+	  where: {
+            id: invoice.account_id
+	  }
         });
 
         Slack.notify(
