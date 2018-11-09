@@ -6,7 +6,6 @@ const uuid = require('uuid')
 import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
 import {emitter} from '../../../lib/events';
-
 import { statsd } from '../../../lib/stats/statsd';
 
 module.exports.index = async (request, reply) => {
@@ -110,6 +109,8 @@ emitter.on('invoice.requested', async (invoice) => {
 
 })
 emitter.on('invoice.created', async (invoice) => {
+  
+  if(invoice.currency == 'DASH' || invoice.currency == 'DOGE' || invoice.currency == 'BTC' || invoice.currency == 'LTC' ){return}
 
   let waitTime = []
 
