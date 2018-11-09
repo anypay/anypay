@@ -8,7 +8,7 @@ import { connection, channel } from './lib/amqp';
 
 import { Payment } from '../../types/interfaces'
 
-import { ripple_restAPI_checkAddressForPayments } from './lib/ripple_restAPI'
+import { rippleLib_checkAddressForPayments, ripple_restAPI_checkAddressForPayments } from './lib/ripple_restAPI'
 
 const routing_key = 'payment';
 
@@ -16,7 +16,7 @@ const exchange = 'anypay.payments';
 
 async function generateInvoiceAddress(settlementAddress:string){
 
-  return settlementAddress+'?dt='+Math.floor(Math.random() * (1000000000000 - 0) + 0)
+  return settlementAddress+'?dt='+Math.floor(Math.random() * (10000000 - 0) + 0)
 
 }
 
@@ -37,7 +37,9 @@ async function createInvoice(accountId: number, amount: number) {
 async function checkAddressForPayments(address:string, currency:string){
 
    let start = new Date().getTime()
-      
+  
+   rippleLib_checkAddressForPayments(address)
+
    let payments = await ripple_restAPI_checkAddressForPayments(address)
 
    statsd.timing('XRP_checkAddressForPayments', new Date().getTime()-start)
@@ -61,5 +63,4 @@ export {
   checkAddressForPayments
 
 };
-
 
