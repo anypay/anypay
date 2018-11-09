@@ -51,6 +51,14 @@ module.exports.create = async (request, reply) => {
 
     let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
+    if(invoice){
+   
+      log.info('invoice.created', invoice.toJSON());
+
+      emitter.emit('invoice.created', invoice.toJSON());
+
+    }
+
     return invoice;
 
   } catch(error) {
@@ -101,5 +109,32 @@ emitter.on('invoice.requested', async (invoice) => {
   await plugins.checkAddressForPayments(invoice.address, invoice.currency);
 
 })
+emitter.on('invoice.created', async (invoice) => {
 
+  let waitTime = []
 
+  for(let j = 0; j<120;j++){
+    if( j<60 ){
+      waitTime.push(2000)
+    }
+    else{
+      waitTime.push(4000)
+    }
+  }
+
+  for(let i=0;i<waitTime.length;i++){
+
+    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+
+    await sleep(waitTime[i]);
+
+    invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+
+    if(invoice.status == 'paid'){break}
+
+  }
+})
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
