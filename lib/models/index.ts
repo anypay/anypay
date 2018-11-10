@@ -54,6 +54,6 @@ export {
   BankAccount,
   BlockcypherPaymentForward,
   MerchantGroup,
-  MerchantGroupMember,
+  MerchantGroupMember
 };
 
