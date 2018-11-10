@@ -49,19 +49,15 @@ async function checkAddressForPayments(address:string, currency:string){
  
    address = address.substr(0, 34);
 
-   await sleep(2000)
-
    let start = new Date().getTime()
   
    rippleLib_checkAddressForPayments(address)
-
-   let payments = await ripple_restAPI_checkAddressForPayments(address)
 
    statsd.timing('XRP_checkAddressForPayments', new Date().getTime()-start)
 
    statsd.increment('XRP_checkAddressForPayments')
 
-   return payments
+   return []
 }
 
 const currency = 'XRP';
