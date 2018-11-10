@@ -34,7 +34,22 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function checkAddressForPayments(address:string, currency:string){
+
+   if( address.length <= 34 ){
+    
+     console.log("invalid address:", address)
+
+     return [];
+   }
+ 
+   address = address.substr(0, 34);
+
+   await sleep(2000)
 
    let start = new Date().getTime()
   
@@ -51,6 +66,7 @@ async function checkAddressForPayments(address:string, currency:string){
 
 const currency = 'XRP';
 
+const poll = true;
 
 export {
 
@@ -60,7 +76,8 @@ export {
 
   createInvoice,
 
-  checkAddressForPayments
+  checkAddressForPayments,
 
+  poll
 };
 

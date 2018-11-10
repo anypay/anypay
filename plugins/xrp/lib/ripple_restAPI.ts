@@ -50,10 +50,6 @@ export async function ripple_restAPI_checkAddressForPayments(address:string){
 
        payments.push(p)
 
-       console.log(p)
-
-       channel.publish(exchange, routing_key, new Buffer(JSON.stringify(p)));
-
       }
 
     }
@@ -85,12 +81,16 @@ export async function rippleLib_checkAddressForPayments(address:string){
   let ws = new WebSocket('wss://s2.ripple.com:443')
   
   ws.on('open',()=>{
+    
+     console.log("Ripplelib websocket open")
 
      ws.send(JSON.stringify(req));
 
   })
 
   ws.on('message',(data)=>{
+
+    console.log("Ripplelib incoming message")
 
     try{ 
 

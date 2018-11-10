@@ -110,7 +110,9 @@ emitter.on('invoice.requested', async (invoice) => {
 })
 emitter.on('invoice.created', async (invoice) => {
   
-  if(invoice.currency == 'DASH' || invoice.currency == 'DOGE' || invoice.currency == 'BTC' || invoice.currency == 'LTC' ){return}
+  log.info("invoice.created")
+
+  if(plugins.poll == false){return}
 
   let waitTime = []
 
@@ -124,6 +126,8 @@ emitter.on('invoice.created', async (invoice) => {
   }
 
   for(let i=0;i<waitTime.length;i++){
+
+    log.info("Polling invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
     await plugins.checkAddressForPayments(invoice.address,invoice.currency)
 

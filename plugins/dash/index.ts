@@ -6,7 +6,7 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
-export async function createInvoice(accountId: number, amount: number) {
+async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
 
@@ -20,7 +20,7 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
-export async function checkAddressForPayments(address:string, currency:string){
+async function checkAddressForPayments(address:string, currency:string){
 
   let start = new Date().getTime()
 
@@ -32,3 +32,19 @@ export async function checkAddressForPayments(address:string, currency:string){
 
   return payments;
 }
+
+const currency = 'DASH';
+
+const poll = false;
+
+export {
+
+  currency,
+
+  createInvoice,
+
+  checkAddressForPayments,
+
+  poll
+
+};
