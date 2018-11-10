@@ -30,7 +30,6 @@ var oracles = ConfigureOracles(configureOracles);
 
 export {
   oracles,
-  plugins,
   cashback,
   models,
   accounts,
