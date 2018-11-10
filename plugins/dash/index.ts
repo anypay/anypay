@@ -8,7 +8,9 @@ import {statsd} from '../../lib/stats/statsd'
 
 import {log} from '../../lib'
 
-async function createInvoice(accountId: number, amount: number) {
+var rpc = require('./lib/jsonrpc').rpc;
+
+export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
 
@@ -55,6 +57,8 @@ export {
 
   checkAddressForPayments,
 
-  poll
+  poll,
+
+  rpc
 
 };
