@@ -17,6 +17,7 @@ var PaymentForwardOutputPayment = require('./payment_forward_output_payment');
 var PayrollAccount = require('./payroll_account');
 var PayrollInvoice = require('./payroll_invoice');
 var PayrollPayment = require('./payrollpayment');
+var ExtendedPublicKey = require('./extended_public_key');
 
 export {
   Account,
@@ -34,6 +35,7 @@ export {
   PayrollAccount,
   PayrollInvoice,
   PayrollPayment,
-  MerchantBountyReward
+  MerchantBountyReward,
+  ExtendedPublicKey
 };
 
