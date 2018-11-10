@@ -4,6 +4,8 @@ import * as models from '../models';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
+import {AccountAddress} from '../core/types';
+
 export async function registerAccount(email: string, password: string): Promise<any>{
 
   let passwordHash = await hash(password);
@@ -59,6 +61,16 @@ export async function setPhysicalAddress(email: string, address: string): Promis
   await account.save();
 
   return account;
+
+}
+
+export async function getAccountAddress(accountId: number, currency: string): Promise<AccountAddress> {
+
+  let coins = await getSupportedCoins(accountId);
+
+  let coin = coins[currency];
+
+  return coins[currency];
 
 }
 
