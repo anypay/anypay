@@ -122,3 +122,19 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
 }
 
+export async function getAddress(accountId: number, currency: string) {
+
+  let coins = await getSupportedCoins(accountId);
+
+  if (coins[currency]) {
+
+    return coins[currency].address;
+
+  } else {
+
+    return null;
+
+  }
+
+}
+

@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 
 import * as models from '../models';
 
-import {getSupportedCoins} from './supported_coins';
+import {getAddress, getSupportedCoins} from './supported_coins';
 
 export async function registerAccount(email: string, password: string): Promise<any>{
 
@@ -37,6 +37,7 @@ function hash(password) {
 }
 
 export {
-  getSupportedCoins
+  getSupportedCoins,
+  getAddress
 }
 

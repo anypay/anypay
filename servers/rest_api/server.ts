@@ -26,6 +26,7 @@ const sequelize = require("../../lib/database");
 const EventEmitter = require("events").EventEmitter;
 const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
+const AmbassadorsController = require("./handlers/ambassadors");
 const WebhookHandler = new EventEmitter();
 const Joi = require('joi');
 
@@ -675,6 +676,24 @@ async function Server() {
     config: {
       tags: ['api'],
       handler: totals.merchants
+    }
+  });
+
+  server.route({
+    method: 'GET',
+    path: '/ambassador_claims',
+    config: {
+      auth: "token",
+      handler: AmbassadorsController.list_account_claims
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/ambassador_claims',
+    config: {
+      auth: "token",
+      handler: AmbassadorsController.claim_merchant
     }
   });
   
