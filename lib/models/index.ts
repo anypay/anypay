@@ -1,6 +1,10 @@
+import * as Sequelize from 'sequelize';
+import * as sequelize from '../database';
+
 var Account = require('./account');
 var AccessToken = require('./access_token');
 var Address = require('./address');
+var Ambassador = require('./ambassador')(sequelize, Sequelize);
 var DashBackMerchant = require('./dash_back_merchant');
 var DashBackMerchantPayment = require('./dash_back_merchant_payment');
 var DashBackCustomerPayment = require('./dash_back_customer_payment');
@@ -16,17 +20,19 @@ var PayrollPayment = require('./payrollpayment');
 export {
   Account,
   AccessToken,
+  Address,
+  Ambassador,
   DashBackMerchant,
   DashBackMerchantPayment,
   DashBackCustomerPayment,
-  MerchantBountyReward,
+  ExtendedPublicKey,
   Invoice,
-  Address,
   PaymentForward,
   PaymentForwardInputPayment,
   PaymentForwardOutputPayment,
   PayrollAccount,
   PayrollInvoice,
-  PayrollPayment
+  PayrollPayment,
+  MerchantBountyReward
 };
 
