@@ -44,6 +44,8 @@ export async function getAmbassadorAddressForInvoice(invoiceUID: string) {
 
     log.error('no ambassador for merchant');
 
+    return null;
+
   }
 
 

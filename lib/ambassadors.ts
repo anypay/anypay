@@ -84,3 +84,116 @@ export async function claimBusiness(ambassadorEmail: string, merchantEmail: stri
 
 }
 
+export async function createClaim(ambassadorEmail: string, merchantEmail: string) {
+
+  let ambassadorAccount = await models.Account.findOne({ where: {
+
+    email: ambassadorEmail
+
+  }});
+
+  if (!ambassadorAccount) {
+    throw new Error(`account ${ambassadorEmail} not found`);
+  }
+
+  let ambassador = await models.Ambassador.findOne({
+
+    where: {
+
+      account_id: ambassadorAccount.id
+
+    }
+
+  });
+
+  if (!ambassador) {
+    throw new Error(`ambassador ${ambassadorEmail} not found`);
+  }
+
+  let merchantAccount = await models.Account.findOne({ where: {
+  
+    email: merchantEmail
+    
+  }});
+
+  if (!merchantAccount) {
+    throw new Error(`account ${merchantEmail} not found`);
+  }
+
+  let merchant = await models.DashBackMerchant.findOne({ where: {
+
+    account_id: merchantAccount.id
+    
+  }});
+
+  let claim = await models.AmbassadorClaim.create({
+
+    ambassador_id: ambassador.id,
+
+    merchant_id: merchant.id
+  })
+
+  return claim;
+
+}
+
+export async function listUnverifiedClaims() {
+
+  let claims = await models.AmbassadorClaim.findAll({ where: {
+
+    status: 'unverified'
+
+  }});
+
+  return claims;
+
+}
+
+export async function listAccountClaims(email: string) {
+
+  let account = await models.Account.findOne({ where: { email }});
+
+  let ambassador = await models.Ambassador.findOne({ where: {
+  
+    account_id: account.id
+    
+  }});
+
+  let claims = await models.AmbassadorClaim.findAll({ where: {
+
+    ambassador_id: ambassador.id
+
+  }});
+
+  return claims;
+
+}
+
+export async function rejectClaim(claimId: number) {
+
+  await models.AmbassadorClaim.update({
+
+    status: 'rejected'
+
+  }, {
+
+    where: { id: claimId }
+  
+  });
+
+}
+
+export async function verifyClaim(claimId: number) {
+
+  await models.AmbassadorClaim.update({
+
+    status: 'verified'
+
+  }, {
+
+    where: { id: claimId }
+  
+  });
+
+}
+
