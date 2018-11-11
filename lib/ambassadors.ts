@@ -185,15 +185,29 @@ export async function rejectClaim(claimId: number) {
 
 export async function verifyClaim(claimId: number) {
 
-  await models.AmbassadorClaim.update({
+  let claim = await models.AmbassadorClaim.findOne({ where: {
 
-    status: 'verified'
+    id: claimId
+
+  }});
+
+  await models.DashBackMerchant.update({
+
+    ambassador_id: claim.ambassador_id
 
   }, {
 
-    where: { id: claimId }
+    where: {
+
+      id: claim.merchant_id
+
+    }
   
   });
+
+  claim.status = 'verified';
+
+  await claim.save();
 
 }
 
