@@ -4,6 +4,7 @@ require('dotenv').config();
 
 import { models, log } from '../lib';
 import { getSupportedCoins } from '../lib/accounts';
+import { registerAccount } from '../lib/accounts';
 
 var program = require("commander");
 
@@ -48,6 +49,18 @@ program
     let accountCoins = await getSupportedCoins(account.id);
 
     log.info(accountCoins[currency]);
+
+    process.exit(0);
+
+  });
+
+program
+  .command('register <email> <password>')
+  .action(async (email, password) => {
+
+    let account = await registerAccount(email, password);
+
+    log.info(account.toJSON());
 
     process.exit(0);
 
