@@ -111,8 +111,10 @@ emitter.on('invoice.requested', async (invoice) => {
 emitter.on('invoice.created', async (invoice) => {
   
   log.info("invoice.created")
+ 
+  let plugin = await plugins.findForCurrency(invoice.currency);
 
-  if(plugins.poll == false){return}
+  if(plugin.poll == false){return}
 
   let waitTime = []
 
@@ -129,7 +131,7 @@ emitter.on('invoice.created', async (invoice) => {
 
     log.info("Polling invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
-    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+    await plugin.checkAddressForPayments(invoice.address,invoice.currency)
 
     await sleep(waitTime[i]);
 

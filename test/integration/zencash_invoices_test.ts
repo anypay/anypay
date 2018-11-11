@@ -31,7 +31,12 @@ describe("Creating Bitcoin Cash Invoices Via REST", async () => {
       await setAddress({
         account_id: account.id,
         currency: 'ZEN',
-        address: '13RS85NrE4TyHCVeuZu6d2N55nHGunNgCp'
+        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
+      });
+      await setAddress({
+        account_id: account.id,
+        currency: 'DASH',
+        address: 'XnBw5G3wAU1j7oF1QTDVVbmUTVmEyPNPze'
       });
 
     } catch(error) {
