@@ -1,5 +1,6 @@
 
 import { models, log } from './';
+import { getAddress } from './accounts';
 
 export async function getAmbassadorAddressForInvoice(invoiceUID: string) {
     
@@ -35,10 +36,15 @@ export async function getAmbassadorAddressForInvoice(invoiceUID: string) {
 
     }});
 
+    let address = await getAddress(ambassadorAccount.id, invoice.currency);
+
+    return address;
+
   } else {
 
     log.error('no ambassador for merchant');
 
   }
+
 
 }
