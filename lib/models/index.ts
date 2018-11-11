@@ -25,7 +25,6 @@ export {
   DashBackMerchant,
   DashBackMerchantPayment,
   DashBackCustomerPayment,
-  ExtendedPublicKey,
   Invoice,
   PaymentForward,
   PaymentForwardInputPayment,

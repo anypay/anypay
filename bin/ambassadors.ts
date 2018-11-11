@@ -5,7 +5,11 @@ require('dotenv').config();
 var program = require('commander');
 var Table = require('cli-table');
 
-import {listAll, register} from '../lib/ambassadors';
+import {
+  listAll,
+  register,
+  claimBusiness
+} from '../lib/ambassadors';
 
 function renderTable() {
 
@@ -18,6 +22,20 @@ program
     let ambassador = await register(email, name);
 
     console.log(ambassador.toJSON());
+
+    process.exit(0);
+
+  });
+
+program
+  .command('claimbusiness <ambassador_email> <merchant_email>')
+  .action(async (ambassadorEmail, merchantEmail) => {
+
+    let claim = await claimBusiness(ambassadorEmail, merchantEmail);
+
+    console.log(claim);
+
+    process.exit(0);
 
   });
 
