@@ -36,21 +36,31 @@ async function createInvoice(accountId: number, amount: number) {
 
 async function checkAddressForPayments(address:string, currency:string){
 
+   if( address.length < 34 ){
+    
+     console.log("invalid address:", address)
+
+     return [];
+   }
+ 
+   address = address.substr(0, 34);
+
    let start = new Date().getTime()
   
-   rippleLib_checkAddressForPayments(address)
-
-   let payments = await ripple_restAPI_checkAddressForPayments(address)
+   let payments = await rippleLib_checkAddressForPayments(address)
 
    statsd.timing('XRP_checkAddressForPayments', new Date().getTime()-start)
 
    statsd.increment('XRP_checkAddressForPayments')
+
+   console.log("payments", payments)
 
    return payments
 }
 
 const currency = 'XRP';
 
+const poll = true;
 
 export {
 
@@ -60,7 +70,8 @@ export {
 
   createInvoice,
 
-  checkAddressForPayments
+  checkAddressForPayments,
 
+  poll
 };
 

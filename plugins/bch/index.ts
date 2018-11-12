@@ -96,6 +96,8 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
 
 const currency = 'BCH';
 
+const poll = true;
+
 export {
 
   currency,
@@ -110,7 +112,9 @@ export {
 
   forwards,
 
-  rpc
+  rpc,
+
+  poll
 
 };
 

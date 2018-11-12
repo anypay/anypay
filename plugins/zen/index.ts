@@ -10,7 +10,7 @@ import { log } from '../../lib/logger';
 
 import * as forwards from './lib/forwards';
 
-export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
+async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
 
   let start = new Date().getTime()
 
@@ -26,7 +26,7 @@ export async function generateInvoiceAddress(settlementAddress: string): Promise
 
 }
 
-export async function createInvoice(accountId: number, amount: number) {
+async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
 
@@ -40,11 +40,13 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
-export async function checkAddressForPayments(address:string, currency:string) {
+async function checkAddressForPayments(address:string, currency:string) {
 
   let start = new Date().getTime()
 
   let payments = await anypay_checkAddressForPayments(address, 'ZEN') 
+
+  log.info("Payments found to address: ", address, payments)
 
   statsd.timing('ZEN_checkAddressForPayments', new Date().getTime()-start)
 
@@ -53,4 +55,23 @@ export async function checkAddressForPayments(address:string, currency:string) {
   return(payments)
 
 }
+const currency = 'ZEN';
+
+const poll = true;
+
+export {
+
+  currency,
+
+  createInvoice,
+
+  checkAddressForPayments,
+
+  generateInvoiceAddress,
+
+  poll
+
+};
+
+
 
