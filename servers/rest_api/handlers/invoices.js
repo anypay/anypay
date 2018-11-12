@@ -105,14 +105,30 @@ emitter.on('invoice.requested', async (invoice) => {
 
   statsd.increment('invoice requested')
 
-  await plugins.checkAddressForPayments(invoice.address, invoice.currency);
+  poll(invoice)
 
 })
 emitter.on('invoice.created', async (invoice) => {
   
   log.info("invoice.created")
  
+  poll(invoice)
+  
+})
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function poll(invoice){
+
+  invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+
+  if(invoice.status == 'paid'){break}
+
   let plugin = await plugins.findForCurrency(invoice.currency);
+
+  await plugin.checkAddressForPayments(invoice.address,invoice.currency)
 
   if(plugin.poll == false){return}
 
@@ -129,19 +145,16 @@ emitter.on('invoice.created', async (invoice) => {
 
   for(let i=0;i<waitTime.length;i++){
 
+    invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+
+    if(invoice.status == 'paid'){break}
+
     log.info("Polling invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
     await plugin.checkAddressForPayments(invoice.address,invoice.currency)
 
     await sleep(waitTime[i]);
 
-    invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
-
-    if(invoice.status == 'paid'){break}
-
   }
-})
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
