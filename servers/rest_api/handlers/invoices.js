@@ -88,8 +88,6 @@ module.exports.show = async function(request, reply) {
 
     emitter.emit('invoice.requested', invoice.toJSON()); 
 
-    emitter.emit('invoice.requested', invoice.toJSON());
-
     return invoice;
 
   } else {

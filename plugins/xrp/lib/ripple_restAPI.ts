@@ -157,5 +157,19 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
 
   ws.on('close',()=>{console.log})
+  
+  await sleep(1000)
+
+  return payments
 
 }
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+
+
+
