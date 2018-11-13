@@ -38,58 +38,8 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
     try{ 
 
-      let res = JSON.parse(data);
+      parsePaymentsFromAccount_tx(data)
 
-      if( typeof(res.result) == 'undefined'){return}
-      
-      for( let i = 0; i<res.result.transactions.length;i++){
-
-        if( typeof(res.result.transactions[i].tx) == 'undefined'){continue}
-        
-	if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
-
-        let currency = "XRP"
-
-        let amount = 0
-
-        if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
-
-          amount = res.result.transactions[i].tx.Amount
-
-	  amount = amount/1000000
-
-        }
-
-        else{
-
-          currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
-
-          amount = res.result.transactions[i].tx.Amount.value
-
-        }
-
-        let receiveAddress = res.result.transactions[i].tx.Destination
-
-        if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
-      
-          receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
-     
-        }
-      
-        let p: Payment = {
-
-          currency: currency,
-          address: receiveAddress,
-          amount: amount,
-          hash: res.result.transactions[i].tx.hash
-
-        }
-
-	  emitter.emit('payment', p)
-
-	  console.log(p)
-
-	}
     }
     catch(err){
 
@@ -104,3 +54,59 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
 }
 
+export async function parsePaymentsFromAccount_tx(data){
+
+  let res = JSON.parse(data);
+
+  if( typeof(res.result) == 'undefined'){return}
+      
+  for( let i = 0; i<res.result.transactions.length;i++){
+
+    if( typeof(res.result.transactions[i].tx) == 'undefined'){continue}
+        
+    if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
+
+      let currency = "XRP"
+
+      let amount = 0
+
+    if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
+
+      amount = res.result.transactions[i].tx.Amount
+
+      amount = amount/1000000
+
+    }
+
+    else{
+
+      currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
+
+      amount = res.result.transactions[i].tx.Amount.value
+
+    }
+
+    let receiveAddress = res.result.transactions[i].tx.Destination
+
+    if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
+      
+      receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
+     
+    }
+      
+    let p: Payment = {
+
+      currency: currency,
+      address: receiveAddress,
+      amount: amount,
+      hash: res.result.transactions[i].tx.hash
+
+    }
+
+    emitter.emit('payment', p)
+
+    console.log(p)
+
+  }
+
+}
