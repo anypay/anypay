@@ -8,7 +8,7 @@ import { connection, channel } from './lib/amqp';
 
 import { Payment } from '../../types/interfaces'
 
-import { rippleLib_checkAddressForPayments, ripple_restAPI_checkAddressForPayments } from './lib/ripple_restAPI'
+import { rippleLib_checkAddressForPayments } from './lib/ripple_restAPI'
 
 const routing_key = 'payment';
 
@@ -47,15 +47,12 @@ async function checkAddressForPayments(address:string, currency:string){
 
    let start = new Date().getTime()
   
-   let payments = await rippleLib_checkAddressForPayments(address)
+   rippleLib_checkAddressForPayments(address)
 
    statsd.timing('XRP_checkAddressForPayments', new Date().getTime()-start)
 
    statsd.increment('XRP_checkAddressForPayments')
 
-   console.log("payments", payments)
-
-   return payments
 }
 
 const currency = 'XRP';

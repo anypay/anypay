@@ -24,10 +24,8 @@ module.exports.index = async (request, reply) => {
 module.exports.create = async (request, reply) => {
 
   /*
-
     Dynamicallly look up coin and corresponding plugin given the currency
     provided.
-
   */
 
   log.info(`controller:invoices,action:create`);
@@ -103,7 +101,11 @@ emitter.on('invoice.requested', async (invoice) => {
 
   statsd.increment('invoice requested')
 
-  poll(invoice)
+  log.info("checking.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
+
+  let plugin = await plugins.findForCurrency(invoice.currency);
+
+  await plugin.checkAddressForPayments(invoice.address, invoice.currency);
 
 })
 emitter.on('invoice.created', async (invoice) => {
@@ -122,24 +124,15 @@ async function poll(invoice){
 
   invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
 
-  if(invoice.status == 'paid'){break}
+  if(invoice.status == 'paid'){return}
 
   let plugin = await plugins.findForCurrency(invoice.currency);
 
-  await plugin.checkAddressForPayments(invoice.address,invoice.currency)
+  await plugins.checkAddressForPayments(invoice.address,invoice.currency)
 
   if(plugin.poll == false){return}
 
-  let waitTime = []
-
-  for(let j = 0; j<120;j++){
-    if( j<60 ){
-      waitTime.push(2000)
-    }
-    else{
-      waitTime.push(4000)
-    }
-  }
+  let waitTime = [5000,2000,2000,4000,4000,8000,8000.8000,16000,16000,16000,16000]
 
   for(let i=0;i<waitTime.length;i++){
 
@@ -147,9 +140,9 @@ async function poll(invoice){
 
     if(invoice.status == 'paid'){break}
 
-    log.info("Polling invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
+    log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
-    await plugin.checkAddressForPayments(invoice.address,invoice.currency)
+    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
 
     await sleep(waitTime[i]);
 
