@@ -5,7 +5,7 @@ const uuid = require('uuid');
 const aws = require('aws-sdk');
 const log = require('winston');
 
-function hash(password) {
+export function hash(password) {
   return new Promise((resolve, reject) => {
 
     bcrypt.hash(password, 10, (error, hash) => {
@@ -13,6 +13,18 @@ function hash(password) {
       resolve(hash);
     })
   });
+}
+
+export async function bcryptCompare(password, hash) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(password, hash, (error, res) => {
+      if (res) {
+        resolve();
+      } else {
+        reject(new Error("invalid password"));
+      }
+    })
+  })
 }
 
 async function resetPasswordByEmail(email, newPassword) {

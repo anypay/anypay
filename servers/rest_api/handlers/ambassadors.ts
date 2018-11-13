@@ -1,5 +1,7 @@
 import * as Hapi from 'hapi';
 
+import { Request, ResponseToolkit } from 'hapi';
+
 import { models, ambassadors } from '../../../lib';
 
 module.exports.list_account_claims = async function(req: Hapi.Request, h: Hapi.ResponseToolkit) {
@@ -25,6 +27,14 @@ module.exports.claim_merchant = async function(req: Hapi.Request, h: Hapi.Respon
     req.body.merchantEmail
     
   );
+
+};
+
+module.exports.list = async function(req: Request, h: ResponseToolkit) {
+
+  let ambassadors = await models.Ambassador.findAll();
+
+  return { ambassadors };
 
 };
 
