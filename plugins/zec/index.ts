@@ -6,7 +6,7 @@ const http = require("superagent");
 
 import {statsd} from '../../lib/stats/statsd'
 
-export async function createInvoice(accountId: number, amount: number) {
+async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
 
@@ -22,7 +22,7 @@ export async function createInvoice(accountId: number, amount: number) {
 
 //@param invoice - an existing invoice
 //@return - A promise containing an array of recieved tx to the invoice address
-export async function checkAddressForPayments(address:string,currency:string){
+async function checkAddressForPayments(address:string,currency:string){
   
   let start = new Date().getTime()
 
@@ -55,3 +55,21 @@ export async function checkAddressForPayments(address:string,currency:string){
     return payments 
 }
 
+const currency = 'ZEC';
+
+const poll = false;
+
+export {
+
+  currency,
+
+  createInvoice,
+
+  checkAddressForPayments,
+
+  poll
+
+};
+
+
+ 

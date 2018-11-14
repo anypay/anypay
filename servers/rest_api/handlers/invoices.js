@@ -6,7 +6,6 @@ const uuid = require('uuid')
 import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
 import {emitter} from '../../../lib/events';
-
 import { statsd } from '../../../lib/stats/statsd';
 
 module.exports.index = async (request, reply) => {
@@ -25,10 +24,8 @@ module.exports.index = async (request, reply) => {
 module.exports.create = async (request, reply) => {
 
   /*
-
     Dynamicallly look up coin and corresponding plugin given the currency
     provided.
-
   */
 
   log.info(`controller:invoices,action:create`);
@@ -50,6 +47,14 @@ module.exports.create = async (request, reply) => {
     let plugin = await plugins.findForCurrency(request.payload.currency);
 
     let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
+
+    if(invoice){
+   
+      log.info('invoice.created', invoice.toJSON());
+
+      emitter.emit('invoice.created', invoice.toJSON());
+
+    }
 
     return invoice;
 
@@ -81,8 +86,6 @@ module.exports.show = async function(request, reply) {
 
     emitter.emit('invoice.requested', invoice.toJSON()); 
 
-    emitter.emit('invoice.requested', invoice.toJSON());
-
     return invoice;
 
   } else {
@@ -98,8 +101,51 @@ emitter.on('invoice.requested', async (invoice) => {
 
   statsd.increment('invoice requested')
 
-  await plugins.checkAddressForPayments(invoice.address, invoice.currency);
+  log.info("checking.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
+
+  let plugin = await plugins.findForCurrency(invoice.currency);
+
+  await plugin.checkAddressForPayments(invoice.address, invoice.currency);
 
 })
+emitter.on('invoice.created', async (invoice) => {
+  
+  log.info("invoice.created")
+ 
+  poll(invoice)
+  
+})
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
+async function poll(invoice){
+
+  invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+
+  if(invoice.status == 'paid'){return}
+
+  let plugin = await plugins.findForCurrency(invoice.currency);
+
+  await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+
+  if(plugin.poll == false){return}
+
+  let waitTime = [5000,2000,2000,4000,4000,8000,8000.8000,16000,16000,16000,16000]
+
+  for(let i=0;i<waitTime.length;i++){
+
+    invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+
+    if(invoice.status == 'paid'){break}
+
+    log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
+
+    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+
+    await sleep(waitTime[i]);
+
+  }
+
+}

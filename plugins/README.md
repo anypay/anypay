@@ -49,4 +49,5 @@ file defines the following properies:
 
 - currency
 - name
-
+- poll
+  - This is used to indicated whether or not the plugins checkAddressForPayments function is polled upon invoice creation.  Reason for not polling might be for api usage limits

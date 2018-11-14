@@ -19,7 +19,9 @@ export async function validateSudoPassword(request, username, password, h) {
 
   }
 
-  if (bcryptCompare(username, process.env.SUDO_PASSWORD_HASH)) { 
+  try {
+
+    await bcryptCompare(username, process.env.SUDO_PASSWORD_HASH);
 
     return {
 
@@ -33,7 +35,9 @@ export async function validateSudoPassword(request, username, password, h) {
 
     }
 
-  } else {
+  } catch(error) {
+
+    log.error(error.message);
 
     return {
 
@@ -41,6 +45,8 @@ export async function validateSudoPassword(request, username, password, h) {
 
     }
 
+
   }
 
 }
+
