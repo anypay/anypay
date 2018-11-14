@@ -1,15 +1,60 @@
+require('dotenv').config();
+
+require('../../../actors/payment_publisher')
+
+import{emitter} from '../../../lib/events'
+
 import {parsePaymentsFromAccount_tx} from '../lib/ripple_restAPI'
+
+import {Payment} from '../../../types/interfaces'
+
 import * as assert from 'assert'
 
+let payments:Payment[]=
+[{
+  currency:"XRP",
+  address:"r3pzYrVu7oruSJh1jhACmb6wRDkTWVw1JJ?dt=4774246",
+  amount:0.2122,
+  hash:"198B475CFD2B0693966D684CD33C2950BFA235F25F68F78FB5797FF87B40E97F"
+ },
+ {
+  currency:"XRP",
+  address:"r4EwBWxrx5HxYRyisfGzMto3AT8FZiYdWk?dt=855007911",
+  amount: 0.48348,
+  hash: "D7D181E7F2BA66F5180806999EC105AF53D5108CF6EEBC4A5E5ABFB7A4268611"
+ },
+ {
+  currency:"XRP",
+  address:"r3pzYrVu7oruSJh1jhACmb6wRDkTWVw1J?dt=0",
+  amount:20,
+  hash:"7F47A8AE1A17EE6D7EF47E5732ED99F17D5514EEE29E5D77AD8AC56556B7390B"
+ }
+]
 
 describe("Checking function to parse incoming payments", ()=>{
 
-  it("should parse transactions", ()=>{
+  it("should parse transactions", (done)=>{
 
-    parsePaymentsFromAccount_tx(getData())
+     let sem = false
+
+     let counter = 0;
+    emitter.on('payment',(p)=>{
+      if(!sem){
+        done()
+        }
+      assert(p.currency == payments[counter].currency)
+      assert(p.amount == payments[counter].amount)
+      assert(p.address, payments[counter].address)
+      assert(p.hash == payments[counter].hash)
+
+      counter++;
+      sem = true;
+    })
+
+     parsePaymentsFromAccount_tx(getData())
 
   })
-
+ 
 })
 
 function getData(){
