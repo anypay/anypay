@@ -61,16 +61,7 @@ class Plugins {
 	throw new Error('plugin does not implement checkAddressForPayments')
     }
 
-    let payments = await this.plugins[currency].checkAddressForPayments(address, currency);
-
-    payments.forEach(payment => {
-
-      payment.amount = parseFloat(payment.amount);
-
-      console.log('payment found', payment);
-
-      this.channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
-    })
+    this.plugins[currency].checkAddressForPayments(address, currency);
 
  }
 
