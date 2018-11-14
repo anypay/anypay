@@ -12,6 +12,7 @@ Configuration of the application is done via environment variables
 - FORWARDING_SERVICE_URL
 - JSONWEBTOKEN_PUBKEY_PATH
 - JSONWEBTOKEN_PRIVATE_KEY_PATH
+- SUDO_PASSWORD_HASH
 
 ### Optional Environmente Variables
 

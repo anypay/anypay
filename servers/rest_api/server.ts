@@ -28,11 +28,15 @@ const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
 const AmbassadorsController = require("./handlers/ambassadors");
 const WebhookHandler = new EventEmitter();
+
+import { sudoLogin } from './handlers/sudo_login'
 const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
 import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 import {dashbackTotalsByMonth} from './handlers/dashback_controller';
+
+import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import {createConversion } from '../../lib/prices';
 import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
@@ -242,6 +246,7 @@ async function Server() {
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
+  server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
@@ -752,8 +757,43 @@ async function Server() {
     }
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/auth',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/ambassadors',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AmbassadorsController.list
+
+    }
+
+  });
+
   return server;
+
 }
+
+  
 
 if (require.main === module) {
   // main module, sync database & start server
