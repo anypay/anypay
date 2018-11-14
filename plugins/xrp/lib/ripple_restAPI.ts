@@ -90,7 +90,7 @@ export async function parsePaymentsFromAccount_tx(data){
 
     if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
       
-      receiveAddress = res.result.transactions[i].tx.Destination+'?'+res.result.transactions[i].tx.DestinationTag
+      receiveAddress = res.result.transactions[i].tx.Destination+'?dt='+res.result.transactions[i].tx.DestinationTag
      
     }
       
@@ -104,8 +104,6 @@ export async function parsePaymentsFromAccount_tx(data){
     }
 
     emitter.emit('payment', p)
-
-    console.log(p)
 
   }
 
