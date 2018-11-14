@@ -21,7 +21,7 @@ program
 
     let password_hash = await hash(password);
 
-    log.info({
+    log.info('generatepassword', {
 
       password,
 
@@ -41,7 +41,7 @@ program
 
     let password_hash = await hash(password);
 
-    log.info({
+    log.info('hashpassword', {
 
       password,
 
