@@ -5,15 +5,11 @@ require('dotenv').config();
 var program = require('commander');
 var Table = require('cli-table');
 
-<<<<<<< HEAD
-import {listAll, register} from '../lib/ambassadors';
-=======
 import {
   listAll,
   register,
   claimBusiness
 } from '../lib/ambassadors';
->>>>>>> f01154dc6cd50fe8b78ccd947052514dc8ca6a1d
 
 function renderTable() {
 
@@ -27,8 +23,6 @@ program
 
     console.log(ambassador.toJSON());
 
-<<<<<<< HEAD
-=======
     process.exit(0);
 
   });
@@ -43,7 +37,6 @@ program
 
     process.exit(0);
 
->>>>>>> f01154dc6cd50fe8b78ccd947052514dc8ca6a1d
   });
 
 program
