@@ -25,7 +25,9 @@ module.exports.list = async function(request, reply) {
 
     'LTC': account.litecoin_address,
 
-    'DOGE': account.dogecoin_address
+    'DOGE': account.dogecoin_address,
+
+    'XRP': account.ripple_address
 
   };
 
