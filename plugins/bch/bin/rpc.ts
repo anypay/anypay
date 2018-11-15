@@ -19,6 +19,18 @@ commander
   });
 
 commander
+  .command('sendtoaddress <address> <amount>')
+  .action(async (address, amount) => {
+
+    let resp = await rpc.call('sendtoaddress', [address, amount]); 
+
+    console.log(resp);
+
+  });
+
+
+
+commander
   .command('getbalance [confirmations]')
   .action(async (confirmations) => {
 
