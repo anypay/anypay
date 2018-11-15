@@ -23,6 +23,8 @@ emitter.on('payment',(payment)=>{
 			clearInterval(interval);
 
 			publish(payment);
+
+			log.info("payment.publish", payment)
 		}
 	  
 	  }, 1000);
