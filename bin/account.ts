@@ -5,6 +5,7 @@ require('dotenv').config();
 import { models, log } from '../lib';
 import { getSupportedCoins } from '../lib/accounts';
 import { registerAccount } from '../lib/accounts';
+import { setAddress } from '../lib/core';
 
 var program = require("commander");
 
@@ -38,6 +39,26 @@ program
 
     process.exit();
  
+  });
+
+program
+  .command('setaddress <email> <currency> <address>')
+  .action(async (email, currency, address) => {
+
+    let account = await models.Account.findOne({ where: { email }});
+
+    await setAddress({
+
+      account_id: account.id,
+
+      currency,
+
+      address
+
+    });
+
+    console.log(`${currency} address set to ${address} for ${email}`);
+
   });
 
 program
