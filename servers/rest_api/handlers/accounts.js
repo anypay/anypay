@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
+import {emitter} from '../../../lib/events.ts'
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -17,7 +18,7 @@ function hash(password) {
 module.exports.create = async (request, reply) => {
   let email = request.payload.email;
 
-  log.info('create account with email', email);
+  log.info('create.account', email);
 
   let passwordHash = await hash(request.payload.password);
 
@@ -29,6 +30,8 @@ module.exports.create = async (request, reply) => {
 
     Slack.notify(`account:created | ${account.email}`);
 
+    emitter.emit('create.account', account)
+    
     return account;
 
   } catch(error) {
@@ -48,3 +51,4 @@ module.exports.show = async (request, reply) => {
 
   return account;
 }
+
