@@ -4,7 +4,7 @@ require('../../../actors/payment_publisher')
 
 import{emitter} from '../../../lib/events'
 
-import {parsePaymentsFromAccount_tx} from '../lib/ripple_restAPI'
+import {parsePaymentsFromAccount_tx, parsePaymentsFromAccount_tx2} from '../lib/ripple_restAPI'
 
 import {Payment} from '../../../types/interfaces'
 
@@ -25,13 +25,32 @@ let payments:Payment[]=
  },
  {
   currency:"XRP",
-  address:"r3pzYrVu7oruSJh1jhACmb6wRDkTWVw1J?dt=0",
+  address:"r3pzYrVu7oruSJh1jhACmb6wRDkTWVw1JJ?dt=0",
   amount:20,
   hash:"7F47A8AE1A17EE6D7EF47E5732ED99F17D5514EEE29E5D77AD8AC56556B7390B"
  }
 ]
 
 describe("Checking function to parse incoming payments", ()=>{
+
+  it("should simply parse payments without emitting", () => {
+
+    let parsedPayments = parsePaymentsFromAccount_tx2(getData());
+
+    console.log(parsedPayments);
+
+    assert.strictEqual(parsedPayments.length, 3);
+
+    parsedPayments.forEach((payment, index) => {
+
+      assert.strictEqual(payment.hash, payments[index].hash);
+      assert.strictEqual(payment.currency, payments[index].currency);
+      assert.strictEqual(payment.address, payments[index].address);
+      assert.strictEqual(payment.amount, payments[index].amount);
+
+    });
+
+  });
 
   it("should parse transactions", (done)=>{
 

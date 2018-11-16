@@ -56,43 +56,72 @@ export async function rippleLib_checkAddressForPayments(address:string){
 
 export async function parsePaymentsFromAccount_tx(data){
 
+  parsePaymentsFromAccount_tx2(data).forEach(payment => {
+
+    emitter.emit('payment', payment);
+
+  });
+
+}
+
+
+function filterTxns(transactions) {
+
+  return transactions.filter(tx => {
+
+    return typeof(tx.tx) !== 'undefined';
+
+  });
+
+}
+
+function filterPayments(transactions) {
+
+  return transactions.filter(t => {
+
+    return t.tx.TransactionType === 'Payment';
+
+  });
+
+}
+
+export function parsePaymentsFromAccount_tx2(data) {
+
   let res = JSON.parse(data);
 
-  if( typeof(res.result) == 'undefined'){return}
-      
-  for( let i = 0; i<res.result.transactions.length;i++){
+  if( typeof(res.result) == 'undefined' || !res.result.transactions){
+    throw new Error('xrp.accounttx.parse.error')
+  }
 
-    if( typeof(res.result.transactions[i].tx) == 'undefined'){continue}
-        
-    if( res.result.transactions[i].tx.TransactionType != 'Payment'){continue}
+  let validTransactions = filterTxns(res.result.transactions);
 
-      let currency = "XRP"
+  return filterPayments(validTransactions).map(t => t.tx).map(tx => {
 
-      let amount = 0
+    var amount, currency;
 
-    if( typeof(res.result.transactions[i].tx.Amount) == 'string'){
+    if( typeof(tx.Amount) == 'string'){
 
-      amount = res.result.transactions[i].tx.Amount
+      // XRP Payment
 
-      amount = amount/1000000
+      amount = parseFloat(tx.Amount) / 1000000; // Convert from drops to XRP
+
+      currency = 'XRP';
+
+    } else {
+
+      // Non XRP Payment
+
+      currency = `XRP.${tx.Amount.currency}.${tx.Amount.issuer}`;
+
+      amount = tx.Amount.value;
 
     }
 
-    else{
+    var receiveAddress = tx.Destination;
 
-      currency = "XRP."+res.result.transactions[i].tx.Amount.currency+"."+res.result.transactions[i].tx.Amount.issuer
+    if (tx.DestinationTag !== null) {
 
-      amount = res.result.transactions[i].tx.Amount.value
-
-    }
-
-    let receiveAddress = res.result.transactions[i].tx.Destination
-
-    if( typeof(res.result.transactions[i].tx.DestinationTag) != 'undefined'){ 
-      
-
-      receiveAddress = res.result.transactions[i].tx.Destination+'?dt='+res.result.transactions[i].tx.DestinationTag
-
+      receiveAddress = `${receiveAddress}?dt=${tx.DestinationTag}`;
      
     }
       
@@ -101,12 +130,13 @@ export async function parsePaymentsFromAccount_tx(data){
       currency: currency,
       address: receiveAddress,
       amount: amount,
-      hash: res.result.transactions[i].tx.hash
+      hash: tx.hash
 
     }
 
-    emitter.emit('payment', p)
+    return p;
 
-  }
+  });
 
 }
+
