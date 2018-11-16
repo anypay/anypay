@@ -4,7 +4,7 @@ import {Account, Invoice} from '../models';
 import {emitter} from '../events'
 AWS.config.update({ region: "us-east-1" });
 
-const FROM_EMAIL = 'Derrick from Anypay <welcome@anypay.global>';
+const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
 
 const templates = requireAll(`${__dirname}/templates`);
 
@@ -34,7 +34,7 @@ export async function sendEmail(recipient, subject, body) {
             },
       Source: FROM_EMAIL, /* required */
       ReplyToAddresses: [
-              'derrick@anypay.global',
+              'support@anypay.global',
             /* more items */
           ],
   };  
