@@ -114,7 +114,7 @@ export async function invoicePaidEmail(invoice){
   let body =  "Invoice ${invoice.uid} was paid at ${invoice.paidAt}. ${invoice.currency} ${invoice.address} recieved ${invoice.amount} ${invoice.currency}!"
 
   let account = await Account.findOne({ where: {
-    id: changeset.account_id
+    id: invoice.account_id
   }});
  
   return sendEmail(account.email, subject, body);
@@ -123,7 +123,7 @@ export async function invoicePaidEmail(invoice){
 
 emitter.on('create.account', (account) => {
    
-  newAccountCreatedEmail(email)
+  newAccountCreatedEmail(account)
         
 })   
 
