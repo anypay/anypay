@@ -121,7 +121,7 @@ export async function invoicePaidEmail(invoice){
 
 }
 
-emitter.on('create.account'), (account) => {
+emitter.on('create.account', (account) => {
    
   newAccountCreatedEmail(email)
         
@@ -143,4 +143,4 @@ emitter.on('invoice.paid', (invoice)=>{
 
  invoicePaidEmail(invoice) 
 
-}
+})
