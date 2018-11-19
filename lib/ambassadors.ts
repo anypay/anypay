@@ -10,15 +10,15 @@ export async function listAll() {
 
 }
 
-export async function register(email: string, name?: string) {
+export async function register(accountId: string, name?: string) {
 
-  log.info('ambassadors.register', { email, name });
+  log.info('ambassadors.register', { accountId, name });
 
-  let account = await models.Account.findOne({ where: { email }});
+  let account = await models.Account.findOne({ where: { id: accountId }});
 
   if (!account) {
 
-    throw new Error(`account ${email} not found`);
+    throw new Error(`account ${accountId} not found`);
 
   }
 
@@ -27,6 +27,37 @@ export async function register(email: string, name?: string) {
   return resp;
 
 }
+
+export async function create(accountId, name?: string): Promise<any>{
+
+  return register(accountId, name)
+
+}
+
+export async function createTeam(ambassadorId, teamName):Promise<any>{
+
+  console.log(ambassadorId, teamName)
+
+  let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
+  
+  console.log(ambassador)
+
+  let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
+
+  let resp = await models.AmbassadorTeam.create({
+  
+    name:teamName,
+    status:"active",
+    leader_id: account.account_id,
+    created_at: Date.now(),
+    updated_at: Date.now()
+
+  })
+
+  return resp
+
+}
+
 
 export async function claimBusiness(ambassadorEmail: string, merchantEmail: string) {
 
@@ -208,6 +239,32 @@ export async function verifyClaim(claimId: number) {
   claim.status = 'verified';
 
   await claim.save();
+
+}
+
+export async function listTeamMembers(teamId): Promise<any>{
+
+
+}
+
+export async function listMemberJoinRequests(teamId): Promise<any>{
+
+
+
+}
+
+export async function requestToJoinTeam(ambassadorId, teamId): Promise<any>{
+
+
+}
+
+export async function rejectJoinRequest(joinRequestId): Promise<any>{
+
+
+}
+
+export async function acceptJoinRequest(joinRequestId): Promise<any>{
+
 
 }
 
