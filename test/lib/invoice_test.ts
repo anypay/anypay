@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import { generateInvoice } from '../../lib/invoice';
+import { replaceInvoice } from '../../lib/invoice';
 import { registerAccount } from '../../lib/accounts';
 import { setAddress, setDenomination } from '../../lib/core';
 import * as assert from 'assert';
@@ -78,6 +79,44 @@ describe("Creating Invoices", () => {
 
     assert(invoice.invoice_amount > 0);
     assert.strictEqual(invoice.invoice_currency, 'DASH');
+
+  });
+
+  describe("Replacing an Invoice", () => {
+
+    it("#replaceInvoice should change the currency of an invoice", async () => {
+
+      let account = await registerAccount(chance.email(), chance.word());
+
+      await setAddress({
+        account_id: account.id,
+        currency: "DASH",
+        address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+      });
+
+      await setAddress({
+        account_id: account.id,
+        currency: "BTC",
+        address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
+      });
+
+      var amount = {
+        currency: 'VEF',
+        value: 15000000
+      };
+
+      await setDenomination({
+        account_id: account.id,
+        currency: amount.currency
+      });
+
+      let invoice = await generateInvoice(account.id, amount.value, 'DASH');
+
+      invoice = await replaceInvoice(invoice.uid, 'BTC');
+
+      assert.strictEqual(invoice.currency, 'BTC')
+
+    });
 
   });
 
