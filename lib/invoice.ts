@@ -156,11 +156,15 @@ export async function replaceInvoice(uid: string, currency: string) {
     throw new Error(`invoice ${uid} not found`);
   }
 
-  return generateInvoice(
+  let newInvoice = await generateInvoice(
     invoice.account_id,
     invoice.denomination_amount,
     currency,
     invoice.uid
   );
+
+  await invoice.destroy();
+
+  return newInvoice;
 }
 
