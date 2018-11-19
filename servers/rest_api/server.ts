@@ -299,6 +299,16 @@ async function Server() {
       handler: PairTokensController.show
     }
   });
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/replacements",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: InvoicesController.replace
+    }
+  });
   server.route({
     method: "POST",
     path: "/bch/invoices",
