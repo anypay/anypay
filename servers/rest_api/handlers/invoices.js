@@ -3,6 +3,8 @@ const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import {replaceInvoice} from '../../../lib/invoice';
+
 import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
 import {emitter} from '../../../lib/events';
@@ -20,6 +22,33 @@ module.exports.index = async (request, reply) => {
 
   return { invoices };
 };
+
+module.exports.replace = async (request, reply) => {
+
+  let invoiceId = request.params.uid;
+
+  log.info(`controller:invoices,action:replace,invoice_id:${invoiceId}`);
+
+  let invoice = await Invoice.findOne({
+    where: {
+      uid: invoiceId
+    }
+  });
+
+  if (invoice) {
+
+    invoice = await replaceInvoice(invoice.uid, request.payload.currency);
+
+    return invoice;
+
+  } else {
+
+    log.error('no invoice found', invoiceId);
+
+    throw new Error('invoice not found')
+  }
+
+}
 
 module.exports.create = async (request, reply) => {
 

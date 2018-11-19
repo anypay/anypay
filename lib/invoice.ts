@@ -100,7 +100,14 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
 };
 
-export async function generateInvoice(accountId: number, denominationAmountValue: number, invoiceCurrency: string): Promise<any> {
+export async function generateInvoice(
+
+  accountId: number,
+  denominationAmountValue: number,
+  invoiceCurrency: string,
+  uid?: string
+
+): Promise<any> {
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
@@ -131,6 +138,7 @@ export async function generateInvoice(accountId: number, denominationAmountValue
     denomination_amount: invoiceChangeset.denominationAmount.value,
     account_id: invoiceChangeset.accountId,
     status: 'unpaid',
+    uid: uid,
 
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
@@ -138,5 +146,21 @@ export async function generateInvoice(accountId: number, denominationAmountValue
   });
 
   return invoice;
+}
+
+export async function replaceInvoice(uid: string, currency: string) {
+
+  let invoice = await models.Invoice.findOne({ where: { uid: uid }});
+
+  if (!invoice) {
+    throw new Error(`invoice ${uid} not found`);
+  }
+
+  return generateInvoice(
+    invoice.account_id,
+    invoice.denomination_amount,
+    currency,
+    invoice.uid
+  );
 }
 
