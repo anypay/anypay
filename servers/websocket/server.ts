@@ -25,7 +25,18 @@ function handleInvoicePaid(invoice) {
     invoices[invoice].forEach(client => {
       client.emit("invoice:paid", invoice);
     });
-    delete invoices[invoice];
+
+    setTimeout(function() {
+      delete invoices[invoice];
+    }, 60000); // remove from map in one minute
+  }
+}
+
+function handleDashbackPaid(invoice) {
+  if (invoices[invoice]) {
+    invoices[invoice].forEach(client => {
+      client.emit("dashback.paid", invoice);
+    });
   }
 }
 
@@ -81,6 +92,8 @@ if (!AMQP_URL) {
 
   await channel.assertQueue(QUEUE);
 
+  await channel.assertQueue('dashback.notifications');
+
   await channel.bindQueue(QUEUE, 'anypay:invoices', 'invoice:paid');
 
   console.log(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
@@ -90,6 +103,20 @@ if (!AMQP_URL) {
     console.log('message', message.content.toString());
 
     handleInvoicePaid(message.content.toString());
+
+    channel.ack(message);
+
+  }, {
+
+    noAck: false
+
+  });
+
+  channel.consume('dashback.notifications', message => {
+
+    console.log('dashback.notifications', message.content.toString());
+
+    handleDashbackPaid(message.content.toString());
 
     channel.ack(message);
 
