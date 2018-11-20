@@ -2,6 +2,7 @@ import * as requireAll from  'require-all';
 import * as AWS from 'aws-sdk';
 import {Account, Invoice} from '../models';
 import {emitter} from '../events'
+const log = require("winston");
 AWS.config.update({ region: "us-east-1" });
 
 const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
@@ -38,6 +39,8 @@ export async function sendEmail(recipient, subject, body) {
             /* more items */
           ],
   };  
+
+  log.info('email.sent', template.subject, account.email) 
 
   return new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
   
