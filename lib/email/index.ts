@@ -40,7 +40,7 @@ export async function sendEmail(recipient, subject, body) {
           ],
   };  
 
-  log.info('email.sent', template.subject, account.email) 
+  log.info('email.sent', recipient, subject ) 
 
   return new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
   
