@@ -45,13 +45,8 @@ export async function createTeam(ambassadorId, teamName):Promise<any>{
   let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
 
   let resp = await models.AmbassadorTeam.create({
-  
     name:teamName,
-    status:"active",
-    leader_id: account.account_id,
-    created_at: Date.now(),
-    updated_at: Date.now()
-
+    leader_account_id: account.account_id,
   })
 
   return resp

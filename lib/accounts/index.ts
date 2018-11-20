@@ -16,6 +16,12 @@ export async function registerAccount(email: string, password: string): Promise<
   return account;
 }
 
+export async function create(email: string, password: string): Promise<any>{
+
+  return registerAccount(email, password)
+
+}
+
 export async function createAccessToken(accountId: number): Promise<any> {
 
   let accessToken = models.AccessToken.create({

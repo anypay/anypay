@@ -6,6 +6,7 @@ var AccessToken = require('./access_token');
 var Address = require('./address');
 var Ambassador = require('./ambassador')(sequelize, Sequelize);
 var AmbassadorClaim = require('./ambassador_claim')(sequelize, Sequelize);
+var AmbassadorTeam = require('./ambassador_team')(sequelize, Sequelize);
 var DashBackMerchant = require('./dash_back_merchant');
 var DashBackMerchantPayment = require('./dash_back_merchant_payment');
 var DashBackCustomerPayment = require('./dash_back_customer_payment');
@@ -24,6 +25,7 @@ export {
   Address,
   Ambassador,
   AmbassadorClaim,
+  AmbassadorTeam,
   DashBackMerchant,
   DashBackMerchantPayment,
   DashBackCustomerPayment,
