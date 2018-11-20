@@ -87,5 +87,31 @@ program
 
   });
 
+program
+  .command('setname <email> <name>')
+  .action(async (email, name) => {
+
+    let account = await accounts.setName(email, name);
+
+    log.info(account.toJSON());
+
+    process.exit(0);
+
+  });
+
+
+program
+  .command('setphysicaladdress <email> <address>')
+  .action(async (email, address) => {
+
+    let account = await accounts.setPhysicalAddress(email, address);
+
+    log.info(account.toJSON());
+
+    process.exit(0);
+
+  });
+
+
 program.parse(process.argv);
 
