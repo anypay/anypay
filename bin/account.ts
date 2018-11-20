@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { models, log } from '../lib';
+import { models, log, accounts } from '../lib';
 import { getSupportedCoins } from '../lib/accounts';
 import { registerAccount } from '../lib/accounts';
 import { setAddress } from '../lib/core';
