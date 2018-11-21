@@ -12,7 +12,7 @@
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
 require('./payment_publisher')
-require('../lib/emails/index')
+require('../lib/email/index')
 
 async function start() {
 
