@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { models, log } from '../lib';
+import { models, log, accounts } from '../lib';
 import { getSupportedCoins } from '../lib/accounts';
 import { registerAccount } from '../lib/accounts';
 import { setAddress } from '../lib/core';
@@ -86,6 +86,32 @@ program
     process.exit(0);
 
   });
+
+program
+  .command('setname <email> <name>')
+  .action(async (email, name) => {
+
+    let account = await accounts.setName(email, name);
+
+    log.info(account.toJSON());
+
+    process.exit(0);
+
+  });
+
+
+program
+  .command('setphysicaladdress <email> <address>')
+  .action(async (email, address) => {
+
+    let account = await accounts.setPhysicalAddress(email, address);
+
+    log.info(account.toJSON());
+
+    process.exit(0);
+
+  });
+
 
 program.parse(process.argv);
 

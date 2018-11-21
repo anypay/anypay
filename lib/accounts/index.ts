@@ -26,6 +26,42 @@ export async function createAccessToken(accountId: number): Promise<any> {
 
 }
 
+export async function setName(email: string, name: string): Promise<any> {
+
+  let account = await models.Account.findOne({ where: { email }});
+
+  if (!account) {
+
+    throw new Error(`account ${email} not found`);
+
+  }
+
+  account.business_name = name; 
+
+  await account.save();
+
+  return account;
+
+}
+
+export async function setPhysicalAddress(email: string, address: string): Promise<any> {
+
+  let account = await models.Account.findOne({ where: { email }});
+
+  if (!account) {
+
+    throw new Error(`account ${email} not found`);
+
+  }
+
+  account.physical_address = address; 
+
+  await account.save();
+
+  return account;
+
+}
+
 function hash(password) {
   return new Promise((resolve, reject) => {
 

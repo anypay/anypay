@@ -299,6 +299,16 @@ async function Server() {
       handler: PairTokensController.show
     }
   });
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/replacements",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: InvoicesController.replace
+    }
+  });
   server.route({
     method: "POST",
     path: "/bch/invoices",
@@ -622,6 +632,24 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/totals/monthly/by-denomination/{startDate}/{endDate}",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.byDenomination
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/totals/monthly/by-denomination-for-currency/{currency}/{startDate}/{endDate}",
+    config: {
+      tags: ['api'],
+      handler: monthlyChartsController.byDenominationForCurrency
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/totals/monthly/total",
     config: {
       tags: ['api'],
@@ -738,6 +766,7 @@ async function Server() {
       }
     }
   });
+
   server.route({
     method: "POST",
     path: "/invoices/{uid}/cointext_payments",

@@ -123,3 +123,40 @@ export async function totalTransactionsByCoin(coin: string) {
 
 }
 
+export async function totalByDenominationForCurrencyInPeriod(
+  currency: string,
+  periodStart: string,
+  periodEnd: string
+) {
+
+  const query = `select denomination_currency, count(*) from invoices
+    where status = 'paid'	
+    and invoice_currency = '${currency}'
+    and "createdAt" >= '${periodStart}'
+    and "createdAt" < '${periodEnd}'
+    group by denomination_currency
+    order by count desc;`;
+
+  var result = await database.query(query);
+
+  return result[0];
+
+}
+
+export async function totalByDenominationInPeriod(
+  periodStart: string,
+  periodEnd: string
+) {
+
+  const query = `select denomination_currency, count(*) from invoices
+    where status = 'paid'	
+    and "createdAt" >= '${periodStart}'
+    and "createdAt" < '${periodEnd}'
+    group by denomination_currency
+    order by count desc;`;
+
+  var result = await database.query(query);
+
+  return result[0];
+
+}

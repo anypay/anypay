@@ -88,3 +88,30 @@ describe("Total Merchants", () => {
 
 });
 
+describe("Number of Transactions By Denomination", () => {
+
+  it("#totalByDenominationForCurrencyInPeriod should require period", async () => {
+
+    let result = await monthly.totalByDenominationForCurrencyInPeriod(
+      'DASH',
+      '10-01-2018',
+      '11-01-2018'
+    );
+
+    assert(result);
+
+  });
+
+  it("#totalByDenominationInPeriod should include all currencies", async () => {
+
+    let result = await monthly.totalByDenominationInPeriod(
+      '10-01-2018',
+      '11-01-2018'
+    );
+
+    assert(result);
+
+  });
+
+});
+
