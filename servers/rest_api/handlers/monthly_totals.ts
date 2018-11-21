@@ -148,3 +148,37 @@ export async function totalTransactionsByCoin(req, h) {
   return response;
 }
 
+export async function byDenomination(req, h) {
+
+  try {
+
+    let totals = await monthly.totalByDenominationInPeriod(
+      req.params.startDate,
+      req.params.endDate
+    );
+
+    console.log(totals);
+
+    return totals;
+
+
+  } catch(error) {
+
+    console.log('error', error.message);
+
+  }
+
+}
+
+export async function byDenominationForCurrency(req, h) {
+
+  let totals = await monthly.totalByDenominationForCurrencyInPeriod(
+    req.params.currency,
+    req.params.startDate,
+    req.params.endDate
+  );
+
+  return totals;
+
+}
+

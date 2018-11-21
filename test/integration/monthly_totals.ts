@@ -86,4 +86,30 @@ describe("Monthly Totals API", () => {
 
   });
 
+  describe("Totals Transactions By Denomination", () => {
+
+    it("GET /totals/monthly/by-denomination-for-currency/{currency}/{start}/{end}", async () => {
+
+      let response = await server.inject({
+        method: 'GET',
+        url: '/totals/monthly-by-denomination-for-currency/DASH/01-01-2018/02-01-2018'
+      });
+
+      assert(response.result);
+    
+    });
+
+    it("GET /totals/monthly/by-denomination/{start}/{end}", async () => {
+
+      let response = await server.inject({
+        method: 'GET',
+        url: '/totals/monthly-by-denomination/01-01-2018/02-01-2018'
+      })
+
+      assert(response.result);
+    
+    });
+
+  });
+
 });
