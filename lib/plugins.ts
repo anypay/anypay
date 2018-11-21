@@ -3,6 +3,7 @@ require("dotenv").config();
 import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
 import {connect, Channel} from 'amqplib';
+import {Invoice} from '../types/interfaces'
 
 class Plugins {
 
@@ -62,6 +63,12 @@ class Plugins {
     }
 
     this.plugins[currency].checkAddressForPayments(address, currency);
+
+ }
+
+ async checkInvoiceForPayment(invoice:Invoice) {
+
+   this.plugins[invoice.currency].checkAddressForPayments(invoice.address, invoice.currency);
 
  }
 

@@ -113,7 +113,7 @@ emitter.on('invoice.requested', async (invoice) => {
 
   let plugin = await plugins.findForCurrency(invoice.currency);
 
-  await plugin.checkAddressForPayments(invoice.address, invoice.currency);
+  await plugin.checkInvoiceForPayment(invoice);
 
 })
 emitter.on('invoice.created', async (invoice) => {
@@ -136,7 +136,7 @@ async function poll(invoice){
 
   let plugin = await plugins.findForCurrency(invoice.currency);
 
-  await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+  plugins.checkInvoiceForPayment(invoice)
 
   if(plugin.poll == false){return}
 
@@ -150,7 +150,7 @@ async function poll(invoice){
 
     log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
-    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+    plugins.checkInvoiceForPayment(invoice)
 
     await sleep(waitTime[i]);
 
