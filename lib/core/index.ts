@@ -151,7 +151,11 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     } else {
 
-      await xpub.destroy();
+      if (xpub) {
+
+        await xpub.destroy();
+
+      }
 
     }
 
