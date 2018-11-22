@@ -125,6 +125,38 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     }
 
+    let xpub = await models.ExtendedPublicKey.findOne({ where: {
+
+      account_id: changeset.account_id,
+
+      currency: changeset.currency
+
+    }});
+
+    if (changeset.address.match(/^xpub/)) {
+
+      await models.ExtendedPublicKey.create({
+
+        account_id: changeset.account_id,
+
+        xpubkey: changeset.address,
+
+        nonce: 0,
+
+        currency: changeset.currency
+
+      });
+
+    } else {
+
+      if (xpub) {
+
+        await xpub.destroy();
+
+      }
+
+    }
+
   }
 
   events.emit('address:set', changeset);
