@@ -135,7 +135,7 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     }});
 
-    if (changeset.address.match(/^xpub/) {
+    if (changeset.address.match(/^xpub/)) {
 
       await models.ExtendedPublicKey.create({
 

@@ -49,8 +49,6 @@ export {
 
   currency,
 
-  createInvoice,
-
   checkAddressForPayments,
 
   poll,
