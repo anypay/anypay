@@ -79,6 +79,7 @@ export async function setAddress(changeset: AddressChangeSet) {
       currency: changeset.currency,
       value: changeset.address
     });
+  }
 
   }
 
