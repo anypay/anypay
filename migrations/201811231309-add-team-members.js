@@ -11,6 +11,9 @@ module.exports = {
       account_id: {
         type: Sequelize.INTEGER
       },
+      account_id: {
+        type: Sequelize.INTEGER
+      },
       team_id: {
         type: Sequelize.INTEGER
       },
