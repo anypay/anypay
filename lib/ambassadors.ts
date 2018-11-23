@@ -36,23 +36,36 @@ export async function create(accountId, name?: string): Promise<any>{
 
 export async function createTeam(ambassadorId, teamName):Promise<any>{
 
-  console.log(ambassadorId, teamName)
 
   let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
   
-  console.log(ambassador)
-
   let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
-
+     
   let resp = await models.AmbassadorTeam.create({
-    name:teamName,
-    leader_account_id: account.account_id,
+      team_name:teamName,
+      leader_account_id: account.account_id,
+	  
   })
+
+  let team = await models.AmbassadorTeam.findOne({where: {team_name:teamName}})
+       
+  await addTeamMember(team.id, ambassador.account_id, ambassador.id)
 
   return resp
 
 }
 
+export async function addTeamMember(teamId, accountId, ambassadorId){
+
+  let resp = await models.AmbassadorTeamMember.create({
+    team_id:teamId,
+    account_id:accountId,
+    ambassador_id:ambassadorId
+  })
+
+  return resp
+
+}
 
 export async function claimBusiness(ambassadorEmail: string, merchantEmail: string) {
 
@@ -238,28 +251,55 @@ export async function verifyClaim(claimId: number) {
 }
 
 export async function listTeamMembers(teamId): Promise<any>{
+ 
+  let resp = await models.AmbassadorTeamMember.findAll({ where: {team_id:teamId}})  
 
-
+  return resp
 }
 
 export async function listMemberJoinRequests(teamId): Promise<any>{
 
+  let resp = await models.JoinRequest.findAll({ where: {team_id:teamId, status: "pending"}})  
 
-
+  return resp
 }
 
 export async function requestToJoinTeam(ambassadorId, teamId): Promise<any>{
 
+  let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
+
+  let resp = await models.JoinRequest.create({  
+
+   account_id: ambassador.account_id,
+
+   team_id: teamId,
+
+   status: "pending"
+ 
+  })
+
+  return resp
 
 }
 
 export async function rejectJoinRequest(joinRequestId): Promise<any>{
 
+  let resp = await models.JoinRequest.destroy({where: {id: joinRequestId}});
+
+  return resp
 
 }
 
 export async function acceptJoinRequest(joinRequestId): Promise<any>{
 
+  let joinRequest = await models.JoinRequest.findOne({ where: {id:joinRequestId}})
+
+  let ambassador = await models.Ambassador.findOne({ where: { account_id: joinRequest.account_id }});
+
+  let resp = await addTeamMember(joinRequest.team_id, ambassador.account_id, ambassador.id)
+
+  let req = await models.JoinRequest.destroy({where: {id: joinRequestId}});
+
+  return resp
 
 }
-
