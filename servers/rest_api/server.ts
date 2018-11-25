@@ -27,6 +27,7 @@ const EventEmitter = require("events").EventEmitter;
 const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
 const AmbassadorsController = require("./handlers/ambassadors");
+const DashWatchController = require("./handlers/dashwatch_reports");
 const WebhookHandler = new EventEmitter();
 
 import { sudoLogin } from './handlers/sudo_login'
@@ -794,6 +795,20 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: AmbassadorsController.list
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/dashwatch/reports/{month}',
+
+    config: {
+
+      handler: DashWatchController.reportForMonth
 
     }
 
