@@ -98,9 +98,9 @@ export async function unpaidInvoiceEmail(invoiceId) {
 
 export async function addressChangedEmail(changeset) {
   
-  let subject = "Anypay ${changeset.currency} address updated"
+  let subject = `Anypay ${changeset.currency} address updated`
 
-  let body = "Your Anypay ${changeset.currency} payout address has been updated to ${changeset.address}"
+  let body = `Your Anypay ${changeset.currency} payout address has been updated to ${changeset.address}`
 
   let account = await Account.findOne({ where: {
     id: changeset.account_id
@@ -114,7 +114,7 @@ export async function invoicePaidEmail(invoice){
   
   let subject = "Anypay Invoice Paid!"
  
-  let body =  "Invoice ${invoice.uid} was paid at ${invoice.paidAt}. ${invoice.currency} ${invoice.address} recieved ${invoice.amount} ${invoice.currency}!"
+  let body =  `Invoice ${invoice.uid} was paid at ${invoice.paidAt}. ${invoice.currency} ${invoice.address} recieved ${invoice.amount} ${invoice.currency}!`
 
   let account = await Account.findOne({ where: {
     id: invoice.account_id
