@@ -6,6 +6,8 @@ var AccessToken = require('./access_token');
 var Address = require('./address');
 var Ambassador = require('./ambassador')(sequelize, Sequelize);
 var AmbassadorClaim = require('./ambassador_claim')(sequelize, Sequelize);
+var AmbassadorTeam = require('./ambassador_team')(sequelize, Sequelize);
+var AmbassadorTeamMember = require('./ambassador_team_member')(sequelize, Sequelize);
 var DashBackMerchant = require('./dash_back_merchant');
 var DashBackMerchantPayment = require('./dash_back_merchant_payment');
 var DashBackCustomerPayment = require('./dash_back_customer_payment');
@@ -17,6 +19,7 @@ var PaymentForwardOutputPayment = require('./payment_forward_output_payment');
 var PayrollAccount = require('./payroll_account');
 var PayrollInvoice = require('./payroll_invoice');
 var PayrollPayment = require('./payrollpayment');
+var JoinRequest = require('./join_request')(sequelize, Sequelize);
 
 export {
   Account,
@@ -24,6 +27,8 @@ export {
   Address,
   Ambassador,
   AmbassadorClaim,
+  AmbassadorTeam,
+  AmbassadorTeamMember,
   DashBackMerchant,
   DashBackMerchantPayment,
   DashBackCustomerPayment,
@@ -34,6 +39,7 @@ export {
   PayrollAccount,
   PayrollInvoice,
   PayrollPayment,
-  MerchantBountyReward
+  MerchantBountyReward,
+  JoinRequest
 };
 

@@ -113,7 +113,7 @@ export async function addressChangedEmail(changeset) {
 export async function invoicePaidEmail(invoice){
   
   let subject = "Anypay Invoice Paid!"
- 
+
   let body =  `Invoice ${invoice.uid} was paid at ${invoice.paidAt}. ${invoice.currency} ${invoice.address} recieved ${invoice.amount} ${invoice.currency}!`
 
   let account = await Account.findOne({ where: {
