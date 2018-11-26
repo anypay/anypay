@@ -28,6 +28,7 @@ const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
 const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
+const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
 
 import { sudoLogin } from './handlers/sudo_login'
@@ -809,6 +810,20 @@ async function Server() {
     config: {
 
       handler: DashWatchController.reportForMonth
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/merchants',
+
+    config: {
+
+      handler: MerchantsController.list
 
     }
 
