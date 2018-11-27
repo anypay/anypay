@@ -83,11 +83,13 @@ module.exports.create = async (request, reply) => {
 
       emitter.emit('invoice.created', invoice.toJSON());
 
-      let result = await Invoice.findAllAndCountAll({ where: {account_id: invoice.account_id}})
+      let result = await Invoice.findAndCountAll({ where: {account_id: invoice.account_id}})
 
       if(result.count == 1){
 
         emitter.emit('invoice.created.first', invoice)
+
+	log.info('invoice.created.first')
 
       }
 
