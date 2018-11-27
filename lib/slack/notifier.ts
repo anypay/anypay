@@ -5,19 +5,19 @@ const SLACK_URL = 'https://hooks.slack.com/services/T7NS5H415/B7QRQ76PN/dH2DAqb9
 
 export function notify(message: string) {
 
-  if (process.env.NODE_ENV != 'test') {
+  if (process.env.NODE_ENV === 'production') {
 
-  http
-    .post(SLACK_URL)
-    .send({
-      text: message
-    })
-    .end((error, response) => {
-      if (error) {
-        log.error("slack:error", error.message);
-      } else {
-        log.info("slack:notified", response.body);
-      }
-    });
+    http
+      .post(SLACK_URL)
+      .send({
+        text: message
+      })
+      .end((error, response) => {
+        if (error) {
+          log.error("slack:error", error.message);
+        } else {
+          log.info("slack:notified", response.body);
+        }
+      });
   }
 }
