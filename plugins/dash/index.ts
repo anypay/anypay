@@ -6,6 +6,8 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
+import {log} from '../../lib'
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -22,13 +24,17 @@ async function createInvoice(accountId: number, amount: number) {
 
 async function checkAddressForPayments(address:string, currency:string){
 
-  let start = new Date().getTime()
+  log.info(`dash.checkAddressForPayments.${address}`);
+
+  let start = new Date().getTime();
 
   let payments = await chainSoAPI.checkAddressForPayments(address,currency);
 
-  statsd.timing('DASH_checkAddressForPayments', new Date().getTime()-start)
+  log.info(`dash.checkAddressForPayments.result`, payments);
 
-  statsd.increment('DASH_checkAddressForPayments')
+  statsd.timing('DASH_checkAddressForPayments', new Date().getTime()-start);
+
+  statsd.increment('DASH_checkAddressForPayments');
 
   return payments;
 }

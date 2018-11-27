@@ -4,6 +4,8 @@ import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
 import {connect, Channel} from 'amqplib';
 
+import { log } from './';
+
 class Plugins {
 
   plugins: any;
@@ -57,11 +59,25 @@ class Plugins {
 
   async checkAddressForPayments(address: string, currency: string) {
 
+    log.info(`global.checkaddressforpayments.${address}.${currency}`);
+
     if(!this.plugins[currency].checkAddressForPayments){
-	throw new Error('plugin does not implement checkAddressForPayments')
+      throw new Error('plugin does not implement checkAddressForPayments')
     }
 
-    this.plugins[currency].checkAddressForPayments(address, currency);
+    let payments = await this.plugins[currency].checkAddressForPayments(address, currency);
+
+    log.info(`checkaddressforpayments.found`, payments);
+
+    payments.forEach(async payment => {
+
+      let message = new Buffer(JSON.stringify(payment));
+
+      await this.channel.publish('anypay.payments', 'payment', message);
+
+      log.info(`amqp.message.published`, `anypay.payments.${JSON.stringify(payment)}`);
+
+    });
 
  }
 

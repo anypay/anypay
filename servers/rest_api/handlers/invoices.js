@@ -132,11 +132,9 @@ emitter.on('invoice.requested', async (invoice) => {
 
   log.info("checking.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
-  let plugin = await plugins.findForCurrency(invoice.currency);
+  plugins.checkAddressForPayments(invoice.address, invoice.currency);
 
-  await plugin.checkAddressForPayments(invoice.address, invoice.currency);
-
-})
+});
 emitter.on('invoice.created', async (invoice) => {
   
   log.info("invoice.created")
