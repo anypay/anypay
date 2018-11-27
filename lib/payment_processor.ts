@@ -1,5 +1,6 @@
 const InvoiceModel = require("./models/invoice");
 import { Payment, Invoice } from "../types/interfaces";
+import {emitter} from './events';
 
 export async function handlePayment(invoice: Invoice, payment: Payment) {
   if (invoice.amount === payment.amount) {
@@ -66,6 +67,7 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
   );
 
   if (result[0] === 1) {
+    emitter.emit('invoice.paid', invoice)
     return invoice;
   } else {
     throw new Error("error updating invoice");
