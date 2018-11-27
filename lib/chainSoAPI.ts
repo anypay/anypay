@@ -19,7 +19,7 @@ export async function checkAddressForPayments(address:string, currency:string): 
         let p: Payment = { 
           currency: currency,
           address: address,
-          amount: tx.value,
+          amount: parseFloat(tx.value),
           hash: tx.txid
         };  
         payments.push(p)
