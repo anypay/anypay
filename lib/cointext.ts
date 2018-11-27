@@ -6,7 +6,24 @@ import { getLegacyAddressFromCashAddress } from '../plugins/bch/lib/bitbox'
 
 import { statsd } from './stats/statsd'
 
+const supportedCurrencies = {
+
+  'BCH': true,
+
+  'DASH': true,
+
+  'LTC': true,
+
+  'RVN': true
+};
+
 export async function createCoinTextInvoice(address:string, amount:number, currency:string):Promise<any>{
+
+  if (!supportedCurrencies[currency]) {
+
+    return;
+
+  }
 
   statsd.increment('CoinTextInvoiceCreated')	
 
