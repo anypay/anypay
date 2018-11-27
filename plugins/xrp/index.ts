@@ -53,6 +53,8 @@ async function checkAddressForPayments(address:string, currency:string){
 
    statsd.increment('XRP_checkAddressForPayments')
 
+   return [];
+
 }
 
 const currency = 'XRP';

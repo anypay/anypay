@@ -148,28 +148,38 @@ function sleep(ms) {
 }
 
 async function poll(invoice){
-
-  invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
-
-  if(invoice.status == 'paid'){return}
+  log.info(`poll.begin.${invoice.uid}`);
 
   let plugin = await plugins.findForCurrency(invoice.currency);
 
-  await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+  if(plugin.poll === false){
 
-  if(plugin.poll == false){return}
+    log.debug(`polling disabled for ${invoice.currency} ${invoice.address}`);
+
+    return; 
+  }
 
   let waitTime = [5000,2000,2000,4000,4000,8000,8000.8000,16000,16000,16000,16000]
 
   for(let i=0;i<waitTime.length;i++){
 
-    invoice = await Invoice.findOne({ where: {uid: invoice.uid}})
+    try {
 
-    if(invoice.status == 'paid'){break}
+      log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
 
-    log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
+      invoice = await Invoice.findOne({ where: {uid: invoice.uid}});
 
-    await plugins.checkAddressForPayments(invoice.address,invoice.currency)
+      if(invoice.status === 'paid'){ break }
+
+      await plugins.checkAddressForPayments(invoice.address,invoice.currency);
+
+    } catch(error) {
+
+      log.error(error.message);
+
+    }
+
+    log.debug(`sleep ${waitTime[i]}`);
 
     await sleep(waitTime[i]);
 
