@@ -41,7 +41,7 @@ async function checkAddressForPayments(address:string, currency:string){
 
 const currency = 'DASH';
 
-const poll = false;
+const poll = true;
 
 export {
 
