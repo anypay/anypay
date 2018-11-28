@@ -1,4 +1,4 @@
-const Invoice = require("../../../lib/models/invoice");
+const Invoice = require('../../../lib/models/invoice');
 const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
@@ -6,8 +6,9 @@ const uuid = require('uuid')
 import {replaceInvoice} from '../../../lib/invoice';
 
 import {emitter} from '../../../lib/events';
+
 import {plugins} from '../../../lib/plugins';
-import {emitter} from '../../../lib/events';
+
 import { statsd } from '../../../lib/stats/statsd';
 
 module.exports.index = async (request, reply) => {
@@ -15,9 +16,19 @@ module.exports.index = async (request, reply) => {
   log.info(`controller:invoices,action:index`);
 
   var invoices = await Invoice.findAll({
+
     where: {
       account_id: request.auth.credentials.accessToken.account_id
-    }
+    },
+
+    order: [
+      ['createdAt', 'DESC']
+    ],
+
+    offset: request.query.offset || 0,
+
+    limit: request.query.limit
+
   });
 
   return { invoices };
