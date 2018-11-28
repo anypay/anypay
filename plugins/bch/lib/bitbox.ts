@@ -1,6 +1,6 @@
 const http = require("superagent")
 
-const bch = require('bitcoincashjs');
+const bch = require('bitcore-lib-cash');
 
 const Address = bch.Address;
 
