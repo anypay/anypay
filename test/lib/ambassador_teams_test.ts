@@ -49,6 +49,8 @@ describe('Ambassador Teams Library', () => {
 
       assert.strictEqual(team.team_name, teamName);
 
+      assert.strictEqual(team.leader_account_id, account.id)
+
 
     });
   
@@ -76,9 +78,9 @@ describe('Ambassador Teams Library', () => {
 
     it('should create a team and the only member should be the team lead', async() =>{
 
-      let teamMembers = await lib.ambassadors.listTeamMembers(ambassadorTeam.id);
+      let teamMembers = await lib.ambassadors.listAmbassadorTeamMembers(ambassadorTeam.id);
 
-      let joinRequests = await lib.ambassadors.listMemberJoinRequests(ambassadorTeam.id);
+      let joinRequests = await lib.ambassadors.listAmbassadorTeamJoinRequests(ambassadorTeam.id);
 
       assert.strictEqual(teamMembers.length, 1);
       assert.strictEqual(joinRequests.length, 0);
@@ -97,15 +99,15 @@ describe('Ambassador Teams Library', () => {
 
       let ambassador = await lib.ambassadors.create(account.id);
    
-      let joinRequest = await lib.ambassadors.requestToJoinTeam(ambassador.id, ambassadorTeam.id);
+      let joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(ambassador.id, ambassadorTeam.id);
 
-      let joinRequests = await lib.ambassadors.listMemberJoinRequests(ambassadorTeam.id);
+      let joinRequests = await lib.ambassadors.listAmbassadorTeamJoinRequests(ambassadorTeam.id);
 
       assert.strictEqual(joinRequests.length, 1);
 
-      await lib.ambassadors.rejectJoinRequest(joinRequest.id);
+      await lib.ambassadors.rejectAmbassadorTeamJoinRequest(joinRequest.id);
 
-      joinRequests = await lib.ambassadors.listMemberJoinRequests(ambassadorTeam.id);
+      joinRequests = await lib.ambassadors.listAmbassadorTeamJoinRequests(ambassadorTeam.id);
 
       assert.strictEqual(joinRequests.length, 0);
 
@@ -121,19 +123,19 @@ describe('Ambassador Teams Library', () => {
 
       let ambassador = await lib.ambassadors.create(account.id);
    
-      let joinRequest = await lib.ambassadors.requestToJoinTeam(ambassador.id, ambassadorTeam.id);
+      let joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(ambassador.id, ambassadorTeam.id);
 
-      let joinRequests = await lib.ambassadors.listMemberJoinRequests(ambassadorTeam.id);
+      let joinRequests = await lib.ambassadors.listAmbassadorTeamJoinRequests(ambassadorTeam.id);
 
       assert.strictEqual(joinRequests.length, 1); 
 
-      await lib.ambassadors.acceptJoinRequest(joinRequest.id);
+      await lib.ambassadors.acceptAmbassadorTeamJoinRequest(joinRequest.id);
 
-      joinRequests = await lib.ambassadors.listMemberJoinRequests(ambassadorTeam.id);
+      joinRequests = await lib.ambassadors.listAmbassadorTeamJoinRequests(ambassadorTeam.id);
 
       assert.strictEqual(joinRequests.length, 0);
 
-      let teamMembers = await lib.ambassadors.listTeamMembers(ambassadorTeam.id);
+      let teamMembers = await lib.ambassadors.listAmbassadorTeamMembers(ambassadorTeam.id);
 
       assert.strictEqual(teamMembers.length, 2);
    

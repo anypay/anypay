@@ -19,7 +19,7 @@ var PaymentForwardOutputPayment = require('./payment_forward_output_payment');
 var PayrollAccount = require('./payroll_account');
 var PayrollInvoice = require('./payroll_invoice');
 var PayrollPayment = require('./payrollpayment');
-var JoinRequest = require('./join_request')(sequelize, Sequelize);
+var AmbassadorTeamJoinRequest = require('./ambassador_team_join_request')(sequelize, Sequelize);
 
 export {
   Account,
@@ -40,6 +40,6 @@ export {
   PayrollInvoice,
   PayrollPayment,
   MerchantBountyReward,
-  JoinRequest
+  AmbassadorTeamJoinRequest
 };
 
