@@ -10,15 +10,15 @@ export async function listAll() {
 
 }
 
-export async function register(email: string, name?: string) {
+export async function register(accountId: string, name?: string) {
 
-  log.info('ambassadors.register', { email, name });
+  log.info('ambassadors.register', { accountId, name });
 
-  let account = await models.Account.findOne({ where: { email }});
+  let account = await models.Account.findOne({ where: { id: accountId }});
 
   if (!account) {
 
-    throw new Error(`account ${email} not found`);
+    throw new Error(`account ${accountId} not found`);
 
   }
 
@@ -28,7 +28,51 @@ export async function register(email: string, name?: string) {
 
 }
 
+export async function create(accountId, name?: string): Promise<any>{
+
+  return register(accountId, name)
+
+}
+
+export async function createTeam(ambassadorId, teamName):Promise<any>{
+
+  log.info('ambassadors.team.created', {teamName });
+
+  let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
+  
+  let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
+     
+  let resp = await models.AmbassadorTeam.create({
+      team_name:teamName,
+      leader_account_id: account.id,
+	  
+  })
+
+  let team = await models.AmbassadorTeam.findOne({where: {team_name:teamName}})
+       
+  await addTeamMember(team.id, ambassador.account_id, ambassador.id)
+
+  return resp
+
+}
+
+export async function addTeamMember(teamId, accountId, ambassadorId){
+
+  log.info('ambassadors.team.addMember', { accountId });
+
+  let resp = await models.AmbassadorTeamMember.create({
+    team_id:teamId,
+    account_id:accountId,
+    ambassador_id:ambassadorId
+  })
+
+  return resp
+
+}
+
 export async function claimBusiness(ambassadorEmail: string, merchantEmail: string) {
+
+  log.info('ambassadors.claimBussiness', { ambassadorEmail, merchantEmail });
 
   let ambassadorAccount = await models.Account.findOne({ where: {
 
@@ -85,6 +129,8 @@ export async function claimBusiness(ambassadorEmail: string, merchantEmail: stri
 }
 
 export async function createClaim(ambassadorEmail: string, merchantEmail: string) {
+
+  log.info('ambassadors.claimBussiness', { ambassadorEmail, merchantEmail });
 
   let ambassadorAccount = await models.Account.findOne({ where: {
 
@@ -171,6 +217,8 @@ export async function listAccountClaims(email: string) {
 
 export async function rejectClaim(claimId: number) {
 
+  log.info('ambassadors.claim.reject', {claimId });
+
   await models.AmbassadorClaim.update({
 
     status: 'rejected'
@@ -184,6 +232,8 @@ export async function rejectClaim(claimId: number) {
 }
 
 export async function verifyClaim(claimId: number) {
+
+  log.info('ambassadors.claim.approve', {claimId });
 
   let claim = await models.AmbassadorClaim.findOne({ where: {
 
@@ -211,3 +261,60 @@ export async function verifyClaim(claimId: number) {
 
 }
 
+export async function listAmbassadorTeamMembers(teamId): Promise<any>{
+ 
+  let resp = await models.AmbassadorTeamMember.findAll({ where: {team_id:teamId}})  
+
+  return resp
+}
+
+export async function listAmbassadorTeamJoinRequests(teamId): Promise<any>{
+
+  let resp = await models.AmbassadorTeamJoinRequest.findAll({ where: {team_id:teamId, status: "pending"}})  
+
+  return resp
+}
+
+export async function requestToJoinAmbassadorTeam(ambassadorId, teamId): Promise<any>{
+
+  let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
+
+  let resp = await models.AmbassadorTeamJoinRequest.create({  
+
+   account_id: ambassador.account_id,
+
+   team_id: teamId,
+
+   status: "pending"
+ 
+  })
+
+  return resp
+
+}
+
+export async function rejectAmbassadorTeamJoinRequest(joinRequestId): Promise<any>{
+
+  log.info('ambassadors.joinrequest.reject', {joinRequestId });
+
+  let resp = await models.AmbassadorTeamJoinRequest.destroy({where: {id: joinRequestId}});
+
+  return resp
+
+}
+
+export async function acceptAmbassadorTeamJoinRequest(joinRequestId): Promise<any>{
+
+  log.info('ambassadors.joinrequest.accept', {joinRequestId });
+
+  let joinRequest = await models.AmbassadorTeamJoinRequest.findOne({ where: {id:joinRequestId}})
+
+  let ambassador = await models.Ambassador.findOne({ where: { account_id: joinRequest.account_id }});
+
+  let resp = await addTeamMember(joinRequest.team_id, ambassador.account_id, ambassador.id)
+
+  let req = await models.AmbassadorTeamJoinRequest.destroy({where: {id: joinRequestId}});
+
+  return resp
+
+}
