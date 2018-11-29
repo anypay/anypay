@@ -38,3 +38,70 @@ module.exports.list = async function(req: Request, h: ResponseToolkit) {
 
 };
 
+module.exports.listTeams = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.listTeamMembers = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.listClaims = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.createAmbassador = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.createTeam = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.createJoinRequesrt = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.createClaim = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.acceptJoinRequest = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.rejectJoinRequest = async function(req: Request, h: ResponseToolkit){
+
+
+}
+module.exports.acceptClaim = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.rejectClaim = async function(req: Request, h: ResponseToolkit){
+
+
+}
+
+module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
+
+
+}
+module.exports.createJoinRequest = async function(req: Request, h: ResponseToolkit){
+
+
+}

@@ -94,7 +94,7 @@ describe("Ambassador REST API", ()=>{
        let url = "/ambassadors/teams/" +teamName+"/join-requests"
 
        let response = await server.inject({
-        method: 'POST',
+        method: 'GET',
 	url: url,
         headers: {
          'Authorization': auth(accessToken.uid, "")
@@ -263,7 +263,7 @@ describe("Ambassador REST API", ()=>{
 
     it("POST /ambassadors/teams/join/{request-id}/accept  should accept join request to ambassador team", async()=>{
 
-      let url = "/ambassadors/teams/join-requests"+joinRequest.id+"accept"
+    let url = "/ambassadors/teams/join-requests/"+joinRequest.id+"accept"
 
       let response = await server.inject({
         method: 'POST',
