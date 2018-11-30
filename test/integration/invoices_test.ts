@@ -119,6 +119,33 @@ describe("Creating Invoices via REST", async () => {
 
   });
 
+  it("POST /invoices should accept webhook_url as a parameter", async () => {
+
+    await setAddress({
+      account_id: account.id,
+      currency: "DASH",
+      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+    });
+
+    let webhook_url = 'https://webhooks.zeiler.io/123454';
+
+    let response = await server.inject({
+      method: 'POST',
+      url: `/invoices`,
+      payload: {
+        currency: 'DASH',
+        amount: '10',
+        webhook_url
+      },
+      headers: {
+        'Authorization': auth(accessToken.uid, "")
+      }
+    });
+
+    assert.strictEqual(response.result.webhook_url, webhook_url);
+
+  })
+
 });
 
 function auth(username, password) {
