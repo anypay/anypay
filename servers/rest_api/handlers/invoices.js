@@ -104,6 +104,14 @@ module.exports.create = async (request, reply) => {
 
     }
 
+    if (request.payload.webhook_url) {
+
+      invoice.webhook_url = request.payload.webhook_url;
+
+      await invoice.save();
+
+    }
+
     return invoice;
 
   } catch(error) {
