@@ -139,7 +139,7 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
 
   let consumer = PaymentConsumer(channel);
 
-  //channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
+  channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
 
   await channel.assertQueue('webhooks.invoice', { durable: true });
 
