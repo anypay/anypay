@@ -281,7 +281,7 @@ async function Server() {
     path: "/dashboard",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       handler: DashBoardController.index,
       plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
@@ -291,7 +291,7 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       handler: PairTokensController.create
     }
   });
@@ -300,7 +300,7 @@ async function Server() {
     path: "/pair_tokens",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       handler: PairTokensController.show
     }
   });
@@ -319,7 +319,7 @@ async function Server() {
     path: "/bch/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -332,7 +332,7 @@ async function Server() {
     path: "/zec/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -345,7 +345,7 @@ async function Server() {
     path: "/btc.lightning/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
@@ -359,7 +359,7 @@ async function Server() {
     path: "/dash/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -372,7 +372,7 @@ async function Server() {
     path: "/btc/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -385,7 +385,7 @@ async function Server() {
     path: "/ltc/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -398,7 +398,7 @@ async function Server() {
     path: "/doge/invoices",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: Invoice.Request,
       },
@@ -478,7 +478,7 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       handler: ExtendedPublicKeysController.index
     }
   });
@@ -487,7 +487,7 @@ async function Server() {
     path: "/extended_public_keys",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       validate: {
         payload: ExtendedPublicKeysController.ExtendedPublicKey
       },
@@ -522,7 +522,7 @@ async function Server() {
     method: "POST",
     path: "/pair_tokens/{uid}",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: PairTokensController.claim
     }
   });
@@ -594,7 +594,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/usd",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.usd
     }
   });
@@ -603,7 +603,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/btc",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.btc
     }
   });
@@ -612,7 +612,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/dash",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.dash
     }
   });
@@ -621,7 +621,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/transactions/{coin}",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.totalTransactionsByCoin
     }
   });
@@ -630,7 +630,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/bch",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.bch
     }
   });
@@ -639,7 +639,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/total",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.total
     }
   });
@@ -649,7 +649,7 @@ async function Server() {
     path: "/account/totals/monthly/{currency}",
     config: {
       auth: "token",
-      tags: ['api'],
+      //tags: ['api'],
       handler: accountMonthlyChartsController.byCurrency
     }
   });
@@ -658,7 +658,7 @@ async function Server() {
     method: "GET",
     path: "/totals/monthly/count",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: monthlyChartsController.count
     }
   });
@@ -667,7 +667,7 @@ async function Server() {
     method: "POST",
     path: "/links",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: createLinks
     }
   });
@@ -676,7 +676,7 @@ async function Server() {
     method: "GET",
     path: "/dashback/totals/alltime",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: dashbackTotalsAlltime
     }
   });
@@ -685,7 +685,7 @@ async function Server() {
     method: "GET",
     path: "/dashback/totals/monthly",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: dashbackTotalsByMonth
     }
   });
@@ -694,7 +694,7 @@ async function Server() {
     method: "GET",
     path: "/totals/merchants",
     config: {
-      tags: ['api'],
+      //tags: ['api'],
       handler: totals.merchants
     }
   });
@@ -722,7 +722,7 @@ async function Server() {
     path: "/sudo/tokenvalidations",
     config: {
       auth: "adminwebtoken",
-      tags: ['api'],
+      //tags: ['api'],
       handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
         return {
