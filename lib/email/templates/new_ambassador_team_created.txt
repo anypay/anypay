@@ -1,0 +1,13 @@
+Trigger:
+New ambassador team created
+
+Subject:
+You created a new ambassador team
+
+Body:
+You created a new team: {team name}
+Anyone can view your team’s progress with this public link: [link]
+You can 
+Best, 
+Derrick J Freeman anypay.global 
+Questions? Visit our Support Desk for help, or reply to this email.

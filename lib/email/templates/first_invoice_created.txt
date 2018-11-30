@@ -1,0 +1,10 @@
+Trigger:
+First Invoice Created
+
+Subject:
+Huzzah! Your first crypto invoice!
+Body:
+Now what happens when you pay it? Do it!
+Best, 
+Derrick J Freeman anypay.global 
+Questions? Visit our Support Desk for help, or reply to this email.

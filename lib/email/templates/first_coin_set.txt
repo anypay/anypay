@@ -1,0 +1,19 @@
+Trigger:
+First {coin} Address Set
+
+Subject:
+Your business, many coins accepted
+
+Body:
+Hey there! 
+
+I noticed you created an account with us recently and set one coin address. Did you know you can accept multiple coins from the same account?
+
+Go to https://admin.anypay.global and sign in, go to "Settings" and then "Addresses" -- That way, your business can accept many coins all from one screen!
+ 
+Questions? Feel free to reply to this email or visit our FAQ.
+
+Best,
+
+Derrick J Freeman
+anypay.global

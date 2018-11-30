@@ -1,0 +1,15 @@
+Trigger:
+New {coin} Address Set
+
+Subject:
+New {coin} Address Set
+
+Body:
+Your account’s {coin} address was recently changed. 
+
+Wasn’t you? Hm… Maybe you should sign into your account at https://admin.anypay.global and double-check that your {coin} address is set to what you want it to be.
+
+Questions? Visit our Support Desk for help, or reply to this email.
+
+Best,  Derrick J Freeman
+anypay.global

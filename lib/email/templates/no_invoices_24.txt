@@ -1,0 +1,15 @@
+Trigger:
+First invoice created but unpaid within 24 hours
+
+Subject:
+Uh-oh. Unpaid invoice!
+
+Body:
+You generated your first crypto invoice, but nobody paid it. Go ahead, give it a try. What happens when you pay it? It will be fun.
+
+View recent invoices by tapping the top-left icon on the Point-of-Sale app, or by logging into the Admin and clicking the “Invoices” button.
+
+Questions? Visit our Support Desk for help, or reply to this email.
+
+Best, 
+Derrick J Freeman anypay.global

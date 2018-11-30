@@ -1,0 +1,16 @@
+Trigger:
+New Account Created
+
+Subject: 
+Congratulations! You activated your business!
+
+Body: 
+Your first crypto payment awaits.
+
+If you already entered your coin addresses, you are ready for payments! Just go to https://POS.anypay.global and ring up your first crypto invoice.  Accept more coins or change your payout addresses in the AnyPay Admin at https://admin.anypay.global. Log in, click “Settings,” and then “Addresses.”
+
+Want more customers? Let people know that your business accepts cryptocurrency. Reply to this email with your business name and address, and we will drive new traffic to your location by adding you to our merchant map.
+
+Questions? Visit our Support Desk for help, or reply to this email.
+
+Best,  Derrick J Freeman anypay.global

@@ -1,0 +1,14 @@
+Trigger:
+Funds were added to one of your ambassador teams
+
+Subject:
+Your team received funds!
+
+Body:
+Good job! Somebody must think you and your team are extremely effective because they sent funds to your team. That can be used to pay out rewards for activating new businesses, plus residuals that come from transactions there.
+
+Manage your team under the “Teams” tab in the AnyPay Admin app at https://admin.anypay.global
+
+Best, 
+Derrick J Freeman anypay.global 
+Questions? Visit our Support Desk for help, or reply to this email.
