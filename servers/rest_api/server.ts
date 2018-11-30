@@ -1,6 +1,9 @@
 "use strict";
 require('dotenv').config();
 import * as Hapi from "hapi";
+
+import { log } from '../../lib';
+
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const Invoice = require("../../lib/models/invoice");
@@ -824,6 +827,26 @@ async function Server() {
     config: {
 
       handler: MerchantsController.list
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/test/webhooks',
+
+    config: {
+
+      handler: async function(req, h) {
+
+        log.info('WEBHOOK', req.payload)
+
+        return true;
+
+      }
 
     }
 

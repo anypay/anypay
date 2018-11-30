@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import {ConfigureOracles} from './oracles'
 var Account = require('./models/account');
 
