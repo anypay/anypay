@@ -96,6 +96,14 @@ module.exports.create = async (request, reply) => {
 
     }
 
+    if (request.payload.redirect_url) {
+
+      invoice.redirect_url = request.payload.redirect_url;
+
+      await invoice.save();
+
+    }
+
     return invoice;
 
   } catch(error) {
@@ -119,6 +127,7 @@ module.exports.show = async function(request, reply) {
       uid: invoiceId
     }
   });
+
 
   if (invoice) {
 

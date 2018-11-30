@@ -78,8 +78,48 @@ describe("Creating Invoices via REST", async () => {
 
   })
 
+  describe("Including Redirect URL", () => {
 
-})
+    it("should allow for a redirect_url POST parameter", async () => {
+
+      let redirectURL = 'https://api.zeiler.io/checkouts/12490343-3434-342342-236ASDFAS/anypay'
+
+      await setAddress({
+        account_id: account.id,
+        currency: "DASH",
+        address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+      });
+
+      let payload = {
+        currency: 'DASH',
+        amount: 5,
+        redirect_url: redirectURL
+      };
+
+      let response = await server.inject({
+        method: 'POST',
+        url: `/invoices`,
+        payload: payload,
+        headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
+      })
+
+      assert.strictEqual(response.result.redirect_url, redirectURL);
+
+      let invoice = await models.Invoice.findOne({ where: {
+        
+        uid: response.result.uid
+
+      }});
+
+      assert.strictEqual(invoice.redirect_url, redirectURL);
+
+    });
+
+  });
+
+});
 
 function auth(username, password) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
