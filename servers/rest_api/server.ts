@@ -58,6 +58,8 @@ const Fixer = require('../../lib/fixer');
 import {events} from '../../lib/core';
 import {notify} from '../../lib/slack/notifier';
 
+import * as ambassadors from '../../lib/ambassadors';
+
 events.on('address:set', async (changeset) => {
 
   await notify(`address:set:${JSON.stringify(changeset)}`);
@@ -902,7 +904,7 @@ async function Server() {
 
     config: {
 
-      handler: AmbassadorsController.listTeamMembers
+      handler: AmbassadorsController.listJoinRequests
 
     }
 
@@ -964,7 +966,19 @@ async function Server() {
 
       auth: "token",
 
-      handler: AmbassadorsController.createJoinRequest
+      //handler: AmbassadorsController.createJoinRequest
+      
+      handler: async function(req: Hapi.Request, h: Hapi.ResponseToolkit){
+
+        let ambassador = await models.Ambassador.findOne({ where:{account_id: req.account.id}})
+
+        let team = await models.AmbassadorTeam.findOne({where:{team_name:req.params.teamName}})
+
+        let join = await ambassadors.requestToJoinAmbassadorTeam(ambassador.id, team.id)
+
+        return join
+    
+      } 
 
     }
 

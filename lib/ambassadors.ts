@@ -10,7 +10,7 @@ export async function listAll() {
 
 }
 
-export async function register(accountId: string, name?: string) {
+export async function register(accountId: number, name?: string) {
 
   log.info('ambassadors.register', { accountId, name });
 
@@ -22,7 +22,12 @@ export async function register(accountId: string, name?: string) {
 
   }
 
-  let resp = await models.Ambassador.create({ name, account_id: account.id });
+  let resp = await models.Ambassador.create({ 
+  
+    account_id: accountId,
+    name: name
+   
+    });
 
   return resp;
 
@@ -30,7 +35,7 @@ export async function register(accountId: string, name?: string) {
 
 export async function create(accountId, name?: string): Promise<any>{
 
-  return register(accountId, name)
+  return await register(accountId, name)
 
 }
 

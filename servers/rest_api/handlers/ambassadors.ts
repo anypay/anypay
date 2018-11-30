@@ -58,23 +58,46 @@ module.exports.listClaims = async function(req: Request, h: ResponseToolkit){
 
 }
 
-module.exports.createAmbassador = async function(req: Request, h: ResponseToolkit){
+module.exports.listJoinRequests = async function(req: Request, h: ResponseToolkit){
 
+
+}
+
+
+module.exports.createAmbassador = async function(req: Request, h: ResponseToolkit){
+ 
+  let ambassador = await ambassadors.create(req.account.id,req.payload.name)
+
+  return ambassador 
 
 }
 
 module.exports.createTeam = async function(req: Request, h: ResponseToolkit){
 
+  let ambassador = await models.Ambassador.findOne({ where: {account_id: req.account.id}})
+
+  let team = await ambassadors.createTeam(ambassador.id, req.payload.teamName)
+
+  return team
 
 }
 
-module.exports.createJoinRequesrt = async function(req: Request, h: ResponseToolkit){
+module.exports.createJoinRequest = async function(req: Request, h: ResponseToolkit){
 
+  //FIX THIS
+  //Had an issue calling this function from server.ts so created anonymous function in server.ts 
+
+  return null
 
 }
 
 module.exports.createClaim = async function(req: Request, h: ResponseToolkit){
 
+let merchant = await models.Account.findOne({ where: { id:req.params.merchantId }})
+
+  let claim = await ambassadors.createClaim(req.account.email(),merchant.email()) 
+
+  return claim
 
 }
 
