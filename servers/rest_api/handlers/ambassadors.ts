@@ -32,9 +32,9 @@ module.exports.claim_merchant = async function(req: Hapi.Request, h: Hapi.Respon
 
 module.exports.list = async function(req: Request, h: ResponseToolkit) {
 
-  let amb  = await ambassadors.listAll();
+  let ambassadors = await models.Ambassador.findAll();
 
-  return {amb};
+  return { ambassadors };
 
 };
 

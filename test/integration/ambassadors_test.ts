@@ -80,7 +80,7 @@ describe("Ambassador REST API", ()=>{
         url: `/ambassadors`
        })
 
-       assert(resp.result.amb.length > 0)
+       assert(resp.result.ambassadors.length > 0)
 
     })
 
