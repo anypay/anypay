@@ -19,102 +19,104 @@ describe("Ambassador REST API", ()=>{
 
   describe("Retrieving collections", ()=>{
 
-    var teamName, joinRequest, joiningAmbassador, account, ambassador, team,joiningAccount, merchantEmail, ambassadorEmail, merchant;
+    var teamLeaderAccount, teamLeaderAmbassador, claim, merchantAccount, teamName, joinRequest, joiningAmbassador, account, ambassador, team,joiningAccount, merchantEmail, ambassadorEmail, merchant;
    
 
     before(async()=>{
-    /* 
+     
       teamName = chance.word()
 
       merchantEmail = chance.email()
 
       ambassadorEmail = chance.email()
 
-      account = await lib.accounts.create(merchantEmail, chance.word())
-     
-      ambassador = await lib.ambassadors.create(account.id)
+      merchantAccount = await lib.accounts.create(merchantEmail, chance.word())
 
-      team = await lib.ambassadors.createTeam(ambassador.id, teamName)
+      teamLeaderAccount = await lib.accounts.create(chance.email(), chance.word())
+
+      teamLeaderAmbassador = await lib.ambassadors.create(teamLeaderAccount.id)
+
+      team = await lib.ambassadors.createTeam(teamLeaderAmbassador.id, teamName)
 
       joiningAccount = await lib.accounts.create(ambassadorEmail, teamName)
 
       joiningAmbassador = await lib.ambassadors.create(joiningAccount.id)
-
-      joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id, teamName)
-      
+     
+      joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id, team.id)
+     
       merchant = await lib.models.DashBackMerchant.create({
 
-        account_id:account.id,
+        account_id:merchantAccount.id,
 
       })
-      */
+
+      await lib.ambassadors.acceptAmbassadorTeamJoinRequest(joinRequest.id)
+
+      claim = await lib.ambassadors.createClaim(ambassadorEmail, merchantEmail)
+     
     })
 
-   it.skip("GET /ambassadors/teams should list all teams", async()=>{
+   it("GET /ambassadors/teams should list all teams", async()=>{
      
       let resp = await server.inject({
         method: 'GET',
         url: `/ambassadors/teams`
        })
 
-       assert(resp.length > 0)
+       assert(resp.result.length > 0)
 
     })
 
-    it.skip("GET /ambassadors should list all ambassadors", async()=>{
+    it("GET /ambassadors should list all ambassadors", async()=>{
 
       let resp = await server.inject({
         method: 'GET',
         url: `/ambassadors`
        })
 
-       assert(resp.length > 0)
+       assert(resp.result.length > 0)
 
     })
 
-    it.skip("GET /ambassador/teams/{team.id} should list all members of team", async()=>{
-
-      let account = await lib.accounts.create(chance.email(), chance.word())
-
-      let team = await lib.ambassadors.createTeam( account.id, chance.email())
-
-      let url = "/ambassador/teams/" + team.id
+    it("GET /ambassador/teams/{team.id} should list all members of team", async()=>{
 
       let resp = await server.inject({
         method: "GET",
-	url: url
+	url: `/ambassadors/teams/${team.id}`,
+	payload:{
+          teamId: team.id
+	},
        })
 
-       assert(resp.length > 0)
+       assert(resp.result.length > 0)
 
      })
 
-     it.skip("GET /ambassador/teams/{teamName}/join-requests should list all request to  ambassador team", async()=>{
+     it("GET /ambassador/teams/{teamid}/join-requests should list all request to  ambassador team", async()=>{
 
-       let url = "/ambassadors/teams/" +teamName+"/join-requests"
+       let url = "/ambassadors/teams/" +team.id +"/join-requests"
 
        let response = await server.inject({
         method: 'GET',
 	url: url,
-        headers: {
-         'Authorization': auth(accessToken.uid, "")
-        }
+	payload: {
+	  teamId:team.id
+	}
       })
 
-      assert(response.id > 0);
+      assert(response.result.length > 0);
 
     })
 
-    it.skip("GET /ambassadors/claims should list all claims", async()=>{
+    it("GET /ambassadors/claims should list all claims", async()=>{
 
-      let claim = await lib.ambassadors.createClaim(merchantEmail,ambassadorEmail)
 
       let resp = await server.inject({
         method: 'GET',
 	url: `/ambassadors/claims`
        })
 
-       assert(resp.length > 0)
+       assert(resp.result.length > 0)
 
     })
 
@@ -209,14 +211,18 @@ describe("Ambassador REST API", ()=>{
 
       let merchantEmail = await chance.email() 
 
-      let account = await lib.accounts.create(merchantEmail, chance.word())
+      let claimingAccount = await lib.accounts.create(chance.email(), chance.word())
 
-      let ambassador = await lib.ambassadors.create(account.id)
+      let claimingAmbassador = await lib.ambassadors.create(claimingAccount.id)
 
-      let merchant = lib.models.DashBackMerchant.create({
+      let merchant = await lib.models.DashBackMerchant.create({
 
         account_id: merchantAccount.id
 
+      })
+
+      accessToken = await AccessToken.create({
+        account_id: claimingAccount.id
       })
 
       let response = await server.inject({
@@ -230,10 +236,9 @@ describe("Ambassador REST API", ()=>{
         }
       })
 
+      assert.strictEqual(response.result.ambassador_id, claimingAmbassador.id);
 
-      console.log(response.result)
-
-      assert(response.result.id > 0);
+      assert.strictEqual(response.result.merchant_id, merchant.id);
 
     })
 
@@ -241,100 +246,205 @@ describe("Ambassador REST API", ()=>{
 
   describe("Controlling resources", ()=>{
 
-    var teamName, joinRequest, joiningAmbassador, account, ambassador, team,joiningAccount, merchantEmail, ambassadorEmail, merchant;
-   
-    before(async()=>{
-    /* 
-      teamName = chance.word()
+    it("POST /ambassadors/teams/join/{request-id}/accept  should accept join request to ambassador team", async()=>{
 
-      merchantEmail = chance.email()
+      let teamName = chance.word()
 
-      ambassadorEmail = chance.email()
+      let merchantEmail = chance.email()
 
-      account = await lib.accounts.create(merchantEmail, chance.word())
-     
-      ambassador = await lib.ambassadors.create(account.id)
+      let joiningAmbassadorEmail = chance.email()
 
-      team = await lib.ambassadors.createTeam(ambassador.id, chance.word())
+      let merchantAccount = await lib.accounts.create(merchantEmail, chance.word())
 
-      joiningAccount = await lib.accounts.create(ambassadorEmail, teamName)
+      let merchant = await lib.models.DashBackMerchant.create({
 
-      joiningAmbassador = await lib.ambassadors.create(joiningAccount.id)
-
-      joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id,team.id)
-      
-      merchant = await lib.models.DashBackMerchant.create({
-
-        account_id:account.id,
+        account_id:merchantAccount.id,
 
       })
-      */
-    })
 
-    it.skip("POST /ambassadors/teams/join/{request-id}/accept  should accept join request to ambassador team", async()=>{
+      let joiningAccount = await lib.accounts.create(joiningAmbassadorEmail, teamName)
 
-    let url = "/ambassadors/teams/join-requests/"+joinRequest.id+"accept"
+      let joiningAmbassador = await lib.ambassadors.create(joiningAccount.id)
+
+      let teamLeadAccount = await lib.accounts.create(chance.email(), chance.word())
+      
+      let teamLeadAmbassador = await lib.ambassadors.create(teamLeadAccount.id)
+
+      let team = await lib.ambassadors.createTeam(teamLeadAmbassador.id, chance.word())
+
+      let joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id,team.id)
+ 
+      accessToken = await AccessToken.create({
+        account_id: teamLeadAccount.id
+      })
+
 
       let response = await server.inject({
         method: 'POST',
-	url: url,
+	url: `/ambassadors/teams/join-requests/${joinRequest.id}/accept`,
+	payload: {
+	  joinRequestId: joinRequest.id
+	},
         headers: {
          'Authorization': auth(accessToken.uid, "")
         }
       })
 
-      assert(response.id > 0);
+      let teamMember = await lib.models.AmbassadorTeamMember.findOne({where: {account_id:joiningAccount.id}})
+
+      assert.strictEqual(teamMember.team_id, team.id);
 
     })
 
-    it.skip("POST /ambassadors/teams/join-requests/{reqId}/reject should reject a  join request to ambassador team", async()=>{
+    it("POST /ambassadors/teams/join-requests/{reqId}/reject should reject a  join request to ambassador team", async()=>{
 
-      let url = "/ambassadors/teams/join-requests/" + joinRequest.id + "/reject"
+      let teamName = chance.word()
+
+      let merchantEmail = chance.email()
+
+      let joiningAmbassadorEmail = chance.email()
+
+      let merchantAccount = await lib.accounts.create(merchantEmail, chance.word())
+
+      let merchant = await lib.models.DashBackMerchant.create({
+
+        account_id:merchantAccount.id,
+
+      })
+
+      let joiningAccount = await lib.accounts.create(joiningAmbassadorEmail, teamName)
+
+      let joiningAmbassador = await lib.ambassadors.create(joiningAccount.id)
+
+      let teamLeadAccount = await lib.accounts.create(chance.email(), chance.word())
+      
+      let teamLeadAmbassador = await lib.ambassadors.create(teamLeadAccount.id)
+
+      let team = await lib.ambassadors.createTeam(teamLeadAmbassador.id, chance.word())
+
+      let joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id,team.id)
+ 
+      accessToken = await AccessToken.create({
+        account_id: teamLeadAccount.id
+      })
+
+
       let response = await server.inject({
         method: 'POST',
-        url: url,
+	url: `/ambassadors/teams/join-requests/${joinRequest.id}/reject`,
         headers: {
          'Authorization': auth(accessToken.uid, "")
         }
       })
 
-      assert(response.id > 0);
+      let teamMember = await lib.models.AmbassadorTeamMember.findOne({where: {account_id:joiningAccount.id}})
 
-     })
+      assert.strictEqual(teamMember, null);
 
-    it.skip("POST /ambassadors/claims/{claimID}/verify should verify a claim", async()=>{
 
-      let claim = await lib.ambassadors.createClaim(merchantEmail,ambassadorEmail)
-
-      let url = "/ambassadors/claims/" + claim.id + "/verify"
-
-      let resp = await server.inject({
-        method: 'POST',
-	url: url, 
-	headers: {
-          'Authorization': auth(accessToken.uid, "")
-	}
-       })
-
-       assert(resp.id > 0)
-      
     })
 
-    it.skip("POST /ambassadors/claims/{claimID}/reject should reject a claim", async()=>{
+    it("POST /ambassadors/claims/{claimID}/reject should reject a claim", async()=>{
 
-      let claim = await lib.ambassadors.createClaim(merchantEmail,ambassadorEmail)
+      let merchantEmail = chance.email()
 
-      let url = "/ambassadors/claims/" + claim.id + "reject"
+      let merchantAccount = await lib.accounts.create(merchantEmail, chance.word())
 
-      let resp = await server.inject({
+      let merchant = await lib.models.DashBackMerchant.create({
+
+        account_id:merchantAccount.id
+
+      })
+
+      let teamLeadAccount = await lib.accounts.create(chance.email(), chance.word())
+
+      let teamLeadAmbassador = await lib.ambassadors.create(teamLeadAccount.id)
+
+      let team = await lib.ambassadors.createTeam(teamLeadAmbassador.id, chance.word())
+
+      let claimingAmbassadorEmail = chance.email()
+
+      let claimingAccount = await lib.accounts.create(claimingAmbassadorEmail, chance.word())
+
+      let claimingAmbassador = await lib.ambassadors.create(claimingAccount.id)
+
+      let joinReq = await lib.ambassadors.requestToJoinAmbassadorTeam(claimingAmbassador.id, team.id)
+
+      await lib.ambassadors.acceptAmbassadorTeamJoinRequest(joinReq.id)
+
+      let claim = await lib.ambassadors.createClaim(claimingAmbassadorEmail, merchantEmail)
+
+      accessToken = await AccessToken.create({
+	account_id:teamLeadAccount.id
+      })
+
+      let response = await server.inject({
+
         method: 'POST',
-	url: url, 
-	headers: {
-          'Authorization': auth(accessToken.uid, "")
+	url: `/ambassadors/claims/${claim.id}/reject`,
+	payload:{
+          claimId:claim.id
+	},
+	headers:{
+	  'Authorization':auth(accessToken.uid,"")
 	}
-       })
 
-       assert(resp.id > 0)
+      })
+
+      assert.strictEqual(response.result.status, "rejected")
+
+
+    })
+
+    it("POST /ambassadors/claims/{claimID}/accept should accept a claim", async()=>{
+
+      let merchantEmail = chance.email()
+
+      let merchantAccount = await lib.accounts.create(merchantEmail, chance.word())
+
+      let merchant = await lib.models.DashBackMerchant.create({
+
+        account_id:merchantAccount.id
+
+      })
+
+      let teamLeadAccount = await lib.accounts.create(chance.email(), chance.word())
+
+      let teamLeadAmbassador = await lib.ambassadors.create(teamLeadAccount.id)
+
+      let team = await lib.ambassadors.createTeam(teamLeadAmbassador.id, chance.word())
+
+      let claimingAmbassadorEmail = chance.email()
+
+      let claimingAccount = await lib.accounts.create(claimingAmbassadorEmail, chance.word())
+
+      let claimingAmbassador = await lib.ambassadors.create(claimingAccount.id)
+
+      let joinReq = await lib.ambassadors.requestToJoinAmbassadorTeam(claimingAmbassador.id, team.id)
+
+      await lib.ambassadors.acceptAmbassadorTeamJoinRequest(joinReq.id)
+
+      let claim = await lib.ambassadors.createClaim(claimingAmbassadorEmail, merchantEmail)
+
+      accessToken = await AccessToken.create({
+	account_id:teamLeadAccount.id
+      })
+
+      let response = await server.inject({
+
+        method: 'POST',
+	url: `/ambassadors/claims/${claim.id}/accept`,
+	payload:{
+          claimId:claim.id
+	},
+	headers:{
+	  'Authorization':auth(accessToken.uid,"")
+	}
+
+      })
+
+      assert.strictEqual(response.result.status, "verified")
+
 
     })
 

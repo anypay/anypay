@@ -2,7 +2,7 @@ import * as Hapi from 'hapi';
 
 import { Request, ResponseToolkit } from 'hapi';
 
-import { models, ambassadors } from '../../../lib';
+import { models, ambassadors, database } from '../../../lib';
 
 module.exports.list_account_claims = async function(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
@@ -32,34 +32,50 @@ module.exports.claim_merchant = async function(req: Hapi.Request, h: Hapi.Respon
 
 module.exports.list = async function(req: Request, h: ResponseToolkit) {
 
-  let ambassadors = await models.Ambassador.findAll();
+  let amb  = await ambassadors.listAll();
 
-  return { ambassadors };
+  return amb;
 
 };
 
 module.exports.listTeams = async function(req: Request, h: ResponseToolkit){
 
+  let teams = await models.AmbassadorTeam.findAll();
+
+  return teams
 
 }
 
 module.exports.listTeamMembers = async function(req: Request, h: ResponseToolkit){
 
+  const query = `select * from ambassador_team_members where team_id=${req.params.teamId}`
+  
+  let result = await database.query(query);
+
+  return result
 
 }
 
 module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
 
+  let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
 
+  return requests
 }
 
 module.exports.listClaims = async function(req: Request, h: ResponseToolkit){
+ 
+ let claim = await models.AmbassadorClaim.findAll();
 
+ return claim
 
 }
 
 module.exports.listJoinRequests = async function(req: Request, h: ResponseToolkit){
 
+  let joins = await models.AmbassadorTeamJoinRequest.findAll();
+
+  return joins
 
 }
 
@@ -93,9 +109,12 @@ module.exports.createJoinRequest = async function(req: Request, h: ResponseToolk
 
 module.exports.createClaim = async function(req: Request, h: ResponseToolkit){
 
-let merchant = await models.Account.findOne({ where: { id:req.params.merchantId }})
 
-  let claim = await ambassadors.createClaim(req.account.email(),merchant.email()) 
+  let merchant = await models.DashBackMerchant.findOne({ where: { id:req.params.merchantId }})
+
+  let merchantAccount = await models.Account.findOne({where:{id:merchant.account_id}})
+
+  let claim = await ambassadors.createClaim(req.account.email,merchantAccount.email) 
 
   return claim
 
@@ -103,20 +122,31 @@ let merchant = await models.Account.findOne({ where: { id:req.params.merchantId 
 
 module.exports.acceptJoinRequest = async function(req: Request, h: ResponseToolkit){
 
+  let resp = await ambassadors.acceptAmbassadorTeamJoinRequest(req.params.requestId)
+
+  return resp
 
 }
 
 module.exports.rejectJoinRequest = async function(req: Request, h: ResponseToolkit){
 
+  let resp = await ambassadors.rejectAmbassadorTeamJoinRequest(req.params.joinRequestId)
+
+  return resp
 
 }
 module.exports.acceptClaim = async function(req: Request, h: ResponseToolkit){
 
+  let resp = await ambassadors.verifyClaim(req.params.claimId)
 
+  return resp
 }
 
 module.exports.rejectClaim = async function(req: Request, h: ResponseToolkit){
 
+  let resp = await ambassadors.rejectClaim(req.params.claimId)
+
+  return resp
 
 }
 

@@ -224,15 +224,17 @@ export async function rejectClaim(claimId: number) {
 
   log.info('ambassadors.claim.reject', {claimId });
 
-  await models.AmbassadorClaim.update({
+  let claim = await models.AmbassadorClaim.findOne({ where: {
 
-    status: 'rejected'
+    id: claimId
 
-  }, {
+  }});
 
-    where: { id: claimId }
-  
-  });
+  claim.status = 'rejected';
+
+  await claim.save();
+
+  return claim
 
 }
 
@@ -263,6 +265,8 @@ export async function verifyClaim(claimId: number) {
   claim.status = 'verified';
 
   await claim.save();
+
+  return claim
 
 }
 
