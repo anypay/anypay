@@ -12,9 +12,12 @@ export interface Invoice {
   account_id: number;
   currency: string;
   amount: number;
+  invoice_amount?: number;
+  invoice_amount_paid?: number;
   amount_paid?: number;
   denomination: string;
   denomination_amount: number;
+  denomination_amount_paid?: number;
   address: string;
   status: string;
   hash?: string;

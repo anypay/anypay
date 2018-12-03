@@ -20,17 +20,16 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
     throw new Error("underpaid handler called with sufficient payment");
   }
 
-  invoice.amount_paid = payment.amount;
-  invoice.hash = payment.hash;
-  invoice.status = "underpaid";
-  invoice.paidAt = new Date();
+  let price = invoice.denomination_amount / invoice.invoice_amount;
 
   var result = await InvoiceModel.update(
     {
-      amount_paid: invoice.amount,
-      hash: invoice.hash,
-      status: invoice.status,
-      paidAt: invoice.paidAt
+      amount_paid: payment.amount,
+      invoice_amount_paid: payment.amount,
+      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      hash: payment.hash,
+      status: 'underpaid',
+      paidAt: new Date()
     },
     {
       where: { id: invoice.id }
@@ -49,14 +48,11 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
     throw new Error("paid handler called with insufficient payment");
   }
 
-  invoice.amount_paid = payment.amount;
-  invoice.hash = payment.hash;
-  invoice.status = "paid";
-  invoice.paidAt = new Date();
-
   var result = await InvoiceModel.update(
     {
       amount_paid: payment.amount,
+      invoice_amount_paid: payment.amount,
+      denomination_amount_paid: invoice.denomination_amount,
       hash: payment.hash,
       status: "paid",
       paidAt: new Date()
@@ -82,17 +78,16 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
     throw new Error("overpaid handler called with exactly sufficient payment");
   }
 
-  invoice.amount_paid = payment.amount;
-  invoice.hash = payment.hash;
-  invoice.status = "paid";
-  invoice.paidAt = new Date();
+  let price = invoice.denomination_amount / invoice.invoice_amount;
 
   var result = await InvoiceModel.update(
     {
-      amount_paid: invoice.amount_paid,
-      hash: invoice.hash,
-      status: invoice.status,
-      paidAt: invoice.paidAt
+      amount_paid: payment.amount,
+      invoice_amount_paid: payment.amount,
+      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      hash: payment.hash,
+      status: 'overpaid',
+      paidAt: new Date()
     },
     {
       where: { id: invoice.id }
