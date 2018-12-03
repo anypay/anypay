@@ -853,12 +853,16 @@ async function Server() {
     }
 
    })
-     
+
+   server.route({
+
     method: 'GET',
 
     path: '/ambassadors',
 
     config: {
+
+      auth: "token",
 
       handler: AmbassadorsController.list
 
@@ -875,6 +879,8 @@ async function Server() {
 
     config: {
 
+      auth: "token",
+
       handler: AmbassadorsController.listTeams
 
     }
@@ -890,6 +896,8 @@ async function Server() {
 
     config: {
 
+      auth: "token",
+      
       handler: AmbassadorsController.listTeamMembers
 
     }
@@ -904,13 +912,10 @@ async function Server() {
 
     config: {
 
-       handler: async function(req: Hapi.Request, h: Hapi.ResponseToolkit){
+      auth: "token",
 
-	let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
-
-	return {requests}
-
-      }
+      handler: AmbassadorsController.listTeamJoinRequests
+    
     }
 
   });  
@@ -923,6 +928,8 @@ async function Server() {
     path: '/ambassadors/claims',
 
     config: {
+
+      auth: "token",
 
       handler: AmbassadorsController.listClaims
 
@@ -971,20 +978,8 @@ async function Server() {
 
       auth: "token",
 
-      //handler: AmbassadorsController.createJoinRequest
+      handler: AmbassadorsController.createJoinRequest
       
-      handler: async function(req: Hapi.Request, h: Hapi.ResponseToolkit){
-
-        let ambassador = await models.Ambassador.findOne({ where:{account_id: req.account.id}})
-
-        let team = await models.AmbassadorTeam.findOne({where:{team_name:req.params.teamName}})
-
-        let join = await ambassadors.requestToJoinAmbassadorTeam(ambassador.id, team.id)
-
-        return join
-    
-      } 
-
     }
 
   });

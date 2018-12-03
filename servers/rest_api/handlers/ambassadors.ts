@@ -47,11 +47,8 @@ module.exports.listTeams = async function(req: Request, h: ResponseToolkit){
 }
 
 module.exports.listTeamMembers = async function(req: Request, h: ResponseToolkit){
-
-  const query = `select * from ambassador_team_members where team_id=${req.params.teamId}`
   
   let members = await models.AmbassadorTeamMember.findAll({where:{team_id:req.params.teamId}})
-  // database.query(query);
 
   return {members}
 
@@ -59,11 +56,8 @@ module.exports.listTeamMembers = async function(req: Request, h: ResponseToolkit
 
 module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
 
-  console.log('fafagafagfd')
-
   let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
 
-  console.log(requests)
 
   return {requests}
 }
@@ -96,19 +90,10 @@ module.exports.createAmbassador = async function(req: Request, h: ResponseToolki
 module.exports.createTeam = async function(req: Request, h: ResponseToolkit){
 
   let ambassador = await models.Ambassador.findOne({ where: {account_id: req.account.id}})
-
+  
   let team = await ambassadors.createTeam(ambassador.id, req.payload.teamName)
 
   return team
-
-}
-
-module.exports.createJoinRequest = async function(req: Request, h: ResponseToolkit){
-
-  //FIX THIS
-  //Had an issue calling this function from server.ts so created anonymous function in server.ts 
-
-  return null
 
 }
 
@@ -157,9 +142,26 @@ module.exports.rejectClaim = async function(req: Request, h: ResponseToolkit){
 
 module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
 
+  let team = await models.AmbassadorTeam.findOne({where:{id: req.params.teamId}})
+
+  if( req.account.id != team.leader_account_id ){
+   
+    return null
+
+  }
+  let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
+
+  return {requests}
 
 }
 module.exports.createJoinRequest = async function(req: Request, h: ResponseToolkit){
 
+  let ambassador = await models.Ambassador.findOne({ where:{account_id: req.account.id}})
+
+  let team = await models.AmbassadorTeam.findOne({where:{team_name:req.params.teamName}})
+
+  let join = await ambassadors.requestToJoinAmbassadorTeam(ambassador.id, team.id)
+
+  return join
 
 }

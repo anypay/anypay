@@ -24,6 +24,8 @@ describe("Ambassador REST API", ()=>{
 
     before(async()=>{
      
+      account = await lib.accounts.create(chance.email(), chance.word())
+
       teamName = chance.word()
 
       merchantEmail = chance.email()
@@ -63,10 +65,17 @@ describe("Ambassador REST API", ()=>{
     })
 
    it("GET /ambassadors/teams should list all teams", async()=>{
-     
+
+      let accessToken = await AccessToken.create({
+        account_id: account.id
+      })
+
       let resp = await server.inject({
         method: 'GET',
-        url: `/ambassadors/teams`
+	url: `/ambassadors/teams`,
+	headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
        })
 
        assert(resp.result.teams.length > 0)
@@ -75,9 +84,17 @@ describe("Ambassador REST API", ()=>{
 
     it("GET /ambassadors should list all ambassadors", async()=>{
 
+
+      let accessToken = await AccessToken.create({
+        account_id: account.id
+      })
+
       let resp = await server.inject({
         method: 'GET',
-        url: `/ambassadors`
+	url: `/ambassadors`,
+	headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
        })
 
        assert(resp.result.ambassadors.length > 0)
@@ -86,39 +103,84 @@ describe("Ambassador REST API", ()=>{
 
     it("GET /ambassador/teams/{team.id} should list all members of team", async()=>{
 
+
+      let accessToken = await AccessToken.create({
+        account_id: account.id
+      })
+
       let resp = await server.inject({
         method: "GET",
 	url: `/ambassadors/teams/${team.id}`,
 	payload:{
           teamId: team.id
 	},
+	headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
        })
 
        assert(resp.result.members.length > 0)
 
      })
 
-     it("GET /ambassador/teams/{teamid}/join-requests should list all request to  ambassador team", async()=>{
+     it("GET /ambassador/teams/{teamid}/join-requests should list all request to ambassador team if team leader", async()=>{
 
+
+      let accessToken = await AccessToken.create({
+        account_id: teamLeaderAccount.id
+      })
 
        let response = await server.inject({
         method: 'GET',
 	url: `/ambassadors/teams/${team.id}/join-requests`,
 	payload: {
 	  teamId:team.id
-	}
+	  },
+	headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
       })
 
       assert(response.result.requests.length > 0);
 
     })
 
+    it("GET /ambassador/teams/{teamid}/join-requests should not list all request to ambassador team if team leader", async()=>{
+
+
+      let accessToken = await AccessToken.create({
+        account_id: account.id
+      })
+
+       let response = await server.inject({
+        method: 'GET',
+        url: `/ambassadors/teams/${team.id}/join-requests`,
+        payload: {
+          teamId:team.id
+          },
+        headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
+      })
+
+      assert.strictEqual(response.result, null);
+
+    })
+
+
     it("GET /ambassadors/claims should list all claims", async()=>{
 
 
+      let accessToken = await AccessToken.create({
+        account_id: account.id
+      })
+
       let resp = await server.inject({
         method: 'GET',
-	url: `/ambassadors/claims`
+	url: `/ambassadors/claims`,
+	headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
        })
 
        assert(resp.result.claims.length > 0)
@@ -154,6 +216,7 @@ describe("Ambassador REST API", ()=>{
       assert.strictEqual(response.result.account_id, account.id)
 
     })
+
 
     it("POST /ambassadors/teams  should create an ambassador team", async()=>{
 
