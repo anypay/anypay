@@ -41,9 +41,15 @@ describe("Ambassador REST API", ()=>{
       joiningAccount = await lib.accounts.create(ambassadorEmail, teamName)
 
       joiningAmbassador = await lib.ambassadors.create(joiningAccount.id)
-     
+  
       joinRequest = await lib.ambassadors.requestToJoinAmbassadorTeam(joiningAmbassador.id, team.id)
-     
+    
+      let acc = await lib.accounts.create(chance.email(), chance.word())
+      
+      let ambassador2 = await lib.ambassadors.create(acc.id)
+
+      await lib.ambassadors.requestToJoinAmbassadorTeam(ambassador2.id, team.id)
+
       merchant = await lib.models.DashBackMerchant.create({
 
         account_id:merchantAccount.id,
@@ -63,7 +69,7 @@ describe("Ambassador REST API", ()=>{
         url: `/ambassadors/teams`
        })
 
-       assert(resp.result.length > 0)
+       assert(resp.result.teams.length > 0)
 
     })
 
@@ -74,7 +80,7 @@ describe("Ambassador REST API", ()=>{
         url: `/ambassadors`
        })
 
-       assert(resp.result.length > 0)
+       assert(resp.result.amb.length > 0)
 
     })
 
@@ -88,23 +94,22 @@ describe("Ambassador REST API", ()=>{
 	},
        })
 
-       assert(resp.result.length > 0)
+       assert(resp.result.members.length > 0)
 
      })
 
      it("GET /ambassador/teams/{teamid}/join-requests should list all request to  ambassador team", async()=>{
 
-       let url = "/ambassadors/teams/" +team.id +"/join-requests"
 
        let response = await server.inject({
         method: 'GET',
-	url: url,
+	url: `/ambassadors/teams/${team.id}/join-requests`,
 	payload: {
 	  teamId:team.id
 	}
       })
 
-      assert(response.result.length > 0);
+      assert(response.result.requests.length > 0);
 
     })
 
@@ -116,7 +121,7 @@ describe("Ambassador REST API", ()=>{
 	url: `/ambassadors/claims`
        })
 
-       assert(resp.result.length > 0)
+       assert(resp.result.claims.length > 0)
 
     })
 

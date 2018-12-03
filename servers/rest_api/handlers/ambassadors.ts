@@ -34,7 +34,7 @@ module.exports.list = async function(req: Request, h: ResponseToolkit) {
 
   let amb  = await ambassadors.listAll();
 
-  return amb;
+  return {amb};
 
 };
 
@@ -42,7 +42,7 @@ module.exports.listTeams = async function(req: Request, h: ResponseToolkit){
 
   let teams = await models.AmbassadorTeam.findAll();
 
-  return teams
+  return {teams}
 
 }
 
@@ -50,24 +50,29 @@ module.exports.listTeamMembers = async function(req: Request, h: ResponseToolkit
 
   const query = `select * from ambassador_team_members where team_id=${req.params.teamId}`
   
-  let result = await database.query(query);
+  let members = await models.AmbassadorTeamMember.findAll({where:{team_id:req.params.teamId}})
+  // database.query(query);
 
-  return result
+  return {members}
 
 }
 
 module.exports.listTeamJoinRequests = async function(req: Request, h: ResponseToolkit){
 
+  console.log('fafagafagfd')
+
   let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
 
-  return requests
+  console.log(requests)
+
+  return {requests}
 }
 
 module.exports.listClaims = async function(req: Request, h: ResponseToolkit){
  
- let claim = await models.AmbassadorClaim.findAll();
+ let claims = await models.AmbassadorClaim.findAll();
 
- return claim
+ return {claims}
 
 }
 
@@ -75,7 +80,7 @@ module.exports.listJoinRequests = async function(req: Request, h: ResponseToolki
 
   let joins = await models.AmbassadorTeamJoinRequest.findAll();
 
-  return joins
+  return {joins}
 
 }
 

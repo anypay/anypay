@@ -900,12 +900,17 @@ async function Server() {
 
     method: 'GET',
 
-    path: "/ambassadors/teams/{teamName}/join-requests",
+    path: "/ambassadors/teams/{teamId}/join-requests",
 
     config: {
 
-      handler: AmbassadorsController.listJoinRequests
+       handler: async function(req: Hapi.Request, h: Hapi.ResponseToolkit){
 
+	let requests = await models.AmbassadorTeamJoinRequest.findAll({where:{ team_id: req.params.teamId}})
+
+	return {requests}
+
+      }
     }
 
   });  
