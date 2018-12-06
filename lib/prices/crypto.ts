@@ -1,14 +1,22 @@
-
+const log = require("winston");
 const http = require('superagent');
 
 var cache;
 
 async function updateCurrencies() {
 
-  let resp = await http.get('https://api.coinmarketcap.com/v1/ticker');
+  log.info('currencies.crypto.updated')
+  let resp = await http
+                     .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
+                     .query({
+                        start: 1,
+                        limit: 5000,
+                        convert: "BTC"
+                      })
+                      .set( 'X-CMC_PRO_API_KEY',process.env.COINMARKETCAP_API_KEY);
 
-  cache = resp.body.reduce((accumulator, item) => {
-      accumulator[item.symbol] = 1 / parseFloat(item.price_btc);
+  cache = resp.body.data.reduce((accumulator, item) => {
+  accumulator[item.symbol] = 1/item.quote.BTC.price;
       return accumulator;
     }, {});
 
