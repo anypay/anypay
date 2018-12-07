@@ -58,6 +58,8 @@ const Fixer = require('../../lib/fixer');
 import {events} from '../../lib/core';
 import {notify} from '../../lib/slack/notifier';
 
+import * as ambassadors from '../../lib/ambassadors';
+
 events.on('address:set', async (changeset) => {
 
   await notify(`address:set:${JSON.stringify(changeset)}`);
@@ -850,7 +852,218 @@ async function Server() {
 
     }
 
+   })
+
+   server.route({
+
+    method: 'GET',
+
+    path: '/ambassadors',
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.list
+
+    }
+
   });
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/ambassadors/teams',
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.listTeams
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/ambassadors/teams/{teamId}",
+
+    config: {
+
+      auth: "token",
+      
+      handler: AmbassadorsController.listTeamMembers
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/ambassadors/teams/{teamId}/join-requests",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.listTeamJoinRequests
+    
+    }
+
+  });  
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/ambassadors/claims',
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.listClaims
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/ambassadors',
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.createAmbassador
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/ambassadors/teams',
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.createTeam
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/teams/{teamName}/join-requests",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.createJoinRequest
+      
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/claims/{merchantId}",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.createClaim
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/teams/join-requests/{requestId}/accept",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.acceptJoinRequest
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/teams/join-requests/{requestId}/reject",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.rejectJoinRequest
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/claims/{claimId}/accept",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.acceptClaim
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: "/ambassadors/claims/{claimId}/reject",
+
+    config: {
+
+      auth: "token",
+
+      handler: AmbassadorsController.rejectClaim
+
+    }
+
+  });
+
 
   return server;
 
