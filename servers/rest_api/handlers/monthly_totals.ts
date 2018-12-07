@@ -135,8 +135,6 @@ export async function count() {
 
 export async function totalTransactionsByCoin(req, h) {
 
-  console.log("PARAMS", req.params);
-
   let coin = req.params.coin.toUpperCase();
 
   let totals = await monthly.totalTransactionsByCoin(coin);
@@ -148,3 +146,84 @@ export async function totalTransactionsByCoin(req, h) {
   return response;
 }
 
+export async function denomination(req, h) {
+
+  let denomination = req.params.denomination.toUpperCase();
+
+  const query = `select extract(month from "createdAt") as mon,
+    extract(year from "createdAt") as yyyy,
+    count(*)
+    from invoices
+    where status = 'paid'
+    and denomination_currency = '${denomination}'
+    group by 1,2;`;
+
+  try {
+
+    var result = await database.query(query);
+
+    return result[0].map(res => {
+      return {
+        mon: res.mon,
+        yyyy: res.yyyy,
+        count: parseInt(res.count)
+      }
+    });
+
+  } catch(error){ 
+
+    logger.error(error.message);
+
+    throw error;
+  }
+
+}
+
+export async function denominations(req, h) {
+
+  try {
+
+    let denominations = (await database.query(`select denomination_currency
+      from invoices
+      where status = 'paid'
+      group by denomination_currency`
+    ))[0];
+
+    let results = Promise.all(denominations.map(async (i) => {
+
+      let denomination = i.denomination_currency;
+
+      const query = `select extract(month from "createdAt") as mon,
+        extract(year from "createdAt") as yyyy,
+        count(*)
+        from invoices
+        where status = 'paid'
+        and denomination_currency = '${denomination}'
+        group by 1,2;`;
+
+      var result = await database.query(query);
+
+      return {
+        denomination,
+        values: result[0].map(res => {
+          return {
+            mon: res.mon,
+            yyyy: res.yyyy,
+            count: parseInt(res.count)
+          }
+        })
+      }
+
+    }));
+
+    return results;
+
+
+  } catch(error){ 
+
+    logger.error(error.message);
+
+    throw error;
+  }
+
+}
