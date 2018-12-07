@@ -12,8 +12,6 @@ export async function listAll() {
 
 export async function register(accountId: number, name?: string) {
 
-  log.info('ambassadors.register', { accountId, name });
-
   let account = await models.Account.findOne({ where: { id: accountId }});
 
   if (!account) {
@@ -21,6 +19,15 @@ export async function register(accountId: number, name?: string) {
     throw new Error(`account ${accountId} not found`);
 
   }
+
+  let ambassador = await models.Ambassador.findOne({ where:{account_id:accountId}})
+  if(ambassador){
+
+    throw new Error('Account is already an ambassador')
+
+  }
+
+  log.info('ambassadors.register', { accountId, name });
 
   let resp = await models.Ambassador.create({ 
   
@@ -46,6 +53,14 @@ export async function createTeam(ambassadorId, teamName):Promise<any>{
   let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
   
   let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
+
+  let teamCheck = await models.AmbassadorTeam.findOne({where: {team_name:teamName}})
+
+  if(teamCheck){
+
+    throw new Error(`Team name ${teamName} is already taken`)
+
+  }
      
   let resp = await models.AmbassadorTeam.create({
       team_name:teamName,
