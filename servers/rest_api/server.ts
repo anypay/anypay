@@ -646,6 +646,15 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/totals/monthly/accounts",
+    config: {
+      //tags: ['api'],
+      handler: monthlyChartsController.accounts
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/totals/monthly/denomination/{denomination}",
     config: {
       //tags: ['api'],
