@@ -26,6 +26,28 @@ export async function usd() {
   }
 }
 
+export async function accounts() {
+
+  const query = `select extract(month from "createdAt") as mon,
+    extract(year from "createdAt") as yyyy,
+    count(*)
+    from accounts
+    group by 1,2;`;
+
+  try {
+
+    var result = await database.query(query);
+
+    return result[0];
+
+  } catch(error){ 
+
+    logger.error(error.message);
+
+    throw error;
+  }
+}
+
 export async function btc() {
 
   const query = `select extract(month from "createdAt") as mon,
