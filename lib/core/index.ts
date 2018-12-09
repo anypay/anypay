@@ -79,11 +79,11 @@ export async function setAddress(changeset: AddressChangeSet) {
       currency: changeset.currency,
       value: changeset.address
     });
+
   }
 
   emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
-
 
 };
 

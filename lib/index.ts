@@ -17,6 +17,8 @@ import * as database from './database';
 import * as dashwatch from './dashwatch';
 import * as addresses from './addresses';
 import * as coins from './coins';
+import * as xpub from './xpub';
+import * as invoice from './invoice';
 import { log } from './logger';
 import { plugins } from './plugins';
 
@@ -41,7 +43,9 @@ export {
   database,
   dashwatch,
   coins,
-  invoices,
   addresses
+  plugins,
+  invoices,
+  xpub
 }
 
