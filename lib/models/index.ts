@@ -20,6 +20,8 @@ var PayrollAccount = require('./payroll_account');
 var PayrollInvoice = require('./payroll_invoice');
 var PayrollPayment = require('./payrollpayment');
 var AmbassadorTeamJoinRequest = require('./ambassador_team_join_request')(sequelize, Sequelize);
+var ExtendedPublicKey = require('./extended_public_key');
+var DashInstantsendTransaction = require('./dash_instantsend_transaction')(sequelize, Sequelize);
 
 export {
   Account,
@@ -40,6 +42,8 @@ export {
   PayrollInvoice,
   PayrollPayment,
   MerchantBountyReward,
-  AmbassadorTeamJoinRequest
+  AmbassadorTeamJoinRequest,
+  ExtendedPublicKey,
+  DashInstantsendTransaction
 };
 

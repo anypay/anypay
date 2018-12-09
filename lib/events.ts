@@ -12,7 +12,9 @@ let events = [
 
   'invoice.created',
 
-  'invoice.requested'
+  'invoice.requested',
+
+  'dash.instantsend.hashlock'
 
 ];
 
