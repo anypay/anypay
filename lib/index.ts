@@ -14,6 +14,8 @@ import * as cashback from './cashback';
 import * as ambassadors from './ambassadors';
 import * as database from './database';
 import * as dashwatch from './dashwatch';
+import * as xpub from './xpub';
+import * as invoice from './invoice';
 import { log } from './logger';
 
 var oracles = ConfigureOracles(configureOracles);
@@ -29,6 +31,8 @@ export {
   ambassadors,
   log,
   database,
-  dashwatch
+  dashwatch,
+  xpub,
+  invoice
 }
 

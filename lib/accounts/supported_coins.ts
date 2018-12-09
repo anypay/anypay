@@ -1,10 +1,16 @@
 import {Account, Address} from '../models';
 
+import {
+  AccountAddress,
+  AccountAddresses
+} from '../core/types';
+
 function CoinsFromAccount(account) {
   var coins = {
 
     'DASH': {
       code: 'DASH',
+      currency: 'DASH',
       name: 'dash',
       enabled: false,
       icon: 'https://pos.anypay.global/dash.png',
@@ -12,6 +18,7 @@ function CoinsFromAccount(account) {
     },
     'BCH': {
       code: 'BCH',
+      currency: 'BCH',
       name: 'bitcoin cash',
       enabled: false,
       icon: 'https://pos.anypay.global/bch.png',
@@ -19,6 +26,7 @@ function CoinsFromAccount(account) {
     },
     'BTC': {
       code: 'BTC',
+      currency: 'BTC',
       name: 'bitcoin',
       enabled: false,
       icon: 'https://pos.anypay.global/btc.png',
@@ -26,6 +34,7 @@ function CoinsFromAccount(account) {
     },
     'LTC': {
       code: 'LTC',
+      currency: 'LTC',
       name: 'litecoin',
       enabled: false,
       icon: 'https://pos.anypay.global/ltc.png',
@@ -33,6 +42,7 @@ function CoinsFromAccount(account) {
     },
     'XRP': {
       code: 'XRP',
+      currency: 'XRP',
       name: 'ripple',
       enabled: false,
       icon: 'https://pos.anypay.global/xrp.png',
@@ -40,6 +50,7 @@ function CoinsFromAccount(account) {
     },
     'DOGE': {
       code: 'DOGE',
+      currency: 'DOGE',
       name: 'dogecoin',
       enabled: false,
       icon: 'https://pos.anypay.global/doge.png',
@@ -47,6 +58,7 @@ function CoinsFromAccount(account) {
     },
     'ZEC': {
       code: 'ZEC',
+      currency: 'ZEC',
       name: 'zcash',
       enabled: false,
       icon: 'https://pos.anypay.global/zec.png',
@@ -54,6 +66,7 @@ function CoinsFromAccount(account) {
     },
     'BTC.lightning': {
       code: 'BTC',
+      currency: 'BTC',
       name: 'BTC Lightning',
       enabled: false
     }
@@ -110,6 +123,7 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
     accountCoins[address.currency] = {
       code: address.currency,
+      currency: address.currency,
       name: address.currency,
       enabled: true,
       icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`,

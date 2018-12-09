@@ -129,9 +129,61 @@ export async function setAddress(changeset: AddressChangeSet) {
 
   }
 
+  if (changeset.currency === 'DASH') {
+
+    let xpub = await models.ExtendedPublicKey.findOne({ where: {
+
+      account_id: changeset.account_id,
+
+      currency: changeset.currency
+
+    }});
+
+    if (changeset.address.match(/^xpub/)) {
+
+      if (xpub) {
+
+        if (xpub.xpubkey === changeset.address) {
+
+          return;
+
+        }
+
+        xpub.xpubkey = changeset.address;
+
+        xpub.nonce = 0;
+
+        xpub.save();
+
+      } else {
+
+        await models.ExtendedPublicKey.create({
+
+          account_id: changeset.account_id,
+
+          xpubkey: changeset.address,
+
+          nonce: 0,
+
+          currency: changeset.currency
+
+        });
+
+      }
+
+    } else {
+
+      if (xpub) {
+
+        await xpub.destroy();
+
+      }
+
+    }
+  }
+
   emitter.emit('address:set', changeset);
   events.emit('address:set', changeset);
-
 
 };
 
