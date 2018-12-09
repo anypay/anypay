@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const program = require('commander');
 
-import {rpc} from '../';
+import {rpc} from '../lib/jsonrpc';
 
 program
   .command('getbalance')
