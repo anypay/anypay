@@ -148,8 +148,13 @@ class JsonRpc {
   }
 }
 
-module.exports.rpc = new JsonRpc();
+let rpc = new JsonRpc();
 
+export {
+  rpc
+}
+
+  /*
 module.exports.sendPayment = sendPayment;
 
 module.exports.getNewAddress = getNewAddress;
@@ -157,3 +162,5 @@ module.exports.getNewAddress = getNewAddress;
 module.exports.listSinceBlock = listSinceBlock;
 
 module.exports.getBestBlockHash = getBestBlockHash;
+
+   */
