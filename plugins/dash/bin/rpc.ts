@@ -12,7 +12,7 @@ program
 
     try {
 
-      let resp = await rpc.call('getbalance');
+      let resp = await rpc.call('getbalance', []);
 
       console.log('balance', resp);
 
@@ -31,7 +31,7 @@ program
 
     try {
 
-      let resp = await rpc.call('getnewaddress');
+      let resp = await rpc.call('getnewaddress', []);
 
       console.log('address', resp);
 
