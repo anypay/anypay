@@ -127,6 +127,10 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     }
 
+  }
+
+  if (changeset.currency === 'DASH') {
+
     let xpub = await models.ExtendedPublicKey.findOne({ where: {
 
       account_id: changeset.account_id,
@@ -176,12 +180,10 @@ export async function setAddress(changeset: AddressChangeSet) {
       }
 
     }
-
   }
 
   emitter.emit('address:set', changeset);
   events.emit('address:set', changeset);
-
 
 };
 

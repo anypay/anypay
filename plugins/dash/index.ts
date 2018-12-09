@@ -8,6 +8,8 @@ import {statsd} from '../../lib/stats/statsd'
 
 import {log} from '../../lib'
 
+import * as rpc from './lib/jsonrpc';
+
 export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
