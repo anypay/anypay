@@ -83,7 +83,7 @@ module.exports.update = async function(request, reply) {
 
   } catch(error) {
 
-    return Boom.badRequest('valid currency and address must be provided');
+    return Boom.badRequest('valid currency and address must be provided: ${error.message}');
 
   };
 
