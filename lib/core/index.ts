@@ -129,7 +129,7 @@ export async function setAddress(changeset: AddressChangeSet) {
 
   }
 
-  emitter.emit('address:set', changeset);
+  emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
 
 
