@@ -37,6 +37,8 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
   );
 
   if (result[0] === 1) {
+    emitter.emit('invoice.underpaid', invoice)
+    emitter.emit('invoice.payment', invoice)
     return invoice;
   } else {
     throw new Error("error updating invoice");
@@ -64,6 +66,7 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
 
   if (result[0] === 1) {
     emitter.emit('invoice.paid', invoice)
+    emitter.emit('invoice.payment', invoice)
     return invoice;
   } else {
     throw new Error("error updating invoice");
@@ -95,6 +98,8 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
   );
 
   if (result[0] === 1) {
+    emitter.emit('invoice.overpaid', invoice)
+    emitter.emit('invoice.payment', invoice)
     return invoice;
   } else {
     throw new Error("error updating invoice");
