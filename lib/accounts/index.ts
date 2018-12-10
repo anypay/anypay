@@ -4,6 +4,8 @@ import * as models from '../models';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
+import {emitter} from '../events'
+
 export async function registerAccount(email: string, password: string): Promise<any>{
 
   let passwordHash = await hash(password);
@@ -12,6 +14,12 @@ export async function registerAccount(email: string, password: string): Promise<
     email: email,
     password_hash: passwordHash
   });
+
+  if( account ){
+
+    emitter.emit('account.created', account)
+
+  }
 
   return account;
 }

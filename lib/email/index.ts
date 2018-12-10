@@ -69,17 +69,6 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
 
 };
 
-export async function firstInvoicePaidEmail(invoice) {
-  let template = templates['first_paid_invoice'];
-
-  let account = await Account.findOne({ where: {
-    id: invoice.account_id
-  }});
-
-  return sendEmail(account.email, template.subject, template.body);
-
-};
-
 export async function unpaidInvoiceEmail(invoiceId) {
 
   let template = templates['unpaid_invoice'];
@@ -98,9 +87,16 @@ export async function unpaidInvoiceEmail(invoiceId) {
 
 export async function addressChangedEmail(changeset) {
   
-  let subject = `Anypay ${changeset.currency} address updated` 
+  let subject = `Anypay ${changeset.currency} address was set! Your business is now ready to accept ${changeset.currency}!` 
 
-  let body = `Your Anypay ${changeset.currency} payout address has been updated to ${changeset.address}` 
+  let body = `Your Anypay ${changeset.currency} payout address has been updated to ${changeset.address}
+  
+  Wasn’t you? Hm… Maybe you should sign into your account at https://admin.anypay.global and double-check that your {coin} address is set to what you want it to be.
+  
+  
+  Questions? Visit our Support Desk for help, or reply to this email.
+  
+  Best,  Derrick J Freeman` 
 
   let account = await Account.findOne({ where: {
     id: changeset.account_id
@@ -124,7 +120,31 @@ export async function invoicePaidEmail(invoice){
 
 }
 
-emitter.on('create.account', (account) => {
+export async function firstInvoicePaidEmail(invoice){
+
+  let subject = "Cha-ching! Your first paid invoice!"
+
+  let body = "Was it you, just testing the system, or did you really get paid? Either way, you will see the payment from your invoice right away in your wallet. Go check now! See? Your money will go there every time. Each coin address you set will be the ones receiving payments in each respective coin. 
+  
+  Pretty cool, huh?
+  
+  Go make another one and show your staff how it is done so they know what to do when a customer comes in to spend crypto at your business.
+  
+  Questions? Visit our Support Desk for help, or reply to this email.
+
+  Best, 
+  Derrick J Freeman"
+  
+
+  let account = await Account.findOne({ where: {
+    id: invoice.account_id
+  }});
+
+  return sendEmail(account.email, subject, body);
+
+}
+
+emitter.on('account.created', (account) => {
    
   newAccountCreatedEmail(account)
     
@@ -132,18 +152,25 @@ emitter.on('create.account', (account) => {
 
 emitter.on('invoice.created.first', (invoice)=>{
 
-  firstInvoicePaidEmail(invoice)
+  firstInvoiceCreatedEmail(invoice.id)
 
 })
 
-emitter.on('address:set', (changeset)=>{
+emitter.on('address.set', (changeset)=>{
 
   addressChangedEmail(changeset) 
 
 })
 
+emitter.on('invoice.paid.first', (invoice)=>{
+
+  firstInvoicePaidEmail(invoice)
+
+})
+
+
 emitter.on('invoice.paid', (invoice)=>{
 
-//invoicePaidEmail(invoice) 
+  invoicePaidEmail(invoice) 
 
 })

@@ -6,6 +6,12 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import * as database from './database';
+
+import {emitter} from './events'
+
+const log = require("winston");
+
 import * as bch from '../plugins/bch';
 
 import * as xrp from '../plugins/xrp';
@@ -145,6 +151,22 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
+  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${account.id};`
+
+  try{
+
+    var result = await database.query(query);
+
+    if(result[1].rows[0].count==1){
+      emitter.emit('invoice.created.first', invoice)
+    }
+    else{
+      emitter.emit('invoice.created', invoice)
+    }
+  }catch(error){
+    log.error(error)
+  }
+  
   return invoice;
 }
 
