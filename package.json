@@ -11,11 +11,13 @@
     "url": "git://github.com/anypay/payment-service.git"
   },
   "bin": {
-    "dash-payment-service": "getnewaddress.js"
+    "dash-payment-service": "getnewaddress.js",
+    "anypay": "./bin/anypay.ts"
   },
   "dependencies": {
     "@types/bluebird": "^3.5.20",
     "amqplib": "^0.5.2",
+    "ascii-art": "^1.5.0",
     "asciichart": "^1.5.7",
     "async": "^2.5.0",
     "aws-sdk": "^2.229.1",
@@ -69,7 +71,7 @@
     "vision": "^5.3.2",
     "winston": "^2.4.0",
     "ws": "^3.0.0",
-    "yargs": "^12.0.2",
+    "yargs": "^12.0.5",
     "zeromq": "^4.6.0"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 import {EventEmitter} from 'events';
 import {connect} from 'amqplib';
+import {log} from './logger';
 
 let emitter = new EventEmitter();
 
@@ -21,7 +22,7 @@ let events = [
 
   let channel = await amqp.createChannel();
 
-  console.log('amqp channel created');
+  log.info('amqp channel created');
 
   await channel.assertExchange(exchange, 'direct');
 
@@ -35,7 +36,7 @@ let events = [
 
       await channel.publish(exchange, event, new Buffer(message));
 
-      console.log(`published to amqp ${exchange}.${event}`, message)
+      log.info(`published to amqp ${exchange}.${event}`, message)
 
     });
 

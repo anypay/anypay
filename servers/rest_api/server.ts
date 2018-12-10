@@ -886,15 +886,22 @@ async function Server() {
   
 
 if (require.main === module) {
-  // main module, sync database & start server
-  sequelize.sync().then(async () => {
 
-    var server = await Server();
-
-    // Start the server
-    await server.start();
-    console.log("Server running at:", server.info.uri);
-  });
+  start();
 }
 
-export { Server }
+async function start () {
+
+  await sequelize.sync()
+
+  var server = await Server();
+
+  // Start the server
+  await server.start();
+
+  log.info("Server running at:", server.info.uri);
+
+}
+
+export { Server, start }
+

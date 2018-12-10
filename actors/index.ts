@@ -14,7 +14,11 @@ import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
 require('./payment_publisher')
 require('../lib/email/index')
 
+import { log } from '../lib';
+
 async function start() {
+
+  log.info('starting actor system');
 
   await bchPaymentForwarder.start();
   await zenPaymentForwarder.start();
