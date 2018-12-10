@@ -11,6 +11,15 @@ const argv = yargs
   .option('actors', {
     default: false
   })
+  .option('payments', {
+    default: false
+  })
+  .option('websockets', {
+    default: false
+  })
+  .option('blockcypher', {
+    default: false
+  })
   .argv
 
 import * as asciiart from 'ascii-art';
@@ -38,6 +47,42 @@ import * as asciiart from 'ascii-art';
   } else {
 
     require('../actors').start();
+
+  }
+
+  if (argv.payments) {
+
+    lib.log.info('start payment processor');
+
+    require('../servers/processor/payments/main.ts');
+
+  } else {
+
+    lib.log.info('payment processor disabled');
+
+  }
+
+  if (argv.websockets) {
+
+    lib.log.info('start websocket server');
+
+    require('../servers/websocket/server.ts');
+
+  } else {
+
+    lib.log.info('websocket server disabled');
+
+  }
+
+  if (argv.blockcypher) {
+
+    lib.log.info('start blockcypher webhook server');
+
+    require('../servers/blockcypher/server.ts');
+
+  } else {
+
+    lib.log.info('blockcypher webhook server disabled');
 
   }
 

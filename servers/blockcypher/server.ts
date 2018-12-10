@@ -15,7 +15,7 @@ const Boom = require('boom');
 
 var server = new Hapi.Server({
   host: process.env.HOST || "localhost",
-  port: process.env.PORT || 8000,
+  port: process.env.PORT || 8100,
   routes: {
     cors: true,
     validate: {
@@ -196,7 +196,7 @@ amqp
       try {
 
         await server.start();
-        log.info("server:started", server.info.uri);
+        log.info("blockcypher webhook server started", server.info.uri);
 
       } catch(err) {
 
