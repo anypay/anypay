@@ -11,8 +11,10 @@
 
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
+<<<<<<< HEAD
 
 import * as instantsend from './instantsend/actor';
+import * as webhooks from './webhooks/actor';
 
 require('./payment_publisher')
 require('../lib/email/index')
@@ -42,6 +44,7 @@ async function start(actors?: any) {
     await bchPaymentForwarder.start();
     await zenPaymentForwarder.start();
     await instantsend.start();
+    await webhooks.start();
 
   }
 

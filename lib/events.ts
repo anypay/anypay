@@ -12,7 +12,11 @@ let events = [
 
   'invoice.created',
 
-  'invoice.requested'
+  'invoice.requested',
+
+  'invoice.payment',
+
+  'invoice.complete'
 
 ];
 
