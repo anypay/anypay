@@ -10,9 +10,7 @@ export async function listAll() {
 
 }
 
-export async function register(accountId: string, name?: string) {
-
-  log.info('ambassadors.register', { accountId, name });
+export async function register(accountId: number, name?: string) {
 
   let account = await models.Account.findOne({ where: { id: accountId }});
 
@@ -22,7 +20,21 @@ export async function register(accountId: string, name?: string) {
 
   }
 
-  let resp = await models.Ambassador.create({ name, account_id: account.id });
+  let ambassador = await models.Ambassador.findOne({ where:{account_id:accountId}})
+  if(ambassador){
+
+    throw new Error('Account is already an ambassador')
+
+  }
+
+  log.info('ambassadors.register', { accountId, name });
+
+  let resp = await models.Ambassador.create({ 
+  
+    account_id: accountId,
+    name: name
+   
+    });
 
   return resp;
 
@@ -30,7 +42,7 @@ export async function register(accountId: string, name?: string) {
 
 export async function create(accountId, name?: string): Promise<any>{
 
-  return register(accountId, name)
+  return await register(accountId, name)
 
 }
 
@@ -41,6 +53,14 @@ export async function createTeam(ambassadorId, teamName):Promise<any>{
   let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }});
   
   let account = await models.Account.findOne({ where: { id: ambassador.account_id } })
+
+  let teamCheck = await models.AmbassadorTeam.findOne({where: {team_name:teamName}})
+
+  if(teamCheck){
+
+    throw new Error(`Team name ${teamName} is already taken`)
+
+  }
      
   let resp = await models.AmbassadorTeam.create({
       team_name:teamName,
@@ -219,15 +239,17 @@ export async function rejectClaim(claimId: number) {
 
   log.info('ambassadors.claim.reject', {claimId });
 
-  await models.AmbassadorClaim.update({
+  let claim = await models.AmbassadorClaim.findOne({ where: {
 
-    status: 'rejected'
+    id: claimId
 
-  }, {
+  }});
 
-    where: { id: claimId }
-  
-  });
+  claim.status = 'rejected';
+
+  await claim.save();
+
+  return claim
 
 }
 
@@ -258,6 +280,8 @@ export async function verifyClaim(claimId: number) {
   claim.status = 'verified';
 
   await claim.save();
+
+  return claim
 
 }
 
