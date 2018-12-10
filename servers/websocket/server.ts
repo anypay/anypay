@@ -12,6 +12,8 @@ const PORT = process.env.PORT || 3000;
 const subscriptions = {};
 const invoices = {};
 
+import { log } from '../../lib';
+
 function subscribeInvoice(client, invoice) {
   subscriptions[client.uid] = invoice;
   if (!invoices[invoice]) {
@@ -42,12 +44,12 @@ function unsubscribeClient(client) {
 
 io.on("connection", client => {
   client.uid = uuid.v4();
-  console.log("client connected", client.uid);
+  log.info("websocket client connected", client.uid);
 
   client.on("subscribe", data => {
     if (data.invoice) {
       subscribeInvoice(client, data.invoice);
-      console.log("client subscripted to invoice", client.uid, data.invoice);
+      log.info("client subscripted to invoice", client.uid, data.invoice);
     }
   });
 
@@ -55,13 +57,13 @@ io.on("connection", client => {
     let invoice = subscriptions[client.uid];
     unsubscribeClient(client);
 
-    console.log("client disconnected", client.uid);
-    console.log("client unsubscribed", client.uid, invoice);
+    log.info("websocket client disconnected", client.uid);
+    log.info("client unsubscribed", client.uid, invoice);
   });
 });
 
 server.listen(PORT, () => {
-  console.log(`Serving Websockets on Port ${PORT}`);
+  log.info(`Serving Websockets on Port ${PORT}`);
 });
 
 const AMQP_URL = process.env.AMQP_URL;
@@ -73,21 +75,21 @@ if (!AMQP_URL) {
 
   let conn = await amqp.connect(AMQP_URL);
 
-  console.log("amqp:connected", AMQP_URL);
+  log.info("websockets.amqp.connected");
 
   let channel = await conn.createChannel();
 
-  console.log("channel:created");
+  log.info("channel:created");
 
   await channel.assertQueue(QUEUE);
 
   await channel.bindQueue(QUEUE, 'anypay:invoices', 'invoice:paid');
 
-  console.log(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
+  log.info(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
 
   channel.consume(QUEUE, message => {
 
-    console.log('message', message.content.toString());
+    log.info('message', message.content.toString());
 
     handleInvoicePaid(message.content.toString());
 

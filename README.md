@@ -1,3 +1,20 @@
+## Usage
+
+```
+
+npm install
+npm link
+
+anypay --api --websockets --blockcypher --actors --payments
+  ___   _   _ __   ________   ___  __   __
+ / _ \ | \ | |\ \ / /| ___ \ / _ \ \ \ / /
+/ /_\ \|  \| | \ V / | |_/ // /_\ \ \ V /
+|  _  || . ` |  \ /  |  __/ |  _  |  \ /
+| | | || |\  |  | |  | |    | | | |  | |
+\_| |_/\_| \_/  \_/  \_|    \_| |_/  \_/
+
+```
+
 
 ## Configuration
 

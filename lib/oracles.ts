@@ -14,12 +14,12 @@ export class Oracles {
   registerOracle(oracle: Oracle) {
 
     if (this.oracles[oracle.name]) {
-      log.info('oracle already registered', oracle.name);
+      //log.info('oracle already registered', oracle.name);
       return oracle;
     } else {
 
       this.oracles[oracle.name] = oracle;
-      log.info('oracle registered', oracle.name);
+      //log.info('oracle registered', oracle.name);
       this.events.emit('oracle:registered', oracle.name)
       return oracle;
     }
