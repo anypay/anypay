@@ -9,7 +9,8 @@ const argv = yargs
     default: false
   })
   .option('actors', {
-    default: false
+    default: false,
+    alias: 'a'
   })
   .option('payments', {
     default: false
@@ -46,7 +47,7 @@ import * as asciiart from 'ascii-art';
 
   } else {
 
-    require('../actors').start();
+    require('../actors').start(argv.actors);
 
   }
 
