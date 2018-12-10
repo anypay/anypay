@@ -82,6 +82,7 @@
     "ts-node": "^6.0.5"
   },
   "scripts": {
+    "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
     "servers:blockcypher:start": "ts-node servers/blockcypher/server.ts",
     "processor:blockcypher:start": "ts-node servers/processor/blockcypher/main.ts",
