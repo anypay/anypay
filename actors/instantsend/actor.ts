@@ -4,7 +4,7 @@ require('dotenv').config();
 var zmq = require('zeromq');
 var sock = zmq.socket('sub');
 
-import { log } from '../../lib';
+import { log, models } from '../../lib';
 import { emitter } from '../../lib/events';
 import { DashInstantsendTransaction } from '../../lib/models';
 import { getTransaction } from '../../plugins/dash/lib/jsonrpc';
@@ -48,17 +48,22 @@ emitter.on("dash.instantsend.hashlock", async (hash) => {
 
   payments.forEach(async (payment) => {
 
-    let invoice = await receivePayment(payment);
+    let { id } = await receivePayment(payment);
 
+    let invoice = await models.Invoice.findOne({ where: { id }});
+    
     if (invoice) {
       log.info(`invoice found for payment ${payment.hash}`);
 
       console.log("INVOICE PAID WITH INSTANTSEND");
 
-      // mark invoice as complete
-      // mark invoice as completed_at
-      // mark invoice with instantsend = true
-      // emit invoice.complete event
+      invoice.complete = true;
+      invoice.completed_at = new Date();
+      invoice.instantsend = true;
+
+      await invoice.save();
+
+      emitter.emit('invoice.complete', invoice.uid);
 
     } else {
 
