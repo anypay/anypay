@@ -4,6 +4,17 @@ const program = require('commander');
 
 import {checkAddressForPayments} from '../lib/check_for_payments';
 import {handlePayment} from '../../../lib/payment_processor';
+import {getTransaction} from '../lib/jsonrpc';
+
+program
+  .command('gettransaction <hash>')
+  .action(async (hash) => {
+
+    let tx = await getTransaction(hash);
+
+    console.log(tx);
+
+  });
 
 program
   .command('checkaddressforpayment <address>')
@@ -35,4 +46,6 @@ program
     process.exit(0);
 
   });
+
+program.parse(process.argv);
 

@@ -79,11 +79,13 @@
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.1.2",
     "mocha": "^5.2.0",
+    "nodemon": "^1.18.8",
     "ts-node": "^6.0.5"
   },
   "scripts": {
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
     "servers:blockcypher:start": "ts-node servers/blockcypher/server.ts",
     "processor:blockcypher:start": "ts-node servers/processor/blockcypher/main.ts",
     "processor:payments:start": "ts-node servers/processor/payments/main.ts",
