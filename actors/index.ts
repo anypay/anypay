@@ -32,7 +32,7 @@ async function start(actors?: any) {
 
   }
 
-  if (actors === true ) {
+  if (actors === true || typeof actors === 'undefined') {
 
     log.info('start all actors');
 
