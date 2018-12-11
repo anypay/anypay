@@ -59,6 +59,7 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
 
   let template = templates['first_invoice_created'];
 
+  let invoice = await Invoice.findOne({where:{id:invoiceId}})
   let account = await Account.findOne({ where: {
     id: invoice.account_id
   }});
@@ -94,7 +95,7 @@ export async function addressChangedEmail(changeset) {
 
   let body = template.body
   body = body.replace("ADDRESS", changeset.address)
-  body = body.replace("CURRENCY", changeset.currency))
+  body = body.replace("CURRENCY", changeset.currency)
 
   let account = await Account.findOne({ where: {
     id: changeset.account_id
@@ -124,13 +125,14 @@ export async function invoicePaidEmail(invoice){
 
 export async function firstInvoicePaidEmail(invoice){
 
-  
+
+  let template = templates["first_paid_invoice"]
 
   let account = await Account.findOne({ where: {
     id: invoice.account_id
   }});
 
-  return sendEmail(account.email, subject, body);
+  return sendEmail(account.email, template.subject, template.body);
 
 }
 
