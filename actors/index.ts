@@ -11,6 +11,9 @@
 
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
+
+import * as instantsend from './instantsend/actor';
+
 require('./payment_publisher')
 require('../lib/email/index')
 
@@ -32,12 +35,13 @@ async function start(actors?: any) {
 
   }
 
-  if (actors === true ) {
+  if (actors === true || typeof actors === 'undefined') {
 
     log.info('start all actors');
 
     await bchPaymentForwarder.start();
     await zenPaymentForwarder.start();
+    await instantsend.start();
 
   }
 
