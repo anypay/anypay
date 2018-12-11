@@ -16,12 +16,30 @@ require('../lib/email/index')
 
 import { log } from '../lib';
 
-async function start() {
+async function start(actors?: any) {
 
   log.info('starting actor system');
 
-  await bchPaymentForwarder.start();
-  await zenPaymentForwarder.start();
+  if (Array.isArray(actors)) {
+
+    log.info(`actors specified ${JSON.stringify(actors)}`);
+
+  }
+
+  if (typeof actors === 'string') {
+
+    log.info(`start single actor "${actors}"`);
+
+  }
+
+  if (actors === true || typeof actors === 'undefined') {
+
+    log.info('start all actors');
+
+    await bchPaymentForwarder.start();
+    await zenPaymentForwarder.start();
+
+  }
 
 }
 
