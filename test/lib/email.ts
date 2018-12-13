@@ -78,11 +78,11 @@ describe("Automated Emails", ()=>{
 
     })
 
-    it("should emit an event when the first invoice is created for the first time", (done)=>{
+    it("should emit an event when the first invoice is created", (done)=>{
 
       let sem = false 
 
-      emitter.on('invoice.created.first', (p)=>{
+      emitter.on('invoice.created', (p)=>{
 	if(!sem){
 	  done()
 	}
