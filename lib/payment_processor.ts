@@ -1,6 +1,8 @@
 const InvoiceModel = require("./models/invoice");
 import { Payment, Invoice } from "../types/interfaces";
 import {emitter} from './events';
+const log = require("winston");
+import * as database from './database';
 
 export async function handlePayment(invoice: Invoice, payment: Payment) {
   if (invoice.amount === payment.amount) {
@@ -64,9 +66,27 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
     }
   );
 
+
+  
   if (result[0] === 1) {
+
     emitter.emit('invoice.paid', invoice)
     emitter.emit('invoice.payment', invoice.uid)
+
+    const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id} AND status='paid';`
+  
+    try{
+  
+      var result = await database.query(query);
+
+      if(result[1].rows[0].count==1){
+        emitter.emit('invoice.paid.first', invoice)
+      } 
+
+    }catch(err){
+     log.error(err)
+    }
+
     return invoice;
   } else {
     throw new Error("error updating invoice");
