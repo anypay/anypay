@@ -153,6 +153,7 @@ emitter.on('invoice.created', (invoice)=>{
     if(result[1].rows[0].count==1){
 
       firstInvoiceCreatedEmail(invoice.id)
+      emitter.emit('invoice.created.first')
 
     }
   }catch(error){
