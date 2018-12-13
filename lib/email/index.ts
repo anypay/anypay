@@ -136,13 +136,7 @@ export async function firstInvoicePaidEmail(invoice){
 
 }
 
-emitter.on('account.created', (account) => {
-   
-  newAccountCreatedEmail(account)
-    
-})   
-
-emitter.on('invoice.created', (invoice)=>{
+async function checkInvoiceCount(invoice){
 
   const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`
 
@@ -160,6 +154,21 @@ emitter.on('invoice.created', (invoice)=>{
     log.error(error)
   }
 
+
+}
+
+emitter.on('account.created', (account) => {
+   
+  newAccountCreatedEmail(account)
+    
+})   
+
+
+
+emitter.on('invoice.created', (invoice)=>{
+ 
+  checkInvoiceCount(invoice)
+ 
 })
 
 emitter.on('address.set', (changeset)=>{
