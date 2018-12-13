@@ -64,7 +64,7 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
     id: invoice.account_id
   }});
 
-  return sendEmail("derrick@anypay.global", template.subject, template.body);
+  return sendEmail(account.email, template.subject, template.body);
 
 };
 
