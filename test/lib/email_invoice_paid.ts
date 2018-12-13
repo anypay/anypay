@@ -25,7 +25,7 @@ describe("Emails when invoice is paid", ()=>{
 
     let sem = false 
 
-    emitter.on('invoice.paid.first', (p)=>{
+    emitter.on('invoice.paid', (p)=>{
       if(!sem){
         done()
       }
