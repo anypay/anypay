@@ -157,6 +157,28 @@ async function checkInvoiceCount(invoice){
 
 }
 
+async function checkInvoicePaidCount(invoice){
+
+  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id} AND status='paid';`
+  
+  try{
+  
+    var result = await database.query(query);
+
+    if(result[1].rows[0].count==1){
+      emitter.emit('invoice.paid.first', invoice)
+      firstInvoicePaidEmail(invoice)
+    }
+    else{
+      invoicePaidEmail(invoice)
+    }
+
+  }catch(err){
+    log.error(err)
+  }
+
+}
+
 emitter.on('account.created', (account) => {
    
   newAccountCreatedEmail(account)
@@ -183,9 +205,8 @@ emitter.on('invoice.paid.first', (invoice)=>{
 
 })
 
-
 emitter.on('invoice.paid', (invoice)=>{
 
-  invoicePaidEmail(invoice) 
+  checkInvoicePaidCount(invoice)
 
 })
