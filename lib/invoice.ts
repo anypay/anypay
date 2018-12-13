@@ -151,21 +151,7 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
-  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${account.id};`
-
-  try{
-
-    var result = await database.query(query);
-
-    if(result[1].rows[0].count==1){
-      emitter.emit('invoice.created.first', invoice)
-    }
-    else{
-      emitter.emit('invoice.created', invoice)
-    }
-  }catch(error){
-    log.error(error)
-  }
+  emitter.emit('invoice.created', invoice)
   
   return invoice;
 }

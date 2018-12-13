@@ -142,9 +142,22 @@ emitter.on('account.created', (account) => {
     
 })   
 
-emitter.on('invoice.created.first', (invoice)=>{
+emitter.on('invoice.created', (invoice)=>{
 
-  firstInvoiceCreatedEmail(invoice.id)
+  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`
+
+  try{
+
+    var result = await database.query(query);
+
+    if(result[1].rows[0].count==1){
+
+      firstInvoiceCreatedEmail(invoice.id)
+
+    }
+  }catch(error){
+    log.error(error)
+  }
 
 })
 
