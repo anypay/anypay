@@ -42,7 +42,7 @@ function CoinsFromAccount(account) {
     },
     'DOGE': {
       code: 'DOGE',
-      name: 'dogeoin',
+      name: 'dogecoin',
       enabled: false,
       icon: 'https://pos.anypay.global/doge.png',
       address: account.dogecoin_address
@@ -124,7 +124,11 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
   coins.forEach(coin => {
 
-    accountCoins[coin.code].unavailable = coin.unavailable;
+    if (accountCoins[coin.code]) {
+
+      accountCoins[coin.code].unavailable = coin.unavailable;
+
+    }
 
   });
 
