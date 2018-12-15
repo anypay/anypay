@@ -42,7 +42,7 @@ function CoinsFromAccount(account) {
     },
     'DOGE': {
       code: 'DOGE',
-      name: 'dogecoin',
+      name: 'dogeoin',
       enabled: false,
       icon: 'https://pos.anypay.global/doge.png',
       address: account.dogecoin_address
