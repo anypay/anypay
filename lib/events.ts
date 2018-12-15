@@ -1,10 +1,16 @@
 require('dotenv').config();
 
-import {EventEmitter} from 'events';
+import { EventEmitter2 } from 'eventemitter2';
 import {connect} from 'amqplib';
 import {log} from './logger';
 
-let emitter = new EventEmitter();
+import {publishEventToSlack} from './slack/events';
+
+let emitter = new EventEmitter2({
+
+  wildcard: true
+
+});
 
 const exchange = 'anypay.events';
 
@@ -46,6 +52,36 @@ let events = [
 
   });
 
+  emitter.on('*', async function (data) {
+
+    log.info(`event emitted: ${this.event}`);
+
+    let message = JSON.stringify(data);
+
+    await channel.publish(exchange, this.event, new Buffer(message));
+
+    log.info(`published to amqp ${exchange}.${this.event}`, message)
+
+  });
+
+  log.info('bound all events to amqp');
+
+  emitter.on('*', async function (data) {
+
+    try {
+
+      let resp = await publishEventToSlack(`${this.event} ${JSON.stringify(data)}`)
+
+      log.info(`published to slack ${this.event}`, data)
+
+    } catch (error) {
+
+      console.log('error', error.msg);
+    }
+
+  });
+
+  log.info('bound to all events to slack');
 
 })()
 
