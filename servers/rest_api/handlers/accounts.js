@@ -29,9 +29,9 @@ module.exports.create = async (request, reply) => {
     });
 
     Slack.notify(`account:created | ${account.email}`);
-
-    emitter.emit('create.account', account)
     
+    emitter.emit('account.created', account)
+
     return account;
 
   } catch(error) {

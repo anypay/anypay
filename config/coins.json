@@ -1,0 +1,51 @@
+{
+  "coins": [
+
+    {
+      "code": "DASH",
+      "name": "DASH",
+      "icon_url": ""
+    },
+
+    {
+      "code": "BCH",
+      "name": "Bitcoin Cash",
+      "icon_url": "",
+      "unavailable": true
+    },
+
+    {
+      "code": "BTC",
+      "name": "Bitcoin",
+      "icon_url": ""
+    },
+
+    {
+      "code": "DOGE",
+      "name": "Dogecoin",
+      "icon_url": ""
+    },
+
+    {
+      "code": "XRP",
+      "name": "XRP",
+      "icon_url": ""
+    },
+
+    {
+      "code": "ZEN",
+      "name": "Horizen",
+      "icon_url": ""
+    },
+
+    {
+      "code": "ZEC",
+      "name": "Zcash",
+      "icon_url": "",
+      "unavailable": true
+    }
+
+  ]
+}
+
+

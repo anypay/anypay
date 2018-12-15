@@ -10,6 +10,7 @@ const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 const AccountsController = require("./handlers/accounts");
+const SudoCoins = require("./handlers/sudo_coins");
 const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
@@ -826,6 +827,53 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: AmbassadorsController.list
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/coins',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.list
+
+    }
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/coins/activate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.activate
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/coins/deactivate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.deactivate
 
     }
 
