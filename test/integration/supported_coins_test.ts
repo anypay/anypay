@@ -3,6 +3,8 @@ import * as assert from 'assert';
 import {hash} from '../../lib/password';
 import * as Database from '../../lib/database';
 
+import { deactivateCoin, activateCoin } from '../../lib/coins';
+
 import {
   settings,
   models,
@@ -12,7 +14,7 @@ import {
 import * as Chance from 'chance';
 const chance = new Chance();
 
-describe("Setting Denomination Via REST", async () => {
+describe("Account Coins over HTTP", async () => {
   var accessToken, account, server;
   
   before(async () => {
@@ -22,6 +24,7 @@ describe("Setting Denomination Via REST", async () => {
     account = await accounts.registerAccount(chance.email(), chance.word());
 
     accessToken = await accounts.createAccessToken(account.id);
+
 
   });
 
@@ -36,8 +39,6 @@ describe("Setting Denomination Via REST", async () => {
         }
       });
 
-      console.log('supported coins', response.result.coins);
-
       assert(response.result.coins);
 
     } catch(error) {
@@ -45,6 +46,47 @@ describe("Setting Denomination Via REST", async () => {
       console.error('ERROR', error.message);
       throw error;
     }
+  });
+
+  describe("Making Coins Unavailable", () => {
+
+    it("coins.deactivateCoin should reflect in the response", async () => {
+
+      await deactivateCoin('DASH');
+
+      let response = await server.inject({
+        method: 'GET',
+        url: '/coins',
+        headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
+      });
+
+      let dash = response.result.coins.find(c => c.code === 'DASH');
+
+      assert(dash.unavailable);
+
+    });
+
+    it("coins.activateCoin should reflect in the response", async () => {
+
+      await deactivateCoin('DASH');
+      await activateCoin('DASH');
+
+      let response = await server.inject({
+        method: 'GET',
+        url: '/coins',
+        headers: {
+          'Authorization': auth(accessToken.uid, "")
+        }
+      });
+
+      let dash = response.result.coins.find(c => c.code === 'DASH');
+
+      assert(!dash.unavailable);
+
+    });
+
   });
 
 })
