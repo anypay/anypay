@@ -1,4 +1,5 @@
 "use strict";
+require('dotenv').config();
 const AccessToken = require("../lib/models/access_token");
 
 module.exports = {

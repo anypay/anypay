@@ -8,6 +8,7 @@ var Ambassador = require('./ambassador')(sequelize, Sequelize);
 var AmbassadorClaim = require('./ambassador_claim')(sequelize, Sequelize);
 var AmbassadorTeam = require('./ambassador_team')(sequelize, Sequelize);
 var AmbassadorTeamMember = require('./ambassador_team_member')(sequelize, Sequelize);
+var Coin = require('./coin')(sequelize, Sequelize);
 var DashBackMerchant = require('./dash_back_merchant');
 var DashBackMerchantPayment = require('./dash_back_merchant_payment');
 var DashBackCustomerPayment = require('./dash_back_customer_payment');
@@ -30,6 +31,7 @@ export {
   AmbassadorClaim,
   AmbassadorTeam,
   AmbassadorTeamMember,
+  Coin,
   DashBackMerchant,
   DashBackMerchantPayment,
   DashBackCustomerPayment,
