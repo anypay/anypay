@@ -820,6 +820,70 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/sudo/accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/invoices',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoIndex
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.destroy
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/sudo/ambassadors',
 
     config: {
