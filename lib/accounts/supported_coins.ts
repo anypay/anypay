@@ -1,5 +1,7 @@
 import {Account, Address} from '../models';
 
+import { getCoins } from '../coins';
+
 function CoinsFromAccount(account) {
   var coins = {
 
@@ -114,6 +116,18 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
       enabled: true,
       icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`,
       address: address.value
+    }
+
+  });
+
+  let coins = await getCoins();
+
+  coins.forEach(coin => {
+
+    if (accountCoins[coin.code]) {
+
+      accountCoins[coin.code].unavailable = coin.unavailable;
+
     }
 
   });
