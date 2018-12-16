@@ -34,6 +34,7 @@ const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
+import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
 import { sudoLogin } from './handlers/sudo_login'
 const Joi = require('joi');
@@ -827,6 +828,38 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: AccountsController.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/payment_forwards',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/payment_forwards/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.show
 
     }
 
