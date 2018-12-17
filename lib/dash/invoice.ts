@@ -22,19 +22,19 @@ function addAddress(address) {
 module.exports.generate = async function generate(dollarAmount, accountId):
 Promise<any> {
 
-  var account = await Account.findOne({ where: { id: accountId }})
-
-  if (!account || !account.dash_payout_address) {
-    throw new Error('no dash payout address');
-  }
-
   console.log('about to genereate dash address')
 
-  var address = await DashAddressService.getNewAddress(dollarAmount, account.dash_payout_address)
+  let payoutAddress = await models.Address.findOne({
+  	where: {
+		currency: 'DASH',
+		account_id: accountId
+	}
+  });
+
+
+  address = await DashAddressService.getNewAddress(payoutAddress.value)
 
   console.log('dash address generated', address);
-
-  //let dashAmount = DashPrice.convertDollarsToDash(dollarAmount).toFixed(5);
 
   const denominationAmount = {
     currency: 'USD',
@@ -51,8 +51,6 @@ Promise<any> {
     account_id: accountId,
     status: 'unpaid'
   })
-
-  //await addAddress(address);
 
   return invoice;
 }

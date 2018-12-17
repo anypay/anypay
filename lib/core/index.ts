@@ -55,55 +55,6 @@ export async function setAddress(changeset: AddressChangeSet) {
 
   }
 
-  var updateParams;
-
-  switch(changeset.currency) {
-  case 'DASH':
-    updateParams = {
-      dash_payout_address: changeset.address
-    };
-    break; 
-  case 'BTC':
-    updateParams = {
-      bitcoin_payout_address: changeset.address
-    };
-    break; 
-  case 'BCH':
-    updateParams = {
-      bitcoin_cash_address: changeset.address
-    };
-    break; 
-  case 'LTC':
-    updateParams = {
-      litecoin_address: changeset.address,
-      litecoin_enabled: true
-    };
-    break;
-  case 'XRP':
-    updateParams = {
-      ripple_address: changeset.address
-    };
-    break;
-  case 'ZEC':
-    updateParams = {
-      zcash_t_address: changeset.address
-    };
-    break;
-  case 'DOGE':
-    updateParams = {
-      dogecoin_address: changeset.address,
-      dogecoin_enabled: false
-    };
-    break;
-  default:
-  }
-
-  if (updateParams) {
-
-    var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
-
-  } else {
-
     var address = await models.Address.findOne({ where: {
       account_id: changeset.account_id,
       currency: changeset.currency
@@ -127,8 +78,6 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     }
 
-  }
-
   emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
 
@@ -137,61 +86,12 @@ export async function setAddress(changeset: AddressChangeSet) {
 
 export async function unsetAddress(changeset: AddressChangeSet) {
 
-  var updateParams;
-
-  switch(changeset.currency) {
-  case 'DASH':
-    updateParams = {
-      dash_payout_address: null
-    };
-    break; 
-  case 'BTC':
-    updateParams = {
-      bitcoin_payout_address: null
-    };
-    break; 
-  case 'BCH':
-    updateParams = {
-      bitcoin_cash_address: null
-    };
-    break; 
-  case 'LTC':
-    updateParams = {
-      litecoin_address: null
-    };
-    break;
-  case 'XRP':
-    updateParams = {
-      ripple_address: null
-    };
-    break;
-  case 'ZEC':
-    updateParams = {
-      zcash_t_address: null
-    };
-    break;
-  case 'DOGE':
-    updateParams = {
-      dogecoin_address: null
-    };
-    break;
-  default:
-  }
-
-  if (updateParams) {
-
-    var res = await Account.update(updateParams, {where: { id: changeset.account_id }});
-
-  } else {
-
     var address = await models.Address.findOne({ where: {
       account_id: changeset.account_id,
       currency: changeset.currency
     }});
 
     await address.destroy({ force: true });
-
-  }
 
   events.emit('address:unset', changeset);
 

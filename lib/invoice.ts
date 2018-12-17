@@ -62,17 +62,13 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      let account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
+      address = (await models.Address.findOne({ where: { account_id: accountId, currency:'BCH' }})).value;
 
       break;
 
     case 'XRP':
 
-      let xrp_account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await xrp.generateInvoiceAddress(xrp_account.ripple_address);
+      address  = (await models.Address.findOne({ where: { account_id: accountId,currency:'XRP' }})).value;
 
       break;
 
