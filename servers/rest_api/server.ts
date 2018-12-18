@@ -34,8 +34,10 @@ const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
+import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
 import { sudoLogin } from './handlers/sudo_login'
+import * as DashBackMerchants from './handlers/dash_back_merchants';
 const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
@@ -811,6 +813,166 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/dashback/merchants',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: DashBackMerchants.sudoList
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/dashback/merchants/{email}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: DashBackMerchants.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/dashback/merchants/{email}/activate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: DashBackMerchants.sudoActivate
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/dashback/merchants/{email}/deactivate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: DashBackMerchants.sudoDeactivate
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/payment_forwards',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/payment_forwards/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/invoices',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoIndex
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.destroy
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoShow
 
     }
 
