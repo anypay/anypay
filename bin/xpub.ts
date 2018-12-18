@@ -5,7 +5,34 @@ require('dotenv').config();
 var program = require('commander');
 const Util = require("../lib/dash/extended_public_key_util");
 
-import {models} from '../lib';
+import {log, models} from '../lib';
+
+import * as xpublib from '../lib/xpub/index';
+
+program
+  .command('randomxpub <currency>')
+  .action(async (currency) => {
+
+    let xpub = xpublib.randomXpubKey(currency);
+
+    console.log(xpub);
+
+    process.exit(0);
+
+  });
+
+program
+  .command('generateaddress <currency> <xpubkey> <nonce>')
+  .action(async (currency, xpubkey, nonce) => {
+
+    let address = xpublib.generateAddress(currency, xpubkey, nonce);
+
+    console.log(address);
+
+    process.exit(0);
+
+  });
+
 
 program
   .command('setkey <email> <xpub>')
@@ -43,8 +70,8 @@ program
   });
 
 program
-  .command('getnewaddress <email>')
-  .action(async (email) => {
+  .command('getnewaddress <email> <currency>')
+  .action(async (email, currency) => {
 
     let account = await models.Account.findOne({ where: { email }});
 
@@ -56,7 +83,9 @@ program
 
     let xpubkey = await models.ExtendedPublicKey.findOne({ where: {
 
-      account_id: account.id
+      account_id: account.id,
+
+      currency
 
     }});
 
@@ -66,7 +95,7 @@ program
 
     }
 
-    let address = Util.generate(xpubkey.xpubkey, `m/0/${xpubkey.nonce}`);
+    let address = xpublib.generateAddress(currency, xpubkey.xpubkey, xpubkey.nonce);
 
     xpubkey.nonce = xpubkey.nonce + 1;
 

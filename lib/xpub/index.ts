@@ -1,0 +1,58 @@
+import * as bitcoincash from 'bitcore-lib-cash';
+import * as dash from 'bitcore-lib-dash';
+import * as dogecoin from 'dogecore-lib';
+
+function getBitcore(currency: string) {
+
+  var bitcore;
+
+  switch(currency) {
+  case 'BCH':
+    bitcore = bitcoincash;
+    break;
+  case 'DASH':
+    bitcore = dash;
+    break;
+  case 'DOGE':
+    bitcore = dogecoin;
+    break;
+  default:
+    throw new Error(`xpubkeys for ${currency} not supported`);
+  }
+
+  return bitcore;
+
+}
+
+export function generateHDPrivateKey(currency: string) {
+
+  let bitcore = getBitcore(currency);
+
+  let hdPrivateKey = new bitcore.HDPrivateKey();
+  let xPrivKey = hdPrivateKey.derive("m/0'");
+
+  return xPrivKey;
+
+}
+
+export function generateAddress(currency: string, xpubkey: string, nonce: number) {
+
+  let bitcore = getBitcore(currency);
+
+  var NETWORK = bitcore.Networks.livenet;
+
+  let pkey = new bitcore.HDPublicKey.fromBuffer(new Buffer(xpubkey));
+
+  let address = new bitcore.Address(pkey.derive(`m/0/${nonce}`).publicKey, NETWORK);
+
+  return address.toString();
+
+}
+
+export function randomXpubKey(currency: string) {
+
+  let hdPrivateKey = generateHDPrivateKey(currency);
+
+  return hdPrivateKey.hdPublicKey.toString();
+
+}
