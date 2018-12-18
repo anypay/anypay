@@ -8,6 +8,8 @@ import * as ZencashAddressService from './zencash/address_service';
 
 import * as database from './database';
 
+import { Payment } from '../types/interfaces';
+
 import {emitter} from './events'
 
 const log = require("winston");
@@ -154,6 +156,32 @@ export async function generateInvoice(
   emitter.emit('invoice.created', invoice)
   
   return invoice;
+}
+
+/*
+
+  Function to mark invoice as paid, accepts an Invoice model record, and a
+  Payment struct.
+
+  Called after the settlement payment has already been sent
+
+  Emits an event `invoice.settled`
+
+*/
+
+export async function settleInvoice(invoice, settlementPayment: Payment) {
+
+  invoice.output_hash = settlementPayment.hash;
+  invoice.output_amount = settlementPayment.amount;
+  invoice.output_address = settlementPayment.address;
+  invoice.output_currency = settlementPayment.currency;
+
+  await invoice.save();
+
+  emitter.emit('invoice.settled', invoice.toJSON());
+
+  return invoice;
+
 }
 
 export async function replaceInvoice(uid: string, currency: string) {
