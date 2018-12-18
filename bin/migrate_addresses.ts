@@ -36,7 +36,7 @@ async function migrateAccountAddresses(account) {
 
 		if (address.value) {
 
-			let record = await lib.Address.findOne({ where: {
+			let record = await lib.models.Address.findOne({ where: {
 				currency: address.currency,
 				account_id: account.id
 			}});

@@ -10,9 +10,9 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
   });
 
-  let accountCoins = addresses.reduce((acc, address) => {
-
-    return acc[address.currency] = {
+  let accountCoins  = addresses.reduce((acc,address) => {
+  
+    acc[address.currency] = {
       code: address.currency,
       name: address.currency,
       enabled: true,
@@ -20,7 +20,9 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
       address: address.value
     }
 
-  }, {});
+    return acc;
+
+  },{});
 
   let coins = await getCoins();
 

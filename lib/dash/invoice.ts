@@ -1,5 +1,6 @@
 const Invoice = require('../models/invoice');
 const Account = require('../models/account');
+const Address = require('../models/address');
 const DashAddressService = require('./forwarding_address_service');
 const jayson = require('jayson');
 
@@ -24,7 +25,7 @@ Promise<any> {
 
   console.log('about to genereate dash address')
 
-  let payoutAddress = await models.Address.findOne({
+  let payoutAddress = await Address.findOne({
   	where: {
 		currency: 'DASH',
 		account_id: accountId
@@ -32,7 +33,7 @@ Promise<any> {
   });
 
 
-  address = await DashAddressService.getNewAddress(payoutAddress.value)
+  let address = await DashAddressService.getNewAddress(payoutAddress.value)
 
   console.log('dash address generated', address);
 
