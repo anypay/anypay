@@ -5,6 +5,8 @@ const SLACK_URL = 'https://hooks.slack.com/services/T7NS5H415/B7QRQ76PN/dH2DAqb9
 
 export function notify(message: string) {
 
+  log.info(`notify slack ${message}`);
+
   if (process.env.NODE_ENV === 'production') {
 
     http

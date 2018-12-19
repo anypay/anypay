@@ -119,7 +119,6 @@ export async function generateInvoice(
     value: denominationAmountValue
   }, invoiceCurrency);
 
-  console.log('invoiceAmount', invoiceAmount);
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
 
@@ -148,8 +147,6 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
-  emitter.emit('invoice.created', invoice)
-  
   return invoice;
 }
 

@@ -3,6 +3,7 @@ import * as requireAll from  'require-all';
 import * as AWS from 'aws-sdk';
 import {Account, Invoice} from '../models';
 import {emitter} from '../events'
+import * as database from '../database';
 const log = require("winston");
 AWS.config.update({ region: "us-east-1" });
 
