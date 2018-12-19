@@ -948,6 +948,22 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/sudo/invoices/{invoice_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.show
+
+    }
+
+  });
+
+  server.route({
+
     method: 'DELETE',
 
     path: '/sudo/accounts/{account_id}',

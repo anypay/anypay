@@ -11,7 +11,7 @@ export async function index(request) {
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
 
-  models.PaymentForward.findAll({ offset, limit });
+  return models.PaymentForward.findAll({ offset, limit });
 
 }
 
