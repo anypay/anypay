@@ -18,6 +18,7 @@ import * as dashwatch from './dashwatch';
 import { plugins } from './plugins';
 import * as coins from './coins';
 import { log } from './logger';
+import { plugins } from './plugins';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -29,6 +30,7 @@ var oracles = ConfigureOracles(configureOracles);
 
 export {
   oracles,
+  plugins,
   cashback,
   models,
   accounts,

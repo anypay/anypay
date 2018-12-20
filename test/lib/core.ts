@@ -3,6 +3,7 @@ import { AddressChangeSet } from '../../lib/core/types/address_change_set';
 
 import * as models from '../../lib/models';
 import * as Account from '../../lib/models/account';
+import * as Address from '../../lib/models/address';
 import * as Chance from 'chance';
 import * as assert from 'assert';
 
@@ -10,7 +11,7 @@ var chance = new Chance();
 
 describe("Anypay Core", () => {
 
-  var account;
+  var account, address;
 
   before(async function() {
     let email = chance.email().toUpperCase();
@@ -49,12 +50,13 @@ describe("Anypay Core", () => {
       };
 
       await setAddress(addressChangeset); 
-
-      account = await Account.findOne({ where: {
-        id: account.id
+      
+      address = await Address.findOne({ where: {
+        account_id: account.id,
+        currency:"DASH"
       }});
 
-      assert.strictEqual(account.dash_payout_address, addressChangeset.address);
+      assert.strictEqual(address.value, addressChangeset.address);
 
     });
 
@@ -68,11 +70,12 @@ describe("Anypay Core", () => {
 
       await setAddress(addressChangeset); 
 
-      account = await Account.findOne({ where: {
-        id: account.id
+      address = await Address.findOne({ where: {
+        account_id: account.id,
+	currency: "BTC"
       }});
 
-      assert.strictEqual(account.bitcoin_payout_address, addressChangeset.address);
+      assert.strictEqual(address.value, addressChangeset.address);
 
     });
 
@@ -103,13 +106,16 @@ describe("Anypay Core", () => {
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
       };
 
+      await setAddress(addressChangeset);
+
       await unsetAddress(addressChangeset); 
 
-      account = await Account.findOne({ where: {
-        id: account.id
+      address = await Address.findOne({ where: {
+        account_id: account.id,
+	currency: "DASH"
       }});
 
-      assert(!account.dash_payout_address);
+      assert(!address);
 
     });
 

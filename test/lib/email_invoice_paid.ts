@@ -15,6 +15,12 @@ describe("Emails when invoice is paid", ()=>{
 
     account = await lib.accounts.create(chance.email(), chance.word())
 
+    await setAddress({
+      account_id:account.id,
+      currency:"XRP",
+      address:"rEdid5kDsz8U4jGqkkvrPgRHpsKQ8gESsG"
+    })
+
     invoice1 = await generateInvoice(account.id, 10, 'XRP');
 
     invoice2 = await generateInvoice(account.id, 1, 'XRP');

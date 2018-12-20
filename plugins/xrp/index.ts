@@ -14,9 +14,23 @@ const routing_key = 'payment';
 
 const exchange = 'anypay.payments';
 
-async function generateInvoiceAddress(settlementAddress:string){
+import {Address} from '../../lib/models' 
 
-  return settlementAddress+'?dt='+Math.floor(Math.random() * (10000000 - 0) + 0)
+async function generateInvoiceAddress(accountId){
+
+  let address = (await Address.findOne({ where: {
+	  currency: 'XRP',
+	  account_id: accountId
+  }})).value;
+
+
+  if (!address) {
+
+    throw new Error('no XRP address');
+
+  }
+
+  return address+'?dt='+Math.floor(Math.random() * (10000000 - 0) + 0)
 
 }
 

@@ -1,6 +1,7 @@
 import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
+import * as RippleAddressService from './ripple/address_service';
 import * as BitcoinAddressService from './bitcoin/address_service';
 import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
@@ -64,17 +65,13 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      let account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
+      address = await BitcoinCashAddressService.getNewAddress(accountId);
 
       break;
 
     case 'XRP':
 
-      let xrp_account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await xrp.generateInvoiceAddress(xrp_account.ripple_address);
+      address = await RippleAddressService.getNewAddress(accountId);
 
       break;
 
@@ -124,7 +121,6 @@ export async function generateInvoice(
     value: denominationAmountValue
   }, invoiceCurrency);
 
-  console.log('invoiceAmount', invoiceAmount);
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
 
@@ -153,8 +149,6 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
-  emitter.emit('invoice.created', invoice)
-  
   return invoice;
 }
 
