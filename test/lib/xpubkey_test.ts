@@ -11,6 +11,7 @@ const chance = new Chance();
 
 describe("Extended Public Key Service", () => {
 
+  /*
   it("#getNextAddress should increment the nonce", async () => {
 
     let account = await accounts.registerAccount(chance.email(), chance.word());
@@ -108,6 +109,7 @@ describe("Extended Public Key Service", () => {
     });
 
   });
+*/
 
 });
 

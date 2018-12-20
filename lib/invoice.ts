@@ -23,6 +23,8 @@ import * as models from './models';
 
 import {convert} from './prices';
 
+import {plugins} from './plugins';
+
 interface Amount {
   currency: string;
   value: number
@@ -65,7 +67,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      address = await BitcoinCashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('BCH', accountId);
 
       break;
 
