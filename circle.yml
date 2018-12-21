@@ -18,7 +18,7 @@ dependencies:
   cache_directories:
     - ~/.cache/yarn
   pre:
-    - docker build -t payment-service .
+    - docker build -t anypay .
 
 test:
   override:
