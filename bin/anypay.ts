@@ -1,5 +1,7 @@
 #!/usr/bin/env ts-node
 
+require('dotenv').config();
+
 const yargs = require('yargs');
 
 import * as lib from '../lib';
