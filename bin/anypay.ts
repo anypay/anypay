@@ -4,7 +4,7 @@ require('dotenv').config();
 
 const yargs = require('yargs');
 
-import { log } from '../logger';
+import { log } from '../lib/logger';
 
 const argv = yargs
   .option('api', {
