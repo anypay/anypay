@@ -15,7 +15,6 @@ import * as cashback from './cashback';
 import * as ambassadors from './ambassadors';
 import * as database from './database';
 import * as dashwatch from './dashwatch';
-import { plugins } from './plugins';
 import * as coins from './coins';
 import { log } from './logger';
 import { plugins } from './plugins';
@@ -42,7 +41,6 @@ export {
   database,
   dashwatch,
   coins,
-  plugins,
   invoices
 }
 
