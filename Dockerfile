@@ -16,3 +16,8 @@ COPY . /usr/src/app
 # Build the project from typscript source
 RUN npm run build
 
+RUN npm link
+
+RUN anypay --help
+
+CMD anypay --api

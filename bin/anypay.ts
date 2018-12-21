@@ -1,8 +1,10 @@
 #!/usr/bin/env ts-node
 
+require('dotenv').config();
+
 const yargs = require('yargs');
 
-import * as lib from '../lib';
+import { log } from '../lib/logger';
 
 const argv = yargs
   .option('api', {
@@ -33,7 +35,7 @@ import * as asciiart from 'ascii-art';
 
   if (!argv.api) {
 
-    lib.log.info("API disabled");
+    log.info("API disabled");
 
   } else {
 
@@ -43,7 +45,7 @@ import * as asciiart from 'ascii-art';
 
   if (!argv.actors) {
 
-    lib.log.info("Actors disabled");
+    log.info("Actors disabled");
 
   } else {
 
@@ -53,37 +55,37 @@ import * as asciiart from 'ascii-art';
 
   if (argv.payments) {
 
-    lib.log.info('start payment processor');
+    log.info('start payment processor');
 
     require('../servers/processor/payments/main.ts');
 
   } else {
 
-    lib.log.info('payment processor disabled');
+    log.info('payment processor disabled');
 
   }
 
   if (argv.websockets) {
 
-    lib.log.info('start websocket server');
+    log.info('start websocket server');
 
     require('../servers/websocket/server.ts');
 
   } else {
 
-    lib.log.info('websocket server disabled');
+    log.info('websocket server disabled');
 
   }
 
   if (argv.blockcypher) {
 
-    lib.log.info('start blockcypher webhook server');
+    log.info('start blockcypher webhook server');
 
     require('../servers/blockcypher/server.ts');
 
   } else {
 
-    lib.log.info('blockcypher webhook server disabled');
+    log.info('blockcypher webhook server disabled');
 
   }
 
