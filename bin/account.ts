@@ -59,6 +59,8 @@ program
 
     console.log(`${currency} address set to ${address} for ${email}`);
 
+    process.exit();
+
   });
 
 program

@@ -6,9 +6,13 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
-import {log} from '../../lib'
+import {log, xpub, models} from '../../lib'
 
 import * as rpc from './lib/jsonrpc';
+
+import * as Blockcypher from '../../lib/dash/blockcypher';
+
+import { I_Address } from '../../types/interfaces';
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -25,6 +29,48 @@ export async function createInvoice(accountId: number, amount: number) {
   statsd.increment('DASH_createInvoice')
 
   return invoice;
+
+}
+
+export async function getNewAddress(record: I_Address) {
+
+  /* 
+   * Example extended public key:
+   *
+   * xpub6CwejPWLBbxgg9hhVUA8kT2RL83ARa1kAk3v564a72kPEyu3sX9GtVNn2UgYDu5aX94Xy3V8ZtwrcJ9QiM7ekJHdq5VpLLyMn4Bog9H5aBS
+   *
+   * (stevenzeiler dash android wallet)
+   *
+   */
+
+  if (record.value.match(/^xpub/)) {
+
+    var address = xpub.generateAddress('DASH', record.value, record.nonce);
+
+    await models.Address.update({
+
+      nonce: record.nonce + 1
+
+    },{
+
+      where: {
+
+        id: record.id
+
+      }
+    
+    });
+
+  } else {
+
+    let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
+
+    address = paymentEndpoint.input_address;
+
+  }
+
+  return address;
+
 
 }
 

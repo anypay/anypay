@@ -48,8 +48,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
   switch(currency) {
 
     case 'DASH':
+      console.log("generate dash invoice");
 
-      address = await DashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('DASH', accountId);
 
       break;
 
