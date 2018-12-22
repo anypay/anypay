@@ -1,3 +1,6 @@
+
+import {createWebhook} from './lib/blockcypher';
+
 import {generateInvoice} from '../../lib/invoice';
 
 import * as chainSoAPI from '../../lib/chainSoAPI';
@@ -60,6 +63,8 @@ export async function getNewAddress(record: I_Address) {
       }
     
     });
+
+    await createWebhook('unconfirmed-tx', address);
 
   } else {
 
