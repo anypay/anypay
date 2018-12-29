@@ -1,7 +1,7 @@
 const PASSWORD = process.env.DASH_CORE_PASSWORD;
 const USER = process.env.DASH_CORE_USER;
 const HOST = process.env.DASH_CORE_HOST || "https://dash.batm.anypay.global";
-const http = require("superagent");
+import * as http from "superagent";
 
 function getNewAddress() {
   let body = { jsonrpc: "2.0", method: "getnewaddress", params: ["0"], id: 1 };

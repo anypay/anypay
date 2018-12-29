@@ -2,7 +2,7 @@ import { Address } from "../models";
 import * as zen from "../../plugins/zen";
 import { log } from '../logger';
 
-module.exports.getNewAddress = async (accountId) => {
+export async function getNewAddress (accountId)  {
 
   // return zencash t_address for account
   log.info('zencash:getnewaddress', `accountId:${accountId}`);

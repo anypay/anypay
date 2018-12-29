@@ -3,7 +3,7 @@ const Address = require("../models/address");
 
 import {generateInvoiceAddress} from '../../plugins/bch';
 
-module.exports.getNewAddress = async (accountId) => {
+export async function getNewAddress (accountId) {
 
   console.log('bitcoincash:getnewaddress', `accountId:${accountId}`);
 
