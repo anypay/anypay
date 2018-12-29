@@ -191,7 +191,7 @@ const kBasicAuthorizationAllowOtherHeaders = Joi.object({
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
-  message: Joi.string().required(),
+  message: Joi.string().required()
 }).label('BoomError')
 
 function responsesWithSuccess({ model }) {

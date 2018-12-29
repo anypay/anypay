@@ -27,9 +27,7 @@ import {emitter} from '../events'
 
 logger.configure({
     transports: [
-        new logger.transports.Console({
-            colorize: true
-        })
+        new logger.transports.Console()
     ]
 });
 
