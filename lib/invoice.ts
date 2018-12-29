@@ -116,13 +116,19 @@ export async function generateInvoice(
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
+  console.log('converting price');
+
   let invoiceAmount = await convert({
     currency: account.denomination,
     value: denominationAmountValue
   }, invoiceCurrency);
 
+  console.log('converted price');
+  console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
+
+  console.log('got new invoice address');
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,

@@ -125,6 +125,8 @@ module.exports.create = async (request, reply) => {
 
     let plugin = await plugins.findForCurrency(request.payload.currency);
 
+    log.info('plugin.createInvoice');
+
     let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
     if(invoice){
