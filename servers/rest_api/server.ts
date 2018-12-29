@@ -1,5 +1,6 @@
 "use strict";
 require('dotenv').config();
+
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
