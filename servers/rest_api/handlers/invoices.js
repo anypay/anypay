@@ -139,17 +139,21 @@ module.exports.create = async (request, reply) => {
 
       invoice.redirect_url = request.payload.redirect_url;
 
-      await invoice.save();
-
     }
 
     if (request.payload.webhook_url) {
 
       invoice.webhook_url = request.payload.webhook_url;
 
-      await invoice.save();
+    }
+
+    if (request.payload.external_id) {
+
+      invoice.external_id = request.payload.external_id;
 
     }
+
+    await invoice.save();
 
     return invoice;
 
