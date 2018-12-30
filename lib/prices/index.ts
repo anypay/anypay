@@ -3,6 +3,8 @@ import { getLegacyPrices } from './legacy';
 import { getCryptoPrices } from './crypto';
 import { getVESPrice } from './localbitcoins';
 
+import * as database from '../database';
+
 const MAX_DECIMALS = 5;
 
 interface Amount {
@@ -17,12 +19,16 @@ interface Conversion {
 };
 
 async function getAllPrices() {
-  let legacyPrices = await getLegacyPrices();
-  let cryptoPrices = await getCryptoPrices();
 
-  let prices = Object.assign(legacyPrices, cryptoPrices);
+  let resp = await database.query('select currency, value from prices'); 
 
-  prices['VES'] = await getVESPrice();
+  let prices = resp[0].reduce(function(acc, price) {
+    
+    acc[price.currency] = parseFloat(price.value);
+
+    return acc;
+
+  }, {});
 
   return prices;
 };
