@@ -10,6 +10,8 @@ const Account = require("../../lib/models/account");
 const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
+import * as pricesActor from '../../actors/prices/actor';
+
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const DenominationsController = require("./handlers/denominations");
@@ -1102,6 +1104,8 @@ if (require.main === module) {
 }
 
 async function start () {
+
+  pricesActor.start();
 
   await sequelize.sync()
 

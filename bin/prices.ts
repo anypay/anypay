@@ -39,7 +39,6 @@ program
 
     let allPrices = await getAllPrices();
 
-
     let btcPrice = usdPrice * allPrices['USD'];
 
     console.log(`one BTC equals ${btcPrice} VES`);
@@ -63,6 +62,8 @@ program
     let allPrices = await getAllPrices();
 
     console.log(allPrices);
+
+    process.exit(0);
 
   });
 
