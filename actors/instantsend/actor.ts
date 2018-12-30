@@ -48,9 +48,17 @@ emitter.on("dash.instantsend.hashlock", async (hash) => {
 
   payments.forEach(async (payment) => {
 
-    let { id } = await receivePayment(payment);
+    payment.confirmations = 5;
 
-    let invoice = await models.Invoice.findOne({ where: { id }});
+    let invoice: any = await receivePayment(payment);
+
+    if (!invoice) {
+
+      return;
+
+    }
+
+    invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
     
     if (invoice) {
       log.info(`invoice found for payment ${payment.hash}`);
