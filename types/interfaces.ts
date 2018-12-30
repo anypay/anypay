@@ -4,6 +4,7 @@ export interface Payment {
   address: string;
   amount: number;
   hash: string;
+  confirmations?: number;
 }
 
 export interface Invoice {
