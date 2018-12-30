@@ -4,11 +4,15 @@ import * as models from '../models';
 
 import * as log from 'winston';
 
-export async function getNewAddress(accountId: number): Promise<string> {
+export async function getNewAddress(accountId: number): Promise<any> {
 
-  const account = await models.Account.findOne({ where: { id: accountId }});
+  const address = await models.Address.findOne({where:{account_id:accountId, currency:"LTC"}}) 
 
-  const address = account.litecoin_address;
+  if(!address){
+
+  	throw new Error("LTC address not set")
+
+  }
 
   const paymentEndpoint = await Blockcypher.createPaymentEndpoint(address);
 

@@ -4,9 +4,13 @@ import * as log from 'winston';
 
 export async function getNewAddress(accountId: number): Promise<string> {
 
-  const account = await models.Account.findOne({ where: { id: accountId }});
+  const address = await models.Address.findOne({ where: { account_id: accountId, currency:"DOGE" } })
 
-  const address = account.dogecoin_address;
+  if(!address){
+
+    throw new Error("DOGE address not set")
+
+  }
 
   const paymentEndpoint = await Blockcypher.createPaymentEndpoint(address)
 

@@ -12,7 +12,11 @@ async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
 
+  log.info('about to generate dash invoice');
+
   let invoice = await generateInvoice(accountId, amount, 'DASH');
+
+  log.info('generated dash invoice');
 
   statsd.timing('DASH_createInvoice', new Date().getTime()-start)
   

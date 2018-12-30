@@ -12,17 +12,10 @@ const BitcoinCashPrice = require('./price');
 
 module.exports.generate = async function generate(dollarAmount, accountId) {
 
-  let account = await Account.findOne({ where: { id: accountId }})
-
-  if (!account || !account.bitcoin_cash_address) {
-
-    throw new Error('no bitcoin cash payout address');
-  }
 
   let oracle = oracles.getOracle('bitcoincash:forwarder');
 
-  //let address = await oracle.registerAddress(account.bitcoin_cash_address)
-  let address = await AddressService.getNewAddress(account.id);
+  let address = await AddressService.getNewAddress(accountId);
 
   /*let bitcoinCashAmount = BitcoinCashPrice
     .convertDollarsToBitcoinCash(dollarAmount)

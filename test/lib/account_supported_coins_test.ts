@@ -26,6 +26,12 @@ describe("Supported Coins For Account", () => {
       address: "12Y7DPDJzy4DBKXgDBRJBJnpUTPPcgYHtm"
     });
 
+   await setAddress({
+      account_id: account.id,
+      currency: "DASH",
+      address: "12Y7DPDJzy4DBKXgDBRJBJnpUTPPcgYHtm"
+    });
+
     let coins = await getSupportedCoins(account.id);
 
     console.log("coins", coins);

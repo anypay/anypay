@@ -1,5 +1,6 @@
 const Invoice = require('../models/invoice');
 const Account = require('../models/account');
+const Address = require('../models/address');
 const DashAddressService = require('./forwarding_address_service');
 const jayson = require('jayson');
 
@@ -22,19 +23,19 @@ function addAddress(address) {
 module.exports.generate = async function generate(dollarAmount, accountId):
 Promise<any> {
 
-  var account = await Account.findOne({ where: { id: accountId }})
-
-  if (!account || !account.dash_payout_address) {
-    throw new Error('no dash payout address');
-  }
-
   console.log('about to genereate dash address')
 
-  var address = await DashAddressService.getNewAddress(dollarAmount, account.dash_payout_address)
+  let payoutAddress = await Address.findOne({
+  	where: {
+		currency: 'DASH',
+		account_id: accountId
+	}
+  });
+
+
+  let address = await DashAddressService.getNewAddress(payoutAddress.value)
 
   console.log('dash address generated', address);
-
-  //let dashAmount = DashPrice.convertDollarsToDash(dollarAmount).toFixed(5);
 
   const denominationAmount = {
     currency: 'USD',
@@ -51,8 +52,6 @@ Promise<any> {
     account_id: accountId,
     status: 'unpaid'
   })
-
-  //await addAddress(address);
 
   return invoice;
 }

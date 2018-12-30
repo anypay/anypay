@@ -125,13 +125,13 @@ module.exports.create = async (request, reply) => {
 
     let plugin = await plugins.findForCurrency(request.payload.currency);
 
+    log.info('plugin.createInvoice');
+
     let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
     if(invoice){
    
       log.info('invoice.created', invoice.toJSON());
-
-      emitter.emit('invoice.created', invoice.toJSON());
 
     }
 
@@ -155,9 +155,9 @@ module.exports.create = async (request, reply) => {
 
   } catch(error) {
 
-    throw Boom.badRequest(error.message);
-
     log.error(error.message);
+
+    throw Boom.badRequest(error.message);
 
   }
 
@@ -169,27 +169,34 @@ module.exports.show = async function(request, reply) {
 
   log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
 
-  let invoice = await Invoice.findOne({
-    where: {
-      uid: invoiceId
-    }
-  });
+
+  try {
+
+	  let invoice = await Invoice.findOne({
+	    where: {
+	      uid: invoiceId
+	    }
+	  });
 
 
-  if (invoice) {
+	  if (invoice) {
 
-    log.info('invoice.requested', invoice.toJSON());
+	    log.info('invoice.requested', invoice.toJSON());
 
-    emitter.emit('invoice.requested', invoice.toJSON()); 
+	    emitter.emit('invoice.requested', invoice.toJSON()); 
 
-    return invoice;
+	    return invoice;
 
-  } else {
+	  } else {
 
-    log.error('no invoice found', invoiceId);
+	    log.error('no invoice found', invoiceId);
 
-    throw new Error('invoice not found')
+	    throw new Error('invoice not found')
+	  }
+  } catch(error) {
+	  log.error(error.message);
   }
+
 
 }
 
@@ -202,54 +209,3 @@ emitter.on('invoice.requested', async (invoice) => {
   plugins.checkAddressForPayments(invoice.address, invoice.currency);
 
 });
-emitter.on('invoice.created', async (invoice) => {
-  
-  log.info("invoice.created")
- 
-  poll(invoice)
-  
-})
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function poll(invoice){
-  log.info(`poll.begin.${invoice.uid}`);
-
-  let plugin = await plugins.findForCurrency(invoice.currency);
-
-  if(plugin.poll === false){
-
-    log.debug(`polling disabled for ${invoice.currency} ${invoice.address}`);
-
-    return; 
-  }
-
-  let waitTime = [5000,2000,2000,4000,4000,8000,8000.8000,16000,16000,16000,16000]
-
-  for(let i=0;i<waitTime.length;i++){
-
-    try {
-
-      log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
-
-      invoice = await Invoice.findOne({ where: {uid: invoice.uid}});
-
-      if(invoice.status === 'paid'){ break }
-
-      await plugins.checkAddressForPayments(invoice.address,invoice.currency);
-
-    } catch(error) {
-
-      log.error(error.message);
-
-    }
-
-    log.debug(`sleep ${waitTime[i]}`);
-
-    await sleep(waitTime[i]);
-
-  }
-
-}

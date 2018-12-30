@@ -1,12 +1,15 @@
 import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
+import * as RippleAddressService from './ripple/address_service';
 import * as BitcoinAddressService from './bitcoin/address_service';
 import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
 import * as database from './database';
+
+import { Payment } from '../types/interfaces';
 
 import {emitter} from './events'
 
@@ -62,17 +65,13 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      let account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
+      address = await BitcoinCashAddressService.getNewAddress(accountId);
 
       break;
 
     case 'XRP':
 
-      let xrp_account = await models.Account.findOne({ where: { id: accountId }});
-
-      address = await xrp.generateInvoiceAddress(xrp_account.ripple_address);
+      address = await RippleAddressService.getNewAddress(accountId);
 
       break;
 
@@ -117,14 +116,19 @@ export async function generateInvoice(
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
+  console.log('converting price');
+
   let invoiceAmount = await convert({
     currency: account.denomination,
     value: denominationAmountValue
   }, invoiceCurrency);
 
-  console.log('invoiceAmount', invoiceAmount);
+  console.log('converted price');
+  console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
+
+  console.log('got new invoice address');
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,
@@ -151,9 +155,33 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
-  emitter.emit('invoice.created', invoice)
-  
   return invoice;
+}
+
+/*
+
+  Function to mark invoice as paid, accepts an Invoice model record, and a
+  Payment struct.
+
+  Called after the settlement payment has already been sent
+
+  Emits an event `invoice.settled`
+
+*/
+
+export async function settleInvoice(invoice, settlementPayment: Payment) {
+
+  invoice.output_hash = settlementPayment.hash;
+  invoice.output_amount = settlementPayment.amount;
+  invoice.output_address = settlementPayment.address;
+  invoice.output_currency = settlementPayment.currency;
+
+  await invoice.save();
+
+  emitter.emit('invoice.settled', invoice.toJSON());
+
+  return invoice;
+
 }
 
 export async function replaceInvoice(uid: string, currency: string) {

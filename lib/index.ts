@@ -6,6 +6,7 @@ var Account = require('./models/account');
 import {configureOracles} from '../config/oracles';
 
 import * as accounts from './accounts';
+import * as invoices from './invoice';
 import * as forwards from './forwards';
 import * as settings from './settings';
 import * as prices from './prices';
@@ -16,6 +17,7 @@ import * as database from './database';
 import * as dashwatch from './dashwatch';
 import * as coins from './coins';
 import { log } from './logger';
+import { plugins } from './plugins';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -27,6 +29,7 @@ var oracles = ConfigureOracles(configureOracles);
 
 export {
   oracles,
+  plugins,
   cashback,
   models,
   accounts,
@@ -37,6 +40,7 @@ export {
   log,
   database,
   dashwatch,
-  coins
+  coins,
+  invoices
 }
 

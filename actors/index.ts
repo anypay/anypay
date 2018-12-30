@@ -12,6 +12,8 @@
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
 
+import * as poller from './poller/actor';
+import * as slack from './slack/actor';
 import * as instantsend from './instantsend/actor';
 import * as webhooks from './webhooks/actor';
 
@@ -40,10 +42,12 @@ async function start(actors?: any) {
 
     log.info('start all actors');
 
+    await poller.start();
+    await slack.start();
+    await webhooks.start();
     await bchPaymentForwarder.start();
     await zenPaymentForwarder.start();
     await instantsend.start();
-    await webhooks.start();
 
   }
 

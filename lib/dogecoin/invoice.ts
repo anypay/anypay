@@ -1,18 +1,20 @@
-const Invoice = require('../models/invoice');
-const Account = require('../models/account');
+import * as models from '../models';
+
 const DogecoinAddressService = require('./address_service');
 
 import {convert} from '../prices';
 
 module.exports.generate = async function generate(dollarAmount, accountId) {
 
-  let account = await Account.findOne({ where: { id: accountId }});
+  let account = await models.Account.findOne({ where: { id: accountId }});
+
+  let address = (await models.Address.findOne({ where: {account_id:accountId, currency:'DOGE'}})).value
 
   if (!account || !account.dogecoin_address) {
     throw new Error('no dogecoin payout address');
   }
 
-  let address = await DogecoinAddressService
+  address = await DogecoinAddressService
     .getNewAddress(dollarAmount, account.dogecoin_address)
 
   console.log('dogecoin address generated', address);
@@ -24,7 +26,7 @@ module.exports.generate = async function generate(dollarAmount, accountId) {
 
   let invoiceAmount = await convert(denominationAmount, 'DOGE');
 
-  let invoice = await Invoice.create({
+  let invoice = await models.Invoice.create({
     address: address,
     amount: invoiceAmount.value,
     currency: invoiceAmount.currency,

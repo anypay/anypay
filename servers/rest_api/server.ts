@@ -1,5 +1,6 @@
 "use strict";
 require('dotenv').config();
+
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
@@ -191,7 +192,7 @@ const kBasicAuthorizationAllowOtherHeaders = Joi.object({
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
-  message: Joi.string().required(),
+  message: Joi.string().required()
 }).label('BoomError')
 
 function responsesWithSuccess({ model }) {

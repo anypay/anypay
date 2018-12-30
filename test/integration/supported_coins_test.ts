@@ -3,6 +3,8 @@ import * as assert from 'assert';
 import {hash} from '../../lib/password';
 import * as Database from '../../lib/database';
 
+import { setAddress} from '../../lib/core';
+
 import { deactivateCoin, activateCoin } from '../../lib/coins';
 
 import {
@@ -24,6 +26,19 @@ describe("Account Coins over HTTP", async () => {
     account = await accounts.registerAccount(chance.email(), chance.word());
 
     accessToken = await accounts.createAccessToken(account.id);
+
+    await setAddress({
+      account_id: account.id,
+      currency: "DASH",
+      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+    });
+
+    await setAddress({
+      account_id: account.id,
+      currency: "BTC",
+      address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
+    });
+
 
 
   });
