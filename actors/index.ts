@@ -36,6 +36,12 @@ async function start(actors?: any) {
 
     log.info(`start single actor "${actors}"`);
 
+    if (actors === 'instantsend') {
+
+      await instantsend.start();
+
+    }
+
   }
 
   if (actors === true || typeof actors === 'undefined') {
