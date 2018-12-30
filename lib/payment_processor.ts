@@ -1,8 +1,32 @@
+require('dotenv').config();
 const InvoiceModel = require("./models/invoice");
 import { Payment, Invoice } from "../types/interfaces";
 import {emitter} from './events';
-const log = require("winston");
-import * as database from './database';
+import {log} from './logger';
+
+export async function receivePayment(payment: Payment) {
+  log.info('receive payment', payment);
+
+  let invoice = await InvoiceModel.findOne({
+    where: {
+      currency: payment.currency,
+      address: payment.address,
+      status: "unpaid"
+    },
+    order: [['createdAt', 'DESC']]
+  });
+
+  if (invoice) {
+
+    return handlePayment(invoice, payment);
+
+  } else {
+
+    return;
+
+  }
+
+}
 
 export async function handlePayment(invoice: Invoice, payment: Payment) {
   if (invoice.amount === payment.amount) {

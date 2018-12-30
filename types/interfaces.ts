@@ -4,6 +4,7 @@ export interface Payment {
   address: string;
   amount: number;
   hash: string;
+  confirmations?: number;
 }
 
 export interface Invoice {
@@ -11,6 +12,9 @@ export interface Invoice {
   uid: string;
   account_id: number;
   currency: string;
+  complete?: boolean;
+  completed_at?: Date;
+  instantsend?: boolean;
   amount: number;
   invoice_amount?: number;
   invoice_amount_paid?: number;

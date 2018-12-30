@@ -1,7 +1,36 @@
+require('dotenv').config()
+
 const PASSWORD = process.env.DASH_CORE_PASSWORD;
 const USER = process.env.DASH_CORE_USER;
-const HOST = process.env.DASH_CORE_HOST || "https://dash.batm.anypay.global";
+const HOST = process.env.DASH_CORE_HOST;
+
 import * as http from "superagent";
+
+async function rpcRequest(method, params) {
+  let body = { jsonrpc: "2.0", method: method, params: params, id: 1 };
+
+  let url = `http://${HOST}:${process.env.DASH_CORE_PORT}`;
+
+  console.log("URL", url);
+
+  let resp = await http
+    .post(url)
+    .send(body)
+    .auth(USER, PASSWORD);
+
+  return resp.body.result;
+
+}
+
+export async function getTransaction(hash: string) {
+
+  let rawtx = await rpcRequest('getrawtransaction', [hash]); 
+
+  let tx = await rpcRequest('decoderawtransaction', [rawtx]);
+
+  return tx;
+  
+}
 
 function getNewAddress() {
   let body = { jsonrpc: "2.0", method: "getnewaddress", params: ["0"], id: 1 };
