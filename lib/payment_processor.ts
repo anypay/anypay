@@ -55,7 +55,9 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
       denomination_amount_paid: (payment.amount * price).toFixed(2),
       hash: payment.hash,
       status: 'underpaid',
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }
@@ -83,7 +85,9 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
       denomination_amount_paid: invoice.denomination_amount,
       hash: payment.hash,
       status: "paid",
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }
@@ -119,7 +123,9 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
       denomination_amount_paid: (payment.amount * price).toFixed(2),
       hash: payment.hash,
       status: 'overpaid',
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }
