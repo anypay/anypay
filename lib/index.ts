@@ -31,6 +31,7 @@ import * as auth from './auth';
 import * as square from './square';
 import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
+import * as twofactor from './twofactor';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -65,13 +66,14 @@ export {
   blockcypher,
   tipjar,
   email,
-  routes,
   password,
   login,
   auth,
   square,
   mysql_lib,
   kraken
+  routes
+  twofactor
 }
 
 export async function initialize() {

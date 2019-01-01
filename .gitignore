@@ -6,3 +6,4 @@ nbproject/
 dist/
 .env
 production.env
+dev.env
