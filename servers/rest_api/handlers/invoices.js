@@ -74,9 +74,12 @@ module.exports.index = async (request, reply) => {
 
   if (request.query.end_date_completed) {
 
-    query.where['completed_at'] = {
-      [Op.lt]: moment(request.query.end_date_completed).toDate()
+    if (!query.where['completed_at']) {
+
+      query.where['completed_at'] = {};
     }
+
+    query.where['completed_at'][Op.lt] = moment(request.query.end_date_completed).toDate();
 
   }
 
