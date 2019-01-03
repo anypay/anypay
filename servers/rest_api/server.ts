@@ -11,6 +11,7 @@ const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
+import * as sudoAddresses from './handlers/sudo_addresses';
 
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
@@ -816,6 +817,54 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/addresses',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/accounts/:account_id/addresses/:currency/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.lockAddress
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/accounts/:account_id/addresses/:currency/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.unlockAddress
 
     }
 

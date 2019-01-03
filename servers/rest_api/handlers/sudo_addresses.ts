@@ -1,9 +1,46 @@
 
-import { addresses, models } from '../../../lib';
+import { database, addresses, models } from '../../../lib';
 
 import * as Boom from 'boom';
 
-export async function lock(request, h) {
+export async function index(request, h) {
+
+  var query: string;
+
+  if (request.query.locked === 'true') {
+
+    query = `select addresses.*, accounts.email from addresses  join accounts on accounts.id = addresses.account_id where locked = true;`;
+
+  }
+
+  if (request.query.locked === 'false') {
+
+    query = `select addresses.*, accounts.email from addresses  join accounts on accounts.id = addresses.account_id where locked = false;`;
+
+  }
+
+  if (typeof request.query.locked === 'undefined') {
+
+    query = `select addresses.*, accounts.email from addresses  join accounts on accounts.id = addresses.account_id;`;
+
+  }
+
+  try {
+
+    let addresses = await database.query(query);
+
+    return addresses[0];
+
+  } catch(error) {
+
+    console.log(error.message);
+
+    return { error: error.message, message: error.message };
+  }
+
+}
+
+export async function lockAddress(request, h) {
 
   /*
 
@@ -23,7 +60,7 @@ export async function lock(request, h) {
 
 }
 
-export async function unlock(request, h) {
+export async function unlockAddress(request, h) {
 
   /*
 
