@@ -5,6 +5,7 @@ import {
   Address
 } from '../../lib/models';
 
+import {addresses} from '../../lib';
 import {registerAccount} from '../../lib/accounts';
 
 import * as database from '../../lib/database';
@@ -13,21 +14,34 @@ import * as Chance from 'chance';
 
 const chance = new Chance();
 
-describe('Address Model', () => {
+describe('Addresses Library', () => {
 
-  it("should have an account, currency, value", async () => {
+  it("should lock and unlock an address", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
+
+    let currency = 'DASH'
 
     let address = await Address.create({
       account_id: account.id,
       value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
-      currency: 'DASH',
-      locked: true
+      currency
     });
 
     assert(address.id > 0);
+    assert(!address.locked);
+
+    await addresses.lockAddress(account.id, currency);
+
+    address = await Address.findOne({ where: { id: address.id }});
+
     assert(address.locked);
+
+    await addresses.unlockAddress(account.id, currency);
+
+    address = await Address.findOne({ where: { id: address.id }});
+
+    assert(!address.locked);
 
   });
 
