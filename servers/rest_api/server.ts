@@ -842,7 +842,7 @@ async function Server() {
 
     method: 'POST',
 
-    path: '/sudo/accounts/:account_id/addresses/:currency/locks',
+    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
 
     config: {
 
@@ -858,7 +858,7 @@ async function Server() {
 
     method: 'DELETE',
 
-    path: '/sudo/accounts/:account_id/addresses/:currency/locks',
+    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
 
     config: {
 
