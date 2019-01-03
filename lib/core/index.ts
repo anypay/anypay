@@ -62,6 +62,12 @@ export async function setAddress(changeset: AddressChangeSet) {
 
       console.log(`${changeset.currency} address already set`);
 
+      if (address.locked) {
+
+        throw new Error(`${changeset.currency} address locked`);
+
+      }
+
       await address.update({
         value: changeset.address
       });
@@ -88,6 +94,12 @@ export async function unsetAddress(changeset: AddressChangeSet) {
       account_id: changeset.account_id,
       currency: changeset.currency
     }});
+
+    if (address.locked) {
+
+      throw new Error(`${changeset.currency} address locked`);
+
+    }
 
     await address.destroy({ force: true });
 

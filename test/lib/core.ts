@@ -1,6 +1,8 @@
 import { logger, events, setAddress, unsetAddress } from '../../lib/core';
 import { AddressChangeSet } from '../../lib/core/types/address_change_set';
 
+import { lockAddress, unlockAddress  } from '../../lib/addresses';
+
 import * as models from '../../lib/models';
 import * as Account from '../../lib/models/account';
 import * as Address from '../../lib/models/address';
@@ -26,7 +28,7 @@ describe("Anypay Core", () => {
 
     it("#setAddress should emit an event", (done) => {
 
-      events.once('address:set', changeset => {
+      events.once('address:set', async (changeset) => {
 
         logger.info('address:set', changeset);
         done();
@@ -38,6 +40,31 @@ describe("Anypay Core", () => {
         currency: 'DASH',
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
       }); 
+
+    });
+
+    it("#setAddress should fail if locked", async () => {
+
+      await lockAddress(account.id, 'DASH');
+      
+      try {
+
+        await setAddress({
+          account_id: account.id,
+          currency: 'DASH',
+          address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+        }); 
+
+        assert(false);
+
+      } catch(error) {
+         console.log('ERROR', error.message);
+
+        assert.strictEqual(error.message, `DASH address locked`); 
+
+        await unlockAddress(account.id, 'DASH');
+
+      }
 
     });
 
