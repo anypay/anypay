@@ -30,6 +30,8 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
     if (accountCoins[coin.code]) {
 
+      accountCoins[coin.code]['name'] = coin.name;
+
       accountCoins[coin.code].unavailable = coin.unavailable;
 
     }
