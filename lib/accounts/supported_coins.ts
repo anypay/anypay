@@ -14,7 +14,7 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
   
     acc[address.currency] = {
       code: address.currency,
-      name: address.currency,
+      name: address.name,
       enabled: true,
       icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`,
       address: address.value
