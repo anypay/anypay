@@ -8,6 +8,12 @@
     },
 
     {
+      "code": "LTC",
+      "name": "Litecoin",
+      "icon_url": "https://pos.anypay.global/ltc.png"
+    },
+
+    {
       "code": "BCH",
       "name": "Bitcoin Cash",
       "icon_url": "",
