@@ -12,6 +12,7 @@ const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
+import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
@@ -833,6 +834,22 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoAddresses.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.index
 
     }
 
