@@ -859,6 +859,54 @@ async function Server() {
 
     method: 'POST',
 
+    path: '/sudo/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.del
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
     path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
 
     config: {
