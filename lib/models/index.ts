@@ -23,6 +23,7 @@ var PayrollPayment = require('./payrollpayment');
 var AmbassadorTeamJoinRequest = require('./ambassador_team_join_request')(sequelize, Sequelize);
 var DashInstantsendTransaction = require('./dash_instantsend_transaction')(sequelize, Sequelize);
 var Price = require('./price')(sequelize, Sequelize);
+var BankAccount = require('./bank_account')(sequelize, Sequelize);
 
 export {
   Account,
@@ -46,6 +47,7 @@ export {
   MerchantBountyReward,
   AmbassadorTeamJoinRequest,
   DashInstantsendTransaction,
-  Price
+  Price,
+  BankAccount
 };
 
