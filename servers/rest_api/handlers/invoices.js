@@ -235,7 +235,7 @@ module.exports.create = async (request, reply) => {
 
     await invoice.save();
 
-    return invoice;
+    return sanitizeInvoice(invoice);
 
   } catch(error) {
 
@@ -246,6 +246,18 @@ module.exports.create = async (request, reply) => {
   }
 
 };
+
+function sanitizeInvoice(invoice) {
+
+  let resp = invoice.toJSON();
+
+  delete resp.webhook_url;
+  delete resp.id;
+  delete resp.account_id;
+  delete resp.dollar_amount;
+
+  return resp;
+}
 
 module.exports.show = async function(request, reply) {
 
@@ -269,7 +281,7 @@ module.exports.show = async function(request, reply) {
 
 	    emitter.emit('invoice.requested', invoice.toJSON()); 
 
-	    return invoice;
+      return sanitizeInvoice(invoice);
 
 	  } else {
 
