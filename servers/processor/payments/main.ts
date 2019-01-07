@@ -57,6 +57,8 @@ function handlePaymentMessage(payment: Payment) {
 
       if (invoice) {
 
+        let invoiceUID = invoice.uid;
+
         statsd.increment('handlePaymentMessage_invoiceFound') 
 
         invoice = invoice.toJSON();
@@ -64,20 +66,31 @@ function handlePaymentMessage(payment: Payment) {
 
         invoice = await handlePayment(invoice, payment);
 
-				log.info("invoices:paid", invoice.uid);
+        if (invoice) {
+
+          log.info("invoices:paid", invoice.uid);
+
+          await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
+
+          let account = await Account.findOne({
+      where: {
+              id: invoice.account_id
+      }
+          });
+
+          Slack.notify(
+            `invoice:${invoice.status} ${account.email} https://pos.anypay.global/invoices/${invoice.uid}`
+          );
+
+        } else {
+
+          Slack.notify(
+            `payment for expired invoice ${invoiceUID} ${JSON.stringify(payment)}`
+          );
+
+        }
 
         await channel.ack(message);
-        await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
-
-        let account = await Account.findOne({
-	  where: {
-            id: invoice.account_id
-	  }
-        });
-
-        Slack.notify(
-          `invoice:${invoice.status} ${account.email} https://pos.anypay.global/invoices/${invoice.uid}`
-        );
 
       } else {
 

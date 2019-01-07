@@ -4,6 +4,8 @@ import { Payment, Invoice } from "../types/interfaces";
 import {emitter} from './events';
 import {log} from './logger';
 
+import * as moment from 'moment';
+
 export async function receivePayment(payment: Payment) {
   log.info('receive payment', payment);
 
@@ -29,6 +31,28 @@ export async function receivePayment(payment: Payment) {
 }
 
 export async function handlePayment(invoice: Invoice, payment: Payment) {
+
+  /* Check if invoice has expired yet, emit 'invoice.payment.expired'. */
+
+  let expires = moment(invoice.expiry);
+
+  let now = moment(); 
+
+  if (expires.valueOf() < now.valueOf()) {
+
+    log.info('invoice.payment.expired', invoice, payment);
+
+    emitter.emit('invoice.payment.expired', {
+      invoice,
+      payment
+    });
+
+    return;
+
+  }
+
+  /* End Expiration Check */
+
   if (invoice.amount === payment.amount) {
     console.log("handle paid");
     return handlePaid(invoice, payment);

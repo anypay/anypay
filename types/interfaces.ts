@@ -23,6 +23,7 @@ export interface Invoice {
   denomination_amount: number;
   denomination_amount_paid?: number;
   address: string;
+  expiry?: string;
   status: string;
   hash?: string;
   paidAt?: Date;
