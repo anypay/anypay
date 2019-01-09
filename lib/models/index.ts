@@ -24,6 +24,7 @@ var AmbassadorTeamJoinRequest = require('./ambassador_team_join_request')(sequel
 var DashInstantsendTransaction = require('./dash_instantsend_transaction')(sequelize, Sequelize);
 var Price = require('./price')(sequelize, Sequelize);
 var BankAccount = require('./bank_account')(sequelize, Sequelize);
+var BlockcypherPaymentForward = require('./blockcypher_payment_forward')(sequelize, Sequelize);
 
 export {
   Account,
@@ -48,6 +49,7 @@ export {
   AmbassadorTeamJoinRequest,
   DashInstantsendTransaction,
   Price,
-  BankAccount
+  BankAccount,
+  BlockcypherPaymentForward
 };
 
