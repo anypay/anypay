@@ -21,7 +21,7 @@ async function getAllExpiredBlockcypherPaymentForwards() {
 
       createdAt: {
 
-        [Op.lt]: moment().subtract(1, 'hour').toDate()
+        [Op.lt]: moment().subtract(1, 'day').toDate()
 
       }
 
