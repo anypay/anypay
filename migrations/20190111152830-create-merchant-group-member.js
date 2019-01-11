@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('ambassador_team_members', {
+    return queryInterface.createTable('merchant_group_members', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -16,11 +16,13 @@ module.exports = {
           key: "id"
         }
       },
-      ambassador_id: {
-        type: Sequelize.INTEGER
-      },
-      team_id: {
-        type: Sequelize.INTEGER
+      merchant_group_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "merchant_groups",
+          key: "id"
+        }
       },
       createdAt: {
         allowNull: false,
@@ -33,6 +35,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('ambassador_team_members');
+    return queryInterface.dropTable('merchant_group_members');
   }
 };

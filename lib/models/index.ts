@@ -25,6 +25,8 @@ var DashInstantsendTransaction = require('./dash_instantsend_transaction')(seque
 var Price = require('./price')(sequelize, Sequelize);
 var BankAccount = require('./bank_account')(sequelize, Sequelize);
 var BlockcypherPaymentForward = require('./blockcypher_payment_forward')(sequelize, Sequelize);
+var MerchantGroup = require('./merchant_group')(sequelize, Sequelize);
+var MerchantGroupMember = require('./merchant_group_member')(sequelize, Sequelize);
 
 export {
   Account,
@@ -50,6 +52,8 @@ export {
   DashInstantsendTransaction,
   Price,
   BankAccount,
-  BlockcypherPaymentForward
+  BlockcypherPaymentForward,
+  MerchantGroup,
+  MerchantGroupMember,
 };
 
