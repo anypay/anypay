@@ -183,6 +183,26 @@ program
 
   });
 
+program
+  .command('listgroups')
+  .action(async () => {
+
+    let merchantGroups = await models.MerchantGroup.findAll();
+
+    merchantGroups.forEach(group => {
+
+      let members = models.MerchantGroupMember.findAll({ where: {
+
+        merchant_group_id: group.id
+
+      }});
+
+      log.info(`${group.name} | ${members.length || 0} members`);
+
+    });
+
+  });
+
 
 program.parse(process.argv);
 

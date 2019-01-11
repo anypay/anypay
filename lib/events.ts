@@ -32,7 +32,7 @@ let events = [
 
   let channel = await amqp.createChannel();
 
-  log.info('amqp channel created');
+  log.debug('amqp channel created');
 
   await channel.assertExchange(exchange, 'direct');
 
@@ -64,7 +64,7 @@ let events = [
 
   });
 
-  log.info('bound all events to amqp');
+  log.debug('bound all events to amqp');
 
   emitter.on('*', async function (data) {
 
@@ -81,7 +81,7 @@ let events = [
 
   });
 
-  log.info('bound to all events to slack');
+  log.debug('bound to all events to slack');
 
 })()
 
