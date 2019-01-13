@@ -6,7 +6,7 @@ import {BLOCKCYPHER_CALLBACKS_BASE} from '../blockcypher';
 
 let token = process.env.BLOCKCYPHER_TOKEN;
 
-function createPaymentEndpoint(merchantAddress) {
+export function createPaymentEndpoint(merchantAddress): Promise<any> {
 
 	return new Promise((resolve, reject) => {
 		let webhook = {
@@ -36,6 +36,4 @@ function createPaymentEndpoint(merchantAddress) {
 			});
   });
 };
-
-module.exports.createPaymentEndpoint = createPaymentEndpoint;
 
