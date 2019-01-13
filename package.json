@@ -38,7 +38,6 @@
     "cli-table2": "^0.2.0",
     "commander": "^2.13.0",
     "cron": "^1.2.1",
-    "dogecore-lib": "^0.14.0",
     "dotenv": "^5.0.0",
     "eventemitter2": "^5.0.1",
     "figlet": "^1.2.0",
@@ -89,7 +88,7 @@
   "scripts": {
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
-    "dev": "./node_modules/nodemon/bin/nodemon.js",
+    "dev": "./node_modules/nodemon/bin/nodemon.js ./bin/anypay.ts --api",
     "servers:blockcypher:start": "ts-node servers/blockcypher/server.ts",
     "processor:blockcypher:start": "ts-node servers/processor/blockcypher/main.ts",
     "processor:payments:start": "ts-node servers/processor/payments/main.ts",

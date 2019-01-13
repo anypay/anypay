@@ -1,6 +1,5 @@
 import * as bitcoincash from 'bitcore-lib-cash';
 import * as dash from 'bitcore-lib-dash';
-import * as dogecoin from 'dogecore-lib';
 
 function getBitcore(currency: string) {
 
@@ -12,9 +11,6 @@ function getBitcore(currency: string) {
     break;
   case 'DASH':
     bitcore = dash;
-    break;
-  case 'DOGE':
-    bitcore = dogecoin;
     break;
   default:
     throw new Error(`xpubkeys for ${currency} not supported`);

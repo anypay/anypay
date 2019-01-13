@@ -48,17 +48,18 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
         icon: `https://pos.anypay.global/${coin.code.toLowerCase()}.png`
       };
 
-      if (coin.code === 'BCH') {
+    }
 
-        if (accountCoins[coin.code].address.match(/^xpub/)) {
+    if (coin.code === 'BCH') {
 
-          accountCoins[coin.code].unavailable = false;
+      if (accountCoins[coin.code].address.match(/^xpub/)) {
 
-        }
+        accountCoins[coin.code].unavailable = false;
 
       }
 
     }
+
 
   });
 
