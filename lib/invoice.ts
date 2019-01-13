@@ -1,4 +1,3 @@
-import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
