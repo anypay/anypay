@@ -43,7 +43,7 @@ export {
   database,
   dashwatch,
   coins,
-  addresses
+  addresses,
   plugins,
   invoices,
   xpub

@@ -3,7 +3,6 @@
 require('dotenv').config();
 
 var program = require('commander');
-const Util = require("../lib/dash/extended_public_key_util");
 
 import {log, models} from '../lib';
 
@@ -30,78 +29,6 @@ program
     console.log(address);
 
     process.exit(0);
-
-  });
-
-
-program
-  .command('setkey <email> <xpub>')
-  .action(async (email, xpub) => {
-
-    let account = await models.Account.findOne({ where: { email }});
-
-    let xpubkey = await models.ExtendedPublicKey.findOne({ where: {
-
-      account_id: account.id
-
-    }});
-
-    if (xpubkey) {
-
-      console.log('xpubkey already set');
-
-      return;
-
-    }
-
-    xpubkey = await models.ExtendedPublicKey.create({
-
-      account_id: account.id,
-
-      nonce: 0,
-
-      xpubkey: xpub
-
-    })
-
-    console.log('xpubkey set', xpubkey.toJSON())
-    
-
-  });
-
-program
-  .command('getnewaddress <email> <currency>')
-  .action(async (email, currency) => {
-
-    let account = await models.Account.findOne({ where: { email }});
-
-    if (!account) {
-
-      throw new Error(`account with email ${email} not found`);
-  
-    }
-
-    let xpubkey = await models.ExtendedPublicKey.findOne({ where: {
-
-      account_id: account.id,
-
-      currency
-
-    }});
-
-    if (!xpubkey) {
-
-      throw new Error('no xpubkey for account');
-
-    }
-
-    let address = xpublib.generateAddress(currency, xpubkey.xpubkey, xpubkey.nonce);
-
-    xpubkey.nonce = xpubkey.nonce + 1;
-
-    await xpubkey.save();
-
-    console.log(address);
 
   });
 
