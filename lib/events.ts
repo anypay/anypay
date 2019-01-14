@@ -42,7 +42,17 @@ let events = [
 
     emitter.on(event, async (data) => {
 
-      let message = JSON.stringify(data);
+      var message;
+
+      if (typeof data === 'string') {
+
+        message = data;
+
+      } else {
+
+        message = JSON.stringify(data);
+
+      }
 
       await channel.publish(exchange, event, new Buffer(message));
 
