@@ -41,7 +41,7 @@ async function start() {
 
   // Automatically begin polling when invoice is created by binding queue
 
-  await conn.bindQueue(queue, exchange, 'invoice.created');
+  await channel.bindQueue(queue, exchange, 'invoice.created');
 
   // Legacy: begin polling when in-memory event is emitted
 
