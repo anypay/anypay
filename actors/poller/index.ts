@@ -6,7 +6,9 @@ const queue = "anypay.invoice.payments.check";
 
 import * as moment from 'moment';
 
-export function checkInvoicesUntilExpiredOrPaid(channel: Channel, lambda) {
+export async function checkInvoicesUntilExpiredOrPaid(channel: Channel, lambda) {
+
+  await channel.assertQueue(queue);
 
   channel.consume(queue, async function(msg: Message) {
 
