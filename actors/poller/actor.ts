@@ -6,7 +6,7 @@ import {Connection, Channel, Message, connect} from "amqplib";
 
 import { checkInvoicesUntilExpiredOrPaid } from './';
 
-const exchange = 'anypay';
+const exchange = 'anypay.events';
 
 const queue = "anypay.invoice.payments.check";
 

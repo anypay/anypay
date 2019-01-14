@@ -1,7 +1,7 @@
 import {Channel, Message} from "amqplib"; 
 import { log, models } from '../../lib';
 
-const exchange = 'anypay';
+const exchange = 'anypay.events';
 const queue = "anypay.invoice.payments.check";
 
 import * as moment from 'moment';
