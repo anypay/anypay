@@ -1,65 +1,61 @@
 import { plugins, log, models } from '../../lib';
+
 import { emitter } from '../../lib/events';
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import {Connection, Channel, Message, connect} from "amqplib"; 
 
-async function poll(invoice){
-  log.info(`poll.begin.${invoice.uid}`);
+import { checkInvoicesUntilExpiredOrPaid } from './';
 
-  let plugin = await plugins.findForCurrency(invoice.currency);
+const exchange = 'anypay.events';
 
-  if(plugin.poll === false){
-
-    log.debug(`polling disabled for ${invoice.currency} ${invoice.address}`);
-
-    return; 
-  }
-
-  let waitTime = [5000,2000,2000,4000,4000,8000,8000.8000,16000,16000,16000,16000]
-
-  for(let i=0;i<waitTime.length;i++){
-
-    try {
-
-      log.info("polling.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
-
-      invoice = await models.Invoice.findOne({ where: {uid: invoice.uid}});
-
-      if(invoice.status === 'paid'){ break }
-
-      await plugins.checkAddressForPayments(invoice.address,invoice.currency);
-
-    } catch(error) {
-
-      log.error(error.message);
-
-    }
-
-    log.debug(`sleep ${waitTime[i]}`);
-
-    await sleep(waitTime[i]);
-
-  }
-
-}
+const queue = "anypay.invoice.payments.check";
 
 async function start() {
 
-  log.info("START POLLER ACTOR");
+  let conn: Connection = await connect(process.env.AMQP_URL);
+
+  let channel: Channel = await conn.createChannel()
+
+  /*
+    -------------------------------
+    checkInvoicesUntilExpiredOrPaid
+    -------------------------------
+
+    Pulls invoice records from database based on a queue of invoice uids.
+
+    Invoices will be automatically re-queued at the back after checking.
+
+    Expired invoices are automatically removed from the queue.
+
+    Paid invoices automatically removed from the queue
+
+  */
+
+  checkInvoicesUntilExpiredOrPaid(channel, async function(invoice) {
+
+    log.info('check invoice for payment', invoice.uid);
+
+    await plugins.checkAddressForPayments(invoice.address, invoice.currency);
+
+  });
+
+  // Automatically begin polling when invoice is created by binding queue
+
+  await channel.bindQueue(queue, exchange, 'invoice.created');
+
+  // Legacy: begin polling when in-memory event is emitted
 
 	emitter.on('invoice.created', async (invoice) => {
 	  
 		log.info(`invoice.created ${invoice.uid}`);
+
 		log.info(`invoice.startpolling ${invoice.uid}`);
 
 		emitter.emit('invoice.poll', invoice);
-	 
-	  poll(invoice)
-	  
-	})
 
+    await channel.publish(exchange, queue, new Buffer(invoice.uid));
+	  
+	});
 
 }
 
