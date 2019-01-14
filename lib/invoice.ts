@@ -155,6 +155,8 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
 
+  emitter.emit('invoice.created', invoice.uid);
+
   return invoice;
 }
 
