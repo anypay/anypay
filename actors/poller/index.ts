@@ -10,6 +10,8 @@ export async function checkInvoicesUntilExpiredOrPaid(channel: Channel, lambda) 
 
   await channel.assertQueue(queue);
 
+  await channel.bindQueue(queue, exchange, queue);
+
   channel.consume(queue, async function(msg: Message) {
 
     try {
@@ -66,7 +68,13 @@ export async function checkInvoicesUntilExpiredOrPaid(channel: Channel, lambda) 
 
       /* republish message */
 
-      await channel.publish(exchange, queue, msg.content);
+      console.log("REPUBLISH MESSAGE");
+
+      setTimeout(async function() {
+
+        await channel.publish(exchange, queue, msg.content);
+
+      }, 2000);
 
       await channel.ack(msg);
 
