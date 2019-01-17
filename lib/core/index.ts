@@ -53,38 +53,37 @@ export async function setAddress(changeset: AddressChangeSet) {
 
   }
 
-    var address = await models.Address.findOne({ where: {
-      account_id: changeset.account_id,
-      currency: changeset.currency
-    }});
+  var address = await models.Address.findOne({ where: {
+    account_id: changeset.account_id,
+    currency: changeset.currency
+  }});
 
-    if (address) {
+  if (address) {
 
-      console.log(`${changeset.currency} address already set`);
+    console.log(`${changeset.currency} address already set`);
 
-      if (address.locked) {
+    if (address.locked) {
 
-        throw new Error(`${changeset.currency} address locked`);
-
-      }
-
-      await address.update({
-        value: changeset.address
-      });
-
-    } else {
-
-      address = await models.Address.create({
-        account_id: changeset.account_id,
-        currency: changeset.currency,
-        value: changeset.address
-      });
+      throw new Error(`${changeset.currency} address locked`);
 
     }
 
+    await address.update({
+      value: changeset.address
+    });
+
+  } else {
+
+    address = await models.Address.create({
+      account_id: changeset.account_id,
+      currency: changeset.currency,
+      value: changeset.address
+    });
+
+  }
+
   emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
-
 
 };
 

@@ -4,6 +4,8 @@ import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
 import {connect, Channel} from 'amqplib';
 
+import { models } from './';
+
 import { log } from './';
 
 class Plugins {
@@ -54,6 +56,34 @@ class Plugins {
     let plugin = new Plugin(currency, this.plugins[currency]);
 
     return plugin.plugin;
+
+  }
+
+  async getNewAddress(currency: string, accountId: number) {
+
+    let address = await models.Address.findOne({ where: {
+
+      currency,
+
+      account_id: accountId 
+
+    }});
+
+    if (!address) {
+      throw new Error(`${currency} address not found for account ${accountId}`);
+    }
+
+    log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
+
+    console.log(this.plugins[currency]);
+
+    if(!this.plugins[currency].getNewAddress){
+      throw new Error('plugin does not implement getNewAddress')
+    }
+
+    let input = await this.plugins[currency].getNewAddress(address);
+
+    return input;
 
   }
 
