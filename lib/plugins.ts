@@ -2,7 +2,8 @@ require("dotenv").config();
 
 import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
-import {connect, Channel} from 'amqplib';
+
+import { channel } from './amqp';
 
 import { models } from './';
 
@@ -12,17 +13,8 @@ class Plugins {
 
   plugins: any;
 
-  channel?: Channel;
-
   constructor() {
     this.load();
-  }
-
-  async connectAmqp() {
-    let connection = await connect(process.env.AMQP_URL);
-    this.channel = await connection.createChannel();
-
-    await this.channel.assertExchange('anypay.payments', 'direct');
   }
 
   load() {
@@ -103,7 +95,7 @@ class Plugins {
 
       let message = new Buffer(JSON.stringify(payment));
 
-      await this.channel.publish('anypay.payments', 'payment', message);
+      await channel.publish('anypay.payments', 'payment', message);
 
       log.info(`amqp.message.published`, `anypay.payments.${JSON.stringify(payment)}`);
 
@@ -117,7 +109,6 @@ class Plugin {
   currency: string;
   plugin: any;
   database?: any;
-  channel?: any;
   env?: any;
 
   constructor(currency: string, plugin?: any) {
@@ -131,12 +122,6 @@ class Plugin {
 const plugins = new Plugins();
 
 plugins.load();
-
-(async function() {
-
-  await plugins.connectAmqp();
-
-})()
 
 export {plugins};
 
