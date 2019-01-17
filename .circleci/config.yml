@@ -23,4 +23,4 @@ jobs:
       - deploy:
           command: |
             ./push_to_docker_staging.sh
-            ssh chef@api.staging.anypay.global "sudo /opt/anypay/redeploy_api_staging.sh"
+            ssh chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
