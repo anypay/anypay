@@ -20,17 +20,17 @@ dependencies:
   pre:
     - docker build -t anypay .
 
-test:
-  override:
-    - yarn db:migrate --env=test
-    - yarn test
+      #test:
+      #override:
+      #- yarn db:migrate --env=test
+      #- yarn test
 
 deployment:
   production:
     branch: master
     commands:
-      - ./push_to_docker.sh
-      - ssh chef@api.anypay.global "sudo /opt/anypay/redeploy_api.sh"
+      - ./push_to_docker_staging.sh
+      - ssh chef@api.staging.anypay.global "sudo /opt/anypay/redeploy_api_staging.sh"
   staging:
     branch: staging
     commands:
