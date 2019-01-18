@@ -4,6 +4,7 @@ require('dotenv').config();
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
+import { channel } from '../../lib/amqp';
 
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
@@ -13,6 +14,8 @@ const HapiSwagger = require("hapi-swagger");
 import * as pricesActor from '../../actors/prices/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
+
+import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
@@ -1228,6 +1231,16 @@ async function Server() {
           });
 
           log.info('blockcypher.event.recorded', hook.toJSON());
+
+          let payments = parseUnconfirmedTxEventToPayments(req.payload);
+
+          payments.forEach(async (payment) => {
+
+            log.info('payment', payment);
+
+            await channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
+
+          });
 
         } catch(error) {
 
