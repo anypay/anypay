@@ -1209,7 +1209,7 @@ async function Server() {
 
     method: 'POST',
 
-    path: 'blockcypher/webhooks/dash',
+    path: '/blockcypher/webhooks/dash',
 
     config: {
 
