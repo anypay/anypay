@@ -1,5 +1,8 @@
 
-const WEBHOOK_URL = 'https://api.anypay.global/blockcypher/webhooks/dash';
+/*
+ * allow for staging url
+ */
+const webhookBase = process.env.BLOCKCYPHER_WEBHOOK_BASE || 'https://api.anypay.global';
 
 const TOKEN = process.env.BLOCKCYPHER_TOKEN;
 
@@ -24,7 +27,7 @@ export async function createWebhook (event: string, address: string): Promise<We
 
     address,
 
-    url: WEBHOOK_URL
+    url: `${webhookBase}/blockcypher/webhooks/dash`
 
   });
 
