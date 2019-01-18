@@ -1217,15 +1217,23 @@ async function Server() {
 
         log.info('blockcypher.webhook', req.payload);
 
-        let hook = await models.BlockcypherEvent.create({
-        
-          type: 'unconfirmed-tx',
+        try {
 
-          payload: JSON.stringify(req.payload)
+          let hook = await models.BlockcypherEvent.create({
+          
+            type: 'unconfirmed-tx',
 
-        });
+            payload: JSON.stringify(req.payload)
 
-        log.info('blockcypher.event.recorded', hook.toJSON());
+          });
+
+          log.info('blockcypher.event.recorded', hook.toJSON());
+
+        } catch(error) {
+
+          log.error(error.message);
+
+        }
 
         return { success: true }
 
