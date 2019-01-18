@@ -1217,7 +1217,7 @@ async function Server() {
 
         log.info('blockcypher.webhook', req.payload);
 
-        let hook = await await models.BlockcypherEvent.create({
+        let hook = await models.BlockcypherEvent.create({
         
           type: 'unconfirmed-tx',
 
