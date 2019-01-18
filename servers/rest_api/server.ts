@@ -1203,6 +1203,23 @@ async function Server() {
       }
 
     }
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: 'blockcypher/webhooks/dash',
+
+    config: {
+
+      handler: async function(req, h) {
+
+        log.info('WEBHOOK', req.payload);
+
+      }
+
+    }
 
   });
 
