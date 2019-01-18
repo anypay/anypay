@@ -23,16 +23,14 @@ jobs:
       - deploy:
           filters:
               branches:
-                only:
-                  - staging
+                only: staging
           command: |
             ./push_to_docker_staging.sh
             ssh chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
       - deploy:
           filters:
               branches:
-                only:
-                  - master
+                only: master
           command: |
             ./push_to_docker.sh
             ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"

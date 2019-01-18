@@ -64,7 +64,7 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    await createWebhook('unconfirmed-tx', address);
+    await createWebhook('tx-confirmation', address);
 
   } else {
 
