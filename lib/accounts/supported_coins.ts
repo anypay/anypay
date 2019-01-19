@@ -1,6 +1,10 @@
 import {Account, Address} from '../models';
 
 import { getCoins } from '../coins';
+import {
+  AccountAddress,
+  AccountAddresses
+} from '../core/types';
 
 export async function getSupportedCoins(accountId: number): Promise<any> {
 
@@ -14,7 +18,8 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
   
     acc[address.currency] = {
       code: address.currency,
-      name: address.name,
+      currency: address.currency,
+      name: address.currency,
       enabled: true,
       icon: `https://pos.anypay.global/${address.currency.toLowerCase()}.png`,
       address: address.value
@@ -42,7 +47,23 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
         enabled: false,
         icon: `https://pos.anypay.global/${coin.code.toLowerCase()}.png`
       };
+
     }
+
+    if (coin.code === 'BCH') {
+
+      let address = accountCoins[coin.code].address;
+
+      // Enable BCH only if xpubkey set
+
+      if (address && address.match(/^xpub/)) {
+
+        accountCoins[coin.code].unavailable = false;
+
+      }
+
+    }
+
 
   });
 

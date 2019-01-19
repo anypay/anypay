@@ -7,6 +7,14 @@ export interface Payment {
   confirmations?: number;
 }
 
+export interface I_Address {
+  id: number;
+  account_id: number;
+  currency: string;
+  value: string;
+  nonce?: number;
+}
+
 export interface Invoice {
   id: number;
   uid: string;

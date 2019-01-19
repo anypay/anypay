@@ -2,7 +2,10 @@ require("dotenv").config();
 
 import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
-import {connect, Channel} from 'amqplib';
+
+import { channel } from './amqp';
+
+import { models } from './';
 
 import { log } from './';
 
@@ -10,17 +13,8 @@ class Plugins {
 
   plugins: any;
 
-  channel?: Channel;
-
   constructor() {
     this.load();
-  }
-
-  async connectAmqp() {
-    let connection = await connect(process.env.AMQP_URL);
-    this.channel = await connection.createChannel();
-
-    await this.channel.assertExchange('anypay.payments', 'direct');
   }
 
   load() {
@@ -57,6 +51,34 @@ class Plugins {
 
   }
 
+  async getNewAddress(currency: string, accountId: number) {
+
+    let address = await models.Address.findOne({ where: {
+
+      currency,
+
+      account_id: accountId 
+
+    }});
+
+    if (!address) {
+      throw new Error(`${currency} address not found for account ${accountId}`);
+    }
+
+    log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
+
+    console.log(this.plugins[currency]);
+
+    if(!this.plugins[currency].getNewAddress){
+      throw new Error('plugin does not implement getNewAddress')
+    }
+
+    let input = await this.plugins[currency].getNewAddress(address);
+
+    return input;
+
+  }
+
   async checkAddressForPayments(address: string, currency: string) {
 
     log.info(`global.checkaddressforpayments.${address}.${currency}`);
@@ -73,7 +95,7 @@ class Plugins {
 
       let message = new Buffer(JSON.stringify(payment));
 
-      await this.channel.publish('anypay.payments', 'payment', message);
+      await channel.publish('anypay.payments', 'payment', message);
 
       log.info(`amqp.message.published`, `anypay.payments.${JSON.stringify(payment)}`);
 
@@ -87,7 +109,6 @@ class Plugin {
   currency: string;
   plugin: any;
   database?: any;
-  channel?: any;
   env?: any;
 
   constructor(currency: string, plugin?: any) {
@@ -101,12 +122,6 @@ class Plugin {
 const plugins = new Plugins();
 
 plugins.load();
-
-(async function() {
-
-  await plugins.connectAmqp();
-
-})()
 
 export {plugins};
 

@@ -27,6 +27,8 @@ var BankAccount = require('./bank_account')(sequelize, Sequelize);
 var BlockcypherPaymentForward = require('./blockcypher_payment_forward')(sequelize, Sequelize);
 var MerchantGroup = require('./merchant_group')(sequelize, Sequelize);
 var MerchantGroupMember = require('./merchant_group_member')(sequelize, Sequelize);
+var BlockcypherEvent = require('./blockcypher_event')(sequelize, Sequelize);
+var BlockcypherHook = require('./blockcypher_hook')(sequelize, Sequelize);
 
 export {
   Account,
@@ -55,5 +57,7 @@ export {
   BlockcypherPaymentForward,
   MerchantGroup,
   MerchantGroupMember,
+  BlockcypherEvent,
+  BlockcypherHook
 };
 

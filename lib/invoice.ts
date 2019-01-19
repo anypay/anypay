@@ -1,4 +1,3 @@
-import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
@@ -23,6 +22,8 @@ import * as models from './models';
 
 import {convert} from './prices';
 
+import {plugins} from './plugins';
+
 interface Amount {
   currency: string;
   value: number
@@ -46,8 +47,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
   switch(currency) {
 
     case 'DASH':
+      console.log("generate dash invoice");
 
-      address = await DashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('DASH', accountId);
 
       break;
 
@@ -65,7 +67,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'BCH':
 
-      address = await BitcoinCashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('BCH', accountId);
 
       break;
 
