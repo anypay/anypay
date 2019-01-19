@@ -21,6 +21,7 @@ import * as xpub from './xpub';
 import * as invoice from './invoice';
 import { log } from './logger';
 import { plugins } from './plugins';
+import * as blockcypher from './blockcypher';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -46,6 +47,7 @@ export {
   addresses,
   plugins,
   invoices,
-  xpub
+  xpub,
+  blockcypher
 }
 
