@@ -118,9 +118,20 @@ async function getTotalVerifiedMerchants(endDateFormatted) {
 
 }
 
-async function countMonthlyTransactionsAllCrypto(start, end) {
+async function getAccountId(email){
 
-  let resp = await database.query(`select count(*) from invoices where status = 'paid'
+  let resp = await database.query(`SELECT id FROM accounts WHERE email='${email}'`)
+
+  return resp[0][0].id
+
+}
+
+
+export async function countMonthlyTransactionsAllCrypto(start, end) {
+
+  let id = await getAccountId('diagnostics@anypay.global')
+
+  let resp = await database.query(`select count(*) from invoices where not id=${id} and  status = 'paid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
@@ -128,9 +139,11 @@ async function countMonthlyTransactionsAllCrypto(start, end) {
 
 }
 
-async function countMonthlyTransactionsDash(start, end) {
+export async function countMonthlyTransactionsDash(start, end) {
 
-  let resp = await database.query(`select count(*) from invoices where status = 'paid'
+  let id = await getAccountId('diagnostics@anypay.global')
+
+  let resp = await database.query(`select count(*) from invoices where not id=${id} and status = 'paid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}' and currency = 'DASH'`);
 
