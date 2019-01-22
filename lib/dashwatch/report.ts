@@ -131,7 +131,7 @@ export async function countMonthlyTransactionsAllCrypto(start, end) {
 
   let id = await getAccountId('diagnostics@anypay.global')
 
-  let resp = await database.query(`select count(*) from invoices where not id=${id} and  status = 'paid'
+  let resp = await database.query(`select count(*) from invoices where not account_id=${id} and  status = 'paid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
@@ -143,7 +143,7 @@ export async function countMonthlyTransactionsDash(start, end) {
 
   let id = await getAccountId('diagnostics@anypay.global')
 
-  let resp = await database.query(`select count(*) from invoices where not id=${id} and status = 'paid'
+  let resp = await database.query(`select count(*) from invoices where not account_id=${id} and status = 'paid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}' and currency = 'DASH'`);
 
