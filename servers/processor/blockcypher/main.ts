@@ -49,9 +49,11 @@ function WebhookConsumer(currency, channel) {
   return async function(message) {
     try {
 
-      await Blockcypher.recordAddressForwardCallback(
-        JSON.parse(message.content.toString())
-      );
+      let addressForwardCallback = JSON.parse(message.content.toString());
+
+      console.log('addressForwardCallback', addressForwardCallback);
+
+      await Blockcypher.recordAddressForwardCallback(addressForwardCallback);
     
       var payment = await parseWebhookMessage(message, currency.name, currency.fee);
 
