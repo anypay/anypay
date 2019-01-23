@@ -29,6 +29,8 @@ var MerchantGroup = require('./merchant_group')(sequelize, Sequelize);
 var MerchantGroupMember = require('./merchant_group_member')(sequelize, Sequelize);
 var BlockcypherEvent = require('./blockcypher_event')(sequelize, Sequelize);
 var BlockcypherHook = require('./blockcypher_hook')(sequelize, Sequelize);
+var BlockcypherAddressForward = require('./blockcypher_address_forward')(sequelize, Sequelize);
+var BlockcypherAddressForwardCallback = require('./blockcypher_address_forward_callback')(sequelize, Sequelize);
 
 export {
   Account,
@@ -58,6 +60,8 @@ export {
   MerchantGroup,
   MerchantGroupMember,
   BlockcypherEvent,
-  BlockcypherHook
+  BlockcypherHook,
+  BlockcypherAddressForward,
+  BlockcypherAddressForwardCallback
 };
 

@@ -2,6 +2,10 @@ const http = require("superagent");
 
 let token = process.env.BLOCKCYPHER_TOKEN;
 
+import { log } from '../logger';
+
+import * as models from '../models';
+
 const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypay.global";
 
 function createWebhook(address) {
@@ -59,33 +63,70 @@ function createTxConfirmationWebhook(address) {
   });
 }
 
-module.exports.createWebhook = createWebhook;
-module.exports.listPayments = listPayments;
-module.exports.createTxConfirmationWebhook = createTxConfirmationWebhook;
+var BLOCKCYPHER_CALLBACKS_BASE = CALLBACKS_BASE;
 
-module.exports.BLOCKCYPHER_CALLBACKS_BASE = CALLBACKS_BASE;
+var BITCOIN_FEE,
+    DASH_FEE,
+    LITECOIN_FEE,
+    DOGECOIN_FEE;
 
 if (process.env.BLOCKCYPHER_BITCOIN_FEE) {
-  module.exports.BITCOIN_FEE = parseInt(process.env.BLOCKCYPHER_BITCOIN_FEE)
+  BITCOIN_FEE = parseInt(process.env.BLOCKCYPHER_BITCOIN_FEE)
 } else {
-  module.exports.BITCOIN_FEE = 10000;
+  BITCOIN_FEE = 10000;
 }
 
 if (process.env.BLOCKCYPHER_DASH_FEE) {
-  module.exports.DASH_FEE = parseInt(process.env.BLOCKCYPHER_DASH_FEE)
+  DASH_FEE = parseInt(process.env.BLOCKCYPHER_DASH_FEE)
 } else {
-  module.exports.DASH_FEE = 10000;
+  DASH_FEE = 10000;
 }
 
 if (process.env.BLOCKCYPHER_LITECOIN_FEE) {
-  module.exports.LITECOIN_FEE = parseInt(process.env.BLOCKCYPHER_LITECOIN_FEE)
+  LITECOIN_FEE = parseInt(process.env.BLOCKCYPHER_LITECOIN_FEE)
 } else {
-  module.exports.LITECOIN_FEE = 10000;
+  LITECOIN_FEE = 10000;
 }
 
 if (process.env.BLOCKCYPHER_DOGECOIN_FEE) {
-  module.exports.DOGECOIN_FEE = parseInt(process.env.BLOCKCYPHER_DOGECOIN_FEE)
+  DOGECOIN_FEE = parseInt(process.env.BLOCKCYPHER_DOGECOIN_FEE)
 } else {
-  module.exports.DOGECOIN_FEE = 10000;
+  DOGECOIN_FEE = 10000;
+}
+
+export async function recordAddressForward(forward: any): Promise<any> {
+
+  let addressForward = Object.assign({}, forward);
+
+  addressForward.uid = forward.id;
+  delete addressForward.id
+
+  let record = await models.BlockcypherAddressForward.create(addressForward);
+
+  log.info('blockcypher.addressforward.created', record.toJSON());
+
+  return record;
+
+}
+
+export async function recordAddressForwardCallback(addressForwardCallback: any): Promise<any> {
+
+  let record = await models.BlockcypherAddressForwardCallback.create(addressForwardCallback);
+
+  log.info('blockcypher.addressforwardcallback.created', record.toJSON());
+
+  return record;
+
+}
+
+export {
+  createWebhook,
+  listPayments,
+  createTxConfirmationWebhook,
+  BITCOIN_FEE,
+  LITECOIN_FEE,
+  DOGECOIN_FEE,
+  DASH_FEE,
+  BLOCKCYPHER_CALLBACKS_BASE
 }
 

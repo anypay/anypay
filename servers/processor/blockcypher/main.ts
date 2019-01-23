@@ -1,10 +1,11 @@
 require('dotenv').config();
 import amqp = require("amqplib");
-var log = require("winston");
 var Blockcypher = require("../../../lib/blockcypher");
 var Invoice = require("../../../lib/models/invoice");
 var Dashcore = require("../../../lib/dashcore");
 var Slack = require("../../../lib/slack/notifier");
+
+import { log } from '../../../lib';
 
 var AMQP_URL = process.env.AMQP_URL;
 var QUEUE = "blockcypher:webhooks";
@@ -47,6 +48,14 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
 function WebhookConsumer(currency, channel) {
   return async function(message) {
     try {
+
+      let addressForwardCallback = JSON.parse(message.content.toString());
+
+      log.info('addressForwardCallback', addressForwardCallback);
+
+      let record = await Blockcypher.recordAddressForwardCallback(addressForwardCallback);
+
+      log.info('addressForwardCallback.recorded', record.toJSON());
     
       var payment = await parseWebhookMessage(message, currency.name, currency.fee);
 

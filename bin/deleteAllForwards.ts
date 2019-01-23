@@ -6,7 +6,7 @@ const token = process.env.BLOCKCYPHER_TOKEN;
 
 async function getWebhooks() {
   let resp = await http
-    .get(`https://api.blockcypher.com/v1/dash/main/forwards/?token=${token}`)
+    .get(`https://api.blockcypher.com/v1/dash/main/payments/?token=${token}`)
 
   return resp.body;
 }
@@ -15,6 +15,13 @@ async function deleteWebhook(id) {
   await http
     .delete(
       `https://api.blockcypher.com/v1/dash/main/forwards/${id}?token=${token}`
+    )
+}
+
+async function deletePayment(id) {
+  await http
+    .delete(
+      `https://api.blockcypher.com/v1/dash/main/payments/${id}?token=${token}`
     )
 }
 
@@ -28,7 +35,9 @@ async function deleteWebhook(id) {
       let webhook = webhooks[i];
 
       console.log('delete webhook', webhook);
-      await deleteWebhook(webhook.id);
+      //let resp = await deleteWebhook(webhook.id);
+      let resp = await deletePayment(webhook.id);
+      console.log(resp);
 
   }
 
