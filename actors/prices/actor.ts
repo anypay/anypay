@@ -3,7 +3,7 @@ require('dotenv').config();
 import { log, models } from '../../lib';
 
 import { getVESPrice } from '../../lib/prices/localbitcoins';
-import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
+import { getPriceOfOneDASHInVES } from '../../lib/prices/ves';
 import { getAllPrices } from '../../lib/prices';
 
 import * as http from 'superagent';
@@ -46,11 +46,11 @@ async function updateVESPrice() {
 
   log.info('update VES price');
 
-  let usdPrice = await getPriceOfOneDollarInVES();
+  let dashPrice = await getPriceOfOneDASHInVES();
 
   let allPrices = await getAllPrices();
 
-  let btcPrice = usdPrice * allPrices['USD'];
+  let btcPrice = dashPrice * allPrices['DASH'];
 
   if (btcPrice && btcPrice > 0) {
 
