@@ -2,6 +2,8 @@ require('dotenv').config();
 
 var JSONRPC = require('./lib/jsonrpc');
 
+import * as http from 'superagent';
+
 import {generateInvoice} from '../../lib/invoice';
 
 import {log, models, xpub} from '../../lib';
@@ -116,6 +118,20 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
   return invoice
 }
 
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://bch.anypay.global/v1/bch/forwards";
+
+  let resp = await http.post(url).send({
+
+    destination: record.value
+
+  });
+
+  return resp.body.input_address;
+
+}
+
 export async function getNewAddress(record: I_Address) {
 
   if (record.value.match(/^xpub/)) {
@@ -140,10 +156,9 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-    //address = await bch.generateInvoiceAddress(account.bitcoin_cash_address);
-    //
-    // ( or if not enabled throw error )
-    throw new Error('only extended public keys supported at this time');
+    let address = await createAddressForward(record);
+
+    return address;
 
   }
 
