@@ -124,7 +124,9 @@ async function createAddressForward(record: I_Address) {
 
   let resp = await http.post(url).send({
 
-    destination: record.value
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/bch/address_forward_callbacks'
 
   });
 

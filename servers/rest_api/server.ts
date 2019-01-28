@@ -16,7 +16,8 @@ import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-
+import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
+ 
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const DenominationsController = require("./handlers/denominations");
@@ -1206,6 +1207,20 @@ async function Server() {
       }
 
     }
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/bch/address_forward_callbacks',
+
+    config: {
+
+      handler: BCHAddressForwardCallbacks.create
+
+    }
+
   });
 
   server.route({
