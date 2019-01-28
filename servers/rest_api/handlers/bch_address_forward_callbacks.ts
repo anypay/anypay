@@ -10,7 +10,7 @@ export async function create(req, h) {
   let payment = {
     currency: "BCH",
     amount: req.payload.value,
-    address: req.paylod.input_address,
+    address: req.payload.input_address,
     hash: req.payload.input_transaction_hash,
     output_hash: req.payload.destination_transaction_hash
   }
