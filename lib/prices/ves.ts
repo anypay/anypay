@@ -34,6 +34,14 @@ export async function getPriceOfOneDollarInVES() {
 
 }
 
+export async function getPriceOfOneDASHInVES() {
+
+  let resp = await http.get('https://api.get-spark.com/ves')
+
+  return resp.body['VES'];
+
+}
+
 export async function periodicallyRefresh(interval) {
 
   if (!refreshInterval) {
