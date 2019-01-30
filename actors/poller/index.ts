@@ -36,6 +36,15 @@ export async function checkInvoicesUntilExpiredOrPaid(channel: Channel, lambda) 
 
       log.info('invoice found', invoice.toJSON());
 
+      // do not poll for BCH invoices anymore
+      if (invoice.currency === 'BCH') {
+
+        await channel.ack(msg);
+
+        return;
+        
+      }
+
       if ( moment() > moment(invoice.expiry) ) {
 
         log.info(`invoice ${invoice.uid} expired`);
