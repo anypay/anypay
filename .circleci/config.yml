@@ -5,16 +5,15 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
-      - setup_remote_docker:
+      - setup_remote_docker
       - run:
           name: Build docker image
           command: docker build -t anypay .
       - add_ssh_keys
   deploy:
-    docker:
-      - image: circleci/node:10
+    machine: true
     steps:
-      - setup_remote_docker:
+      - setup_remote_docker
       - run:
           name: Deploy To Server
           command: |
