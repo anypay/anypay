@@ -20,11 +20,20 @@ jobs:
 
       - add_ssh_keys
 
+  deploy:
+    command: |
+      ./push_to_docker.sh
+      ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
       - deploy:
-          filters:
-            branches:
-              only: master
-          command: |
-            ./push_to_docker.sh
-            ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
 
