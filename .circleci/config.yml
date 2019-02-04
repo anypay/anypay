@@ -21,8 +21,6 @@ workflows:
           - add_ssh_keys
 
       deploy:
-        requires:
-          - build
         filters:
           branches:
             only: master
