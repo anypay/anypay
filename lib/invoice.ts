@@ -91,7 +91,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'ZEN':
 
-      address = await ZencashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('ZEN', accountId);
 
       break;
   }

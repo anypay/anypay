@@ -2,6 +2,10 @@ require("dotenv").config();
 
 import {generateInvoice} from '../../lib/invoice';
 
+import { I_Address } from '../../types/interfaces';
+
+import * as http from 'superagent'
+
 import {anypay_checkAddressForPayments} from './lib/checkAddressForPayments'
 
 import {statsd} from '../../lib/stats/statsd';
@@ -55,6 +59,34 @@ async function checkAddressForPayments(address:string, currency:string) {
   return(payments)
 
 }
+
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://zen.anypay.global/v1/zen/forwards";
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/zen/address_forward_callbacks'
+
+  });
+
+  return resp.body.input_address;
+
+}
+
+export async function getNewAddress(record: I_Address) {
+
+  let address = await createAddressForward(record);
+
+  return address;
+
+}
+
+
+
+
 const currency = 'ZEN';
 
 const poll = true;
