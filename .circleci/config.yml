@@ -1,22 +1,15 @@
 version: 2
 jobs:
   build:
-     docker:
-       - image: circleci/node:10
-         environment:
-           JOBS: 1
-       steps:
-        - checkout
-        - setup_remote_docker:
-            filters:
-              branches:
-                only:
-                  - master
-                  - staging
-        - run:
-            name: Build docker image
-            command: docker build -t anypay .
-        - add_ssh_keys
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - setup_remote_docker:
+      - run:
+          name: Build docker image
+          command: docker build -t anypay .
+      - add_ssh_keys
   deploy:
     steps:
       - run:
