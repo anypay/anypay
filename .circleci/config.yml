@@ -26,8 +26,8 @@ workflows:
             only: master
         steps:
           - run:
-            name: Deploy To Server
-            command: |
-              ./push_to_docker.sh
-              ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
+              name: Deploy To Server
+              command: |
+                ./push_to_docker.sh
+                ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
 
