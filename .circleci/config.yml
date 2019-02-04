@@ -21,9 +21,12 @@ jobs:
       - add_ssh_keys
 
   deploy:
-    command: |
-      ./push_to_docker.sh
-      ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
+    steps:
+      - run
+        name: Deploy To Server
+        command: |
+          ./push_to_docker.sh
+          ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
 
 workflows:
   version: 2
