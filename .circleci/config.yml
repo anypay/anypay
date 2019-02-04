@@ -17,6 +17,9 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
+          name: Build docker image
+          command: docker build -t anypay .
+      - run:
           name: Deploy To Server
           command: |
             ./push_to_docker.sh
