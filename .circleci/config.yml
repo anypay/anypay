@@ -25,7 +25,7 @@ workflows:
           branches:
             only: master
         steps:
-          - run
+          - run:
             name: Deploy To Server
             command: |
               ./push_to_docker.sh
