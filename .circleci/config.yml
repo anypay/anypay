@@ -11,7 +11,8 @@ jobs:
           command: docker build -t anypay .
       - add_ssh_keys
   deploy:
-    machine: true
+    docker:
+      - image: circleci/node:10
     steps:
       - setup_remote_docker
       - run:
