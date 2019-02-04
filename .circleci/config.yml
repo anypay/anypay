@@ -11,6 +11,8 @@ jobs:
           command: docker build -t anypay .
       - add_ssh_keys
   deploy:
+    docker:
+      - image: circleci/node:10
     steps:
       - run:
         name: Deploy To Server
