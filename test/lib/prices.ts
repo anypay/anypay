@@ -51,5 +51,19 @@ describe('Prices', () => {
 
   });
   
+    it("#convert should convert from USD to ZEN", async () => {
+
+    let input = {
+      currency: 'USD',
+      value: 12
+    }
+
+    let output = await prices.convert(input, 'ZEN');
+
+    console.log('output of 12 USD to ZEN', output);
+
+    assert(output.value > 0);
+
+  });
 
 });
