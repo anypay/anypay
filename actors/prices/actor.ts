@@ -64,15 +64,22 @@ async function updateCryptos() {
 
   log.info('update crypto rates');
 
-  let resp = await http.get('https://api.coinmarketcap.com/v1/ticker');
+  let resp = await http
+                     .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
+                     .query({
+                        start: 1,
+                        limit: 5000,
+                        convert: "BTC"
+                      })
+                      .set( 'X-CMC_PRO_API_KEY',process.env.COINMARKETCAP_API_KEY);
+   
+  for( let i=0; i < resp.body.data.length; i++){
 
-  for (let i=0; i < resp.body.length; i++) {
+    let item = resp.body.data[i];
 
-    let item = resp.body[i];
+    let value = 1 / parseFloat(item.quote.BTC.price);
 
-    let value = 1 / parseFloat(item.price_btc);
-
-    if (value > 0) {
+    if( value > 0 ){
 
       await setPrice(item.symbol, value);
 
@@ -134,7 +141,7 @@ async function start() {
 
   }, 1000 * 60 * 60); // every hour
 
-  await updateFiatCurrencies();
+  //  await updateFiatCurrencies();
 
   await updateCryptos();
 
