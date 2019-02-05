@@ -19,7 +19,7 @@
     "amqplib": "^0.5.2",
     "ascii-art": "^1.5.0",
     "asciichart": "^1.5.7",
-    "async": "^2.5.0",
+    "async": "^2.6.1",
     "aws-sdk": "^2.229.1",
     "bchaddrjs": "^0.2.1",
     "bcrypt": "^2.0.1",

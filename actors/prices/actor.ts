@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+var async = require("async");
+
 import { log, models } from '../../lib';
 
 import { getVESPrice } from '../../lib/prices/localbitcoins';
@@ -11,6 +13,8 @@ import * as http from 'superagent';
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
 async function setPrice(currency, value) {
+
+  log.info("set price", currency, value)
 
   let [price, isNew] = await models.Price.findOrCreate({
 
@@ -37,8 +41,40 @@ async function setPrice(currency, value) {
 
   }
 
-  return price;
+  return price
 
+}
+
+async function setPriceChuncks(currency, value, callback) {
+
+  log.info("set price", currency, value)
+
+  let [price, isNew] = await models.Price.findOrCreate({
+
+    where: {
+
+      currency
+
+    },
+
+    defaults: {
+
+      currency,
+
+      value
+
+    }
+  });
+
+  if (!isNew) {
+
+    price.value = value;
+
+    await price.save();
+
+  }
+
+  callback(price)
 
 }
 
@@ -68,25 +104,21 @@ async function updateCryptos() {
                      .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
                      .query({
                         start: 1,
-                        limit: 5000,
+                        limit: 1000,
                         convert: "BTC"
                       })
                       .set( 'X-CMC_PRO_API_KEY',process.env.COINMARKETCAP_API_KEY);
-   
-  for( let i=0; i < resp.body.data.length; i++){
+  
+  async.eachLimit(resp.body.data, 10, (item,callback)=>{  
 
-    let item = resp.body.data[i];
+    setPriceChuncks(item.symbol, 1 / parseFloat(item.quote.BTC.price), (res)=>{
 
-    let value = 1 / parseFloat(item.quote.BTC.price);
+      callback();
 
-    if( value > 0 ){
+    })  
 
-      await setPrice(item.symbol, value);
-
-    }
-
-  }
-
+  })
+  
 }
 
 async function updateFiatCurrencies() {
