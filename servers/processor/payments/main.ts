@@ -2,9 +2,9 @@ require('dotenv').config();
 const amqp = require("amqplib");
 const log = require("winston");
 const Blockcypher = require("../../../lib/blockcypher");
-const Invoice = require("../../../lib/models/invoice");
-const Account = require("../../../lib/models/account");
 const Slack = require("../../../lib/slack/notifier");
+
+import { models } from '../../../lib';
 
 import {Connection, Channel, Message} from "amqplib"; 
 import {paymentSchema} from '../../../jsonschema/payment';
@@ -46,7 +46,7 @@ function handlePaymentMessage(payment: Payment) {
 
     try {
       
-      invoice = await Invoice.findOne({
+      invoice = await models.Invoice.findOne({
         where: {
           currency: payment.currency,
           address: payment.address,
@@ -72,15 +72,21 @@ function handlePaymentMessage(payment: Payment) {
 
           await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
-          let account = await Account.findOne({
+          let account = await models.Account.findOne({
       where: {
               id: invoice.account_id
       }
           });
 
-          Slack.notify(
-            `invoice:${invoice.status} ${account.email} https://pos.anypay.global/invoices/${invoice.uid}`
-          );
+          invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
+
+          if (account.email !== 'diagnostic@anypay.global') {
+
+            Slack.notify(
+              `invoice:${invoice.status} ${account.email} https://pos.anypay.global/invoices/${invoice.uid}`
+            );
+
+          }
 
         } else {
 
@@ -170,7 +176,7 @@ function WebhooksConsumer(channel: Channel) {
 
     log.info('UID', uid);
 
-    let invoice = await Invoice.findOne({ where: { uid }});
+    let invoice = await models.Invoice.findOne({ where: { uid }});
 
     if (!invoice) {
 
