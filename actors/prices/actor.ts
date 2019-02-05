@@ -104,7 +104,7 @@ async function updateCryptos() {
                      .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
                      .query({
                         start: 1,
-                        limit: 1000,
+                        limit: 300,
                         convert: "BTC"
                       })
                       .set( 'X-CMC_PRO_API_KEY',process.env.COINMARKETCAP_API_KEY);
