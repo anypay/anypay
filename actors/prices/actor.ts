@@ -141,7 +141,7 @@ async function start() {
 
   }, 1000 * 60 * 60); // every hour
 
-  //  await updateFiatCurrencies();
+  await updateFiatCurrencies();
 
   await updateCryptos();
 
