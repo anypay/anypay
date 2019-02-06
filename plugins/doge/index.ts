@@ -6,6 +6,20 @@ import {Payment,Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
+import * as forwards from './lib/forwards';
+
+import { I_Address } from '../../types/interfaces';
+
+async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
+
+  let start = new Date().getTime()
+
+  let paymentForward = await forwards.setupPaymentForward(settlementAddress);
+
+  return paymentForward.input_address;
+
+}
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -53,7 +67,37 @@ async function checkAddressForPayments(address:string,currency:string){
       statsd.increment('DOGE_checkAddressForPayments')
     
       return payments 
+      
 }
+
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://api.anypay.global/ltc/address_forward_callbacks";
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/ltc/address_forward_callbacks'
+
+  });
+
+  return resp.body.input_address;
+
+}
+
+export async function getNewAddress(record: I_Address) {
+
+  let address = await createAddressForward(record);
+
+  return address;
+
+}
+
+
+
+
+
 const currency = 'DOGE';
 
 const poll = false;
