@@ -19,6 +19,8 @@ import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockc
 import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
 import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
  
+import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_callbacks';
+
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const DenominationsController = require("./handlers/denominations");
@@ -1219,6 +1221,20 @@ async function Server() {
     config: {
 
       handler: BCHAddressForwardCallbacks.create
+
+    }
+
+  });
+
+   server.route({
+
+    method: 'POST',
+
+    path: '/ltc/address_forward_callbacks',
+
+    config: {
+
+      handler: LTCAddressForwardCallbacks.create
 
     }
 

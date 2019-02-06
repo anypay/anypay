@@ -61,7 +61,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'LTC':
 
-      address = await LitecoinAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('LTC', accountId);
 
       break;
 
