@@ -79,7 +79,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'DOGE':
 
-      address = await DogecoinAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('DOGE', accountId);
 
       break;
 

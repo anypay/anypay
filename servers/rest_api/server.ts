@@ -20,6 +20,14 @@ import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_call
 import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
 import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_callbacks';
  
+
+
+
+
+
+
+import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
+
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const DenominationsController = require("./handlers/denominations");
@@ -1239,7 +1247,6 @@ async function Server() {
 
   });
 
- 
   server.route({
 
     method: 'POST',
@@ -1254,6 +1261,19 @@ async function Server() {
 
   });
 
+ server.route({
+
+    method: 'POST',
+
+    path: '/doge/address_forward_callbacks',
+
+    config: {
+
+      handler: DOGEAddressForwardCallbacks.create
+
+    }
+
+  });
 
   server.route({
 
