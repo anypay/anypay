@@ -1,7 +1,5 @@
 const http = require("superagent")
 
-import {generateInvoice} from '../../lib/invoice';;
-
 import {Payment,Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
