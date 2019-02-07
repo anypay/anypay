@@ -75,7 +75,7 @@ async function checkAddressForPayments(address:string,currency:string){
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://api.anypay.global/zec/address_forward_callbacks";
+  let url = process.env.ZEC_FORWARDING_URL;
 
   let resp = await http.post(url).send({
 
