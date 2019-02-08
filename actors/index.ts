@@ -11,7 +11,6 @@
 
 import * as bchPaymentForwarder from '../plugins/bch/actors/payment_forwarder';
 import * as zenPaymentForwarder from '../plugins/zen/actors/payment_forwarder';
-import * as zecPaymentForwarder from '../plugins/zec/actors/payment_forwarder';
 
 import * as poller from './poller/actor';
 import * as slack from './slack/actor';
@@ -55,7 +54,6 @@ async function start(actors?: any) {
     await bchPaymentForwarder.start();
     await zenPaymentForwarder.start();
     await instantsend.start();
-    await zecPaymentForwarder.start();
   }
 
 }
