@@ -58,7 +58,7 @@ async function checkAddressForPayments(address:string, currency:string){
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://api.anypay.global/ltc/address_forward_callbacks";
+  let url = process.env.LTC_FORWARDING_URL; 
 
   let resp = await http.post(url).send({
 
