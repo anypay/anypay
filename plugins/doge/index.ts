@@ -6,19 +6,8 @@ import {Payment,Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
-import * as forwards from './lib/forwards';
-
 import { I_Address } from '../../types/interfaces';
 
-async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
-
-  let start = new Date().getTime()
-
-  let paymentForward = await forwards.setupPaymentForward(settlementAddress);
-
-  return paymentForward.input_address;
-
-}
 
 async function createInvoice(accountId: number, amount: number) {
 
@@ -72,13 +61,13 @@ async function checkAddressForPayments(address:string,currency:string){
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://api.anypay.global/ltc/address_forward_callbacks";
+  let url = "https://api.anypay.global/doge/address_forward_callbacks";
 
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/ltc/address_forward_callbacks'
+    callback_url: 'https://api.anypay.global/doge/address_forward_callbacks'
 
   });
 
