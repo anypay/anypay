@@ -19,13 +19,6 @@ import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockc
 import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
 import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
 import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_callbacks';
- 
-
-
-
-
-
-
 import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
 
 const AccountsController = require("./handlers/accounts");
@@ -1247,31 +1240,6 @@ async function Server() {
 
   });
 
-
-
-
-
-
-
-
-
-
-
-
-
- server.route({
-
-    method: 'POST',
-
-    path: '/doge/address_forward_callbacks',
-
-    config: {
-
-      handler: DOGEAddressForwardCallbacks.create
-
-    }
-
-  });
 
   server.route({
 
