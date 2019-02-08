@@ -4,22 +4,9 @@ import {Payment,Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd'
 
-import * as forwards from './lib/forwards';
-
 import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
-
-async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
-
-  let start = new Date().getTime()
-
-  let paymentForward = await forwards.setupPaymentForward(settlementAddress);
-
-  return paymentForward.input_address;
-
-}
-
 
 async function createInvoice(accountId: number, amount: number) {
 
