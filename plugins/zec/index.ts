@@ -1,10 +1,12 @@
-import {generateInvoice} from '../../lib/invoice';
-
 import {Payment,Invoice} from '../../types/interfaces';
 
 const http = require("superagent");
 
 import {statsd} from '../../lib/stats/statsd'
+
+import {generateInvoice} from '../../lib/invoice';
+
+import { I_Address } from '../../types/interfaces';
 
 async function createInvoice(accountId: number, amount: number) {
 
@@ -20,8 +22,6 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-//@param invoice - an existing invoice
-//@return - A promise containing an array of recieved tx to the invoice address
 async function checkAddressForPayments(address:string,currency:string){
   
   let start = new Date().getTime()
@@ -53,6 +53,30 @@ async function checkAddressForPayments(address:string,currency:string){
     statsd.increment('ZEC_checkAddressForPayments')
     
     return payments 
+}
+
+async function createAddressForward(record: I_Address) {
+
+  let url = process.env.ZEC_FORWARDING_URL;
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/zec/address_forward_callbacks'
+
+  });
+
+  return resp.body.input_address;
+
+}
+
+export async function getNewAddress(record: I_Address) {
+
+  let address = await createAddressForward(record);
+
+  return address;
+
 }
 
 const currency = 'ZEC';

@@ -85,7 +85,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
     case 'ZEC':
 
-      address = await ZcashAddressService.getNewAddress(accountId);
+      address = await plugins.getNewAddress('ZEC', accountId);
 
       break;
 

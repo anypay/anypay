@@ -54,7 +54,6 @@ async function start(actors?: any) {
     await bchPaymentForwarder.start();
     await zenPaymentForwarder.start();
     await instantsend.start();
-
   }
 
 }
