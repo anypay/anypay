@@ -46,39 +46,39 @@ async function checkAddressForPayments(address:string,currency:string){
 
     for (let tx of resp.body.data.txs){
 
-    let p: Payment = { 
+      let p: Payment = { 
 
-      currency: currency,
+        currency: currency,
 
-      address: resp.body.data.address,
+        address: resp.body.data.address,
 
-      amount: tx.value,
+        amount: tx.value,
 
-      hash: tx.txid
+        hash: tx.txid
 
       };  
 
       payments.push(p)
 
-      }
+    }
 
-      statsd.timing('DOGE_checkAddressForPayments', new Date().getTime()-start)
+    statsd.timing('DOGE_checkAddressForPayments', new Date().getTime()-start)
 
-      statsd.increment('DOGE_checkAddressForPayments')
-    
-      return payments 
+    statsd.increment('DOGE_checkAddressForPayments')
+  
+    return payments 
       
 }
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://api.anypay.global/ltc/address_forward_callbacks";
+  let url = process.env.DOGE_FORWARDING_URL;
 
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/ltc/address_forward_callbacks'
+    callback_url: 'https://api.anypay.global/doge/address_forward_callbacks'
 
   });
 
@@ -93,10 +93,6 @@ export async function getNewAddress(record: I_Address) {
   return address;
 
 }
-
-
-
-
 
 const currency = 'DOGE';
 
