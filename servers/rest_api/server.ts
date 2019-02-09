@@ -1287,20 +1287,6 @@ async function Server() {
 
     method: 'POST',
 
-    path: '/doge/address_forward_callbacks',
-
-    config: {
-
-      handler: DOGEAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
     path: '/blockcypher/webhooks/dash',
 
     config: {
