@@ -4,6 +4,8 @@ import { Payment, Invoice } from "../types/interfaces";
 import {emitter} from './events';
 import {log} from './logger';
 
+import {BigNumber} from 'bignumber.js'
+
 import * as moment from 'moment';
 
 export async function receivePayment(payment: Payment) {
@@ -65,18 +67,28 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
   }
 }
 
+function getInvoicePrice(invoice) {
+
+  let denominationAmount = new BigNumber(invoice.denomination_amount);
+  let invoiceAmount = new BigNumber(invoice.invoice_amount);
+
+  return denominationAmount.dividedBy(invoiceAmount);
+}
+
 export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
   if (payment.amount >= invoice.amount) {
     throw new Error("underpaid handler called with sufficient payment");
   }
 
-  let price = invoice.denomination_amount / invoice.invoice_amount;
+  let paymentAmount = new BigNumber(payment.amount);
+
+  let price = getInvoicePrice(invoice);
 
   var result = await InvoiceModel.update(
     {
-      amount_paid: payment.amount,
-      invoice_amount_paid: payment.amount,
-      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      amount_paid: paymentAmount.toNumber(),
+      invoice_amount_paid: paymentAmount.toNumber(),
+      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
       hash: payment.hash,
       status: 'underpaid',
       paidAt: new Date(),
@@ -138,13 +150,15 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
     throw new Error("overpaid handler called with exactly sufficient payment");
   }
 
-  let price = invoice.denomination_amount / invoice.invoice_amount;
+  let paymentAmount = new BigNumber(payment.amount);
+
+  let price = getInvoicePrice(invoice);
 
   var result = await InvoiceModel.update(
     {
-      amount_paid: payment.amount,
-      invoice_amount_paid: payment.amount,
-      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      amount_paid: paymentAmount.toNumber(),
+      invoice_amount_paid: paymentAmount.toNumber(),
+      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
       hash: payment.hash,
       status: 'overpaid',
       paidAt: new Date(),
