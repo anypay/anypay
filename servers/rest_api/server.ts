@@ -1197,6 +1197,20 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/active-merchants',
+
+    config: {
+
+      handler: MerchantsController.listActiveSince
+
+    }
+
+  });
+
+  server.route({
+
     method: 'POST',
 
     path: '/test/webhooks',
