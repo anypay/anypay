@@ -66,6 +66,17 @@ export async function sudoShow (request, reply) {
   return account;
 };
 
+export async function sudoAccountWithEmail (request, reply) {
+
+  var account = await Account.findOne({
+    where: {
+      email: request.params.email
+    }
+  });
+
+  return account;
+}
+
 export async function index(request, reply) {
 
   let limit = parseInt(request.query.limit) || 100;

@@ -1108,6 +1108,22 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/sudo/account-by-email/{email}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoAccountWithEmail
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/sudo/ambassadors',
 
     config: {
