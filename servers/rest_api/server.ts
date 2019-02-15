@@ -24,6 +24,7 @@ import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_ca
 
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
+const SudoAccounts = require("./handlers/sudo/accounts");
 const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
@@ -827,6 +828,40 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/sudo/accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoAccounts.update,
+
+      validate: {
+
+        payload: {
+
+          denomination: Joi.string().optional(),
+
+          physical_address: Joi.string().optional(),
+
+          business_name: Joi.string().optional(),
+
+          latitude: Joi.number().optional(),
+
+          longitude: Joi.number().optional()
+
+        }
+
+      }
 
     }
 
