@@ -23,22 +23,28 @@ async function createInvoice(accountId: number, amount: number) {
 }
 
 async function checkAddressForPayments(address:string,currency:string){
-  
-  let start = new Date().getTime()
 
   let payments: Payment[]=[];
 
-  let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${currency}/${address}`)
+  let resp = (await http.post(`${process.env.ZEC_RPC_HOST}:${process.env.ZEC_RPC_PORT}`)
+    .auth( process.env.ZEC_RPC_USER, process.env.ZEC_RPC_PASSWORD )
+    .send({
+        method: 'z_listreceivedbyaddress',
+        params:  [address, 0]
+    })).body.result
    
-  for (let tx of resp.body.data.txs){
+
+  console.log(resp)
+
+  for (let tx of resp){
 
     let p: Payment = { 
 
       currency: currency,
 
-      address: resp.body.data.address,
+      address: address,
 
-      amount: tx.value,
+      amount: tx.amount,
 
       hash: tx.txid
 
@@ -46,13 +52,10 @@ async function checkAddressForPayments(address:string,currency:string){
 
       payments.push(p)
 
-      }
+  }
 
-    statsd.timing('ZEC_checkAddressForPayments', new Date().getTime()-start)
+  return payments 
 
-    statsd.increment('ZEC_checkAddressForPayments')
-    
-    return payments 
 }
 
 async function createAddressForward(record: I_Address) {
