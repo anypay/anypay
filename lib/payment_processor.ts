@@ -1,17 +1,20 @@
 require('dotenv').config();
-const InvoiceModel = require("./models/invoice");
+
 import { Payment, Invoice } from "../types/interfaces";
+
 import {emitter} from './events';
+
 import {log} from './logger';
 
 import {BigNumber} from 'bignumber.js'
+import * as models from './models';
 
 import * as moment from 'moment';
 
 export async function receivePayment(payment: Payment) {
   log.info('receive payment', payment);
 
-  let invoice = await InvoiceModel.findOne({
+  let invoice = await models.Invoice.findOne({
     where: {
       currency: payment.currency,
       address: payment.address,
@@ -56,15 +59,24 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
   /* End Expiration Check */
 
   if (invoice.amount === payment.amount) {
-    console.log("handle paid");
-    return handlePaid(invoice, payment);
+
+    await handlePaid(invoice, payment);
+
   } else if (payment.amount < invoice.amount) {
-    return handleUnderpaid(invoice, payment);
+
+    await handleUnderpaid(invoice, payment);
+
   } else if (payment.amount > invoice.amount) {
-    return handleOverpaid(invoice, payment);
+
+    await handleOverpaid(invoice, payment);
+
   } else {
+
     throw new Error("invoice neither paid, overpaid, or underpaid");
+
   }
+
+  return models.Invoice.findOne({ where: { id: invoice.id }});
 }
 
 function getInvoicePrice(invoice) {
@@ -84,7 +96,7 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
 
   let price = getInvoicePrice(invoice);
 
-  var result = await InvoiceModel.update(
+  var result = await models.Invoice.update(
     {
       amount_paid: paymentAmount.toNumber(),
       invoice_amount_paid: paymentAmount.toNumber(),
@@ -114,7 +126,7 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
     throw new Error("paid handler called with insufficient payment");
   }
 
-  var result = await InvoiceModel.update(
+  var result = await models.Invoice.update(
     {
       amount_paid: payment.amount,
       invoice_amount_paid: payment.amount,
@@ -154,7 +166,7 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
 
   let price = getInvoicePrice(invoice);
 
-  var result = await InvoiceModel.update(
+  var result = await models.Invoice.update(
     {
       amount_paid: paymentAmount.toNumber(),
       invoice_amount_paid: paymentAmount.toNumber(),
