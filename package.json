@@ -14,6 +14,7 @@
     "anypay": "./bin/anypay.ts"
   },
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",
