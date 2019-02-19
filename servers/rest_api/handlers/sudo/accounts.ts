@@ -1,5 +1,7 @@
 
-import { models } from '../../../../lib';
+import { models, log } from '../../../../lib';
+
+import { geocode } from '../../../../lib/googlemaps';
 
 export async function update(req, h) {
 
@@ -21,7 +23,26 @@ export async function update(req, h) {
 
   }
 
-  await models.Account.update(req.payload, {
+  let updateAttrs: any = Object.assign(req.payload, {});
+
+  if (updateAttrs.physical_address) {
+
+    try {
+
+      let geolocation = await geocode(updateAttrs.physical_address);
+
+      updateAttrs.latitude = geolocation.lat;
+      updateAttrs.longitude = geolocation.lng;
+
+    } catch (error) {
+
+      log.error('error geocoding address', error.message);
+
+    }
+
+  }
+
+  await models.Account.update(updateAttrs, {
 
     where: { id: req.params.id }
 
