@@ -4,6 +4,14 @@ import * as moment from 'moment';
 import * as http from 'superagent';
 import * as database from '../database';
 
+async function getAccountId(email){
+
+  let resp = await database.query(`SELECT id FROM accounts WHERE email='${email}'`)
+
+  return resp[0][0].id
+
+}
+
 export async function forMonth(startDateFormatted) {
 
   var startDate = moment(startDateFormatted);
@@ -120,7 +128,9 @@ async function getTotalVerifiedMerchants(endDateFormatted) {
 
 async function countMonthlyTransactionsAllCrypto(start, end) {
 
-  let resp = await database.query(`select count(*) from invoices where status = 'paid'
+  let id = await getAccountId('diagnostic@anypay.global')
+
+  let resp = await database.query(`select count(*) from invoices where not account_id=${id} and not status = 'unpaid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
@@ -130,7 +140,9 @@ async function countMonthlyTransactionsAllCrypto(start, end) {
 
 async function countMonthlyTransactionsDash(start, end) {
 
-  let resp = await database.query(`select count(*) from invoices where status = 'paid'
+  let id = await getAccountId('diagnostic@anypay.global')
+
+  let resp = await database.query(`select count(*) from invoices where not account_id=${id} and not status = 'unpaid'
   and "createdAt" > '${start}' and "createdAt" <
   '${end}' and currency = 'DASH'`);
 
