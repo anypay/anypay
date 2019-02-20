@@ -6,6 +6,33 @@ const program = require('commander');
 
 import {rpc} from '../lib/jsonrpc';
 
+const lodash = require('lodash');
+
+program
+  .command('listunspent')
+  .action(async (address) => {
+
+    try {
+
+      let resp = await rpc.call('listunspent', [0]);
+
+      resp = lodash.filter(resp.result, item => {
+
+        return item.address === address;
+
+      });
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log('error', error.message);
+    }
+
+    process.exit(0);
+
+  });
+
 program
   .command('getbalance')
   .action(async (address) => {

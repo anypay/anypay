@@ -17,6 +17,7 @@ import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
+import * as DASHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
 import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
 import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_callbacks';
 import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_callbacks';
@@ -1292,6 +1293,22 @@ async function Server() {
     }
 
   });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/dash/address_forward_callbacks',
+
+    config: {
+
+      handler: DASHAddressForwardCallbacks.create
+
+    }
+
+  });
+
+
 
    server.route({
 
