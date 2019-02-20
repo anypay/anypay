@@ -1,4 +1,6 @@
 
+require('dotenv').config();
+
 import {createWebhook} from './lib/blockcypher';
 
 import {generateInvoice} from '../../lib/invoice';
@@ -16,6 +18,8 @@ import * as rpc from './lib/jsonrpc';
 import * as Blockcypher from '../../lib/dash/blockcypher';
 
 import { I_Address } from '../../types/interfaces';
+
+import * as http from 'superagent'
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -39,11 +43,13 @@ async function createAddressForward(record: I_Address) {
 
   let url = "https://dash.anypay.global/v1/dash/forwards";
 
+  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/dash/address_forward_callbacks'
+    callback_url: `${callbackBase}/dash/address_forward_callbacks`
 
   });
 
