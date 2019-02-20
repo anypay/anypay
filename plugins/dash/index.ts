@@ -53,6 +53,8 @@ async function createAddressForward(record: I_Address) {
 
 export async function getNewAddress(record: I_Address) {
 
+  var address;
+
   /* 
    * Example extended public key:
    *
@@ -64,7 +66,7 @@ export async function getNewAddress(record: I_Address) {
 
   if (record.value.match(/^xpub/)) {
 
-    var address = xpub.generateAddress('DASH', record.value, record.nonce);
+    address = xpub.generateAddress('DASH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -84,12 +86,21 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-    let address = await createAddressForward(record);
+    if (process.env.OVERRIDE_BLOCKCYPHER_DASH) {
+
+      let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
+
+      address = paymentEndpoint.input_address;
+
+    } else {
+
+      address = await createAddressForward(record);
+
+    }
     
   }
 
   return address;
-
 
 }
 
