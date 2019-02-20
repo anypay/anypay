@@ -35,6 +35,22 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://dash.anypay.global/v1/dash/forwards";
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/dash/address_forward_callbacks'
+
+  });
+
+  return resp.body.input_address;
+
+}
+
 export async function getNewAddress(record: I_Address) {
 
   /* 
@@ -68,10 +84,8 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-    let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
-
-    address = paymentEndpoint.input_address;
-
+    let address = await createAddressForward(record);
+    
   }
 
   return address;
