@@ -1,6 +1,8 @@
 
 import { log } from '../../../lib';
 
+import { receivePayment } from '../../../lib/payment_processor';
+
 import { channel } from '../../../lib/amqp';
 
 export async function create(req, h) {
@@ -9,13 +11,16 @@ export async function create(req, h) {
 
   let payment = {
     currency: "DASH",
-    amount: req.payload.value,
+    amount: parseFloat(req.payload.value),
     address: req.payload.input_address,
     hash: req.payload.input_transaction_hash,
     output_hash: req.payload.destination_transaction_hash
-  }
+  };
 
   log.info('dash.payment', payment);
+
+  /* Handle payment by matching to an invoice */
+  await receivePayment(payment);
 
   let buffer = new Buffer(JSON.stringify(payment));
 

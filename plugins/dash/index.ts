@@ -19,7 +19,7 @@ import * as Blockcypher from '../../lib/dash/blockcypher';
 
 import { I_Address } from '../../types/interfaces';
 
-import * as http from 'superagent'
+import * as http from 'superagent';
 
 export async function createInvoice(accountId: number, amount: number) {
 
