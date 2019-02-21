@@ -2,7 +2,7 @@
 import { log } from '../../../lib';
 
 //import { receivePayment } from '../../../lib/payment_processor';
-import { handlePaymentMessage } from '../../../processor/payments/main';
+import { handlePaymentMessage } from '../../processor/payments/main';
 
 import { channel } from '../../../lib/amqp';
 
