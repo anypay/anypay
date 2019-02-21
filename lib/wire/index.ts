@@ -77,9 +77,9 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
   console.log('content', content);
 
-  let filepath = await buildReportCsv(invoices, invoiceUID);
+  //let filepath = await buildReportCsv(invoices, invoiceUID);
 
-  console.log(`csv written to ${filepath}`);
+  //console.log(`csv written to ${filepath}`);
 
   return content;
 
