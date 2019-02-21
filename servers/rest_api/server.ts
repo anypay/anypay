@@ -23,6 +23,7 @@ import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_call
 import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_callbacks';
 import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
 
+const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const SudoAccounts = require("./handlers/sudo/accounts");
@@ -829,6 +830,22 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/wires/reportsinceinvoice/{invoice_uid}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoWires.show
 
     }
 

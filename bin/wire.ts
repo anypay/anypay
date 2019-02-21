@@ -12,6 +12,8 @@ import { Op } from 'sequelize';
 
 import { sendEmail } from '../lib/email';
 
+import { buildWireEmailReport } from '../lib/wire';
+
 export async function getReportForDay(day: string, email: string) {
 
   let start = moment(day).startOf('day');
@@ -79,6 +81,18 @@ program
     await sendEmail('derrick@anypay.global', `wire report for ${day}`, JSON.stringify(report));
 
     console.log('email sent');
+
+    process.exit(0);
+
+  });
+
+program
+  .command('reportsinceinvoice <uid>')
+  .action(async (invoiceUID) => {
+
+    let content = await buildWireEmailReport(invoiceUID);
+
+    console.log('content', content);
 
     process.exit(0);
 

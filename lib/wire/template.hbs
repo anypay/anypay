@@ -1,26 +1,26 @@
 
-Hey Rosemary,
+<p>Hey Rosemary,<p>
 
-A Wire was just sent to eGifter for the amount of ${{total}}. Wire confirmation XXXXXXX.
+<p>A Wire was just sent to eGifter for the amount of ${{total}}. Wire confirmation XXXXXXX.</p>
 
-That covers the following invoices from {{start_date}} - {{end_date}}:
+<p>That covers the following invoices from {{start_date}} - {{end_date}}:</p>
 
-----------------------------------------
+<p>----------------------------------------</p>
 
 {{#each invoices as |invoice|}}
-{{invoice.completed_at}}
-${{invoice.denomination_amount_paid}}
-Reference: {{invoice.external_id}}
-Invoice ID: {{invoice.uid}}
-
+<p>{{invoice.completed_at}}</p>
+<p>${{invoice.denomination_amount_paid}}</p>
+<p>Reference: {{invoice.external_id}}</p>
+<p>Invoice ID: {{invoice.uid}}</p>
+<br/>
 {{/each}}
 
-----------------------------------------
+<p>----------------------------------------</p>
 
-Total: ${{total}}
+<p>Total: ${{total}}</p>
 
-Best,
+<p>Best,</p>
 
-Derrick
-Anypay.Global
-202.489.9284 (direct)
+<p>Derrick</p>
+<p>Anypay.Global</p>
+<p>202.489.9284 (direct)</p>
