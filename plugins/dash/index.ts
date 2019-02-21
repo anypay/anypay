@@ -1,4 +1,6 @@
 
+require('dotenv').config();
+
 import {createWebhook} from './lib/blockcypher';
 
 import {generateInvoice} from '../../lib/invoice';
@@ -16,6 +18,8 @@ import * as rpc from './lib/jsonrpc';
 import * as Blockcypher from '../../lib/dash/blockcypher';
 
 import { I_Address } from '../../types/interfaces';
+
+import * as http from 'superagent';
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -35,7 +39,27 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://dash.anypay.global/v1/dash/forwards";
+
+  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: `${callbackBase}/dash/address_forward_callbacks`
+
+  });
+
+  return resp.body.input_address;
+
+}
+
 export async function getNewAddress(record: I_Address) {
+
+  var address;
 
   /* 
    * Example extended public key:
@@ -48,7 +72,7 @@ export async function getNewAddress(record: I_Address) {
 
   if (record.value.match(/^xpub/)) {
 
-    var address = xpub.generateAddress('DASH', record.value, record.nonce);
+    address = xpub.generateAddress('DASH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -68,14 +92,21 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-    let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
+    if (process.env.OVERRIDE_BLOCKCYPHER_DASH) {
 
-    address = paymentEndpoint.input_address;
+      let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
 
+      address = paymentEndpoint.input_address;
+
+    } else {
+
+      address = await createAddressForward(record);
+
+    }
+    
   }
 
   return address;
-
 
 }
 

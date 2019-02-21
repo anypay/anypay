@@ -25,7 +25,7 @@ const AMQP_URL = process.env.AMQP_URL;
 const PAYMENT_QUEUE  = "anypay:payments:received";
 const validator = new Validator();
 
-function handlePaymentMessage(payment: Payment) {
+export function handlePaymentMessage(payment: Payment) {
   console.log('handle payment', payment);
   statsd.increment('handlePaymentMessage')
 

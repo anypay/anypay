@@ -123,7 +123,7 @@ function getBestBlockHash() {
 
 class JsonRpc {
 
-  call(method, params) {
+  call(method, params): Promise<any> {
 
     log.info(`dash.rpc.call.${method}`, params);
 
