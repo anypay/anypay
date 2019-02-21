@@ -1,7 +1,8 @@
 
 import { log } from '../../../lib';
 
-import { receivePayment } from '../../../lib/payment_processor';
+//import { receivePayment } from '../../../lib/payment_processor';
+import { handlePaymentMessage } from '../../../lib/payment_processor';
 
 import { channel } from '../../../lib/amqp';
 
@@ -20,7 +21,7 @@ export async function create(req, h) {
   log.info('dash.payment', payment);
 
   /* Handle payment by matching to an invoice */
-  await receivePayment(payment);
+  await handlePaymentMessage(payment);
 
   let buffer = new Buffer(JSON.stringify(payment));
 
