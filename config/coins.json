@@ -48,6 +48,13 @@
       "name": "Zcash",
       "icon_url": "",
       "unavailable": true
+    },
+
+    {
+      "code": "SMART",
+      "name": "Smart Cash",
+      "icon_url": "",
+      "unavailable": true
     }
 
   ]
