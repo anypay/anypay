@@ -165,7 +165,7 @@ async function start() {
 
       await updateCryptos();
 
-  }, 1000 * 60); // every minute
+  }, 1000 * 120); // every two minute
 
   setInterval(async () => {
 
