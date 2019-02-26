@@ -494,6 +494,15 @@ async function Server() {
     }
   });
   server.route({
+    method: "PUT",
+    path: "/account",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: AccountsController.update
+    }
+  });
+  server.route({
     method: "GET",
     path: "/extended_public_keys",
     config: {
