@@ -35,9 +35,19 @@ module.exports.list = async function(request, reply) {
 
   let accountCoins = await getSupportedCoins(accountId);
 
+  let coins = Object.values(accountCoins);
+
   return {
-    'coins': Object.values(accountCoins)
+    'coins': sortBCHFirst(coins)
   };
+}
+
+function sortBCHFirst(data) {
+  console.log('sort bch', data);
+
+  data.sort(function(x,y){ return x.code == 'BCH' ? -1 : y.code == 'BCH' ? 1 : 0; });
+
+  return data
 }
 
 const Coin = Joi.object({
