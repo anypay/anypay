@@ -612,7 +612,21 @@ async function Server() {
 
         var currencies = await Fixer.getCurrencies();
 
-        currencies.rates['VES'] = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
+        var rates = currencies.rates;
+
+        let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
+
+        rates['VES'] = vesPrice;
+
+        let sortedCurrencies = Object.keys(rates).sort();
+
+        currencies.rates = sortedCurrencies.reduce((map, key) => {
+
+          map[key] = rates[key];
+
+          return map;
+
+        }, {});
 
         return currencies;
 
