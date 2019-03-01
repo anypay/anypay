@@ -17,7 +17,9 @@ export default function() {
 
     "XRP": require('../plugins/xrp'),
 
-    "DOGE": require('../plugins/doge')
+    "DOGE": require('../plugins/doge'),
+
+    "SMART": require('../plugins/smart')
 
   }
 }
