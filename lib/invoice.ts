@@ -46,28 +46,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
   switch(currency) {
 
-    case 'DASH':
-      console.log("generate dash invoice");
-
-      address = await plugins.getNewAddress('DASH', accountId);
-
-      break;
-
     case 'BTC':
 
       address = await BitcoinAddressService.getNewAddress(accountId);
-
-      break;
-
-    case 'LTC':
-
-      address = await plugins.getNewAddress('LTC', accountId);
-
-      break;
-
-    case 'BCH':
-
-      address = await plugins.getNewAddress('BCH', accountId);
 
       break;
 
@@ -77,29 +58,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
       break;
 
-    case 'DOGE':
+    default:
 
-      address = await plugins.getNewAddress('DOGE', accountId);
-
-      break;
-
-    case 'ZEC':
-
-      address = await plugins.getNewAddress('ZEC', accountId);
-
-      break;
-
-    case 'ZEN':
-
-      address = await plugins.getNewAddress('ZEN', accountId);
-
-      break;
-    
-    case 'SMART':
-
-      address = await plugins.getNewAddress('SMART', accountId);
-
-      break;
+      address = await plugins.getNewAddress(currency, accountId);
   }
 
   if (!address) {
