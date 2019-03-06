@@ -13,6 +13,10 @@ module.exports = {
 
     await queryInterface.addColumn('cashback_merchant_payments', 'currency', Sequelize.STRING);
 
+    await queryInterface.sequelize.query("update cashback_customer_payments set currency='DASH';");
+
+    await queryInterface.sequelize.query("update cashback_merchant_payments set currency='DASH';");
+
   },
 
   down: async function (queryInterface, Sequelize) {
