@@ -6,7 +6,7 @@ export async function getCustomerTotalsByMonth(currency: string): Promise<any> {
   let data = await database.query(
     `select extract(month from "createdAt") as mon,                
        extract(year from "createdAt") as yyyy,
-       sum(amount), count(*) from cash_back_customer_payments
+       sum(amount), count(*) from cashback_customer_payments
        where currency = '${currency}'
      	group by 1,2;`
   );
@@ -31,7 +31,7 @@ export async function getMerchantTotalsByMonth(currency: string): Promise<any> {
   let data = await database.query(
     `select extract(month from "createdAt") as mon,                
        extract(year from "createdAt") as yyyy,
-       sum(amount), count(*) from cash_back_merchant_payments
+       sum(amount), count(*) from cashback_merchant_payments
        where currency = '${currency}'
      	group by 1,2;`
   );
@@ -54,7 +54,7 @@ export async function getMerchantTotalsByMonth(currency: string): Promise<any> {
 export async function getCustomerTotalsAllTime(currency: string): Promise<number> {
 
   let customerPayments = await database.query(
-    `select sum(amount) from cash_back_customer_payments where currency = '${currency}'`
+    `select sum(amount) from cashback_customer_payments where currency = '${currency}'`
   );
 
   let amount = parseFloat(customerPayments[0][0].sum);
@@ -74,7 +74,7 @@ export async function getCustomerTotalsAllTime(currency: string): Promise<number
 export async function getMerchantTotalsAllTime(currency: string): Promise<number> {
 
   let merchantPayments = await database.query(
-    `select sum(amount) from cash_back_merchant_payments where currency = '${currency}'`
+    `select sum(amount) from cashback_merchant_payments where currency = '${currency}'`
   );
 
   let amount = parseFloat(merchantPayments[0][0].sum);
