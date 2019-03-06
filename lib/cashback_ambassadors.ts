@@ -16,7 +16,7 @@ export async function getAmbassadorAddressForInvoice(invoiceUID: string) {
 
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
 
     account_id: invoice.account_id
 

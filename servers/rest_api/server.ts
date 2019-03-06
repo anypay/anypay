@@ -55,7 +55,7 @@ const WebhookHandler = new EventEmitter();
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
 import { sudoLogin } from './handlers/sudo_login'
-import * as DashBackMerchants from './handlers/dash_back_merchants';
+import * as CashbackMerchants from './handlers/cashback_merchants';
 const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
@@ -1032,7 +1032,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoList
+      handler: CashbackMerchants.sudoList
 
     }
 
@@ -1048,7 +1048,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoShow
+      handler: CashbackMerchants.sudoShow
 
     }
 
@@ -1064,7 +1064,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoActivate
+      handler: CashbackMerchants.sudoActivate
 
     }
 
@@ -1080,7 +1080,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoDeactivate
+      handler: CashbackMerchants.sudoDeactivate
 
     }
 
