@@ -9,9 +9,9 @@ var AmbassadorClaim = require('./ambassador_claim')(sequelize, Sequelize);
 var AmbassadorTeam = require('./ambassador_team')(sequelize, Sequelize);
 var AmbassadorTeamMember = require('./ambassador_team_member')(sequelize, Sequelize);
 var Coin = require('./coin')(sequelize, Sequelize);
-var DashBackMerchant = require('./dash_back_merchant');
-var DashBackMerchantPayment = require('./dash_back_merchant_payment');
-var DashBackCustomerPayment = require('./dash_back_customer_payment');
+var CashbackMerchant = require('./cashback_merchant');
+var CashbackMerchantPayment = require('./cashback_merchant_payment');
+var CashbackCustomerPayment = require('./cashback_customer_payment');
 var MerchantBountyReward = require('./merchant_bounty_reward');
 var Invoice = require('./invoice');
 var PaymentForward = require('./payment_forward');
@@ -41,9 +41,9 @@ export {
   AmbassadorTeam,
   AmbassadorTeamMember,
   Coin,
-  DashBackMerchant,
-  DashBackMerchantPayment,
-  DashBackCustomerPayment,
+  CashbackMerchant,
+  CashbackMerchantPayment,
+  CashbackCustomerPayment,
   Invoice,
   PaymentForward,
   PaymentForwardInputPayment,

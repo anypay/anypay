@@ -2,7 +2,7 @@ import { models, log } from '../../../lib';
 
 export async function sudoList(request) {
 
-  return models.DashBackMerchant.findAll({ where: { enabled: true }});
+  return models.CashbackMerchant.findAll({ where: { enabled: true }});
 
 }
 
@@ -23,7 +23,7 @@ export async function sudoShow(request) {
 
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
     account_id: account.id 
   }});
 
@@ -51,7 +51,7 @@ export async function sudoActivate(request) {
 
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
 
     account_id: account.id
 
@@ -59,7 +59,7 @@ export async function sudoActivate(request) {
 
   if (!merchant) {
 
-    await models.DashBackMerchant.create({
+    await models.CashbackMerchant.create({
       account_id: account.id,
       enabled: true
     });
@@ -94,7 +94,7 @@ export async function sudoDeactivate(request) {
 
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
 
     account_id: account.id
 
@@ -102,7 +102,7 @@ export async function sudoDeactivate(request) {
 
   if (!merchant) {
 
-    await models.DashBackMerchant.create({
+    await models.CashbackMerchant.create({
       account_id: account.id,
       enabled: false
     });

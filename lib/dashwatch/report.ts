@@ -153,7 +153,7 @@ async function countMonthlyTransactionsDash(start, end) {
 async function sumMerchantsDashBackPaid(start, end) {
 
   let merchantsResp = await database.query(`select sum(amount) from
-  dash_back_merchant_payments where "createdAt" > '${start}' and "createdAt" <
+  cashback_merchant_payments where currency = 'DASH' and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
   return parseFloat(merchantsResp[0][0].sum);
@@ -162,7 +162,7 @@ async function sumMerchantsDashBackPaid(start, end) {
 async function sumCustomersDashBackPaid(start, end) {
 
   let customersResp = await database.query(`select sum(amount) from
-  dash_back_customer_payments where "createdAt" > '${start}' and "createdAt" <
+  cashback_customer_payments where currency = 'DASH' and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
   return parseFloat(customersResp[0][0].sum);
@@ -172,11 +172,11 @@ async function sumCustomersDashBackPaid(start, end) {
 async function sumDashBackTransactions(start, end) {
 
   let customersResp = await database.query(`select count(*) from
-  dash_back_customer_payments where "createdAt" > '${start}' and "createdAt" <
+  cashback_customer_payments where currency = 'DASH' and "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
   let merchantResp = await database.query(`select count(*) from
-  dash_back_merchant_payments where "createdAt" > '${start}' and "createdAt" <
+  cashback_merchant_payments where currency = 'DASH' "createdAt" > '${start}' and "createdAt" <
   '${end}'`);
 
   let numCustomerPayments = parseInt(customersResp[0][0].count);

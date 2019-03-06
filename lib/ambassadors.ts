@@ -108,7 +108,7 @@ export async function claimBusiness(ambassadorEmail: string, merchantEmail: stri
     throw new Error(`account ${merchantEmail} not found`);
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
 
     account_id: merchantAccount.id
     
@@ -166,7 +166,7 @@ export async function createClaim(ambassadorEmail: string, merchantEmail: string
     throw new Error(`account ${merchantEmail} not found`);
   }
 
-  let merchant = await models.DashBackMerchant.findOne({ where: {
+  let merchant = await models.CashbackMerchant.findOne({ where: {
 
     account_id: merchantAccount.id
     
@@ -241,7 +241,7 @@ export async function verifyClaim(claimId: number) {
 
   }});
 
-  await models.DashBackMerchant.update({
+  await models.CashbackMerchant.update({
 
     ambassador_id: claim.ambassador_id
 
