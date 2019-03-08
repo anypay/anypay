@@ -1,26 +1,36 @@
 
+const { lstatSync, readdirSync } = require('fs')
+const { join } = require('path')
+
+const isDirectory = source => lstatSync(source).isDirectory()
+const getDirectories = source =>
+  readdirSync(source).map(name => join(source, name)).filter(isDirectory)
+
 export default function() {
 
-  return {
+  let pluginDirectorPaths = getDirectories(join(__dirname, '../plugins'));
 
-    "BTC": require('../plugins/btc'),
+  return pluginDirectorPaths.reduce((map, path) => {
 
-    "BCH": require('../plugins/bch'),
+    let parts = path.split('/');
 
-    "ZEN": require('../plugins/zen'),
+    let currency = parts[parts.length - 1];
 
-    "ZEC": require('../plugins/zec'),
+    try {
 
-    "DASH": require('../plugins/dash'),
+      let plugin = require(`../plugins/${currency}`);
 
-    "LTC": require('../plugins/ltc'),
+      map[currency.toUpperCase()] = plugin;
 
-    "XRP": require('../plugins/xrp'),
+    } catch(error) {
 
-    "DOGE": require('../plugins/doge'),
+      console.error('failed to load plugin', error.message);
 
-    "SMART": require('../plugins/smart')
+    }
 
-  }
+    return map;
+
+  }, {});
+
 }
 
