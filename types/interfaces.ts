@@ -5,6 +5,7 @@ export interface Payment {
   amount: number;
   hash: string;
   confirmations?: number;
+  locked?: boolean;
 }
 
 export interface I_Address {
