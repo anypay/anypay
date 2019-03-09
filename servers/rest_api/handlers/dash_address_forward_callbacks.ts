@@ -15,7 +15,8 @@ export async function create(req, h) {
     amount: parseFloat(req.payload.value),
     address: req.payload.input_address,
     hash: req.payload.input_transaction_hash,
-    output_hash: req.payload.destination_transaction_hash
+    output_hash: req.payload.destination_transaction_hash,
+    locked: req.payload.locked || false
   };
 
   log.info('dash.payment', payment);
