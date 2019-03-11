@@ -900,7 +900,9 @@ async function Server() {
 
           latitude: Joi.number().optional(),
 
-          longitude: Joi.number().optional()
+          longitude: Joi.number().optional(),
+
+          image_url: Joi.string().optional()
 
         }
 
