@@ -36,7 +36,7 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
   let accountIdsThreeMonths = await database.query(query);
 
   let allVerifiedMerchants = await database.query(`select physical_address, business_name, id,
-    latitude, longitude from accounts where physical_address is not null and
+    latitude, longitude, image_url from accounts where physical_address is not null and
     business_name is not null`);
 
   return {
