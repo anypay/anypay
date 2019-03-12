@@ -5,6 +5,8 @@ import { getVESPrice } from './localbitcoins';
 
 import * as database from '../database';
 
+import { log } from '../logger';
+
 const MAX_DECIMALS = 5;
 
 interface Amount {
@@ -57,11 +59,13 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 
   if (prices[pair]) {
 
+    log.info(`found direct price pair ${pair} ${prices[pair]}`);
     rate = prices[pair];
 
   } else {
 
     rate = prices[`${outputCurrency}/BTC`] / prices[`${inputAmount.currency}/BTC`];
+    log.info(`using BTC to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
 
   }
 

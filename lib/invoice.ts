@@ -92,7 +92,7 @@ export async function generateInvoice(
     value: denominationAmountValue
   }, invoiceCurrency);
 
-  console.log('converted price');
+  console.log('converted price', invoiceAmount);
   console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
