@@ -12,15 +12,17 @@ import * as http from 'superagent';
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
-async function setPrice(currency, value) {
+async function setPrice(currency, value, base_currency = "BTC") {
 
-  log.info("set price", currency, value)
+  log.info("set price", currency, value, base_currency);
 
   let [price, isNew] = await models.Price.findOrCreate({
 
     where: {
 
-      currency
+      currency,
+
+      base_currency
 
     },
 
@@ -28,7 +30,9 @@ async function setPrice(currency, value) {
 
       currency,
 
-      value
+      value,
+
+      base_currency
 
     }
   });
@@ -91,6 +95,26 @@ async function updateVESPrice() {
   if (btcPrice && btcPrice > 0) {
 
     await setPrice('VES', btcPrice);
+
+  }
+
+}
+
+async function updateDashPrices() {
+
+  log.info('update DASH prices');
+
+  let resp = await http.get('https://rates.dashretail.org/list');
+
+  let currencies = Object.keys(resp.body);
+
+  for (let i=0; i<currencies.length; i++) {
+
+    let currency = currencies[i];
+
+    let price = resp.body[currency];
+
+    await setPrice(currency, price, 'DASH');
 
   }
 
@@ -169,9 +193,17 @@ async function start() {
 
   setInterval(async () => {
 
+      await updateDashPrices();
+
+  }, 1000 * 300); // every five minutes
+
+  setInterval(async () => {
+
       await updateVESPrice();
 
   }, 1000 * 60 * 60); // every hour
+
+  await updateDashPrices();
 
   await updateFiatCurrencies();
 
