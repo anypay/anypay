@@ -39,6 +39,24 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
+async function createSubscription(address){
+
+let url = "https://api.anypay.global/v1/dash/subscriptions";
+
+  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
+  let resp = await http.post(url).send({
+
+    address: address,
+
+    callback_url: `${callbackBase}/dash/address_subscription_callbacks`
+
+  });
+
+  return resp.body.result;
+
+}
+
 async function createAddressForward(record: I_Address) {
 
   let url = "https://dash.anypay.global/v1/dash/forwards";
@@ -105,6 +123,8 @@ export async function getNewAddress(record: I_Address) {
     }
     
   }
+
+  createSubscription(address)
 
   return address;
 

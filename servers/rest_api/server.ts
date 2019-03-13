@@ -1325,6 +1325,19 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'POST',
+
+    path: '/dash/address_subscription_callbacks',
+
+    config: {
+
+      handler: DASHAddressForwardCallbacks.subscribtionCallback
+
+    }
+
+  });
 
 
    server.route({
