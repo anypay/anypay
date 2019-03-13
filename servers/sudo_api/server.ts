@@ -5,6 +5,8 @@ import { log, database, models } from '../../lib';
 
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
+import { sendWebhookForInvoice } from '../../lib/webhooks';
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -98,6 +100,27 @@ async function Server() {
         }
 
         return { invoice };
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/api/invoices/{uid}/webhooks",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: async (req, h) => {
+
+        let resp = await sendWebhookForInvoice(req.params.uid); 
+
+        return resp.body;
 
       }
 
