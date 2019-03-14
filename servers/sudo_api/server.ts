@@ -5,6 +5,8 @@ import { log, database, models } from '../../lib';
 
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
+import { sendWebhookForInvoice } from '../../lib/webhooks';
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -36,6 +38,89 @@ async function Server() {
       handler: async (req, h) => {
 
         return models.MerchantGroup.findAll()
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/search/invoices/{search}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: async (req, h) => {
+
+        var invoice;
+
+        invoice = await models.Invoice.findOne({
+          where: {
+            uid: req.params.search
+          } 
+        });
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              address: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              external_id: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              hash: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+          throw new Error(`invoice search not found ${req.params.search}`);
+        }
+
+        return { invoice };
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/api/invoices/{uid}/webhooks",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: async (req, h) => {
+
+        let resp = await sendWebhookForInvoice(req.params.uid); 
+
+        return resp.body;
 
       }
 

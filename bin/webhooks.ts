@@ -4,7 +4,7 @@ require('dotenv').config();
 
 import * as program from 'commander';
 
-import { models, log } from '../lib';
+import { sendWebhookForInvoice } from '../lib/webhooks';
 
 import * as http from 'superagent';
 
@@ -12,25 +12,15 @@ program
   .command('sendwebhook <invoice_uid>')
   .action(async (invoiceUid) => {
 
-    let invoice = await models.Invoice.findOne({ where: {
-      uid: invoiceUid
-    }});
+    try {
 
-    console.log('found invoice');
-
-    if (invoice.webhook_url) {
-
-      console.log(invoice.webhook_url);
-
-      let json = invoice.toJSON();
-
-      let resp = await http.post(invoice.webhook_url).send(json);
+      let resp = sendWebhookForInvoice(invoiceUid);
 
       console.log(resp.statusCode, resp.body);
 
-    } else {
+    } catch(error) {
 
-      log.error('no webhook_url set for invoice');
+      log.error(error.message);
 
     }
 
