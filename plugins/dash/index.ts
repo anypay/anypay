@@ -41,9 +41,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
 async function createSubscription(address){
 
-let url = "https://api.anypay.global/v1/dash/subscriptions";
-
   let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
+  let url = `${callbackBase}/v1/dash/subscriptions`;
 
   let resp = await http.post(url).send({
 
