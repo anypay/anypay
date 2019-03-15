@@ -1499,7 +1499,11 @@ if (require.main === module) {
 
 async function start () {
 
-  pricesActor.start();
+  if (process.env.START_PRICES_ACTOR) {
+
+    pricesActor.start();
+
+  }
 
   await sequelize.sync()
 
