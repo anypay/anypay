@@ -8,6 +8,8 @@ import * as ZencashAddressService from './zencash/address_service';
 
 import * as database from './database';
 
+import * as http from 'superagent';
+
 import { Payment } from '../types/interfaces';
 
 import {emitter} from './events'
@@ -41,6 +43,27 @@ interface Address {
   value: string
 }
 
+async function createSubscription(currency, address){
+
+  
+  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
+  let url = `${process.env.MONITOR_BASE}/v1/subscriptions`;
+
+  let resp = await http.post(url).send({
+
+    currency: currency,
+
+    address: address,
+
+    callback_url: `${callbackBase}/address_subscription_callbacks`
+
+  });
+
+  return resp.body.result;
+
+}
+
 async function getNewInvoiceAddress(accountId: number, currency: string): Promise<Address> {
   var address;
 
@@ -66,6 +89,8 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
   if (!address) {
     throw new Error(`unable to generate address for ${currency}`);
   }
+
+  let sub = await createSubscription(currency, address)
 
   return {
     currency,

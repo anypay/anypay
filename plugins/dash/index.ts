@@ -43,9 +43,11 @@ async function createSubscription(address){
 
   let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
 
-  let url = `${callbackBase}/v1/dash/subscriptions`;
+  let url = `${callbackBase}/v1/subscriptions`;
 
   let resp = await http.post(url).send({
+
+    currency: 'DASH',
 
     address: address,
 
@@ -123,8 +125,6 @@ export async function getNewAddress(record: I_Address) {
     }
     
   }
-
-  createSubscription(address)
 
   return address;
 
