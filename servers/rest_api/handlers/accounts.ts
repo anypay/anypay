@@ -3,6 +3,9 @@ const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
+
+import { geocode } from '../../../lib/googlemaps';
+
 import {emitter} from '../../../lib/events'
 
 import * as models from '../../../lib/models';
@@ -17,6 +20,68 @@ function hash(password) {
     })
   });
 }
+
+export async function update(req, h) {
+
+  let account = await models.Account.findOne({ where: {
+
+    id: req.account.id
+
+  }});
+
+  if (!account) {
+
+    return {
+
+      success: false,
+
+      error: 'account not found'
+
+    }
+
+  }
+
+  let updateAttrs: any = Object.assign(req.payload, {});
+
+  if (updateAttrs.physical_address) {
+
+    try {
+
+      let geolocation = await geocode(updateAttrs.physical_address);
+
+      updateAttrs.latitude = geolocation.lat;
+      updateAttrs.longitude = geolocation.lng;
+
+    } catch (error) {
+
+      log.error('error geocoding address', error.message);
+
+    }
+
+  }
+
+  await models.Account.update(updateAttrs, {
+
+    where: { id: req.account.id }
+
+  });
+
+  account = await models.Account.findOne({ where: {
+
+    id: req.account.id
+
+  }});
+
+  return {
+
+    success: true,
+
+    account
+
+  }
+
+}
+
 
 export async function create (request, reply) {
   let email = request.payload.email;
@@ -65,6 +130,17 @@ export async function sudoShow (request, reply) {
 
   return account;
 };
+
+export async function sudoAccountWithEmail (request, reply) {
+
+  var account = await Account.findOne({
+    where: {
+      email: request.params.email
+    }
+  });
+
+  return account;
+}
 
 export async function index(request, reply) {
 

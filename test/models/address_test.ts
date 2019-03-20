@@ -22,10 +22,12 @@ describe('Address Model', () => {
     let address = await Address.create({
       account_id: account.id,
       value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
-      currency: 'DASH'
+      currency: 'DASH',
+      locked: true
     });
 
     assert(address.id > 0);
+    assert(address.locked);
 
   });
 

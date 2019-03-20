@@ -9,7 +9,12 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       account_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "accounts",
+          key: "id"
+        }
       },
       ambassador_id: {
         type: Sequelize.INTEGER

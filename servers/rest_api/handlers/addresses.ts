@@ -3,6 +3,7 @@ const Account = require("../../../lib/models/account");
 const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
+import { log } from '../../../lib';
 import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
 
 import { models } from '../../../lib';
@@ -66,6 +67,8 @@ module.exports.update = async function(request, reply) {
 
   };
 
+  log.info('setaddress', changeset);
+
   try {
 
     await setAddress(changeset);
@@ -80,7 +83,7 @@ module.exports.update = async function(request, reply) {
 
   } catch(error) {
 
-    return Boom.badRequest('valid currency and address must be provided');
+    return Boom.badRequest(error.message);
 
   };
 

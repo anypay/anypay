@@ -3,6 +3,8 @@ const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import { Op } from 'sequelize';
+
 import {replaceInvoice} from '../../../lib/invoice';
 
 import {emitter} from '../../../lib/events';
@@ -11,14 +13,33 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
+import * as moment from 'moment';
+
 module.exports.index = async (request, reply) => {
+
+  /*
+
+    QUERY OPTIONS
+
+      - offset
+      - limit
+      - status
+      - complete
+      - start_date_created
+      - end_date_created
+      - start_date_completed
+      - end_date_completed
+
+  */
 
   log.info(`controller:invoices,action:index`);
 
-  var invoices = await Invoice.findAll({
+  let query = {
 
     where: {
-      account_id: request.auth.credentials.accessToken.account_id
+
+      account_id: request.auth.credentials.accessToken.account_id,
+
     },
 
     order: [
@@ -29,9 +50,68 @@ module.exports.index = async (request, reply) => {
 
     limit: request.query.limit
 
-  });
+  };
 
-  return { invoices };
+  if (request.query.status) {
+
+    query.where['status'] = request.query.status;
+
+  }
+
+  if (request.query.complete) {
+
+    query.where['complete'] = request.query.complete;
+
+  }
+
+  if (request.query.start_date_completed) {
+
+    query.where['completed_at'] = {
+      [Op.gte]: moment(request.query.start_date_completed).toDate()
+    }
+
+  }
+
+  if (request.query.end_date_completed) {
+
+    if (!query.where['completed_at']) {
+
+      query.where['completed_at'] = {};
+    }
+
+    query.where['completed_at'][Op.lt] = moment(request.query.end_date_completed).toDate();
+
+  }
+
+  if (request.query.start_date_created) {
+
+    query.where['createdAt'] = {
+      [Op.gte]: moment(request.query.start_date_created).toDate()
+    }
+
+  }
+
+  if (request.query.end_date_created) {
+
+    query.where['createdAt'] = {
+      [Op.lt]: moment(request.query.end_date_created).toDate()
+    }
+
+  }
+
+  try {
+
+    var invoices = await Invoice.findAll(query);
+
+    return { invoices };
+
+  } catch(error) {
+
+    log.error(error.message);
+
+    return { error: error.message };
+
+  }
 };
 
 module.exports.sudoIndex = async (request, reply) => {
@@ -139,19 +219,23 @@ module.exports.create = async (request, reply) => {
 
       invoice.redirect_url = request.payload.redirect_url;
 
-      await invoice.save();
-
     }
 
     if (request.payload.webhook_url) {
 
       invoice.webhook_url = request.payload.webhook_url;
 
-      await invoice.save();
+    }
+
+    if (request.payload.external_id) {
+
+      invoice.external_id = request.payload.external_id;
 
     }
 
-    return invoice;
+    await invoice.save();
+
+    return sanitizeInvoice(invoice);
 
   } catch(error) {
 
@@ -162,6 +246,18 @@ module.exports.create = async (request, reply) => {
   }
 
 };
+
+function sanitizeInvoice(invoice) {
+
+  let resp = invoice.toJSON();
+
+  delete resp.webhook_url;
+  delete resp.id;
+  delete resp.account_id;
+  delete resp.dollar_amount;
+
+  return resp;
+}
 
 module.exports.show = async function(request, reply) {
 
@@ -185,7 +281,7 @@ module.exports.show = async function(request, reply) {
 
 	    emitter.emit('invoice.requested', invoice.toJSON()); 
 
-	    return invoice;
+      return sanitizeInvoice(invoice);
 
 	  } else {
 
@@ -200,6 +296,8 @@ module.exports.show = async function(request, reply) {
 
 }
 
+/*
+
 emitter.on('invoice.requested', async (invoice) => {
 
   statsd.increment('invoice requested')
@@ -209,3 +307,4 @@ emitter.on('invoice.requested', async (invoice) => {
   plugins.checkAddressForPayments(invoice.address, invoice.currency);
 
 });
+*/

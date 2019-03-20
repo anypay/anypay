@@ -1,7 +1,38 @@
+require('dotenv').config()
+
 const PASSWORD = process.env.DASH_CORE_PASSWORD;
 const USER = process.env.DASH_CORE_USER;
-const HOST = process.env.DASH_CORE_HOST || "https://dash.batm.anypay.global";
+const HOST = process.env.DASH_CORE_HOST;
+
 import * as http from "superagent";
+
+async function rpcRequest(method, params) {
+  let body = { jsonrpc: "2.0", method: method, params: params, id: 1 };
+
+  let url = `http://${HOST}:${process.env.DASH_CORE_PORT}`;
+
+  console.log("URL", url);
+
+  let resp = await http
+    .post(url)
+    .send(body)
+    .auth(USER, PASSWORD);
+
+  return resp.body.result;
+
+}
+
+export async function getTransaction(hash: string) {
+
+  let rawtx = await rpcRequest('getrawtransaction', [hash]); 
+
+  let tx = await rpcRequest('decoderawtransaction', [rawtx]);
+
+  return tx;
+  
+}
+
+import { log } from '../../../lib';
 
 function getNewAddress() {
   let body = { jsonrpc: "2.0", method: "getnewaddress", params: ["0"], id: 1 };
@@ -90,6 +121,40 @@ function getBestBlockHash() {
   });
 }
 
+class JsonRpc {
+
+  call(method, params): Promise<any> {
+
+    log.info(`dash.rpc.call.${method}`, params);
+
+    return new Promise((resolve, reject) => {
+      http
+        .post(`http://${process.env.DASH_CORE_HOST}:${process.env.DASH_CORE_PORT}`)
+        .auth(process.env.DASH_CORE_USER, process.env.DASH_CORE_PASSWORD)
+        .timeout({
+          response: 5000,  // Wait 5 seconds for the server to start sending,
+          deadline: 10000, // but allow 1 minute for the file to finish loading.
+        })
+        .send({
+          method: method,
+          params: params || [],
+          id: 0
+        })
+        .end((error, resp) => {
+          if (error) { return reject(error) }
+          resolve(resp.body);
+        });
+    });
+  }
+}
+
+let rpc = new JsonRpc();
+
+export {
+  rpc
+}
+
+  /*
 module.exports.sendPayment = sendPayment;
 
 module.exports.getNewAddress = getNewAddress;
@@ -97,3 +162,5 @@ module.exports.getNewAddress = getNewAddress;
 module.exports.listSinceBlock = listSinceBlock;
 
 module.exports.getBestBlockHash = getBestBlockHash;
+
+   */

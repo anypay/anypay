@@ -61,13 +61,13 @@ async function checkAddressForPayments(address:string, currency:string){
 
    let start = new Date().getTime()
   
-   rippleLib_checkAddressForPayments(address)
+   let payments = await rippleLib_checkAddressForPayments(address);
 
    statsd.timing('XRP_checkAddressForPayments', new Date().getTime()-start)
 
    statsd.increment('XRP_checkAddressForPayments')
 
-   return [];
+   return payments;
 
 }
 

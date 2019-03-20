@@ -2,9 +2,11 @@ require('dotenv').config();
 
 var JSONRPC = require('./lib/jsonrpc');
 
+import * as http from 'superagent';
+
 import {generateInvoice} from '../../lib/invoice';
 
-import {log} from '../../lib/logger';
+import {log, models, xpub} from '../../lib';
 
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
@@ -16,21 +18,43 @@ import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
 import {statsd} from '../../lib/stats/statsd'
 
+import { I_Address } from '../../types/interfaces';
+
 var rpc = new JSONRPC();
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
+  var inputAddress;
 
   let start = new Date().getTime()
 
-  let paymentForward = await forwards.setupPaymentForward(settlementAddress);
-
-  log.info('bch.paymentforward.created', paymentForward.toJSON());
-
-  statsd.timing('BCH_generateInvoiceAddress', new Date().getTime()-start)
-
   statsd.increment('BCH_generateInvoiceAddress')
 
-  return paymentForward.input_address;
+  if (settlementAddress.match(/^xpub/)) {
+
+    // generate address from extended public key
+
+  } else {
+
+    // set up payment forward if enabled
+
+    if (process.env.BCH_SUPPORT_FORWARDS) {
+
+      let paymentForward = await forwards.setupPaymentForward(settlementAddress);
+
+      log.info('bch.paymentforward.created', paymentForward.toJSON());
+
+      statsd.timing('BCH_generateInvoiceAddress', new Date().getTime()-start);
+
+      inputAddress = paymentForward.input_address;
+
+    } else {
+
+      throw new Error('BCH Forwards Not Supported');
+
+    }
+  }
+
+  return inputAddress;
 
 }
 
@@ -92,6 +116,54 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
   let invoice =  await createCoinTextInvoice(legacy, amount, currency)
 
   return invoice
+}
+
+async function createAddressForward(record: I_Address) {
+
+  let url = "https://bch.anypay.global/v1/bch/forwards";
+
+  let resp = await http.post(url).send({
+
+    destination: record.value,
+
+    callback_url: 'https://api.anypay.global/bch/address_forward_callbacks'
+
+  });
+
+  return resp.body.input_address;
+
+}
+
+export async function getNewAddress(record: I_Address) {
+
+  if (record.value.match(/^xpub/)) {
+
+    var address = xpub.generateAddress('BCH', record.value, record.nonce);
+
+    await models.Address.update({
+
+      nonce: record.nonce + 1
+
+    },{
+
+      where: {
+
+        id: record.id
+
+      }
+    
+    });
+
+    return address;
+
+  } else {
+
+    let address = await createAddressForward(record);
+
+    return address;
+
+  }
+
 }
 
 const currency = 'BCH';

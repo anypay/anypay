@@ -8,10 +8,15 @@
     },
 
     {
+      "code": "LTC",
+      "name": "Litecoin",
+      "icon_url": "https://pos.anypay.global/ltc.png"
+    },
+
+    {
       "code": "BCH",
       "name": "Bitcoin Cash",
-      "icon_url": "",
-      "unavailable": true
+      "icon_url": ""
     },
 
     {
@@ -41,6 +46,13 @@
     {
       "code": "ZEC",
       "name": "Zcash",
+      "icon_url": "",
+      "unavailable": true
+    },
+
+    {
+      "code": "SMART",
+      "name": "Smart Cash",
       "icon_url": "",
       "unavailable": true
     }

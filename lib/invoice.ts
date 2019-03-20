@@ -1,4 +1,3 @@
-import * as DashAddressService from './dash/forwarding_address_service';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
@@ -23,6 +22,8 @@ import * as models from './models';
 
 import {convert} from './prices';
 
+import {plugins} from './plugins';
+
 interface Amount {
   currency: string;
   value: number
@@ -45,27 +46,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
   switch(currency) {
 
-    case 'DASH':
-
-      address = await DashAddressService.getNewAddress(accountId);
-
-      break;
-
     case 'BTC':
 
       address = await BitcoinAddressService.getNewAddress(accountId);
-
-      break;
-
-    case 'LTC':
-
-      address = await LitecoinAddressService.getNewAddress(accountId);
-
-      break;
-
-    case 'BCH':
-
-      address = await BitcoinCashAddressService.getNewAddress(accountId);
 
       break;
 
@@ -75,23 +58,9 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
       break;
 
-    case 'DOGE':
+    default:
 
-      address = await DogecoinAddressService.getNewAddress(accountId);
-
-      break;
-
-    case 'ZEC':
-
-      address = await ZcashAddressService.getNewAddress(accountId);
-
-      break;
-
-    case 'ZEN':
-
-      address = await ZencashAddressService.getNewAddress(accountId);
-
-      break;
+      address = await plugins.getNewAddress(currency, accountId);
   }
 
   if (!address) {
@@ -123,7 +92,7 @@ export async function generateInvoice(
     value: denominationAmountValue
   }, invoiceCurrency);
 
-  console.log('converted price');
+  console.log('converted price', invoiceAmount);
   console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
@@ -154,6 +123,8 @@ export async function generateInvoice(
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   });
+
+  emitter.emit('invoice.created', invoice.uid);
 
   return invoice;
 }

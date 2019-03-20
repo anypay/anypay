@@ -4,6 +4,16 @@ export interface Payment {
   address: string;
   amount: number;
   hash: string;
+  confirmations?: number;
+  locked?: boolean;
+}
+
+export interface I_Address {
+  id: number;
+  account_id: number;
+  currency: string;
+  value: string;
+  nonce?: number;
 }
 
 export interface Invoice {
@@ -11,6 +21,9 @@ export interface Invoice {
   uid: string;
   account_id: number;
   currency: string;
+  complete?: boolean;
+  completed_at?: Date;
+  instantsend?: boolean;
   amount: number;
   invoice_amount?: number;
   invoice_amount_paid?: number;
@@ -19,6 +32,7 @@ export interface Invoice {
   denomination_amount: number;
   denomination_amount_paid?: number;
   address: string;
+  expiry?: string;
   status: string;
   hash?: string;
   paidAt?: Date;

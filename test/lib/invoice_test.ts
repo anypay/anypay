@@ -8,6 +8,7 @@ import { setAddress, setDenomination } from '../../lib/core';
 import * as assert from 'assert';
 
 import * as Chance from 'chance';
+import * as moment from 'moment';
 
 const chance = new Chance();
 
@@ -45,6 +46,8 @@ describe("Creating Invoices", () => {
 
     assert(invoice.invoice_amount > 0);
     assert.strictEqual(invoice.invoice_currency, 'DASH');
+
+    assert(moment(invoice.expiry));
 
   });
 

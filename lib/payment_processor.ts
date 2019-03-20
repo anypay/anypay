@@ -1,20 +1,90 @@
-const InvoiceModel = require("./models/invoice");
+require('dotenv').config();
+
 import { Payment, Invoice } from "../types/interfaces";
+
 import {emitter} from './events';
-const log = require("winston");
-import * as database from './database';
+
+import {log} from './logger';
+
+import {BigNumber} from 'bignumber.js'
+import * as models from './models';
+
+import * as moment from 'moment';
+
+export async function receivePayment(payment: Payment) {
+  log.info('receive payment', payment);
+
+  let invoice = await models.Invoice.findOne({
+    where: {
+      currency: payment.currency,
+      address: payment.address,
+      status: "unpaid"
+    },
+    order: [['createdAt', 'DESC']]
+  });
+
+  if (invoice) {
+
+    return handlePayment(invoice, payment);
+
+  } else {
+
+    return;
+
+  }
+
+}
 
 export async function handlePayment(invoice: Invoice, payment: Payment) {
-  if (invoice.amount === payment.amount) {
-    console.log("handle paid");
-    return handlePaid(invoice, payment);
-  } else if (payment.amount < invoice.amount) {
-    return handleUnderpaid(invoice, payment);
-  } else if (payment.amount > invoice.amount) {
-    return handleOverpaid(invoice, payment);
-  } else {
-    throw new Error("invoice neither paid, overpaid, or underpaid");
+
+  /* Check if invoice has expired yet, emit 'invoice.payment.expired'. */
+
+  let expires = moment(invoice.expiry);
+
+  let now = moment(); 
+
+  if (expires.valueOf() < now.valueOf()) {
+
+    log.info('invoice.payment.expired', invoice, payment);
+
+    emitter.emit('invoice.payment.expired', {
+      invoice,
+      payment
+    });
+
+    return;
+
   }
+
+  /* End Expiration Check */
+
+  if (invoice.amount === payment.amount) {
+
+    await handlePaid(invoice, payment);
+
+  } else if (payment.amount < invoice.amount) {
+
+    await handleUnderpaid(invoice, payment);
+
+  } else if (payment.amount > invoice.amount) {
+
+    await handleOverpaid(invoice, payment);
+
+  } else {
+
+    throw new Error("invoice neither paid, overpaid, or underpaid");
+
+  }
+
+  return models.Invoice.findOne({ where: { id: invoice.id }});
+}
+
+function getInvoicePrice(invoice) {
+
+  let denominationAmount = new BigNumber(invoice.denomination_amount);
+  let invoiceAmount = new BigNumber(invoice.invoice_amount);
+
+  return denominationAmount.dividedBy(invoiceAmount);
 }
 
 export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
@@ -22,16 +92,21 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
     throw new Error("underpaid handler called with sufficient payment");
   }
 
-  let price = invoice.denomination_amount / invoice.invoice_amount;
+  let paymentAmount = new BigNumber(payment.amount);
 
-  var result = await InvoiceModel.update(
+  let price = getInvoicePrice(invoice);
+
+  var result = await models.Invoice.update(
     {
-      amount_paid: payment.amount,
-      invoice_amount_paid: payment.amount,
-      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      amount_paid: paymentAmount.toNumber(),
+      invoice_amount_paid: paymentAmount.toNumber(),
+      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
       hash: payment.hash,
+      locked: payment.locked,
       status: 'underpaid',
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }
@@ -52,14 +127,17 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
     throw new Error("paid handler called with insufficient payment");
   }
 
-  var result = await InvoiceModel.update(
+  var result = await models.Invoice.update(
     {
       amount_paid: payment.amount,
       invoice_amount_paid: payment.amount,
       denomination_amount_paid: invoice.denomination_amount,
       hash: payment.hash,
+      locked: payment.locked,
       status: "paid",
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }
@@ -86,16 +164,21 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
     throw new Error("overpaid handler called with exactly sufficient payment");
   }
 
-  let price = invoice.denomination_amount / invoice.invoice_amount;
+  let paymentAmount = new BigNumber(payment.amount);
 
-  var result = await InvoiceModel.update(
+  let price = getInvoicePrice(invoice);
+
+  var result = await models.Invoice.update(
     {
-      amount_paid: payment.amount,
-      invoice_amount_paid: payment.amount,
-      denomination_amount_paid: (payment.amount * price).toFixed(2),
+      amount_paid: paymentAmount.toNumber(),
+      invoice_amount_paid: paymentAmount.toNumber(),
+      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
       hash: payment.hash,
+      locked: payment.locked,
       status: 'overpaid',
-      paidAt: new Date()
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
     },
     {
       where: { id: invoice.id }

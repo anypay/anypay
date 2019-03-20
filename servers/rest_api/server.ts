@@ -4,14 +4,31 @@ require('dotenv').config();
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
+import { channel } from '../../lib/amqp';
 
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
 const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
+import * as pricesActor from '../../actors/prices/actor';
+import * as sudoAddresses from './handlers/sudo_addresses';
+import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
+
+import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
+import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
+import * as DASHAddressForwardCallbacks from './handlers/dash_address_forward_callbacks';
+import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
+import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_callbacks';
+import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_callbacks';
+import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
+import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_callbacks';
+import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
+
+const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
+const SudoAccounts = require("./handlers/sudo/accounts");
 const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
@@ -38,7 +55,7 @@ const WebhookHandler = new EventEmitter();
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
 import { sudoLogin } from './handlers/sudo_login'
-import * as DashBackMerchants from './handlers/dash_back_merchants';
+import * as CashbackMerchants from './handlers/cashback_merchants';
 const Joi = require('joi');
 
 import {createLinks} from './handlers/links_controller';
@@ -397,6 +414,7 @@ async function Server() {
       plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
+
   server.route({
     method: "POST",
     path: "/doge/invoices",
@@ -475,6 +493,15 @@ async function Server() {
       tags: ['api'],
       handler: AccountsController.show,
       plugins: responsesWithSuccess({ model: Account.Response }),
+    }
+  });
+  server.route({
+    method: "PUT",
+    path: "/account",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: AccountsController.update
     }
   });
   server.route({
@@ -586,7 +613,21 @@ async function Server() {
 
         var currencies = await Fixer.getCurrencies();
 
-        currencies.rates['VES'] = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
+        var rates = currencies.rates;
+
+        let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
+
+        rates['VES'] = vesPrice;
+
+        let sortedCurrencies = Object.keys(rates).sort();
+
+        currencies.rates = sortedCurrencies.reduce((map, key) => {
+
+          map[key] = rates[key];
+
+          return map;
+
+        }, {});
 
         return currencies;
 
@@ -823,13 +864,177 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/sudo/wires/reportsinceinvoice/{invoice_uid}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoWires.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/sudo/accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoAccounts.update,
+
+      validate: {
+
+        payload: {
+
+          denomination: Joi.string().optional(),
+
+          physical_address: Joi.string().optional(),
+
+          business_name: Joi.string().optional(),
+
+          latitude: Joi.number().optional(),
+
+          longitude: Joi.number().optional(),
+
+          image_url: Joi.string().optional()
+
+        }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/addresses',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/sudo/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.del
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.lockAddress
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.unlockAddress
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/sudo/dashback/merchants',
 
     config: {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoList
+      handler: CashbackMerchants.sudoList
 
     }
 
@@ -845,7 +1050,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoShow
+      handler: CashbackMerchants.sudoShow
 
     }
 
@@ -861,7 +1066,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoActivate
+      handler: CashbackMerchants.sudoActivate
 
     }
 
@@ -877,7 +1082,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: DashBackMerchants.sudoDeactivate
+      handler: CashbackMerchants.sudoDeactivate
 
     }
 
@@ -983,6 +1188,22 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/sudo/account-by-email/{email}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoAccountWithEmail
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/sudo/ambassadors',
 
     config: {
@@ -1072,6 +1293,20 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/active-merchants',
+
+    config: {
+
+      handler: MerchantsController.listActiveSince
+
+    }
+
+  });
+
+  server.route({
+
     method: 'POST',
 
     path: '/test/webhooks',
@@ -1083,6 +1318,167 @@ async function Server() {
         log.info('WEBHOOK', req.payload)
 
         return true;
+
+      }
+
+    }
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/bch/address_forward_callbacks',
+
+    config: {
+
+      handler: BCHAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/dash/address_forward_callbacks',
+
+    config: {
+
+      handler: DASHAddressForwardCallbacks.create
+
+    }
+
+  });
+
+
+
+   server.route({
+
+    method: 'POST',
+
+    path: '/ltc/address_forward_callbacks',
+
+    config: {
+
+      handler: LTCAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/zen/address_forward_callbacks',
+
+    config: {
+
+      handler: ZENAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/zec/address_forward_callbacks',
+
+    config: {
+
+      handler: ZECAddressForwardCallbacks.create
+    }
+
+  })
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/doge/address_forward_callbacks',
+
+    config: {
+
+      handler: DOGEAddressForwardCallbacks.create
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/smart/address_forward_callbacks',
+
+    config: {
+
+      handler: SMARTAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/rvn/address_forward_callbacks',
+
+    config: {
+
+      handler: RVNAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/blockcypher/webhooks/dash',
+
+    config: {
+
+      handler: async function(req, h) {
+
+        log.info('blockcypher.webhook', req.payload);
+
+        try {
+
+          let hook = await models.BlockcypherEvent.create({
+          
+            type: 'unconfirmed-tx',
+
+            payload: JSON.stringify(req.payload)
+
+          });
+
+          log.info('blockcypher.event.recorded', hook.toJSON());
+
+          let payments = parseUnconfirmedTxEventToPayments(req.payload);
+
+          payments.forEach(async (payment) => {
+
+            log.info('payment', payment);
+
+            await channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
+
+          });
+
+        } catch(error) {
+
+          log.error(error.message);
+
+        }
+
+        return { success: true }
 
       }
 
@@ -1102,6 +1498,12 @@ if (require.main === module) {
 }
 
 async function start () {
+
+  if (process.env.START_PRICES_ACTOR) {
+
+    pricesActor.start();
+
+  }
 
   await sequelize.sync()
 
