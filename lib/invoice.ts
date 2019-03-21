@@ -10,6 +10,8 @@ import * as database from './database';
 
 import { Payment } from '../types/interfaces';
 
+import * as http from 'superagent';
+
 import {emitter} from './events'
 
 const log = require("winston");
@@ -41,6 +43,26 @@ interface Address {
   value: string
 }
 
+async function createSubscription(currency, address){
+
+  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+
+  let url = `${process.env.MONITOR_BASE}/v1/subscriptions`;
+
+  let resp = await http.post(url).send({
+
+    currency: currency,
+
+    address: address,
+
+    callback_url: `${callbackBase}/address_subscription_callbacks`
+
+  });
+
+  return resp.body.result;
+
+}
+
 async function getNewInvoiceAddress(accountId: number, currency: string): Promise<Address> {
   var address;
 
@@ -65,6 +87,17 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
   if (!address) {
     throw new Error(`unable to generate address for ${currency}`);
+  }
+
+  try{
+
+    console.log('createSubscription', currency, address)
+    createSubscription(currency, address)
+
+  }catch(err){
+
+    console.log(err)
+
   }
 
   return {
