@@ -120,12 +120,21 @@ const validatePassword = async function(request, username, password, h) {
 
   var accessToken = await AccountLogin.withEmailPassword(username, password);
 
+  console.log('got access token');
+
+  var account = await models.Account.findOne({
+    where: {
+      id: accessToken.account_id
+    }
+  });
+
+  console.log('got account');
 
   if (accessToken) {
 
     return {
       isValid: true,
-      credentials: { accessToken }
+      credentials: { accessToken, account }
     };
 
   } else {
@@ -438,6 +447,20 @@ async function Server() {
         payload: Account.Credentials,
       },
       handler: AccountsController.create,
+      plugins: responsesWithSuccess({ model: Account.Response }),
+    },
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/anonymous-accounts",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        payload: Account.Credentials,
+      },
+      handler: AccountsController.registerAnonymous,
       plugins: responsesWithSuccess({ model: Account.Response }),
     },
   });
