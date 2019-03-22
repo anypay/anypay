@@ -22,6 +22,8 @@ import { I_Address } from '../../types/interfaces';
 
 var rpc = new JSONRPC();
 
+import * as address_subscription from '../../lib/address_subscription';
+
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
   var inputAddress;
 
@@ -154,6 +156,8 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
+    let subscription = await address_subscription.createSubscription('BCH', address)
+
     return address;
 
   } else {
@@ -189,4 +193,3 @@ export {
   poll
 
 };
-

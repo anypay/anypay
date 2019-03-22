@@ -43,26 +43,6 @@ interface Address {
   value: string
 }
 
-async function createSubscription(currency, address){
-
-  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
-
-  let url = `${process.env.MONITOR_BASE}/v1/subscriptions`;
-
-  let resp = await http.post(url).send({
-
-    currency: currency,
-
-    address: address,
-
-    callback_url: `${callbackBase}/address_subscription_callbacks`
-
-  });
-
-  return resp.body.result;
-
-}
-
 async function getNewInvoiceAddress(accountId: number, currency: string): Promise<Address> {
   var address;
 
@@ -118,8 +98,6 @@ export async function generateInvoice(
   console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
-
-  let subscription = await createSubscription(invoiceCurrency, address.value)
 
   console.log('got new invoice address');
 
