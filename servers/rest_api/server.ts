@@ -24,6 +24,7 @@ import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_call
 import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
 import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_callbacks';
 import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
+import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
@@ -1465,6 +1466,20 @@ async function Server() {
     config: {
 
       handler: RVNAddressForwardCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/address_subscription_callbacks',
+
+    config: {
+
+      handler: AddressSubscriptionCallbacks.subscriptionCallback
 
     }
 
