@@ -1447,7 +1447,7 @@ async function Server() {
 
     config: {
 
-      handler: AddressSubscriptionCallbacks.subscribtionCallback
+      handler: AddressSubscriptionCallbacks.subscriptionCallback
 
     }
 

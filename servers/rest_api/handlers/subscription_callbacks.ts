@@ -4,7 +4,7 @@ import { handlePaymentMessage } from '../../processor/payments/main';
 
 import { channel } from '../../../lib/amqp';
 
-export async function subscribtionCallback(req, h){
+export async function subscriptionCallback(req, h){
 
   log.info('subscription.callback', req.payload);
 
