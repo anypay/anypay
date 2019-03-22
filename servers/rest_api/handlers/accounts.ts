@@ -103,6 +103,36 @@ export async function createAnonymous(request, reply) {
 
 }
 
+export async function registerAnonymous(request, reply) {
+  let email = request.payload.email;
+
+  log.info('create.account', email);
+
+  let passwordHash = await hash(request.payload.password);
+
+  request.account.email = request.payload.email;
+  request.account.password_hash = passwordHash;
+
+  try {
+
+    request.account.save();
+
+    Slack.notify(`account:registered | ${request.account.email}`);
+    
+    emitter.emit('account.created', request.account)
+
+    return request.account;
+
+  } catch(error) {
+
+    log.error(`account ${email} already registered`);
+
+    return Boom.badRequest(
+      new Error(`account ${email} already registered`)
+    );
+  }
+}
+
 export async function create (request, reply) {
   let email = request.payload.email;
 
