@@ -89,17 +89,6 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
     throw new Error(`unable to generate address for ${currency}`);
   }
 
-  try{
-
-    console.log('createSubscription', currency, address)
-    createSubscription(currency, address)
-
-  }catch(err){
-
-    console.log(err)
-
-  }
-
   return {
     currency,
     value: address
@@ -129,6 +118,8 @@ export async function generateInvoice(
   console.log('getting new invoice address');
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
+
+  let subscription = await createSubscription(invoiceCurrency, address.value)
 
   console.log('got new invoice address');
 
