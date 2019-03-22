@@ -443,6 +443,15 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/anonymous-accounts",
+    config: {
+      tags: ['api'],
+      handler: AccountsController.createAnonymous,
+    },
+  });
+
+  server.route({
     method: "GET",
     path: "/accounts/:account_uid/confirmation",
     handler: (request, reply) => {
