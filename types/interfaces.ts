@@ -4,6 +4,7 @@ export interface Payment {
   address: string;
   amount: number;
   hash: string;
+  output_hash?: string;
   confirmations?: number;
   locked?: boolean;
 }

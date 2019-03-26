@@ -6,6 +6,8 @@ const Slack = require("../../../lib/slack/notifier");
 
 import { models } from '../../../lib';
 
+import * as forwarderEventsActor from '../../../actors/forwarder_events/actor';
+
 import {Connection, Channel, Message} from "amqplib"; 
 import {paymentSchema} from '../../../jsonschema/payment';
 import {Validator} from 'jsonschema';
@@ -165,6 +167,8 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
   await channel.bindQueue('webhooks.invoice', 'anypay:invoices', 'invoice:paid');
 
   channel.consume('webhooks.invoice', WebhooksConsumer(channel));
+
+  await forwarderEventsActor.start();
 
 });
 
