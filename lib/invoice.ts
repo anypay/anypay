@@ -10,6 +10,8 @@ import * as database from './database';
 
 import { Payment } from '../types/interfaces';
 
+import * as http from 'superagent';
+
 import {emitter} from './events'
 
 const log = require("winston");
