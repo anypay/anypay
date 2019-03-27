@@ -4,6 +4,8 @@ import * as moment from 'moment';
 
 import { Request, ResponseToolkit } from 'hapi';
 
+const BitcoinDotComMerchants = require('../../../config/bitcoin.com-merchants.json');
+
 export async function list(req: Request, h: ResponseToolkit) {
 
   let resp = await database.query(`select physical_address, business_name,
@@ -43,7 +45,8 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
     merchants: allVerifiedMerchants[0],
     oneWeek: accountIdsOneWeek[0],
     oneMonth: accountIdsOneMonth[0],
-    threeMonths: accountIdsThreeMonths[0]
+    threeMonths: accountIdsThreeMonths[0],
+    bitcoincom: BitcoinDotComMerchants
   };
 
   } catch (error) {
