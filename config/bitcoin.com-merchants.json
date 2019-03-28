@@ -1,0 +1,427 @@
+[
+  {
+    "name": "Jostes Suministros,C.A.",
+    "address": "Calle Luis de Camoens Edif Villanova piso 4 ofic 4-04 ",
+    "category": "Venta de materiales de oficina ",
+    "latitude": 10.436107,
+    "longitude": -66.865764,
+    "phone": "02129432397",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "CuchiCakes",
+    "address": "centro comercial galerias avila nivel parque plaza central ",
+    "category": "postres",
+    "latitude": 10.5061023,
+    "longitude": -66.9024695,
+    "phone": "04129599196",
+    "websiteUrl": "@cuchicakes"
+  },
+
+
+  {
+    "name": "Bebecitos en linea",
+    "address": "Av. Las Americas Centro Comercial Terras Plaza, Nivel Feria. Terrezas Club Hípico. Caracas",
+    "category": "Ropa y juguetes para niños",
+    "latitude": 10.438818,
+    "longitude": -66.873581,
+    "phone": "+584244238174",
+    "websiteUrl": "www bebecitosenlinea.com"
+  },
+
+  {
+
+    "name": "INTERI DISEÑOS, CA",
+    "address": "Av. El Ppal. Urb.Los Naranjos, Centro Comercial Galerías Los Naranjos, Nivel Pasarela, Local C2 67B, Zona Postal 1061\nCaracas\nVE\n",
+    "category": "Cosas del Hogar",
+    "latitude": 10.4404163,
+    "longitude": -66.8364359,
+    "phone": "+58212 414 9393",
+    "websiteUrl": ""
+  },
+
+  {
+
+    "name": "Marcos TsaI I C.A",
+    "address": "Av. Ppal de la Trinidad C.C Sorocaima Local A La Trinidad Caracas",
+    "category": "Galería de Arte, marqueteria",
+    "latitude": 10.433802,
+    "longitude": -66.8637401,
+    "phone": "+582129453679",
+    "websiteUrl": "instagram.@marcostsai"
+  },
+  {
+
+    "name": "El Musiú Foodtruck ",
+    "address": "Establecimiento rodante, ubicalo a través de sus redes sociales.",
+    "category": "Comida rápida ",
+    "latitude": 10.484418,
+    "longitude": -66.885839,
+    "phone": "",
+    "websiteUrl": "instagram@elmusiuccs/?hl=es-la"
+  },
+  {
+
+    "name": "Food Truck Bianco gastronomía Italiana",
+    "address": "Conoce su ubicación a traves de la redes",
+    "category": "comida rapida",
+    "latitude": 10.512514,
+    "longitude": -66.8657934,
+    "phone": "",
+    "websiteUrl": "Instagram@biancofoodtruck"
+  },
+
+  {
+
+    "name": "Bartender's Truck bebidas, merengadas y cocteles refrescantes",
+    "address": "Conoce su ubicación a traves de la redes sociales",
+    "category": "Camión de bebidas refrescantes",
+    "latitude": 10.511815,
+    "longitude": -66.896051,
+    "phone": "04265159671",
+    "websiteUrl": "Instagram@bartenderstruckvzla/"
+  },
+
+  {
+    "name": "Inversiones ToTheGame Servicio técnico video Juegos y accesorios",
+    "address": "C.C City Market piso 4 local 450",
+    "category": "video Juegos",
+    "latitude": 10.493977,
+    "longitude": -66.8778491,
+    "phone": "02127620755",
+    "websiteUrl": "Instagram@tothegamecaracas/"
+  },
+
+  {
+    "name": "Inversiones. Rino Cell Venta liberación y sofware de equipos celulares y pc",
+    "address": "C.c City Market\nPiso 4 nivel Feria mezanina Sabana Grande",
+    "category": "Servicio técnico celulares y pc",
+    "latitude": 10.4939653,
+    "longitude": -66.8778688,
+    "phone": "02127619884",
+    "websiteUrl": "Inversionesrinocell@gmail.com"
+  },
+
+  {
+    "name": "Franquicia de Perros Calientes Plumrose Express",
+    "address": "C.C Galerias Paraiso, Nivel PB. Redoma La India",
+    "category": "Comida Rapida",
+    "latitude": 10.47501,
+    "longitude": -66.94583,
+    "phone": "04123038371",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Franquicia de Perros Calientes Plumrose Express",
+    "address": "C.C City Market, Nivel Feria. Sabana Grande",
+    "category": "Comida Rapida",
+    "latitude": 10.494367,
+    "longitude": -66.877862,
+    "phone": "04123038371",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Servicell Rave 20 C.A Servico técnico y venta de celulares",
+    "address": "C.C. City Market Piso 3 Nivel Bazar local 418",
+    "category": "servicio técnico sofware y liberación de celular es",
+    "latitude": 10.4943678,
+    "longitude": -66.8780071,
+    "phone": "0212-7619084",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "As Sistemas C.A Equipos de computación y celulares",
+    "address": "C.C City Market Nivel boulevard local 224 Sabana Grande ccs",
+    "category": "Tecnologia",
+    "latitude": 10.4940889,
+    "longitude": -66.8778506,
+    "phone": "02127611720",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "X.Tech Repuestos y accesorios de celulares",
+    "address": "C.C City Market nivel bazar piso 2 Sabana Grande",
+    "category": "repuestos y accesorios de celulares",
+    "latitude": 10.4943835,
+    "longitude": -66.8779702,
+    "phone": "021227616917",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Dr. Impresora C.A. servicio técnico  tintas y equipos Epson ",
+    "address": "C.C City Marketing nivel bazar piso 3 local B-405 Sabana Grande",
+    "category": "Servicio tecnico y accesorios de impresoras",
+    "latitude": 10.4944128,
+    "longitude": -66.8780156,
+    "phone": "04242460939",
+    "websiteUrl": "www.drimpresora.com"
+  },
+  {
+
+    "name": "Sr. Waffles C.A Mayor y detal de chucherías y bebidas nacional e importas",
+    "address": "C.C City Market nivel Bazar MZ local B-310- Sabana Grande",
+    "category": "Alimentos y Bebidas",
+    "latitude": 10.4943064,
+    "longitude": -66.8780374,
+    "phone": "02127610298",
+    "websiteUrl": "www.twitter\/srwaffles310\/"
+  },
+  {
+
+    "name": "Tu mundo electrónico C.A. servicio técnico y accesorios celulares",
+    "address": "C.C City Marketing nivel bazar piso 2 local B-321 Sabana Grande",
+    "category": "servicio tecnico y accesorios de celulares",
+    "latitude": 10.4944283,
+    "longitude": -66.8780105,
+    "phone": "02123175885",
+    "websiteUrl": "www.tumundoelectronico.com"
+  },
+  {
+
+    "name": "Alpha Computer C.A. Servicio técnico celulares laptops video juegos y accesorios",
+    "address": "C.C. City Market nivel bazar local-B-327",
+    "category": "servicio técnico celulares y laptops ",
+    "latitude": 10.4942438,
+    "longitude": -66.8780939,
+    "phone": "0212-7632830",
+    "websiteUrl": "www.instagram alphacomputervzla"
+  },
+  {
+
+    "name": "Insumos Chicho C.A. Accesorios equipos electrónicos video juegos",
+    "address": "C.C. City Market nivel Bazar local B-322 Sabana Grande",
+    "category": "Accesorios equipos electrónicos video juegos",
+    "latitude": 10.4944044,
+    "longitude": -66.877957,
+    "phone": "0212-7631972",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "N-Veces Inversiones C.A. - Equipos celulares accesorios y servicio técnico ",
+    "address": "C.C. City Market local-163 nivel plaza Sabana Grande ",
+    "category": "Equipos electrónicos accesorios",
+    "latitude": 10.4987614,
+    "longitude": -66.8840823,
+    "phone": "0212-7629210",
+    "websiteUrl": "www.instagram@nvecesinversionesca"
+  },
+  {
+
+    "name": "Cafe Macchiato Gourmet- postres y cafe",
+    "address": "Nivel plaza central kiosko 185-186",
+    "category": "",
+    "latitude": 10.4941006,
+    "longitude": -66.8780209,
+    "phone": "02127620363",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Printer Ink C.A. Reparación de impresoras y tóners, recargas, consumibles y repuestos",
+    "address": "C.C Sabana Grande nivel feria local 03",
+    "category": "Impresoras consumibles",
+    "latitude": 10.4943755,
+    "longitude": -66.8782634,
+    "phone": "04242-519678 \/ 0212-7633678",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Inversiones Morales Cibercafé",
+    "address": "C.C. Sabana Grande Nivel Mezanina Local-37",
+    "category": "Cibercafé",
+    "latitude": 10.494165,
+    "longitude": -66.8782994,
+    "phone": "0212-7617119",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Inversiones Stephinet121520 C.A. Ciber Café Snack Xpress",
+    "address": "C.C. Sabana grande Nivel PB Local-12\nCiber",
+    "category": "Ciber Cafe",
+    "latitude": 10.4945462,
+    "longitude": -66.8781557,
+    "phone": "0212-7625339",
+    "websiteUrl": ""
+  },
+  {
+
+    "name": "Ciber Mania C.A. impresiones fotocopias digitalizaciónes",
+    "address": "C.C. Sabana grande Nivel PB Local-06",
+    "category": "Ciber cafe",
+    "latitude": 10.4945445,
+    "longitude": -66.8782406,
+    "phone": "02127611207",
+    "websiteUrl": "Instagram@cibermania.caracas"
+
+  },
+  {
+    "name": "Yujuu Accesorios C.A. Tienda por Departamento",
+    "address": "C.C. Sabana Grande Nivel PB Local-11",
+    "category": "Tienda por Departamento",
+    "latitude": 10.4946022,
+    "longitude": -66.8781576,
+    "phone": "02127634964",
+    "websiteUrl": "@yujuuaccesorios"
+  },
+  {
+
+   "name": "Maranta Nutrition C.A\nSuplementos deportivos, nutricionales, y vitaminas",
+    "address": "C.C. Sabana Grande Nivel PB Local-06",
+    "category": "Suplementos y Vitaminas",
+    "latitude": 10.4946255,
+    "longitude": -66.8781871,
+    "phone": "0212-7631121",
+    "websiteUrl": "Instagram@marantanutrition"
+  },
+  {
+
+   "name": "Organifit C.A Micromercado alimentos y víveres ",
+    "address": "C.C. Sabana Grande Nivel PB Local-23",
+    "category": "Micromercado alimentos y viveres",
+    "latitude": 10.494656,
+    "longitude": -66.8781633,
+    "phone": "04242686788",
+    "websiteUrl": "Instagram@organifit20"
+  },
+  {
+
+  "name": "Auto Lavado Las Acacias. Pulitura cambio de aceite, filtros autoperiquitos",
+    "address": "Av. Lois Braille con Av. Luis Toro al lafo de Clinicas de los Ciegos. Las Acacias",
+    "category": "Autolavado",
+    "latitude": 10.485804,
+    "longitude": -66.907211,
+    "phone": "0212-6313039",
+    "websiteUrl": "Instagram@autolavadolasacaciasexpress"
+  },
+  {
+
+  "name": "Inversiones Barbara C.A.\nServicio técnico de celulares y venta de equipos y accesorios.\n",
+    "address": "Centro Comercial Sábana Grande \nNivel MZ Local 27",
+    "category": "equipos electrónicos servicio tecnico",
+    "latitude": 10.4943758,
+    "longitude": -66.8782152,
+    "phone": "0414-2563847",
+    "websiteUrl": ""
+
+  },
+  {
+
+    "name": "Soluciones Integrales CGT C.A.  Electrónica y computación ",
+    "address": "Nivel Mezanina  Local 19 C.C. Sábana Grande",
+    "category": "computación",
+    "latitude": 10.4944353,
+    "longitude": -66.8781504,
+    "phone": "02127613532",
+    "websiteUrl": "Instagram@Ventas.tecnicesargt"
+  },
+  {
+
+     "name": "Auto Moto Repuesto C.A. Venta de Repuesto de vehículos y motos",
+    "address": "C.C. Sabana Grande Local 22 Nivel Mezanina ",
+    "category": "repuestos de vehículos y motos",
+    "latitude": 10.4944176,
+    "longitude": -66.8781395,
+    "phone": "02123258376",
+    "websiteUrl": ""
+  },
+  {
+
+  "name": "Global Servicios CG-GC C.A. Equipos electrónicos computación servicio tecnico",
+    "address": "C.C. Sabana Grande Nivel Mezanina local 9A",
+    "category": "tecnología",
+    "latitude": 10.4947401,
+    "longitude": -66.8783485,
+    "phone": "02123138166",
+    "websiteUrl": "@globalservicioscggc"
+  },
+  {
+
+    "name": "Autolavado Car Wash. Pulitura, lavado y engrase de chasis, servicios",
+    "address": "Av. Presidente Medina local 8 Urb. Las Acacias frente E\/S PDV Guayana ",
+    "category": "Autolavado",
+    "latitude": 10.4849063,
+    "longitude": -66.898,
+    "phone": "0212-6938988",
+    "websiteUrl": "@carwashvictoria"
+  },
+  {
+
+    "name": "Autolavado Car Wash. Pulitura, lavado y engrase de chasis, servicios",
+    "address": "Av. Presidente Medina local 8 Urb. Las Acacias frente E\/S PDV Guayana ",
+    "category": "Autolavado",
+    "latitude": 10.4849063,
+    "longitude": -66.898,
+    "phone": "0212-6938988",
+    "websiteUrl": "@Carwashvictoria"
+  },
+  {
+
+  "name": "A&M Servicios y Repuestos C.A.  celulares",
+    "address": "Centro Comercial Sabana Grande \nNivel MZ Local 28",
+    "category": "servicio técnico de equipos celulares",
+    "latitude": 10.4943632,
+    "longitude": -66.8782027,
+    "phone": "0424-2976397",
+    "websiteUrl": ""
+  },
+  {
+
+  "name": "P Cell  C.A. servicio técnico y venta de equipos celulares",
+    "address": "C.C. Sabana Grande nivel sótano local 27",
+    "category": "Tecnología",
+    "latitude": 10.4946793,
+    "longitude": -66.8782769,
+    "phone": "0416-9042309",
+    "websiteUrl": ""
+  },
+  {
+
+  "name": "Servi Parts C.A.Venta de repuestos y servicio de línea blanca ",
+    "address": "C.C. Sábana Grande Nivel Mezanina local 17",
+    "category": "Línea Blanca",
+    "latitude": 10.494354,
+    "longitude": -66.8782364,
+    "phone": "0212-7623853",
+    "websiteUrl": "www.Serviparts.com.ve"
+  },
+  {
+
+  "name": "Mundo Android C.A. Servicio técnico sofware, actualización, liberaciones deblosqueo, repuestos, accesorios  ",
+    "address": "C.C. Sábana Grande local 15  nivel PB",
+    "category": "tecnología",
+    "latitude": 10.4947634,
+    "longitude": -66.8783395,
+    "phone": "04241877759",
+    "websiteUrl": ""
+  },
+  {
+
+     "name": "Y & J electronincs 21 C.A Ventas de equipos telefónicos",
+    "address": "C.C City Market Nivel Plaza frente a la BLU del CC ",
+    "category": "tecnología",
+    "latitude": 10.4941112,
+    "longitude": -66.877864,
+    "phone": "02127614353",
+    "websiteUrl": ""
+  },
+  {
+    "name": "Sonido natural C.A. Ventas de intrumentos musicales, reparación y academia",
+    "address": "Av Abraham Lincoln Torre Lincoln PB loca E - Plaza Venezuela",
+    "category": "Musical",
+    "latitude": 10.4957488,
+    "longitude": -66.8817077,
+    "phone": "0212-7828742 \/0212-7812990",
+    "websiteUrl": ""
+  }
+]
+
+
