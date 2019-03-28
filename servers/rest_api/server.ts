@@ -29,6 +29,7 @@ import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
+const TipJars = require("./handlers/tipjars");
 const SudoAccounts = require("./handlers/sudo/accounts");
 const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
@@ -55,7 +56,8 @@ const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
-import { sudoLogin } from './handlers/sudo_login'
+import { sudoLogin } from './handlers/sudo_login';
+import { sudoTipjars } from './handlers/sudo/tipjars';
 import * as CashbackMerchants from './handlers/cashback_merchants';
 const Joi = require('joi');
 
@@ -371,6 +373,27 @@ async function Server() {
       plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
+
+  server.route({
+
+    method: "GET",
+    path: "/tipjars/{currency}",
+    config: {
+      auth: "token",
+      handler: TipJars.show
+    }
+  });
+
+  server.route({
+
+    method: "GET",
+    path: "/sudo/accounts/{account_id}/tipjars/{currency}",
+    config: {
+      auth: "sudopassword",
+      handler: sudoTipjars.show
+    }
+  });
+
   server.route({
     method: "POST",
     path: "/btc.lightning/invoices",

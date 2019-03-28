@@ -22,6 +22,7 @@ import * as invoice from './invoice';
 import { log } from './logger';
 import { plugins } from './plugins';
 import * as blockcypher from './blockcypher';
+import * as tipjar from './tipjar';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -48,6 +49,7 @@ export {
   plugins,
   invoices,
   xpub,
-  blockcypher
+  blockcypher,
+  tipjar
 }
 
