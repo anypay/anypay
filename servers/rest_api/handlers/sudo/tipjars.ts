@@ -1,5 +1,5 @@
 
-import { log, tipjar } from '../../../lib';
+import { log, tipjar } from '../../../../lib';
 
 export async function show(request, h) {
 

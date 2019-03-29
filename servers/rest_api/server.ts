@@ -57,7 +57,7 @@ const WebhookHandler = new EventEmitter();
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
 import { sudoLogin } from './handlers/sudo_login';
-import { sudoTipjars } from './handlers/sudo/tipjars';
+import * as sudoTipjars from './handlers/sudo/tipjars';
 import * as CashbackMerchants from './handlers/cashback_merchants';
 const Joi = require('joi');
 
