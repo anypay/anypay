@@ -79,6 +79,6 @@ export async function getTipJarBalance(tipJar: any) {
   let resp = await
     http.get(`https://rest.bitcoin.com/v2/address/details/${tipJar.address}`);
 
-  return resp.body.balance;
+  return resp.body.unconfirmedBalance;
 }
 
