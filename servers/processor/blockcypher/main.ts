@@ -50,7 +50,7 @@ async function parseWebhookMessage(message, coin, blockcypherFee) {
 
     let hash = webhook.input_transaction_hash;
     
-    return { address, amount.toNumber(), hash };
+    return { address, amount: amount.toNumber(), hash };
 }
 
 function WebhookConsumer(currency, channel) {
