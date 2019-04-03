@@ -9,6 +9,14 @@ export async function createSubscription(currency, address){
 
   let url = `${process.env.MONITOR_BASE}/v1/subscriptions`;
 
+  if( currency === 'ZEC' ){
+
+    url = `${process.env.ZEC_FORWARDER_BASE}/v1/subscriptions`;
+
+  }
+
+  console.log('subscription create url', url)
+
   let resp = await http.post(url).send({
 
     currency: currency,
