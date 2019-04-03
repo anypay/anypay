@@ -8,6 +8,8 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
+import * as address_subscription from '../../lib/address_subscription';
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -74,6 +76,12 @@ async function createAddressForward(record: I_Address) {
 export async function getNewAddress(record: I_Address) {
 
   let address = await createAddressForward(record);
+
+  console.log('forward address', address)
+
+  let subscription = await address_subscription.createSubscription('ZEC', address)
+
+  console.log('subscription', subscription)
 
   return address;
 

@@ -1446,6 +1446,8 @@ async function Server() {
 
     config: {
 
+      auth: "sudopassword",
+      
       handler: ZECAddressForwardCallbacks.create
     }
 
@@ -1501,6 +1503,8 @@ async function Server() {
     path: '/address_subscription_callbacks',
 
     config: {
+
+      auth: "sudopassword",
 
       handler: AddressSubscriptionCallbacks.subscriptionCallback
 
