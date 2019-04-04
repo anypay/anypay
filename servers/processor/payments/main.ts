@@ -160,6 +160,8 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
 
   let consumer = PaymentConsumer(channel);
 
+  log.info('consume channel', PAYMENT_QUEUE);
+
   channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
 
   await channel.assertQueue('webhooks.invoice', { durable: true });
@@ -168,7 +170,24 @@ amqp.connect(AMQP_URL).then(async (conn: Connection) => {
 
   channel.consume('webhooks.invoice', WebhooksConsumer(channel));
 
-  await forwarderEventsActor.start();
+  log.info('consumed queue', 'webhooks.invoice');
+
+  if (process.env.FORWARDER_EVENTS_ACTOR) {
+
+    log.info('starting forwarding events actor');
+
+    await forwarderEventsActor.start();
+
+  } else {
+
+    log.info('not starting forwarding events actor');
+
+  }
+
+})
+.catch(error => {
+
+  log.error(error.message);
 
 });
 
