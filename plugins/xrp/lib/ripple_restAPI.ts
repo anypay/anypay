@@ -6,7 +6,7 @@ const http = require("superagent");
 
 const WebSocket = require('ws');
 
-export function rippleLib_checkAddressForPayments(address:string){
+export function rippleLib_checkAddressForPayments(address:string, tag?:number){
 
   return new Promise((resolve, reject) => {
 
@@ -34,7 +34,7 @@ export function rippleLib_checkAddressForPayments(address:string){
 
     })
 
-    ws.on('message',(data)=>{
+    ws.on('message', async (data)=>{
 
       //console.log("Ripplelib.incoming.message", data)
 
@@ -42,10 +42,21 @@ export function rippleLib_checkAddressForPayments(address:string){
 
         ws.close();
 
-        resolve(parsePaymentsFromAccount_tx(data));
+        let payments = await parsePaymentsFromAccount_tx(data);
 
-      }
-      catch(err){
+        if (tag) {
+
+          payments = payments.filter(payment => {
+
+            return payment.address === `${address}?dt=${tag}`;
+
+          });
+        }
+
+        resolve(payments[0]);
+
+
+      } catch(err){
 
         console.error(err.message)
         reject(err);
