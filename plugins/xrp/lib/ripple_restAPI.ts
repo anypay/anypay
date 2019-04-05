@@ -4,9 +4,13 @@ const http = require("superagent");
 
 //import {emitter} from '../../../lib/events'
 
+import { log } from '../../../lib';
+
 const WebSocket = require('ws');
 
 export function rippleLib_checkAddressForPayments(address:string, tag?:number){
+
+  log.info(`check for payments acct:${address} - tag:${tag}`);
 
   return new Promise((resolve, reject) => {
 

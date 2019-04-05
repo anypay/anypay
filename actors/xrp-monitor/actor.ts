@@ -92,12 +92,12 @@ class InvoicePoller {
 
     clearInterval(this.interval);
 
-    console.log("stop polling for invoice", this.invoice.uid);
+    log.info("stop polling for invoice", this.invoice.uid);
   }
 
   pollForPayment() {
 
-    console.log('polling for invoice', this.invoice.uid);
+    log.info('polling for invoice', this.invoice.uid);
 
     this.interval = setInterval(async () => {
 
@@ -121,14 +121,22 @@ class InvoicePoller {
 
           let [account, tag] = this.invoice.address.split('?dt=');
 
+          log.info(`check for payments acct:${account} - tag:${tag}`);
+
           var payment = await rippleLib_checkAddressForPayments(account, tag);
 
           if (payment) {
+
+            log.info('payment found', payment);
 
             let message = new Buffer(JSON.stringify(payment));
 
             this.channel.publish('anypay.payments', 'payment', message);
     
+          } else {
+
+            log.info(`no payment found acct:${account} - tag:${tag}`);
+
           }
 
         } catch(error) {
