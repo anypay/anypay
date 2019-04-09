@@ -34,6 +34,25 @@ program
   });
 
 program
+  .command('dumpprivkey <address>')
+  .action(async (address) => {
+
+    try {
+
+      let resp = await rpc.call('dumpprivkey', [address]);
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log('error', error.message);
+    }
+
+    process.exit(0);
+
+  });
+
+program
   .command('getbalance')
   .action(async (address) => {
 

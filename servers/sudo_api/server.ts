@@ -7,6 +7,9 @@ import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import { sendWebhookForInvoice } from '../../lib/webhooks';
 
+import * as cashbackMerchants from './handlers/cashback_merchants';
+import * as cashback from './handlers/cashback';
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -166,9 +169,43 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: "/api/cashback/merchants",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: cashbackMerchants.list
+
+    }
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/api/cashback/dashboard",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: cashback.dashboard
+
+    }
+  });
+
+
+
   return server;
 
 }
+
+
 
 async function start() {
 

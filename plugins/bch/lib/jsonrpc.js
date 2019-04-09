@@ -36,5 +36,11 @@ class JsonRpc {
   }
 }
 
-module.exports = JsonRpc;
+let rpc = new JsonRpc();
+
+export {
+  rpc
+}
+
+//module.exports = JsonRpc;
 
