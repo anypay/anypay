@@ -4,15 +4,19 @@ import * as bch from '../../../plugins/bch/lib/jsonrpc';
 
 import { log, models, database } from '../../../lib';
 
+import { RPCSimpleWallet } from 'rpc-simple-wallet';
+
 const coins: any = {
 
   'DASH': {
     address: 'Xymo4w1fDkig77VBd1s6si1mZWwKxdgXvJ',
+    wallet: new RPCSimpleWallet('DASH', 'Xymo4w1fDkig77VBd1s6si1mZWwKxdgXvJ'),
     balance: null
   },
 
   'BCH': {
     address: 'bitcoincash:qp9jz20u2amv4cp5wm02zt7u00lujpdtgy48zsmlvp',
+    wallet: new RPCSimpleWallet('BCH', 'bitcoincash:qp9jz20u2amv4cp5wm02zt7u00lujpdtgy48zsmlvp'),
     balance: null
   }
 
@@ -22,17 +26,17 @@ async function updateStats() {
 
   console.log('update stats');
 
-  var dashBalance = await dash.rpc.call('getbalance', [coins['DASH'].address, 0]);
+  var dashBalance = await coins['DASH'].wallet.getAddressUnspentBalance();
 
   console.log('dashBalance', dashBalance);
 
-  coins['DASH'].balance = dashBalance.result;
+  coins['DASH'].balance = dashBalance;
 
-  var bchBalance = await bch.rpc.call('getbalance', [coins['BCH'].address, 0]);
+  var bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
 
-  console.log('bchBalance', dashBalance);
+  console.log('bchBalance', bchBalance);
 
-  coins['BCH'].balance = bchBalance.result;
+  coins['BCH'].balance = bchBalance;
 
 }
 

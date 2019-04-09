@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-var JSONRPC = require('./lib/jsonrpc');
+import { rpc } from './lib/jsonrpc';
 
 import * as http from 'superagent';
 
@@ -19,8 +19,6 @@ import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
-
-var rpc = new JSONRPC();
 
 import * as address_subscription from '../../lib/address_subscription';
 
