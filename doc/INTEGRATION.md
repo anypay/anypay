@@ -226,6 +226,43 @@ Response:
 }
 ```
 
+### Forwarding Payments
+
+When your system detects a payment it may query Anypay to find out
+whether there is a payment route set up for the payment's address. When
+there is a route set up your system is responsible for forwarding the payment.
+In the case that the route maintains the same address for both input and
+destination your system is not required to forward payments.
+
+To query Anypay for existing routes for an address make the following
+request:
+
+```
+GET https://api.anypay.global/v1/routes/{address}
+```
+
+Example:
+```
+http
+  .get('https://api.anypay.global/v1/routes/XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D')
+  .set('x-api-key', process.env.ANYPAY_API_KEY)
+  .set('x-api-secret', process.env.ANYPAY_API_SECRET)
+```
+
+Response:
+```
+{
+  "input": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D",
+  "destination": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D",
+  "invoice_uid": "31541ada-a91d-415d-a9f4-e4bab4aeb667",
+  "invoice_url": "https://api.anypay.global/invoices/31541ada-a91d-415d-a9f4-e4bab4aeb667"
+}
+```
+
+The response will contain the payment destination address you need to forward the
+payment. Additionally the response contains a pointer to the invoice associated
+with this particular address.
+
 ### Notifying Anypay of Payment
 
 So far all communication has been made as HTTP requests from
