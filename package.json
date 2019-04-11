@@ -58,7 +58,7 @@
     "moment": "^2.22.1",
     "node-cron": "^2.0.3",
     "node-statsd": "^0.1.1",
-    "pg": "^6.2.4",
+    "pg": "^7.9.0",
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
     "prompt-async": "^0.9.9",

@@ -9,7 +9,7 @@ import { geocode } from '../../../lib/googlemaps';
 import {emitter} from '../../../lib/events'
 
 import * as models from '../../../lib/models';
-import { Account } from '../../../lib/models';
+import { Account, AccessToken } from '../../../lib/models';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -82,6 +82,56 @@ export async function update(req, h) {
 
 }
 
+export async function createAnonymous(request, reply) {
+
+  try {
+
+    let account = await Account.create();
+
+    log.info(`anonymous account ${account.uid} created`);
+
+    let access_token = await AccessToken.create({ account_id: account.id });
+
+    return { account, access_token }
+
+  } catch(error) {
+
+    log.error(`error creating anonymous account ${error.message}`);
+
+    return Boom.badRequest(error);
+  }
+
+}
+
+export async function registerAnonymous(request, reply) {
+  let email = request.payload.email;
+
+  log.info('create.account', email);
+
+  let passwordHash = await hash(request.payload.password);
+
+  request.account.email = request.payload.email;
+  request.account.password_hash = passwordHash;
+
+  try {
+
+    request.account.save();
+
+    Slack.notify(`account:registered | ${request.account.email}`);
+    
+    emitter.emit('account.created', request.account)
+
+    return request.account;
+
+  } catch(error) {
+
+    log.error(`account ${email} already registered`);
+
+    return Boom.badRequest(
+      new Error(`account ${email} already registered`)
+    );
+  }
+}
 
 export async function create (request, reply) {
   let email = request.payload.email;

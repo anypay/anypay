@@ -21,6 +21,8 @@ import { I_Address } from '../../types/interfaces';
 
 import * as http from 'superagent';
 
+import * as address_subscription from '../../lib/address_subscription';
+
 export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -72,7 +74,19 @@ export async function getNewAddress(record: I_Address) {
 
   if (record.value.match(/^xpub/)) {
 
-    address = xpub.generateAddress('DASH', record.value, record.nonce);
+    address = record.value;
+
+    //address contains metadata 
+    /*
+    * example xpub key given by DASH official wallet 
+    *xpub6CfwhFo3F2UmpqM19kE1P7W3JTZ5ieUBYNcYt8fxpYcvUU1hgMvzuBsZeS2Ujq7zV1XH1m1mDudS43nMBC1oBmM1rvqZ4H3KvGWz7KxaP4f?c=1514577265&h=bip32
+    *
+    */
+    if(address.length == 132){
+	address = address.substring(0,111)
+    }
+
+    address = xpub.generateAddress('DASH', address, record.nonce);
 
     await models.Address.update({
 
@@ -88,21 +102,11 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    await createWebhook('tx-confirmation', address);
+    let subscription = await address_subscription.createSubscription('DASH', address)
 
   } else {
 
-    if (process.env.OVERRIDE_BLOCKCYPHER_DASH) {
-
-      let paymentEndpoint = await Blockcypher.createPaymentEndpoint(record.value);
-
-      address = paymentEndpoint.input_address;
-
-    } else {
-
       address = await createAddressForward(record);
-
-    }
     
   }
 

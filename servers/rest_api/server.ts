@@ -24,6 +24,7 @@ import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_call
 import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
 import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_callbacks';
 import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
+import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
@@ -120,12 +121,21 @@ const validatePassword = async function(request, username, password, h) {
 
   var accessToken = await AccountLogin.withEmailPassword(username, password);
 
+  console.log('got access token');
+
+  var account = await models.Account.findOne({
+    where: {
+      id: accessToken.account_id
+    }
+  });
+
+  console.log('got account');
 
   if (accessToken) {
 
     return {
       isValid: true,
-      credentials: { accessToken }
+      credentials: { accessToken, account }
     };
 
   } else {
@@ -439,6 +449,29 @@ async function Server() {
       },
       handler: AccountsController.create,
       plugins: responsesWithSuccess({ model: Account.Response }),
+    },
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/anonymous-accounts",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        payload: Account.Credentials,
+      },
+      handler: AccountsController.registerAnonymous,
+      plugins: responsesWithSuccess({ model: Account.Response }),
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/anonymous-accounts",
+    config: {
+      tags: ['api'],
+      handler: AccountsController.createAnonymous,
     },
   });
 
@@ -1442,6 +1475,20 @@ async function Server() {
 
     method: 'POST',
 
+    path: '/address_subscription_callbacks',
+
+    config: {
+
+      handler: AddressSubscriptionCallbacks.subscriptionCallback
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
     path: '/blockcypher/webhooks/dash',
 
     config: {
@@ -1499,7 +1546,11 @@ if (require.main === module) {
 
 async function start () {
 
-  pricesActor.start();
+  if (process.env.START_PRICES_ACTOR) {
+
+    pricesActor.start();
+
+  }
 
   await sequelize.sync()
 

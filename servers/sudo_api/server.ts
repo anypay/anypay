@@ -47,6 +47,67 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/api/search/invoices/{search}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: async (req, h) => {
+
+        var invoice;
+
+        invoice = await models.Invoice.findOne({
+          where: {
+            uid: req.params.search
+          } 
+        });
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              address: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              external_id: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+
+          invoice = await models.Invoice.findOne({
+            where: {
+              hash: req.params.search
+            } 
+          });
+
+        }
+
+        if (!invoice) {
+          throw new Error(`invoice search not found ${req.params.search}`);
+        }
+
+        return { invoice };
+      }
+
+    }
+
+  });
+
+  server.route({
+
     method: "POST",
 
     path: "/api/invoices/{uid}/webhooks",
