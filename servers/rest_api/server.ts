@@ -25,6 +25,7 @@ import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_ca
 import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_callbacks';
 import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
 import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
+import * as AddressRoutes from './handlers/address_routes';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
@@ -1511,6 +1512,24 @@ async function Server() {
     }
 
   });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/routes/{input_currency}/{input_address}',
+
+    config: {
+
+      //auth: "sudopassword",
+
+      handler: AddressRoutes.show
+
+    }
+
+  });
+
+
 
   server.route({
 

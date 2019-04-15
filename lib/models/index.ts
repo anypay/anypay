@@ -32,6 +32,7 @@ var BlockcypherHook = require('./blockcypher_hook')(sequelize, Sequelize);
 var BlockcypherAddressForward = require('./blockcypher_address_forward')(sequelize, Sequelize);
 var BlockcypherAddressForwardCallback = require('./blockcypher_address_forward_callback')(sequelize, Sequelize);
 var TipJar = require('./tipjar')(sequelize, Sequelize);
+var AddressRoute = require('./address_route')(sequelize, Sequelize);
 
 export {
   Account,
@@ -64,6 +65,7 @@ export {
   BlockcypherHook,
   BlockcypherAddressForward,
   BlockcypherAddressForwardCallback,
+  AddressRoute,
   TipJar
 };
 
