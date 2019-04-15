@@ -8,6 +8,15 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
+var WAValidator = require('wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'LTC')
+
+  return valid;
+
+}
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()

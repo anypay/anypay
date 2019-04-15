@@ -10,6 +10,16 @@ import * as forwards from './lib/forwards';
 
 import { I_Address } from '../../types/interfaces';
 
+var WAValidator = require('wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'DOGE')
+
+  return valid;
+
+}
+
 async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
 
   let start = new Date().getTime()

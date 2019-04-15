@@ -10,6 +10,16 @@ import { I_Address } from '../../types/interfaces';
 
 import * as address_subscription from '../../lib/address_subscription';
 
+var WAValidator = require('wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'ZEC')
+
+  return valid;
+
+}
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -74,6 +84,8 @@ async function createAddressForward(record: I_Address) {
 }
 
 export async function getNewAddress(record: I_Address) {
+
+  console.log('ADDRESS')
 
   let address = await createAddressForward(record);
 

@@ -37,19 +37,26 @@ const events = new EventEmitter2();
 
 export async function setAddress(changeset: AddressChangeSet) {
 
+  var isValid = true;
+
   try {
 
     let plugin = await plugins.findForCurrency(changeset.currency);
 
     if (plugin.validateAddress) {
 
-      changeset.address = await plugin.validateAddress(changeset.address);
-
+      isValid = await plugin.validateAddress(changeset.address);
     }
 
   } catch(error) {
 
     console.error('unable to validate address with plugin');
+
+  }
+
+  if(!isValid){
+  
+    throw(`invalid ${changeset.currency} address`)
 
   }
 

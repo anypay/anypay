@@ -23,6 +23,15 @@ import * as http from 'superagent';
 
 import * as address_subscription from '../../lib/address_subscription';
 
+var WAValidator = require('wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'DASH')
+
+  return valid;
+
+}
 export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
