@@ -14,7 +14,7 @@ import { log } from '../../lib/logger';
 
 import * as forwards from './lib/forwards';
 
-var WAValidator = require('wallet-address-validator');
+var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 

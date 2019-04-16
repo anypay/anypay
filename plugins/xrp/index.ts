@@ -16,7 +16,7 @@ const exchange = 'anypay.payments';
 
 import {Address} from '../../lib/models' 
 
-var WAValidator = require('wallet-address-validator');
+var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 

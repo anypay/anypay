@@ -10,7 +10,7 @@ import * as forwards from './lib/forwards';
 
 import { I_Address } from '../../types/interfaces';
 
-var WAValidator = require('wallet-address-validator');
+var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 

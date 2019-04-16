@@ -8,21 +8,13 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
-import { rpc } from './lib/jsonrpc';
+var WAValidator = require('anypay-wallet-address-validator');
 
-export async function validateAddress(address: string){
+export function validateAddress(address: string){
 
-  let value = await rpc.call('validateaddress', [address])
+  let valid = WAValidator.validate( address, 'RVN')
 
-  if( value.result.address === address ){
-
-    return true;
-
-  }else{
-
-    return false;
-
-  }
+  return valid;
 
 }
 

@@ -18,6 +18,7 @@
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",
+    "anypay-wallet-address-validator": "^0.2.6",
     "ascii-art": "^1.5.0",
     "asciichart": "^1.5.7",
     "async": "^2.6.1",

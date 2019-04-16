@@ -6,7 +6,7 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
-var WAValidator = require('wallet-address-validator');
+var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 
