@@ -3,23 +3,23 @@ const assert = require("assert");
 
 describe("Validating addresses", () => {
 
-  it ("should return true for valid address", async () => {
+  it("should return true for valid address", async () => {
 
     let address = 't1PQAem4f1nK1gbXba8j4i1Cz4CuZpMySWx';
 
-    let valid = validateAddress(address);
+    let valid = await validateAddress(address);
 
-    assert(valid);
+    assert.strictEqual(valid, true);
 
   });
 
-  it ("should return true for valid z address", async () => {
+  it("should return true for valid z address", async () => {
 
     let address = 'zs1ls5rh33uxqhzq7lp0vtsdg0s64gffhrg8m0g3ya7562ld5d5zxyn8p8qv4w73exlpkf6cv4sk6p';
 
-    let valid = validateAddress(address);
+    let valid = await validateAddress(address);
 
-    assert(valid);
+    assert.strictEqual(valid,true);
 
   });
 });

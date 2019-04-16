@@ -5,11 +5,11 @@ describe("Validating addresses", () => {
 
   it ("should return true for valid address", async () => {
 
-    let address = 'Xyja8PS1aLgkCpatqZB6sYEuPUsSc5NYxF';
+    let address = 'SgjWpg5aCiSBrdSwUiUtyCTn7m5CPuecb5';
 
-    let valid = validateAddress(address);
+    let valid = await validateAddress(address);
 
-    assert(valid);
+    assert.strictEqual(valid, true);
 
   });
 

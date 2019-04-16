@@ -10,15 +10,27 @@ import { I_Address } from '../../types/interfaces';
 
 import * as address_subscription from '../../lib/address_subscription';
 
-var WAValidator = require('wallet-address-validator');
+import { rpc } from './lib/jsonrpc';
 
-export function validateAddress(address: string){
+export async function validateAddress(address: string){
 
-  let valid = WAValidator.validate( address, 'ZEC')
+  let value = await rpc.call('validateaddress', [address])
 
-  return valid;
+  if( value.result.isvalid ){
+
+    return true;
+  
+  }else{
+
+    let z_value= await rpc.call('z_validateaddress', [address]);
+
+    return z_value.result.isvalid
+
+  }
+
 
 }
+
 
 async function createInvoice(accountId: number, amount: number) {
 

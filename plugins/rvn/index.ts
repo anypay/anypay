@@ -8,13 +8,21 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
-var WAValidator = require('wallet-address-validator');
+import { rpc } from './lib/jsonrpc';
 
-export function validateAddress(address: string){
+export async function validateAddress(address: string){
 
-  let valid = WAValidator.validate( address, 'RVN')
+  let value = await rpc.call('validateaddress', [address])
 
-  return valid;
+  if( value.result.address === address ){
+
+    return true;
+
+  }else{
+
+    return false;
+
+  }
 
 }
 
@@ -50,7 +58,7 @@ async function checkAddressForPayments(address:string,currency:string){
 
         if( tx.vout[j].scriptPubKey.addresses[0] != address){continue}
 
-	let p = {
+   	let p = {
   
           hash: tx.txid,
   

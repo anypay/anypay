@@ -46,10 +46,12 @@ export async function setAddress(changeset: AddressChangeSet) {
     if (plugin.validateAddress) {
 
       isValid = await plugin.validateAddress(changeset.address);
+
     }
 
   } catch(error) {
 
+    console.error(error)
     console.error('unable to validate address with plugin');
 
   }

@@ -22,8 +22,6 @@ import { I_Address } from '../../types/interfaces';
 
 var bchaddr = require('bchaddrjs');
 
-var rpc = new JSONRPC();
-
 import * as address_subscription from '../../lib/address_subscription';
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -78,11 +76,19 @@ async function createInvoice(accountId: number, amount: number) {
 
 function validateAddress(address: string){
 
-  var isCashAddress = bchaddr.isCashAddress
+  try{
 
-  let valid = isCashAddress(address)
+    var isCashAddress = bchaddr.isCashAddress
 
-  return valid;
+    let valid = isCashAddress(address)
+
+    return valid;
+  }catch(error){
+
+    return false;
+
+  }
+
 
 }
 

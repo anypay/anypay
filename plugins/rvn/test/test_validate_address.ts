@@ -7,7 +7,7 @@ describe("Validating addresses", () => {
 
     let address = 'RFFABGPdXjRoqLxX36BxnPmTCSWTpZzq7C';
 
-    let valid = validateAddress(address);
+    let valid = await validateAddress(address);
 
     assert(valid);
 
