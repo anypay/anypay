@@ -8,6 +8,26 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
+import { rpc } from './lib/jsonrpc';
+
+export async function validateAddress(address: string){
+
+  let value = await rpc.call('validateaddress', [address])
+
+  console.log(value)
+  if( value.result.address === address ){
+
+    return true;
+
+  }else{
+
+    return false;
+
+  }
+
+}
+
+
 async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'SMART');

@@ -6,6 +6,16 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
+var WAValidator = require('anypay-wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'BTC')
+
+  return valid;
+
+}
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()

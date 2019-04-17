@@ -10,6 +10,28 @@ import { I_Address } from '../../types/interfaces';
 
 import * as address_subscription from '../../lib/address_subscription';
 
+import { rpc } from './lib/jsonrpc';
+
+export async function validateAddress(address: string){
+
+  let value = await rpc.call('validateaddress', [address])
+
+  if( value.result.isvalid ){
+
+    return true;
+  
+  }else{
+
+    let z_value= await rpc.call('z_validateaddress', [address]);
+
+    return z_value.result.isvalid
+
+  }
+
+
+}
+
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -74,6 +96,8 @@ async function createAddressForward(record: I_Address) {
 }
 
 export async function getNewAddress(record: I_Address) {
+
+  console.log('ADDRESS')
 
   let address = await createAddressForward(record);
 

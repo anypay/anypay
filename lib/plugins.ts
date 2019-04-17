@@ -26,10 +26,10 @@ class Plugins {
 
       if (plugin) {
 
-        assert(
-          (typeof plugin.createInvoice) === 'function',
-          'plugin must implement createInvoice'
-        );
+      // assert(
+      //    (typeof plugin.createInvoice) === 'function',
+      //    'plugin must implement createInvoice'
+      //  );
       }
 
     });

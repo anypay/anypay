@@ -20,6 +20,8 @@ import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
 
+var bchaddr = require('bchaddrjs');
+
 import * as address_subscription from '../../lib/address_subscription';
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -72,25 +74,21 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-async function validateAddress(address: string): Promise<string> {
+function validateAddress(address: string){
 
-  statsd.increment('validateAddress')
+  try{
 
-  let start = new Date().getTime()
+    var isCashAddress = bchaddr.isCashAddress
 
-  let resp = await rpc.call('validateaddress', [address]);
+    let valid = isCashAddress(address)
 
-  if (!resp.result.isvalid) {
-   
-    statsd.increment('Invalid_BCH_Address')
+    return valid;
+  }catch(error){
 
-    throw new Error('Invalid BCH address');
+    return false;
 
   }
 
-  statsd.timing('BCH_validateAddress', new Date().getTime()-start)
-
-  return resp.result.address;
 
 }
 

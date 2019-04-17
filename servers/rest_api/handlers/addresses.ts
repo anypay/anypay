@@ -83,7 +83,9 @@ module.exports.update = async function(request, reply) {
 
   } catch(error) {
 
-    return Boom.badRequest(error.message);
+    log.error(error)
+
+    return Boom.badRequest(error);
 
   };
 

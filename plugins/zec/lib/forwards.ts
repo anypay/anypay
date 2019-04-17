@@ -1,11 +1,12 @@
-
 import { log } from '../../../lib/logger';
 
 import { models } from '../../../lib';
 
 import { forwards } from '../../../lib';
 
-import { rpc } from './jsonrpc';
+var JSONRPC = require('./jsonrpc');
+
+var rpc = new JSONRPC();
 
 interface Payment {
 
@@ -23,13 +24,13 @@ export async function setupPaymentForward(outputAddress: string) {
 
   let result = await rpc.call('getnewaddress');
 
-  log.info('bch.getnewaddress.result', result);
+  log.info('zec.getnewaddress.result', result);
 
   let record = await forwards.createPaymentForward({
 
     input: {
 
-      currency: 'BCH',
+      currency: 'ZEC',
 
       address: result.result
 
@@ -37,7 +38,7 @@ export async function setupPaymentForward(outputAddress: string) {
 
     output: {
 
-      currency: "BCH",
+      currency: "ZEC",
 
       address: outputAddress
 
@@ -57,7 +58,7 @@ export async function forwardPayment(payment: Payment) {
 
     address: payment.address,
 
-    currency: 'BCH'
+    currency: 'ZEC'
 
   });
 
@@ -87,14 +88,6 @@ export async function forwardPayment(payment: Payment) {
 
   }
 
-  log.info('about to forward payment', payment.hash);
-
-  let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
-
-  log.info('bch.forwardpayment.result', rpcResult);
-
-  let txid = rpcResult.result;
-
   let paymentForwardInputPayment = await forwards.createPaymentForwardInputPayment(paymentForward.id, {
 
     amount: payment.amount,
@@ -102,6 +95,15 @@ export async function forwardPayment(payment: Payment) {
     txid: payment.hash
 
   });
+
+  log.info('about to forward payment', payment.hash);
+
+  let rpcResult = await rpc.call('sendtoaddress', [paymentForward.output_address, payment.amount.toString()]);
+
+  log.info('zec.forwardpayment.result', rpcResult);
+
+  let txid = rpcResult.result;
+
 
   let paymentForwardOutputPayment = await forwards.createPaymentForwardOutputPayment(
     
@@ -122,4 +124,3 @@ export async function forwardPayment(payment: Payment) {
   return paymentForwardOutputPayment;
 
 }
-

@@ -8,6 +8,16 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
+var WAValidator = require('anypay-wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'RVN')
+
+  return valid;
+
+}
+
 async function createInvoice(accountId: number, amount: number) {
 
   let invoice = await generateInvoice(accountId, amount, 'RVN');
@@ -40,7 +50,7 @@ async function checkAddressForPayments(address:string,currency:string){
 
         if( tx.vout[j].scriptPubKey.addresses[0] != address){continue}
 
-	let p = {
+   	let p = {
   
           hash: tx.txid,
   

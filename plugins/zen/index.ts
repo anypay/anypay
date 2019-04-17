@@ -14,6 +14,15 @@ import { log } from '../../lib/logger';
 
 import * as forwards from './lib/forwards';
 
+var WAValidator = require('anypay-wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'ZEN')
+
+  return valid;
+
+}
 async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
 
   let start = new Date().getTime()

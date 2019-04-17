@@ -16,6 +16,16 @@ const exchange = 'anypay.payments';
 
 import {Address} from '../../lib/models' 
 
+var WAValidator = require('anypay-wallet-address-validator');
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'XRP')
+
+  return valid;
+
+}
+
 async function generateInvoiceAddress(accountId){
 
   let address = (await Address.findOne({ where: {
