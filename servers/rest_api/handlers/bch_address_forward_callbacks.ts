@@ -3,6 +3,8 @@ import { log } from '../../../lib';
 
 import { channel } from '../../../lib/amqp';
 
+import { handlePaymentMessage } from '../../processor/payments/main';
+
 export async function create(req, h) {
 
   log.info('bch.addressforwardcallback', req.payload);
@@ -14,6 +16,9 @@ export async function create(req, h) {
     hash: req.payload.input_transaction_hash,
     output_hash: req.payload.destination_transaction_hash
   }
+
+  /* Handle payment by matching to an invoice */
+  await handlePaymentMessage(payment);
 
   log.info('bch.payment', payment);
 
