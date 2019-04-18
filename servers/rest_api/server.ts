@@ -57,6 +57,7 @@ const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
+import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
 import { sudoLogin } from './handlers/sudo_login';
 import * as sudoTipjars from './handlers/sudo/tipjars';
@@ -68,6 +69,7 @@ import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 import {dashbackTotalsByMonth} from './handlers/dashback_controller';
 
 import { validateSudoPassword } from './auth/sudo_admin_password';
+import { httpAuthCoinOracle } from './auth/auth_coin_oracle';
 
 import {createConversion } from '../../lib/prices';
 import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
@@ -287,6 +289,7 @@ async function Server() {
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
   server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
+  server.auth.strategy("authoracle", "basic", { validate: httpAuthCoinOracle});
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
@@ -883,6 +886,35 @@ async function Server() {
       }
     }
   });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/{coin}/payments",
+
+    config: {
+
+      tags: ['api'],
+
+      validate: {
+        payload: {
+          amount: Joi.required(),
+          currency: Joi.string().required(),
+          address: Joi.string().required(),
+          hash: Joi.string().required(),
+          output_hash: Joi.string().optional()
+        },
+      },
+
+      auth: 'authoracle',
+
+      handler: CoinOraclePayments.create
+
+    }
+
+  });
+
   server.route({
     method: "POST",
     path: "/invoices/{uid}/cointext_payments",
@@ -1522,7 +1554,7 @@ async function Server() {
 
     config: {
 
-      //auth: "sudopassword",
+      auth: "authoracle",
 
       handler: AddressRoutes.show
 

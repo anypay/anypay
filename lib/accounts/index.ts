@@ -87,7 +87,7 @@ export async function getAccountAddress(accountId: number, currency: string): Pr
 
 }
 
-function hash(password) {
+export function hash(password) {
   return new Promise((resolve, reject) => {
 
     bcrypt.hash(password, 10, (error, hash) => {
