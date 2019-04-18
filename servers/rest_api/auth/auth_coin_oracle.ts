@@ -1,6 +1,8 @@
 
 import { authCoinOracle } from '../../../lib/coin_oracles';
 
+import * as Boom from 'boom';
+
 export async function httpAuthCoinOracle(request, username, password, h) {
 
   var coin;
@@ -9,9 +11,9 @@ export async function httpAuthCoinOracle(request, username, password, h) {
 
     coin = request.payload.currency;
 
-  } else if (request.params.input_currency) {
+  } else if (request.params.coin) {
 
-    coin = request.params.input_currency;
+    coin = request.params.coin;
 
   }
 
@@ -33,11 +35,15 @@ export async function httpAuthCoinOracle(request, username, password, h) {
 
   } else {
 
+    return Boom.badRequest(`oracle not autheneticated for coin ${coin}`)
+
+    /*
     return {
 
       isValid: false
 
     }
+    */
 
   }
 

@@ -891,7 +891,7 @@ async function Server() {
 
     method: "POST",
 
-    path: "/payments",
+    path: "/{coin}/payments",
 
     config: {
 
@@ -899,7 +899,7 @@ async function Server() {
 
       validate: {
         payload: {
-          amount: Joi.number().required(),
+          amount: Joi.required(),
           currency: Joi.string().required(),
           address: Joi.string().required(),
           hash: Joi.string().required(),
