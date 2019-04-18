@@ -1,0 +1,120 @@
+
+import { log, models } from '../../lib';
+import { awaitChannel } from '../../lib/amqp';
+
+import { connect } from 'amqplib';
+
+require('dotenv').config();
+
+async function start() {
+
+  let channel = await awaitChannel();
+
+  log.info('amqp.channel.created');
+
+  const queue = 'anypay.addressroutes.create'
+
+  await channel.assertQueue(queue);
+
+  await channel.bindQueue(
+    queue,
+    'anypay.events',
+    'invoice.created'
+  );
+
+  log.info('amqp.channel.connected');
+
+  channel.consume(queue, async (msg) => {
+
+    let msgString = msg.content.toString();
+
+    var invoice;
+
+    try {
+
+      invoice = JSON.parse(msgString);
+
+    } catch(error) {
+
+      log.error(queue, `message not json ${msgString}`);
+
+    }
+
+    if (!invoice) {
+
+      invoice = (await models.Invoice.findOne({ where: { uid: msgString
+      }})).toJSON();
+    }
+
+    if (!invoice) {
+
+      log.info('invoice not found', msgString);
+
+      return channel.ack(msg);
+    }
+
+    log.info(queue, invoice);
+
+    try {
+
+      let route = await createAddressRoute(invoice);
+
+      log.info('addressroute.created', route.toJSON());
+
+    } catch(error) {
+
+      log.error('error creating address route', error.message);
+
+    }
+
+    channel.ack(msg);
+
+  });
+
+}
+
+async function createAddressRoute(invoice) {
+
+  let outputAddress = await models.Address.findOne({ where: {
+
+    account_id: invoice.account_id,
+
+    currency: invoice.currency
+
+  }});
+
+  if (!outputAddress) {
+
+    throw new Error('no output address found');
+  }
+
+  let addressRoute = await models.AddressRoute.create({
+
+    input_currency: invoice.currency, 
+
+    input_address: invoice.address, 
+
+    output_currency: invoice.currency,
+
+    output_address: outputAddress.value
+
+  });
+
+  return addressRoute;
+
+}
+
+export {
+	start
+}
+
+if (require.main === module) {
+
+  start();
+
+}
+
+(async function() {
+
+})();
+

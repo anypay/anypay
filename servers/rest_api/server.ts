@@ -12,6 +12,7 @@ const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
+import * as addressRoutesActor from '../../actors/address_routes/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -1517,7 +1518,7 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/routes/{input_currency}/{input_address}',
+    path: '/address_routes/{input_currency}/{input_address}',
 
     config: {
 
@@ -1597,6 +1598,8 @@ async function start () {
     pricesActor.start();
 
   }
+
+  addressRoutesActor.start();
 
   await sequelize.sync()
 
