@@ -99,7 +99,7 @@ export async function generateInvoice(
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
 
-  console.log('got new invoice address');
+  console.log('got new invoice address', address);
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,
@@ -111,7 +111,7 @@ export async function generateInvoice(
     invoiceAmount
   };
 
-  var invoice = await models.Invoice.create({
+  var invoiceParams = {
     address: invoiceChangeset.address,
     invoice_amount: invoiceChangeset.invoiceAmount.value,
     invoice_currency: invoiceChangeset.invoiceAmount.currency,
@@ -124,7 +124,11 @@ export async function generateInvoice(
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
-  });
+  }
+
+  console.log('invoice params', invoiceParams);
+
+  var invoice = await models.Invoice.create(invoiceParams);
 
   emitter.emit('invoice.created', invoice.uid);
 
