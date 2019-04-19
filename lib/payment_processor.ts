@@ -52,8 +52,6 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
       payment
     });
 
-    return;
-
   }
 
   /* End Expiration Check */
