@@ -176,14 +176,7 @@ Here the destination is the address to which the business
 will ultimately receive settlement. This address is never
 displayed to the customers.
 
-Request:
-```
-{
-  "destination": "XdqEsnvcWJ6MnLXnWmGWrUGLj6W98u4K5F"
-}
-```
-
-Respond with a pair of addresses. The `input` address will
+Respond with an addresses. The `input` address will
 be the address to which payment is made by a customer. When
 payment is received to the input address your system is
 responsible for relaying the payment on to the destination
@@ -192,8 +185,7 @@ address.
 Response:
 ```
 {
-  "input": "Xkp5r7Luq9sGSLbTP2Mss2k3HSkPuATXkx",
-  "destination": "XdqEsnvcWJ6MnLXnWmGWrUGLj6W98u4K5F"
+  "address": "Xkp5r7Luq9sGSLbTP2Mss2k3HSkPuATXkx"
 }
 ```
 
@@ -221,8 +213,7 @@ Respond with a pair of addresses, both of which are identical.
 Response:
 ```
 {
-  "input": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D",
-  "destination": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D"
+  "address": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D"
 }
 ```
 
@@ -245,8 +236,7 @@ Example:
 ```
 http
   .get('https://api.anypay.global/v1/routes/XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D')
-  .set('x-api-key', process.env.ANYPAY_API_KEY)
-  .set('x-api-secret', process.env.ANYPAY_API_SECRET)
+  .set('Authorization', 'Basic ZWx1c3VhcmlvOnlsYWNsYXZl')
 ```
 
 Response:
@@ -280,14 +270,20 @@ This message will be directly responsible for alerting customers
 that their payment was complete and they can walk away from the
 store.
 
-`POST https://api.anypay.global/v1/payments`
+Once your system receives payment and forwards the payment, post a message
+back to Anypay with the input payment information as well as the output payment
+hash.
+
+`POST https://api.anypay.global/v1/BSV/payments`
 
 Request
 ```
 {
   "address": "XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D",
   "amount": 0.335,
-  "hash": "8104c0e5c2d5b7318db384c5fe76eea60370f63aea37dceb1359f202506894fa"
+  "hash": "8104c0e5c2d5b7318db384c5fe76eea60370f63aea37dceb1359f202506894fa",
+  "currency": "AGX",
+  "output_hash": "f8fde970abfc086a94b6000e6761f31cc3ff44b763ec1ba1da029d28a29defa2" 
 }
 ```
 
@@ -307,8 +303,7 @@ headers `x-api-key` and `x-api-secret` respectively.
 ```
 http
   .post('https://api.anypay.global/v1/payments')
-  .set('x-api-key', process.env.ANYPAY_API_KEY)
-  .set('x-api-secret', process.env.ANYPAY_API_SECRET)
+  .set('Authorization', 'Basic ZWx1c3VhcmlvOnlsYWNsYXZl')
   .send({
     address: 'XgEz3Dm9mh6VVUW6geMVagMukH3YD9Dk6D'
     amount: 0.335,
@@ -320,11 +315,9 @@ http
 ### Summary
 
 Ultimately your service is responsible for making sure customer payments
-are delivered to the merchant's address. While Anypay stores all invoice
-information your system is responsible for storing the routing information
-from one address to the final settlement address. For this storage any
-database will do, especially one that is easily run in a docker container,
-but we prefer PostgreSQL to simplify operations.
+are delivered to the merchant's address. Anypay stores all invoice
+information as well as routing information from one address to the final
+settlement address. 
 
 Given the architecture outlined above your coin can be added into our system
 by simply providing a single URL to Anypay. In turn Anypay provides to your
