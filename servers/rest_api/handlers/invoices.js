@@ -233,6 +233,12 @@ module.exports.create = async (request, reply) => {
 
     }
 
+    if (request.payload.cashback_amount) {
+
+      invoice.cashback_amount = request.payload.cashback_amount;
+
+    }
+
     await invoice.save();
 
     return sanitizeInvoice(invoice);

@@ -35,7 +35,7 @@ describe("Creating Invoices via REST", async () => {
     }
   });
 
-  it("POST /invoices/:uid/replacesments should replace the invoice", async () => {
+  it("POST /invoices/:uid/replacements should replace the invoice", async () => {
 
     await setAddress({
       account_id: account.id,
@@ -145,6 +145,26 @@ describe("Creating Invoices via REST", async () => {
     assert.strictEqual(response.result.webhook_url, webhook_url);
 
   })
+
+  describe("Optionally Allowing Cash Back Amount", async () => {
+    let cashback_amount = 1;
+
+    let response = await server.inject({
+      method: 'POST',
+      url: `/invoices`,
+      payload: {
+        currency: 'DASH',
+        amount: '10',
+        cashback_amount
+      },
+      headers: {
+        'Authorization': auth(accessToken.uid, "")
+      }
+    });
+
+    assert.strictEqual(response.result.cashback_amount, cashback_amount);
+
+  });
 
 });
 
