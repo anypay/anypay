@@ -226,7 +226,7 @@ function WebhooksConsumer(channel: Channel) {
 
         log.error('webhook.failed', invoice.toJSON());
 
-        channel.ack(msg);
+        channel.nack(msg);
 
       }
 
