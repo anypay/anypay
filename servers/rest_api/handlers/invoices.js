@@ -235,7 +235,11 @@ module.exports.create = async (request, reply) => {
 
     if (request.payload.cashback_amount) {
 
-      invoice.cashback_amount = request.payload.cashback_amount;
+      let price = invoice.denomination_amount / invoice.amount;
+
+      invoice.cashback_amount = request.payload.cashback_amount / price;
+
+      console.log('cashback amount', invoice.cashback_amount);
 
     }
 
