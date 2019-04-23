@@ -56,9 +56,20 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
   });
 
+  invoices = invoices.map(invoice => {
+
+    if (!invoice.cashback_denomination_amount) {
+
+      invoice.cashback_denomination_amount = 0;
+    }
+
+    return invoice;
+
+  });
+
   let total = invoices.reduce(function(acc, invoice) {
 
-    acc += invoice.denomination_amount_paid;
+    acc += invoice.settlement_amount;
 
     return acc;
 
