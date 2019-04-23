@@ -233,7 +233,9 @@ module.exports.create = async (request, reply) => {
 
     }
 
-    if (request.payload.cashback_amount) {
+    if (request.payload.cashback_amount && request.account.allow_cashback_amount) {
+
+      invoice.cashback_denomination_amount = request.payload.cashback_amount;
 
       let price = invoice.denomination_amount / invoice.amount;
 
