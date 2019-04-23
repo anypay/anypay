@@ -60,7 +60,7 @@ function WebhooksConsumer(channel: Channel) {
 
         log.error('webhook.failed', error.message);
 
-        channel.ack(msg);
+        channel.nack(msg);
 
       }
 
