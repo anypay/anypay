@@ -22,7 +22,6 @@ async function start() {
   await channel.bindQueue('webhooks.invoice', 'anypay.events', 'invoice.complete');
 
   channel.consume('webhooks.invoice', WebhooksConsumer(channel));
-  channel.consume('webhooks.invoice', WebhooksConsumer(channel));
 
 }
 
