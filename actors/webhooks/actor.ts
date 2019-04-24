@@ -36,7 +36,7 @@ function WebhooksConsumer(channel: Channel) {
 
       log.error(`invoice ${uid} not found`);
 
-      channel.ack(msg);
+      await channel.ack(msg);
 
       return;
 
@@ -52,7 +52,7 @@ function WebhooksConsumer(channel: Channel) {
 
         log.info('webhook.sent', invoice.toJSON());
 
-        channel.ack(msg);
+        await channel.ack(msg);
 
       } catch(error) {
 
@@ -67,7 +67,7 @@ function WebhooksConsumer(channel: Channel) {
 
       log.error('invalid webhook url', invoice.webhook_url);
 
-      channel.ack(msg);
+      await channel.ack(msg);
 
     }
 
