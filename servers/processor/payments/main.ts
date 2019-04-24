@@ -218,6 +218,8 @@ function WebhooksConsumer(channel: Channel) {
       try {
 
         await http.post(invoice.webhook_url).send(invoice.toJSON()); 
+        
+        channel.ack(msg);
 
         log.info('webhook.sent', invoice.toJSON());
 
