@@ -17,9 +17,8 @@ async function start() {
   let channel = await connection.createChannel();
 
   await channel.assertQueue('webhooks.invoice', { durable: true });
-
-  await channel.bindQueue('webhooks.invoice', 'anypay.events', 'invoice.payment');
-  await channel.bindQueue('webhooks.invoice', 'anypay.events', 'invoice.complete');
+ 
+  await channel.bindQueue('webhooks.invoice', 'anypay:invoices', 'invoice:paid');
 
   channel.consume('webhooks.invoice', WebhooksConsumer(channel));
 
