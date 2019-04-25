@@ -52,7 +52,7 @@
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",
     "jayson": "^2.0.5",
-    "joi": "^13.2.0",
+    "joi": "^14.3.1",
     "jsonschema": "^1.2.2",
     "jsonwebtoken": "^8.3.0",
     "level": "^2.1.2",

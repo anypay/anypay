@@ -10,6 +10,10 @@ import { sendWebhookForInvoice } from '../../lib/webhooks';
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
 
+import * as passwords from './handlers/passwords';
+
+import * as Joi from 'joi';
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -195,6 +199,34 @@ async function Server() {
       auth: "sudopassword",
 
       handler: cashback.dashboard
+
+    }
+  });
+
+
+  server.route({
+
+    method: 'PUT',
+
+    path: "/api/accounts/{account_id}/passwords",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: passwords.update,
+
+      validate: {
+
+        payload: {
+
+          password: Joi.string(),
+
+          password_confirmation: Joi.string()
+
+        }
+
+      }
 
     }
   });

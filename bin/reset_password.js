@@ -1,7 +1,9 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
-const password = require('../lib/password');
-const program = require('commander');
+require('dotenv').config();
+
+import * as password from '../lib/password';
+import * as program from 'commander';
 
 program
   .version('0.1.0')
