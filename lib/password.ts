@@ -27,7 +27,7 @@ export async function bcryptCompare(password, hash) {
   })
 }
 
-async function resetPasswordByEmail(email, newPassword) {
+export async function resetPasswordByEmail(email, newPassword) {
 
   let account = await Account.findOne({
     where: { email: email }
