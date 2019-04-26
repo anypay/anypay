@@ -44,7 +44,9 @@ async function updateStats() {
 
   setInterval(async () => {
 
-    updateStats();
+    console.log('update cashback balances');
+
+    await updateStats();
 
   }, 1000 * 60); // every minute
 
@@ -72,13 +74,16 @@ export async function dashboard(req, h) {
   let totalBchPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='BCH'`);
   let totalDashPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='DASH'`);
 
+  let bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
+  let dashBalance = await coins['DASH'].wallet.getAddressUnspentBalance();
+
   return [{                                                                       
     currency: 'BCH',
     name: 'Bitcon Cash',
     donation_address: coins['BCH'].address,
     donations: "?",
     total_donations: "?",
-    amount_remaining: coins['BCH'].balance || 0,
+    amount_remaining: bchBalance || 0,
     total_paid: totalBchPaid[0][0].sum,
     number_payments: bchPayments.length,
     eligible_merchants: merchants.length,
@@ -88,7 +93,7 @@ export async function dashboard(req, h) {
     donation_address: coins['DASH'].address,
     donations: "?",
     total_donations: "?",
-    amount_remaining: coins['DASH'].balance || 0,
+    amount_remaining: dashBalance || 0,
     total_paid: totalDashPaid[0][0].sum,
     number_payments: dashPayments.length,
     eligible_merchants: merchants.length
