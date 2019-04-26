@@ -88,7 +88,7 @@ export async function dashboard(req, h) {
     number_payments: bchPayments.length,
     eligible_merchants: merchants.length,
   }, {                                                                            
-    currecy: 'DASH',
+    currency: 'DASH',
     name: 'Dash',
     donation_address: coins['DASH'].address,
     donations: "?",
