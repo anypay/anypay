@@ -75,17 +75,43 @@ async function start() {
 
 async function createAddressRoute(invoice) {
 
-  let outputAddress = await models.Address.findOne({ where: {
+  var outputAddressValue, outputCurrency;
+
+  let accountRoute = await models.AccountRoute.findOne({ where: {
 
     account_id: invoice.account_id,
 
-    currency: invoice.currency
+    input_currency: invoice.currency
 
   }});
 
-  if (!outputAddress) {
+  if (accountRoute) {
 
-    throw new Error('no output address found');
+    outputAddressValue = accountRoute.output_address;
+
+    outputCurrency = accountRoute.output_currency;
+
+  } else {
+
+    let outputAddress = await models.Address.findOne({ where: {
+
+      account_id: invoice.account_id,
+
+      currency: invoice.currency
+
+    }});
+
+    if (outputAddress) {
+
+      outputAddressValue = outputAddress.value;
+
+      outputCurrency = outputAddress.currency;
+
+    } else {
+
+      throw new Error(`no address or route for invoice ${invoice.uid}`)
+    }
+
   }
 
   let addressRoute = await models.AddressRoute.create({
@@ -94,9 +120,9 @@ async function createAddressRoute(invoice) {
 
     input_address: invoice.address, 
 
-    output_currency: invoice.currency,
+    output_currency: outputCurrency,
 
-    output_address: outputAddress.value
+    output_address: outputAddressValue
 
   });
 

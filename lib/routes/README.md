@@ -13,11 +13,11 @@ to an output currency and output address.
 | 5          | BCH            | BSV             | 15hQ7MpGAds3mPek7fHi3JkXcipx8Sgeaa |
 |            |                |                 |                                    |
 
-## Behavior
+## Generating Invoices
 
-Upon generating an address Anypay will look first for a specific address for the
-currency. If no address is found it will look for an account route. When an
-account route is found Anypay will generate an invoice that forwards to the
-connector's address. The connector will respond by forwarding to the output
-currency address.
+When generating an invoice Anypay will first check for an active account route
+for the currency. If found, the forwarding address will be the connector's
+address. If no account route is found Anypay will look for a normal address
+for that currency. If an address is found for that currency payment will be
+forwarded to that address.
 
