@@ -7,13 +7,13 @@ export async function httpAuthCoinOracle(request, username, password, h) {
 
   var coin;
 
-  if (request.payload && request.payload.currency) {
+  if (request.payload && request.payload.input_currency) {
 
-    coin = request.payload.currency;
+    coin = request.payload.input_currency;
 
-  } else if (request.params.coin) {
+  } else if (request.params.input_currency) {
 
-    coin = request.params.coin;
+    coin = request.params.input_currency;
 
   }
 

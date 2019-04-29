@@ -1,12 +1,74 @@
-#!/usr/bin/env node
+#!/usr/bin/env ts-node
 
+require('dotenv').config();
 const program = require('commander');
 const Account = require('../lib/models/account');
 const InvoiceService = require('../lib/invoice_service');
 const prettyjson = require('prettyjson');
 
+import { log, models } from '../lib';
+
+async function ensureAccountFromEmail(email: string): Promise<any> {
+
+  let account = await models.Account.findOne({ where: { email }});
+
+  if (!account) {
+
+    throw new Error(`account ${email} not found`);
+
+  }
+
+  return account;
+
+}
+
 program
   .option('-a --account <account_id>', 'account for which to generate invoice');
+
+program
+  .command('setaddressroute <email>')
+  .option('--inputcurrency <currency>')
+  .option('--inputaddress <address>')
+  .option('--outputcurrency <currency>')
+  .option('--outputaddress <address>')
+  .action(async (email, options) => {
+
+    let account = await ensureAccountFromEmail(email);
+
+    log.info('setaddressroute', options.inputcurrency); 
+
+    let route = await models.AddressRoute.findOne({ where: {
+
+      input_currency: options.inputcurrency,
+
+      input_address: options.inputaddress
+
+    }});
+
+    if (route) {
+
+      throw new Error('route already exists');
+
+    }
+
+    route = await models.AddressRoute.create({
+
+      account_id: account.id,
+
+      input_currency: options.inputcurrency,
+
+      input_address: options.inputaddress,
+
+      output_currency: options.outputcurrency,
+
+      output_address: options.outputaddress
+
+    });
+  
+    log.info('route created', route.toJSON());
+
+  });
+
 
 program
   .description('generate invoice such as "createinvoice 10 USD BCH"')
