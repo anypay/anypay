@@ -24,7 +24,7 @@ export default function() {
 
     } catch(error) {
 
-      console.error('failed to load plugin', error.message);
+      //console.error('failed to load plugin', error.message);
 
     }
 
