@@ -217,11 +217,6 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
-// Unused
-const kBasicAuthorizationAllowOtherHeaders = Joi.object({
-  authorization: Joi.string().regex(/^(Basic) \w+/g).required()
-}).unknown()
-
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
@@ -406,7 +401,6 @@ async function Server() {
       auth: "token",
       //tags: ['api'],
       validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
         payload: Invoice.Request,
       },
       handler: BitcoinLightningInvoicesController.create,
