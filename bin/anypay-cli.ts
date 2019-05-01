@@ -26,6 +26,27 @@ program
   .option('-a --account <account_id>', 'account for which to generate invoice');
 
 program
+  .command('createsimplewallet')
+  .option('--name <name>')
+  .option('--currency <currency>')
+  .option('--address <address>')
+  .action(async (options) => {
+
+    let wallet = await models.SimpleWallet.create({
+
+      name: options.name,
+
+      currency: options.currency,
+
+      address: options.address
+
+    });
+
+    log.info('simplewallet.created', wallet.toJSON());
+
+  });
+
+program
   .command('setaddressroute <email>')
   .option('--inputcurrency <currency>')
   .option('--inputaddress <address>')
