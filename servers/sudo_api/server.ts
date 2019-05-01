@@ -9,6 +9,7 @@ import { sendWebhookForInvoice } from '../../lib/webhooks';
 
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
+import * as simplewallets from './handlers/simple_wallets';
 
 import * as passwords from './handlers/passwords';
 
@@ -47,6 +48,22 @@ async function Server() {
         return models.MerchantGroup.findAll()
 
       }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/simple_wallets",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: simplewallets.index
 
     }
 
