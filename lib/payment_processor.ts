@@ -104,6 +104,7 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
       status: 'underpaid',
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
       completed_at: new Date()
     },
     {
@@ -135,6 +136,7 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
       status: "paid",
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
       completed_at: new Date()
     },
     {
@@ -162,6 +164,8 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
     throw new Error("overpaid handler called with exactly sufficient payment");
   }
 
+  console.log("handleOverpaid", payment)
+
   let paymentAmount = new BigNumber(payment.amount);
 
   let price = getInvoicePrice(invoice);
@@ -176,6 +180,7 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
       status: 'overpaid',
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
       completed_at: new Date()
     },
     {
