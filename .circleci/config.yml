@@ -37,7 +37,7 @@ jobs:
       - run:
           name: Deploy To Server
           command: |
-            ./push_to_docker.sh
+            ./push_to_docker_staging.sh
             ssh chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
 
 workflows:
