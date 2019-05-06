@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 import * as Hapi from 'hapi';
 
@@ -81,49 +82,58 @@ async function Server() {
 
       handler: async (req, h) => {
 
-        var invoice;
+        try{
 
-        invoice = await models.Invoice.findOne({
-          where: {
-            uid: req.params.search
-          } 
-        });
-
-        if (!invoice) {
+          var invoice;
 
           invoice = await models.Invoice.findOne({
             where: {
-              address: req.params.search
+              uid: req.params.search
             } 
           });
 
+          if (!invoice) {
+
+            invoice = await models.Invoice.findOne({
+              where: {
+                address: req.params.search
+              } 
+            });
+
+          }
+
+          if (!invoice) {
+
+            invoice = await models.Invoice.findOne({
+              where: {
+                external_id: req.params.search
+              } 
+            });
+
+          }
+
+          if (!invoice) {
+
+            invoice = await models.Invoice.findOne({
+              where: {
+                hash: req.params.search
+              } 
+            });
+
+          }
+
+          if (!invoice) {
+            throw new Error(`invoice search not found ${req.params.search}`);
+          }
+
+          return { invoice };
+
+        }catch(err){
+
+          console.log(err)
+
         }
 
-        if (!invoice) {
-
-          invoice = await models.Invoice.findOne({
-            where: {
-              external_id: req.params.search
-            } 
-          });
-
-        }
-
-        if (!invoice) {
-
-          invoice = await models.Invoice.findOne({
-            where: {
-              hash: req.params.search
-            } 
-          });
-
-        }
-
-        if (!invoice) {
-          throw new Error(`invoice search not found ${req.params.search}`);
-        }
-
-        return { invoice };
       }
 
     }
@@ -258,6 +268,7 @@ async function Server() {
 
 async function start() {
 
+ try{
   await database.sync()
 
   var server = await Server();
@@ -266,6 +277,11 @@ async function start() {
   await server.start();
 
   log.info("Server running at:", server.info.uri);
+ }catch(err){
+
+   console.log(err)
+
+ }
 
 }
 
