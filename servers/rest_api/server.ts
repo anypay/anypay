@@ -1389,6 +1389,21 @@ async function Server() {
 
   });
 
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/active-merchant-coins',
+
+    config: {
+
+      handler: MerchantsController.listMerchantCoins
+
+    }
+
+  });
   server.route({
 
     method: 'POST',
