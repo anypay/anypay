@@ -10,6 +10,15 @@ jobs:
           name: Build docker image
           command: docker build -t anypay .
       - add_ssh_keys
+  test:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Test writing payment output
+          command: mocha --require=ts-node/register --timeout=10000 test/lib/payment_processor.ts  
   deploy:
     docker:
       - image: circleci/node:10
