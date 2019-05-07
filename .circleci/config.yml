@@ -8,10 +8,10 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build docker image
-          command: sudo docker build -t anypay . 
+          command: docker build -t anypay . 
       - run:
           name: Running tests
-          command: sudo docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
+          command: docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
       - add_ssh_keys
   deploy:
     docker:
