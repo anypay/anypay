@@ -75,9 +75,9 @@ export function handlePaymentMessage(payment: Payment) {
           await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
           let account = await models.Account.findOne({
-      where: {
+            where: {
               id: invoice.account_id
-      }
+            }
           });
 
           invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
@@ -108,8 +108,7 @@ export function handlePaymentMessage(payment: Payment) {
 
         channel.ack(message);
 
-
-      }
+     }
 
     } catch(error) {
 
