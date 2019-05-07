@@ -17,8 +17,8 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: Test writing payment output
-          command: mocha --require=ts-node/register --timeout=10000 test/lib/payment_processor.ts  
+          name: Running tests
+          command: npm test  
   deploy:
     docker:
       - image: circleci/node:10
@@ -33,7 +33,6 @@ jobs:
           command: |
             ./push_to_docker.sh
             ssh -o StrictHostKeyChecking=no chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
-
   deploy_staging:
     docker:
       - image: circleci/node:10
@@ -48,7 +47,6 @@ jobs:
           command: |
             ./push_to_docker_staging.sh
             ssh -o StrictHostKeyChecking=no chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
-
 workflows:
   version: 2
   build:
