@@ -56,12 +56,6 @@ workflows:
   build-and-deploy-staging:
       jobs:
         - build
-        - test:
-            requires:
-              - build
-            filters:
-              branches:
-                only: staging
         - deploy_staging:
             requires:
               - build
