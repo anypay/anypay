@@ -17,7 +17,7 @@ import * as validate from 'validator';
 import * as http from 'superagent';
 
 import {
-  handlePayment,
+  handlePayment, updateOutput,
 } from '../../../lib/payment_processor';
 
 import {Payment} from '../../../types/interfaces';
@@ -103,30 +103,11 @@ export function handlePaymentMessage(payment: Payment) {
       } else {
 
         log.error('no unpaid invoice found matching currency and address');
-        
-        invoice = await models.Invoice.findOne({
-          where: {
-            currency: payment.currency,
-            address: payment.address,
-          },
-          order: [['createdAt', 'DESC']]
-        });
 
-        if( invoice && payment.output_hash ){
-
-          var result = await models.Invoice.update({
-            output_hash: payment.output_hash,
-            completed_at: new Date()
-          },
-          {
-            where: { id: invoice.id }
-          });
-
-          log.info('output hash recorded', payment )
-
-        }
+        await updateOutput(payment)
 
         channel.ack(message);
+
 
       }
 

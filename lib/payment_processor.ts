@@ -11,6 +11,34 @@ import * as models from './models';
 
 import * as moment from 'moment';
 
+
+export async function updateOutput(payment: Payment){
+
+  let invoice = await models.Invoice.findOne({
+    where: {
+      currency: payment.currency,
+      address: payment.address,
+    },
+    order: [['createdAt', 'DESC']]
+  });
+
+  if( invoice && payment.output_hash ){
+
+     var result = await models.Invoice.update({
+       output_hash: payment.output_hash,
+       completed_at: new Date()
+      },
+      {
+       where: { id: invoice.id }
+      });
+
+     log.info('output hash recorded', payment )
+
+     return result
+  }
+  
+}
+
 export async function receivePayment(payment: Payment) {
   log.info('receive payment', payment);
 
