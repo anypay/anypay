@@ -8,17 +8,11 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build docker image
-          command: docker build -t anypay .
-      - add_ssh_keys
-  test:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - setup_remote_docker
+          command: docker build -t anypay . 
       - run:
           name: Running tests
-          command: npm test  
+          command: docker run -i -t anypay npm test
+      - add_ssh_keys
   deploy:
     docker:
       - image: circleci/node:10
