@@ -32,7 +32,7 @@ jobs:
           name: Deploy To Server
           command: |
             ./push_to_docker.sh
-            ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
+            ssh -o StrictHostKeyChecking=no chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
 
   deploy_staging:
     docker:
@@ -47,7 +47,7 @@ jobs:
           name: Deploy To Server
           command: |
             ./push_to_docker_staging.sh
-            ssh chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
+            ssh -o StrictHostKeyChecking=no chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
 
 workflows:
   version: 2
