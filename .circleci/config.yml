@@ -18,7 +18,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Test writing payment output
-          command: mocha --require=ts-node/register --timeout=10000 test/lib/payment_processor.ts  
+          command: npm test
   deploy:
     docker:
       - image: circleci/node:10
