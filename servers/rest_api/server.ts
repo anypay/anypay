@@ -928,6 +928,7 @@ async function Server() {
     }
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -944,6 +945,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -960,6 +962,7 @@ async function Server() {
 
   });
 
+ //deprecated
   server.route({
 
     method: 'PUT',
@@ -996,6 +999,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1012,6 +1016,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1028,6 +1033,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
@@ -1044,6 +1050,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1060,6 +1067,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
@@ -1076,6 +1084,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
@@ -1092,6 +1101,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
@@ -1108,6 +1118,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1124,6 +1135,7 @@ async function Server() {
 
   });
 
+  //derecated
   server.route({
 
     method: 'GET',
@@ -1140,6 +1152,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
@@ -1156,6 +1169,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
@@ -1172,6 +1186,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1188,6 +1203,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1204,6 +1220,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1220,6 +1237,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1236,6 +1254,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
@@ -1252,6 +1271,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1268,6 +1288,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1300,6 +1321,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
@@ -1315,6 +1337,7 @@ async function Server() {
     }
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
@@ -1331,6 +1354,7 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
