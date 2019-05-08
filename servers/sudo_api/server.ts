@@ -11,6 +11,7 @@ import { sendWebhookForInvoice } from '../../lib/webhooks';
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
 import * as simplewallets from './handlers/simple_wallets';
+import * as accountInvoices from './handlers/account_invoices';
 
 import * as passwords from './handlers/passwords';
 
@@ -226,6 +227,21 @@ async function Server() {
       auth: "sudopassword",
 
       handler: cashback.dashboard
+
+    }
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/api/accounts/{id}/invoices",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: accountInvoices.show
 
     }
   });
