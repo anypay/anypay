@@ -544,12 +544,6 @@ async function Server() {
 
           return { invoice };
 
-        }catch(err){
-
-          console.log(err)
-
-        }
-
       }
 
     }
