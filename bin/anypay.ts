@@ -43,6 +43,12 @@ import * as asciiart from 'ascii-art';
 
   }
 
+  if (argv.mailchimp) {
+
+    require('../actors/mailchimp_registration/actor').start();
+
+  }
+
   if (!argv.actors) {
 
     log.info("Actors disabled");
