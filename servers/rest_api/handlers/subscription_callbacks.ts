@@ -9,10 +9,10 @@ export async function subscriptionCallback(req, h){
   log.info('subscription.callback', req.payload);
 
   let payment = {
-    currency: req.payload.currency,
+    currency: req.payload.input_currency,
     amount: parseFloat(req.payload.value),
-    address: req.payload.address,
-    hash: req.payload.hash,
+    address: req.payload.input_address,
+    hash: req.payload.input_transaction_hash,
     locked: req.payload.locked || false,
     output_hash: req.payload.destination_transaction_hash,
     output_currency: req.payload.output_currency,
@@ -34,3 +34,4 @@ export async function subscriptionCallback(req, h){
 
 
 }
+
