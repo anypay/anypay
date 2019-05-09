@@ -42,3 +42,34 @@ module.exports.sudoIndex = async (request, reply) => {
 
 };
 
+module.exports.sudoShow = async function(request, reply) {
+
+  let invoiceId = request.params.invoice_id;
+
+  log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
+
+  try {
+
+	  let invoice = await Invoice.findOne({
+	    where: {
+	      uid: invoiceId
+	    }
+	  });
+
+
+	  if (invoice) {
+
+      return invoice.toJSON();
+
+	  } else {
+
+	    log.error('no invoice found', invoiceId);
+
+	    throw new Error('invoice not found')
+	  }
+  } catch(error) {
+	  log.error(error.message);
+  }
+
+
+}

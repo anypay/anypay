@@ -238,8 +238,22 @@ async function Server() {
     }
 
   });
+        
+  server.route({
 
+    method: 'GET',
 
+    path: '/api/invoices/{invoice_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoShow
+
+    }
+
+  });
 
   server.route({
 
