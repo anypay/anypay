@@ -13,7 +13,11 @@ export async function subscriptionCallback(req, h){
     amount: parseFloat(req.payload.value),
     address: req.payload.address,
     hash: req.payload.hash,
-    output_hash: req.payload.hash
+    locked: req.payload.locked || false,
+    output_hash: req.payload.destination_transaction_hash,
+    output_currency: req.payload.output_currency,
+    output_amount: req.payload.output_amount,
+    output_address: req.payload.output_address
   };
 
   log.info(`${req.payload.currency}.payment`, payment);
