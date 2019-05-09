@@ -7,6 +7,9 @@ export interface Payment {
   output_hash?: string;
   confirmations?: number;
   locked?: boolean;
+  output_currency?: boolean;
+  output_amount?: boolean;
+  output_address?: boolean;
 }
 
 export interface I_Address {
