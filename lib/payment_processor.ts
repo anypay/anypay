@@ -136,6 +136,9 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
       paidAt: new Date(),
       complete: true,
       output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {
@@ -168,6 +171,9 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
       paidAt: new Date(),
       complete: true,
       output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {
@@ -212,6 +218,9 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
       paidAt: new Date(),
       complete: true,
       output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {
