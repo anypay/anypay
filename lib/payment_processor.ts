@@ -26,6 +26,9 @@ export async function updateOutput(payment: Payment){
 
      var result = await models.Invoice.update({
        output_hash: payment.output_hash,
+       output_currency: payment.output_currency;
+       output_amount: payment.output_amount;
+       output_address: payment.output_address;
        completed_at: new Date()
       },
       {
