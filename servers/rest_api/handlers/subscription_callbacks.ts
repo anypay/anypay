@@ -8,6 +8,12 @@ export async function subscriptionCallback(req, h){
 
   log.info('subscription.callback', req.payload);
 
+  console.log('input_currency', typeof req.payload.input_currency, req.payload.input_currency)
+  console.log('input_address', typeof req.payload.input_address, req.payload.input_address)
+  console.log('hash', typeof req.payload.input_transaction_hash, req.payload.input_transaction_hash)
+  console.log('destination tx hash', typeof req.payload.destination_transaction_hash, req.payload.destination_transaction_hash)
+
+
   let payment = {
     currency: req.payload.input_currency,
     amount: parseFloat(req.payload.value),
@@ -20,7 +26,7 @@ export async function subscriptionCallback(req, h){
     output_address: req.payload.output_address
   };
 
-  log.info(`${req.payload.currency}.payment`, payment);
+  log.info(`payment`, payment);
 
   /* Handle payment by matching to an invoice */
   await handlePaymentMessage(payment);
