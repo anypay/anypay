@@ -84,7 +84,7 @@ async function createAddressForward(record: I_Address) {
 
   let url = process.env.DOGE_FORWARDING_URL;
 
-  let callback_url = process.env.ADDRESS_SUBSCRIPTION_CALLBACK_URL
+  let callback_url = `${process.env.API_BASE}/DOGE/payments` 
 
   let resp = await http.post(url).send({
 
