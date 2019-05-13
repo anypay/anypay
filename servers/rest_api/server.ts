@@ -892,21 +892,21 @@ async function Server() {
       tags: ['api'],
 
       validate: {
-        payload: {
+              /* payload: {
           amount: Joi.required(),
-          currency: Joi.string().required(),
+          input_currency: Joi.string().required(),
           address: Joi.string().required(),
           hash: Joi.string().required(),
           output_hash: Joi.string().optional(),
           output_amount: Joi.string().optional(),
           output_address: Joi.string().optional(),
           output_currency: Joi.string().optional()
-        },
+        },*/
       },
 
       auth: 'authoracle',
 
-      handler: CoinOraclePayments.create
+      handler: CoinOraclePayments.create  
 
     }
 
