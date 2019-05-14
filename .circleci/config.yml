@@ -35,7 +35,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build docker image
-          command: docker build -t anypay:staging .
+          command: docker build -t anypay .
       - run:
           name: Deploy To Server
           command: |
