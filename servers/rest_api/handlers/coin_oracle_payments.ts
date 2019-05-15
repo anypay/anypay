@@ -14,12 +14,12 @@ export async function create(req, h) {
 
   }
   let payment = {
-    currency: req.payload.input_currency,
-    amount: parseFloat(req.payload.value),
-    address: req.payload.input_address,
-    hash: req.payload.input_transaction_hash,
+    currency: req.payload.currency,
+    amount: parseFloat(req.payload.amount),
+    address: req.payload.address,
+    hash: req.payload.hash,
     locked: req.payload.locked || false,
-    output_hash: req.payload.destination_transaction_hash,
+    output_hash: req.payload.output_hash,
     output_currency: req.payload.output_currency,
     output_amount: req.payload.output_amount,
     output_address: req.payload.output_address

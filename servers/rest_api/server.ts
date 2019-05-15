@@ -893,11 +893,11 @@ async function Server() {
 
       validate: {
         payload: {
-          value: Joi.required(),
-          input_currency: Joi.string().required(),
-          input_address: Joi.string().required(),
-          input_transaction_hash: Joi.string().required(),
-          destination_transaction_hash: Joi.string().optional(),
+          amount: Joi.required(),
+          currency: Joi.string().required(),
+          address: Joi.string().required(),
+          hash: Joi.string().required(),
+          output_hash: Joi.string().optional(),
           output_amount: Joi.optional(),
           output_address: Joi.string().optional(),
           output_currency: Joi.string().optional()
