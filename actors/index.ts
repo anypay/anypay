@@ -15,6 +15,11 @@ import * as webhooks from './webhooks/actor';
 require('./payment_publisher')
 require('../lib/email/index')
 
+let actorModules = {
+  slack,
+  webhooks
+}
+
 import { log } from '../lib';
 
 async function start(actors?: any) {
@@ -30,6 +35,20 @@ async function start(actors?: any) {
   if (typeof actors === 'string') {
 
     log.info(`start single actor "${actors}"`);
+
+    actors.split(",").forEach(actor => {
+
+      if (actorModules[actor]) {
+
+        actorModules[actor].start();
+
+      } else {
+
+        throw new Error(`actor ${actor} not found`);
+
+      }
+
+    });
 
   }
 

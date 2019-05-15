@@ -286,7 +286,6 @@ module.exports.show = async function(request, reply) {
 	    }
 	  });
 
-
 	  if (invoice) {
 
 	    log.info('invoice.requested', invoice.toJSON());
