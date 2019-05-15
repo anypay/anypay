@@ -26,6 +26,8 @@ import {convert} from './prices';
 
 import {plugins} from './plugins';
 
+import { computeInvoiceURI } from './uri';
+
 interface Amount {
   currency: string;
   value: number
@@ -111,6 +113,12 @@ export async function generateInvoice(
     invoiceAmount
   };
 
+  let uri = computeInvoiceURI({
+    currency: invoiceChangeset.invoiceAmount.currency,
+    amount: invoiceChangeset.invoiceAmount.value,
+    address: invoiceChangeset.address
+  });
+
   var invoiceParams = {
     address: invoiceChangeset.address,
     invoice_amount: invoiceChangeset.invoiceAmount.value,
@@ -120,6 +128,7 @@ export async function generateInvoice(
     account_id: invoiceChangeset.accountId,
     status: 'unpaid',
     uid: uid,
+    uri,
 
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
