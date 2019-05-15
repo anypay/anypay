@@ -8,7 +8,7 @@ export async function create(req, h) {
 
   console.log('register payment', req.payload); 
 
-  if (req.auth.credentials.coin !== req.payload.input_currency) {
+  if (req.auth.credentials.coin !== req.payload.currency) {
 
     return Boom.badRequest(`oracle not authorized for coin ${req.payload.currency}`);
 
