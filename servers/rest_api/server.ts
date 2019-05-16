@@ -897,13 +897,16 @@ async function Server() {
           currency: Joi.string().required(),
           address: Joi.string().required(),
           hash: Joi.string().required(),
-          output_hash: Joi.string().optional()
+          output_hash: Joi.string().optional(),
+          output_amount: Joi.optional(),
+          output_address: Joi.string().optional(),
+          output_currency: Joi.string().optional()
         },
       },
 
       auth: 'authoracle',
 
-      handler: CoinOraclePayments.create
+      handler: CoinOraclePayments.create  
 
     }
 
