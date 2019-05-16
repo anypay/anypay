@@ -24,19 +24,21 @@ const coins: any = {
 
 async function updateStats() {
 
-  console.log('update stats');
+  await coins['DASH'].wallet.updateWallet();
+  coins['DASH'].balance = await coins['DASH'].wallet.getAddressUnspentBalance();
 
-  var dashBalance = await coins['DASH'].wallet.getAddressUnspentBalance();
+  log.info('cashback.balance', {
+    coin: "BCH",
+    balance: coins['DASH'].balance
+  });
 
-  console.log('dashBalance', dashBalance);
+  await coins['BCH'].wallet.updateWallet();
+  coins['BCH'].balance = await coins['BCH'].wallet.getAddressUnspentBalance();
 
-  coins['DASH'].balance = dashBalance;
-
-  var bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
-
-  console.log('bchBalance', bchBalance);
-
-  coins['BCH'].balance = bchBalance;
+  log.info('cashback.balance', {
+    coin: 'BCH',
+    balance: coins['BCH'].balance
+  });
 
 }
 
