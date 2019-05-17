@@ -53,14 +53,14 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 
   let prices = await getAllPrices();
 
-  let pair = `${outputCurrency}/${inputAmount.currency}`
+  let pair = `${inputAmount.currency}/${outputCurrency}`;
 
   var rate;
 
   if (prices[pair]) {
 
     log.info(`found direct price pair ${pair} ${prices[pair]}`);
-    rate = prices[pair];
+    rate = 1 / prices[pair];
 
   } else {
 
