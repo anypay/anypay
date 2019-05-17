@@ -7,6 +7,8 @@ import * as database from '../database';
 
 import { log } from '../logger';
 
+import { Price } from '../models';
+
 const MAX_DECIMALS = 5;
 
 interface Amount {
@@ -22,13 +24,25 @@ interface Conversion {
 
 async function getAllPrices() {
 
-  let resp = await database.query('select currency, value, base_currency from prices'); 
+  let prices = await Price.findAll();
 
-  let prices = resp[0].reduce(function(acc, price) {
+  prices = prices.reduce(function(acc, price) {
 
     let pair = `${price.currency}/${price.base_currency}`;
-    
-    acc[pair] = parseFloat(price.value);
+
+    if (acc[pair]) {
+
+      if (price.createdAt > acc[pair].createdAt) {
+
+        acc[pair] = parseFloat(price.value);
+
+      }
+
+    } else {
+
+      acc[pair] = parseFloat(price.value);
+
+    }
 
     return acc;
 
