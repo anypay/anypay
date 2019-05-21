@@ -11,9 +11,9 @@ import * as Handlebars from 'handlebars';
 
 import { join } from 'path';
 
-export async function buildWireEmailReport(invoiceUID: string) {
+async function getInvoices(invoiceUID: string) {
 
-  /*
+  /*:
    * 1) Check to see when last invoice was
    *   - here provided by command line
    *   - will be provided manually Derrick
@@ -33,10 +33,6 @@ export async function buildWireEmailReport(invoiceUID: string) {
    *     the one indicated in step 1
    *
    */
-
-  let templateSource = readFileSync(join(__dirname, './template.hbs'));
-
-  let template = Handlebars.compile(templateSource.toString('utf8'));
 
   let invoices = await models.Invoice.findAll({
 
@@ -67,6 +63,18 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
   });
 
+  return invoices;
+
+}
+
+export async function buildWireEmailReport(invoiceUID: string) {
+
+  let templateSource = readFileSync(join(__dirname, './template.hbs'));
+
+  let template = Handlebars.compile(templateSource.toString('utf8'));
+
+  let invoices = await getInvoices(invoiceUID);
+
   let total = invoices.reduce(function(acc, invoice) {
 
     acc += invoice.settlement_amount;
@@ -78,42 +86,41 @@ export async function buildWireEmailReport(invoiceUID: string) {
   let start_date = moment(invoices[0].completed_at).format('MM-DD-YYYY');
   let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY');
 
-
   let content = template({
+    reportCSVURL: `https://sudo.anypay.global/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
     invoices,
     total,
     start_date,
     end_date
   });
 
-  console.log('content', content);
-
-  //let filepath = await buildReportCsv(invoices, invoiceUID);
-
-  //console.log(`csv written to ${filepath}`);
-
   return content;
 
 }
 
-async function buildReportCsv(invoices, invoiceUID: string): Promise<string> {
+export async function buildReportCsv(invoiceUID: string): Promise<string> {
+
+  let invoices = await getInvoices(invoiceUID);
 
   let filepath = join(__dirname, `../../.tmp/${invoiceUID}.csv`);
 
-  const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-  const csvWriter = createCsvWriter({
+  const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
+  const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'external_id', title: 'EXTERNAL ID'},
-      {id: 'uid', title: 'INVOICE UID'},
-      {id: 'denomination_amount_paid', title: 'AMOUNT PAID'},
-      {id: 'completed_at', title: 'DATE PAID'},
+      {id: 'completed_at', title: 'Payment Completed At'},
+      {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
+      {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
+      {id: 'settlement_amount', title: 'eGifter Gets (USD)'},
+      {id: 'external_id', title: 'Reference'},
+      {id: 'uid', title: 'Invoice ID'},
     ]
   });
 
-  await csvWriter.writeRecords(invoices)
+  let header = await csvStringifier.getHeaderString();
+  let records = await csvStringifier.stringifyRecords(invoices)
 
-  return filepath;
+  return `${header}\t${records}`;
 
 }
 
