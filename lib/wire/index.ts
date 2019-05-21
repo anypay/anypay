@@ -87,7 +87,7 @@ export async function buildWireEmailReport(invoiceUID: string) {
   let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY');
 
   let content = template({
-    reportCSVURL: `https://sudo.anypay.global/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
+    reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
     invoices,
     total,
     start_date,
