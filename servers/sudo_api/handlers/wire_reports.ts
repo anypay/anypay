@@ -1,5 +1,5 @@
 
-import { buildWireEmailReport } from '../../../lib/wire';
+import { buildWireEmailReport, buildReportCsv } from '../../../lib/wire';
 
 export async function show(req, h) {
 
@@ -18,4 +18,31 @@ export async function show(req, h) {
   }
 
 }
+
+export async function showCSV(req, h) {
+
+  try{
+
+    let invoiceUID = req.params.invoice_uid;
+
+    let content = await buildReportCsv(invoiceUID);
+
+    console.log('content', content);
+
+    let response =  h.response(content).header("Content-Disposition", `attachment;filename=anypay_egifter_report_${invoiceUID}.csv`);
+
+    return response;
+
+  }catch(error){
+
+     console.log(error)
+
+     return { error: error.message }
+
+  }
+
+
+
+}
+
 

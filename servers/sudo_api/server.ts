@@ -716,6 +716,22 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/wires/reportsinceinvoice/{invoice_uid}/csv',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoWires.showCSV
+
+    }
+
+  });
+
 
   return server;
 
