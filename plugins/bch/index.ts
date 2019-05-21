@@ -6,6 +6,8 @@ import * as http from 'superagent';
 
 import {generateInvoice} from '../../lib/invoice';
 
+import {awaitChannel} from '../../lib/amqp';
+
 import {log, models, xpub} from '../../lib';
 
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
@@ -130,7 +132,13 @@ async function createAddressForward(record: I_Address) {
 
   });
 
-  return resp.body.input_address;
+  let address = resp.body.input_address;
+
+  let channel = await awaitChannel();
+
+  await channel.publish('anypay.bch', 'addaddress', new Buffer(address))
+
+  return address;
 
 }
 
