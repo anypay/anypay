@@ -23,7 +23,7 @@ export async function update(req, h) {
 
   }
 
-  let updateAttrs: any = Object.assign(req.payload, {});
+  let updateAttrs: any = Object.assign(req.orig.payload, {});
 
   if (updateAttrs.physical_address) {
 

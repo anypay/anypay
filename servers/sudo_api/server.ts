@@ -384,6 +384,8 @@ async function Server() {
       validate: {
 
         payload: {
+                /*
+          email: Joi.string().optional(),
 
           denomination: Joi.string().optional(),
 
@@ -396,7 +398,7 @@ async function Server() {
           longitude: Joi.number().optional(),
 
           image_url: Joi.string().optional()
-
+                */ 
         }
 
       }
