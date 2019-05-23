@@ -105,6 +105,59 @@ function filterPayments(transactions) {
 
 }
 
+export function parsePaymentFromTransaction(transaction) {
+
+  let tx = filterTxns([{ tx: transaction }])[0].tx;
+
+  console.log("TX", tx);
+
+  if (!tx) {
+
+    return false;
+
+  }
+
+  var amount, currency;
+
+  if( typeof(tx.Amount) == 'string'){
+
+    // XRP Payment
+
+    amount = parseFloat(tx.Amount) / 1000000; // Convert from drops to XRP
+
+    currency = 'XRP';
+
+  } else {
+
+    // Non XRP Payment
+
+    currency = `XRP.${tx.Amount.currency}.${tx.Amount.issuer}`;
+
+    amount = tx.Amount.value;
+
+  }
+
+  var receiveAddress = tx.Destination;
+
+  if (tx.DestinationTag != undefined) {
+
+    receiveAddress = `${receiveAddress}?dt=${tx.DestinationTag}`;
+   
+  }
+    
+  let p: Payment = {
+
+    currency: currency,
+    address: receiveAddress,
+    amount: amount,
+    hash: tx.hash
+
+  }
+
+  return p;
+
+}
+
 export function parsePaymentsFromAccount_tx2(data) {
 
   let res = JSON.parse(data);
