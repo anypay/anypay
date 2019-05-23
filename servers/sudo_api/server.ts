@@ -385,7 +385,6 @@ async function Server() {
 
         payload: {
                 /*
-          email: Joi.string().optional(),
 
           email: Joi.string().optional(),
 
