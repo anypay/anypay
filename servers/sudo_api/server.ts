@@ -387,6 +387,8 @@ async function Server() {
                 /*
           email: Joi.string().optional(),
 
+          email: Joi.string().optional(),
+
           denomination: Joi.string().optional(),
 
           physical_address: Joi.string().optional(),
