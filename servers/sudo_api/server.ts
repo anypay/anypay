@@ -385,19 +385,21 @@ async function Server() {
 
         payload: {
 
-          denomination: Joi.string().optional(),
+           email: Joi.string().optional(),
 
-          physical_address: Joi.string().optional(),
+           denomination: Joi.string().optional(),
 
-          business_name: Joi.string().optional(),
+           physical_address: Joi.string().optional(),
 
-          latitude: Joi.number().optional(),
+           business_name: Joi.string().optional(),
 
-          longitude: Joi.number().optional(),
+           latitude: Joi.number().optional(),
 
-          image_url: Joi.string().optional()
+           longitude: Joi.number().optional(),
 
-        }
+           image_url: Joi.string().optional()
+
+         }
 
       }
 

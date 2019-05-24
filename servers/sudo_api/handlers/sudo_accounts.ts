@@ -63,4 +63,3 @@ export async function update(req, h) {
   }
 
 }
-
