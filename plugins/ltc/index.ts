@@ -69,11 +69,13 @@ async function createAddressForward(record: I_Address) {
 
   let url = process.env.LTC_FORWARDING_URL; 
 
+  let callback_url = `${process.env.API_BASE}/LTC/payments` 
+
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/ltc/address_forward_callbacks'
+    callback_url: callback_url 
 
   });
 
