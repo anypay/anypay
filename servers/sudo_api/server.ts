@@ -379,7 +379,29 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoAccounts.update
+      handler: SudoAccounts.update,
+
+      validate: {
+
+        payload: {
+
+           email: Joi.string().optional(),
+
+           denomination: Joi.string().optional(),
+
+           physical_address: Joi.string().optional(),
+
+           business_name: Joi.string().optional(),
+
+           latitude: Joi.number().optional(),
+
+           longitude: Joi.number().optional(),
+
+           image_url: Joi.string().optional()
+
+         }
+
+      }
 
     }
 
