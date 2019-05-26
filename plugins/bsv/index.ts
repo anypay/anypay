@@ -1,7 +1,25 @@
 
 import { rpc } from './lib/jsonrpc';
 
-export async function getNewAddress(outputAddress: string) {
+import {generateInvoice} from '../../lib/invoice';
+
+import {statsd} from '../../lib/stats/statsd'
+
+async function createInvoice(accountId: number, amount: number) {
+
+  let start = new Date().getTime()
+
+  let invoice = await generateInvoice(accountId, amount, 'BSV');
+
+  statsd.timing('BSV_createInvoice', new Date().getTime()-start)
+
+  statsd.increment('BSV_createInvoice')
+
+  return invoice;
+
+}
+
+async function getNewAddress(outputAddress: string) {
 
   let address = await rpc.call('getnewaddress', []);
 
@@ -9,12 +27,23 @@ export async function getNewAddress(outputAddress: string) {
 
 }
 
+const name = 'Bitcoin Satoshi Vision';
+
+const currency = 'BSV';
+
+const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
+
 export {
 
-  name: "Bitcoin SV",
+  name,
 
-  code: "BSV",
+  currency,
 
-  icon: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png"
+  icon,
+
+  getNewAddress,
+
+  createInvoice
 
 }
+
