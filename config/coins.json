@@ -44,6 +44,12 @@
     },
 
     {
+      "code": "BSV",
+      "name": "Bitcoin Satoshi Vision",
+      "icon_url": ""
+    },
+
+    {
       "code": "ZEC",
       "name": "Zcash",
       "icon_url": "",

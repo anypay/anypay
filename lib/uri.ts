@@ -21,7 +21,8 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
     'XRP': 'ripple',
     'ZEN': 'horizen',
     'SMART': 'smartcash',
-    'RVN': 'ravencoin'
+    'RVN': 'ravencoin',
+    'BSV': 'bitcoin'
   };
 
   var protocol = protocols[params.currency] || params.currency.toLowerCase();
