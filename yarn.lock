@@ -407,12 +407,12 @@ base@^0.11.1:
     mixin-deep "^1.2.0"
     pascalcase "^0.1.1"
 
-bchaddrjs@^0.2.3:
-  version "0.2.3"
-  resolved "https://registry.yarnpkg.com/bchaddrjs/-/bchaddrjs-0.2.3.tgz#c3008ac85d7c7e583e83a30604c427b5bed26c68"
+bchaddrjs@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/bchaddrjs/-/bchaddrjs-0.3.2.tgz#62d4915f8f69012b7a16ae9fd0c99eca3a8ccf91"
   dependencies:
     bs58check "^2.1.2"
-    cashaddrjs "^0.2.9"
+    cashaddrjs "^0.3.3"
 
 bcrypt-nodejs@0.0.3:
   version "0.0.3"
@@ -436,6 +436,10 @@ better-assert@~1.0.0:
   resolved "https://registry.yarnpkg.com/better-assert/-/better-assert-1.0.2.tgz#40866b9e1b9e0b55b481894311e68faffaebc522"
   dependencies:
     callsite "1.0.0"
+
+big-integer@1.6.36:
+  version "1.6.36"
+  resolved "https://registry.yarnpkg.com/big-integer/-/big-integer-1.6.36.tgz#78631076265d4ae3555c04f85e7d9d2f3a071a36"
 
 big-integer@^1.6.34:
   version "1.6.43"
@@ -740,6 +744,12 @@ cashaddrjs@^0.2.9:
   resolved "https://registry.yarnpkg.com/cashaddrjs/-/cashaddrjs-0.2.9.tgz#e38e323e11e0ab761767006b3938a36278dadec9"
   dependencies:
     big-integer "^1.6.34"
+
+cashaddrjs@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/cashaddrjs/-/cashaddrjs-0.3.3.tgz#e4368892034422468ec2a1404ab6dba0a3c96728"
+  dependencies:
+    big-integer "1.6.36"
 
 catbox-memory@3.x.x:
   version "3.1.1"

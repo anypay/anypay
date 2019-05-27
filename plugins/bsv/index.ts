@@ -5,6 +5,8 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {statsd} from '../../lib/stats/statsd'
 
+import { toLegacyAddress} from 'bchaddrjs';
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -23,7 +25,7 @@ async function getNewAddress(outputAddress: string) {
 
   let address = await rpc.call('getnewaddress', []);
 
-  return address.result;
+  return toLegacyAddress(address.result);
 
 }
 

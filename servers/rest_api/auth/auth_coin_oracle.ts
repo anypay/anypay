@@ -11,9 +11,9 @@ export async function httpAuthCoinOracle(request, username, password, h) {
 
     coin = request.payload.input_currency;
 
-  } else if (request.params.coin) {
+  } else if (request.params.input_currency) {
 
-    coin = request.params.coin;
+    coin = request.params.input_currency;
 
   }
 
