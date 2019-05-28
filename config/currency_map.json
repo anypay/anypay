@@ -705,6 +705,11 @@
     "decimal_places": 2
   },
   {
+    "currency_code": "VES",
+    "currency_name": "Venezuelan bolivar",
+    "decimal_places": 2
+  },
+  {
     "currency_code": "VND",
     "currency_name": "Vietnamese dong",
     "decimal_places": 0

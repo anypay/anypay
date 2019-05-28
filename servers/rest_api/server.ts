@@ -80,7 +80,7 @@ import * as totals from './handlers/totals';
 import { models } from '../../lib'
 import {createCoinTextInvoice} from '../../lib/cointext'
 
-const currencyMap = require('../../config/currency_map.js')
+const currencyMap = require('../../config/currency_map.json')
 
 const Fixer = require('../../lib/fixer');
 
@@ -1657,7 +1657,7 @@ async function Server() {
       //tags: ['api'],
       handler:(req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
-        return currencyMap.map
+        return currencyMap
 
       }
     }
