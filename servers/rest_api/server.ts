@@ -886,7 +886,7 @@ async function Server() {
 
     method: "POST",
 
-    path: "/{coin}/payments",
+    path: "/{input_currency}/payments",
 
     config: {
 
