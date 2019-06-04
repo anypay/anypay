@@ -1599,7 +1599,16 @@ async function Server() {
 
   });
 
+  server.route({
+    method: "GET",
+    path: "/accounts/roi",
+    config: {
+      auth: "token",
+      tags: ['api'],
+      handler: AccountsController.calculateROI
 
+    }
+  });
 
   server.route({
 
