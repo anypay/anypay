@@ -24,20 +24,28 @@ export async function getROI(accountID){
 
     acc['fiat_value_invoiced'] = parseFloat(pair.fiat_total) + acc['fiat_value_invoiced']
 
+    acc[`${pair.currency}_invoiced`] = parseFloat(pair.fiat_total)
+
     acc['total_crypto_value'] = cryptoPrice[pair.currency]*parseFloat(pair.crypto_total) + acc['total_crypto_value']
 
     acc[`${pair.currency}_value`] = cryptoPrice[pair.currency]*parseFloat(pair.crypto_total)
 
-    acc[`${pair.currency}_roi`] = (cryptoPrice[pair.currency]*parseFloat(pair.crypto_total)/parseFloat(pair.fiat_total)-1) * 100
+    acc[`${pair.currency}_roi`] = ((cryptoPrice[pair.currency]*parseFloat(pair.crypto_total)/parseFloat(pair.fiat_total)-1) * 100).toFixed(2)
 
     return acc
 
   }, roi)
 
 
-   roi['percentChange'] = (roi['total_crypto_value']/roi['fiat_value_invoiced']-1) * 100
+   roi['percentChange'] = ((roi['total_crypto_value']/roi['fiat_value_invoiced']-1) * 100).toFixed(2)
 
    roi['currency'] = account.denomination;
+
+   if(roi['percentChange'] >= 0){
+     roi['isPositive'] = true;
+   }else{
+     roi['isPositive'] = false;
+   }
 
    return roi
 
