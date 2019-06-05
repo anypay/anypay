@@ -9,6 +9,9 @@ import { geocode } from '../../../lib/googlemaps';
 import {emitter} from '../../../lib/events'
 
 import * as models from '../../../lib/models';
+
+import { getROI } from '../../../lib/roi';
+
 import { Account, AccessToken } from '../../../lib/models';
 
 function hash(password) {
@@ -91,3 +94,20 @@ export async function destroy(request, reply) {
   return { success: true };
 };
 
+export async function calculateROI(req, reply){
+
+  try{
+
+   let roi = await getROI(req.params.id)
+
+   return roi;
+
+  }catch(error){
+
+    console.log(error)
+
+    return(error)
+
+  }
+
+}
