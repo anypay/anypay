@@ -663,6 +663,20 @@ async function Server() {
     }
   });
 
+  server.route({
+
+    method: "GET",
+
+    path: "/accounts/{id}/roi",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.calculateROI
+
+    }
+  });
 
   server.route({
 

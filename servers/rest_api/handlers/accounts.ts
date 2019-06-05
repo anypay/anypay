@@ -11,6 +11,8 @@ import {emitter} from '../../../lib/events'
 import * as models from '../../../lib/models';
 import { Account, AccessToken } from '../../../lib/models';
 
+import { getROI } from '../../../lib/roi';
+
 function hash(password) {
   return new Promise((resolve, reject) => {
 
@@ -240,3 +242,22 @@ export async function destroy(request, reply) {
   return { success: true };
 };
 
+export async function calculateROI(req, reply){
+
+  try{
+
+   let roi = await getROI(req.account.id)
+
+   return roi;
+
+  }catch(error){
+
+    console.log(error)
+
+    return(error)
+
+  }
+
+
+
+}
