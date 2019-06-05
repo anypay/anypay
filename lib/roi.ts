@@ -8,12 +8,11 @@ export async function getROI(accountID){
 
   let account = await models.Account.findOne({ where : { id:accountID }})
 
-
   let invoices = (await database.query(`SELECT invoices.currency, sum(invoices.invoice_amount_paid) as crypto_total, sum(invoices.denomination_amount_paid) as fiat_total FROM invoices where denomination_currency='${account.denomination}' and account_id=${account.id} and not status='unpaid' group by currency`))[0]
 
   let roi = {}
-  roi['invoiced_fiat'] = 0;
-  roi['crypto_value'] = 0;
+  roi['fiat_value_invoiced'] = 0;
+  roi['total_crypto_value'] = 0;
   let cryptoPrice = {}
 
   for( let i=0; i<invoices.length; i++){
@@ -23,16 +22,22 @@ export async function getROI(accountID){
 
   let response = invoices.reduce( (acc, pair)=>{
 
-    acc['invoiced_fiat'] = parseFloat(pair.fiat_total) + acc['invoiced_fiat']
+    acc['fiat_value_invoiced'] = parseFloat(pair.fiat_total) + acc['fiat_value_invoiced']
 
-    acc['crypto_value'] = cryptoPrice[pair.currency]*parseFloat(pair.crypto_total) + acc['crypto_value']
+    acc['total_crypto_value'] = cryptoPrice[pair.currency]*parseFloat(pair.crypto_total) + acc['total_crypto_value']
+
+    acc[`${pair.currency}_value`] = cryptoPrice[pair.currency]*parseFloat(pair.crypto_total)
+
+    acc[`${pair.currency}_roi`] = (cryptoPrice[pair.currency]*parseFloat(pair.crypto_total)/parseFloat(pair.fiat_total)-1) * 100
 
     return acc
 
   }, roi)
 
 
-   roi['percentChange'] = (roi['crypto_value']/roi['invoiced_fiat']-1) * 100
+   roi['percentChange'] = (roi['total_crypto_value']/roi['fiat_value_invoiced']-1) * 100
+
+   roi['currency'] = account.denomination;
 
    return roi
 
