@@ -367,6 +367,41 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/invoices/{uid}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.update,
+
+      validate: {
+
+        payload: {
+
+           status: Joi.string().optional(),
+
+           amount: Joi.number().optional(),
+
+           invoice_amount_paid: Joi.number().optional(),
+
+           cashback_amount: Joi.number().optional(),
+
+           cashback_denomination_amount: Joi.number().optional(),
+
+         }
+
+      }
+
+    }
+
+  });
+
+
 
 
   server.route({
