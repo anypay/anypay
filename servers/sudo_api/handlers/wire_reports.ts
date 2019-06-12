@@ -1,5 +1,5 @@
 
-import { buildWireEmailReport, buildReportCsv } from '../../../lib/wire';
+import { buildWireEmailReport, buildReportCsvFromInvoiceUID } from '../../../lib/wire';
 
 export async function show(req, h) {
 
@@ -25,7 +25,7 @@ export async function showCSV(req, h) {
 
     let invoiceUID = req.params.invoice_uid;
 
-    let content = await buildReportCsv(invoiceUID);
+    let content = await buildReportCsvFromInvoiceUID(invoiceUID);
 
     console.log('content', content);
 
@@ -40,8 +40,6 @@ export async function showCSV(req, h) {
      return { error: error.message }
 
   }
-
-
 
 }
 

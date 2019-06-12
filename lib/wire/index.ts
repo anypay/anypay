@@ -11,6 +11,42 @@ import * as Handlebars from 'handlebars';
 
 import { join } from 'path';
 
+async function getInvoicesByDates(accountId, start, end) {
+
+  let invoices = await models.Invoice.findAll({
+
+    where: {
+
+      account_id: accountId,
+
+      complete: true,
+
+      completed_at: {
+
+        [Op.gte]: start,
+
+        [Op.lt]: end
+
+      }
+
+    }
+
+  });
+
+  invoices = invoices.map(invoice => {
+
+    if (!invoice.cashback_denomination_amount) {
+
+      invoice.cashback_denomination_amount = 0;
+    }
+
+    return invoice;
+
+  });
+
+  return invoices;
+}
+
 async function getInvoices(invoiceUID: string) {
 
   /*:
@@ -24,15 +60,6 @@ async function getInvoices(invoiceUID: string) {
   let account = await models.Account.findOne({
     where: { id: invoice.account_id }
   });
-
-  /*
-   * 2) Look in slack for all invoices starting at that
-   *   invoice number
-   *
-   *   - here use database to query all completed invoices since
-   *     the one indicated in step 1
-   *
-   */
 
   let invoices = await models.Invoice.findAll({
 
@@ -98,11 +125,7 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
 }
 
-export async function buildReportCsv(invoiceUID: string): Promise<string> {
-
-  let invoices = await getInvoices(invoiceUID);
-
-  let filepath = join(__dirname, `../../.tmp/${invoiceUID}.csv`);
+export async function buildReportCsv(invoices: any[], filepath: string): Promise<string> {
 
   const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
   const csvStringifier = createCsvStringifier({
@@ -118,9 +141,30 @@ export async function buildReportCsv(invoiceUID: string): Promise<string> {
   });
 
   let header = await csvStringifier.getHeaderString();
-  let records = await csvStringifier.stringifyRecords(invoices)
+  let records = await csvStringifier.stringifyRecords(invoices);
 
   return `${header}\t${records}`;
+
+}
+
+export async function buildReportCsvFromDates(accountId, start, end) {
+
+  let invoices = await getInvoicesByDates(accountId, start, end);
+
+  let filepath = join(__dirname,
+  `../../.tmp/account-${accountId}-${start}-${end}.csv`);
+
+  return buildReportCsv(invoices, filepath);
+
+}
+
+export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<string> {
+
+  let invoices = await getInvoices(invoiceUid);
+
+  let filepath = join(__dirname, `../../.tmp/${invoiceUid}.csv`);
+
+  return buildReportCsv(invoices, filepath);
 
 }
 
