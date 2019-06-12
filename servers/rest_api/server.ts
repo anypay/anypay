@@ -16,6 +16,8 @@ import * as addressRoutesActor from '../../actors/address_routes/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
+import { accountCSVReports } from './handlers/csv_reports';
+
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
 import * as DASHAddressForwardCallbacks from './handlers/dash_address_forward_callbacks';
@@ -1671,6 +1673,8 @@ async function Server() {
       }
     }
   });
+
+  accountCSVReports(server);
 
   return server;
 
