@@ -40,6 +40,8 @@ async function getInvoicesByDates(accountId, start, end) {
       invoice.cashback_denomination_amount = 0;
     }
 
+    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
+
     return invoice;
 
   });
@@ -86,6 +88,8 @@ async function getInvoices(invoiceUID: string) {
       invoice.cashback_denomination_amount = 0;
     }
 
+    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
+
     return invoice;
 
   });
@@ -127,14 +131,15 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
 export async function buildReportCsv(invoices: any[], filepath: string): Promise<string> {
 
+
   const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
   const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'completed_at', title: 'Payment Completed At'},
+      {id: 'completed', title: 'Payment Completed At'},
       {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
       {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
-      {id: 'settlement_amount', title: 'eGifter Gets (USD)'},
+      {id: 'settlement_amount', title: 'Account Gets (USD)'},
       {id: 'external_id', title: 'Reference'},
       {id: 'uid', title: 'Invoice ID'},
     ]
