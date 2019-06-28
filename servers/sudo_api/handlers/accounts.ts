@@ -12,6 +12,8 @@ import * as models from '../../../lib/models';
 
 import { getROI } from '../../../lib/roi';
 
+import { getVolume } from '../../../lib/sudo/volume';
+
 import { Account, AccessToken } from '../../../lib/models';
 
 function hash(password) {
@@ -101,6 +103,24 @@ export async function calculateROI(req, reply){
    let roi = await getROI(req.params.id)
 
    return roi;
+
+  }catch(error){
+
+    console.log(error)
+
+    return(error)
+
+  }
+
+}
+
+export async function accountVolume(req, reply){
+
+  try{
+
+   let volume = await getVolume(req.params.id)
+
+   return volume;
 
   }catch(error){
 

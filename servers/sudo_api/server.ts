@@ -680,6 +680,20 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/accounts/{id}/volume",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.accountVolume
+
+    }
+  });
+  server.route({
+
     method: 'PUT',
 
     path: "/api/accounts/{account_id}/passwords",
