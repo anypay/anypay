@@ -1,8 +1,10 @@
 
 import * as moment from 'moment';
-import * as Joi from 'joi'
+import * as Joi from 'joi';
+import * as Boom from 'boom';
 
 import { buildReportCsvFromDates } from '../../../lib/wire';
+import * as models from '../../../lib/models';
 
 export async function accountCSVReports(server) {
 
@@ -11,14 +13,26 @@ export async function accountCSVReports(server) {
     path: '/csv_reports',
     handler: async (req, h) => {
 
+      console.log('query', req.query);
+
+      let token = await models.AccessToken.findOne({ where: {
+
+        uid: req.query.token
+
+      }});
+
+      if (!token) {
+
+        return Boom.unauthorized('invalid access token');
+      }
+
       console.log(req.query);
-      console.log(req.account);
 
       let start_date = moment(req.query.start_date);
       let end_date = moment(req.query.end_date);
 
       let content = await buildReportCsvFromDates(
-        req.account.id,
+        token.account_id,
         start_date,
         end_date
       );
@@ -39,11 +53,12 @@ export async function accountCSVReports(server) {
     },
     config: {
       tags: ['api'],
-      auth: "token",
+      //auth: "token",
       validate: {
         query: {
           start_date: Joi.date().required(),
-          end_date: Joi.date().required()
+          end_date: Joi.date().required(),
+          token: Joi.string().required()
         }
       }
     }
