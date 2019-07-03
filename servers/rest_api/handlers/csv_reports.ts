@@ -10,7 +10,7 @@ export async function accountCSVReports(server) {
 
   server.route({
     method: 'GET',
-    path: '/csv_reports',
+    path: '/csv_reports.csv',
     handler: async (req, h) => {
 
       let token = await models.AccessToken.findOne({ where: {
