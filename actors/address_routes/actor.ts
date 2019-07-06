@@ -8,6 +8,24 @@ require('dotenv').config();
 
 async function start() {
 
+  /*
+
+    Address Routes Actor
+
+    When a customer pays payments must be routed to their ultimate destination,
+    which can be either an address for the same coin as the initial payment, or
+    it may be an address for a different coin.
+
+    The business's preference for which coin(s) they would like to ultimately
+    receive dictate how payments are routed through inter-coin. Preferences are
+    expressed in two forms, account routes and basic addresses.
+
+    Account Routes indicate the destination currency and address for all
+    payments of a given coin.
+
+  */
+
+
   let channel = await awaitChannel();
 
   log.info('amqp.channel.created');
