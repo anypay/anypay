@@ -72,7 +72,20 @@ export async function getStartDate(accountId){
 
 }
 
+export async function send_all_roi_email(){
 
+  console.log('send_all')
+  let query = `SELECT id FROM accounts`
+
+  let ids = (await database.query(query))[0]
+
+  ids.forEach( elem =>{
+
+    roi_updateEmail(elem.id)
+
+  })
+
+}
 
 export async function roi_updateEmail(accountId) {
   
@@ -114,8 +127,8 @@ export async function roiEmailBody(accountId){
   let total_crypto_value = roi['total_crypto_value'].toFixed(2)
 
   body += `Since then, the bitcoin you took in has grown in value ${roi['percentChange']}%!`
-        body += `<br><br>Total invoices (${account.denomination}): ${total_fiat_invoiced}`
-        body += `<br><br>Bitcoin Value (${account.denomination}): ${total_crypto_value}` 
+        body += `<br><br>Total payments (${account.denomination}): ${total_fiat_invoiced}`
+        body += `<br><br>Current value of bitcoins received (${account.denomination}): ${total_crypto_value}` 
 
   if( !roi['isPositive']){
     return null
