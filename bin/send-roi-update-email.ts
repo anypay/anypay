@@ -1,14 +1,12 @@
 #!/usr/bin/env ts-node
 
 require('dotenv').config();
-const program = require('commander');
+
 import * as roi from '../lib/roi';
 
 (async function() {
 
-
   try {
- 
 
    let mail = await roi.send_all_roi_email()
 
