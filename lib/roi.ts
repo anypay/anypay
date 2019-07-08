@@ -1,8 +1,18 @@
 const http = require('superagent')
 
+import * as moment from 'moment'
+
+require('dotenv').config()
+
 import * as database from './database';
 
 import * as models from './models';
+
+import {sendEmail} from './email';
+
+import * as requireAll from  'require-all';
+
+const templates = requireAll(`${__dirname}/email/templates`);
 
 export async function getROI(accountID){
 
@@ -48,5 +58,95 @@ export async function getROI(accountID){
    }
 
    return roi
+
+}
+
+export async function getStartDate(accountId){
+
+  let query = `SELECT cast(date_trunc('day',"createdAt") as date) as start_date from invoices where account_id=${accountId} order by id asc limit 1`
+
+  let start = await database.query(query)
+
+  if(start[0][0]){
+
+    return moment(start[0][0].start_date).format('MMM YYYY')
+
+  }
+
+  return null
+
+}
+
+export async function send_all_roi_email(){
+
+  let query = `SELECT id FROM accounts`
+
+  let ids = (await database.query(query))[0]
+
+  for( let i=0; i<ids.length; i++){
+    
+    let email = await roi_updateEmail(ids[i].id)
+
+    console.log(email)
+  }
+
+}
+
+export async function roi_updateEmail(accountId) {
+  
+  let template = templates['roi_update']
+
+  let account = await models.Account.findOne({ where : { id:accountId }})
+
+  let subject = template.subject
+
+  let roi = await roiEmailBody(accountId)
+
+  //Roi is negative 
+  if( roi === null ){
+     return
+  }
+  if( account.email !== null){
+
+    let body = template.body
+    body = body.replace("ROI_BODY", roi)
+    return sendEmail(account.email, subject, body);
+  }
+  return
+}
+
+
+export async function roiEmailBody(accountId){
+
+
+  let account = await models.Account.findOne({ where : { id:accountId }})
+
+  if(account){
+
+    let roi = await getROI(accountId)
+
+    let start_date = await getStartDate(accountId)
+
+    let subject = "How is taking bitcoin working out for you? You're going to want to see these numbers."
+  
+    let body = `You are going to love this: <br><br>Your business started accepting Bitcoin in ${start_date}.  ` 
+
+    let total_fiat_invoiced = roi['fiat_value_invoiced'].toFixed(2)
+          
+    let total_crypto_value = roi['total_crypto_value'].toFixed(2)
+
+    body += `Since then, the bitcoin you took in has grown in value ${roi['percentChange']}%!`
+        body += `<br><br>Total payments (${account.denomination}): ${total_fiat_invoiced}`
+        body += `<br><br>Current value of bitcoins received (${account.denomination}): ${total_crypto_value}` 
+
+    if( !roi['isPositive']){
+      return null
+    }
+  
+  return body;
+
+ }
+
+  return null
 
 }
