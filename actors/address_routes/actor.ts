@@ -73,7 +73,7 @@ async function start() {
 
 }
 
-async function createAddressRoute(invoice) {
+export async function createAddressRoute(invoice) {
 
   var outputAddressValue, outputCurrency;
 

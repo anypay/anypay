@@ -6,6 +6,8 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import { createAddressRoute } from '../actors/address_routes/actor';
+
 import * as database from './database';
 
 import { Payment } from '../types/interfaces';
@@ -135,11 +137,13 @@ export async function generateInvoice(
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   }
 
-  console.log('invoice params', invoiceParams);
-
   var invoice = await models.Invoice.create(invoiceParams);
 
   emitter.emit('invoice.created', invoice.uid);
+
+  let route = await createAddressRoute(invoice);
+
+  console.log('address_route.created', route.toJSON());
 
   return invoice;
 }
