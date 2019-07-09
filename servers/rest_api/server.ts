@@ -1695,7 +1695,7 @@ async function start () {
 
   }
 
-  addressRoutesActor.start();
+//addressRoutesActor.start();
 
   await sequelize.sync()
 
