@@ -14,6 +14,51 @@ import * as requireAll from  'require-all';
 
 const templates = requireAll(`${__dirname}/email/templates`);
 
+async function getAccountId(email){
+
+  let resp = await database.query(`SELECT id FROM accounts WHERE email='${email}'`)
+
+  return resp[0][0].id
+
+}
+
+export async function getTotalRoi(){
+
+  let id = await getAccountId('diagnostic@anypay.global')
+  let tradingPairs = (await database.query(`SELECT denomination_currency, invoices.currency, round(sum(invoices.invoice_amount_paid),3) as crypto_total, round(sum(invoices.denomination_amount_paid),2) as fiat_total FROM invoices
+where not status='unpaid' 
+and invoices.denomination_amount_paid is not null 
+and invoices.invoice_amount_paid is not null 
+and (denomination_currency = 'USD' or denomination_currency = 'THB') 
+and (currency = 'BCH' or currency = 'DASH')
+and not account_id = ${id} 
+group by currency, denomination_currency`))[0]
+
+  let pairs = [];
+
+  for(let i=0; i<tradingPairs.length; i++){
+
+     let pairReturn = tradingPairs[i]
+
+     if( pairReturn.denomination_currency !== 'USD' &&  pairReturn.denomination_currency !== 'THB' ){
+       continue;
+     }
+     if( pairReturn.currency !== 'BTC' && pairReturn.currency !== 'DASH' && pairReturn.currency !== 'BCH'){
+       continue;
+     }
+
+     pairReturn.cryptoValue = ((await http.get(`api.anypay.global/convert/${pairReturn.crypto_total}-${pairReturn.currency}/to-${pairReturn.denomination_currency}`)).body.conversion.output.value).toFixed(2)
+
+     pairReturn.percentage = ((pairReturn.cryptoValue/pairReturn.fiat_total - 1) * 100).toFixed(2)
+
+     pairs.push(pairReturn)
+    
+  }
+
+  return pairs;
+
+}
+
 export async function getROI(accountID){
 
   let account = await models.Account.findOne({ where : { id:accountID }})

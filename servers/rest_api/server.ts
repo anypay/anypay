@@ -1613,6 +1613,16 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/roi",
+    config: {
+      tags: ['api'],
+      handler: AccountsController.calculateTotalROI
+
+    }
+  });
+
+  server.route({
 
     method: 'POST',
 
