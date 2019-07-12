@@ -20,7 +20,7 @@ class JsonRpc {
         .post(`http://${process.env.BCH_RPC_HOST}:${process.env.BCH_RPC_PORT}`)
         .auth(process.env.BCH_RPC_USER, process.env.BCH_RPC_PASSWORD)
         .timeout({
-          response: 5000,  // Wait 5 seconds for the server to start sending,
+          response: 10000,  // Wait 5 seconds for the server to start sending,
           deadline: 10000, // but allow 1 minute for the file to finish loading.
         })
         .send({
@@ -34,11 +34,36 @@ class JsonRpc {
         });
     });
   }
+
+  callAll(method, params) {
+
+    log.info(`bch.rpc.callall.${method}`, params);
+
+    return new Promise((resolve, reject) => {
+      http
+        .post('https://nodes.anypay.global/bch/rpc/all')
+        .auth('anypay', process.env.SUDO_ADMIN_KEY)
+        .timeout({
+          response: 15000,  // Wait 5 seconds for the server to start sending,
+          deadline: 10000, // but allow 1 minute for the file to finish loading.
+        })
+        .send({
+          method: method,
+          params: JSON.stringify(params || []),
+          id: 0
+        })
+        .end((error, resp) => {
+          if (error) { return reject(error) }
+          resolve(resp.body);
+        });
+    });
+  }
 }
 
 let rpc = new JsonRpc();
 
 export {
+
   rpc
 }
 
