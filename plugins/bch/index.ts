@@ -85,6 +85,7 @@ function validateAddress(address: string){
     let valid = isCashAddress(address)
 
     return valid;
+
   }catch(error){
 
     return false;
@@ -144,9 +145,11 @@ async function createAddressForward(record: I_Address) {
 
 export async function getNewAddress(record: I_Address) {
 
+  var address;
+
   if (record.value.match(/^xpub/)) {
 
-    var address = xpub.generateAddress('BCH', record.value, record.nonce);
+    address = xpub.generateAddress('BCH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -164,15 +167,26 @@ export async function getNewAddress(record: I_Address) {
 
     let subscription = await address_subscription.createSubscription('BCH', address)
 
-    return address;
-
   } else {
 
-    let address = await createAddressForward(record);
-
-    return address;
+    address = await createAddressForward(record);
 
   }
+
+  rpc.callAll('importaddress', [address, false, false])
+
+    .then(result => {
+
+      console.log('rpcresult', result); 
+
+    })
+    .catch(error => {
+
+      console.log('rpcerror', error); 
+
+    });
+
+  return address;
 
 }
 
