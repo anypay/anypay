@@ -31,6 +31,8 @@ import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_call
 import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
+import * as dashtext from '../../lib/dash/dashtext';
+
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
@@ -914,6 +916,29 @@ async function Server() {
 
     }
 
+  });
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/dashtext_payments",
+    config: {
+      tags: ['api'],
+      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+        let invoice = await models.Invoice.findOne({ where: {
+        
+          uid: req.params.uid
+
+        }})
+
+        return dashtext.generateCode(
+          invoice.address,
+          invoice.invoice_amount,
+          invoice.uid
+        );
+	 
+      }
+    }
   });
 
   server.route({
