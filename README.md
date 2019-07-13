@@ -66,6 +66,8 @@ Configuration of the application is done via environment variables
 - JSONWEBTOKEN_PRIVATE_KEY_PATH
 - SUDO_PASSWORD_HASH
 
+- DASHTEXT_TOKEN
+
 ### Optional Environmente Variables
 
 - BLOCKCYPHER_CALLBACKS_BASE (used for staging/testing of blockcypher)
