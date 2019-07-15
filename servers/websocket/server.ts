@@ -3,9 +3,9 @@ const uuid = require("uuid");
 import * as amqp from "amqplib";
 const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
 
-require('dotenv').config();
+import * as Hapi from 'hapi';
 
-const io = require("socket.io")(server);
+require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
 
@@ -14,44 +14,97 @@ const invoices = {};
 
 import { log } from '../../lib';
 
-function subscribeInvoice(client, invoice) {
-  subscriptions[client.uid] = invoice;
-  if (!invoices[invoice]) {
-    invoices[invoice] = [];
+class InvoiceSubscriptions {
+
+  subscriptions: any = {};
+
+  invoices: any = {};
+
+  subscribeInvoice(client, invoice) {
+
+    this.subscriptions[client.uid] = invoice;
+
+    if (!this.invoices[invoice]) {
+
+      this.invoices[invoice] = [];
+
+    }
+
+    this.invoices[invoice].push(client);
   }
-  invoices[invoice].push(client);
+
+  handleInvoicePaid(invoice) {
+
+    if (this.invoices[invoice]) {
+
+      this.invoices[invoice].forEach(client => {
+
+        client.emit("invoice:paid", invoice);
+
+      });
+
+      setTimeout(function() {
+
+        delete this.invoices[invoice];
+
+      }, 60000); // remove from map in one minute
+
+    }
+  }
+
+  handleDashbackPaid(invoice) {
+
+    if (this.invoices[invoice]) {
+
+      this.invoices[invoice].forEach(client => {
+
+        client.emit("dashback.paid", invoice);
+
+      });
+
+    }
+  }
+
+  unsubscribeClient(client) {
+
+    let invoice = this.subscriptions[client.uid];
+
+    if (this.invoices[invoice]) {
+
+      this.invoices[invoice] = this.invoices[invoice].filter(c => {
+
+        return c.uid !== client.uid;
+
+      });
+
+    }
+
+    delete this.subscriptions[client.uid];
+
+  }
+
+  getSubscriptions() {
+
+    return this.subscriptions;
+
+  }
+
+  getInvoices() {
+
+    return this.subscriptions;
+
+  }
+
 }
 
-function handleInvoicePaid(invoice) {
-  if (invoices[invoice]) {
-    invoices[invoice].forEach(client => {
-      client.emit("invoice:paid", invoice);
-    });
+let wsSubscriptions = new InvoiceSubscriptions();  
 
-    setTimeout(function() {
-      delete invoices[invoice];
-    }, 60000); // remove from map in one minute
-  }
-}
+let hapiServer = new Hapi.Server({
+  port: 3000,
+  host: '0.0.0.0'
+});
 
-function handleDashbackPaid(invoice) {
-  if (invoices[invoice]) {
-    invoices[invoice].forEach(client => {
-      client.emit("dashback.paid", invoice);
-    });
-  }
-}
-
-function unsubscribeClient(client) {
-  let invoice = subscriptions[client.uid];
-
-  if (invoices[invoice]) {
-    invoices[invoice] = invoices[invoice].filter(c => {
-      return c.uid !== client.uid;
-    });
-  }
-  delete subscriptions[client.uid];
-}
+const io = require("socket.io")(hapiServer.listener);
 
 io.on("connection", client => {
   client.uid = uuid.v4();
@@ -59,23 +112,41 @@ io.on("connection", client => {
 
   client.on("subscribe", data => {
     if (data.invoice) {
-      subscribeInvoice(client, data.invoice);
-      log.info("client subscripted to invoice", client.uid, data.invoice);
+      wsSubscriptions.subscribeInvoice(client, data.invoice);
+      log.info("client subscribed to invoice", client.uid, data.invoice);
     }
   });
 
   client.on("disconnect", () => {
-    let invoice = subscriptions[client.uid];
-    unsubscribeClient(client);
+    let invoice = wsSubscriptions.subscriptions[client.uid];
+    wsSubscriptions.unsubscribeClient(client);
 
     log.info("websocket client disconnected", client.uid);
     log.info("client unsubscribed", client.uid, invoice);
   });
 });
 
-server.listen(PORT, () => {
+/*server.listen(PORT, () => {
   log.info(`Serving Websockets on Port ${PORT}`);
 });
+*/
+
+
+hapiServer.route({
+
+  method: 'GET',
+
+  path: '/subscriptions',
+
+  handler: (request, h) => {
+
+    return wsSubscriptions.subscriptions;
+
+  }
+
+})
+
+hapiServer.start();
 
 const AMQP_URL = process.env.AMQP_URL;
 if (!AMQP_URL) {
@@ -104,7 +175,7 @@ if (!AMQP_URL) {
 
     log.info('message', message.content.toString());
 
-    handleInvoicePaid(message.content.toString());
+    wsSubscriptions.handleInvoicePaid(message.content.toString());
 
     channel.ack(message);
 
@@ -118,7 +189,7 @@ if (!AMQP_URL) {
 
     console.log('dashback.notifications', message.content.toString());
 
-    handleDashbackPaid(message.content.toString());
+    wsSubscriptions.handleDashbackPaid(message.content.toString());
 
     channel.ack(message);
 
