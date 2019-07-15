@@ -100,7 +100,7 @@ class InvoiceSubscriptions {
 let wsSubscriptions = new InvoiceSubscriptions();  
 
 let hapiServer = new Hapi.Server({
-  port: 3000,
+  port: PORT,
   host: '0.0.0.0'
 });
 
