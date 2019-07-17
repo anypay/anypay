@@ -4,7 +4,7 @@ const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
 
-import { geocode } from '../../../lib/googlemaps';
+import { geocode } from '../../../lib/geocode';
 
 import {emitter} from '../../../lib/events'
 
@@ -27,7 +27,7 @@ export async function update(req, h) {
 
   let account = await models.Account.findOne({ where: {
 
-    id: req.account.id
+    id: req.account.id 
 
   }});
 
@@ -51,8 +51,17 @@ export async function update(req, h) {
 
       let geolocation = await geocode(updateAttrs.physical_address);
 
-      updateAttrs.latitude = geolocation.lat;
-      updateAttrs.longitude = geolocation.lng;
+      updateAttrs.latitude = geolocation['latitude'];
+      updateAttrs.longitude = geolocation['longitude'];
+      if(geolocation['city']){
+        updateAttrs.city = geolocation['city'];
+      }
+      if(geolocation['state']){
+        updateAttrs.state = geolocation['state'];
+      }
+      if(geolocation['country']){
+        updateAttrs.country = geolocation['country'];
+      }
 
     } catch (error) {
 
