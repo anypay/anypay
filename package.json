@@ -106,7 +106,7 @@
     "test": "mocha --require=ts-node/register --timeout=20000 test/integration/roi_test.ts test/lib/payment_processor.ts --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
-    "db:migrate": "sequelize db:migrate"
+    "db:migrate": "sequelize db:migrate --url=$DATABASE_URL"
   },
   "keywords": [],
   "author": "",
