@@ -33,11 +33,19 @@ export async function start() {
 
       try {
 
-        let resp = await rpc.callAll('importaddress', [
 
-          invoice.address, invoice.uid, false, false 
+        let params = [
 
-        ]);
+          invoice.address, invoice.uid, false
+
+        ]
+
+        console.log('rpccall', {
+          method: 'importaddress',
+          params
+        })
+
+        let resp = await rpc.callAll('importaddress', params);
 
         console.log('rpcresp', resp);
 
