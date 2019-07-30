@@ -1,16 +1,10 @@
 {
   "development": {
-    "username": "postgres",
-    "password": null,
-    "database": "anypay_development",
-    "host": "127.0.0.1",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "postgresql"
   },
   "test": {
-    "username": "postgres",
-    "password": null,
-    "database": "anypay_test",
-    "host": "127.0.0.1",
+    "use_env_variable": "DATABASE_URL",
     "dialect": "postgresql"
   },
   "production": {
