@@ -24,6 +24,8 @@ import { I_Address } from '../../types/interfaces';
 
 var bchaddr = require('bchaddrjs');
 
+import * as bch from 'bitcore-lib-cash';
+
 import * as address_subscription from '../../lib/address_subscription';
 
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -77,6 +79,18 @@ async function createInvoice(accountId: number, amount: number) {
 }
 
 function validateAddress(address: string){
+
+  try {
+
+    new bch.HDPublicKey(address);
+
+    return true;
+
+  } catch(error) {
+
+    console.log(error.message);
+
+  }
 
   try{
 
@@ -173,7 +187,7 @@ export async function getNewAddress(record: I_Address) {
 
   }
 
-  rpc.callAll('importaddress', [address, false, false])
+  rpc.callAll('importaddress', [address, 'false', false])
 
     .then(result => {
 

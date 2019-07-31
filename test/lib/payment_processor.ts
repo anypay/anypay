@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 import * as assert from 'assert';
 import {models} from '../../lib';
 import {accounts} from '../../lib';

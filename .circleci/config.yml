@@ -10,8 +10,11 @@ jobs:
           name: Build docker image
           command: docker build -t anypay . 
       - run:
-          name: Running tests
-          command: docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
+          name: Migrate Database
+          command: docker run -i -t -e DATABASE_URL=$DATABASE_URL anypay npm run db:migrate
+      #- run:
+      #    name: Running tests
+      #    command: docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
       - add_ssh_keys
   deploy:
     docker:
