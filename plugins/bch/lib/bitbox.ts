@@ -2,6 +2,8 @@ const http = require("superagent")
 
 const bch = require('bitcore-lib-cash');
 
+import * as bchaddr from 'bchaddrjs';
+
 const Address = bch.Address;
 
 const fromString = Address.fromString;
@@ -51,20 +53,9 @@ async function getCashAddress(address:string):Promise<any>{
 }
 
 export function getLegacyAddressFromCashAddress(address:string):string{
+
+  return bchaddr.toLegacyAddress(address);
   
-  try{
-  
-    let cashaddr = fromString( address, 'livenet', 'pubkeyhash', CashAddrFormat);
-
-      return cashaddr.toString()
-    
-    }
-    catch(err){
-     
-      return address
-
-    }
-
 }
 
 async function getTransactionDetails(hash:string):Promise<any>{
