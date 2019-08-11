@@ -17,7 +17,7 @@ class JsonRpc {
 
     return new Promise((resolve, reject) => {
       http
-        .post(`http://${process.env.LTC_RPC_HOST}:${process.env.LTC_RPC_PORT}`)
+        .post(`https://${process.env.LTC_RPC_HOST}:${process.env.LTC_RPC_PORT}`)
         .auth(process.env.LTC_RPC_USER, process.env.LTC_RPC_PASSWORD)
         .timeout({
           response: 5000,  // Wait 5 seconds for the server to start sending,
@@ -37,3 +37,4 @@ class JsonRpc {
 }
 
 module.exports = JsonRpc;
+
