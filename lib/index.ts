@@ -27,7 +27,7 @@ import * as tipjar from './tipjar';
 import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
-
+import * as merchants from './merchants';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -61,5 +61,6 @@ export {
   routes,
   password,
   login
+  merchants
 }
 

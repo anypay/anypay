@@ -52,6 +52,7 @@
     "figlet": "^1.2.0",
     "flipit": "^2.0.3",
     "got": "^9.6.0",
+    "geolib": "^3.0.4",
     "handlebars": "^4.1.0",
     "hapi": "^18.1.0",
     "hapi-auth-basic": "^5.0.0",

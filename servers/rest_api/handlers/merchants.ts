@@ -1,4 +1,5 @@
 import { database } from '../../../lib';
+import { getNearbyMerchants } from '../../../lib/merchants';
 
 import * as moment from 'moment';
 
@@ -13,6 +14,17 @@ export async function list(req: Request, h: ResponseToolkit) {
     business_name is not null`);
 
   return { merchants: resp[0] };
+
+}
+
+export async function listNearbyMerchants(req, h) {
+
+  let merchants = await getNearbyMerchants({
+    latitude: req.params.latitude,
+    longitude: req.params.longitude
+  });
+
+  return { merchants };
 
 }
 

@@ -4,7 +4,24 @@ require('dotenv').config();
 
 var program = require('commander');
 
-import { models, log, accounts } from '../lib';
+import { models, log, accounts, merchants } from '../lib';
+
+program
+  .command('listnearby <address>')
+  .action(async (address) => {
+
+    let coordinates = await merchants.getCoordinates(address);
+
+    let m = await merchants.getNearbyMerchants(coordinates);
+
+    console.log(m.map(merchant => {
+      return {
+        name: merchant.business_name,
+        distance: merchant.distance
+      }
+    }));
+
+  });
 
 program
   .command('create <email> <password>')
@@ -24,7 +41,7 @@ program
 
     let account = await models.Account.findOne({ where: { email }});
 
-    let merchant = await models.DashBackMerchant.create({
+    let merchant = await models.CashbackMerchant.create({
 
       account_id: account.id
 

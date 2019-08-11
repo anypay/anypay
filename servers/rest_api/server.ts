@@ -1408,6 +1408,20 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/nearby-merchants/{latitude}/{longitude}',
+
+    config: {
+
+      handler: MerchantsController.listNearbyMerchants
+
+    }
+
+  });
+
 
 
   server.route({
