@@ -20,14 +20,14 @@ export async function show(req, h) {
     input_currency
 
   }});
-
+        
   if (!addressRoute) {
 
     return Boom.notFound('no route found for input address and currency');
 
   }
 
-  return {
+  let route = {
 
     input: {
 
@@ -46,6 +46,20 @@ export async function show(req, h) {
 
     expires: addressRoute.expires
   }
+
+  let hdKey = await models.HDKeyAddresses.findOne({where:{
+     address:input_address,
+     currency:input_currency
+  }})
+
+  console.log('hdkey', hdKey)
+  if( hdKey ){
+    
+    route['HDKeyAddress'] = hdKey.toJSON()
+
+  }
+
+  return route
 
 }
 
