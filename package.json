@@ -31,7 +31,6 @@
     "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-lib": "^0.16.0",
     "bitcore-lib-cash": "^0.19.0",
-    "bitcore-lib-dash": "^0.13.21",
     "bluebird": "^3.5.0",
     "boom": "^7.1.1",
     "bunnies": "^1.0.2",
