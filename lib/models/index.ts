@@ -36,6 +36,7 @@ var AddressRoute = require('./address_route')(sequelize, Sequelize);
 var AccountRoute = require('./account_route')(sequelize, Sequelize);
 var CoinOracle = require('./coin_oracle')(sequelize, Sequelize);
 var SimpleWallet = require('./simple_wallet')(sequelize, Sequelize);
+var HDKeyAddresses = require('./hdkeyaddresses')(sequelize, Sequelize);
 
 export {
   Account,
@@ -72,6 +73,7 @@ export {
   AccountRoute,
   TipJar,
   CoinOracle,
-  SimpleWallet
+  SimpleWallet,
+  HDKeyAddresses
 };
 
