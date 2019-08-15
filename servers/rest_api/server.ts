@@ -4,7 +4,7 @@ require('dotenv').config();
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
-import { channel } from '../../lib/amqp';
+import { channel, awaitChannel } from '../../lib/amqp';
 
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
@@ -30,6 +30,8 @@ import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_
 import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
 import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
+
+import * as dashtext from '../../lib/dash/dashtext';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
@@ -918,6 +920,33 @@ async function Server() {
 
   server.route({
     method: "POST",
+    path: "/invoices/{uid}/dashtext_payments",
+    config: {
+      tags: ['api'],
+      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+        let invoice = await models.Invoice.findOne({ where: {
+        
+          uid: req.params.uid
+
+        }})
+
+        let code = await dashtext.generateCode(
+          invoice.address,
+          invoice.invoice_amount,
+          invoice.uid
+        );
+
+        console.log("CODE", code);
+
+        return code;
+	 
+      }
+    }
+  });
+
+  server.route({
+    method: "POST",
     path: "/invoices/{uid}/cointext_payments",
     config: {
       tags: ['api'],
@@ -1675,11 +1704,88 @@ async function Server() {
     }
   });
 
+  server.route({
+    method: 'PUT',
+    path: '/account/watch_address_webhook',
+    config: {
+      auth: 'token',
+      validate: {
+        payload: Joi.object().keys({
+          webhook_url: Joi.string().uri().required()
+        })
+      },
+
+      handler: async (req, h) => {
+
+        req.account.watch_address_webhook_url = req.payload.webhook_url
+
+        try {
+
+          await req.account.save();
+
+          return { success: true}
+
+        } catch(error) {
+
+          return { success: false}
+
+        }
+
+      }
+    }
+  });
+
+  server.route({
+
+    method: 'POST',
+    path: '/dash/watch_addresses',
+
+    config: {
+
+      auth: "token",
+
+      handler: async (req, h) => {
+
+        await awaitChannel();
+
+        switch(req.account.email) {
+
+        case 'lorenzo@dashtext.io':
+
+          break;
+
+        case 'steven@anypay.global':
+
+          break;
+
+        default:
+
+          console.log('not authorized');
+
+          return {succes: false}
+
+        }
+
+        let buffer = Buffer.from(JSON.stringify({
+          account_email: req.account.email,
+          address: req.payload.address
+        }))
+
+        await channel.publish('anypay.payments', 'addresses.watch', buffer);
+
+        return { success: true }
+
+      }
+
+    }
+  }); 
+
   accountCSVReports(server);
 
   return server;
 
 }
+
 
   
 
