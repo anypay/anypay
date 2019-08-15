@@ -4,7 +4,7 @@ require('dotenv').config();
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
-import { channel } from '../../lib/amqp';
+import { channel, awaitChannel } from '../../lib/amqp';
 
 const AccessToken = require("../../lib/models/access_token");
 const Account = require("../../lib/models/account");
@@ -931,11 +931,15 @@ async function Server() {
 
         }})
 
-        return dashtext.generateCode(
+        let code = await dashtext.generateCode(
           invoice.address,
           invoice.invoice_amount,
           invoice.uid
         );
+
+        console.log("CODE", code);
+
+        return code;
 	 
       }
     }
@@ -1700,11 +1704,57 @@ async function Server() {
     }
   });
 
+  server.route({
+
+    method: 'POST',
+    path: '/dash/watch_addresses',
+
+    config: {
+
+      auth: "token",
+
+      handler: async (req, h) => {
+
+        await awaitChannel();
+
+        switch(req.account.email) {
+
+        case 'lorenzo@dashtext.io':
+
+          break;
+
+        case 'steven@anypay.global':
+
+          break;
+
+        default:
+
+          console.log('not authorized');
+
+          return {succes: false}
+
+        }
+
+        let buffer = Buffer.from(JSON.stringify({
+          account_email: req.account.email,
+          address: req.payload.address
+        }))
+
+        await channel.publish('anypay.payments', 'addresses.watch', buffer);
+
+        return { success: true }
+
+      }
+
+    }
+  }); 
+
   accountCSVReports(server);
 
   return server;
 
 }
+
 
   
 

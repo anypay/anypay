@@ -132,7 +132,7 @@ class JsonRpc {
         .post(`http://${process.env.DASH_CORE_HOST}:${process.env.DASH_CORE_PORT}`)
         .auth(process.env.DASH_CORE_USER, process.env.DASH_CORE_PASSWORD)
         .timeout({
-          response: 5000,  // Wait 5 seconds for the server to start sending,
+          response: 10000,  // Wait 5 seconds for the server to start sending,
           deadline: 10000, // but allow 1 minute for the file to finish loading.
         })
         .send({
