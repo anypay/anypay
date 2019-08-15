@@ -3,6 +3,8 @@ require('dotenv').config()
 
 import * as http from 'superagent';
 
+import * as qs from 'qs';
+
 export async function generateCode(address: string, amount: number, uid?: string): Promise<string> {
 
   let requestData = {
@@ -12,19 +14,18 @@ export async function generateCode(address: string, amount: number, uid?: string
     note: "Invoice 4434"
   };
 
+  /*
   if (uid) {
 
     requestData['note'] =  uid;
 
   }
-
-  console.log('requestData', requestData);
+  */
 
   let resp = await http
     .post('https://api.dashtext.io/apibuy.php')
-    //.type('application/json')
-    .send(JSON.stringify(requestData));
+    .send(qs.stringify(requestData));
 
-  return resp;
+  return JSON.parse(resp.text);
 
 }

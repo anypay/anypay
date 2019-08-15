@@ -64,6 +64,7 @@
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
     "prompt-async": "^0.9.9",
+    "qr": "^0.2.4",
     "qrcode-terminal": "^0.11.0",
     "rabbi": "^1.5.0",
     "redis": "^2.8.0",

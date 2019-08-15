@@ -10,7 +10,7 @@ program
 
     try {
 
-      let code = await generateCode('XsceVTMC4oYmGyJbx8fitopPGHxakK6JGe', 1000);
+      let code = await generateCode('XsceVTMC4oYmGyJbx8fitopPGHxakK6JGe', 1000) ;
 
       console.log(code);
 
