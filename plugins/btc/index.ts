@@ -1,4 +1,5 @@
 require('dotenv').config()
+const btc = require('bitcore-lib')
 import {generateInvoice} from '../../lib/invoice';
 
 import * as chainSoAPI from '../../lib/chainSoAPI';
@@ -11,7 +12,6 @@ import {HDKeyAddresses} from '../../lib/models';
 
 import {rpc} from './jsonrpc';
 
-const btc = require('bitcore-lib')
 
 var WAValidator = require('anypay-wallet-address-validator');
 
@@ -46,7 +46,9 @@ export async function getNewAddress(deprecatedParam){
 
 function deriveAddress(xkey, nonce){
 
-  return btc.HDPublicKey(xkey).derive(nonce).publicKey.toAddress().toString()
+  let address = btc.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+
+  return address 
 
 }
 
