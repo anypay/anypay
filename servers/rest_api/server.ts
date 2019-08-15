@@ -1705,6 +1705,37 @@ async function Server() {
   });
 
   server.route({
+    method: 'PUT',
+    path: '/account/watch_address_webhook',
+    config: {
+      auth: 'token',
+      validate: {
+        payload: Joi.object().keys({
+          webhook_url: Joi.string().uri().required()
+        })
+      },
+
+      handler: async (req, h) => {
+
+        req.account.watch_address_webhook_url = req.payload.webhook_url
+
+        try {
+
+          await req.account.save();
+
+          return { success: true}
+
+        } catch(error) {
+
+          return { success: false}
+
+        }
+
+      }
+    }
+  });
+
+  server.route({
 
     method: 'POST',
     path: '/dash/watch_addresses',

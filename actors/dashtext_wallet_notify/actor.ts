@@ -5,6 +5,9 @@ require('dotenv').config();
 import { Actor, Joi } from 'rabbi';
 
 import { rpc } from '../../plugins/dash/lib/jsonrpc';
+import { models } from '../../lib';
+
+import * as http from 'superagent';
 
 export async function start() {
 
@@ -87,7 +90,34 @@ export async function start() {
 
     console.log('dashtext notify via http', json);
 
-    await channel.ack(msg);
+    let account = await models.Account.findOne({ where: {
+
+      email: 'lorenzo@dashtext.io'
+
+    }});
+
+
+    if (!account || !account.watch_address_webhook_url) {
+      return channel.ack(msg);
+    }
+
+    try {
+
+      let resp = await http
+        .post(account.watch_address_webhook_url)
+        .send(json);
+
+      console.log('webhook sent to dashtext');
+
+      await channel.ack(msg);
+
+    } catch(error) {
+
+      await wait(2000);
+
+      await channel.nack(msg);
+
+    }
 
   });
 
@@ -102,9 +132,38 @@ export async function start() {
   })
   .start(async (channel, msg, json) => {
 
-    console.log('dashtext notify via http', json);
+    console.log('notify stevnezeiler via http', json);
 
-    await channel.ack(msg);
+    let account = await models.Account.findOne({ where: {
+
+      email: 'steven@anypay.global'
+
+    }});
+
+
+    if (!account || !account.watch_address_webhook_url) {
+      return channel.ack(msg);
+    }
+
+    try {
+
+      let resp = await http
+        .post(account.watch_address_webhook_url)
+        .send(json);
+
+      console.log('webhook sent to stevenzeiler');
+
+      await channel.ack(msg);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+      await wait(2000);
+
+      await channel.nack(msg);
+
+    }
 
   });
 
@@ -116,3 +175,10 @@ if (require.main === module) {
 
 }
 
+async function wait(ms) {
+  return new Promise(resolve => {
+
+    setTimeout(resolve, ms);
+
+  });
+}
