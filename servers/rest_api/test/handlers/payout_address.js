@@ -1,7 +1,7 @@
 'use strict'; const assert = require("assert"); process.env.DATABASE_URL = "postgres://stevenzeiler:@127.0.0.1/anypay_dash_test"; const Account = require("../../../../lib/models/account"); const AccessToken = require("../../../../lib/models/access_token"); const Chance = require('chance'), chance = new Chance(); const Database = require("../../../../lib/database");
 const server = require('../../server');
 const bcrypt = require('bcrypt');
-const bitcore = require('../../../../bitcore-lib-dash');
+const bitcore = require('bitcore-lib-dash');
 
 function auth(username, password) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
