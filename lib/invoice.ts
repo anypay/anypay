@@ -52,12 +52,6 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
   switch(currency) {
 
-    case 'BTC':
-
-      address = await BitcoinAddressService.getNewAddress(accountId);
-
-      break;
-
     case 'XRP':
 
       address = await RippleAddressService.getNewAddress(accountId);
