@@ -1,5 +1,6 @@
 "use strict";
 require('dotenv').config();
+require('bitcore-lib');
 
 import * as Hapi from "hapi";
 
