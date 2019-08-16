@@ -32,7 +32,7 @@ describe("Creating Bitcoin Cash Invoices Via REST", async () => {
     }
   });
 
-  it.skip("POST /bch/invoices should create a bitcoin cash invoice", async () => {
+  it("POST /bch/invoices should create a bitcoin cash invoice", async () => {
     try {
 
       let response = await server.inject({

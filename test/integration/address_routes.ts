@@ -6,6 +6,11 @@ import { database, models } from "../../lib";
 import * as Chance from 'chance';
 const chance = new Chance();
 
+
+function basicHeader(username) {
+    return 'Basic ' + (new Buffer(username + ":", 'utf8')).toString('base64');
+}
+
 describe("Merchants REST API", async () => {
   var account, accessToken, server;
   
@@ -35,8 +40,11 @@ describe("Merchants REST API", async () => {
 
     let response = await server.inject({
       method: 'GET',
-      url: `/routes/DASH/${dashAddress}`
+      url: `/address_routes/DASH/${dashAddress}`,
+      headers: { authorization: basicHeader(process.env.DASH_ORACLE_ACCESS_TOKEN)}
     });
+
+    console.log(response.result)
 
     assert.strictEqual(response.result.output.currency, 'BCH');
     assert.strictEqual(response.result.output.address, bchAddress);
