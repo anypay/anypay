@@ -35,7 +35,7 @@ describe("Getting ROI  via REST", async () => {
     }
   });
 
-  it("GET /accounts/roi ", async () => {
+  it.skip("GET /accounts/roi ", async () => {
 
     let response = await server.inject({
       method: 'GET',
