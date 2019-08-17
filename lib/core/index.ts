@@ -7,13 +7,11 @@ import {
   DenominationChangeset
 } from './types/address_change_set';
 
-import * as models from '../models';
-
 import * as moment from 'moment';
 
 import {Op} from 'sequelize';
 
-import {Account, Invoice} from "../models";
+import {models} from "../models";
 
 import * as logger from "winston";
 
@@ -117,7 +115,7 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
 export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
 
-  var res = await Account.update({
+  var res = await models.Account.update({
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});
 
@@ -157,7 +155,7 @@ export async function getRecentlyUnpaidInvoices(sinceDate?: Date, currency?: str
 
   }
 
-  let recentlyUnpaidInvoices = await Invoice.findAll(query);
+  let recentlyUnpaidInvoices = await models.Invoice.findAll(query);
 
   return recentlyUnpaidInvoices;
 

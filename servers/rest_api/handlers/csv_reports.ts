@@ -4,7 +4,7 @@ import * as Joi from 'joi';
 import * as Boom from 'boom';
 
 import { buildReportCsvFromDates } from '../../../lib/wire';
-import * as models from '../../../lib/models';
+import { models } from '../../../lib';
 
 export async function accountCSVReports(server) {
 
@@ -43,7 +43,7 @@ export async function accountCSVReports(server) {
       return response;
 
     },
-    config: {
+    options: {
       tags: ['api'],
       validate: {
         query: {

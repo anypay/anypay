@@ -6,7 +6,7 @@ import { models, ambassadors } from '../../../lib';
 
 module.exports.list_account_claims = async function(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
-  let accountId = req.auth.credentials.accessToken.account_id;
+  let accountId = req.auth.credentials['accessToken']['account_id'];
 
   let account = await models.Account.findOne({ where: { id: accountId }});
 
@@ -16,7 +16,7 @@ module.exports.list_account_claims = async function(req: Hapi.Request, h: Hapi.R
 
 module.exports.claim_merchant = async function(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
-  let accountId = req.auth.credentials.accessToken.account_id;
+  let accountId = req.auth.credentials['accessToken']['account_id'];
 
   let account = await models.Account.findOne({ where: { id: accountId }});
 
@@ -24,7 +24,7 @@ module.exports.claim_merchant = async function(req: Hapi.Request, h: Hapi.Respon
 
     account.email,
 
-    req.body.merchantEmail
+    req.payload['merchantEmail']
     
   );
 

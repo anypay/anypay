@@ -7,7 +7,7 @@ import {emitter} from './events';
 import {log} from './logger';
 
 import {BigNumber} from 'bignumber.js'
-import * as models from './models';
+import { models } from './models';
 
 import * as moment from 'moment';
 
