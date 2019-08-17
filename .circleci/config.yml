@@ -12,56 +12,16 @@ jobs:
       - run:
           name: Migrate Database
           command: docker run -i -t -e DATABASE_URL=$DATABASE_URL anypay npm run db:migrate
-      #- run:
-      #    name: Running tests
-      #    command: docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
-      - add_ssh_keys
-  deploy:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - setup_remote_docker
       - run:
-          name: Build docker image
-          command: docker build -t anypay .
+          name: Running tests
+          command: docker run -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
       - run:
-          name: Deploy To Server
+          name: Push to Docker Hub
           command: |
             ./push_to_docker.sh
-            #ssh -o StrictHostKeyChecking=no chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
-  deploy_staging:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build docker image
-          command: docker build -t anypay .
-      - run:
-          name: Deploy To Server
-          command: |
-            ./push_to_docker_staging.sh
-            ssh -o StrictHostKeyChecking=no chef@api.staging.anypay.global "sudo /opt/anypay/deploy_api.sh"
 workflows:
   version: 2
   build:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
 
-  build-and-deploy-staging:
-      jobs:
-        - build
-        - deploy_staging:
-            requires:
-              - build
-            filters:
-              branches:
-                only: staging
