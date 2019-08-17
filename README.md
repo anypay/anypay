@@ -96,6 +96,10 @@ Setting the `PORT` environment variable to something other than 8000 will allow 
 Ideally every piece of the application will have accompanying tests to increase
 the security, availability and quality of the software.
 
+```
+npm test
+```
+
 #### Configuring the Postgres Database for Testing
 
 The tests require a postgres database to be created.
