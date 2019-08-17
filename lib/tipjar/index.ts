@@ -1,5 +1,5 @@
 
-import * as models from '../models';
+import { models } from '../models';
 import * as bch from 'bitcore-lib-cash';
 import * as http from 'superagent';
 

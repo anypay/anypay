@@ -7,7 +7,7 @@ import * as database from '../database';
 
 import { log } from '../logger';
 
-import { Price } from '../models';
+import { models } from '../models';
 
 const MAX_DECIMALS = 5;
 
@@ -24,7 +24,7 @@ interface Conversion {
 
 async function getAllPrices() {
 
-  let prices = await Price.findAll();
+  let prices = await models.Price.findAll();
 
   prices = prices.reduce(function(acc, price) {
 

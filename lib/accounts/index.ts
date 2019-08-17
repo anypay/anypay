@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-import * as models from '../models';
+import { models } from '../models';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 

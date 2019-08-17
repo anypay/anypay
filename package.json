@@ -16,6 +16,7 @@
   "dependencies": {
     "@google/maps": "^0.5.5",
     "@types/bluebird": "^3.5.20",
+    "@types/sequelize": "^4.28.4",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",
     "anypay-wallet-address-validator": "^0.2.6",
@@ -96,6 +97,7 @@
     "ts-node": "^6.0.5"
   },
   "scripts": {
+    "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
     "dev": "./node_modules/nodemon/bin/nodemon.js ./bin/anypay.ts --api",
