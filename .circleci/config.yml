@@ -14,10 +14,10 @@ jobs:
           command: docker run -i -t -e DATABASE_URL=$DATABASE_URL anypay npm run db:migrate
       - run:
           name: Seed Test Database
-          command: docker run -e -e AMQP_URL=$AMQP_URL DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
+          command: docker run -e -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
       - run:
           name: Running tests
-          command: docker run -e -e AMQP_URL=$AMQP_URL DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
+          command: docker run -e -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
       - run:
           name: Push to Docker Hub
           command: |
