@@ -106,7 +106,7 @@
     "bch:monitor:zeromq": "ts-node plugins/bch/actors/zeromqmonitor.ts",
     "bch:monitor:supervisor": "ts-node plugins/bch/actors/supervisor.ts",
     "ws:server": "ts-node servers/websocket/server.ts",
-    "test": "mocha --require=ts-node/register --timeout=20000 test/integration/roi_test.ts test/lib/payment_processor.ts --exit",
+    "test": "mocha --require=ts-node/register --timeout=20000 test/models/*_test.ts test/integration/roi_test.ts test/lib/payment_processor.ts --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate --url=$DATABASE_URL",

@@ -1,31 +1,25 @@
-import {
-  Account,
-  DashBackMerchant,
-  DashBackMerchantPayment,
-  Invoice
-} from '../../lib/models';
+import { models } from '../../lib';
 
-import * as database from '../../lib/database';
 import * as assert from 'assert';
 import * as Chance from 'chance';
 
 const chance = new Chance();
 
-describe('DashBackMerchantPayment Model', () => {
+describe('CashbackMerchantPayment Model', () => {
 
   it('should require a valid merchant id and transaction hash', async () => {
 
     let email = chance.email();
 
-    let account = await Account.create({
+    let account = await models.Account.create({
       email: email
     });
 
-    let dashBackMerchant = await DashBackMerchant.create({
+    let cashBackMerchant = await models.CashbackMerchant.create({
       account_id: account.id
     });
 
-    let invoice = await Invoice.create({
+    let invoice = await models.Invoice.create({
       currency: 'DASH',
       dollar_amount: 300,
       invoice_currency: 'DASH',
@@ -39,15 +33,16 @@ describe('DashBackMerchantPayment Model', () => {
 
     try {
 
-      let dashBackMerchantPayment = await DashBackMerchantPayment.create({
+      let cashBackMerchantPayment = await models.CashbackMerchantPayment.create({
         amount: 0.1,
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5',
-        dash_back_merchant_id: dashBackMerchant.id,
+        currency: "DASH",
+        cashback_merchant_id: cashBackMerchant.id,
         transaction_hash: '352fdc50a99fbf9a6bff99b9474251a7fb94ad6b8f28fe4ca1de9003a412410a',
         invoice_id: invoice.id
       });
 
-      console.log(dashBackMerchantPayment);
+      console.log(cashBackMerchantPayment);
 
     } catch(error) {
 

@@ -1,9 +1,8 @@
 require('dotenv').config();
 
-import { AmbassadorClaim, Account, Ambassador, DashBackMerchant } from '../../lib/models';
 import * as assert from 'assert';
 import * as Chance from 'chance';
-import {ambassadors, log} from '../../lib';
+import { ambassadors, log, models } from '../../lib';
 
 const chance = new Chance();
 
@@ -14,19 +13,19 @@ describe('AmbassadorClaim Model', () => {
     let ambassadorEmail = chance.email();
     let merchantEmail = chance.email();
 
-    let ambassadorAccount = await Account.create({
+    let ambassadorAccount = await models.Account.create({
       email: ambassadorEmail
     });
 
-    let ambassador = await Ambassador.create({
+    let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await Account.create({
+    let merchantAccount = await models.Account.create({
       email: merchantEmail
     });
 
-    let merchant = await DashBackMerchant.create({
+    let merchant = await models.CashbackMerchant.create({
       account_id: merchantAccount.id
     });
 
@@ -59,19 +58,19 @@ describe('AmbassadorClaim Model', () => {
     let ambassadorEmail = chance.email();
     let merchantEmail = chance.email();
 
-    let ambassadorAccount = await Account.create({
+    let ambassadorAccount = await models.Account.create({
       email: ambassadorEmail
     });
 
-    let ambassador = await Ambassador.create({
+    let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await Account.create({
+    let merchantAccount = await models.Account.create({
       email: merchantEmail
     });
 
-    let merchant = await DashBackMerchant.create({
+    let merchant = await models.CashbackMerchant.create({
       account_id: merchantAccount.id
     });
 
@@ -88,19 +87,19 @@ describe('AmbassadorClaim Model', () => {
     let ambassadorEmail = chance.email();
     let merchantEmail = chance.email();
 
-    let ambassadorAccount = await Account.create({
+    let ambassadorAccount = await models.Account.create({
       email: ambassadorEmail
     });
 
-    let ambassador = await Ambassador.create({
+    let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await Account.create({
+    let merchantAccount = await models.Account.create({
       email: merchantEmail
     });
 
-    let merchant = await DashBackMerchant.create({
+    let merchant = await models.CashbackMerchant.create({
       account_id: merchantAccount.id
     });
 
@@ -108,7 +107,7 @@ describe('AmbassadorClaim Model', () => {
 
     await ambassadors.rejectClaim(claim.id);
 
-    claim = await AmbassadorClaim.findOne({ where: { id: claim.id }});
+    claim = await models.AmbassadorClaim.findOne({ where: { id: claim.id }});
 
     assert.strictEqual(claim.status, 'rejected');
 
@@ -119,19 +118,19 @@ describe('AmbassadorClaim Model', () => {
     let ambassadorEmail = chance.email();
     let merchantEmail = chance.email();
 
-    let ambassadorAccount = await Account.create({
+    let ambassadorAccount = await models.Account.create({
       email: ambassadorEmail
     });
 
-    let ambassador = await Ambassador.create({
+    let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await Account.create({
+    let merchantAccount = await models.Account.create({
       email: merchantEmail
     });
 
-    let merchant = await DashBackMerchant.create({
+    let merchant = await models.CashbackMerchant.create({
       account_id: merchantAccount.id
     });
 
@@ -139,7 +138,7 @@ describe('AmbassadorClaim Model', () => {
 
     await ambassadors.verifyClaim(claim.id);
 
-    claim = await AmbassadorClaim.findOne({ where: { id: claim.id }});
+    claim = await models.AmbassadorClaim.findOne({ where: { id: claim.id }});
 
     assert.strictEqual(claim.status, 'verified');
 
