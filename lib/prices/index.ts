@@ -48,8 +48,6 @@ async function getAllPrices() {
 
   }, {});
 
-  console.log('PRICES', prices);
-
   return prices;
 };
 
@@ -72,7 +70,6 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
   let pair = `${inputAmount.currency}/${outputCurrency}`;
 
   var rate;
-  console.log("PAIR", pair);
 
   if (prices[pair]) {
 
