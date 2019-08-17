@@ -6,9 +6,6 @@ import * as Hapi from "hapi";
 import { log } from '../../lib';
 import { channel, awaitChannel } from '../../lib/amqp';
 
-const AccessToken = require("../../lib/models/access_token");
-const Account = require("../../lib/models/account");
-const Invoice = require("../../lib/models/invoice");
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
@@ -141,7 +138,7 @@ const validatePassword = async function(request, username, password, h) {
     };
 
   } else {
-    var account = await Account.findOne({
+    var account = await models.Account.findOne({
       where: {
         email: username
       }
@@ -155,7 +152,7 @@ const validatePassword = async function(request, username, password, h) {
       }
     }
 
-    var accessToken = await AccessToken.findOne({
+    var accessToken = await models.AccessToken.findOne({
       where: {
         account_id: account.id,
         uid: password
@@ -187,14 +184,14 @@ const validateToken = async function(request, username, password, h) {
     };
   }
 
-  var accessToken = await AccessToken.findOne({
+  var accessToken = await models.AccessToken.findOne({
     where: {
       uid: username
     }
   });
 
   if (accessToken) {
-		var account = await Account.findOne({
+		var account = await models.Account.findOne({
 			where: {
 				id: accessToken.account_id
 			}
@@ -292,7 +289,7 @@ async function Server() {
           invoice_id: Joi.string().required()
         },
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response })
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
   server.route({
@@ -351,9 +348,9 @@ async function Server() {
     options: {
       tags: ['api'],
       validate: {
-        payload: Account.Credentials,
+        payload: models.Account.Credentials,
       },
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
@@ -365,9 +362,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Account.Credentials,
+        payload: models.Account.Credentials,
       },
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
@@ -387,7 +384,7 @@ async function Server() {
     options: {
       auth: "password",
       tags: ['api'],
-      plugins: responsesWithSuccess({ model: AccessToken.Response })
+      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
 
@@ -415,7 +412,7 @@ async function Server() {
         },
         payload: AddressesController.PayoutAddressUpdate
       },
-      plugins: responsesWithSuccess({ model: Account.Response })
+      plugins: responsesWithSuccess({ model: models.Account.Response })
     }
   });
 
@@ -426,7 +423,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
 
@@ -459,9 +456,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
 
