@@ -5,13 +5,7 @@ import * as Database from '../../lib/database';
 
 import { setAddress} from '../../lib/core';
 
-import { deactivateCoin, activateCoin } from '../../lib/coins';
-
-import {
-  settings,
-  models,
-  accounts
-} from "../../lib";
+import { coins, database, settings, models, accounts } from "../../lib";
 
 import * as Chance from 'chance';
 const chance = new Chance();
@@ -67,7 +61,7 @@ describe("Account Coins over HTTP", async () => {
 
     it("coins.deactivateCoin should reflect in the response", async () => {
 
-      await deactivateCoin('DASH');
+      await coins.deactivateCoin('DASH');
 
       let response = await server.inject({
         method: 'GET',
@@ -85,8 +79,8 @@ describe("Account Coins over HTTP", async () => {
 
     it("coins.activateCoin should reflect in the response", async () => {
 
-      await deactivateCoin('DASH');
-      await activateCoin('DASH');
+      await coins.deactivateCoin('DASH');
+      await coins.activateCoin('DASH');
 
       let response = await server.inject({
         method: 'GET',

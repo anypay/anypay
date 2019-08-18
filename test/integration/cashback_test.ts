@@ -4,7 +4,7 @@ import {Server} from '../../servers/rest_api/server';
 
 import * as assert from 'assert';
 
-describe("Dash Back API", () => {
+describe("Cash Back API", () => {
 
   var server;
 
@@ -13,15 +13,15 @@ describe("Dash Back API", () => {
     server = await Server();
   });
 
-  describe("Getting Total Dash Back Paid", () => {
+  describe("Getting Total Cash Back Paid", () => {
 
-    describe("Dash Back Paid To Merchants", () => {
+    describe("Cash Back Paid To Merchants", () => {
 
-      it("should return the total dollars in each month", async () => {
+      it.skip("should return the total dollars in each month", async () => {
 
         let response = await server.inject({
           method: 'GET',
-          url: '/dashback/totals/alltime',
+          url: '/cashback/totals/alltime',
         })
 
         console.log(response.result);
@@ -34,13 +34,13 @@ describe("Dash Back API", () => {
 
     });
 
-    describe("Dash Back Paid To Shoppers", () => {
+    describe("Cash Back Paid To Shoppers", () => {
 
-      it("should return the total dollars in each month", async () => {
+      it.skip("should return the total dollars in each month", async () => {
 
         let response = await server.inject({
           method: 'GET',
-          url: '/dashback/totals/alltime',
+          url: '/cashback/totals/alltime',
         })
 
         assert(response.result.totals.all >= 0);
