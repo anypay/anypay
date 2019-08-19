@@ -53,7 +53,7 @@ describe("Creating Invoices", () => {
     await setAddress({
       account_id: account.id,
       currency: "XRP",
-      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+      address: "r3kmLJN5D28dHuH8vZNUZpMC43pEHpaocV"
     });
 
     var amount = {

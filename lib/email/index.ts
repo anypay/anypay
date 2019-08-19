@@ -60,7 +60,7 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
 
   let template = templates['first_invoice_created'];
 
-  let invoice = await models.Ivoice.findOne({where:{id:invoiceId}})
+  let invoice = await models.Invoice.findOne({where:{id:invoiceId}})
   let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});

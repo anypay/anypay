@@ -37,7 +37,7 @@ describe('CashbackMerchantPayment Model', () => {
         amount: 0.1,
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5',
         currency: "DASH",
-        cashback_merchant_id: cashBackMerchant.id,
+        dashback_merchant_id: cashBackMerchant.id,
         transaction_hash: '352fdc50a99fbf9a6bff99b9474251a7fb94ad6b8f28fe4ca1de9003a412410a',
         invoice_id: invoice.id
       });

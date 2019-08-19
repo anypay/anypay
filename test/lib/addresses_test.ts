@@ -1,9 +1,6 @@
 require('dotenv').config();
 
-import {
-  Account,
-  Address
-} from '../../lib/models';
+import { models } from '../../lib';
 
 import {addresses} from '../../lib';
 import {registerAccount} from '../../lib/accounts';
@@ -22,7 +19,7 @@ describe('Addresses Library', () => {
 
     let currency = 'DASH'
 
-    let address = await Address.create({
+    let address = await models.Address.create({
       account_id: account.id,
       value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
       currency
@@ -33,13 +30,13 @@ describe('Addresses Library', () => {
 
     await addresses.lockAddress(account.id, currency);
 
-    address = await Address.findOne({ where: { id: address.id }});
+    address = await models.Address.findOne({ where: { id: address.id }});
 
     assert(address.locked);
 
     await addresses.unlockAddress(account.id, currency);
 
-    address = await Address.findOne({ where: { id: address.id }});
+    address = await models.Address.findOne({ where: { id: address.id }});
 
     assert(!address.locked);
 
