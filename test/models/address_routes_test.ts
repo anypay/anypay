@@ -3,10 +3,18 @@ import { models } from '../../lib';
 import * as moment from 'moment';
 import * as assert from 'assert';
 
+import * as bch from 'bitcore-lib-cash';
+import * as dash from 'bitcore-lib-dash';
+
+var keys = {
+  BCH: new bch.PrivateKey(),
+  DASH: new dash.PrivateKey()
+}
+
 describe('Address Routes model', () => {
 
-  var bchAddress = 'bitcoincash:qrzta75m5zp7x66ghfmnua7sf7vkkz5gqcznkdmqnw';
-  var dashAddress = 'XhRQfmFYBKRGzPb8cP1opzZmotZCVQVRbf';
+  var bchAddress = keys['BCH'].toAddress().toString();
+  var dashAddress = keys['DASH'].toAddress().toString();
 
   it("should accept input and output", async () => {
 
@@ -133,6 +141,33 @@ describe('Address Routes model', () => {
       console.error(error.message);
 
     }
+
+  });
+
+  describe("Static Address Routes", () => {
+
+    it("should allow static to be true, default to false", async() => {
+
+      let dashAddr1 = new dash.PrivateKey().toAddress().toString();
+      let dashAddr2 = new dash.PrivateKey().toAddress().toString();
+
+      let addressRoute = await models.AddressRoute.create({
+
+        input_currency: 'DASH',
+
+        input_address: dashAddr1,
+
+        output_currency: 'DASH',
+
+        output_address: dashAddr2,
+
+        is_static: true
+
+      });
+
+      assert(addressRoute.is_static);
+
+    });
 
   });
   
