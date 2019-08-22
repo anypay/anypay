@@ -7,7 +7,7 @@ import * as database from '../database';
 
 import { log } from '../logger';
 
-import { Price } from '../models';
+import { models } from '../models';
 
 const MAX_DECIMALS = 5;
 
@@ -24,7 +24,7 @@ interface Conversion {
 
 async function getAllPrices() {
 
-  let prices = await Price.findAll();
+  let prices = await models.Price.findAll();
 
   prices = prices.reduce(function(acc, price) {
 
@@ -78,6 +78,10 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 
   } else {
 
+    if (inputAmount.currency === 'BTC') {
+      prices[`BTC/BTC`] = 1;
+    }
+
     rate = prices[`${outputCurrency}/BTC`] / prices[`${inputAmount.currency}/BTC`];
     log.info(`using BTC to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
 
@@ -91,6 +95,43 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
     value: parseFloat(targetAmount.toFixed(MAX_DECIMALS))
   };
 };
+
+export async function setPrice(currency, value, base_currency = "BTC") {
+
+  log.info("set price", currency, value, base_currency);
+
+  let [price, isNew] = await models.Price.findOrCreate({
+
+    where: {
+
+      currency,
+
+      base_currency
+
+    },
+
+    defaults: {
+
+      currency,
+
+      value,
+
+      base_currency
+
+    }
+  });
+
+  if (!isNew) {
+
+    price.value = value;
+
+    await price.save();
+
+  }
+
+  return price;
+
+}
 
 export {
   convert, createConversion,

@@ -6,7 +6,7 @@ require('dotenv').config()
 
 import * as database from './database';
 
-import * as models from './models';
+import { models } from './models';
 
 import {sendEmail} from './email';
 

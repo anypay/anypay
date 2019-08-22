@@ -1,4 +1,4 @@
-import {Account, Address} from '../models';
+import {models} from '../models';
 
 import { getCoins } from '../coins';
 import {
@@ -8,7 +8,7 @@ import {
 
 export async function getSupportedCoins(accountId: number): Promise<any> {
 
-  let addresses = await Address.findAll({
+  let addresses = await models.Address.findAll({
 
     where: { account_id: accountId  }
 

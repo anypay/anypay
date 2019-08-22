@@ -2,7 +2,7 @@
 import { hash } from './accounts';
 import { bcryptCompare } from './account_login';
 
-import * as models from './models';
+import { models } from './models';
 
 import { v4 } from 'uuid';
 

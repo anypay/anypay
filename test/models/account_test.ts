@@ -1,10 +1,12 @@
 require("dotenv").config();
 
-const Account = require('../../lib/models/account');
-const database = require('../../lib/database');
+import { models } from '../../lib';
+
 const assert = require('assert');
 const Chance = require('chance');
 const chance = new Chance();
+
+const Account = models.Account;
 
 describe('Account Model', () => {
 

@@ -3,21 +3,20 @@ require('dotenv').config();
 import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 
-const Database = require("../../lib/database");
-
 import * as Chance from 'chance';
 const chance = new Chance();
 
 import { v4 } from 'uuid';
 
 import { hash } from '../../lib/password';
+import { database } from '../../lib';
 
 describe("Ambassadors API with Sudo Password", async () => {
 
   var server;
   
   before(async () => {
-    await Database.sync();
+    await database.sync();
     server = await Server();
   });
 

@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 import * as assert from 'assert';
-import {models} from '../../lib';
+import {models, prices} from '../../lib';
 import {accounts} from '../../lib';
 import {setAddress} from '../../lib/core';
 import {generateInvoice} from '../../lib/invoice';
@@ -11,6 +11,12 @@ import * as Chance from 'chance';
 const chance = new Chance();
 
 describe("Payment Handler", () => {
+
+  before(async () => {
+
+    await prices.setPrice('DASH', 100, 'USD');
+
+  });
 
   describe("Correct Payment", () => {
 

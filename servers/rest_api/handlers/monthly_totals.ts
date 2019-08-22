@@ -1,4 +1,4 @@
-import * as database from '../../../lib/database';
+import { database } from '../../../lib';
 import * as logger from 'winston';
 import {globalTotalsForCurrency} from '../../../lib/totals/monthly';
 import {monthly} from '../../../lib/totals';

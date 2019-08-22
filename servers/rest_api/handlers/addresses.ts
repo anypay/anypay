@@ -1,5 +1,5 @@
 const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
-const Account = require("../../../lib/models/account");
+
 const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
@@ -12,7 +12,7 @@ module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let account = await Account.find({ where: { id: accountId }})
+  let account = await models.Account.find({ where: { id: accountId }})
 
   let addresses = {
 

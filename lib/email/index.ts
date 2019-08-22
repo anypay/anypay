@@ -1,7 +1,7 @@
 require('dotenv').config()
 import * as requireAll from  'require-all';
 import * as AWS from 'aws-sdk';
-import {Account, Invoice} from '../models';
+import {models} from '../models';
 import {emitter} from '../events'
 import * as database from '../database';
 const log = require("winston");
@@ -60,8 +60,8 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
 
   let template = templates['first_invoice_created'];
 
-  let invoice = await Invoice.findOne({where:{id:invoiceId}})
-  let account = await Account.findOne({ where: {
+  let invoice = await models.Invoice.findOne({where:{id:invoiceId}})
+  let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});
 
@@ -73,11 +73,11 @@ export async function unpaidInvoiceEmail(invoiceId) {
 
   let template = templates['unpaid_invoice'];
 
-  let invoice = await Invoice.findOne({ where: {
+  let invoice = await models.Invoice.findOne({ where: {
     id: invoiceId
   }});
 
-  let account = await Account.findOne({ where: {
+  let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});
 
@@ -98,7 +98,7 @@ export async function addressChangedEmail(changeset) {
   body = body.replace("ADDRESS", changeset.address)
   body = body.replace("CURRENCY", changeset.currency)
 
-  let account = await Account.findOne({ where: {
+  let account = await models.Account.findOne({ where: {
     id: changeset.account_id
   }});
 
@@ -111,7 +111,7 @@ export async function invoicePaidEmail(invoice){
   
   let template = templates['invoice_paid'];
 
-  let account = await Account.findOne({ where: {
+  let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});
 
@@ -129,7 +129,7 @@ export async function firstInvoicePaidEmail(invoice){
 
   let template = templates["first_paid_invoice"]
 
-  let account = await Account.findOne({ where: {
+  let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});
 

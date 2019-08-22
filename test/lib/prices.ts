@@ -1,12 +1,21 @@
 require('dotenv').config();
 
 import * as assert from 'assert';
-import {prices} from '../../lib';
+import { prices } from '../../lib';
 
 
 describe('Prices', () => {
 
+  it('#setPrice should set a price in the database', async () => {
+
+    await prices.setPrice('USD', 0.0001, 'BTC');
+
+  });
+
   it("#createConversion should convert from VEF to DASH", async () => {
+
+    await prices.setPrice('DASH', 0.01, 'BTC');
+    await prices.setPrice('VEF', 0.0001, 'DASH');
 
     let input = {
       currency: 'VEF',
@@ -23,6 +32,8 @@ describe('Prices', () => {
 
   it("#convert should convert from BTC to BCH", async () => {
 
+    await prices.setPrice('BCH', 10, 'BTC');
+
     let input = {
       currency: 'BTC',
       value: 0.05
@@ -38,6 +49,8 @@ describe('Prices', () => {
 
   it("#convert should convert from USD to XRP", async () => {
 
+    await prices.setPrice('XRP', 0.3, 'BTC');
+
     let input = {
       currency: 'USD',
       value: 12
@@ -51,7 +64,9 @@ describe('Prices', () => {
 
   });
   
-    it("#convert should convert from USD to ZEN", async () => {
+  it("#convert should convert from USD to ZEN", async () => {
+
+    await prices.setPrice('ZEN', 0.01, 'BTC');
 
     let input = {
       currency: 'USD',

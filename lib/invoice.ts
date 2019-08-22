@@ -22,7 +22,7 @@ import * as bch from '../plugins/bch';
 
 import * as xrp from '../plugins/xrp';
 
-import * as models from './models';
+import { models } from './models';
 
 import {convert} from './prices';
 

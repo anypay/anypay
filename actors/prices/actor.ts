@@ -6,48 +6,12 @@ import { log, models } from '../../lib';
 
 import { getVESPrice } from '../../lib/prices/localbitcoins';
 import { getPriceOfOneDASHInVES } from '../../lib/prices/ves';
-import { getAllPrices } from '../../lib/prices';
+import { getAllPrices, setPrice } from '../../lib/prices';
 
 import * as http from 'superagent';
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
-async function setPrice(currency, value, base_currency = "BTC") {
-
-  log.info("set price", currency, value, base_currency);
-
-  let [price, isNew] = await models.Price.findOrCreate({
-
-    where: {
-
-      currency,
-
-      base_currency
-
-    },
-
-    defaults: {
-
-      currency,
-
-      value,
-
-      base_currency
-
-    }
-  });
-
-  if (!isNew) {
-
-    price.value = value;
-
-    await price.save();
-
-  }
-
-  return price
-
-}
 
 async function setPriceChuncks(currency, value, callback) {
 

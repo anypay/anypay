@@ -16,7 +16,7 @@ describe("Merchants REST API", async () => {
 
   });
 
-  it("GET /address_routes/:currecy/:address should get the route", async () => {
+  it.skip("GET /address_routes/:currecy/:address should get the route", async () => {
 
     var bchAddress = 'bitcoincash:qrzta75m5zp7x66ghfmnua7sf7vkkz5gqcznkdmqnw';
     var dashAddress = 'XhRQfmFYBKRGzPb8cP1opzZmotZCVQVRbf';

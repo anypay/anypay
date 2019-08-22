@@ -1,5 +1,5 @@
 
-import * as models from './models';
+import { models } from './models';
 
 export async function lockAddress(accountId: number, currency: string) {
 

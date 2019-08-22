@@ -1,6 +1,8 @@
 const bcrypt = require('bcrypt');
 const Account = require('./models/account');
-const PasswordReset = require('./models/password_resets');
+
+import { models } from './models';
+
 const uuid = require('uuid');
 const aws = require('aws-sdk');
 const log = require('winston');
@@ -97,7 +99,7 @@ function sendPasswordResetEmail(email) {
 
 function createPasswordReset(email) {
 
-  return PasswordReset.create({ email })
+  return models.PasswordReset.create({ email })
 }
 
 module.exports.resetPasswordById = resetPassword;

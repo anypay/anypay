@@ -1,6 +1,7 @@
-const Invoice = require('../../../lib/models/invoice');
-const sequelize = require('../../../lib/database');
 const Joi = require('joi');
+
+import { database, models } from '../../../lib';
+var InvoiceResponse = require('../../../lib/models/invoice').Response;
 
 module.exports.index = function(request, reply) {
   let accountId = 14;
@@ -9,11 +10,11 @@ module.exports.index = function(request, reply) {
   let currentMonth = currentDate.getMonth() + 1;
   let currentDay = currentDate.getDate() + 1;
   let targetDate = currentYear + '-' + currentMonth + '-' + currentDay + 'T00:00:00.0Z';
-  sequelize.query(`select*
+  database.query(`select*
                         from invoices
                         where "createdAt">'` + targetDate + `'
                         `, {
-      type: sequelize.QueryTypes.SELECT
+      type: database.QueryTypes.SELECT
     })
     .then(invoices => {
       reply({
@@ -29,6 +30,6 @@ module.exports.index = function(request, reply) {
 }
 
 module.exports.IndexResponse = Joi.object({
-    invoices: Joi.array().items(Invoice.Response).required().label('Invoices'),
+    invoices: Joi.array().items(InvoiceResponse).required().label('Invoices'),
     targetDate: Joi.date(),
 }).label('InvoiceIndexResponse');
