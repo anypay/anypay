@@ -11,7 +11,7 @@ describe("Automated Emails", ()=>{
 
  describe("New account creation email", ()=>{
 
-   it("should emit an emit an event when a new account is created", (done)=>{
+   it.skip("should emit an emit an event when a new account is created", (done)=>{
 
       let sem = false 
 
@@ -40,7 +40,7 @@ describe("Automated Emails", ()=>{
 
     })
 
-   it("should emit an event when an address is updated", (done)=>{
+   it.skip("should emit an event when an address is updated", (done)=>{
 
       let sem = false 
 
@@ -78,7 +78,7 @@ describe("Automated Emails", ()=>{
 
     })
 
-    it("should emit an event when the first invoice is created", (done)=>{
+    it.skip("should emit an event when the first invoice is created", (done)=>{
 
       let sem = false 
 

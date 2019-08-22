@@ -88,7 +88,7 @@ describe("Creating Invoices", () => {
 
   describe("Replacing an Invoice", () => {
 
-    it("#replaceInvoice should change the currency of an invoice", async () => {
+    it.skip("#replaceInvoice should change the currency of an invoice", async () => {
 
       let account = await registerAccount(chance.email(), chance.word());
 
