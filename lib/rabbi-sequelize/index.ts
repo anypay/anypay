@@ -62,7 +62,7 @@ export function bindHook(model, hookName, exchange) {
 
     let channel = await awaitChannel();
 
-    let event = `models.${name}.#{hookName}`;
+    let event = `models.${name}.${hookName}`;
 
     let data = instance.toJSON()
 
