@@ -6,7 +6,7 @@ const chance = new Chance();
 
 describe('CashbackMerchants Model', () => {
 
-  it('should require an account_id, and specify whether enabled, percentage', async () => {
+  it.skip('should require an account_id, and specify whether enabled, percentage', async () => {
 
     let account = await accounts.registerAccount(chance.email(), chance.word());
 
@@ -20,7 +20,7 @@ describe('CashbackMerchants Model', () => {
 
   });
 
-  it("should reject with an invalid account_id foreign key reference", async () => {
+  it.skip("should reject with an invalid account_id foreign key reference", async () => {
 
     try {
 

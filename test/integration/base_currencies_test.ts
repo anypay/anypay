@@ -14,8 +14,8 @@ describe("Creating Bitcoin Cash Invoices Via REST", async () => {
     await database.sync();
     server = await Server();
   });
-
-  it("GET /base_currencies should return a list of base currencies", async () => {
+        //deprecated
+  it.skip("GET /base_currencies should return a list of base currencies", async () => {
 
     let response = await server.inject({
       method: 'GET',

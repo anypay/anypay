@@ -22,7 +22,7 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'VEF',
+      currency: 'USD',
       value: 15000000
     };
 
@@ -57,15 +57,14 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'GBP',
+      currency: 'USD',
       value: 15
     };
 
     await setDenomination({
       account_id: account.id,
       currency: amount.currency
-    });
-
+    })
     let invoice = await generateInvoice(account.id, amount.value, 'XRP');
 
     console.log('invoice', invoice.toJSON());
