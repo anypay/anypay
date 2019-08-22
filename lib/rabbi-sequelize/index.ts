@@ -7,6 +7,7 @@ import * as amqp from 'amqplib';
 
 const hookNames = [
 
+/*
   'beforeBulkCreate',
   'beforeBulkDestroy',
   'beforeBulkUpdate',
@@ -24,13 +25,17 @@ const hookNames = [
   'destroy',
   'update',
 
+*/
   'afterCreate',
   'afterUpdate',
   'afterDestroy',
+  /*
+
 
   'afterBulkCreate',
   'afterBulkDestroy',
   'afterBulkUpdate'
+  */
 
 ]
 
@@ -56,13 +61,20 @@ export function bindModelHooks(model, exchange) {
 
 export function bindHook(model, hookName, exchange) {
 
-  var name = model.options.name.singular;
+  var name = model.options.name.singular
+    .split('_')
+    .map(capitalizeFirstLetter)
+    .join('');
 
-  model.addHook('afterCreate', async (instance) => {
+  console.log("NAME", name);
+
+  model.addHook(hookName, async (instance) => {
 
     let channel = await awaitChannel();
 
     let event = `models.${name}.${hookName}`;
+
+    console.log('EVENT', event);
 
     let data = instance.toJSON()
 
@@ -74,4 +86,7 @@ export function bindHook(model, hookName, exchange) {
 
 }
 
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
