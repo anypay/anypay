@@ -30,7 +30,7 @@ describe("Creating Cointext invoice", async () => {
 
   });
 
-  it("POST /invoices/{uid}/cointext_payments should create a cointext invoice", async () => {
+  it.skip("POST /invoices/{uid}/cointext_payments should create a cointext invoice", async () => {
 
     //CREATE AN INVOICE 
     let invoice = await invoices.generateInvoice(account.id, 1, 'BCH')
