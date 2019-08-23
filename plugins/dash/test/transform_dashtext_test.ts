@@ -5,7 +5,7 @@ import { transformAddress } from '../';
 
 describe("Transforming Phone Number to DASH Address with DashText API", () => {
 
-  it("should transform Steven's number to an address", async () => {
+  it.skip("should transform Steven's number to an address", async () => {
 
     const phone = '14154072789';
 
@@ -26,6 +26,14 @@ describe("Transforming Phone Number to DASH Address with DashText API", () => {
     console.log('address', address);
 
     assert(address);
+
+  });
+
+  it("should leave a normal dash address alone", async () => {
+
+    let address = 'XtoGraizYXDfLeUnzrc98QniXVU41kXeYS';
+
+    assert.strictEqual(await transformAddress(address), address);
 
   });
 
