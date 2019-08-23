@@ -12,6 +12,10 @@ import {statsd} from '../../lib/stats/statsd'
 
 var WAValidator = require('anypay-wallet-address-validator');
 
+import * as http from 'superagent';
+
+import { lookupHandle } from './lib/handcash';
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -69,6 +73,30 @@ const name = 'Bitcoin Satoshi Vision';
 const currency = 'BSV';
 
 const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
+
+export async function transformAddress(address: string): Promise<string> {
+
+  if (address.match(/^\$/)) {
+
+    let receiveAddress = await lookupHandle(address);
+
+    if (receiveAddress) {
+
+      return receiveAddress;
+
+    } else {
+
+      throw new Error(`handcash handle ${address} not found`);
+
+    }
+
+  } else {
+
+    return address;
+
+  }
+
+}
 
 export {
 
