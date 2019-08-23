@@ -4,6 +4,7 @@ import {ConfigureOracles} from './oracles'
 
 import {configureOracles} from '../config/oracles';
 
+import * as events from './events';
 import * as accounts from './accounts';
 import * as invoices from './invoice';
 import * as forwards from './forwards';
@@ -35,6 +36,7 @@ var oracles = ConfigureOracles(configureOracles);
 })();
 
 export {
+  events,
   oracles,
   cashback,
   models,

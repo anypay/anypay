@@ -52,6 +52,12 @@ class Plugins {
 
   }
 
+  getRPC(currency) {
+
+    return this.plugins[currency].rpc;
+
+  }
+
   async getNewAddress(currency: string, accountId: number) {
 
     let address = await models.Address.findOne({ where: {
