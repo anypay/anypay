@@ -2,7 +2,6 @@ require('dotenv').config();
 import amqp = require("amqplib");
 var Blockcypher = require("../../../lib/blockcypher");
 var Invoice = require("../../../lib/models/invoice");
-var Dashcore = require("../../../lib/dashcore");
 var Slack = require("../../../lib/slack/notifier");
 
 import { BigNumber } from "bignumber.js"
