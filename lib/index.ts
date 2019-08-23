@@ -5,6 +5,7 @@ import {ConfigureOracles} from './oracles'
 import {configureOracles} from '../config/oracles';
 
 import * as amqp from './amqp';
+import * as events from './events';
 import * as accounts from './accounts';
 import * as login from './account_login';
 import * as invoices from './invoice';
@@ -38,6 +39,7 @@ var oracles = ConfigureOracles(configureOracles);
 })();
 
 export {
+  events,
   oracles,
   amqp,
   cashback,
