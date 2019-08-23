@@ -47,6 +47,12 @@ export async function setAddress(changeset: AddressChangeSet) {
 
     }
 
+    if (plugin.transformAddress) {
+
+      changeset.address = await plugin.transformAddress(changeset.address);
+
+    }
+
   } catch(error) {
 
     console.error(error)
