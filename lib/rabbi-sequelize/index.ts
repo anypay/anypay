@@ -66,8 +66,6 @@ export function bindHook(model, hookName, exchange) {
     .map(capitalizeFirstLetter)
     .join('');
 
-  console.log("NAME", name);
-
   model.addHook(hookName, async (instance) => {
 
     let channel = await awaitChannel();

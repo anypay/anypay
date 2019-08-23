@@ -10,7 +10,7 @@ export async function generateCode(address: string, amount: number, uid?: string
   let requestData = {
     token: process.env.DASHTEXT_TOKEN,
     address,
-    amount: amount.toString(),
+    amount: (amount * 100000000).toString(), // convert to satoshis
     note: "Invoice 4434"
   };
 
