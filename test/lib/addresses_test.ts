@@ -42,6 +42,46 @@ describe('Addresses Library', () => {
 
   });
 
+  describe("Setting An Address", () => {
+
+    it('should convert a dashtext phone number to an address', async () => {
+
+      let account = await registerAccount(chance.email(), chance.word());
+
+      let address = await addresses.setAddress({
+        account_id: account.id,
+        currency: 'DASH',
+        address: '+14154072789'
+      });
+
+      assert(address.match(/^X/)); // starts with X
+
+    });
+
+  });
+
+  it('should fail to set an invalid address phone number', async () => {
+
+    let account = await registerAccount(chance.email(), chance.word());
+
+    try {
+
+      let address = await addresses.setAddress({
+        account_id: account.id,
+        currency: 'DASH',
+        address: '+14154072'
+      });
+
+      assert(false);
+
+    } catch(error) {
+
+      assert(error);
+
+    }
+
+  });
+
 });
 
 

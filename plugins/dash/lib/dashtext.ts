@@ -24,6 +24,10 @@ export async function generateCode(address: string, amount: number, uid?: string
 
 export async function lookupAddressFromPhoneNumber(phone: string) {
 
+  if (phone.match(/^\+/)) {
+    phone = phone.substring(1);
+  }
+
   let requestData = {
     token: process.env.DASHTEXT_TOKEN,
     phone
