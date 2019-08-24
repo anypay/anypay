@@ -5,15 +5,13 @@ import { transformAddress } from '../';
 
 describe("Transforming Phone Number to DASH Address with DashText API", () => {
 
-  it.skip("should transform Steven's number to an address", async () => {
+  it("should transform Steven's number to an address", async () => {
 
     const phone = '14154072789';
 
     let address = await transformAddress(phone);
 
-    console.log('address', address);
-
-    assert(address);
+    assert.strictEqual(address, 'XvdKv8yF9KJy1VqVUZ4docMGN37kXBsKJV');
 
   });
 
