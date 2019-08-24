@@ -1,7 +1,6 @@
 
 require('dotenv').config();
 
-
 import {generateInvoice} from '../../lib/invoice';
 
 import * as chainSoAPI from '../../lib/chainSoAPI';
@@ -24,7 +23,17 @@ var WAValidator = require('anypay-wallet-address-validator');
 
 import { lookupAddressFromPhoneNumber } from './lib/dashtext';
 
+function isPhone(phone: string) {
+  const isPhoneRegexp = /\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/
+
+  return phone.match(isPhoneRegexp);
+}
+
 export function validateAddress(address: string){
+
+  if (isPhone(address)) {
+    return true;
+  }
 
   let valid = WAValidator.validate( address, 'DASH')
 
@@ -141,9 +150,7 @@ async function checkAddressForPayments(address:string, currency:string){
 
 export async function transformAddress(address: string): Promise<string> {
 
-  let isPhone = /(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/
-
-  if (address.match(isPhone)) {
+  if (isPhone(address)) {
 
     // is a phone number, attempt dash text transformation
     console.log('IS PHONE NUMBER', address);

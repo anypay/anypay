@@ -1,6 +1,10 @@
 
 import { models } from './models';
 
+import { setAddress } from './core';
+
+export { setAddress }
+
 export async function lockAddress(accountId: number, currency: string) {
 
   let address = await models.Address.findOne({ where: {
