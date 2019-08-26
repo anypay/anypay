@@ -6,7 +6,7 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
-import { createAddressRoute } from '../actors/address_routes/actor';
+import { createAddressRoute } from './routes';
 
 import * as database from './database';
 
