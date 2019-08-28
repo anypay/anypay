@@ -72,7 +72,7 @@ describe("Returning routes", async ()=>{
 
 describe("Creating Invoices", () => {
 
-  it.skip("#generateInvoice should create a new BTC invoice and return proper route with HDkey", async () => {
+  it("#generateInvoice should create a new BTC invoice and return proper route with HDkey", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
@@ -111,7 +111,7 @@ describe("Creating Invoices", () => {
   });
 
 
-  it.skip("#generateInvoice should create a new DASH invoice and not return a route with HDkey", async () => {
+  it("#generateInvoice should create a new DASH invoice and not return a route with HDkey", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
