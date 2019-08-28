@@ -1,3 +1,5 @@
+//Require bitcore-lib before bitcore-lib-cash to resolve conflicts`
+require('bitcore-lib');
 require("dotenv").config();
 
 import configurePlugins from "../config/plugins";
