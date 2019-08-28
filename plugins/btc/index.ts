@@ -8,7 +8,7 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
-import {HDKeyAddresses} from '../../lib/models';
+import {models} from '../../lib/models';
 
 import {rpc} from './jsonrpc';
 
@@ -26,7 +26,7 @@ export function validateAddress(address: string){
 export async function getNewAddress(deprecatedParam){
 
   //Create a new HDKeyAddress 
-  let record = await HDKeyAddresses.create({
+  let record = await models.Hdkeyaddresses.create({
 
     currency:'BTC',
 
@@ -46,7 +46,7 @@ export async function getNewAddress(deprecatedParam){
 
 function deriveAddress(xkey, nonce){
 
-  let address = btc.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+  let address = new btc.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
 
   return address 
 

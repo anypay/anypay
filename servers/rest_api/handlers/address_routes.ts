@@ -47,7 +47,7 @@ export async function show(req, h) {
     expires: addressRoute.expires
   }
 
-  let hdKey = await models.HDKeyAddresses.findOne({where:{
+  let hdKey = await models.Hdkeyaddresses.findOne({where:{
      address:input_address,
      currency:input_currency
   }})
