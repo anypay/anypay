@@ -1,5 +1,5 @@
 
-import * as models from '../models';
+import { models }  from '../index';
 import { log } from '../logger';
 
 export interface AccountRoute {
