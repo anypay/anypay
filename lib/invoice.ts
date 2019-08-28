@@ -1,3 +1,4 @@
+import {plugins} from './plugins';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
@@ -26,7 +27,6 @@ import { models } from './models';
 
 import {convert} from './prices';
 
-import {plugins} from './plugins';
 
 import { computeInvoiceURI } from './uri';
 
