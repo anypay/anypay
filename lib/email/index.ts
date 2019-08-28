@@ -5,11 +5,13 @@ import {models} from '../models';
 import {emitter} from '../events'
 import * as database from '../database';
 const log = require("winston");
+const moment = require('moment');
 AWS.config.update({ region: "us-east-1" });
 
 const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
 
 const templates = requireAll(`${__dirname}/templates`);
+
 
 export async function sendEmail(recipient, subject, body) {
   var params = {
@@ -107,20 +109,42 @@ export async function addressChangedEmail(changeset) {
 }
 
 
-export async function invoicePaidEmail(invoice){
-  
-  let template = templates['invoice_paid'];
+export async function invoicePaidEmail(invoice){  
 
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
+  const account = await  models.Account.findOne({ where: {id:invoice.account_id}})
 
-  let body = template.body
-  body = body.replace("UID", invoice.uid)
-  body = body.replace("TIMEPAID", invoice.updatedAt)
-  body = body.replace("CURRENCYAMOUNT", invoice.amount)
-  body = body.replace("CURRENCY", invoice.currency)
-  return sendEmail(account.email, template.subject, body);
+  const template = {
+   
+    uid: invoice.uid,
+    currency: invoice.currency,
+    amount_paid: invoice.invoice_amount_paid.toString(),
+    denomination_amount_paid: invoice.denomination_amount_paid,
+    denomination: invoice.denomination_currency,
+    paidAt : moment(invoice.paidAt).toString()
+
+  }
+
+  const params = {
+    Destination: { /* required */
+        ToAddresses: [account.email]
+    },
+    Source: 'derrick@anypay.global', /* required */
+    Template: 'Anypay_paid', /* required */
+    TemplateData: JSON.stringify(template), /* required */
+    Tags: [
+      {
+        Name: 'Anypay_Receipt', /* required */
+        Value: 'receipt' /* required */
+      }
+    ],
+    ReplyToAddresses: [
+      'support@anypayapp.com',
+    ],
+  };
+
+  log.info('email.sent', account.email, "receipt") 
+
+  return new AWS.SES({apiVersion: '2010-12-01'}).sendTemplatedEmail(params).promise()
 
 }
 
