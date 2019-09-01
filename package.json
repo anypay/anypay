@@ -16,6 +16,7 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
+    "@moneybutton/paymail-client": "^0.24.3",
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",
@@ -48,6 +49,7 @@
     "eventemitter2": "^5.0.1",
     "figlet": "^1.2.0",
     "flipit": "^2.0.3",
+    "got": "^9.6.0",
     "handlebars": "^4.1.0",
     "hapi": "^18.1.0",
     "hapi-auth-basic": "^5.0.0",
