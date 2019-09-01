@@ -16,7 +16,6 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
-    "@moneybutton/paymail-client": "^0.24.3",
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",
