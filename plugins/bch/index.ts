@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+import { lookupAddressFromPhoneNumber } from './lib/cointext';
+
 import { rpc } from './lib/jsonrpc';
 
 import * as http from 'superagent';
@@ -204,6 +206,31 @@ export async function getNewAddress(record: I_Address) {
 
 }
 
+export async function transformAddress(address: string): Promise<string> {
+
+  if (isPhone(address) || isPhone(`+${address}`)) {
+
+    // is a phone number, attempt dash text transformation
+    console.log('IS PHONE NUMBER', address);
+
+    let addr = await lookupAddressFromPhoneNumber(address);
+
+    if (addr) {
+
+      return bchaddr.toCashAddress(addr);
+
+    } else {
+
+      throw new Error(`failed to look up BCH address by phone ${address}`);
+
+    }
+
+  }
+
+  return address;
+
+}
+
 const currency = 'BCH';
 
 const poll = true;
@@ -227,3 +254,9 @@ export {
   poll
 
 };
+
+function isPhone(phone: string) {
+  const isPhoneRegexp = /\+(9[976]\d|8[987530]\d|6[987]\d|5[90]\d|42\d|3[875]\d|2[98654321]\d|9[8543210]|8[6421]|6[6543210]|5[87654321]|4[987654310]|3[9643210]|2[70]|7|1)\d{1,14}$/
+
+  return phone.match(isPhoneRegexp);
+}
