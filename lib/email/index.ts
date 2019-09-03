@@ -7,6 +7,7 @@ import * as database from '../database';
 const log = require("winston");
 const moment = require('moment');
 AWS.config.update({ region: "us-east-1" });
+require('./createTemplate')
 
 const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
 
@@ -128,7 +129,7 @@ export async function invoicePaidEmail(invoice){
     Destination: { /* required */
         ToAddresses: [account.email]
     },
-    Source: 'derrick@anypay.global', /* required */
+    Source: 'receipts@anypayapp.com', /* required */
     Template: 'Anypay_paid', /* required */
     TemplateData: JSON.stringify(template), /* required */
     Tags: [
