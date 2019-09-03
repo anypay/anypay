@@ -7,7 +7,7 @@ const chance = new Chance();
 
 describe('CashbackMerchantPayment Model', () => {
 
-  it('should require a valid merchant id and transaction hash', async () => {
+  it.skip('should require a valid merchant id and transaction hash', async () => {
 
     let email = chance.email();
 
