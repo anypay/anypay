@@ -30,11 +30,11 @@ export async function getNewAddress(deprecatedParam){
 
     currency:'BTC',
 
-    xpub_key:process.env.BTC_XPUB_KEY
+    xpub_key:process.env.BTC_HD_PUBLIC_KEY
 
   })
 
-  record.address = deriveAddress(process.env.BTC_XPUB_KEY, record.id)
+  record.address = deriveAddress(process.env.BTC_HD_PUBLIC_KEY, record.id)
 
   await record.save()
 
