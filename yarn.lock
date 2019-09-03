@@ -31,73 +31,9 @@
   version "3.5.26"
   resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.26.tgz#a38c438ae84fa02431d6892edf86e46edcbca291"
 
-"@types/boom@*":
-  version "7.3.0"
-  resolved "https://registry.yarnpkg.com/@types/boom/-/boom-7.3.0.tgz#33280c5552d4cfabc21b8b7e0f6d29292decd985"
-  integrity sha512-PH7bfkt1nu4pnlxz+Ws+wwJJF1HE12W3ia+Iace2JT7q56DLH3hbyjOJyNHJYRxk3PkKaC36fHfHKyeG1rMgCA==
-
-"@types/catbox@*":
-  version "10.0.6"
-  resolved "https://registry.yarnpkg.com/@types/catbox/-/catbox-10.0.6.tgz#8a4c91261cf0afca03351bb82a95b2d6cf43a5d0"
-  integrity sha512-qS0VHlL6eBUUoUeBnI/ASCffoniS62zdV6IUtLSIjGKmRhZNawotaOMsTYivZOTZVktfe9koAJkD9XFac7tEEg==
-
-"@types/continuation-local-storage@*":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@types/continuation-local-storage/-/continuation-local-storage-3.2.2.tgz#7cbf177a6206ece87bc4b808784772ad2aa5f6db"
-  integrity sha512-aItm+aYPJ4rT1cHmAxO+OdWjSviQ9iB5UKb5f0Uvgln0N4hS2mcDodHtPiqicYBXViUYhqyBjhA5uyOcT+S34Q==
-  dependencies:
-    "@types/node" "*"
-
 "@types/events@*":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.1.0.tgz#93b1be91f63c184450385272c47b6496fd028e02"
-
-"@types/geojson@^1.0.0":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-1.0.5.tgz#ef9f12277233399c7f32086818a56a84c8952f8f"
-
-"@types/hapi@^7.0.0":
-  version "17.8.6"
-  resolved "https://registry.yarnpkg.com/@types/hapi/-/hapi-17.8.6.tgz#bf9132c2dd56b6344dd3f60eb86806d197f0e90b"
-  integrity sha512-8xfvwsfZmQCSognkNDMAkyNlnQwfpGdIP1Y7h/EMgcEzrVHB6lmuDHc8TEMhOJ6lt40TKGBA1e9z9htb/KSbOA==
-  dependencies:
-    "@types/boom" "*"
-    "@types/catbox" "*"
-    "@types/iron" "*"
-    "@types/joi" "*"
-    "@types/mimos" "*"
-    "@types/node" "*"
-    "@types/podium" "*"
-    "@types/shot" "*"
-
-"@types/iron@*":
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/@types/iron/-/iron-5.0.1.tgz#5420bbda8623c48ee51b9a78ebad05d7305b4b24"
-  integrity sha512-Ng5BkVGPt7Tw9k1OJ6qYwuD9+dmnWgActmsnnrdvs4075N8V2go1f6Pz8omG3q5rbHjXN6yzzZDYo3JOgAE/Ug==
-  dependencies:
-    "@types/node" "*"
-
-"@types/joi@*":
-  version "14.3.3"
-  resolved "https://registry.yarnpkg.com/@types/joi/-/joi-14.3.3.tgz#f251aa8150fc0b6a7ce9feab21802a28473de335"
-  integrity sha512-6gAT/UkIzYb7zZulAbcof3lFxpiD5EI6xBeTvkL1wYN12pnFQ+y/+xl9BvnVgxkmaIDN89xWhGZLD9CvuOtZ9g==
-
-"@types/lodash@*":
-  version "4.14.137"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.137.tgz#8a4804937dc6462274ffcc088df8f14fc1b368e2"
-  integrity sha512-g4rNK5SRKloO+sUGbuO7aPtwbwzMgjK+bm9BBhLD7jGUiGR7zhwYEhSln/ihgYQBeIJ5j7xjyaYzrWTcu3UotQ==
-
-"@types/mime-db@*":
-  version "1.27.0"
-  resolved "https://registry.yarnpkg.com/@types/mime-db/-/mime-db-1.27.0.tgz#9bc014a1fd1fdf47649c1a54c6dd7966b8284792"
-  integrity sha1-m8AUof0f30dknBpUxt15ZrgoR5I=
-
-"@types/mimos@*":
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/@types/mimos/-/mimos-3.0.1.tgz#59d96abe1c9e487e7463fe41e8d86d76b57a441a"
-  integrity sha512-MATIRH4VMIJki8lcYUZdNQEHuAG7iQ1FWwoLgxV+4fUOly2xZYdhHtGgvQyWiTeJqq2tZbE0nOOgZD6pR0FpNQ==
-  dependencies:
-    "@types/mime-db" "*"
 
 "@types/mocha@^5.2.0":
   version "5.2.0"
@@ -128,33 +64,6 @@
   version "12.7.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-12.7.2.tgz#c4e63af5e8823ce9cc3f0b34f7b998c2171f0c44"
   integrity sha512-dyYO+f6ihZEtNPDcWNR1fkoTDf3zAK3lAABDze3mz6POyIercH0lEUawUFXlG8xaQZmm1yEBON/4TsYv/laDYg==
-
-"@types/podium@*":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@types/podium/-/podium-1.0.0.tgz#bfaa2151be2b1d6109cc69f7faa9dac2cba3bb20"
-  integrity sha1-v6ohUb4rHWEJzGn3+qnawsujuyA=
-
-"@types/sequelize@^4.28.4":
-  version "4.28.4"
-  resolved "https://registry.yarnpkg.com/@types/sequelize/-/sequelize-4.28.4.tgz#89262cca5de285d115afefd56c91cb46050d9def"
-  integrity sha512-kN9pBVtl6ed0xB0XwCUWNO7xJRREVBglo95TsEkAhs1JILsnDrJitUcUXQp+bqohKLqxRFfR56qT28OXZ7CiEA==
-  dependencies:
-    "@types/bluebird" "*"
-    "@types/continuation-local-storage" "*"
-    "@types/lodash" "*"
-    "@types/validator" "*"
-
-"@types/shot@*":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@types/shot/-/shot-4.0.0.tgz#7545500c489b65c69b5bc5446ba4fef3bd26af92"
-  integrity sha512-Xv+n8yfccuicMlwBY58K5PVVNtXRm7uDzcwwmCarBxMP+XxGfnh1BI06YiVAsPbTAzcnYsrzpoS5QHeyV7LS8A==
-  dependencies:
-    "@types/node" "*"
-
-"@types/validator@*":
-  version "10.11.2"
-  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-10.11.2.tgz#48b60ca2cca927081f37a1ad1de3e25d04abc9f0"
-  integrity sha512-k/ju1RsdP5ACFUWebqsyEy0avP5uNJCs2p3pmTHzOZdd4gMSAJTq7iUEHFY3tt3emBrPTm6oGvfZ4SzcqOgLPQ==
 
 "@types/winston@^2.4.4":
   version "2.4.4"
@@ -589,19 +498,6 @@ bitcore-lib-cash@^0.19.0:
     elliptic "=6.4.0"
     inherits "=2.0.1"
     lodash "=4.17.11"
-
-bitcore-lib-dash@^0.13.21:
-  version "0.13.21"
-  resolved "https://registry.yarnpkg.com/bitcore-lib-dash/-/bitcore-lib-dash-0.13.21.tgz#eeae92591f58bbcbef92598f44bae40d510078fd"
-  dependencies:
-    bn.js "=2.0.4"
-    bs58 "=2.0.0"
-    buffer-compare "=1.0.0"
-    elliptic "=3.0.3"
-    inherits "=2.0.1"
-    lodash "=3.10.1"
-    sha512 "=0.0.1"
-    x11-hash-js "^1.0.0"
 
 bitcore-lib@^0.16.0:
   version "0.16.0"
@@ -1294,7 +1190,7 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-debug@2, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.6, debug@^2.6.9, debug@~2.6.4, debug@~2.6.6, debug@~2.6.9:
+debug@2, debug@^2.1.2, debug@^2.2.0, debug@^2.3.3, debug@^2.6.6, debug@~2.6.4, debug@~2.6.6, debug@~2.6.9:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
   dependencies:
@@ -1384,10 +1280,6 @@ delayed-stream@~1.0.0:
 delegates@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/delegates/-/delegates-1.0.0.tgz#84c6e159b81904fdca59a0ef44cd870d31250f9a"
-
-depd@^1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.1.tgz#5783b4e1c459f06fa5ca27f991f3d06e7a310359"
 
 detect-indent@^5.0.0:
   version "5.0.0"
@@ -1909,10 +1801,6 @@ gauge@~2.7.3:
     string-width "^1.0.1"
     strip-ansi "^3.0.1"
     wide-align "^1.1.0"
-
-generic-pool@^3.4.0:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/generic-pool/-/generic-pool-3.4.2.tgz#92ff7196520d670839a67308092a12aadf2f6a59"
 
 get-caller-file@^1.0.1:
   version "1.0.2"
@@ -2907,7 +2795,7 @@ lodash@^4.0.0, lodash@^4.17.0, lodash@^4.17.5:
   version "4.17.10"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
 
-lodash@^4.17.1, lodash@^4.17.4:
+lodash@^4.17.4:
   version "4.17.4"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.4.tgz#78203a4d1c328ae1d86dca6460e369b57f4055ae"
 
@@ -3229,9 +3117,10 @@ mocha@^6.2.0:
     yargs-parser "13.0.0"
     yargs-unparser "1.5.0"
 
-moment-timezone@^0.5.14:
-  version "0.5.16"
-  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.16.tgz#661717d5f55b4d2c2e002262d726c83785192a5a"
+moment-timezone@^0.5.21:
+  version "0.5.26"
+  resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.26.tgz#c0267ca09ae84631aa3dc33f65bedbe6e8e0d772"
+  integrity sha512-sFP4cgEKTCymBBKgoxZjYzlSovC20Y6J7y3nanDc5RoBIXKlZhoYwBoZGe3flwU6A372AcRwScH8KiwV6zjy1g==
   dependencies:
     moment ">= 2.9.0"
 
@@ -3241,9 +3130,14 @@ moment-timezone@^0.5.x:
   dependencies:
     moment ">= 2.9.0"
 
-"moment@>= 2.9.0", moment@^2.20.0, moment@^2.22.1:
+"moment@>= 2.9.0", moment@^2.22.1:
   version "2.22.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.1.tgz#529a2e9bf973f259c9643d237fda84de3a26e8ad"
+
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 ms@2.0.0:
   version "2.0.0"
@@ -4244,12 +4138,12 @@ ret@~0.1.10:
   version "0.1.15"
   resolved "https://registry.yarnpkg.com/ret/-/ret-0.1.15.tgz#b8a4825d5bdb1fc3f6f53c2bc33f81388681c7bc"
 
-retry-as-promised@^2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/retry-as-promised/-/retry-as-promised-2.3.2.tgz#cd974ee4fd9b5fe03cbf31871ee48221c07737b7"
+retry-as-promised@^3.1.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/retry-as-promised/-/retry-as-promised-3.2.0.tgz#769f63d536bec4783549db0777cb56dadd9d8543"
+  integrity sha512-CybGs60B7oYU/qSQ6kuaFmRd9sTZ6oXSc0toqePvV74Ac6/IFZSI1ReFQmtCN+uvW1Mtqdwpvt/LGOiCBAY2Mg==
   dependencies:
-    bluebird "^3.4.6"
-    debug "^2.6.9"
+    any-promise "^1.3.0"
 
 revalidator@0.1.x:
   version "0.1.8"
@@ -4361,27 +4255,31 @@ sequelize-cli@^4.0.0:
     umzug "^2.1.0"
     yargs "^8.0.2"
 
-sequelize@^4.37.6:
-  version "4.37.6"
-  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-4.37.6.tgz#f37eec55a285cfdeab27f8a85c5db38034f87126"
+sequelize-pool@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/sequelize-pool/-/sequelize-pool-2.3.0.tgz#64f1fe8744228172c474f530604b6133be64993d"
+  integrity sha512-Ibz08vnXvkZ8LJTiUOxRcj1Ckdn7qafNZ2t59jYHMX1VIebTAOYefWdRYFt6z6+hy52WGthAHAoLc9hvk3onqA==
+
+sequelize@^5.16.0:
+  version "5.16.0"
+  resolved "https://registry.yarnpkg.com/sequelize/-/sequelize-5.16.0.tgz#6626f82cc41cdf02a5758f73783566e369d05cd8"
+  integrity sha512-1b2PNgxV3+HtaOCJ9gos4qQzvd8QEc5jz77MUxZg8+nqX4haSZWI7Rn0XzW1lPIRseKUXVHanyh/gqztsfJN+g==
   dependencies:
     bluebird "^3.5.0"
     cls-bluebird "^2.1.0"
-    debug "^3.1.0"
-    depd "^1.1.0"
+    debug "^4.1.1"
     dottie "^2.0.0"
-    generic-pool "^3.4.0"
     inflection "1.12.0"
-    lodash "^4.17.1"
-    moment "^2.20.0"
-    moment-timezone "^0.5.14"
-    retry-as-promised "^2.3.2"
-    semver "^5.5.0"
-    terraformer-wkt-parser "^1.1.2"
+    lodash "^4.17.11"
+    moment "^2.24.0"
+    moment-timezone "^0.5.21"
+    retry-as-promised "^3.1.0"
+    semver "^6.1.1"
+    sequelize-pool "^2.3.0"
     toposort-class "^1.0.1"
     uuid "^3.2.1"
-    validator "^9.4.1"
-    wkx "^0.4.1"
+    validator "^10.11.0"
+    wkx "^0.4.6"
 
 set-blocking@^2.0.0, set-blocking@~2.0.0:
   version "2.0.0"
@@ -4890,18 +4788,6 @@ term-size@^1.2.0:
   dependencies:
     execa "^0.7.0"
 
-terraformer-wkt-parser@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/terraformer-wkt-parser/-/terraformer-wkt-parser-1.1.2.tgz#336a0c8fc82094a5aff83288f69aedecd369bf0c"
-  dependencies:
-    terraformer "~1.0.5"
-
-terraformer@~1.0.5:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/terraformer/-/terraformer-1.0.8.tgz#51e0ad89746fcf2161dc6f65aa70e42377c8b593"
-  dependencies:
-    "@types/geojson" "^1.0.0"
-
 text-hex@1.0.x:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/text-hex/-/text-hex-1.0.0.tgz#69dc9c1b17446ee79a92bf5b884bb4b9127506f5"
@@ -5294,11 +5180,16 @@ validate-npm-package-license@^3.0.1:
     spdx-correct "~1.0.0"
     spdx-expression-parse "~1.0.0"
 
+validator@^10.11.0:
+  version "10.11.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-10.11.0.tgz#003108ea6e9a9874d31ccc9e5006856ccd76b228"
+  integrity sha512-X/p3UZerAIsbBfN/IwahhYaBbY68EN/UQBWHtsbXGT5bfrH/p4NQzUCG1kF/rtKaNpnJ7jAu6NGTdSNtyNIXMw==
+
 validator@^10.9.0:
   version "10.9.0"
   resolved "https://registry.yarnpkg.com/validator/-/validator-10.9.0.tgz#d10c11673b5061fb7ccf4c1114412411b2bac2a8"
 
-validator@^9.0.0, validator@^9.4.1:
+validator@^9.0.0:
   version "9.4.1"
   resolved "https://registry.yarnpkg.com/validator/-/validator-9.4.1.tgz#abf466d398b561cd243050112c6ff1de6cc12663"
 
@@ -5458,9 +5349,10 @@ winston@^3.2.1:
     triple-beam "^1.3.0"
     winston-transport "^4.3.0"
 
-wkx@^0.4.1:
-  version "0.4.2"
-  resolved "https://registry.yarnpkg.com/wkx/-/wkx-0.4.2.tgz#776d35a634a5c22e656e4744bdeb54f83fd2ce8d"
+wkx@^0.4.6:
+  version "0.4.8"
+  resolved "https://registry.yarnpkg.com/wkx/-/wkx-0.4.8.tgz#a092cf088d112683fdc7182fd31493b2c5820003"
+  integrity sha512-ikPXMM9IR/gy/LwiOSqWlSL3X/J5uk9EO2hHNRXS41eTLXaUFEVw9fn/593jW/tE5tedNg8YjT5HkCa4FqQZyQ==
   dependencies:
     "@types/node" "*"
 

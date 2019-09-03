@@ -14,6 +14,7 @@
     "anypay": "./bin/anypay.ts"
   },
   "dependencies": {
+    "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
@@ -31,7 +32,6 @@
     "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-lib": "^0.16.0",
     "bitcore-lib-cash": "^0.19.0",
-    "bitcore-lib-dash": "^0.13.21",
     "bluebird": "^3.5.0",
     "boom": "^7.1.1",
     "bunnies": "^1.0.2",
@@ -70,7 +70,7 @@
     "redis": "^2.8.0",
     "require-all": "^3.0.0",
     "rpc-simple-wallet": "^1.0.7",
-    "sequelize": "^4.37.6",
+    "sequelize": "^5.16.0",
     "sequelize-cli": "^4.0.0",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",

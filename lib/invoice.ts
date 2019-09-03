@@ -1,3 +1,4 @@
+import {plugins} from './plugins';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
@@ -6,7 +7,7 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
-import { createAddressRoute } from '../actors/address_routes/actor';
+import { createAddressRoute } from './routes';
 
 import * as database from './database';
 
@@ -26,7 +27,6 @@ import { models } from './models';
 
 import {convert} from './prices';
 
-import {plugins} from './plugins';
 
 import { computeInvoiceURI } from './uri';
 
@@ -51,12 +51,6 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
   var address;
 
   switch(currency) {
-
-    case 'BTC':
-
-      address = await BitcoinAddressService.getNewAddress(accountId);
-
-      break;
 
     case 'XRP':
 

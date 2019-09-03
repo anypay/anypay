@@ -1,4 +1,5 @@
 require("dotenv").config();
+require('bitcore-lib')
 
 import configurePlugins from "../config/plugins";
 import * as assert from 'assert';
