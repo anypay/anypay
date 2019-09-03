@@ -26,7 +26,7 @@ async function start() {
 
     await channel.assertExchange('anypay.payments', 'direct');
 
-    await channel.assertExchange('anypay:invoices', 'fanout');
+    await channel.assertExchange('anypay:invoices', 'direct');
 
     await channel.bindQueue(PAYMENT_QUEUE, 'anypay.payments', 'payment');
 
