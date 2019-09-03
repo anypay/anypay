@@ -27,8 +27,7 @@ describe("Emails when invoice is paid", ()=>{
   it("should send email when an invoice is paid", async ()=>{
 
     let resp = await email.invoicePaidEmail(invoice1.toJSON())
-    console.log(resp)
-    assert(resp)
+    assert(resp.MessageId)
 
   })
 
