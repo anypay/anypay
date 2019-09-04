@@ -1,8 +1,7 @@
 import {generatePaymentRequest} from '../../../plugins/bch/lib/paymentRequest';
 
-const bch = require('bitcore-lib-cash'); 
-const Message = require('bitcore-message'); 
-
+const bch = require('bsv'); 
+const Message = require('bsv/message'); 
 
 export async function show(req, h){
 
