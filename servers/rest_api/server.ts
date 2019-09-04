@@ -51,6 +51,7 @@ const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
+const PaymentRequestHandler = require("./handlers/payment_request");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
@@ -703,6 +704,13 @@ async function Server() {
       auth: 'authoracle'
     }
   });
+
+  server.route({
+    method: "GET",
+    path: "/invoices/{uid}/bip70",
+    handler: PaymentRequestHandler.show 
+
+  })
 
   server.route({
     method: "POST",
