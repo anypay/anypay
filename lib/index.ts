@@ -25,6 +25,7 @@ import * as blockcypher from './blockcypher';
 import * as tipjar from './tipjar';
 import * as email from './email';
 import * as routes from './routes';
+import * as permanent from './permanent_address';
 
 
 var oracles = ConfigureOracles(configureOracles);
@@ -56,6 +57,7 @@ export {
   blockcypher,
   tipjar,
   email,
-  routes
+  routes,
+  permanent
 }
 
