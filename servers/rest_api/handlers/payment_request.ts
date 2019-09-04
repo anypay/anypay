@@ -22,7 +22,7 @@ export async function show(req, h){
   response.header('x-signature-type', 'ecc');
   response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
   response.header('signature', signature );
-  response.header('digest', digest);
+  response.header('digest', `SHA-256=${digest}`);
 
   return response
 
