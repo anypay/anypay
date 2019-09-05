@@ -30,7 +30,7 @@ export async function show(req, h) {
 
 }
 
-export async function create(req, h){
+export async function create(req, h) {
 
   console.log('HEADERS');
   console.log(req.headers);
@@ -38,55 +38,51 @@ export async function create(req, h){
   console.log('PAYLOAD');
   console.log(req.payload);
 
-  switch (req.headers.accept) {
+  if (req.headers.accept === 'application/verify-payment') {
 
-    case 'application/verify-payment':
+    return {
 
-      return {
+      payment: req.payload,
 
-        payment: req.payload,
+      memo: "This looks good for now, we will see what the miners say."
 
-        memo: "This looks good for now, we will see what the miners say."
+    }
 
-      }
-
-    case 'application/payment':
-
-      req.payload.transactions.forEach(async (hex) => {
-
-        console.log("BROADCAST", hex);
-
-        try {
-
-          let resp = await rpc.call('sendrawtransaction', [hex]);
-
-          console.log('resp', resp);
-
-        } catch(error) {
-
-          console.log('could not broadcast transaction', hex);
-
-        }
-
-      });
-
-      return {
-
-        payment: {
-
-          transactions: req.payload.transactions 
-        },
-
-        memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
-
-      }
-
-
-    default:
-
-      throw new Error(`request type ${req.headers.accept} not accepted`);
   }
 
+  if (req.headers['x-content-type'] === 'application/payment') {
+
+    req.payload.transactions.forEach(async (hex) => {
+
+      console.log("BROADCAST", hex);
+
+      try {
+
+        let resp = await rpc.call('sendrawtransaction', [hex]);
+
+        console.log('resp', resp);
+
+      } catch(error) {
+
+        console.log('could not broadcast transaction', hex);
+
+      }
+
+    });
+
+    return {
+
+      payment: {
+
+        transactions: req.payload.transactions 
+
+      },
+
+      memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+
+    }
+
+  }
 
 }
 
