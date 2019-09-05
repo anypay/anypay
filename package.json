@@ -67,7 +67,7 @@
     "prompt-async": "^0.9.9",
     "qr": "^0.2.4",
     "qrcode-terminal": "^0.11.0",
-    "rabbi": "^1.5.0",
+    "rabbi": "^1.5.1",
     "redis": "^2.8.0",
     "require-all": "^3.0.0",
     "rpc-simple-wallet": "^1.0.7",

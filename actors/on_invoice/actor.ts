@@ -19,20 +19,19 @@ export async function start() {
     })
     .start(async (channel, msg) => {
 
-      let invoice = await parseInvoiceFromMessage(msg);
-
-      console.log(invoice);
-
-      if (invoice.currency !== 'BCH') {
-        
-        channel.ack(msg);
-
-        return;
-
-      }
-
       try {
 
+        let invoice = await parseInvoiceFromMessage(msg);
+
+        console.log(invoice);
+
+        if (invoice.currency !== 'BCH') {
+          
+          channel.ack(msg);
+
+          return;
+
+        }
 
         let params = [
 
