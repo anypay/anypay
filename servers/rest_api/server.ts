@@ -255,6 +255,43 @@ async function Server() {
     }
   });
 
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/verify-payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/verify-payment';
+    }
+
+    if ('application/verify-payment' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/verify-payment';
+    }
+
+    return h.continue;
+  });
+
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    return h.continue;
+  });
+
+
+
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
   await server.register(require('vision'));
