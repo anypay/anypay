@@ -31,7 +31,7 @@ export async function generatePaymentRequest(invoiceUid: string):Promise<Payment
     time: Date.now() / 1000 | 0,
     expires: invoice.expiry,
     memo: "Anypay Invoice",
-          paymentUrl: `https://${process.env.API_BASE}/invoices/${invoice.uid}/bip70`,
+    paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/bip70`,
     paymentId: invoice.uid
   }
 
