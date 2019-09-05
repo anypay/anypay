@@ -1,5 +1,7 @@
 import {generatePaymentRequest} from '../../../plugins/bch/lib/paymentRequest';
 
+import { rpc } from '../../../plugins/bch/lib/jsonrpc'
+
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
@@ -40,11 +42,9 @@ export async function create(req, h){
 
     case 'application/verify-payment':
 
-      var payment = JSON.parse(Object.keys(req.payload)[0])
-
       return {
 
-        payment: payment,
+        payment: req.payload,
 
         memo: "This looks good for now, we will see what the miners say."
 
@@ -52,7 +52,35 @@ export async function create(req, h){
 
     case 'application/payment':
 
-      throw new Error(`payment not yet implemented`);
+      req.payload.transactions.forEach(async (hex) => {
+
+        console.log("BROADCAST", hex);
+
+        try {
+
+          let resp = await rpc.call('sendrawtransaction', [hex]);
+
+          console.log('resp', resp);
+
+        } catch(error) {
+
+          console.log('could not broadcast transaction', hex);
+
+        }
+
+      });
+
+      return {
+
+        payment: {
+
+          transactions: req.payload.transactions 
+        },
+
+        memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+
+      }
+
 
     default:
 
