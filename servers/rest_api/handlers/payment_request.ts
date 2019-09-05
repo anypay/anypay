@@ -3,7 +3,7 @@ import {generatePaymentRequest} from '../../../plugins/bch/lib/paymentRequest';
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
-export async function show(req, h){
+export async function show(req, h) {
 
   const params = req.params
 
@@ -27,3 +27,38 @@ export async function show(req, h){
   return response
 
 }
+
+export async function create(req, h){
+
+  console.log('HEADERS');
+  console.log(req.headers);
+
+  console.log('PAYLOAD');
+  console.log(req.payload);
+
+  switch (req.headers.accept) {
+
+    case 'application/verify-payment':
+
+      var payment = JSON.parse(Object.keys(req.payload)[0])
+
+      return {
+
+        payment: payment,
+
+        memo: "This looks good for now, we will see what the miners say."
+
+      }
+
+    case 'application/payment':
+
+      throw new Error(`payment not yet implemented`);
+
+    default:
+
+      throw new Error(`request type ${req.headers.accept} not accepted`);
+  }
+
+
+}
+

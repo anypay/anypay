@@ -714,6 +714,14 @@ async function Server() {
 
   server.route({
     method: "POST",
+    path: "/invoices/{uid}/bip70",
+    handler: PaymentRequestHandler.create 
+
+  })
+
+
+  server.route({
+    method: "POST",
     path: "/invoices/{uid}/dashtext_payments",
     handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
