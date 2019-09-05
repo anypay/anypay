@@ -19,7 +19,7 @@ export async function getTipJar(account_id: number, currency: string) {
     throw new Error('only BCH tip jars supported currently');
   }
 
-  let tipJar = await models.TipJar.findOne({
+  let tipJar = await models.Tipjar.findOne({
 
     where: {
 
@@ -35,7 +35,7 @@ export async function getTipJar(account_id: number, currency: string) {
 
     let privateKey = await new bch.PrivateKey();
 
-    tipJar = await models.TipJar.create({
+    tipJar = await models.Tipjar.create({
 
       account_id,
 
