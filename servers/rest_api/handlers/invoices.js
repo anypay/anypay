@@ -246,6 +246,12 @@ module.exports.create = async (request, reply) => {
 
     }
 
+    if (request.is_public_request) {
+
+      invoice.is_public_request = true;
+
+    }
+
     await invoice.save();
 
     return sanitizeInvoice(invoice);

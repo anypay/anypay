@@ -213,6 +213,30 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
+const getAccount = async function(request, username, password, h) {
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    }
+  });
+
+  if (account) {
+
+		request.account = account;
+		request.is_public_request = true;
+
+    return {
+      isValid: true,
+      credentials: { account: account }
+    }
+  } else {
+    return {
+      isValid: false
+    }
+  }
+}
+
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
@@ -313,6 +337,7 @@ async function Server() {
     }
   })
 
+  server.auth.strategy("getaccount", "basic", { validate: getAccount });
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
@@ -499,6 +524,20 @@ async function Server() {
         payload: models.Invoice.Request,
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/accounts/{account_id}/invoices",
+    handler: InvoicesController.create,
+    options: {
+      auth: "getaccount",
+      tags: ['api'],
+      validate: {
+        payload: models.Invoice.Request,
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
 
