@@ -272,7 +272,6 @@ function sanitizeInvoice(invoice) {
 
   delete resp.webhook_url;
   delete resp.id;
-  delete resp.account_id;
   delete resp.dollar_amount;
 
   return resp;
