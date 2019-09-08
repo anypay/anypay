@@ -8,6 +8,8 @@ import * as Hapi from "hapi";
 import { log } from '../../lib';
 import { channel, awaitChannel } from '../../lib/amqp';
 
+import { attachMerchantMapRoutes } from '../map/server';
+
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
@@ -343,6 +345,9 @@ async function Server() {
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
   server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
   server.auth.strategy("authoracle", "basic", { validate: httpAuthCoinOracle});
+
+  attachMerchantMapRoutes(server);
+
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
