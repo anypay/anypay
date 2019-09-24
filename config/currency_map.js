@@ -848,6 +848,12 @@
     "currency_name": "Venezuelan bolivar fuerte",
     "decimal_places": 2
   }
+  map['VES'] =
+  {
+    "currency_code": "VES",
+    "currency_name": "Venezuelan bolivar soberano",
+    "decimal_places": 0
+  }
   map['VND'] = 
   {
     "currency_code": "VND",
