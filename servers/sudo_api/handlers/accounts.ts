@@ -8,13 +8,11 @@ import { geocode } from '../../../lib/googlemaps';
 
 import {emitter} from '../../../lib/events'
 
-import * as models from '../../../lib/models';
-
 import { getROI } from '../../../lib/roi';
 
 import { getVolume } from '../../../lib/sudo/volume';
 
-import { Account, AccessToken } from '../../../lib/models';
+import { models } from '../../../lib';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -27,8 +25,9 @@ function hash(password) {
 }
 
 export async function sudoShow (request, reply) {
+  console.log("sudo show", request.params);
 
-   var account = await Account.findOne({
+   var account = await models.Account.findOne({
     where: {
       id: request.params.account_id
     }
@@ -39,7 +38,7 @@ export async function sudoShow (request, reply) {
 
 export async function sudoAccountWithEmail (request, reply) {
 
-  var account = await Account.findOne({
+  var account = await models.Account.findOne({
     where: {
       email: request.params.email
     }
@@ -53,14 +52,14 @@ export async function index(request, reply) {
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
 
-  var accounts = await Account.findAll({ offset, limit });
+  var accounts = await models.Account.findAll({ offset, limit });
 
   return accounts;
 };
 
 export async function destroy(request, reply) {
 
-  let account = await Account.findOne({
+  let account = await models.Account.findOne({
     where: { id: request.params.account_id }
   });
 

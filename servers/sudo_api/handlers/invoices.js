@@ -1,4 +1,5 @@
-const Invoice = require('../../../lib/models/invoice');
+
+import { models } from '../../../lib';
 
 const log = require('winston');
 
@@ -24,7 +25,7 @@ module.exports.sudoIndex = async (request, reply) => {
     where['status'] = request.query.status;
   }
 
-  var invoices = await Invoice.findAll({
+  var invoices = await models.Invoice.findAll({
 
     where,
 
@@ -50,7 +51,7 @@ module.exports.sudoShow = async function(request, reply) {
 
   try {
 
-	  let invoice = await Invoice.findOne({
+	  let invoice = await models.Invoice.findOne({
 	    where: {
 	      uid: invoiceId
 	    }
