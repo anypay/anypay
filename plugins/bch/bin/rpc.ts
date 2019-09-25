@@ -4,9 +4,7 @@ require("dotenv").config();
 
 var commander = require('commander');
 
-var JSONRPC = require('../lib/jsonrpc');
-
-var rpc = new JSONRPC();
+var { rpc } = require('../lib/jsonrpc');
 
 commander
   .command('getnewaddress')

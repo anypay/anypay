@@ -1,15 +1,15 @@
 require('dotenv').config()
 
-const PASSWORD = process.env.DASH_CORE_PASSWORD;
-const USER = process.env.DASH_CORE_USER;
-const HOST = process.env.DASH_CORE_HOST;
+const PASSWORD = process.env.DASH_RPC_PASSWORD;
+const USER = process.env.DASH_RPC_USER;
+const HOST = process.env.DASH_RPC_HOST;
 
 import * as http from "superagent";
 
 async function rpcRequest(method, params) {
   let body = { jsonrpc: "2.0", method: method, params: params, id: 1 };
 
-  let url = `http://${HOST}:${process.env.DASH_CORE_PORT}`;
+  let url = `http://${HOST}:${process.env.DASH_RPC_PORT}`;
 
   console.log("URL", url);
 
@@ -129,8 +129,8 @@ class JsonRpc {
 
     return new Promise((resolve, reject) => {
       http
-        .post(`http://${process.env.DASH_CORE_HOST}:${process.env.DASH_CORE_PORT}`)
-        .auth(process.env.DASH_CORE_USER, process.env.DASH_CORE_PASSWORD)
+        .post(`http://${process.env.DASH_RPC_HOST}:${process.env.DASH_RPC_PORT}`)
+        .auth(process.env.DASH_RPC_USER, process.env.DASH_RPC_PASSWORD)
         .timeout({
           response: 5000,  // Wait 5 seconds for the server to start sending,
           deadline: 10000, // but allow 1 minute for the file to finish loading.
