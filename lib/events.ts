@@ -16,6 +16,8 @@ const exchange = 'anypay.events';
 
 let events = [
 
+  'account.created',
+
   'invoice.created',
 
   'invoice.requested',

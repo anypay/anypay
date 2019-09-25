@@ -7,6 +7,8 @@ import * as database from '../database';
 
 import { log } from '../logger';
 
+import { models } from '../models';
+
 const MAX_DECIMALS = 5;
 
 interface Amount {
@@ -22,13 +24,25 @@ interface Conversion {
 
 async function getAllPrices() {
 
-  let resp = await database.query('select currency, value, base_currency from prices'); 
+  let prices = await models.Price.findAll();
 
-  let prices = resp[0].reduce(function(acc, price) {
+  prices = prices.reduce(function(acc, price) {
 
     let pair = `${price.currency}/${price.base_currency}`;
-    
-    acc[pair] = parseFloat(price.value);
+
+    if (acc[pair]) {
+
+      if (price.createdAt > acc[pair].createdAt) {
+
+        acc[pair] = parseFloat(price.value);
+
+      }
+
+    } else {
+
+      acc[pair] = parseFloat(price.value);
+
+    }
 
     return acc;
 
@@ -53,16 +67,20 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 
   let prices = await getAllPrices();
 
-  let pair = `${outputCurrency}/${inputAmount.currency}`
+  let pair = `${inputAmount.currency}/${outputCurrency}`;
 
   var rate;
 
   if (prices[pair]) {
 
     log.info(`found direct price pair ${pair} ${prices[pair]}`);
-    rate = prices[pair];
+    rate = 1 / prices[pair];
 
   } else {
+
+    if (inputAmount.currency === 'BTC') {
+      prices[`BTC/BTC`] = 1;
+    }
 
     rate = prices[`${outputCurrency}/BTC`] / prices[`${inputAmount.currency}/BTC`];
     log.info(`using BTC to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
@@ -77,6 +95,43 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
     value: parseFloat(targetAmount.toFixed(MAX_DECIMALS))
   };
 };
+
+export async function setPrice(currency, value, base_currency = "BTC") {
+
+  log.info("set price", currency, value, base_currency);
+
+  let [price, isNew] = await models.Price.findOrCreate({
+
+    where: {
+
+      currency,
+
+      base_currency
+
+    },
+
+    defaults: {
+
+      currency,
+
+      value,
+
+      base_currency
+
+    }
+  });
+
+  if (!isNew) {
+
+    price.value = value;
+
+    await price.save();
+
+  }
+
+  return price;
+
+}
 
 export {
   convert, createConversion,

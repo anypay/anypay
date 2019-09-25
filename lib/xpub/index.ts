@@ -1,5 +1,5 @@
 import * as bitcoincash from 'bitcore-lib-cash';
-import * as dash from 'bitcore-lib-dash';
+import * as dash from '@dashevo/dashcore-lib';
 
 function getBitcore(currency: string) {
 

@@ -1,20 +1,24 @@
 "use strict";
 require('dotenv').config();
 
+import('bitcore-lib')
+
 import * as Hapi from "hapi";
 
 import { log } from '../../lib';
-import { channel } from '../../lib/amqp';
+import { channel, awaitChannel } from '../../lib/amqp';
 
-const AccessToken = require("../../lib/models/access_token");
-const Account = require("../../lib/models/account");
-const Invoice = require("../../lib/models/invoice");
+import { attachMerchantMapRoutes } from '../map/server';
+
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
 import * as addressRoutesActor from '../../actors/address_routes/actor';
+import * as bchAddAddressToAllOnInvoiceCreated from '../../actors/on_invoice/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
+
+import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
@@ -28,6 +32,8 @@ import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_call
 import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
+import * as dashtext from '../../lib/dash/dashtext';
+
 const sudoWires = require("./handlers/sudo/wire_reports");
 const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
@@ -36,15 +42,6 @@ const SudoAccounts = require("./handlers/sudo/accounts");
 const DenominationsController = require("./handlers/denominations");
 const PasswordsController = require("./handlers/passwords");
 const AccessTokensController = require("./handlers/access_tokens");
-const ExtendedPublicKeysController = require("./handlers/extended_public_keys");
-const PairTokensController = require("./handlers/pair_tokens");
-const ZcashInvoicesController = require("./handlers/zcash_invoices");
-const DashInvoicesController = require("./handlers/dash_invoices");
-const BitcoinCashInvoicesController = require("./handlers/bitcoin_cash_invoices");
-const BitcoinInvoicesController = require("./handlers/bitcoin_invoices");
-const BitcoinLightningInvoicesController = require("./handlers/bitcoin_lightning_invoices");
-const LitecoinInvoicesController = require("./handlers/litecoin_invoices");
-const DogecoinInvoicesController = require("./handlers/dogecoin_invoices");
 const AddressesController = require("./handlers/addresses");
 const CoinsController = require("./handlers/coins");
 const AccountLogin = require("../../lib/account_login");
@@ -56,6 +53,7 @@ const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
+const PaymentRequestHandler = require("./handlers/payment_request");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
@@ -64,7 +62,6 @@ import * as sudoTipjars from './handlers/sudo/tipjars';
 import * as CashbackMerchants from './handlers/cashback_merchants';
 const Joi = require('joi');
 
-import {createLinks} from './handlers/links_controller';
 import {dashbackTotalsAlltime} from './handlers/dashback_controller';
 import {dashbackTotalsByMonth} from './handlers/dashback_controller';
 
@@ -80,6 +77,7 @@ import * as totals from './handlers/totals';
 import { models } from '../../lib'
 import {createCoinTextInvoice} from '../../lib/cointext'
 
+const currencyMap = require('../../config/currency_map.js')
 
 const Fixer = require('../../lib/fixer');
 
@@ -145,7 +143,7 @@ const validatePassword = async function(request, username, password, h) {
     };
 
   } else {
-    var account = await Account.findOne({
+    var account = await models.Account.findOne({
       where: {
         email: username
       }
@@ -159,7 +157,7 @@ const validatePassword = async function(request, username, password, h) {
       }
     }
 
-    var accessToken = await AccessToken.findOne({
+    var accessToken = await models.AccessToken.findOne({
       where: {
         account_id: account.id,
         uid: password
@@ -191,14 +189,14 @@ const validateToken = async function(request, username, password, h) {
     };
   }
 
-  var accessToken = await AccessToken.findOne({
+  var accessToken = await models.AccessToken.findOne({
     where: {
       uid: username
     }
   });
 
   if (accessToken) {
-		var account = await Account.findOne({
+		var account = await models.Account.findOne({
 			where: {
 				id: accessToken.account_id
 			}
@@ -217,10 +215,29 @@ const validateToken = async function(request, username, password, h) {
   }
 };
 
-// Unused
-const kBasicAuthorizationAllowOtherHeaders = Joi.object({
-  authorization: Joi.string().regex(/^(Basic) \w+/g).required()
-}).unknown()
+const getAccount = async function(request, username, password, h) {
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    }
+  });
+
+  if (account) {
+
+		request.account = account;
+		request.is_public_request = true;
+
+    return {
+      isValid: true,
+      credentials: { account: account }
+    }
+  } else {
+    return {
+      isValid: false
+    }
+  }
+}
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -264,6 +281,43 @@ async function Server() {
     }
   });
 
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/verify-payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/verify-payment';
+    }
+
+    if ('application/verify-payment' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/verify-payment';
+    }
+
+    return h.continue;
+  });
+
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    return h.continue;
+  });
+
+
+
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
   await server.register(require('vision'));
@@ -285,97 +339,56 @@ async function Server() {
     }
   })
 
+  server.auth.strategy("getaccount", "basic", { validate: getAccount });
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
   server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
   server.auth.strategy("authoracle", "basic", { validate: httpAuthCoinOracle});
+
+  attachMerchantMapRoutes(server);
+
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    config: {
+    handler: InvoicesController.show,
+    options: {
       tags: ['api'],
-      handler: InvoicesController.show,
       validate: {
         params: {
           invoice_id: Joi.string().required()
         },
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response })
-    },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+    }
   });
   server.route({
     method: "GET",
     path: "/invoices",
-    config: {
+    handler: InvoicesController.index,
+    options: {
       auth: "token",
       tags: ['api'],
-      handler: InvoicesController.index,
       plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
     }
   });
   server.route({
     method: "GET",
     path: "/dashboard",
-    config: {
+    handler: DashBoardController.index,
+    options: {
       auth: "token",
-      //tags: ['api'],
-      handler: DashBoardController.index,
       plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/pair_tokens",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      handler: PairTokensController.create
-    }
-  });
-  server.route({
-    method: "GET",
-    path: "/pair_tokens",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      handler: PairTokensController.show
     }
   });
 
   server.route({
     method: "POST",
     path: "/invoices/{uid}/replacements",
-    config: {
+    handler: InvoicesController.replace,
+    options: {
       auth: "token",
       tags: ['api'],
-      handler: InvoicesController.replace
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/bch/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: BitcoinCashInvoicesController.create
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/zec/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: ZcashInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
     }
   });
 
@@ -383,248 +396,162 @@ async function Server() {
 
     method: "GET",
     path: "/tipjars/{currency}",
-    config: {
-      auth: "token",
-      handler: TipJars.show
+    handler: TipJars.show,
+    options: {
+      auth: "token"
     }
   });
 
   server.route({
-
     method: "GET",
     path: "/sudo/accounts/{account_id}/tipjars/{currency}",
-    config: {
-      auth: "sudopassword",
-      handler: sudoTipjars.show
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/btc.lightning/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        headers: kBasicAuthorizationAllowOtherHeaders,
-        payload: Invoice.Request,
-      },
-      handler: BitcoinLightningInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/dash/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: DashInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/btc/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: BitcoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/ltc/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: LitecoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/doge/invoices",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: Invoice.Request,
-      },
-      handler: DogecoinInvoicesController.create,
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+    handler: sudoTipjars.show,
+    options: {
+      auth: "sudopassword"
     }
   });
 
   server.route({
     method: "POST",
     path: "/accounts",
-    config: {
+    handler: AccountsController.create,
+    options: {
       tags: ['api'],
       validate: {
-        payload: Account.Credentials,
+        payload: models.Account.Credentials,
       },
-      handler: AccountsController.create,
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
   server.route({
     method: "PUT",
     path: "/anonymous-accounts",
-    config: {
+    handler: AccountsController.registerAnonymous,
+    options: {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: Account.Credentials,
+        payload: models.Account.Credentials,
       },
-      handler: AccountsController.registerAnonymous,
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
   server.route({
     method: "POST",
     path: "/anonymous-accounts",
-    config: {
-      tags: ['api'],
-      handler: AccountsController.createAnonymous,
+    handler: AccountsController.createAnonymous,
+    options: {
+      tags: ['api']
     },
   });
 
-  server.route({
-    method: "GET",
-    path: "/accounts/:account_uid/confirmation",
-    handler: (request, reply) => {
-      // email confirmation link
-    }
-  });
   server.route({
     method: "POST",
     path: "/access_tokens",
-    config: {
+    handler: AccessTokensController.create,
+    options: {
       auth: "password",
       tags: ['api'],
-      handler: AccessTokensController.create,
-      plugins: responsesWithSuccess({ model: AccessToken.Response })
+      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
+
   server.route({
     method: "GET",
     path: "/addresses",
-    config: {
+    handler: AddressesController.list,
+    options: {
       auth: "token",
       tags: ['api'],
-      handler: AddressesController.list,
       plugins: responsesWithSuccess({ model: AddressesController.PayoutAddresses }),
     }
   });
+
   server.route({
     method: "PUT",
     path: "/addresses/{currency}",
-    config: {
+    handler: AddressesController.update,
+    options: {
       auth: "token",
       tags: ['api'],
       validate: {
         params: {
           currency: Joi.string().required()
         },
-        payload: AddressesController.PayoutAddressUpdate,
+        payload: AddressesController.PayoutAddressUpdate
       },
-      handler: AddressesController.update,
-      plugins: responsesWithSuccess({ model: Account.Response })
+      plugins: responsesWithSuccess({ model: models.Account.Response })
     }
   });
+
   server.route({
     method: "GET",
     path: "/account",
-    config: {
+    handler: AccountsController.show,
+    options: {
       auth: "token",
       tags: ['api'],
-      handler: AccountsController.show,
-      plugins: responsesWithSuccess({ model: Account.Response }),
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
+
   server.route({
     method: "PUT",
     path: "/account",
-    config: {
+    handler: AccountsController.update,
+    options: {
       auth: "token",
-      tags: ['api'],
-      handler: AccountsController.update
+      tags: ['api']
     }
   });
-  server.route({
-    method: "GET",
-    path: "/extended_public_keys",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      handler: ExtendedPublicKeysController.index
-    }
-  });
-  server.route({
-    method: "POST",
-    path: "/extended_public_keys",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      validate: {
-        payload: ExtendedPublicKeysController.ExtendedPublicKey
-      },
-      handler: ExtendedPublicKeysController.create,
-      plugins: responsesWithSuccess({ model: ExtendedPublicKeysController.ExtendedPublicKey }),
-    }
-  });
+
   server.route({
     method: "GET",
     path: "/coins",
-    config: {
+    handler: CoinsController.list,
+    options: {
       tags: ['api'],
       auth: "token",
-      handler: CoinsController.list,
       plugins: responsesWithSuccess({ model: CoinsController.CoinsIndexResponse }),
     }
   });
+
   server.route({
     method: "POST",
     path: "/invoices",
-    config: {
+    handler: InvoicesController.create,
+    options: {
       auth: "token",
       tags: ['api'],
-      handler: InvoicesController.create,
       validate: {
-        payload: Invoice.Request,
+        payload: models.Invoice.Request,
       },
-      plugins: responsesWithSuccess({ model: Invoice.Response }),
+      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
+
   server.route({
     method: "POST",
-    path: "/pair_tokens/{uid}",
-    config: {
-      //tags: ['api'],
-      handler: PairTokensController.claim
+    path: "/accounts/{account_id}/invoices",
+    handler: InvoicesController.create,
+    options: {
+      auth: "getaccount",
+      tags: ['api'],
+      validate: {
+        payload: models.Invoice.Request,
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
 
   server.route({
     method: "POST",
     path: "/password-resets",
-    config: {
+    handler: PasswordsController.reset,
+    options: {
       tags: ['api'],
-      handler: PasswordsController.reset,
       validate: {
         payload: PasswordsController.PasswordReset,
       },
@@ -635,9 +562,9 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/password-resets/{uid}",
-    config: {
+    handler: PasswordsController.claim,
+    options: {
       tags: ['api'],
-      handler: PasswordsController.claim,
       validate: {
         payload: PasswordsController.PasswordResetClaim,
       },
@@ -648,279 +575,236 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/settings/denomination",
-    config: {
+    handler: DenominationsController.update,
+    options: {
       tags: ['api'],
-      auth: "token",
-      handler: DenominationsController.update
+      auth: "token"
     }
   });
 
   server.route({
     method: "GET",
     path: "/settings/denomination",
-    config: {
+    handler: DenominationsController.show,
+    options: {
       tags: ['api'],
-      auth: "token",
-      handler: DenominationsController.show
+      auth: "token"
     }
   });
 
   server.route({
     method: "GET",
     path: "/base_currencies",
-    config: {
-      tags: ['api'],
-      handler: async (request, h) => {
+    handler: async (request, h) => {
 
-        var currencies = await Fixer.getCurrencies();
+      var currencies = await Fixer.getCurrencies();
 
-        var rates = currencies.rates;
+      var rates = currencies.rates;
 
-        let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
+      let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
 
-        rates['VES'] = vesPrice;
+      rates['VES'] = vesPrice;
 
-        let sortedCurrencies = Object.keys(rates).sort();
+      let sortedCurrencies = Object.keys(rates).sort();
 
-        currencies.rates = sortedCurrencies.reduce((map, key) => {
+      currencies.rates = sortedCurrencies.reduce((map, key) => {
 
-          map[key] = rates[key];
+        map[key] = rates[key];
 
-          return map;
+        return map;
 
-        }, {});
+      }, {});
 
-        return currencies;
+      return currencies;
 
-      }
+    },
+    options: {
+      tags: ['api']
     }
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/usd",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.usd
-    }
+    handler: monthlyChartsController.usd
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/btc",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.btc
-    }
+    handler: monthlyChartsController.btc
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/dash",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.dash
-    }
+    handler: monthlyChartsController.dash
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/transactions/{coin}",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.totalTransactionsByCoin
-    }
+    handler: monthlyChartsController.totalTransactionsByCoin
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/bch",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.bch
-    }
+    handler: monthlyChartsController.bch
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/total",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.total
-    }
+    handler: monthlyChartsController.total
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/accounts",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.accounts
-    }
+    handler: monthlyChartsController.accounts
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/denomination/{denomination}",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.denomination
-    }
+    handler: monthlyChartsController.denomination
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/denominations",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.denominations
-    }
+    handler: monthlyChartsController.denominations
   });
 
   server.route({
     method: "GET",
     path: "/account/totals/monthly/{currency}",
-    config: {
-      auth: "token",
-      //tags: ['api'],
-      handler: accountMonthlyChartsController.byCurrency
+    handler: accountMonthlyChartsController.byCurrency,
+    options: {
+      auth: "token"
     }
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/count",
-    config: {
-      //tags: ['api'],
-      handler: monthlyChartsController.count
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/links",
-    config: {
-      //tags: ['api'],
-      handler: createLinks
-    }
+    handler: monthlyChartsController.count
   });
 
   server.route({
     method: "GET",
     path: "/dashback/totals/alltime",
-    config: {
-      //tags: ['api'],
-      handler: dashbackTotalsAlltime
-    }
+    handler: dashbackTotalsAlltime
   });
 
   server.route({
     method: "GET",
     path: "/dashback/totals/monthly",
-    config: {
-      //tags: ['api'],
-      handler: dashbackTotalsByMonth
-    }
+    handler: dashbackTotalsByMonth
   });
 
   server.route({
     method: "GET",
     path: "/totals/merchants",
-    config: {
-      //tags: ['api'],
-      handler: totals.merchants
-    }
+    handler: totals.merchants
   });
 
   server.route({
     method: 'GET',
     path: '/ambassador_claims',
-    config: {
-      auth: "token",
-      handler: AmbassadorsController.list_account_claims
+    handler: AmbassadorsController.list_account_claims,
+    options: {
+      auth: "token"
     }
   });
 
   server.route({
     method: 'POST',
     path: '/ambassador_claims',
-    config: {
-      auth: "token",
-      handler: AmbassadorsController.claim_merchant
+    handler: AmbassadorsController.claim_merchant,
+    options: {
+      auth: "token"
     }
   });
   
   server.route({
     method: "GET",
     path: "/sudo/tokenvalidations",
-    config: {
-      auth: "adminwebtoken",
-      //tags: ['api'],
-      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
-        return {
-          token: req.auth.token
-        };
-      }
+      return {
+        token: req.auth['token']
+      };
+    },
+    options: {
+      auth: "adminwebtoken"
     }
   });
 
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
-    config: {
-      tags: ['api'],
-      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
-        let inputAmount = {
+      let inputAmount = {
 
-          currency: req.params.oldcurrency,
+        currency: req.params.oldcurrency,
 
-          value: req.params.oldamount
+        value: parseFloat(req.params.oldamount)
 
-        };
+      };
 
-        let conversion = await createConversion(inputAmount, req.params.newcurrency);
+      let conversion = await createConversion(inputAmount, req.params.newcurrency);
 
-        return {conversion};
-      }
+      return {conversion};
+    },
+    options: {
+      tags: ['api']
     }
   });
 
   server.route({
-
     method: "POST",
-
-    path: "/{coin}/payments",
-
-    config: {
-
+    path: "/{input_currency}/payments",
+    handler: CoinOraclePayments.create,
+    options: {
       tags: ['api'],
-
       validate: {
         payload: {
           amount: Joi.required(),
           currency: Joi.string().required(),
           address: Joi.string().required(),
           hash: Joi.string().required(),
-          output_hash: Joi.string().optional()
+          output_hash: Joi.string().optional(),
+          output_amount: Joi.optional(),
+          output_address: Joi.string().optional(),
+          output_currency: Joi.string().optional()
         },
       },
-
-      auth: 'authoracle',
-
-      handler: CoinOraclePayments.create
-
+      auth: 'authoracle'
     }
-
   });
 
   server.route({
+    method: "GET",
+    path: "/invoices/{uid}/bip70",
+    handler: PaymentRequestHandler.show 
+
+  })
+
+  server.route({
     method: "POST",
-    path: "/invoices/{uid}/cointext_payments",
-    config: {
-      tags: ['api'],
-      handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+    path: "/invoices/{uid}/bip70",
+    handler: PaymentRequestHandler.create 
+
+  })
+
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/dashtext_payments",
+    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
 
       let invoice = await models.Invoice.findOne({ where: {
       
@@ -928,19 +812,47 @@ async function Server() {
 
       }})
 
-        return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
-	 
-      }
+      let code = await dashtext.generateCode(
+        invoice.address,
+        invoice.invoice_amount,
+        invoice.uid
+      );
+
+      return code;
+ 
+    },
+    options: {
+      tags: ['api']
     }
   });
 
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/cointext_payments",
+    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+    let invoice = await models.Invoice.findOne({ where: {
+    
+      uid: req.params.uid
+
+    }})
+
+      return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
+ 
+    },
+    options: {
+      tags: ['api']
+    }
+  });
+
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/auth',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -950,13 +862,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/wires/reportsinceinvoice/{invoice_uid}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -966,13 +879,14 @@ async function Server() {
 
   });
 
+ //deprecated
   server.route({
 
     method: 'PUT',
 
     path: '/sudo/accounts/{id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1002,13 +916,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/addresses',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1018,13 +933,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/bank_accounts',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1034,13 +950,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/bank_accounts',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1050,13 +967,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/bank_accounts/{id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1066,13 +984,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
 
     path: '/sudo/bank_accounts/{id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1082,13 +1001,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1098,13 +1018,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
 
     path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1114,13 +1035,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/dashback/merchants',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1130,13 +1052,14 @@ async function Server() {
 
   });
 
+  //derecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/dashback/merchants/{email}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1146,13 +1069,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/dashback/merchants/{email}/activate',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1162,13 +1086,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/dashback/merchants/{email}/deactivate',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1178,13 +1103,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/accounts',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1194,13 +1120,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/payment_forwards',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1210,13 +1137,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/payment_forwards/{id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1226,13 +1154,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/invoices',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1242,13 +1171,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'DELETE',
 
     path: '/sudo/accounts/{account_id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1258,13 +1188,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/accounts/{account_id}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1274,13 +1205,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/account-by-email/{email}',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1296,7 +1228,7 @@ async function Server() {
 
     path: '/sudo/ambassadors',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1306,13 +1238,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'GET',
 
     path: '/sudo/coins',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1321,13 +1254,14 @@ async function Server() {
     }
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/coins/activate',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1337,13 +1271,14 @@ async function Server() {
 
   });
 
+  //deprecated
   server.route({
 
     method: 'POST',
 
     path: '/sudo/coins/deactivate',
 
-    config: {
+    options: {
 
       auth: 'sudopassword',
 
@@ -1359,7 +1294,7 @@ async function Server() {
 
     path: '/dashwatch/reports/{month}',
 
-    config: {
+    options: {
 
       handler: DashWatchController.reportForMonth
 
@@ -1373,7 +1308,7 @@ async function Server() {
 
     path: '/merchants',
 
-    config: {
+    options: {
 
       handler: MerchantsController.list
 
@@ -1387,7 +1322,7 @@ async function Server() {
 
     path: '/active-merchants',
 
-    config: {
+    options: {
 
       handler: MerchantsController.listActiveSince
 
@@ -1395,13 +1330,28 @@ async function Server() {
 
   });
 
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/active-merchant-coins',
+
+    options: {
+
+      handler: MerchantsController.listMerchantCoins
+
+    }
+
+  });
   server.route({
 
     method: 'POST',
 
     path: '/test/webhooks',
 
-    config: {
+    options: {
 
       handler: async function(req, h) {
 
@@ -1420,7 +1370,7 @@ async function Server() {
 
     path: '/bch/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: BCHAddressForwardCallbacks.create
 
@@ -1434,7 +1384,7 @@ async function Server() {
 
     path: '/dash/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: DASHAddressForwardCallbacks.create
 
@@ -1450,7 +1400,7 @@ async function Server() {
 
     path: '/ltc/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: LTCAddressForwardCallbacks.create
 
@@ -1464,7 +1414,7 @@ async function Server() {
 
     path: '/zen/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: ZENAddressForwardCallbacks.create
 
@@ -1478,7 +1428,7 @@ async function Server() {
 
     path: '/zec/address_forward_callbacks',
 
-    config: {
+    options: {
 
       auth: "sudopassword",
       
@@ -1493,7 +1443,7 @@ async function Server() {
 
     path: '/doge/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: DOGEAddressForwardCallbacks.create
 
@@ -1508,7 +1458,7 @@ async function Server() {
 
     path: '/smart/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: SMARTAddressForwardCallbacks.create
 
@@ -1522,7 +1472,7 @@ async function Server() {
 
     path: '/rvn/address_forward_callbacks',
 
-    config: {
+    options: {
 
       handler: RVNAddressForwardCallbacks.create
 
@@ -1536,7 +1486,7 @@ async function Server() {
 
     path: '/address_subscription_callbacks',
 
-    config: {
+    options: {
 
       auth: "sudopassword",
 
@@ -1552,7 +1502,7 @@ async function Server() {
 
     path: '/address_routes/{input_currency}/{input_address}',
 
-    config: {
+    options: {
 
       auth: "authoracle",
 
@@ -1562,7 +1512,16 @@ async function Server() {
 
   });
 
+  server.route({
+    method: "GET",
+    path: "/accounts/roi",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: AccountsController.calculateROI
 
+    }
+  });
 
   server.route({
 
@@ -1570,7 +1529,7 @@ async function Server() {
 
     path: '/blockcypher/webhooks/dash',
 
-    config: {
+    options: {
 
       handler: async function(req, h) {
 
@@ -1612,9 +1571,102 @@ async function Server() {
 
   });
 
+
+  server.route({
+    method: "GET",
+    path: "/currency-map",
+    options: {
+      //tags: ['api'],
+      handler:(req: Hapi.Request, h: Hapi.ResponseToolkit) => {
+
+        return currencyMap.map
+
+      }
+    }
+  });
+
+  server.route({
+    method: 'PUT',
+    path: '/account/watch_address_webhook',
+    options: {
+      auth: 'token',
+      validate: {
+        payload: Joi.object().keys({
+          webhook_url: Joi.string().uri().required()
+        })
+      },
+
+      handler: async (req: Hapi.Request, h) => {
+
+        req['account']['watch_address_webhook_url'] = req.payload['webhook_url']
+
+        try {
+
+          await req['account'].save();
+
+          return { success: true}
+
+        } catch(error) {
+
+          return { success: false}
+
+        }
+
+      }
+    }
+  });
+
+  server.route({
+
+    method: 'POST',
+    path: '/dash/watch_addresses',
+
+    options: {
+
+      auth: "token",
+
+      handler: async (req: any, h) => {
+
+        await awaitChannel();
+
+        switch(req.account.email) {
+
+        case 'lorenzo@dashtext.io':
+
+          break;
+
+        case 'steven@anypay.global':
+
+          break;
+
+        default:
+
+          console.log('not authorized');
+
+          return {succes: false}
+
+        }
+
+        let buffer = Buffer.from(JSON.stringify({
+          account_email: req.account.email,
+          address: req.payload.address
+        }))
+
+        await channel.publish('anypay.payments', 'addresses.watch', buffer);
+
+        return { success: true }
+
+      }
+
+    }
+  }); 
+
+  accountCSVReports(server);
+
   return server;
 
 }
+
 
   
 
@@ -1631,7 +1683,7 @@ async function start () {
 
   }
 
-  addressRoutesActor.start();
+  bchAddAddressToAllOnInvoiceCreated.start();
 
   await sequelize.sync()
 

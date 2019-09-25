@@ -14,7 +14,7 @@ const routing_key = 'payment';
 
 const exchange = 'anypay.payments';
 
-import {Address} from '../../lib/models' 
+import {models} from '../../lib' 
 
 var WAValidator = require('anypay-wallet-address-validator');
 
@@ -28,7 +28,7 @@ export function validateAddress(address: string){
 
 async function generateInvoiceAddress(accountId){
 
-  let address = (await Address.findOne({ where: {
+  let address = (await models.Address.findOne({ where: {
 	  currency: 'XRP',
 	  account_id: accountId
   }})).value;

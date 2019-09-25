@@ -1,6 +1,7 @@
 docker login --username $DOCKER_USER \
              --password $DOCKER_PASSWORD 
 
-docker tag anypay anypay/api.anypay.global:latest
+docker tag anypay anypay/anypay:$CIRCLE_BRANCH
 
-docker push anypay/api.anypay.global:latest
+docker push anypay/anypay:$CIRCLE_BRANCH
+

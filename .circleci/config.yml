@@ -8,31 +8,23 @@ jobs:
       - setup_remote_docker
       - run:
           name: Build docker image
-          command: docker build -t anypay .
-      - add_ssh_keys
-  deploy:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - setup_remote_docker
+          command: docker build -t anypay . 
       - run:
-          name: Build docker image
-          command: docker build -t anypay .
+          name: Migrate Database
+          command: docker run -i -t -e DATABASE_URL=$DATABASE_URL anypay npm run db:migrate
       - run:
-          name: Deploy To Server
+          name: Seed Test Database
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
+      - run:
+          name: Running tests
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
+      - run:
+          name: Push to Docker Hub
           command: |
             ./push_to_docker.sh
-            ssh chef@api.anypay.global "sudo /opt/anypay/deploy_api.sh"
-
 workflows:
   version: 2
-  build-and-deploy:
+  build:
     jobs:
       - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+

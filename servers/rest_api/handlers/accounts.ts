@@ -3,13 +3,13 @@ const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
-
 import { geocode } from '../../../lib/googlemaps';
 
 import {emitter} from '../../../lib/events'
 
-import * as models from '../../../lib/models';
-import { Account, AccessToken } from '../../../lib/models';
+import { models } from '../../../lib';
+
+import { getROI } from '../../../lib/roi';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -86,11 +86,11 @@ export async function createAnonymous(request, reply) {
 
   try {
 
-    let account = await Account.create();
+    let account = await models.Account.create();
 
     log.info(`anonymous account ${account.uid} created`);
 
-    let access_token = await AccessToken.create({ account_id: account.id });
+    let access_token = await models.AccessToken.create({ account_id: account.id });
 
     return { account, access_token }
 
@@ -141,7 +141,7 @@ export async function create (request, reply) {
   let passwordHash = await hash(request.payload.password);
 
   try {
-    let account = await Account.create({
+    let account = await models.Account.create({
       email: request.payload.email,
       password_hash: passwordHash
     });
@@ -165,14 +165,14 @@ export async function create (request, reply) {
 
 export async function show (request, reply) {
   let accountId = request.auth.credentials.accessToken.account_id;
-  var account = await Account.findOne({ where: { id: accountId } })
+  var account = await models.Account.findOne({ where: { id: accountId } })
 
   return account;
 };
 
 export async function sudoShow (request, reply) {
 
-  var account = await Account.findOne({
+  var account = await models.Account.findOne({
     where: {
       id: request.params.account_id
     }
@@ -183,7 +183,7 @@ export async function sudoShow (request, reply) {
 
 export async function sudoAccountWithEmail (request, reply) {
 
-  var account = await Account.findOne({
+  var account = await models.Account.findOne({
     where: {
       email: request.params.email
     }
@@ -197,14 +197,14 @@ export async function index(request, reply) {
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
 
-  var accounts = await Account.findAll({ offset, limit });
+  var accounts = await models.Account.findAll({ offset, limit });
 
   return accounts;
 };
 
 export async function destroy(request, reply) {
 
-  let account = await Account.findOne({
+  let account = await models.Account.findOne({
     where: { id: request.params.account_id }
   });
 
@@ -240,3 +240,22 @@ export async function destroy(request, reply) {
   return { success: true };
 };
 
+export async function calculateROI(req, reply){
+
+  try{
+
+   let roi = await getROI(req.account.id)
+
+   return roi;
+
+  }catch(error){
+
+    console.log(error)
+
+    return(error)
+
+  }
+
+
+
+}

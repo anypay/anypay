@@ -6,6 +6,8 @@ import * as http from 'superagent';
 
 import {generateInvoice} from '../../lib/invoice';
 
+import {awaitChannel} from '../../lib/amqp';
+
 import {log, models, xpub} from '../../lib';
 
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
@@ -21,6 +23,8 @@ import {statsd} from '../../lib/stats/statsd'
 import { I_Address } from '../../types/interfaces';
 
 var bchaddr = require('bchaddrjs');
+
+import * as bch from 'bitcore-lib-cash';
 
 import * as address_subscription from '../../lib/address_subscription';
 
@@ -76,6 +80,18 @@ async function createInvoice(accountId: number, amount: number) {
 
 function validateAddress(address: string){
 
+  try {
+
+    new bch.HDPublicKey(address);
+
+    return true;
+
+  } catch(error) {
+
+    console.log(error.message);
+
+  }
+
   try{
 
     var isCashAddress = bchaddr.isCashAddress
@@ -83,6 +99,7 @@ function validateAddress(address: string){
     let valid = isCashAddress(address)
 
     return valid;
+
   }catch(error){
 
     return false;
@@ -120,23 +137,33 @@ async function createAddressForward(record: I_Address) {
 
   let url = "https://bch.anypay.global/v1/bch/forwards";
 
+  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypay.global/v1/bch/forwards";
+
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/bch/address_forward_callbacks'
+    callback_url: callback_url
 
   });
 
-  return resp.body.input_address;
+  let address = resp.body.input_address;
+
+  let channel = await awaitChannel();
+
+  await channel.publish('anypay.bch', 'addaddress', new Buffer(address))
+
+  return address;
 
 }
 
 export async function getNewAddress(record: I_Address) {
 
+  var address;
+
   if (record.value.match(/^xpub/)) {
 
-    var address = xpub.generateAddress('BCH', record.value, record.nonce);
+    address = xpub.generateAddress('BCH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -154,15 +181,26 @@ export async function getNewAddress(record: I_Address) {
 
     let subscription = await address_subscription.createSubscription('BCH', address)
 
-    return address;
-
   } else {
 
-    let address = await createAddressForward(record);
-
-    return address;
+    address = await createAddressForward(record);
 
   }
+
+  rpc.callAll('importaddress', [address, 'false', false])
+
+    .then(result => {
+
+      console.log('rpcresult', result); 
+
+    })
+    .catch(error => {
+
+      console.log('rpcerror', error); 
+
+    });
+
+  return address;
 
 }
 

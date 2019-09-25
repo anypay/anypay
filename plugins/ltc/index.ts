@@ -6,6 +6,8 @@ import {statsd} from '../../lib/stats/statsd'
 
 import {generateInvoice} from '../../lib/invoice';
 
+import * as JsonRpc from './lib/jsonrpc';
+
 import { I_Address } from '../../types/interfaces';
 
 var WAValidator = require('anypay-wallet-address-validator');
@@ -65,30 +67,17 @@ async function checkAddressForPayments(address:string, currency:string){
       return payments;
 }
 
-async function createAddressForward(record: I_Address) {
+export async function getNewAddress(outputAddress: string) {
 
-  let url = process.env.LTC_FORWARDING_URL; 
+  let rpc = new JsonRpc();
 
-  let resp = await http.post(url).send({
+  let address = await rpc.call('getnewaddress', []);
 
-    destination: record.value,
+  console.log('rpc result', address);
 
-    callback_url: 'https://api.anypay.global/ltc/address_forward_callbacks'
-
-  });
-
-  return resp.body.input_address;
+  return address.result;
 
 }
-
-export async function getNewAddress(record: I_Address) {
-
-  let address = await createAddressForward(record);
-
-  return address;
-
-}
-
 
 const currency = 'LTC';
 

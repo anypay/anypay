@@ -25,7 +25,7 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'VEF',
+      currency: 'USD',
       value: 15000000
     };
 
@@ -62,7 +62,7 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'GBP',
+      currency: 'VEF',
       value: 15
     };
 
@@ -88,7 +88,7 @@ describe("Creating Invoices", () => {
 
   describe("Replacing an Invoice", () => {
 
-    it("#replaceInvoice should change the currency of an invoice", async () => {
+    it.skip("#replaceInvoice should change the currency of an invoice", async () => {
 
       let account = await registerAccount(chance.email(), chance.word());
 
@@ -100,12 +100,12 @@ describe("Creating Invoices", () => {
 
       await setAddress({
         account_id: account.id,
-        currency: "BTC",
-        address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
+        currency: "BCH",
+        address: "bitcoincash:pp8skudq3x5hzw8ew7vzsw8tn4k8wxsqsv0lt0mf3g"
       });
 
       var amount = {
-        currency: 'VEF',
+        currency: 'USD',
         value: 15000000
       };
 
@@ -116,9 +116,9 @@ describe("Creating Invoices", () => {
 
       let invoice = await generateInvoice(account.id, amount.value, 'DASH');
 
-      invoice = await replaceInvoice(invoice.uid, 'BTC');
+      invoice = await replaceInvoice(invoice.uid, 'BCH');
 
-      assert.strictEqual(invoice.currency, 'BTC')
+      assert.strictEqual(invoice.currency, 'BCH')
 
     });
 

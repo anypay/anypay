@@ -4,7 +4,7 @@ let token = process.env.BLOCKCYPHER_TOKEN;
 
 import { log } from '../logger';
 
-import * as models from '../models';
+import { models } from '../models';
 
 const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypay.global";
 

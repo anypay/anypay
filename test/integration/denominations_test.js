@@ -1,13 +1,8 @@
 import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 import {hash} from '../../lib/password';
-import * as Database from '../../lib/database';
 
-import {
-  settings,
-  models,
-  accounts
-} from "../../lib";
+import { settings, database, models, accounts } from "../../lib";
 
 import * as Chance from 'chance';
 const chance = new Chance();
@@ -16,7 +11,7 @@ describe("Setting Denomination Via REST", async () => {
   var accessToken, account, server;
   
   before(async () => {
-    await Database.sync();
+    await database.sync();
     server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());

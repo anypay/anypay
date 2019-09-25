@@ -15,6 +15,26 @@ export async function list(req: Request, h: ResponseToolkit) {
   return { merchants: resp[0] };
 
 }
+
+export async function listMerchantCoins( req: Request, h:ResponseToolkit){
+
+  try{
+
+    let query = `select accounts.id, currency from accounts full join addresses on accounts.id = addresses.account_id where accounts.physical_address is not null and accounts.business_name is not null`
+
+    let coinList = await database.query(query)
+
+    return coinList[0]
+
+  }catch(error){
+
+    console.log(error)
+
+  }
+
+
+}
+
 export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
   try {

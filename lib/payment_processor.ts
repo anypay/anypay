@@ -7,9 +7,40 @@ import {emitter} from './events';
 import {log} from './logger';
 
 import {BigNumber} from 'bignumber.js'
-import * as models from './models';
+import { models } from './models';
 
 import * as moment from 'moment';
+
+
+export async function updateOutput(payment: Payment){
+
+  let invoice = await models.Invoice.findOne({
+    where: {
+      currency: payment.currency,
+      address: payment.address,
+    },
+    order: [['createdAt', 'DESC']]
+  });
+
+  if( invoice && payment.output_hash ){
+
+     var result = await models.Invoice.update({
+       output_hash: payment.output_hash,
+       output_currency: payment.output_currency,
+       output_amount: payment.output_amount,
+       output_address: payment.output_address,
+       completed_at: new Date()
+      },
+      {
+       where: { id: invoice.id }
+      });
+
+     log.info('output hash recorded', payment )
+
+     return result
+  }
+  
+}
 
 export async function receivePayment(payment: Payment) {
   log.info('receive payment', payment);
@@ -104,6 +135,10 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
       status: 'underpaid',
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {
@@ -135,6 +170,10 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
       status: "paid",
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {
@@ -162,6 +201,8 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
     throw new Error("overpaid handler called with exactly sufficient payment");
   }
 
+  console.log("handleOverpaid", payment)
+
   let paymentAmount = new BigNumber(payment.amount);
 
   let price = getInvoicePrice(invoice);
@@ -176,6 +217,10 @@ export async function handleOverpaid(invoice: Invoice, payment: Payment) {
       status: 'overpaid',
       paidAt: new Date(),
       complete: true,
+      output_hash: payment.output_hash,
+      output_currency: payment.output_currency,
+      output_amount: payment.output_amount,
+      output_address: payment.output_address,
       completed_at: new Date()
     },
     {

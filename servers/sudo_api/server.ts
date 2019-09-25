@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 import * as Hapi from 'hapi';
 
@@ -9,6 +10,30 @@ import { sendWebhookForInvoice } from '../../lib/webhooks';
 
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
+import * as simplewallets from './handlers/simple_wallets';
+import * as accountInvoices from './handlers/account_invoices';
+
+const sudoWires = require("./handlers/wire_reports");
+
+const SudoAccounts = require("./handlers/sudo_accounts");
+
+const AccountsController = require("./handlers/accounts");
+
+const InvoicesController = require("./handlers/invoices");
+
+const SudoCoins = require("./handlers/sudo_coins");
+
+import { sudoLogin } from './handlers/sudo_login';
+
+import * as CashbackMerchants from './handlers/cashback_merchants';
+
+import * as SudoPaymentForwards from "./handlers/payment_forwards";
+
+import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
+
+import * as sudoAddresses from './handlers/sudo_addresses';
+
+import * as sudoTipjars from './handlers/tipjars';
 
 import * as passwords from './handlers/passwords';
 
@@ -17,8 +42,8 @@ import * as Joi from 'joi';
 async function Server() {
 
   var server = new Hapi.Server({
-    host: process.env.HOST || "0.0.0.0",
-    port: process.env.PORT || 8100,
+    host: "0.0.0.0",
+    port:  8100,
     routes: {
       cors: true,
       validate: {
@@ -52,6 +77,433 @@ async function Server() {
 
   });
 
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/api/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.destroy
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/accounts/{account_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/account-by-email/{email}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.sudoAccountWithEmail
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/coins',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.list
+
+    }
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/coins/activate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.activate
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/coins/deactivate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoCoins.deactivate
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: AccountsController.index
+
+    }
+
+  });
+ 
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payment_forwards',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payment_forwards/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoPaymentForwards.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/invoices',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoIndex
+
+    }
+
+  });
+        
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/invoices/{invoice_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/addresses',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/accounts/{account_id}/addresses/{currency}/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.lockAddress
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/api/accounts/{account_id}/addresses/{currency}/locks',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoAddresses.unlockAddress
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/cashback/merchants',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: CashbackMerchants.sudoList
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/cashback/merchants/{email}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: CashbackMerchants.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/cashback/merchants/{email}/activate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: CashbackMerchants.sudoActivate
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/cashback/merchants/{email}/deactivate',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: CashbackMerchants.sudoDeactivate
+
+    }
+
+  });
+
+
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: SudoAccounts.update,
+
+      validate: {
+
+        payload: {
+
+           email: Joi.string().optional(),
+
+           denomination: Joi.string().optional(),
+
+           physical_address: Joi.string().optional(),
+
+           business_name: Joi.string().optional(),
+
+           latitude: Joi.number().optional(),
+
+           longitude: Joi.number().optional(),
+
+           image_url: Joi.string().optional()
+
+         }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/bank_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/api/bank_accounts/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoBankAccounts.del
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/auth',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoLogin
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/simple_wallets",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: simplewallets.index
+
+    }
+
+  });
+
   server.route({
 
     method: "GET",
@@ -63,50 +515,51 @@ async function Server() {
       auth: "sudopassword",
 
       handler: async (req, h) => {
-
-        var invoice;
-
-        invoice = await models.Invoice.findOne({
-          where: {
-            uid: req.params.search
-          } 
-        });
-
-        if (!invoice) {
+             
+          var invoice;
 
           invoice = await models.Invoice.findOne({
             where: {
-              address: req.params.search
+              uid: req.params.search
             } 
           });
 
-        }
+          if (!invoice) {
 
-        if (!invoice) {
+            invoice = await models.Invoice.findOne({
+              where: {
+                address: req.params.search
+              } 
+            });
 
-          invoice = await models.Invoice.findOne({
-            where: {
-              external_id: req.params.search
-            } 
-          });
+          }
 
-        }
+          if (!invoice) {
 
-        if (!invoice) {
+            invoice = await models.Invoice.findOne({
+              where: {
+                external_id: req.params.search
+              } 
+            });
 
-          invoice = await models.Invoice.findOne({
-            where: {
-              hash: req.params.search
-            } 
-          });
+          }
 
-        }
+          if (!invoice) {
 
-        if (!invoice) {
-          throw new Error(`invoice search not found ${req.params.search}`);
-        }
+            invoice = await models.Invoice.findOne({
+              where: {
+                hash: req.params.search
+              } 
+            });
 
-        return { invoice };
+          }
+
+          if (!invoice) {
+            throw new Error(`invoice search not found ${req.params.search}`);
+          }
+
+          return { invoice };
+
       }
 
     }
@@ -125,10 +578,17 @@ async function Server() {
 
       handler: async (req, h) => {
 
-        let resp = await sendWebhookForInvoice(req.params.uid); 
+        try{
 
-        return resp.body;
+          let resp = await sendWebhookForInvoice(req.params.uid); 
 
+          return resp.body;
+
+        }catch(err){
+
+          console.log(err)
+
+        }
       }
 
     }
@@ -177,21 +637,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: "/api/cashback/merchants",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: cashbackMerchants.list
-
-    }
-  });
-
-  server.route({
-
-    method: 'GET',
-
     path: "/api/cashback/dashboard",
 
     config: {
@@ -203,7 +648,50 @@ async function Server() {
     }
   });
 
+  server.route({
 
+    method: 'GET',
+
+    path: "/api/accounts/{id}/invoices",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: accountInvoices.show
+
+    }
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/accounts/{id}/roi",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.calculateROI
+
+    }
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/accounts/{id}/volume",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.accountVolume
+
+    }
+  });
   server.route({
 
     method: 'PUT',
@@ -231,6 +719,48 @@ async function Server() {
     }
   });
 
+  server.route({
+
+    method: "GET",
+    path: "/api/accounts/{account_id}/tipjars/{currency}",
+    config: {
+      auth: "sudopassword",
+      handler: sudoTipjars.show
+    }
+  });
+
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/wires/reportsinceinvoice/{invoice_uid}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoWires.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/wires/reportsinceinvoice/{invoice_uid}/csv',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: sudoWires.showCSV
+
+    }
+
+  });
 
 
   return server;
@@ -241,6 +771,7 @@ async function Server() {
 
 async function start() {
 
+ try{
   await database.sync()
 
   var server = await Server();
@@ -249,6 +780,11 @@ async function start() {
   await server.start();
 
   log.info("Server running at:", server.info.uri);
+ }catch(err){
+
+   console.log(err)
+
+ }
 
 }
 

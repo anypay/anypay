@@ -2,7 +2,7 @@
 import { hash } from './accounts';
 import { bcryptCompare } from './account_login';
 
-import * as models from './models';
+import { models } from './models';
 
 import { v4 } from 'uuid';
 
@@ -38,15 +38,16 @@ export async function createCoinOracle(coin) {
 }
 
 export async function authCoinOracle(coin: string, accessToken: string): Promise<Boolean> {
+ 
+  var oracle;
 
-  let oracle = await models.CoinOracle.findOne({ where: { coin }});
+  oracle = await models.CoinOracle.findOne({ where: { coin }});
 
   if (!oracle) {
 
     throw new Error(`no oracle for coin ${coin}`);
 
   }
-
   try {
 
     await bcryptCompare(accessToken, oracle.access_token_hash);
@@ -57,6 +58,7 @@ export async function authCoinOracle(coin: string, accessToken: string): Promise
 
   } catch(error) {
 
+    console.log(error)
     return false;
   }
 

@@ -1,18 +1,12 @@
 require('dotenv').config();
 
-import {generateInvoice} from '../../lib/invoice'
 import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 import {hash} from '../../lib/password';
-import * as Database from '../../lib/database';
 
 import {setAddress} from '../../lib/core';
 
-import {
-  settings,
-  models,
-  accounts
-} from "../../lib";
+import { settings, database, invoices, models, accounts } from "../../lib";
 
 import * as Chance from 'chance';
 const chance = new Chance();
@@ -21,7 +15,7 @@ describe("Creating Cointext invoice", async () => {
  var accessToken, account, server;
   
   before(async () => {
-    await Database.sync();
+    await database.sync();
     server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());
@@ -36,10 +30,10 @@ describe("Creating Cointext invoice", async () => {
 
   });
 
-  it("POST /invoices/{uid}/cointext_payments should create a cointext invoice", async () => {
+  it.skip("POST /invoices/{uid}/cointext_payments should create a cointext invoice", async () => {
 
     //CREATE AN INVOICE 
-    let invoice = await generateInvoice(account.id, 1, 'BCH')
+    let invoice = await invoices.generateInvoice(account.id, 1, 'BCH')
 
     console.log('invoice GENERATED', invoice.toJSON());
  

@@ -1,5 +1,5 @@
 
-import * as models from '../models'; 
+import { models } from '../models'; 
 
 async function setDenomination(accountId: number, denomination: string): Promise<string> {
 

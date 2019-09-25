@@ -1,6 +1,4 @@
-import {Account}  from '../../../lib/models';
-
-import {getSupportedCoins} from '../../../lib/accounts';
+import {accounts}  from '../../../lib';
 
 import * as Joi from 'joi';
 
@@ -33,7 +31,7 @@ module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let accountCoins = await getSupportedCoins(accountId);
+  let accountCoins = await accounts.getSupportedCoins(accountId);
 
   let coins = Object.values(accountCoins);
 

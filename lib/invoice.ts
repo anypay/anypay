@@ -1,3 +1,4 @@
+import {plugins} from './plugins';
 import * as LitecoinAddressService from './litecoin/address_service';
 import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
 import * as RippleAddressService from './ripple/address_service';
@@ -5,6 +6,8 @@ import * as BitcoinAddressService from './bitcoin/address_service';
 import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
+
+import { createAddressRoute } from './routes';
 
 import * as database from './database';
 
@@ -20,11 +23,12 @@ import * as bch from '../plugins/bch';
 
 import * as xrp from '../plugins/xrp';
 
-import * as models from './models';
+import { models } from './models';
 
 import {convert} from './prices';
 
-import {plugins} from './plugins';
+
+import { computeInvoiceURI } from './uri';
 
 interface Amount {
   currency: string;
@@ -47,12 +51,6 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
   var address;
 
   switch(currency) {
-
-    case 'BTC':
-
-      address = await BitcoinAddressService.getNewAddress(accountId);
-
-      break;
 
     case 'XRP':
 
@@ -111,6 +109,12 @@ export async function generateInvoice(
     invoiceAmount
   };
 
+  let uri = computeInvoiceURI({
+    currency: invoiceChangeset.invoiceAmount.currency,
+    amount: invoiceChangeset.invoiceAmount.value,
+    address: invoiceChangeset.address
+  });
+
   var invoiceParams = {
     address: invoiceChangeset.address,
     invoice_amount: invoiceChangeset.invoiceAmount.value,
@@ -120,17 +124,20 @@ export async function generateInvoice(
     account_id: invoiceChangeset.accountId,
     status: 'unpaid',
     uid: uid,
+    uri,
 
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   }
 
-  console.log('invoice params', invoiceParams);
-
   var invoice = await models.Invoice.create(invoiceParams);
 
   emitter.emit('invoice.created', invoice.uid);
+
+  let route = await createAddressRoute(invoice);
+
+  console.log('address_route.created', route.toJSON());
 
   return invoice;
 }

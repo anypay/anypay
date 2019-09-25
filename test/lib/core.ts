@@ -3,9 +3,8 @@ import { AddressChangeSet } from '../../lib/core/types/address_change_set';
 
 import { lockAddress, unlockAddress  } from '../../lib/addresses';
 
-import * as models from '../../lib/models';
-import * as Account from '../../lib/models/account';
-import * as Address from '../../lib/models/address';
+import { models } from '../../lib/models';
+
 import * as Chance from 'chance';
 import * as assert from 'assert';
 
@@ -18,13 +17,13 @@ describe("Anypay Core", () => {
   before(async function() {
     let email = chance.email().toUpperCase();
 
-    account = await Account.create({
+    account = await models.Account.create({
       email: email
     });
 
   });
 
-  describe("Updating Account Address", () => {
+  describe("Updating Account.models Address", () => {
 
     it("#setAddress should emit an event", (done) => {
 
@@ -78,7 +77,7 @@ describe("Anypay Core", () => {
 
       await setAddress(addressChangeset); 
       
-      address = await Address.findOne({ where: {
+      address = await models.Address.findOne({ where: {
         account_id: account.id,
         currency:"DASH"
       }});
@@ -97,7 +96,7 @@ describe("Anypay Core", () => {
 
       await setAddress(addressChangeset); 
 
-      address = await Address.findOne({ where: {
+      address = await models.Address.findOne({ where: {
         account_id: account.id,
 	currency: "BTC"
       }});
@@ -137,7 +136,7 @@ describe("Anypay Core", () => {
 
       await unsetAddress(addressChangeset); 
 
-      address = await Address.findOne({ where: {
+      address = await models.Address.findOne({ where: {
         account_id: account.id,
 	currency: "DASH"
       }});
@@ -155,7 +154,7 @@ describe("Anypay Core", () => {
       let addressChangeset = {
         account_id: account.id,
         currency: 'ZEN',
-        address: 'ZojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
       };
 
       await setAddress(addressChangeset); 
@@ -174,7 +173,7 @@ describe("Anypay Core", () => {
       let addressChangeset = {
         account_id: account.id,
         currency: 'ZEN',
-        address: 'ZojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
       };
 
       await unsetAddress(addressChangeset); 

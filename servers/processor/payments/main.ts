@@ -17,7 +17,7 @@ import * as validate from 'validator';
 import * as http from 'superagent';
 
 import {
-  handlePayment,
+  handlePayment, updateOutput,
 } from '../../../lib/payment_processor';
 
 import {Payment} from '../../../types/interfaces';
@@ -75,9 +75,9 @@ export function handlePaymentMessage(payment: Payment) {
           await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
 
           let account = await models.Account.findOne({
-      where: {
+            where: {
               id: invoice.account_id
-      }
+            }
           });
 
           invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
@@ -103,11 +103,12 @@ export function handlePaymentMessage(payment: Payment) {
       } else {
 
         log.error('no unpaid invoice found matching currency and address');
-      
-	statsd.increment('handlePaymentMessage_invoiceNotFound')
+
+        await updateOutput(payment)
 
         channel.ack(message);
-      }
+
+     }
 
     } catch(error) {
 
@@ -118,12 +119,12 @@ export function handlePaymentMessage(payment: Payment) {
   }
 }
 
-function PaymentConsumer(channel: Channel) {
+export function PaymentConsumer(channel: Channel) {
   return async function(message: Message) {
 
     var msgString = message.content.toString();
 
-    log.info('raw message string', msgString);
+    log.info('Payment Consumer', msgString);
 
     try {
 
@@ -141,44 +142,3 @@ function PaymentConsumer(channel: Channel) {
     }
   };
 }
-
-amqp.connect(AMQP_URL).then(async (conn: Connection) => {
-
-  let channel: Channel = await conn.createChannel()
-
-  log.info("amqp:channel:connected");
-
-  await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
-
-  await channel.assertExchange('anypay', 'fanout');
-
-  await channel.assertExchange('anypay.payments', 'direct');
-
-  await channel.assertExchange('anypay:invoices', 'fanout');
-
-  await channel.bindQueue(PAYMENT_QUEUE, 'anypay.payments', 'payment');
-
-  let consumer = PaymentConsumer(channel);
-
-  log.info('consume channel', PAYMENT_QUEUE);
-
-  channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
-
-  if (process.env.FORWARDER_EVENTS_ACTOR) {
-
-    log.info('starting forwarding events actor');
-
-    await forwarderEventsActor.start();
-
-  } else {
-
-    log.info('not starting forwarding events actor');
-
-  }
-
-})
-.catch(error => {
-
-  log.error(error.message);
-
-});

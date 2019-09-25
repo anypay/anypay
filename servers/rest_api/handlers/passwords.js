@@ -1,6 +1,7 @@
 const password = require("../../../lib/password")
-const PasswordReset = require("../../../lib/models/password_resets");
 const Joi = require('joi');
+
+import { models } from '../../../lib';
 
 module.exports.reset = async function(request, reply) {
 
@@ -20,7 +21,7 @@ module.exports.claim = async function(request, reply) {
 
   try {
 
-    let passwordReset = await PasswordReset.findOne({ where:
+    let passwordReset = await models.PasswordReset.findOne({ where:
       { uid: request.params.uid }
     })
 

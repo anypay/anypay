@@ -1,5 +1,5 @@
 
-import * as models from '../models';
+import { models } from '../models';
 
 import * as moment from 'moment';
 
@@ -11,9 +11,47 @@ import * as Handlebars from 'handlebars';
 
 import { join } from 'path';
 
-export async function buildWireEmailReport(invoiceUID: string) {
+async function getInvoicesByDates(accountId, start, end) {
 
-  /*
+  let invoices = await models.Invoice.findAll({
+
+    where: {
+
+      account_id: accountId,
+
+      complete: true,
+
+      completed_at: {
+
+        [Op.gte]: start,
+
+        [Op.lt]: end
+
+      }
+
+    }
+
+  });
+
+  invoices = invoices.map(invoice => {
+
+    if (!invoice.cashback_denomination_amount) {
+
+      invoice.cashback_denomination_amount = 0;
+    }
+
+    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
+
+    return invoice;
+
+  });
+
+  return invoices;
+}
+
+async function getInvoices(invoiceUID: string) {
+
+  /*:
    * 1) Check to see when last invoice was
    *   - here provided by command line
    *   - will be provided manually Derrick
@@ -24,19 +62,6 @@ export async function buildWireEmailReport(invoiceUID: string) {
   let account = await models.Account.findOne({
     where: { id: invoice.account_id }
   });
-
-  /*
-   * 2) Look in slack for all invoices starting at that
-   *   invoice number
-   *
-   *   - here use database to query all completed invoices since
-   *     the one indicated in step 1
-   *
-   */
-
-  let templateSource = readFileSync(join(__dirname, './template.hbs'));
-
-  let template = Handlebars.compile(templateSource.toString('utf8'));
 
   let invoices = await models.Invoice.findAll({
 
@@ -63,9 +88,23 @@ export async function buildWireEmailReport(invoiceUID: string) {
       invoice.cashback_denomination_amount = 0;
     }
 
+    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
+
     return invoice;
 
   });
+
+  return invoices;
+
+}
+
+export async function buildWireEmailReport(invoiceUID: string) {
+
+  let templateSource = readFileSync(join(__dirname, './template.hbs'));
+
+  let template = Handlebars.compile(templateSource.toString('utf8'));
+
+  let invoices = await getInvoices(invoiceUID);
 
   let total = invoices.reduce(function(acc, invoice) {
 
@@ -78,42 +117,59 @@ export async function buildWireEmailReport(invoiceUID: string) {
   let start_date = moment(invoices[0].completed_at).format('MM-DD-YYYY');
   let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY');
 
-
   let content = template({
+    reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
     invoices,
     total,
     start_date,
     end_date
   });
 
-  console.log('content', content);
-
-  //let filepath = await buildReportCsv(invoices, invoiceUID);
-
-  //console.log(`csv written to ${filepath}`);
-
   return content;
 
 }
 
-async function buildReportCsv(invoices, invoiceUID: string): Promise<string> {
+export async function buildReportCsv(invoices: any[], filepath: string): Promise<string> {
 
-  let filepath = join(__dirname, `../../.tmp/${invoiceUID}.csv`);
 
-  const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-  const csvWriter = createCsvWriter({
+  const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
+  const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'external_id', title: 'EXTERNAL ID'},
-      {id: 'uid', title: 'INVOICE UID'},
-      {id: 'denomination_amount_paid', title: 'AMOUNT PAID'},
-      {id: 'completed_at', title: 'DATE PAID'},
+      {id: 'completed', title: 'Payment Completed At'},
+      {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
+      {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
+      {id: 'settlement_amount', title: 'Account Gets (USD)'},
+      {id: 'external_id', title: 'Reference'},
+      {id: 'uid', title: 'Invoice ID'},
     ]
   });
 
-  await csvWriter.writeRecords(invoices)
+  let header = await csvStringifier.getHeaderString();
+  let records = await csvStringifier.stringifyRecords(invoices);
 
-  return filepath;
+  return `${header}\t${records}`;
+
+}
+
+export async function buildReportCsvFromDates(accountId, start, end) {
+
+  let invoices = await getInvoicesByDates(accountId, start, end);
+
+  let filepath = join(__dirname,
+  `../../.tmp/account-${accountId}-${start}-${end}.csv`);
+
+  return buildReportCsv(invoices, filepath);
+
+}
+
+export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<string> {
+
+  let invoices = await getInvoices(invoiceUid);
+
+  let filepath = join(__dirname, `../../.tmp/${invoiceUid}.csv`);
+
+  return buildReportCsv(invoices, filepath);
 
 }
 

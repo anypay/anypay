@@ -4,6 +4,8 @@ import { awaitChannel } from '../../lib/amqp';
 
 import { connect } from 'amqplib';
 
+import { createAddressRoute } from '../../lib/routes';
+
 require('dotenv').config();
 
 async function start() {
@@ -70,37 +72,6 @@ async function start() {
     channel.ack(msg);
 
   });
-
-}
-
-async function createAddressRoute(invoice) {
-
-  let outputAddress = await models.Address.findOne({ where: {
-
-    account_id: invoice.account_id,
-
-    currency: invoice.currency
-
-  }});
-
-  if (!outputAddress) {
-
-    throw new Error('no output address found');
-  }
-
-  let addressRoute = await models.AddressRoute.create({
-
-    input_currency: invoice.currency, 
-
-    input_address: invoice.address, 
-
-    output_currency: invoice.currency,
-
-    output_address: outputAddress.value
-
-  });
-
-  return addressRoute;
 
 }
 

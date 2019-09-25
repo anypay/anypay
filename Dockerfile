@@ -13,4 +13,4 @@ RUN yarn global add ts-node
 # Bundle app source
 COPY . /usr/src/app
 
-CMD ./bin/anypay.ts
+CMD ./bin/anypay.ts --api --actors slack

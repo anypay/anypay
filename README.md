@@ -17,6 +17,40 @@ anypay --api --websockets --blockcypher --actors --payments
 
 ## Documenation
 
+
+## Staging Deployment
+
+The staging environment is available at https://api.staging.anypay.global,
+which is configured to be accessed by the staging point of sale app at
+https://pos.staging.anypay.global.
+
+Code is deployed to staging via the `staging` branch using the following
+process.
+
+1) Delete existing staging branch on github
+
+`git push origin :staging`
+
+2) Delete local staging branch
+
+`git branch -D staging`
+
+3) Update local master branch with latest from github
+
+`git checkout master && git pull origin master`
+
+4) Merge local master branch into local staging
+
+`git checkout staging && git merge master`
+
+5) Push staging branch to github
+
+`git push origin staging`
+
+At this point Circle CI will take over and build your code with the staging
+environment parameters. Upon a successful build with all tests passing Circle
+CI will deploy your new code to `https://api.staging.anypay.global`.
+
 ## Configuration
 
 Configuration of the application is done via environment variables
@@ -32,9 +66,13 @@ Configuration of the application is done via environment variables
 - JSONWEBTOKEN_PRIVATE_KEY_PATH
 - SUDO_PASSWORD_HASH
 
+- DASHTEXT_TOKEN
+
 ### Optional Environmente Variables
 
 - BLOCKCYPHER_CALLBACKS_BASE (used for staging/testing of blockcypher)
+
+
 
 ## Enabling Features
 
@@ -57,6 +95,10 @@ Setting the `PORT` environment variable to something other than 8000 will allow 
 
 Ideally every piece of the application will have accompanying tests to increase
 the security, availability and quality of the software.
+
+```
+npm test
+```
 
 #### Configuring the Postgres Database for Testing
 

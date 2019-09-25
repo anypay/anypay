@@ -1,4 +1,3 @@
-const Invoice = require('../../../lib/models/invoice');
 const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
@@ -12,6 +11,8 @@ import {emitter} from '../../../lib/events';
 import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
+
+import { models } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -101,7 +102,7 @@ module.exports.index = async (request, reply) => {
 
   try {
 
-    var invoices = await Invoice.findAll(query);
+    var invoices = await models.Invoice.findAll(query);
 
     return { invoices };
 
@@ -136,7 +137,7 @@ module.exports.sudoIndex = async (request, reply) => {
     where['status'] = request.query.status;
   }
 
-  var invoices = await Invoice.findAll({
+  var invoices = await models.Invoice.findAll({
 
     where,
 
@@ -159,7 +160,7 @@ module.exports.replace = async (request, reply) => {
 
   log.info(`controller:invoices,action:replace,invoice_id:${invoiceId}`);
 
-  let invoice = await Invoice.findOne({
+  let invoice = await models.Invoice.findOne({
     where: {
       uid: invoiceId
     }
@@ -245,6 +246,12 @@ module.exports.create = async (request, reply) => {
 
     }
 
+    if (request.is_public_request) {
+
+      invoice.is_public_request = true;
+
+    }
+
     await invoice.save();
 
     return sanitizeInvoice(invoice);
@@ -265,7 +272,6 @@ function sanitizeInvoice(invoice) {
 
   delete resp.webhook_url;
   delete resp.id;
-  delete resp.account_id;
   delete resp.dollar_amount;
 
   return resp;
@@ -280,12 +286,11 @@ module.exports.show = async function(request, reply) {
 
   try {
 
-	  let invoice = await Invoice.findOne({
+	  let invoice = await models.Invoice.findOne({
 	    where: {
 	      uid: invoiceId
 	    }
 	  });
-
 
 	  if (invoice) {
 

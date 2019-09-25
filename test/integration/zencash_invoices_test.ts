@@ -2,11 +2,9 @@ import {Server} from '../../servers/rest_api/server';
 import * as assert from 'assert';
 import {hash} from '../../lib/password';
 
-const Database = require("../../lib/database");
-const Account = require("../../lib/models/account");
-const AccessToken = require("../../lib/models/access_token");
-
 import {setAddress} from '../../lib/core';
+
+import { database, models } from '../../lib';
 
 import * as Chance from 'chance';
 const chance = new Chance();
@@ -15,16 +13,16 @@ describe("Creating Bitcoin Cash Invoices Via REST", async () => {
   var accessToken, server;
   
   before(async () => {
-    await Database.sync();
+    await database.sync();
     server = await Server();
 
     try {
-      var account = await Account.create({
+      var account = await models.Account.create({
         email: chance.email(),
         password_hash: await hash(chance.word())
       })
 
-      accessToken = await AccessToken.create({
+      accessToken = await models.AccessToken.create({
         account_id: account.id
       })
 
