@@ -83,6 +83,12 @@ async function getInvoices(invoiceUID: string) {
 
   invoices = invoices.map(invoice => {
 
+    if (invoice.status !== 'paid') {
+
+      invoice.cashback_denomination_amount = 0;
+
+    }
+
     if (!invoice.cashback_denomination_amount) {
 
       invoice.cashback_denomination_amount = 0;
