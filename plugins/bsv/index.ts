@@ -7,6 +7,8 @@ import {statsd} from '../../lib/stats/statsd'
 
 import { toLegacyAddress} from 'bchaddrjs';
 
+var WAValidator = require('anypay-wallet-address-validator');
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
@@ -26,6 +28,14 @@ async function getNewAddress(outputAddress: string) {
   let address = await rpc.call('getnewaddress', []);
 
   return toLegacyAddress(address.result);
+
+}
+
+export function validateAddress(address: string){
+
+  let valid = WAValidator.validate( address, 'bitcoin')
+
+  return valid;
 
 }
 
