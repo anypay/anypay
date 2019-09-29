@@ -55,6 +55,7 @@
     "inert": "^5.1.0",
     "jayson": "^2.0.5",
     "joi": "^14.3.1",
+    "joi-phone-number": "^3.1.0",
     "jsonschema": "^1.2.2",
     "jsonwebtoken": "^8.3.0",
     "mailchimp-api-v3": "^1.13.0",

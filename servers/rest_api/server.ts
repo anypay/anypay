@@ -12,6 +12,8 @@ import { attachMerchantMapRoutes } from '../map/server';
 
 const HapiSwagger = require("hapi-swagger");
 
+import { validateToken } from './auth/validate_token';
+
 import * as pricesActor from '../../actors/prices/actor';
 import * as addressRoutesActor from '../../actors/address_routes/actor';
 import * as bchAddAddressToAllOnInvoiceCreated from '../../actors/on_invoice/actor';
@@ -179,39 +181,6 @@ const validatePassword = async function(request, username, password, h) {
 
     }
 
-  }
-};
-
-const validateToken = async function(request, username, password, h) {
-  if (!username) {
-    return {
-      isValid: false
-    };
-  }
-
-  var accessToken = await models.AccessToken.findOne({
-    where: {
-      uid: username
-    }
-  });
-
-  if (accessToken) {
-		var account = await models.Account.findOne({
-			where: {
-				id: accessToken.account_id
-			}
-		})
-		request.account = account;
-    request.account_id = accessToken.account_id;
-
-    return {
-      isValid: true,
-      credentials: { accessToken: accessToken }
-    }
-  } else {
-    return {
-      isValid: false
-    }
   }
 };
 
