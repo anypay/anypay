@@ -60,7 +60,19 @@ module.exports.sudoShow = async function(request, reply) {
 
 	  if (invoice) {
 
-      return invoice.toJSON();
+      let data = invoice.toJSON();
+
+      let cashback = await models.CashbackCustomerPayment.findOne({
+        where: { invoice_id: invoice.id }
+      });
+
+      if (cashback) {
+
+        data.cashback = cashback;
+
+      }
+
+      return data;
 
 	  } else {
 
