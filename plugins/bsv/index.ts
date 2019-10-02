@@ -1,11 +1,10 @@
+import * as bsv from 'bsv';
 
 import { rpc } from './lib/jsonrpc';
 
 import {generateInvoice} from '../../lib/invoice';
 
 import {statsd} from '../../lib/stats/statsd'
-
-import { toLegacyAddress} from 'bchaddrjs';
 
 var WAValidator = require('anypay-wallet-address-validator');
 
