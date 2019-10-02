@@ -1,8 +1,12 @@
+require('dotenv').config()
+
 import * as bsv from 'bsv';
 
 import { rpc } from './lib/jsonrpc';
 
 import {generateInvoice} from '../../lib/invoice';
+
+import {models} from '../../lib/models';
 
 import {statsd} from '../../lib/stats/statsd'
 
@@ -73,8 +77,6 @@ export {
   currency,
 
   icon,
-
-  getNewAddress,
 
   createInvoice
 
