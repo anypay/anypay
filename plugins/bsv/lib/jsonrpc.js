@@ -13,7 +13,7 @@ class JsonRpc {
 
   call(method, params) {
 
-    log.info(`bch.rpc.call.${method}`, params);
+    log.info(`bsv.rpc.call.${method}`, params);
 
     return new Promise((resolve, reject) => {
       http

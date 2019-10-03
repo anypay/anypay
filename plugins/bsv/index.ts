@@ -1,11 +1,14 @@
+require('dotenv').config()
+
+import * as bsv from 'bsv';
 
 import { rpc } from './lib/jsonrpc';
 
 import {generateInvoice} from '../../lib/invoice';
 
-import {statsd} from '../../lib/stats/statsd'
+import {models} from '../../lib/models';
 
-import { toLegacyAddress} from 'bchaddrjs';
+import {statsd} from '../../lib/stats/statsd'
 
 var WAValidator = require('anypay-wallet-address-validator');
 
@@ -23,11 +26,33 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-async function getNewAddress(outputAddress: string) {
 
-  let address = await rpc.call('getnewaddress', []);
+export async function getNewAddress(deprecatedParam){
 
-  return toLegacyAddress(address.result);
+  //Create a new HDKeyAddress 
+  let record = await models.Hdkeyaddresses.create({
+
+    currency:'BSV',
+
+    xpub_key:process.env.BSV_HD_PUBLIC_KEY
+
+  })
+
+  record.address = deriveAddress(process.env.BSV_HD_PUBLIC_KEY, record.id)
+
+  await record.save()
+
+  await rpc.call('importaddress', [record.address, "", false, false])
+
+  return record.address;
+
+}
+
+function deriveAddress(xkey, nonce){
+
+  let address = new bsv.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+
+  return address 
 
 }
 
@@ -52,8 +77,6 @@ export {
   currency,
 
   icon,
-
-  getNewAddress,
 
   createInvoice
 
