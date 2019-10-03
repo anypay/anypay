@@ -14,13 +14,11 @@ export async function start() {
 
     routingkey: 'bsv.forwarded',
 
-    queue: 'write.output',
+    queue: 'bsv.router.write.output',
 
     schema: Joi.object({
 
       input_address: Joi.string(),
-
-      input_hash: Joi.string(),
 
       output_hash: Joi.string(),
 
@@ -40,8 +38,6 @@ export async function start() {
       where: { address: json.input_address }
 
     })
-
-    invoice.hash = json.input_hash;
 
     invoice.output_hash = json.output_hash;
 
