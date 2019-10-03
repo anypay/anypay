@@ -12,9 +12,9 @@ export async function start() {
 
     exchange: 'anypay.router',
 
-    routingkey: 'bsv.forwarded',
+    routingkey: 'router.transaction.forwarded',
 
-    queue: 'bsv.router.write.output',
+    queue: 'router.write.output',
 
     schema: Joi.object({
 
