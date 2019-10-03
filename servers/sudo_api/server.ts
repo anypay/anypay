@@ -307,6 +307,35 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/cashback/payments',
+
+    config: {
+
+      handler: cashback.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/api/invoices/{invoice_uid}/cashback_payments",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: cashback.retry
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/cashback/merchants',
 
     config: {

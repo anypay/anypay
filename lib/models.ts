@@ -27,5 +27,9 @@ const exchange = 'anypay.events';
 
 bindAllModelsHooks(models, exchange);
 
+models.CashbackCustomerPayment.belongsTo(models.Invoice, {
+  foreignKey: 'invoice_id'
+});
+
 export { models };
 
