@@ -29,7 +29,7 @@ module.exports = {
         allowNull: false
       },
       amount: {
-        type: Sequelize.NUMBER,
+        type: Sequelize.DECIMAL,
         allowNull: false
       },
       currency: {
@@ -37,12 +37,12 @@ module.exports = {
         allowNull: false
       },
       createdAt: {
+        type: Sequelize.DATE,
         allowNull: false,
-        type: Sequelize.DATE
       },
       updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        allowNull: false
       }
     });
   },
