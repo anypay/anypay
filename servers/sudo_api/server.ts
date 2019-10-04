@@ -33,6 +33,8 @@ import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 import * as sudoAddresses from './handlers/sudo_addresses';
 
+import * as sudoAchBatches from './handlers/sudo_ach_batches';
+
 import * as sudoTipjars from './handlers/tipjars';
 
 import * as passwords from './handlers/passwords';
@@ -72,6 +74,22 @@ async function Server() {
         return models.MerchantGroup.findAll()
 
       }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/ach_batches",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: sudoAchBatches.index
 
     }
 
