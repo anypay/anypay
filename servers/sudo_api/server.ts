@@ -35,6 +35,8 @@ import * as sudoAddresses from './handlers/sudo_addresses';
 
 import * as sudoAchBatches from './handlers/sudo_ach_batches';
 
+import * as vendingMachines from './handlers/vending_machines';
+
 import * as sudoTipjars from './handlers/tipjars';
 
 import * as passwords from './handlers/passwords';
@@ -90,6 +92,22 @@ async function Server() {
       auth: "sudopassword",
 
       handler: sudoAchBatches.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/vending_machines",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: vendingMachines.index
 
     }
 
