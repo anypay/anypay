@@ -77,6 +77,8 @@ import * as totals from './handlers/totals';
 import { models } from '../../lib'
 import {createCoinTextInvoice} from '../../lib/cointext'
 
+import * as ACHs from './handlers/achs';
+
 const currencyMap = require('../../config/currency_map.js')
 
 const Fixer = require('../../lib/fixer');
@@ -501,6 +503,16 @@ async function Server() {
     method: "PUT",
     path: "/account",
     handler: AccountsController.update,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/achs",
+    handler: ACHs.index,
     options: {
       auth: "token",
       tags: ['api']
