@@ -10,9 +10,9 @@ import { join } from 'path';
 
 import * as csvParse from 'csv-parse';
 
-async function findAchBatch(batchId) {
+async function findAchBatch(batch: AchBatch) {
 
-  return models.AchBatch.findOne({ where: { batch_id: batchId }});
+  return models.AchBatch.findOne({ where: { batch_id: batch.batch_id }});
 
 }
 
@@ -22,6 +22,8 @@ interface AchBatch {
   type: string;
   batch_description: string;
   originating_account: string;
+  first_invoice_uid: string;
+  last_invoice_uid: string;
   amount: number;
   currency: number;
 }
@@ -32,9 +34,29 @@ async function recordAchBatch(batch: AchBatch) {
 
 }
 
+async function findAccount(email: string) {
+
+  return models.Account.findOne({ where: { email }});
+
+}
+
 async function findOrRecordAchBatch(batch: AchBatch) {
 
-  var record = await findAchBatch(batch.batch_id);
+  var record = await findAchBatch(batch);
+
+  if (!record) {
+
+    record = await recordAchBatch(batch);
+
+  }
+
+  return record
+
+}
+
+async function updateAchBatch(batch: AchBatch) {
+
+  var record = await findAchBatch(batch);
 
   if (!record) {
 
@@ -68,6 +90,8 @@ function csvToBatches(path): Promise<AchBatch[]> {
           batch_description: row[3],
           originating_account: row[4],
           amount: parseFloat(row[5].replace('$', '')),
+          first_invoice_uid: row[6],
+          last_invoice_uid: row[7],
           currency: 'USD'
         }
 
@@ -96,6 +120,36 @@ program
       console.log('batch', batches[i]);
 
       await findOrRecordAchBatch(batches[i]);
+
+    }
+
+  
+  });
+
+program
+  .command('importaccountcsv <email> <path>')
+  .action(async (email, path) => {
+
+    if (!path.match(/^\//)) {
+      path = join(process.cwd(), path);
+    }
+
+    // load and parse the csv
+    let batches = await csvToBatches(path);
+
+    let account = await findAccount(email);
+
+    // import any new records
+    for (let i=0; i < batches.length; i++) {
+
+      let batch = await findAchBatch(batches[i]);
+
+      await models.AccountAch.create({
+        ach_batch_id: batch.id,
+        account_id: account.id,
+        first_invoice_uid: batches[i].first_invoice_uid,
+        last_invoice_uid: batches[i].last_invoice_uid
+      });
 
     }
 

@@ -12,6 +12,7 @@ import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
 import * as simplewallets from './handlers/simple_wallets';
 import * as accountInvoices from './handlers/account_invoices';
+import * as achs from './handlers/achs';
 
 const sudoWires = require("./handlers/wire_reports");
 
@@ -364,6 +365,36 @@ async function Server() {
       auth: "sudopassword",
 
       handler: cashback.retry
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/accounts/{account_id}/achs",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: achs.index
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/achs",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: achs.index
     }
 
   });
