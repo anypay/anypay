@@ -9,11 +9,18 @@ export async function index(req: Request, h: ResponseToolkit) {
 
   try {
 
-    let achs = await models.AccountAch.findAll({ where: {
+    let achs = await models.AccountAch.findAll({
 
-      account_id: req.account.id
+      where: {
+        account_id: req.account.id
+      },
 
-    }});
+      include: {
+        model: models.AchBatch,
+        as: 'batch'
+      }
+
+    });
 
     return { achs };
 
