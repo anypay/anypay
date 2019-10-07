@@ -183,11 +183,29 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-    address = await createAddressForward(record);
+           //Create a new HDKeyAddress
+     let record = await models.Hdkeyaddresses.create({
+
+        currency:'BCH',
+
+        xpub_key:process.env.BCH_HD_PUBLIC_KEY
+
+      })
+
+      record.address = deriveAddress(process.env.BCH_HD_PUBLIC_KEY, record.id)
+
+      console.log('Importing address', record.address)
+
+      await record.save()
+
+      await rpc.call('importaddress', [record.address, "", false, false])
+
+
+      return record.address;
 
   }
 
-  rpc.callAll('importaddress', [address, 'false', false])
+  rpc.call('importaddress', [address, 'false', false])
 
     .then(result => {
 
@@ -203,6 +221,15 @@ export async function getNewAddress(record: I_Address) {
   return address;
 
 }
+
+function deriveAddress(xkey, nonce){
+
+  let address = new bch.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+
+  return address
+
+}
+
 
 const currency = 'BCH';
 
