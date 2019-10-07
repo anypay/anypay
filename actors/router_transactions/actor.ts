@@ -30,13 +30,15 @@ export async function start() {
       
       output_currency: Joi.string()
 
+      output_currency: Joi.string()
+
     })
 
   })
   .start(async (channel, msg, json) => {
 
     console.log(json)
-    
+
     let invoice = await models.Invoice.findOne({
  
       where: { address: json.input_address }
