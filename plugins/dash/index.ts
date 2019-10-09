@@ -13,7 +13,7 @@ import {statsd} from '../../lib/stats/statsd'
 
 import {log, xpub, models} from '../../lib'
 
-import * as rpc from './lib/jsonrpc';
+import { rpc } from './lib/jsonrpc';
 
 import * as Blockcypher from '../../lib/dash/blockcypher';
 
@@ -22,6 +22,8 @@ import { I_Address } from '../../types/interfaces';
 import * as http from 'superagent';
 
 import * as address_subscription from '../../lib/address_subscription';
+
+import * as dash from '@dashevo/dashcore-lib';
 
 var WAValidator = require('anypay-wallet-address-validator');
 
@@ -115,13 +117,46 @@ export async function getNewAddress(record: I_Address) {
 
   } else {
 
-      address = await createAddressForward(record);
-    
+    //Create a new HDKeyAddress 
+      let record = await models.Hdkeyaddresses.create({
+
+      currency:'DASH',
+
+      xpub_key:process.env.DASH_HD_PUBLIC_KEY
+
+     })
+
+     record.address = deriveAddress(process.env.DASH_HD_PUBLIC_KEY, record.id)
+
+     await record.save()
+
+     try{
+
+       await rpc.call('importaddress', [record.address, "", false, false])
+
+     }catch(error){
+
+        console.log(error)
+     }
+     return record.address;
+
   }
 
   return address;
 
 }
+
+
+function deriveAddress(xkey, nonce){
+
+  let address = new dash.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+
+  return address 
+
+}
+
+
+
 
 async function checkAddressForPayments(address:string, currency:string){
 
