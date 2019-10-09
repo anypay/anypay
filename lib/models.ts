@@ -43,6 +43,15 @@ models.AccountAch.belongsTo(models.Account, {
   foreignKey: 'account_id'
 });
 
+models.AccountAchInvoice.belongsTo(models.AccountAch, {
+  foreignKey: 'account_ach_id',
+  as: 'invoices'
+});
+models.AccountAch.hasMany(models.AccountAchInvoice, {
+  foreignKey: 'account_ach_id',
+  as: 'invoices'
+})
+
 
 export { models };
 
