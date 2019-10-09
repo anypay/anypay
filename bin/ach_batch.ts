@@ -3,6 +3,7 @@
 import * as program from 'commander';
 
 import { models, log } from '../lib';
+import * as ach from '../lib/ach';
 
 import * as fs from 'fs';
 
@@ -154,6 +155,30 @@ program
     }
 
   
+  });
+
+program
+  .command('getinvoicerange <email <startUid> <endUid>')
+  .action(async (email, startUid, endUid) => {
+
+    try {
+
+      let account = await models.Account.findOne({ where: { email }});
+
+      let invoices = await ach.getInvoiceRange(startUid, endUid, {
+
+        account_id: account.id 
+
+      });
+
+      console.log(invoices);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
   });
 
 program
