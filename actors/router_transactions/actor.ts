@@ -26,12 +26,14 @@ export async function start() {
 
       output_currency: Joi.string(),
 
-      output_amount: Joi.string()
+      output_amount: Joi.number()
 
     })
 
   })
   .start(async (channel, msg, json) => {
+
+    console.log(json)
 
     let invoice = await models.Invoice.findOne({
  
