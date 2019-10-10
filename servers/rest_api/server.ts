@@ -32,6 +32,12 @@ import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_call
 import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
+/* Import all handlers from './handlers directory */
+import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
+import { join } from 'path';
+const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
+/* end handlers import */
+
 import * as dashtext from '../../lib/dash/dashtext';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
@@ -513,6 +519,16 @@ async function Server() {
     method: "GET",
     path: "/achs",
     handler: ACHs.index,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/achs/{account_ach_id}/invoices",
+    handler: handlers.AccountAchInvoices.show,
     options: {
       auth: "token",
       tags: ['api']
