@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import * as models from '../lib/models';
+import { models } from '../lib';
 import {setAddress} from '../lib/core';
 
 const argv = require('yargs').argv;
