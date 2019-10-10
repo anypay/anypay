@@ -17,7 +17,7 @@ jobs:
           command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
       - run:
           name: Running tests
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm test 
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -i -t anypay npm test 
       - run:
           name: Push to Docker Hub
           command: |
