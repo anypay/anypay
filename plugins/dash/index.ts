@@ -132,7 +132,7 @@ export async function getNewAddress(record: I_Address) {
 
      try{
 
-       await rpc.call('importaddress', [record.address, "", false, false])
+       rpc.call('importaddress', [record.address, "", false, false])
 
      }catch(error){
 
