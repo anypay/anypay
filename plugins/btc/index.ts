@@ -38,7 +38,7 @@ export async function getNewAddress(deprecatedParam){
 
   await record.save()
 
-  await rpc.call('importaddress', [record.address, "", false, false])
+  rpc.call('importaddress', [record.address, "", false, false])
 
   return record.address;
 
