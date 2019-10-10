@@ -1,5 +1,7 @@
 #!/usr/bin/env ts-node
 
+require('dotenv').config();
+
 import * as program from 'commander';
 
 import { models, log } from '../lib';
@@ -10,6 +12,10 @@ import * as fs from 'fs';
 import { join } from 'path';
 
 import * as csvParse from 'csv-parse';
+
+import { importInvoiceRangeForAchBatch } from '../lib/ach';
+
+const _cliProgress = require('cli-progress');
 
 async function findAchBatch(batch: AchBatch) {
 
@@ -158,26 +164,114 @@ program
   });
 
 program
-  .command('getinvoicerange <email <startUid> <endUid>')
-  .action(async (email, startUid, endUid) => {
+  .command('getinvoicerange <account_ach_id>')
+  .action(async (accountAchId) => {
 
     try {
 
-      let account = await models.Account.findOne({ where: { email }});
+      let accountAch = await models.AccountAch.findOne({ where: {
 
-      let invoices = await ach.getInvoiceRange(startUid, endUid, {
+        id: parseInt(accountAchId)
 
-        account_id: account.id 
+      }});
+
+      let invoices = await ach.getInvoiceRange(
+        accountAch.first_invoice_uid,
+        accountAch.last_invoice_uid,
+        {
+          account_id: accountAch.account_id 
+        }
+      );
+
+      invoices.forEach(invoice => {
+
+        console.log({
+
+          uid: invoice.uid,
+
+          amount: invoice.denomination_amount,
+
+          cashback: invoice.cashback_denomination_amount || 0
+
+        });
 
       });
-
-      console.log(invoices);
 
     } catch(error) {
 
       console.error(error.message);
 
     }
+
+  });
+
+program
+  .command('importinvoicerange <account_ach_id>')
+  .action(async (accountAchId) => {
+
+    try {
+
+      let newRecords = await importInvoiceRangeForAchBatch(accountAchId);
+
+      newRecords.map(r => console.log(r.toJSON()));
+
+      console.log(`imported ${newRecords.length} new records`);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+  });
+
+program
+  .command('importaccountachinvoices <email>')
+  .action(async (email) => {
+
+    const bar1 = new _cliProgress.SingleBar({}, _cliProgress.Presets.shades_classic);
+
+    try {
+
+      let account = await models.Account.findOne({ where: { email }});
+
+      let accountAchs = await models.AccountAch.findAll({ where: {
+
+        account_id: account.id
+
+      }});
+
+      console.log(`Importing ${accountAchs.length} ACH Batches`);
+
+      bar1.start(accountAchs.length, 0);
+
+      for (let i=0; i < accountAchs.length; i++) {
+
+        try {
+
+          let newRecords = await importInvoiceRangeForAchBatch(accountAchs[i].id);
+
+          newRecords.map(r => console.log(r.toJSON()));
+
+        } catch(error) {
+
+          //console.error(error.message);
+
+        }
+
+        bar1.update(i);
+
+      }
+
+    } catch(error) {
+
+      //console.error(error.message);
+
+    }
+
+    bar1.stop();
+
+    process.exit(0);
 
   });
 

@@ -356,6 +356,11 @@ async@^2.6.0:
   dependencies:
     lodash "^4.17.10"
 
+async@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.1.0.tgz#42b3b12ae1b74927b5217d8c0016baaf62463772"
+  integrity sha512-4vx/aaY6j/j3Lw3fbCHNWP0pPaTCew3F6F3hYyl/tHs/ndmV1q7NW9T5yuJ2XAGwdQrP+6Wu20x06U4APo/iQQ==
+
 async@~0.9.0:
   version "0.9.2"
   resolved "https://registry.yarnpkg.com/async/-/async-0.9.2.tgz#aea74d5e61c1f899613bf64bda66d4c78f2fd17d"
@@ -922,6 +927,14 @@ cli-cursor@^1.0.2:
   resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-1.0.2.tgz#64da3f7d56a54412e59794bd62dc35295e8f2987"
   dependencies:
     restore-cursor "^1.0.1"
+
+cli-progress@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/cli-progress/-/cli-progress-3.3.1.tgz#e08fb6853e269c3bc7e0ad8ad0ede59035f5fbce"
+  integrity sha512-cfvv/uuWblzSI6fvpmCNREWxwzI/luelp+P7zoPlguswswWVCfsq334/U6tmh+vusJ7yzbQ3xFni9JNqiF4fAA==
+  dependencies:
+    colors "^1.1.2"
+    string-width "^2.1.1"
 
 cli-table2@^0.2.0:
   version "0.2.0"
