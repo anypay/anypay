@@ -22,6 +22,72 @@ program
   });
 
 program
+  .command('addtag <email> <tag>')
+  .action(async (email, tag) => {
+    try {
+
+      let account = await models.Account.findOne({ where: { email }});
+
+      let [record, isNew] = await models.AccountTag.findOrCreate({
+        where: {
+          account_id: account.id,
+          tag
+        },
+        defaults: {
+          account_id: account.id,
+          tag
+        }
+      });
+
+      if (isNew) {
+
+        console.log(`${email} tagged as "${tag}"`);
+
+      } else {
+
+        console.log(`${email} already tagged as "${tag}"`);
+
+      }
+
+    } catch(error) {
+      
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('removetag <email> <tag>')
+  .action(async (email, tag) => {
+    try {
+
+      let account = await models.Account.findOne({ where: { email }});
+
+      let record = await models.AccountTag.findOne({ where: {
+
+        account_id: account.id,
+
+        tag
+
+      }});
+
+      await record.destroy();
+
+    } catch(error) {
+      
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+
+program
   .command('getaccount <email>')
   .action(async (email) => {
 
