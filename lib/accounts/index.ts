@@ -1,11 +1,44 @@
 const bcrypt = require('bcrypt');
 
 import { models } from '../models';
+import { log } from '../logger';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
 import {emitter} from '../events'
 import {AccountAddress} from '../core/types';
+
+export async function findAllWithTags(tags: string[]): Promise<any> {
+
+  const groups = await Promise.all(tags.map(async (tag) => {
+
+    let tags = await models.AccountTag.findAll({
+      where: { tag }
+    })
+
+    return tags.map(tag => tag.account_id);
+
+  }));
+
+  var intersection = groups.shift();
+
+  groups.forEach(group => {
+
+    intersection = getIntersection(intersection, group);
+
+  });
+
+  log.info('accounts.findallwithtags.result', {
+
+    tags,
+
+    account_ids: intersection
+
+  });
+
+  return intersection;
+
+}
 
 export async function registerAccount(email: string, password: string): Promise<any>{
 
@@ -100,5 +133,9 @@ export function hash(password) {
 export {
   getSupportedCoins,
   getAddress
+}
+
+function getIntersection(arrA, arrB) {
+  return arrA.filter(x => arrB.includes(x));
 }
 
