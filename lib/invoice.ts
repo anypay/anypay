@@ -27,6 +27,7 @@ import { models } from './models';
 
 import {convert} from './prices';
 
+import {getCoin} from './coins';
 
 import { computeInvoiceURI } from './uri';
 
@@ -87,10 +88,12 @@ export async function generateInvoice(
 
   console.log('converting price');
 
+  let coin = await getCoin(invoiceCurrency);
+
   let invoiceAmount = await convert({
     currency: account.denomination,
     value: denominationAmountValue
-  }, invoiceCurrency);
+  }, invoiceCurrency, coin.precision);
 
   console.log('converted price', invoiceAmount);
   console.log('getting new invoice address');
