@@ -103,7 +103,7 @@
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
-    "dev": "./node_modules/nodemon/bin/nodemon.js ./bin/anypay.ts --api",
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
     "servers:blockcypher:start": "ts-node servers/blockcypher/server.ts",
     "processor:blockcypher:start": "ts-node servers/processor/blockcypher/main.ts",
     "processor:payments:start": "ts-node servers/processor/payments/main.ts",
