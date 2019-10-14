@@ -44,7 +44,7 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
     var tokenId = '8e635bcd1b97ad565b2fdf6b642e760762a386fe4df9e4961f2c13629221914f';
 
-    uri = `${params.address}?amount=${params.amount}-${tokenId}&label=Anypay-Gold`;
+    uri = `${params.address}?amount=${params.amount}&label=Anypay-Gold`;
 
   } else {
 

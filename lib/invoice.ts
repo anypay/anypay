@@ -88,7 +88,7 @@ export async function generateInvoice(
 
   console.log('converting price');
 
-  let coin = getCoin(invoiceCurrency);
+  let coin = await getCoin(invoiceCurrency);
 
   let invoiceAmount = await convert({
     currency: account.denomination,

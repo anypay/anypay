@@ -73,7 +73,7 @@ export async function activateCoin(code) {
 
 export async function getCoin(code: string) {
 
-  return coins.select(coin => coin.code === code);
+  return coins.find(coin => coin.code === code);
 
 }
 

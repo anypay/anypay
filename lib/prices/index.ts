@@ -92,7 +92,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   return {
     currency: outputCurrency,
-    value: parseFloat(targetAmount.toFixed(precision || MAX_DECIMALS));
+    value: parseFloat(targetAmount.toFixed(precision || MAX_DECIMALS))
   };
 };
 
