@@ -51,7 +51,11 @@ models.AccountAch.hasMany(models.AccountAchInvoice, {
   foreignKey: 'account_ach_id',
   as: 'invoices'
 })
-
+models.AccountAchInvoice.hasOne(models.Invoice, {
+  foreignKey: 'uid',
+  sourceKey: 'invoice_uid',
+  as: 'invoice'
+});
 
 export { models };
 
