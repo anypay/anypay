@@ -76,6 +76,7 @@
     "rpc-simple-wallet": "^1.0.7",
     "sequelize": "^5.16.0",
     "sequelize-cli": "^4.0.0",
+    "slpjs": "^0.21.3",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "superagent": "^3.5.2",
