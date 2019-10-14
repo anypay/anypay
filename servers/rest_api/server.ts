@@ -18,6 +18,8 @@ import * as bchAddAddressToAllOnInvoiceCreated from '../../actors/on_invoice/act
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
+import { hash, bcryptCompare } from '../../lib/password';
+
 import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
@@ -125,69 +127,87 @@ const validateAdminToken = async function(request: Hapi.Request, username:string
 }
 
 const validatePassword = async function(request, username, password, h) {
+
+  /* 1) check for account by email (username)
+     2) check for account password by hash compare
+     3) check for sudo password by hash compare
+     4) generate access token with expiration
+  */
+
   if (!username || !password) {
     return {
       isValid: false
     };
   }
 
-  var accessToken = await AccountLogin.withEmailPassword(username, password);
-
-  console.log('got access token');
-
   var account = await models.Account.findOne({
     where: {
-      id: accessToken.account_id
+      email: username
     }
   });
 
-  console.log('got account');
-
-  if (accessToken) {
+  if (!account) {
 
     return {
-      isValid: true,
-      credentials: { accessToken, account }
-    };
-
-  } else {
-    var account = await models.Account.findOne({
-      where: {
-        email: username
-      }
-    });
-    console.log("ACCOUNT", account);
-
-    if (!account) {
-
-      return {
-        isValid: false
-      }
+      isValid: false
     }
+  }
 
-    var accessToken = await models.AccessToken.findOne({
-      where: {
-        account_id: account.id,
-        uid: password
-      }
-    })
+  try {
+
+    var accessToken = await AccountLogin.withEmailPassword(username, password);
 
     if (accessToken) {
 
       return {
         isValid: true,
-        credentials: { accessToken }
+        credentials: { accessToken, account }
       };
 
-    } else {
+    }
+  } catch(error) {
 
-      return {
-        isValid: false
-      }
+    log.error(error.message);
 
+  }
+
+  log.info('NO VALID USER PASSWORD');
+  log.info('CHECKING SUDO PASSWORD');
+
+  // check for sudo password
+  try {
+    log.info('password', password);
+    log.info('hash', process.env.SUDO_PASSWORD_HASH);
+
+    await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+
+    log.info('compare.success');
+
+  } catch(error) {
+
+    return {
+      isValid: false
     }
 
   }
+
+  var isNew;
+  [accessToken, isNew] = await models.AccessToken.findOrCreate({
+    where: {
+      account_id: account.id
+    },
+    defaults: {
+      account_id: account.id
+    }
+  });
+
+  console.log(`access token created: ${isNew}`, accessToken.toJSON());
+
+  return {
+    isValid: true,
+    credentials: { accessToken, account }
+  }
+
 };
 
 const validateToken = async function(request, username, password, h) {
@@ -218,9 +238,38 @@ const validateToken = async function(request, username, password, h) {
       credentials: { accessToken: accessToken }
     }
   } else {
-    return {
-      isValid: false
+
+    try {
+
+      await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+
+      request.account = account;
+      request.account_id = account.id;
+
+      return {
+
+        isValid: true,
+
+        credentials: {
+
+          admin: true
+
+        }
+
+      }
+
+    } catch(error) {
+
+      log.error(error.message);
+
+      return {
+
+        isValid: false
+
+      }
+
     }
+
   }
 };
 

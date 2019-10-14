@@ -5,6 +5,8 @@ import * as Boom from 'boom';
 
 import { models } from '../../../lib';
 
+import { Op } from 'sequelize';
+
 export async function index(req: Request, h: ResponseToolkit) {
 
   try {
@@ -21,7 +23,19 @@ export async function index(req: Request, h: ResponseToolkit) {
       }, {
 
         model: models.AccountAchInvoice,
-        as: 'invoices'
+        as: 'invoices',
+
+        include: [{
+          model: models.Invoice,
+          as: 'invoice',
+
+          where: {
+            status: {
+            //
+              [Op.ne]: 'unpaid'
+            }
+          }
+        }]
       
       }]
 
@@ -31,11 +45,11 @@ export async function index(req: Request, h: ResponseToolkit) {
 
       if (parseInt(a.batch.batch_id) > parseInt(b.batch.batch_id)) {
 
-        return 1;
+        return -1;
 
       } else {
 
-        return -1;
+        return 1;
       
       };
 
