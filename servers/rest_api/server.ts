@@ -191,6 +191,7 @@ const validatePassword = async function(request, username, password, h) {
 };
 
 const validateToken = async function(request, username, password, h) {
+
   if (!username) {
     return {
       isValid: false

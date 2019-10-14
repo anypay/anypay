@@ -21,6 +21,12 @@ export async function show(req: Request, h: ResponseToolkit) {
 
         as: 'invoices'
 
+      },{
+
+        model: models.AchBatch,
+
+        as: 'batch'
+
       }]
 
     });

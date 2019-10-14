@@ -276,4 +276,50 @@ program
   });
 
 program
+  .command('copyachbatchdata')
+  .action(async () => {
+
+    let batches = await models.AchBatch.findAll();
+
+    let account1 = await models.Account.findOne({ where: {
+
+      email: 'dashsupport@egifter.com'
+
+    }});
+
+    let account2 = await models.Account.findOne({ where: {
+
+      email: 'steven@anypay.global'
+
+    }});
+
+    for (let i = 0; i < batches.length; i++) {
+
+      let ach1 = await models.AccountAch.findOne({ where: {
+
+        account_id: account1.id
+
+      }});
+
+      let ach2 = await models.AccountAch.findOne({ where: {
+
+        account_id: account2.id
+
+      }});
+
+      if (ach1) {
+        ach1.total_paid = batches[i].amount;
+        await ach1.save();
+      }
+
+      if (ach2) {
+        ach2.total_paid = batches[i].amount;
+        await ach2.save();
+      }
+
+    }
+
+  });
+
+program
   .parse(process.argv);
