@@ -1,6 +1,6 @@
 
 import { models } from '../models';
-import * as bch from 'bitcore-lib-cash';
+const bch: any = require('bitcore-lib-cash');
 import * as http from 'superagent';
 
 interface iTipJar {
@@ -33,7 +33,7 @@ export async function getTipJar(account_id: number, currency: string) {
 
   if (!tipJar) {
 
-    let privateKey = await new bch.PrivateKey();
+    let privateKey = new bch.PrivateKey();
 
     tipJar = await models.Tipjar.create({
 

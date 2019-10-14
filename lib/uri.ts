@@ -27,6 +27,7 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   var protocol = protocols[params.currency] || params.currency.toLowerCase();
 
+
   if (params.currency === 'BCH') {
 
     uri = `${params.address}?amount=${params.amount}`;
@@ -38,6 +39,12 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
   } else if (params.currency === 'DASH') {
 
     uri = `${protocol}:${params.address}?amount=${params.amount}&is=1`;
+
+  } else if (params.currency === 'GOLD') {
+
+    var tokenId = '8e635bcd1b97ad565b2fdf6b642e760762a386fe4df9e4961f2c13629221914f';
+
+    uri = `${params.address}?amount=${params.amount}-${tokenId}&label=Anypay-Gold`;
 
   } else {
 
