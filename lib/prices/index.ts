@@ -63,7 +63,7 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
   };
 };
 
-async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amount> {
+async function convert(inputAmount: Amount, outputCurrency: string, precision?: number): Promise<Amount> {
 
   let prices = await getAllPrices();
 
@@ -92,7 +92,7 @@ async function convert(inputAmount: Amount, outputCurrency: string): Promise<Amo
 
   return {
     currency: outputCurrency,
-    value: parseFloat(targetAmount.toFixed(MAX_DECIMALS))
+    value: parseFloat(targetAmount.toFixed(precision || MAX_DECIMALS))
   };
 };
 
