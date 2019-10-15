@@ -1,7 +1,6 @@
 const log = require('winston');
 
 module.exports.create = async (request, reply) => {
-  log.info('in create access token controller', request.auth.credentials);
 
   let token = request.auth.credentials.accessToken;
 

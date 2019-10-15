@@ -1,6 +1,7 @@
 import { Request, ResponseToolkit } from 'hapi';
 import { badRequest } from 'boom';
 import { models } from '../../../lib';
+import * as Sequelize from 'sequelize';
 
 export async function show(req: Request, h: ResponseToolkit) {
 
@@ -19,7 +20,27 @@ export async function show(req: Request, h: ResponseToolkit) {
 
         model: models.AccountAchInvoice,
 
-        as: 'invoices'
+        as: 'invoices',
+
+        include: [{
+
+          model: models.Invoice,
+
+          as: 'invoice',
+
+          where: {
+            status: {
+              [Sequelize.Op.ne]: 'unpaid'
+            }
+          }
+
+        }]
+
+      },{
+
+        model: models.AchBatch,
+
+        as: 'batch'
 
       }]
 
