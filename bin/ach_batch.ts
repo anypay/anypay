@@ -134,6 +134,34 @@ program
   });
 
 program
+  .command('addaccountachinvoice <email> <batchid> <invoiceuid>')
+  .action(async (email, batchid, invoiceuid) => {
+
+    let account = await models.Account.findOne({ where: {
+      email
+    }});
+
+    let batch = await models.AchBatch.findOne({ where: {
+      batch_id: batchid
+    }});
+
+    let ach = await models.AccountAch.findOne({ where: {
+      ach_batch_id: batch.id,
+      account_id: account.id
+    }});
+
+    let record = await models.AccountAchInvoice.create({
+      invoice_uid: invoiceuid,
+      account_ach_id: ach.id
+    });
+
+    console.log(record.toJSON());
+
+    process.exit();
+  
+  });
+
+program
   .command('importaccountcsv <email> <path>')
   .action(async (email, path) => {
 
