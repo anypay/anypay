@@ -33,7 +33,7 @@ import {EventEmitter2} from 'eventemitter2';
 
 const events = new EventEmitter2(); 
 
-export async function setAddress(changeset: AddressChangeSet) {
+export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   var isValid = true;
 
@@ -44,6 +44,12 @@ export async function setAddress(changeset: AddressChangeSet) {
     if (plugin.validateAddress) {
 
       isValid = await plugin.validateAddress(changeset.address);
+
+    }
+
+    if (plugin.transformAddress) {
+
+      changeset.address = await plugin.transformAddress(changeset.address);
 
     }
 
@@ -91,6 +97,8 @@ export async function setAddress(changeset: AddressChangeSet) {
 
   emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
+
+  return address.value;
 
 };
 
