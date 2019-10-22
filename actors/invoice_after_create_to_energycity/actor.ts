@@ -90,8 +90,7 @@ async function updateEnergyCityAccounts() {
 async function getEnergyCityAccounts() {
 
   let taggedAccounts = await accounts.findAllWithTags([
-    'energycity',
-    'portsmouth'
+    'energycity'
   ]);
 
   return taggedAccounts.reduce((map, accountId) => {
