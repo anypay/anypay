@@ -6,6 +6,7 @@ import {configureOracles} from '../config/oracles';
 
 import * as amqp from './amqp';
 import * as accounts from './accounts';
+import * as login from './account_login';
 import * as invoices from './invoice';
 import * as forwards from './forwards';
 import * as settings from './settings';
@@ -25,6 +26,7 @@ import * as blockcypher from './blockcypher';
 import * as tipjar from './tipjar';
 import * as email from './email';
 import * as routes from './routes';
+import * as password from './password';
 
 
 var oracles = ConfigureOracles(configureOracles);
@@ -56,6 +58,8 @@ export {
   blockcypher,
   tipjar,
   email,
-  routes
+  routes,
+  password,
+  login
 }
 

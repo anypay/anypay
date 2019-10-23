@@ -45,7 +45,7 @@ export async function resetPasswordByEmail(email, newPassword) {
   }
 }
 
-async function resetPassword(accountId, newPassword) {
+async function resetPassword(accountId, newPassword): Promise<boolean> {
 
   let passwordHash = await hash(newPassword);
 
@@ -69,14 +69,13 @@ function sendPasswordResetEmail(email) {
 
     ses.sendEmail({
       Destination: {
-        BccAddresses: ['me@stevenzeiler.com'],
         ToAddresses: [email]
       },
       Message: {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link below:\n\nhttps://admin.anypay.global/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link below:\n\nhttps://anypayadmin.com/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
