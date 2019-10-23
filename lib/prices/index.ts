@@ -97,7 +97,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   };
 };
 
-export async function setPrice(currency, value, base_currency) {
+export async function setPrice(currency, value, base_currency = 'BTC') {
 
   log.info("set price", currency, value, base_currency);
 
