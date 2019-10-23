@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const Account = require('./models/account');
 
 import { models } from './models';
 
@@ -31,7 +30,7 @@ export async function bcryptCompare(password, hash) {
 
 export async function resetPasswordByEmail(email, newPassword) {
 
-  let account = await Account.findOne({
+  let account = await models.Account.findOne({
     where: { email: email }
   })
 
@@ -50,7 +49,7 @@ async function resetPassword(accountId, newPassword) {
 
   let passwordHash = await hash(newPassword);
 
-  await Account.update({
+  await models.Account.update({
     password_hash: passwordHash
   }, {
     where: {
@@ -85,7 +84,7 @@ function sendPasswordResetEmail(email) {
           Data: "Forgotted Password Reset"
         }
       },
-      Source: 'password-reset@anypay.global'
+      Source: 'password-reset@anypayapp.com'
     }, (error, response) => {
       if (error) {
         log.error('error sending password reset email', error.message);
