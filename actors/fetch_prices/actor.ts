@@ -24,7 +24,7 @@ export async function start() {
 
     await chan.publish('anypay.prices', 'fetch.prices', Buffer.from('fetch prices'))        
 
-  }, 3000)
+  }, 300000)
 
   Actor.create({
 
