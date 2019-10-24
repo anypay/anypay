@@ -12,6 +12,89 @@ import * as http from 'superagent';
 
 const async = require("async");
 
+( async ()=> {
+
+  let connection = await amqp.connect(process.env.AMQP_URL);
+        
+  let chan = await connection.createChannel();
+
+  const WebSocket = require('ws');
+
+  const ws = new WebSocket('wss://ws.kraken.com');
+
+  let lastAsk = 0;
+
+  let subscriptions = [{
+    "event": "subscribe",
+    "pair": [
+      "XBT/USD"
+    ],
+    "subscription": {
+      "name": "ticker",
+    }
+  }]
+
+  ws.on('open', function open() {
+
+    subscriptions.forEach((data)=>{
+      ws.send(JSON.stringify(data))
+    })
+
+  });
+
+
+  ws.on('message', function incoming(data) {
+
+    let msg = JSON.parse(data)
+
+    console.log(msg)
+
+    if( msg.event === 'subscriptionStatus' ){
+
+    }
+    else if( msg.event === 'systemStatus' ){
+
+      console.log(msg)
+
+    }
+    else if( msg.event === 'heartbeat' ){
+
+
+    }
+    else{
+
+      let newAsk = msg[1].a[0];
+
+      console.log('newAsk', newAsk)
+      console.log('lastAsk', lastAsk)
+
+      if( lastAsk / newAsk > 1.002 || lastAsk / newAsk < 0.998 ){
+
+        console.log('prices changed .02% fetching new prices')
+        chan.publish('anypay.prices', 'fetch.prices', Buffer.from('fetch prices'))
+
+      }
+
+      lastAsk = newAsk
+
+    }
+
+  });
+
+  ws.on('close',(e)=>{
+
+    ws.reconnect(e);
+
+  });
+
+  ws.on('error',(e)=>{
+
+    ws.reconnect(e);
+
+  });
+
+})()
+
 export async function start() {
 
   let conn = await amqp.connect(process.env.AMQP_URL)
@@ -19,8 +102,6 @@ export async function start() {
   let chan = await conn.createChannel();
 
   setInterval( async ()=>{
-
-    console.log('fetch prices')
 
     await chan.publish('anypay.prices', 'fetch.prices', Buffer.from('fetch prices'))        
 
@@ -169,10 +250,15 @@ export async function start() {
     channel.ack(msg);
 
   });
+
+
 }
 
 if (require.main === module) {
 
   start();
 
+
 }
+
+
