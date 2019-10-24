@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const Account = require('./models/account');
 
 import { models } from './models';
 
@@ -31,7 +30,7 @@ export async function bcryptCompare(password, hash) {
 
 export async function resetPasswordByEmail(email, newPassword) {
 
-  let account = await Account.findOne({
+  let account = await models.Account.findOne({
     where: { email: email }
   })
 
@@ -46,11 +45,11 @@ export async function resetPasswordByEmail(email, newPassword) {
   }
 }
 
-async function resetPassword(accountId, newPassword) {
+async function resetPassword(accountId, newPassword): Promise<boolean> {
 
   let passwordHash = await hash(newPassword);
 
-  await Account.update({
+  await models.Account.update({
     password_hash: passwordHash
   }, {
     where: {
@@ -70,14 +69,13 @@ function sendPasswordResetEmail(email) {
 
     ses.sendEmail({
       Destination: {
-        BccAddresses: ['me@stevenzeiler.com'],
         ToAddresses: [email]
       },
       Message: {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link below:\n\nhttps://admin.anypay.global/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link below:\n\nhttps://anypayadmin.com/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
@@ -85,7 +83,7 @@ function sendPasswordResetEmail(email) {
           Data: "Forgotted Password Reset"
         }
       },
-      Source: 'password-reset@anypay.global'
+      Source: 'password-reset@anypayapp.com'
     }, (error, response) => {
       if (error) {
         log.error('error sending password reset email', error.message);

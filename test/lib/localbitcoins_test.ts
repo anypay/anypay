@@ -5,7 +5,7 @@ import { log } from '../../lib/logger';
 
 describe("Local Bitcoins API", () => {
 
-  it('should get the price of all currencies', async () => {
+  it.skip('should get the price of all currencies', async () => {
 
     let currencies = await getTickerAllCurrencies();
 

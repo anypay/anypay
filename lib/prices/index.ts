@@ -78,12 +78,13 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   } else {
 
-    if (inputAmount.currency === 'BTC') {
-      prices[`BTC/BTC`] = 1;
+    if (inputAmount.currency === 'USD') {
+      prices[`USD/USD`] = 1;
     }
 
-    rate = prices[`${outputCurrency}/BTC`] / prices[`${inputAmount.currency}/BTC`];
-    log.info(`using BTC to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
+    rate =  prices[`${inputAmount.currency}/USD`] / prices[`${outputCurrency}/USD`];
+
+    log.info(`using USD to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
 
   }
 
@@ -96,7 +97,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   };
 };
 
-export async function setPrice(currency, value, base_currency = "BTC") {
+export async function setPrice(currency, value, source,  base_currency = 'BTC') {
 
   log.info("set price", currency, value, base_currency);
 
@@ -116,7 +117,9 @@ export async function setPrice(currency, value, base_currency = "BTC") {
 
       value,
 
-      base_currency
+      base_currency,
+    
+      source
 
     }
   });
@@ -124,6 +127,8 @@ export async function setPrice(currency, value, base_currency = "BTC") {
   if (!isNew) {
 
     price.value = value;
+
+    price.source = source;
 
     await price.save();
 

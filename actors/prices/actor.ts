@@ -58,7 +58,7 @@ async function updateVESPrice() {
 
   if (btcPrice && btcPrice > 0) {
 
-    await setPrice('VES', btcPrice);
+    await setPrice('VES', btcPrice, 'ves');
 
   }
 
@@ -78,7 +78,7 @@ async function updateDashPrices() {
 
     let price = resp.body[currency];
 
-    await setPrice(currency, price, 'DASH');
+    await setPrice(currency, price, 'dashretail', 'DASH');
 
   }
 
@@ -130,7 +130,7 @@ async function updateFiatCurrencies() {
 
       if (rates[currency] > 0) {
 
-        await setPrice(currency, rates[currency]);
+        await setPrice(currency, rates[currency],'fixer');
 
       }
 
