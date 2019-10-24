@@ -293,6 +293,22 @@ async function Server() {
     }
 
   });
+        
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/prices/{currency}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: PricesController.sudoShow
+
+    }
+
+  });
 
   server.route({
 
