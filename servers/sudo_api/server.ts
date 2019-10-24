@@ -22,6 +22,8 @@ const AccountsController = require("./handlers/accounts");
 
 const InvoicesController = require("./handlers/invoices");
 
+const PricesController = require("./handlers/prices");
+
 const SudoCoins = require("./handlers/sudo_coins");
 
 import { sudoLogin } from './handlers/sudo_login';
@@ -271,6 +273,54 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: InvoicesController.sudoIndex
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/prices',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: PricesController.sudoIndex
+
+    }
+
+  });
+        
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/prices/{currency}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: PricesController.sudoShow
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/prices',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: PricesController.sudoUpdate
 
     }
 
