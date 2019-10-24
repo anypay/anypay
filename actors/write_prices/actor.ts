@@ -22,7 +22,7 @@ export async function start() {
 
     routingkey: 'price.update',
 
-    queue: 'write.prices.to.bsv',
+    queue: 'write.prices.to.database',
 
     schema: Joi.object({
 
