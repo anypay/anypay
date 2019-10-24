@@ -1,6 +1,8 @@
 require('dotenv').config();
 
-import { Actor, Joi } from 'rabbi';
+import { Actor, Joi, log } from 'rabbi';
+
+import {setPrice} from '../../lib/prices';
 
 import {models} from '../../lib';
 
@@ -28,7 +30,9 @@ export async function start() {
 
       base: Joi.string(),
 
-      price: Joi.number()
+      price: Joi.number(),
+ 
+      source: Joi.string()
 
     })
 
@@ -42,9 +46,9 @@ export async function start() {
 
     if( found ){
 
-      let price = await setPrice(json.currency, json.price, json.base);
+      let price = await setPrice(json.currency, json.price, json.source,  json.base);
 
-      console.log(price)
+      log.info(price.toJSON())
 
                     /*      
       datapay.send({
@@ -66,41 +70,3 @@ if (require.main === module) {
   start();
 
 }
-
-export async function setPrice(currency, value, base_currency) {
-
-  console.log("set price", currency, value, base_currency);
-
-  let [price, isNew] = await models.Price.findOrCreate({
-
-    where: {
-
-      currency,
-
-      base_currency
-
-    },
-
-    defaults: {
-
-      currency,
-
-      value,
-
-      base_currency
-
-    }
-  });
-
-  if (!isNew) {
-
-    price.value = value;
-
-    await price.save();
-
-  }
-
-  return price;
-
-}
-

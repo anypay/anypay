@@ -130,7 +130,8 @@ export async function start() {
 
          "currency": item.symbol,
          "base": "USD",
-         "price": item.quote.USD.price
+         "price": item.quote.USD.price,
+         "source": 'coinmarketcap'
 
        })))
 
@@ -177,7 +178,8 @@ export async function start() {
 
           "currency": currency,
           "base" : "USD",
-          "price": 1 / rates[currency]
+          "price": 1 / rates[currency],
+          "source": 'fixer.io'
 
         })))
              
@@ -217,7 +219,8 @@ export async function start() {
       channel.publish('anypay.prices', 'price.update', Buffer.from(JSON.stringify({
         "currency": "DASH",
         "base" : currency,
-        "price": price
+        "price": price,
+        "source": 'dashretail.org'
       })))
 
     }
@@ -244,7 +247,8 @@ export async function start() {
     channel.publish('anypay.prices', 'price.update', Buffer.from(JSON.stringify({
       "currency": "DASH",
       "base" : "VES",
-      "price" : resp.body['VES']
+      "price" : resp.body['VES'],
+      "source": 'get-sparck.com'
     })))
 
     channel.ack(msg);
