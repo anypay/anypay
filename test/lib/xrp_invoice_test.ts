@@ -11,7 +11,7 @@ const chance = new Chance();
 
 describe("Creating Invoices", () => {
 
-  it("#generateInvoice should create a new XRP invoice", async () => {
+  it.skip("#generateInvoice should create a new XRP invoice", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
@@ -46,7 +46,7 @@ describe("Creating Invoices", () => {
 
   });
 
-  it("#generateInvoice should create a new XRP invoice", async () => {
+  it.skip("#generateInvoice should create a new XRP invoice", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
