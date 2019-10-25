@@ -878,6 +878,23 @@ async function Server() {
 
   })
 
+  server.route({
+    method: "GET",
+    path: "/invoices/{uid}/bip270",
+    handler: PaymentRequestHandler.showBip270
+
+  })
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/bip270",
+    handler: PaymentRequestHandler.createBip270 
+
+  })
+
+
+
+
 
   server.route({
     method: "POST",
