@@ -911,6 +911,21 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/yelp_businesses',
+
+    config: {
+
+      handler: handlers.YelpBusinesses.index
+
+    }
+
+  });
+
+
 
 
   server.route({
