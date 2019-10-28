@@ -14,6 +14,11 @@ import * as simplewallets from './handlers/simple_wallets';
 import * as accountInvoices from './handlers/account_invoices';
 import * as achs from './handlers/achs';
 
+import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
+
+import { join } from 'path';
+const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
+
 const sudoWires = require("./handlers/wire_reports");
 
 const SudoAccounts = require("./handlers/sudo_accounts");
@@ -891,6 +896,22 @@ async function Server() {
     }
 
   });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/cities',
+
+    config: {
+
+      handler: handlers.Cities.index
+
+    }
+
+  });
+
+
 
   server.route({
 

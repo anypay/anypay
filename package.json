@@ -91,6 +91,7 @@
     "winston": "^2.4.0",
     "ws": "^3.3.3",
     "yargs": "^12.0.5",
+    "yelp-fusion": "^3.0.0",
     "zeromq": "^4.6.0"
   },
   "devDependencies": {
