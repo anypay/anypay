@@ -38,15 +38,21 @@ export async function removeAccountRoute(params: AccountRouteLookup) {
 
 }
 
-export async function createAddressRoute(invoice) {
+interface ProposedPaymentOption {
+  account_id: number;
+  address: string;
+  currency: string;
+}
+
+export async function createAddressRoute(options: ProposedPaymentOption) {
 
   var outputAddressValue, outputCurrency;
 
   let accountRoute = await models.AccountRoute.findOne({ where: {
 
-    account_id: invoice.account_id,
+    account_id: options.account_id,
 
-    input_currency: invoice.currency
+    input_currency: options.currency
 
   }});
 
@@ -60,9 +66,9 @@ export async function createAddressRoute(invoice) {
 
     let outputAddress = await models.Address.findOne({ where: {
 
-      account_id: invoice.account_id,
+      account_id: options.account_id,
 
-      currency: invoice.currency
+      currency: options.currency
 
     }});
 
@@ -74,16 +80,16 @@ export async function createAddressRoute(invoice) {
 
     } else {
 
-      throw new Error(`no address or route for invoice ${invoice.uid}`)
+      throw new Error(`no ${options.currency} address or route for account ${options.account_id}`)
     }
 
   }
 
   let addressRoute = await models.AddressRoute.create({
 
-    input_currency: invoice.currency, 
+    input_currency: options.currency, 
 
-    input_address: invoice.address, 
+    input_address: options.address, 
 
     output_currency: outputCurrency,
 

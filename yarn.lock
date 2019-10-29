@@ -4416,15 +4416,19 @@ ripemd160@^2.0.0:
     hash-base "^2.0.0"
     inherits "^2.0.1"
 
-rpc-simple-wallet@^1.0.7:
-  version "1.0.7"
-  resolved "https://registry.yarnpkg.com/rpc-simple-wallet/-/rpc-simple-wallet-1.0.7.tgz#4c97c6a474261249d50b1e71a5f2c136e55fa8a2"
+rpc-simple-wallet@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/rpc-simple-wallet/-/rpc-simple-wallet-1.1.0.tgz#fcea507f27d8cc505f8fa9a36100e21dd1663ca8"
+  integrity sha512-9XHcZ5IcwE1JXllC9dE3eT7hizTFTgnSBtlG1K44+JKWimCVHEJrt04M5V1nAJsoFlFfsWDFTc5X7ENZWzaSHQ==
   dependencies:
+    "@types/mocha" "^5.2.7"
     "@types/node" "^11.12.0"
     bignumber.js "^8.1.1"
     commander "^2.19.0"
     dotenv "^7.0.0"
+    mocha "^6.2.0"
     superagent "^4.1.0"
+    ts-node "^8.3.0"
 
 safe-buffer@^5.0.1, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.1"

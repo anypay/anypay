@@ -71,7 +71,7 @@ export async function activateCoin(code) {
 
 }
 
-export async function getCoin(code: string) {
+export function getCoin(code: string) {
 
   return coins.find(coin => coin.code === code);
 

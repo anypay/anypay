@@ -7,6 +7,8 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import * as _ from 'underscore';
+
 import { createAddressRoute } from './routes';
 
 import * as database from './database';
@@ -30,6 +32,8 @@ import {convert} from './prices';
 import {getCoin} from './coins';
 
 import { computeInvoiceURI } from './uri';
+
+import { writePaymentOptions } from './payment_options';
 
 interface Amount {
   currency: string;
@@ -86,21 +90,41 @@ export async function generateInvoice(
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
-  console.log('converting price');
+  let addresses = await models.Address.findAll({ where: {
+    account_id: account.id
+  }});
 
-  let coin = await getCoin(invoiceCurrency);
+  addresses = _.reject(addresses, (address) => {
+    return getCoin(address.currency).unavailable;
+  });
+
+  let coin = getCoin(invoiceCurrency);
 
   let invoiceAmount = await convert({
     currency: account.denomination,
     value: denominationAmountValue
   }, invoiceCurrency, coin.precision);
 
-  console.log('converted price', invoiceAmount);
-  console.log('getting new invoice address');
+  let invoiceAmounts = await Promise.all(addresses.map((address) => {
+
+    return convert({
+      currency: account.denomination,
+      value: denominationAmountValue
+    }, address.currency, coin.precision);
+
+  }));
 
   let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
 
-  console.log('got new invoice address', address);
+  let newAddresses = await Promise.all(addresses.map(async (address) => {
+    let newAddress = await getNewInvoiceAddress(accountId, address.currency);
+    return {
+      currency: address.currency,
+      address: newAddress.value
+    }
+  }));
+
+  console.log('newAddresses', newAddresses);
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,
@@ -117,6 +141,29 @@ export async function generateInvoice(
     amount: invoiceChangeset.invoiceAmount.value,
     address: invoiceChangeset.address
   });
+
+  let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
+
+  console.log('matrix', matrix);
+
+  let uris = matrix.map((row) => {
+    let address = row[0];
+
+    return  computeInvoiceURI({
+      currency: address.currency,
+      amount: row[1].value,
+      address: row[2].address
+    });
+  });
+
+  matrix = matrix.map((row, i) => {
+
+    row.push(uris[i]);
+
+    return row;
+  });
+
+  console.log('matrix2', matrix)
 
   var invoiceParams = {
     address: invoiceChangeset.address,
@@ -136,13 +183,32 @@ export async function generateInvoice(
 
   var invoice = await models.Invoice.create(invoiceParams);
 
+  let paymentOptions = matrix.map(row => {
+
+    return {
+      invoice_uid: invoice.uid,
+      currency: row[0].currency,
+      amount: row[1].value,
+      address: row[2].address,
+      uri: row[3]
+    }
+  });
+
+  let paymentOptionRecords = await writePaymentOptions(paymentOptions);
+
   emitter.emit('invoice.created', invoice.uid);
 
-  let route = await createAddressRoute(invoice);
+  await Promise.all(paymentOptions.map(option => {
 
-  console.log('address_route.created', route.toJSON());
+    return createAddressRoute({
+      account_id: account.id,
+      address: option.address,
+      currency: option.currency
+    });
+  }))
 
   return invoice;
+
 }
 
 /*

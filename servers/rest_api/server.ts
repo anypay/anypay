@@ -14,7 +14,6 @@ const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
 import * as addressRoutesActor from '../../actors/address_routes/actor';
-import * as bchAddAddressToAllOnInvoiceCreated from '../../actors/on_invoice/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -1760,8 +1759,6 @@ async function start () {
     pricesActor.start();
 
   }
-
-  bchAddAddressToAllOnInvoiceCreated.start();
 
   await sequelize.sync()
 
