@@ -114,9 +114,7 @@ export async function generateInvoice(
 
   }));
 
-  let address = await getNewInvoiceAddress(accountId, invoiceCurrency);
-
-  let newAddresses = await Promise.all(addresses.map(async (address) => {
+  let newAddresses = await Promise.all(addresses.map(async (address:any) => {
     let newAddress = await getNewInvoiceAddress(accountId, address.currency);
     return {
       currency: address.currency,
@@ -124,11 +122,13 @@ export async function generateInvoice(
     }
   }));
 
+  let address:any = newAddresses.find((elem:any)=> elem.currency === invoiceCurrency);
+
   console.log('newAddresses', newAddresses);
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,
-    address: address.value,
+    address: address.address,
     denominationAmount: {
       currency: account.denomination,
       value: denominationAmountValue
@@ -175,7 +175,6 @@ export async function generateInvoice(
     status: 'unpaid',
     uid: uid,
     uri,
-
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
@@ -241,19 +240,31 @@ export async function replaceInvoice(uid: string, currency: string) {
 
   let invoice = await models.Invoice.findOne({ where: { uid: uid }});
 
+  let option = await models.PaymentOption.findOne({ 
+    where: { 
+      invoice_uid: uid,
+      currency: currency
+     }
+  });
+
   if (!invoice) {
     throw new Error(`invoice ${uid} not found`);
   }
 
-  let newInvoice = await generateInvoice(
-    invoice.account_id,
-    invoice.denomination_amount,
-    currency,
-    invoice.uid
-  );
+  if (!option) {
+    throw new Error(`currency ${currency} is not a payment option for invoice ${uid}`);
+  }
 
-  await invoice.destroy();
+  invoice.currency = option.currency;
 
-  return newInvoice;
+  invoice.amount = option.amount;
+
+  invoice.address = option.address;
+
+  invoice.uri = option.uri;
+  
+  await invoice.save();
+
+  return invoice;
+
 }
-
