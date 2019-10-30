@@ -83,12 +83,14 @@ describe("Payment Option Library", () => {
       //assert invocie is dash with Dash address
       assert.strictEqual(invoice.currency, "DASH");
 
+      assert(invoice.uri)
       assert(dash.validateAddress(invoice.address));
 
       //replace invoice with BSV 
       invoice =  await invoices.replaceInvoice(invoice.uid, 'BSV');
       console.log(invoice.toJSON())
 
+      assert(invoice.uri)
       assert.strictEqual(invoice.currency, "BSV");
 
       //assert invoice address is the same as the original
