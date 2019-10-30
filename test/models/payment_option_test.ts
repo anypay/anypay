@@ -17,7 +17,6 @@ describe("Payment Option model", () => {
       uri: 'bitcoincash:qre0g3fymuc29usz6e6hakqte8vn32acq5xjqnwv5s?amount=5'
     });
 
-
     assert(record.id > 0);
 
   });
