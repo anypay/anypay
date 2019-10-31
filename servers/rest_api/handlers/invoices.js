@@ -254,9 +254,16 @@ module.exports.create = async (request, reply) => {
 
     await invoice.save();
 
+    let payment_options = await models.PaymentOption.findAll({where: {
+      invoice_uid: invoice.uid
+    }});
+
+    invoice.payment_options = payment_options;
+
     return sanitizeInvoice(invoice);
 
   } catch(error) {
+    console.log(error);
 
     log.error(error.message);
 
@@ -297,6 +304,12 @@ module.exports.show = async function(request, reply) {
 	    log.info('invoice.requested', invoice.toJSON());
 
 	    emitter.emit('invoice.requested', invoice.toJSON()); 
+
+      let payment_options = await models.PaymentOption.findAll({where: {
+        invoice_uid: invoice.uid
+      }});
+
+      invoice.payment_options = payment_options;
 
       return sanitizeInvoice(invoice);
 

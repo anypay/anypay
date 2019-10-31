@@ -31,9 +31,13 @@ import * as password from './password';
 
 var oracles = ConfigureOracles(configureOracles);
 
-(async function() {
+var initialized = false;
 
+(async function() {
+  
   await require('../initializers').initialize();
+
+  initialized = true;
 
 })();
 
@@ -62,4 +66,14 @@ export {
   password,
   login
 }
+
+export async function initialize() {
+
+  while(!initialized) {
+
+    await amqp.wait(10);
+  }
+
+}
+
 

@@ -14,7 +14,6 @@ const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
 import * as addressRoutesActor from '../../actors/address_routes/actor';
-import * as bchAddAddressToAllOnInvoiceCreated from '../../actors/on_invoice/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -23,15 +22,7 @@ import { hash, bcryptCompare } from '../../lib/password';
 import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-import * as BCHAddressForwardCallbacks from './handlers/bch_address_forward_callbacks';
 import * as DASHAddressForwardCallbacks from './handlers/dash_address_forward_callbacks';
-import * as ZENAddressForwardCallbacks from './handlers/zen_address_forward_callbacks';
-import * as ZECAddressForwardCallbacks from './handlers/zec_address_forward_callbacks';
-import * as LTCAddressForwardCallbacks from './handlers/ltc_address_forward_callbacks';
-import * as DOGEAddressForwardCallbacks from './handlers/doge_address_forward_callbacks';
-import * as SMARTAddressForwardCallbacks from './handlers/smart_address_forward_callbacks';
-import * as RVNAddressForwardCallbacks from './handlers/rvn_address_forward_callbacks';
-import * as AddressSubscriptionCallbacks from './handlers/subscription_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
 /* Import all handlers from './handlers directory */
@@ -420,6 +411,16 @@ async function Server() {
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
+
+  server.route({
+    method: "GET",
+    path: "/invoices/{invoice_uid}/payment_options",
+    handler: handlers.InvoicePaymentOptions.show,
+    options: {
+      tags: ['api']
+    }
+  });
+
   server.route({
     method: "GET",
     path: "/invoices",
@@ -1444,138 +1445,6 @@ async function Server() {
 
   server.route({
 
-    method: 'POST',
-
-    path: '/bch/address_forward_callbacks',
-
-    options: {
-
-      handler: BCHAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/dash/address_forward_callbacks',
-
-    options: {
-
-      handler: DASHAddressForwardCallbacks.create
-
-    }
-
-  });
-
-
-
-   server.route({
-
-    method: 'POST',
-
-    path: '/ltc/address_forward_callbacks',
-
-    options: {
-
-      handler: LTCAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/zen/address_forward_callbacks',
-
-    options: {
-
-      handler: ZENAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/zec/address_forward_callbacks',
-
-    options: {
-
-      auth: "sudopassword",
-      
-      handler: ZECAddressForwardCallbacks.create
-    }
-
-  })
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/doge/address_forward_callbacks',
-
-    options: {
-
-      handler: DOGEAddressForwardCallbacks.create
-
-    }
-
-  });
-
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/smart/address_forward_callbacks',
-
-    options: {
-
-      handler: SMARTAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/rvn/address_forward_callbacks',
-
-    options: {
-
-      handler: RVNAddressForwardCallbacks.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/address_subscription_callbacks',
-
-    options: {
-
-      auth: "sudopassword",
-
-      handler: AddressSubscriptionCallbacks.subscriptionCallback
-
-    }
-
-  });
-
-  server.route({
-
     method: 'GET',
 
     path: '/address_routes/{input_currency}/{input_address}',
@@ -1600,55 +1469,6 @@ async function Server() {
 
     }
   });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/blockcypher/webhooks/dash',
-
-    options: {
-
-      handler: async function(req, h) {
-
-        log.info('blockcypher.webhook', req.payload);
-
-        try {
-
-          let hook = await models.BlockcypherEvent.create({
-          
-            type: 'unconfirmed-tx',
-
-            payload: JSON.stringify(req.payload)
-
-          });
-
-          log.info('blockcypher.event.recorded', hook.toJSON());
-
-          let payments = parseUnconfirmedTxEventToPayments(req.payload);
-
-          payments.forEach(async (payment) => {
-
-            log.info('payment', payment);
-
-            await channel.publish('anypay.payments', 'payment', new Buffer(JSON.stringify(payment)));
-
-          });
-
-        } catch(error) {
-
-          log.error(error.message);
-
-        }
-
-        return { success: true }
-
-      }
-
-    }
-
-  });
-
 
   server.route({
     method: "GET",
@@ -1760,8 +1580,6 @@ async function start () {
     pricesActor.start();
 
   }
-
-  bchAddAddressToAllOnInvoiceCreated.start();
 
   await sequelize.sync()
 
