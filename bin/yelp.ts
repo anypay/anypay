@@ -12,23 +12,29 @@ const bar1 = new _cliProgress.SingleBar({}, _cliProgress.Presets.shades_classic)
 
 import { models } from '../lib';
 
+import { getMongodb } from '../lib/mongodb';
+
 (async () => {
 
-  let cities = await models.City.findAll({ where: {
+  let mongodb = await getMongodb();
 
-    id: {
-      [Op.gte]: 250
-    }
-  
-  }});
+  let collection = mongodb.collection('yelp_businesses')
+
+  collection.createIndex({
+    "id": 1 
+  }, {
+    unique: true 
+  });
+
+  let cities = await models.City.findAll();
 
   bar1.start(cities.length, 0);
 
   for (let i = 0; i < cities.length; i++) {
+    //console.log(`${i} / ${cities.length} cities processed`);
 
     let city = cities[i];
 
-    console.log(city.toJSON())
     var businesses;
 
     try {
@@ -37,28 +43,32 @@ import { models } from '../lib';
 
     } catch(error) {
 
-      console.error(error.message);
+      //console.error(error.message);
 
       continue;
     }
 
-    console.log(`found ${businesses.length} businesses in ${city.name}`);
+    //var bar2 = new _cliProgress.SingleBar({}, _cliProgress.Presets.shades_classic);
 
-    var bar2 = new _cliProgress.SingleBar({}, _cliProgress.Presets.shades_classic);
-
-    bar2.start(businesses.length, 0);
+    //bar2.start(businesses.length, 0);
 
     for (let j = 0; j < businesses.length; j++) {
 
+      //bar2.update(j);
+
       let business = businesses[j];
 
-      let [record, isNew] = await importBusiness(city, business);
+      try {
 
-      if (isNew) {
-        console.log(`businesscreated`, record.toJSON());
+        let result = await collection.insertOne(business);
+
+        //console.log('business.created', result);
+
+      } catch(error) {
+
+        //console.log('business already recorded');
+          
       }
-
-      bar2.update(j);
 
     }
 

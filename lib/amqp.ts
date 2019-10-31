@@ -39,6 +39,6 @@ async function awaitChannel() {
   
 export {
  
-  connection, channel, awaitChannel
+  connection, channel, awaitChannel, wait
 
 }
