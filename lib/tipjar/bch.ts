@@ -1,4 +1,5 @@
 
+import * as http from 'superagent';
 
 export async function getAddressBalance(address: string): Promise<number> {
 

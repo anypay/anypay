@@ -463,6 +463,15 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/tipjars",
+    handler: TipJars.index,
+    options: {
+      auth: "token"
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/sudo/accounts/{account_id}/tipjars/{currency}",
     handler: sudoTipjars.show,
     options: {
