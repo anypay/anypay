@@ -52,8 +52,6 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   }
 
-  uri = `${uri}&any=1`;
-
   return uri;
 
 }
