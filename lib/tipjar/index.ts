@@ -1,7 +1,13 @@
 
 import { models } from '../models';
 const bch: any = require('bitcore-lib-cash');
+const bsv: any = require('bsv');
 import * as http from 'superagent';
+
+import * as bsvTipjar from './bsv';
+import * as bchTipjar from './bch';
+
+import { importAddress } from '../fullnode';
 
 interface iTipJar {
   account_id: number;
@@ -12,12 +18,20 @@ interface iTipJar {
   utxos?: any[];
 }
 
+function getBitcore(currency: String): any {
+  switch(currency) {
+    case 'BCH':
+      return bch;
+    case 'BSV':
+      return bsv;
+    default:
+      throw new Error(`tip jars not supported for currency ${currency}`);
+  }
+}
+
 export async function getTipJar(account_id: number, currency: string) {
 
-  if (currency !== 'BCH') {
-
-    throw new Error('only BCH tip jars supported currently');
-  }
+  let bitcore = getBitcore(currency);
 
   let tipJar = await models.Tipjar.findOne({
 
@@ -33,7 +47,11 @@ export async function getTipJar(account_id: number, currency: string) {
 
   if (!tipJar) {
 
-    let privateKey = new bch.PrivateKey();
+    let privateKey = new bitcore.PrivateKey();
+
+    let address = privateKey.toAddress().toString()
+
+    await importAddress(currency, address);
 
     tipJar = await models.Tipjar.create({
 
@@ -41,9 +59,9 @@ export async function getTipJar(account_id: number, currency: string) {
 
       currency,
 
-      private_key: privateKey.toWIF(),
+      address,
 
-      address: privateKey.toAddress().toString()
+      private_key: privateKey.toWIF()
 
     });
 
@@ -59,7 +77,6 @@ export async function getTipJarAndBalance(accountId: number, currency: string) {
 
   let balance = await getTipJarBalance(tipJar);
 
-
   return {
 
     tipjar: tipJar.toJSON(),
@@ -71,14 +88,16 @@ export async function getTipJarAndBalance(accountId: number, currency: string) {
 
 export async function getTipJarBalance(tipJar: any) {
 
-  if (tipJar.currency !== 'BCH') {
+  switch(tipJar.currency) {
 
-    throw new Error('only BCH tip jars supported currently');
+    case 'BCH':
+      return bchTipjar.getAddressBalance(tipJar.address);
+    case 'BSV':
+      return bsvTipjar.getAddressBalance(tipJar.address);
+    default:
+      throw new Error(`tip jars not supported for currency ${tipJar.currency}`);
+
   }
 
-  let resp = await
-    http.get(`https://rest.bitcoin.com/v2/address/details/${tipJar.address}`);
-
-  return resp.body.unconfirmedBalance;
 }
 
