@@ -10,6 +10,8 @@ import {models} from '../../lib/models';
 
 import {statsd} from '../../lib/stats/statsd'
 
+const polynym = require('polynym');
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 async function createInvoice(accountId: number, amount: number) {
@@ -24,6 +26,72 @@ async function createInvoice(accountId: number, amount: number) {
 
   return invoice;
 
+}
+
+export async function forwardAllUTXOsToAddress(privKey: string,receiver:string){
+
+  //get all utxos 
+  //create a transcation with utxo's 
+       
+  let sender = new bsv.PrivateKey(privKey).toAddress().toString()
+
+  console.log( privKey, sender, receiver)
+
+  let resp = (await rpc.call('listunspent', [0, 1000000, [sender]])).result;
+
+  console.log('list unspent', resp)
+
+  let utxos = resp.map((elem)=>{
+    return {
+      "txId": elem.txid,
+      "outputIndex": elem.vout, 
+      "satoshis": bsvToSatoshis(elem.amount),
+      "address" : elem.address,
+      "script": elem.scriptPubKey 
+    }
+  })
+
+  console.log('utxos', utxos)
+
+  let amountToSpend = 0;
+  
+  utxos.forEach(elem => amountToSpend += elem.satoshis)
+
+  amountToSpend -= bsvToSatoshis(.0001);
+
+  console.log('amount to spend', amountToSpend)
+
+  let tx = new bsv.Transaction()
+    .from(utxos)
+    .to(receiver, amountToSpend)
+    .sign(new bsv.PrivateKey(privKey));
+
+  console.log('signed tx', tx)
+
+  let txid =  await rpc.call('sendrawtransaction', [tx.toString()])
+
+  console.log('txid', txid)
+
+  return txid;
+}
+
+function bsvToSatoshis(bsv): number{
+  return bsv*100000000 | 0;
+}
+
+
+export async function resolveAlias(alias: string){
+
+  let address =  await polynym.resolveAddress(alias);
+
+  if( validateAddress(address.address) ){
+
+    return address.address
+
+  }else{
+    throw new Error(`Cannot resolve BSV alias ${alias}`);
+
+  }
 }
 
 

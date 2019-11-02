@@ -29,6 +29,21 @@ function getBitcore(currency: String): any {
   }
 }
 
+export async function claimTipjar( account_id: number, currency:string, alias: string){
+
+  switch( currency) {
+
+    case 'BSV':
+      return await bsvTipjar.claim(account_id, alias);
+    default:
+      throw new Error(`tip jars not supported for currency ${currency}`);
+
+  }
+
+
+
+}
+
 export async function getTipJar(account_id: number, currency: string) {
 
   let bitcore = getBitcore(currency);
@@ -39,7 +54,9 @@ export async function getTipJar(account_id: number, currency: string) {
 
       account_id,
 
-      currency
+      currency,
+  
+      claimed : false
 
     }
 

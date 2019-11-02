@@ -462,6 +462,16 @@ async function Server() {
   });
 
   server.route({
+
+    method: "POST",
+    path: "/tipjars/{currency}/claim",
+    handler: TipJars.claim,
+    options: {
+      auth: "token"
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/tipjars",
     handler: TipJars.index,

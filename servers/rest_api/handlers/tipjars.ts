@@ -26,4 +26,24 @@ export async function index(request, h) {
 
 }
 
+export async function claim(request, h){
+
+  let currency = request.params.currency;
+
+  let account_id = request.account_id;
+
+  let alias = request.payload.alias;
+
+  console.log(request)
+
+  console.log(request.payload)
+
+
+
+  let response = await tipjar.claimTipjar(account_id, currency, alias);
+
+  return response;
+
+}
+
 
