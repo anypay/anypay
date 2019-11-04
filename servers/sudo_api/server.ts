@@ -925,7 +925,21 @@ async function Server() {
 
   });
 
+  server.route({
 
+    method: 'GET',
+
+    path: '/api/cashback/failures',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.CashbackFailures.index
+
+    }
+
+  });
 
 
   server.route({

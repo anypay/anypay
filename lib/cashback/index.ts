@@ -91,3 +91,17 @@ export async function getMerchantTotalsAllTime(currency: string): Promise<number
 
 }
 
+export async function listFailures(): Promise<any[]> {
+
+  let result = await database.query(
+    `select cashback_customer_payments.*, invoices.account_id from
+    cashback_customer_payments inner join invoices on invoices.id =
+    cashback_customer_payments.invoice_id where  invoices.status = 'paid' and
+    invoices.cashback_denomination_amount > 0 and transaction_hash is null order
+    by "createdAt" desc;`
+  );
+
+  return result[0];
+
+}
+
