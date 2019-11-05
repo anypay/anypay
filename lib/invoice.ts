@@ -139,7 +139,9 @@ export async function generateInvoice(
   let uri = computeInvoiceURI({
     currency: invoiceChangeset.invoiceAmount.currency,
     amount: invoiceChangeset.invoiceAmount.value,
-    address: invoiceChangeset.address
+    address: invoiceChangeset.address,
+    business_name: account.business_name,
+    image_url: account.image_url
   });
 
   let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
