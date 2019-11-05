@@ -6,6 +6,7 @@ import * as bch from '../../../plugins/bch/lib/jsonrpc';
 import { log, models, database, amqp } from '../../../lib';
 
 import * as Boom from 'boom';
+import * as http from 'superagent';
 
 import { RPCSimpleWallet } from 'rpc-simple-wallet';
 
@@ -102,7 +103,7 @@ export async function dashboard(req, h) {
     let totalDashPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='DASH'`);
 
     let bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
-    let dashBalance = await coins['DASH'].wallet.getAddressUnspentBalance();
+    let dashBalance = await getDashBalance(coins['DASH'].address);
 
     return [{                                                                       
       currency: 'BCH',
@@ -136,11 +137,10 @@ export async function dashboard(req, h) {
 
 async function updateStats() {
 
-  await coins['DASH'].wallet.updateWallet();
-  coins['DASH'].balance = await coins['DASH'].wallet.getAddressUnspentBalance();
+  coins['DASH'].balance = await getDashBalance(coins.DASH.address);
 
   log.info('cashback.balance', {
-    coin: "BCH",
+    coin: "DASH",
     balance: coins['DASH'].balance
   });
 
@@ -168,3 +168,15 @@ async function updateStats() {
 
 })();
 
+async function getDashBalance(address: string) {
+  console.log(`get dash balance ${address}`);
+
+  let url = `https://chainz.cryptoid.info/dash/api.dws?q=getbalance&a=${address}`;
+
+  let resp = await http.get(url);
+
+  console.log(resp.text);
+
+  return parseFloat(resp.text);
+
+}
