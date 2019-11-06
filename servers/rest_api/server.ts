@@ -53,6 +53,7 @@ const DashWatchController = require("./handlers/dashwatch_reports");
 const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
 const PaymentRequestHandler = require("./handlers/payment_request");
+const BankAccountHandler = require("./handlers/bank_account");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
@@ -575,6 +576,42 @@ async function Server() {
       tags: ['api']
     }
   });
+
+  server.route({
+    method: "GET",
+    path: "/bank_account",
+    handler: BankAccountHandler.show, 
+    options: {
+      auth: "token"
+    }
+  })
+
+  server.route({
+    method: "POST",
+    path: "/bank_account",
+    handler: BankAccountHandler.create,
+    options : {
+
+      validate: {
+
+        payload: {
+
+          beneficiary_name: Joi.string().required(),
+          beneficiary_address: Joi.string().required(),
+          routing_number: Joi.string().required(),
+          city: Joi.string().required(),
+          state: Joi.string().required(),
+          zip: Joi.string().required(),
+          beneficiary_account_number: Joi.string().required()
+
+        }
+
+       },
+
+      auth: "token"
+
+    }
+  })
 
   server.route({
     method: "GET",
