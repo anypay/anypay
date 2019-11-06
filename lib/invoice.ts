@@ -154,9 +154,12 @@ export async function generateInvoice(
     return  computeInvoiceURI({
       currency: address.currency,
       amount: row[1].value,
-      address: row[2].address
+      address: row[2].address,
+      business_name: account.business_name,
+      image_url: account.image_url
     });
   });
+
 
   matrix = matrix.map((row, i) => {
 

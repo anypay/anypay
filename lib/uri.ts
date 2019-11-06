@@ -42,7 +42,7 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   } else if (params.currency === 'BSV') {
 
-    uri = `${protocol}:${params.address}?amount=${params.amount}&sv`;
+    uri = `${protocol}:${params.address}?sv&amount=${params.amount}`;
 
     if (params.business_name) {
       uri = `${uri}&label=${params.business_name}`;
@@ -51,6 +51,8 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
     if (params.image_url) {
       uri = `${uri}&avatarUrl=${params.image_url}`;
     }
+
+    return uri;
 
   } else if (params.currency === 'GOLD') {
 
