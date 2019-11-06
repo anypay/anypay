@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import * as Hapi from 'hapi';
 
-import { log, database, models } from '../../lib';
+import { log, database, models, password } from '../../lib';
 
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
@@ -51,6 +51,10 @@ import * as passwords from './handlers/passwords';
 
 import * as Joi from 'joi';
 
+import * as uuid from 'uuid';
+
+import { Subscriptions } from './lib/subscriptions';
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -64,6 +68,49 @@ async function Server() {
         }
       }
     }
+  });
+
+  const io = require("socket.io")(server.listener);
+
+  let wsSubscriptions = new Subscriptions();
+
+  io.on("connection", client => {
+
+    client.uid = uuid.v4();
+
+    log.info("socket.connected", client.uid);
+
+    client.on("subscribe", async (data) => {
+
+      try {
+
+        await password.bcryptCompare(data.token, process.env.SUDO_PASSWORD_HASH);
+
+        wsSubscriptions.subscribe(client);
+
+      } catch(error) {
+
+        log.error('unauthorized', error.message);
+
+        client.emit('unauthorized');
+
+        client.disconnect();
+
+      }
+    });
+
+    client.on("unsubscribe", data => {
+      wsSubscriptions.unsubscribe(client);
+    });
+
+    client.on("disconnect", () => {
+
+      wsSubscriptions.unsubscribeClient(client);
+
+      log.info("socket.disconnected", client.uid);
+
+    });
+
   });
 
   await server.register(require('hapi-auth-basic'));
