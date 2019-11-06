@@ -27,6 +27,8 @@ import * as tipjar from './tipjar';
 import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
+import * as bankAccounts from './bank_account';
+import * as ach from './ach';
 
 
 var oracles = ConfigureOracles(configureOracles);
@@ -64,7 +66,9 @@ export {
   email,
   routes,
   password,
-  login
+  login,
+  ach,
+  bankAccounts
 }
 
 export async function initialize() {

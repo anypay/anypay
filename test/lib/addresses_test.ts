@@ -42,6 +42,55 @@ describe('Addresses Library', () => {
 
   });
 
+  it("should set an address and unset an address", async ()=>{
+   
+    let account = await registerAccount(chance.email(), chance.word());
+
+    let currency = 'DASH'
+
+    let address  = 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9'
+
+    let changeSet = {
+      account_id : account.id,
+      currency: currency,
+      address: address
+    }
+
+    await addresses.setAddress(changeSet)
+
+    let setAddress  = await models.Address.findOne({ where: {
+
+      account_id: changeSet.account_id,
+
+      currency: changeSet.currency
+
+    }});
+
+    assert.strictEqual(address, setAddress.value)
+
+    console.log('SET', setAddress)
+
+    let unChangeSet = {
+      account_id: account.id,
+      currency: currency,
+      address: address
+    }
+    await addresses.unsetAddress(changeSet);
+
+    let unsetAddress  = await models.Address.findOne({ where: {
+
+      account_id: changeSet.account_id,
+
+      currency: changeSet.currency
+
+    }});
+
+    console.log('UNSET', unsetAddress)
+
+    assert.strictEqual(unsetAddress, null)
+
+  })
+
 });
 
 

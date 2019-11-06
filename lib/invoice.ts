@@ -90,6 +90,12 @@ export async function generateInvoice(
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
+  var bankAccountId;
+
+  if(account.ach_enabled){
+    bankAccountId = account.bank_account_id;
+  }
+
   let addresses = await models.Address.findAll({ where: {
     account_id: account.id
   }});
@@ -180,6 +186,7 @@ export async function generateInvoice(
     status: 'unpaid',
     uid: uid,
     uri,
+    bank_account_id: bankAccountId,
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
