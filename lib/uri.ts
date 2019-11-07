@@ -40,6 +40,8 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   } else if (params.currency === 'DASH') {
 
+    uri = `${protocol}:${params.address}?amount=${params.amount}&is=1`;
+
   } else if (params.currency === 'BSV') {
 
     uri = `${protocol}:${params.address}?sv&amount=${params.amount}`;
@@ -65,8 +67,6 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
     uri = `${protocol}:${params.address}?amount=${params.amount}`;
 
   }
-
-  uri = `${uri}&any=1`;
 
   return uri;
 
