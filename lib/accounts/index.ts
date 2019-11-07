@@ -10,15 +10,15 @@ import {AccountAddress} from '../core/types';
 
 import * as addresses from '../addresses';  
 
-import * as amqp from 'amqplib';
+import {setDenomination} from '../core';
+
+import { awaitChannel } from '../amqp';
 
 export async function setBankAccount( account_id: number, bank_account_id: number): Promise<any>{
 
   let account = await models.Account.findOne({where:{id: account_id}});
 
-  account.bank_account_id = bank_account_id;
-
-  await account.save();
+  await account.update({ bank_account_id })
 
   return account;
 
@@ -159,15 +159,19 @@ function getIntersection(arrA, arrB) {
 
 export async function enableACH(account_id){
 
-  const connection = await amqp.connect(process.env.AMQP_URL);
-
-  const channel = await connection.createChannel();
+  const channel = await awaitChannel() 
 
   let account = await models.Account.findOne({ 
           where: { id: account_id } 
   })
 
   if( account ){
+
+
+    await setDenomination({
+            currency: "USD",
+            account_id: account_id
+    })
 
     const obj =[
 
@@ -177,18 +181,17 @@ export async function enableACH(account_id){
       { currency: "BCH",  address : process.env.ANYPAY_EXCHANGE_BCH_ADDRESS}
     ]
 
-    for( let i = 0; i<obj.length; i++){
+    await Promise.all(
+        obj.map(async (elem:any) => {
 
-      let elem:any = obj[i]
+          elem.account_id = account_id;
 
-      elem.account_id = account_id;
+          await addresses.setAddress(elem)
 
-      await addresses.setAddress(elem)
+          await addresses.lockAddress(account_id, elem.currency)
 
-      await addresses.lockAddress(account_id, elem.currency)
-
-
-    }
+        })
+    );
 
     channel.publish('anypay.events', 'account.ach.enabled', new Buffer(JSON.stringify({"account_id": account_id })))
 
@@ -196,19 +199,21 @@ export async function enableACH(account_id){
 
     await account.save();
 
+    account = await models.Account.findOne({where:{id: account_id}})
+
+    return account;
+
+  }else{
+
+    throw new Error(`enableACH: No account found with id ${account_id}`);
+
   }
-
-  account = await models.Account.findOne({where:{id: account_id}})
-
-  return account.toJSON()
 
 }
 
 export async function disableACH(account_id){
        
-  const connection = await amqp.connect(process.env.AMQP_URL);
-
-  const channel = await connection.createChannel();
+  const channel = await awaitChannel() 
 
   let account = await models.Account.findOne({ 
           where: { id: account_id } 
@@ -219,25 +224,20 @@ export async function disableACH(account_id){
     if( account.ach_enabled ){
           
       const obj =[
-
         { currency: "DASH",  address : process.env.ANYPAY_EXCHANGE_DASH_ADDRESS},
         { currency: "BSV",  address : process.env.ANYPAY_EXCHANGE_BSV_ADDRESS},
         { currency: "BTC",  address : process.env.ANYPAY_EXCHANGE_BTC_ADDRESS},
         { currency: "BCH",  address : process.env.ANYPAY_EXCHANGE_BCH_ADDRESS}
-      ]
+       ]
  
-      for( let i = 0; i<obj.length; i++){
+      await Promise.all(
+        obj.map(async (item:any) => {
+               
+          item.account_id = account_id;
+          await addresses.unsetAddress(item)
 
-        let elem:any = obj[i]
-
-        elem.account_id = account_id;
-
-        await addresses.unlockAddress(account_id, elem.currency)
-
-        await addresses.unsetAddress(elem)
-  
-      }
-
+        })
+      );
    
       account.ach_enabled = false;
 
@@ -245,12 +245,20 @@ export async function disableACH(account_id){
 
       await account.save();
 
+      account = await models.Account.findOne({where:{id: account_id}})
+
+      return account;
+
+    }else{
+    
+      throw new Error(`disableACH: ACH is already disabled for ${account_id}`);
+
     }
 
+  }else{
+
+    throw new Error(`disableACH: No account found with id ${account_id}`);
+
   }
-
-  account = await models.Account.findOne({where:{id: account_id}})
-
-  return account.toJSON()
 
 }

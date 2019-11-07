@@ -123,6 +123,14 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
 export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
 
+  let account = await models.Account.findOne({ where:{ id: changeset.account_id}});
+
+  if( account.ach_enabled ){
+  
+    throw new Error(`Cannot change denomination when ACH is enabled`);
+
+  }
+
   var res = await models.Account.update({
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});

@@ -23,7 +23,7 @@ interface BankAccount{
 
 describe("Bank Accounts library", () => {
 
-  it("it should create a bank account", async () => {
+  it("it should create a bank account and set bank account id for account", async () => {
 
     let email = chance.email();
 

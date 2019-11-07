@@ -73,60 +73,109 @@ export async function importInvoiceRangeForAchBatch(accountAchId: number): Promi
 
 }
 
-export async function generateBatch( type?:string, desc?:string):Promise<any>{
+export async function generateBatchInputs( type?:string, desc?:string):Promise<any>{
 
   let invoices = await models.Invoice.findAll({ 
           where:{
             status:[ "paid", "underpaid", "overpaid"],
-            bank_account_id: { [Op.gt]: 0 }
+            bank_account_id: { [Op.gt]: 0 },
+            ach_batch_id: { [Op.is]: null }
           }
   })
 
-  const reducer = (accumulator, currentValue) => accumulator + currentValue.sum
-
   let batch = await models.AchBatch.create({
-    amount : invoices.reduce(reducer,0),
     currency: "USD",
     type: "ACH",
     description: "test"
   })
 
-  for( let i=0; i<invoices.length; i++){
-    invoices[i].ach_batch_id = batch.id;
-    await invoices[i].save();
-  }
+  await Promise.all(invoices.map(async(invoice) =>{
+
+    await invoice.update({  ach_batch_id: batch.id })
+    await  models.AchBatchInput.create({
+      batch_id: batch.id,
+      amount: invoice.denomination_amount_paid,
+      invoice_uid: invoice.uid,
+      bank_account_id: invoice.bank_account_id
+    })
+  }));
 
 
-  return batch;
+  console.log('batch.id', batch.id)
+
+  let inputs = await models.AchBatchInput.findAll({where: {batch_id: batch.id}});
+
+  console.log('INPUTS!', inputs)
+
+  return inputs;
 
 }
 
-export async function getBatchOutputs( batchId: number): Promise<any[]>{
+export async function generateBatchOutputs( batchId: number): Promise<any>{
 
   // Get all invoices with the batch number 
-  let invoices = await models.Invoice.findAll({ 
+  let inputs = await models.AchBatchInput.findAll({ 
           where:{
-            ach_batch_id : batchId 
+            batch_id : batchId 
           }
   })
 
   //Reduce the invoices to combine the invoices with the same account and SUM the amount due
-  let outputs = invoices.reduce((acc, item)=>{
-   if( !acc[item.bank_account_id] ){
-     acc[item.bank_account_id] = {
-       bank_account_id: item.bank_account_id,
-       amount: item.denomination_amount_paid,
-       currency: "USD"
-     }
+  let outputs = inputs.reduce( async (acc, item)=>{
 
+    let invoice = await models.Invoice.findOne({where:{uid : item.invoice_uid}})
+
+    if( !acc[item.bank_account_id] ){
+
+      acc[item.bank_account_id] = {
+
+        bank_account_id: item.bank_account_id,
+
+        amount: invoice.denomination_amount_paid,
+
+        currency: "USD",
+
+        invoices: [item.uid]
+
+      }
    }else{
-     acc[item.bank_account_id] += item.denomination_amount_paid;
-   }
-    return acc
-  },{});
-  
-  console.log("!!", outputs)
 
-  return outputs
+     acc[item.bank_account_id].amount += invoice.denomination_amount_paid;
+
+     acc[item.bank_account_id].invoices.push(invoice.uid) 
+
+   }
+
+   return acc
+
+  },{});
+
+
+  let sum = 0; 
+
+  await Promise.all(Object.keys(outputs).map(async(output:any)=>{
+
+    console.log('!', output)
+    await models.AchBatchOutput.create({
+       batch_id: batchId,
+       bank_account_id: output.bank_account_id,
+       amount: output.amount,
+       currency: output.currency
+    })
+
+    sum += output.amount;
+
+  }))
+
+  let batch = await models.AchBatch.findOne({where:{id: batchId}})
+
+  await batch.update({
+    amount : sum 
+  })
+
+  outputs = await models.AchBatchOutput.findAll({where: {batch_id: batchId}});
+
+  return outputs; 
 
 }
+

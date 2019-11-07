@@ -10,7 +10,7 @@ const chance = new Chance();
 
 describe("ACH Batch Library", () => {
 
-  var bankAccount1, account1, invoice1, bankAccount, account, invoice;
+  var bankAccount1, account1, invoice1, bankAccount, account, invoice, invoice2, invoice3;
 
   before(async () => {
 
@@ -68,6 +68,33 @@ describe("ACH Batch Library", () => {
 
     await invoice1.save();
 
+    invoice2 = await generateInvoice(account1.id, 100, 'BCH');
+
+    invoice2 = await models.Invoice.findOne({where:{uid:invoice2.uid}});
+
+    invoice2.status = "overpaid";
+
+    invoice2.denomination_amount_paid = invoice2.denomination_amount+1;
+
+    invoice2.amount_paid = invoice2.amount+1;
+
+    await invoice2.save();
+
+
+    invoice3 = await generateInvoice(account1.id, 100, 'BSV');
+
+    invoice3 = await models.Invoice.findOne({where:{uid:invoice3.uid}});
+
+    invoice3.status = "paid";
+
+    invoice3.denomination_amount_paid = invoice3.denomination_amount;
+
+    invoice3.amount_paid = invoice3.amount;
+
+    await invoice3.save();
+
+
+
 
   });
 
@@ -75,14 +102,21 @@ describe("ACH Batch Library", () => {
 
     it("should create a ach batch record and update all invoices not included in a batch", async () => {
 
-      let achBatch = await ach.generateBatch();
+      let inputs = await ach.generateBatchInputs();
+   
+      console.log(inputs)
 
-            //assert(achBatch.id)
+      assert.strictEqual( inputs.length, 4 )
 
-            //assery(achBatch
+      let outputs = await ach.generateBatchOutputs(inputs[0].batch_id);
+            
+      assert.strictEqual( outputs.length, 2 )
 
-      let batchPayments = await ach.getBatchOutputs(achBatch.id);
-      console.log("BATCH PAYMENTS", batchPayments)
+      let batch = await models.AchBatch.findOne({where:{id: outputs[0].batch_id}})
+
+      assert.strictEqual(batch.amount, 400 )
+
+ 
             /* 
       let invoices = await ach.batchSent({
         batch_id : "12324",

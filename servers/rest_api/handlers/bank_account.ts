@@ -21,7 +21,7 @@ export async function create(request, reply){
 
   if( account ){
 
-    throw Boom.badRequest('account already has bank info set');
+    return Boom.badRequest('account already has bank info set');
 
   }
 
@@ -30,11 +30,11 @@ export async function create(request, reply){
   console.log(bank_info)
 
   if (bank_info.code != 200) {
-    throw Boom.badRequest(`no bank found with routing number ${request.payload.routing_number}`)
+    return Boom.badRequest(`no bank found with routing number ${request.payload.routing_number}`)
   }
 
   if(!postcode.validate(request.payload.zip, 'US')){
-    throw Boom.badRequest(`Invalid zip code ${request.payload.zip}`)
+    return Boom.badRequest(`Invalid zip code ${request.payload.zip}`)
   }
 
   log.info(`controller:bank_account,action:create`);
@@ -54,7 +54,7 @@ export async function create(request, reply){
   }catch(error){
 
     log.info(error)
-    throw Boom.badRequest(error)
+    return Boom.badRequest(error)
   }
 
   return account
@@ -74,7 +74,7 @@ export async function confirmTest(request, h){
 
     log.error(err)
 
-    throw Boom.badRequest(err.message)
+    return Boom.badRequest(err.message)
 
  }
 
