@@ -3,6 +3,8 @@ interface InvoiceURIParams {
   address: string;
   amount: number;
   currency: string;
+  image_url?: string;
+  business_name?: string;
 }
 
 export function computeInvoiceURI(params: InvoiceURIParams) {
@@ -38,7 +40,19 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   } else if (params.currency === 'DASH') {
 
-    uri = `${protocol}:${params.address}?amount=${params.amount}&is=1`;
+  } else if (params.currency === 'BSV') {
+
+    uri = `${protocol}:${params.address}?sv&amount=${params.amount}`;
+
+    if (params.business_name) {
+      uri = `${uri}&label=${params.business_name}`;
+    }
+
+    if (params.image_url) {
+      uri = `${uri}&avatarUrl=${params.image_url}`;
+    }
+
+    return uri;
 
   } else if (params.currency === 'GOLD') {
 
