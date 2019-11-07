@@ -318,6 +318,38 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/shareholders',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Shareholders.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/shareholders/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Shareholders.update
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/invoices',
 
     config: {
