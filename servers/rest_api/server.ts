@@ -507,6 +507,16 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/shares",
+    handler: handlers.Shareholders.show,
+    options: {
+      auth: "token",
+      tags: ['api']
+    },
+  });
+
+  server.route({
     method: "POST",
     path: "/access_tokens",
     handler: AccessTokensController.create,
