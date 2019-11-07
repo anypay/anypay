@@ -2,6 +2,8 @@ import * as assert from 'assert';
 
 import { models, accounts, addresses } from '../../lib';
 
+import {setDenomination} from '../../lib/core';
+
 import * as Chance from 'chance';
 const chance = new Chance();
 
@@ -25,6 +27,11 @@ describe("Payment Option Library", () => {
       currency: "BSV",
       address: "19hAwYhCjbK3mFL1hVdgF5zdKzHdZDxVVJ"
     }]
+
+    await setDenomination({
+            currency: "GPB",
+            account_id: account.id
+    })
 
     await Promise.all(addrs.map(address => addresses.setAddress(address)));
 
@@ -64,6 +71,8 @@ describe("Payment Option Library", () => {
                       currency: "BTC"
               }
       })
+      
+      assert.strictEqual( account.denomination, "USD");
       assert.strictEqual( dash.value,  process.env.ANYPAY_EXCHANGE_DASH_ADDRESS );
       assert.strictEqual( dash.locked,  true );
       assert.strictEqual( bsv.value,  process.env.ANYPAY_EXCHANGE_BSV_ADDRESS );
@@ -82,7 +91,14 @@ describe("Payment Option Library", () => {
 
       account1 = await accounts.disableACH(account1.id);
 
-     let dash = await models.Address.findOne({
+      await setDenomination({
+              currency: "GPB",
+              account_id: account1.id
+      })
+
+      await account1.reload()
+
+      let dash = await models.Address.findOne({
               where:{
                       account_id: account1.id,
                       currency: "DASH"
@@ -111,6 +127,8 @@ describe("Payment Option Library", () => {
               }
       })
 
+
+      assert.strictEqual( account1.denomination, "GPB");
       assert.strictEqual( dash,  null );
       assert.strictEqual( bsv,  null );
       assert.strictEqual( bch,  null );
