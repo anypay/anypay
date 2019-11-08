@@ -5,6 +5,19 @@ import * as Sequelize from 'sequelize';
 import { models } from '../models';
 
 
+interface AchBatch_I{
+  id: number;
+  bank_batch_id: number;
+  type: string;
+  effective_date: number;
+  originating_account: number;
+  batch_description: string;
+  amount: number;
+  currency: string;
+
+}
+
+
 export async function getInvoiceRange(startUid:string, endUid:string, where:any={}) {
 
   let start = await models.Invoice.findOne({ where: { uid: startUid }});
@@ -105,8 +118,6 @@ export async function generateBatchInputs( type?:string, desc?:string):Promise<a
 
   let inputs = await models.AchBatchInput.findAll({where: {batch_id: batch.id}});
 
-  console.log('INPUTS!', inputs)
-
   return inputs;
 
 }
@@ -120,14 +131,20 @@ export async function generateBatchOutputs( batchId: number): Promise<any>{
           }
   })
 
-  //Reduce the invoices to combine the invoices with the same account and SUM the amount due
-  let outputs = inputs.reduce( async (acc, item)=>{
+  let outputs = {}
+
+  //To do - make this functional 
+  for( let i=0; i<inputs.length; i++ ){
+
+    let item = inputs[i]
 
     let invoice = await models.Invoice.findOne({where:{uid : item.invoice_uid}})
 
-    if( !acc[item.bank_account_id] ){
+    if( !outputs[item.bank_account_id] ){
 
-      acc[item.bank_account_id] = {
+      console.log('output added', item.bank_account_id )
+
+      outputs[item.bank_account_id] = {
 
         bank_account_id: item.bank_account_id,
 
@@ -135,27 +152,25 @@ export async function generateBatchOutputs( batchId: number): Promise<any>{
 
         currency: "USD",
 
-        invoices: [item.uid]
+        invoices: [item.invoice_uid]
 
       }
    }else{
 
-     acc[item.bank_account_id].amount += invoice.denomination_amount_paid;
+     outputs[item.bank_account_id].amount += invoice.denomination_amount_paid;
 
-     acc[item.bank_account_id].invoices.push(invoice.uid) 
+     outputs[item.bank_account_id].invoices.push(invoice.uid) 
 
    }
 
-   return acc
-
-  },{});
-
+  }
 
   let sum = 0; 
 
-  await Promise.all(Object.keys(outputs).map(async(output:any)=>{
-
-    console.log('!', output)
+  await Promise.all(Object.keys(outputs).map(async(key:any)=>{
+ 
+    let output = outputs[key];
+    
     await models.AchBatchOutput.create({
        batch_id: batchId,
        bank_account_id: output.bank_account_id,
@@ -179,3 +194,22 @@ export async function generateBatchOutputs( batchId: number): Promise<any>{
 
 }
 
+
+
+export async function batchSent(obj: AchBatch_I){
+
+  let batch = await models.AchBatch.findOne({where:{id:obj.id}})
+ 
+  batch = await batch.update({
+    bank_batch_id: obj.bank_batch_id,
+    type: obj.type,
+    effective_date: obj.effective_date,
+    batch_description: obj.batch_description,
+    originating_account: obj.originating_account,
+    amount: obj.amount,
+    currency: obj.currency
+  })
+
+  return batch;
+
+}
