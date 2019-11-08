@@ -104,7 +104,7 @@ describe("ACH Batch Library", () => {
 
       let inputs = await ach.generateBatchInputs();
    
-      console.log(inputs)
+      console.log('inputs!', inputs)
 
       assert.strictEqual( inputs.length, 4 )
 
@@ -114,18 +114,20 @@ describe("ACH Batch Library", () => {
 
       let batch = await models.AchBatch.findOne({where:{id: outputs[0].batch_id}})
 
-      assert.strictEqual(batch.amount, 400 )
-
+      assert.strictEqual(parseInt(batch.amount), 400 )
  
-            /* 
-      let invoices = await ach.batchSent({
-        batch_id : "12324",
+      batch = await ach.batchSent({
+        id: batch.id,
+        bank_batch_id : 12324,
         type: "test",
         effective_date: Date.now(),
+        originating_account: 55555555,
         batch_description: "anypay test",
-        amount: invoice.denomination_amount + invoice1.denomination_amount,
+        amount: 400,
         currency: "USD"
-      })*/
+      })
+
+      assert.strictEqual( batch.bank_batch_id, 12324 )
 
 
     });
