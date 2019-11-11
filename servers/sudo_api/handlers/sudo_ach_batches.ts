@@ -1,5 +1,5 @@
 
-import { models } from '../../../lib';
+import { models, ach } from '../../../lib';
 
 import * as Boom from 'boom';
 
@@ -21,5 +21,18 @@ export async function index(req, h) {
 
   }
 
+}
+
+export async function achBatchCSV(req, h) {
+ 
+  let content = await ach.createAchBatchCSV( req.params.batchId);
+
+  let filename = `anypay_batch_${req.params.batchId}.csv`
+
+  let response = h.response(content).header("Content-Disposition", `attachment;filename=${filename}`);
+
+  return response;
+
+    
 }
 

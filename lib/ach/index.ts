@@ -213,3 +213,52 @@ export async function batchSent(obj: AchBatch_I){
   return batch;
 
 }
+
+export async function createAchBatchCSV(batchId: number){
+
+ let batch = await models.AchBatch.findOne({where:{ id: batchId}});
+
+ let outputs = await models.AchBatchOutput.findAll({where: {batch_id: batchId}});
+
+ let obj = await Promise.all( 
+         
+   outputs.map( async (output:any)=>{
+
+     let bankAccount = await models.BankAccount.findOne({where: {id: output.bank_account_id}})
+
+     if( !bankAccount ){
+       throw new Error(`no bank account found with output ${output.bank_account_id}`);
+     }
+
+     return {
+          'Transaction Code': "ACH",
+          'beneficiary_routing_number': bankAccount.routing_number,
+          'beneficiary_account_number': bankAccount.beneficiary_account_number,
+          'amount': output.amount,
+          'anypay_id_number' : process.env.ANYPAY_BANK_ID_NUMBER,
+          'anypay_individual_name' : process.env.ANYPAY_BANK_INDIVIDUAL_NAME,
+     }
+    
+   })
+
+ );
+
+ const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
+
+ const csvStringifier = createCsvStringifier({
+   header: [
+     {id: 'Transaction Code', title: 'Transaction Code'},
+     {id: 'beneficiary_routing_number' , title: 'Receiver Account RTN'},
+     {id: 'beneficiary_account_number' , title: 'Receiver Account Number'},
+     {id: 'amount', title: 'Amount'},
+     {id: 'anypay_id_number', title: 'Individual Identification Number'},
+     {id: 'anypay_individual_name', title: 'Individual Name'},
+   ]
+  });
+
+  //  let header = await csvStringifier.getHeaderString();
+  let records = await csvStringifier.stringifyRecords(obj);
+
+  return `${records}`;
+
+}
