@@ -49,8 +49,8 @@ describe("ACH Batch Library", () => {
       city: "Porstmouth",
       state: "NH",
       zip: "03801",
-      routing_number: "211489494",
-      beneficiary_account_number: "123456789",
+      routing_number: "211274450",
+      beneficiary_account_number: "5555555555",
       account_id: account1.id
     })
 

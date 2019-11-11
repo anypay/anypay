@@ -153,6 +153,22 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/ach_batches/{batchId}/csv",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: sudoAchBatches.achBatchCSV
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/vending_machines",
 
     config: {
