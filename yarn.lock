@@ -4152,9 +4152,10 @@ querystringify@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.1.tgz#60e5a5fd64a7f8bfa4d2ab2ed6fdf4c85bad154e"
 
-rabbi@^1.5.1:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/rabbi/-/rabbi-1.6.0.tgz#8c758ead8ced3710835c7f3701029c49cadcfde7"
+rabbi@^1.8.0:
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/rabbi/-/rabbi-1.8.0.tgz#885119fd2d70a4588db42c629c7c567193278827"
+  integrity sha512-VKO59BfOYhBgPj8XbFlnP4mjdod0DBJAy18+r1O/fPxBYC4hdGMecAiYMRqDGpbxDxwMZuMlFLPNNF8ymwzb/Q==
   dependencies:
     "@types/amqplib" "^0.5.11"
     "@types/bluebird" "^3.5.26"
