@@ -45,7 +45,7 @@ export async function create(request, reply){
 
     payload.account_id = request.account.id;
 
-    account = await bankAccount.create(payload)
+    account = await bankAccounts.create(payload)
 
     log.info(account.toJSON());
 
