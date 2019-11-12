@@ -1005,6 +1005,21 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/ambassadors',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Ambassadors.index
+
+    }
+
+  });
 
   return server;
 
