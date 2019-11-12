@@ -6,7 +6,11 @@ export async function index(req, h) {
 
   try {
 
-    let shareholders = await models.Shareholder.findAll();
+    let shareholders = await models.Shareholder.findAll({
+      include: [
+        { model: models.ShareholderDocument, as: 'shareholder_documents' }
+      ]
+    });
 
     return {
       shareholders

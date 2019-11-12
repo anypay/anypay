@@ -57,5 +57,11 @@ models.AccountAchInvoice.hasOne(models.Invoice, {
   as: 'invoice'
 });
 
+models.Shareholder.hasMany(models.ShareholderDocument, {
+  foreignKey: 'shareholder_id',
+  sourceKey: 'id',
+  as: 'shareholder_documents'
+});
+
 export { models };
 

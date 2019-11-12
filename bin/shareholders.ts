@@ -56,4 +56,34 @@ program
   });
 
 program
+  .command('adddocument <email> <url> <document_name>')
+  .action(async (email, url, name) => {
+
+    let account = await models.Account.findOne({ where: {
+
+      email
+
+    }});
+
+    let shareholder = await models.Shareholder.findOne({ where: {
+
+      account_id: account.id
+
+    }});
+
+    let document = await models.ShareholderDocument.create({
+
+      name,
+      url,
+      shareholder_id: shareholder.id
+
+    });
+
+    console.log(document.toJSON());
+
+    process.exit(0);
+
+  })
+
+program
   .parse(process.argv);
