@@ -43,7 +43,7 @@ export async function update(req: Request, h: ResponseToolkit) {
 
         id: req.params.id,
 
-        batch_id: 0
+        bank_batch_id: 0
 
       },
 
