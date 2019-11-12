@@ -234,6 +234,7 @@ export async function disableACH(account_id){
         obj.map(async (item:any) => {
                
           item.account_id = account_id;
+          await addresses.unlockAddress(account_id, item.currency)
           await addresses.unsetAddress(item)
 
         })

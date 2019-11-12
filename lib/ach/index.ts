@@ -101,8 +101,8 @@ export async function generateBatchInputs( type?:string, desc?:string):Promise<a
 
     let batch = await models.AchBatch.create({
       currency: "USD",
-      type: "ACH",
-      description: "test"
+      type: type,
+      description: desc
     })
 
     await Promise.all(invoices.map(async(invoice) =>{

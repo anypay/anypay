@@ -1,9 +1,9 @@
 
 import { models } from './models';
 
-import { setAddress } from './core';
+import { setAddress, unsetAddress } from './core';
 
-export { setAddress }
+export { setAddress, unsetAddress }
 
 import {
   AddressChangeSet,
@@ -54,18 +54,3 @@ export async function unlockAddress(accountId: number, currency: string) {
   await address.save();
 
 }
-
-
-export async function unsetAddress(changeset: AddressChangeSet): Promise<string> {
-
-  let response  = await models.Address.destroy({
-    where: {
-      account_id: changeset.account_id,
-      currency: changeset.currency,
-      value: changeset.address
-    }
-  });
-
-  return response;
-
-};

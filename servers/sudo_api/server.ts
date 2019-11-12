@@ -192,7 +192,7 @@ async function Server() {
 
     config: {
 
-      //auth: "sudopassword",
+      auth: "sudopassword",
 
       handler: vendingMachines.index,
 
