@@ -12,7 +12,6 @@ import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
 import * as simplewallets from './handlers/simple_wallets';
 import * as accountInvoices from './handlers/account_invoices';
-import * as achs from './handlers/achs';
 
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 
@@ -40,8 +39,6 @@ import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 import * as sudoAddresses from './handlers/sudo_addresses';
-
-import * as sudoAchBatches from './handlers/sudo_ach_batches';
 
 import * as vendingMachines from './handlers/vending_machines';
 
@@ -146,7 +143,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: sudoAchBatches.index
+      handler: handlers.SudoAchBatches.index
 
     }
 
@@ -513,7 +510,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: achs.index
+      handler: handlers.Achs.index
     }
 
   });
@@ -528,10 +525,26 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: achs.index
+      handler: handlers.Achs.index
     }
 
   });
+
+  server.route({
+
+    method: "PUT",
+
+    path: "/api/ach_batches/{id}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Achs.update
+    }
+
+  });
+
 
   server.route({
 

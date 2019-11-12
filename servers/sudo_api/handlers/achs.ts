@@ -29,3 +29,35 @@ export async function index(req: Request, h: ResponseToolkit) {
 
 }
 
+export async function update(req: Request, h: ResponseToolkit) {
+
+  try {
+
+    let updatedRecord = await models.AchBatch.update({
+
+      batch_id: req.payload.batch_id,
+
+    }, {
+
+      where: {
+
+        id: req.params.id,
+
+        batch_id: 0
+
+      },
+
+      returning: true
+
+    });
+
+    return { ach: updatedRecord };
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message)
+
+  }
+
+}
+
