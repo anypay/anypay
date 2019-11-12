@@ -41,15 +41,15 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
     let plugin = await plugins.findForCurrency(changeset.currency);
 
-    if (plugin.validateAddress) {
-
-      isValid = await plugin.validateAddress(changeset.address);
-
-    }
-
     if (plugin.transformAddress) {
 
       changeset.address = await plugin.transformAddress(changeset.address);
+
+    }
+
+    if (plugin.validateAddress) {
+
+      isValid = await plugin.validateAddress(changeset.address);
 
     }
 
