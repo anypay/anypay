@@ -3,6 +3,8 @@ interface InvoiceURIParams {
   address: string;
   amount: number;
   currency: string;
+  image_url?: string;
+  business_name?: string;
 }
 
 export function computeInvoiceURI(params: InvoiceURIParams) {
@@ -40,6 +42,20 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
     uri = `${protocol}:${params.address}?amount=${params.amount}&is=1`;
 
+  } else if (params.currency === 'BSV') {
+
+    uri = `${protocol}:${params.address}?sv&amount=${params.amount}`;
+
+    if (params.business_name) {
+      uri = `${uri}&label=${params.business_name}`;
+    }
+
+    if (params.image_url) {
+      uri = `${uri}&avatarUrl=${params.image_url}`;
+    }
+
+    return uri;
+
   } else if (params.currency === 'GOLD') {
 
     var tokenId = '8e635bcd1b97ad565b2fdf6b642e760762a386fe4df9e4961f2c13629221914f';
@@ -51,8 +67,6 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
     uri = `${protocol}:${params.address}?amount=${params.amount}`;
 
   }
-
-  uri = `${uri}&any=1`;
 
   return uri;
 
