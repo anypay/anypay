@@ -35,7 +35,7 @@ export async function update(req: Request, h: ResponseToolkit) {
 
     let updatedRecord = await models.AchBatch.update({
 
-      batch_id: req.payload.batch_id,
+      bank_batch_id: req.payload.batch_id,
 
     }, {
 
