@@ -1,8 +1,6 @@
 import * as assert from 'assert';
 
-import { models, accounts, bankAccounts, addresses, ach } from '../../lib';
-
-import { generateInvoice } from '../../lib/invoice';
+import { models, accounts, bankAccounts, addresses, ach, invoices } from '../../lib';
 
 import * as Chance from 'chance';
 
@@ -29,7 +27,7 @@ describe("ACH Batch Library", () => {
 
     await accounts.enableACH(account.id)
 
-    invoice = await generateInvoice(account.id, 100, 'BSV');
+    invoice = await invoices.generateInvoice(account.id, 100, 'BSV');
 
     invoice = await models.Invoice.findOne({where:{uid:invoice.uid}});
 
@@ -56,7 +54,7 @@ describe("ACH Batch Library", () => {
 
     await accounts.enableACH(account1.id)
 
-    invoice1 = await generateInvoice(account1.id, 100, 'DASH');
+    invoice1 = await invoices.generateInvoice(account1.id, 100, 'DASH');
 
     invoice1 = await models.Invoice.findOne({where:{uid:invoice1.uid}});
 
@@ -68,7 +66,7 @@ describe("ACH Batch Library", () => {
 
     await invoice1.save();
 
-    invoice2 = await generateInvoice(account1.id, 100, 'BCH');
+    invoice2 = await invoices.generateInvoice(account1.id, 100, 'BCH');
 
     invoice2 = await models.Invoice.findOne({where:{uid:invoice2.uid}});
 
@@ -81,7 +79,7 @@ describe("ACH Batch Library", () => {
     await invoice2.save();
 
 
-    invoice3 = await generateInvoice(account1.id, 100, 'BSV');
+    invoice3 = await invoices.generateInvoice(account1.id, 100, 'BSV');
 
     invoice3 = await models.Invoice.findOne({where:{uid:invoice3.uid}});
 
@@ -102,17 +100,17 @@ describe("ACH Batch Library", () => {
 
     it("should create a ach batch record and update all invoices not included in a batch", async () => {
 
-      let inputs = await ach.generateBatchInputs();
+      let batch = await ach.generateBatchInputs();
    
-      console.log('inputs!', inputs)
+      assert( batch.id >  0 )
 
-      assert.strictEqual( inputs.length, 4 )
-
-      let outputs = await ach.generateBatchOutputs(inputs[0].batch_id);
+      let outputs = await ach.generateBatchOutputs(batch.id);
             
+      batch = await models.AchBatch.findOne({where:{id:batch.id}});
+
       assert.strictEqual( outputs.length, 2 )
 
-      let batch = await models.AchBatch.findOne({where:{id: outputs[0].batch_id}})
+      console.log(batch.toJSON())
 
       assert.strictEqual(parseInt(batch.amount), 400 )
  
