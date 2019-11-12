@@ -329,6 +329,22 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/api/shareholders/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Shareholders.show
+
+    }
+
+  });
+
+  server.route({
+
     method: 'PUT',
 
     path: '/api/shareholders/{id}',
