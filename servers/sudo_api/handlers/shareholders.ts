@@ -6,7 +6,12 @@ export async function index(req, h) {
 
   try {
 
-    let shareholders = await models.Shareholder.findAll();
+    let shareholders = await models.Shareholder.findAll({
+      include: [
+        { model: models.ShareholderDocument, as: 'shareholder_documents' },
+        { model: models.Account, as: 'account' }
+      ]
+    });
 
     return {
       shareholders
@@ -17,6 +22,45 @@ export async function index(req, h) {
     return Boom.badRequest(error.message);
 
   }
+
+}
+
+export async function show(req) {
+
+  try {
+
+    let shareholder = await models.Shareholder.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!shareholder) {
+
+      return Boom.notFound();
+    }
+
+    let documents = await models.ShareholderDocument.findAll({
+
+      where: {
+
+        shareholder_id: shareholder.id
+
+      }
+
+    });
+
+    return {
+      shareholder,
+      documents
+    }
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message);
+
+  }
+
 
 }
 
