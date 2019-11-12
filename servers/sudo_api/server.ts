@@ -4,7 +4,7 @@ import * as Hapi from 'hapi';
 
 import { log, database, models, password } from '../../lib';
 
-import { validateSudoPassword } from './auth/sudo_admin_password';
+import { validateSudoPassword } from './//auth/sudo_admin_password';
 
 import { sendWebhookForInvoice } from '../../lib/webhooks';
 
@@ -121,7 +121,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: async (req, h) => {
 
@@ -141,7 +141,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: handlers.SudoAchBatches.index
 
@@ -173,9 +173,25 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: sudoAchBatches.achBatchCSV
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/ach_batches/{batchId}",
+
+    config: {
+
+      //auth: "sudopassword",
+
+      handler: sudoAchBatches.show
 
     }
 
@@ -189,9 +205,9 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
-      handler: vendingMachines.index
+      handler: vendingMachines.index,
 
     }
 
@@ -206,7 +222,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: AccountsController.destroy
 
@@ -222,7 +238,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: AccountsController.sudoShow
 
@@ -238,7 +254,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: AccountsController.sudoAccountWithEmail
 
@@ -254,7 +270,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoCoins.list
 
@@ -269,7 +285,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoCoins.activate
 
@@ -285,7 +301,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoCoins.deactivate
 
@@ -302,7 +318,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: AccountsController.index
 
@@ -319,7 +335,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoPaymentForwards.index
 
@@ -335,7 +351,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoPaymentForwards.show
 
@@ -383,7 +399,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: InvoicesController.sudoIndex
 
@@ -399,7 +415,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: PricesController.sudoIndex
 
@@ -415,7 +431,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: PricesController.sudoShow
 
@@ -431,7 +447,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: PricesController.sudoUpdate
 
@@ -447,7 +463,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: InvoicesController.sudoShow
 
@@ -463,7 +479,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoAddresses.index
 
@@ -479,7 +495,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoAddresses.lockAddress
 
@@ -495,7 +511,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoAddresses.unlockAddress
 
@@ -525,7 +541,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: cashback.retry
     }
@@ -540,7 +556,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: handlers.Achs.index
     }
@@ -555,7 +571,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: handlers.Achs.index
     }
@@ -586,7 +602,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: CashbackMerchants.sudoList
 
@@ -602,7 +618,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: CashbackMerchants.sudoShow
 
@@ -618,7 +634,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: CashbackMerchants.sudoActivate
 
@@ -634,7 +650,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: CashbackMerchants.sudoDeactivate
 
@@ -652,7 +668,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: SudoAccounts.update,
 
@@ -690,7 +706,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoBankAccounts.index
 
@@ -706,7 +722,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoBankAccounts.create
 
@@ -722,7 +738,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoBankAccounts.show
 
@@ -738,7 +754,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoBankAccounts.del
 
@@ -755,7 +771,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoLogin
 
@@ -771,7 +787,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: simplewallets.index
 
@@ -787,7 +803,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: async (req, h) => {
              
@@ -849,7 +865,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: async (req, h) => {
 
@@ -878,7 +894,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: async (req, h) => {
 
@@ -916,7 +932,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: cashback.dashboard
 
@@ -931,7 +947,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: accountInvoices.show
 
@@ -946,7 +962,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: AccountsController.calculateROI
 
@@ -961,7 +977,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: AccountsController.accountVolume
 
@@ -975,7 +991,7 @@ async function Server() {
 
     config: {
 
-      auth: "sudopassword",
+      //auth: "sudopassword",
 
       handler: passwords.update,
 
@@ -999,7 +1015,7 @@ async function Server() {
     method: "GET",
     path: "/api/accounts/{account_id}/tipjars/{currency}",
     config: {
-      auth: "sudopassword",
+      //auth: "sudopassword",
       handler: sudoTipjars.show
     }
   });
@@ -1013,7 +1029,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoWires.show
 
@@ -1057,7 +1073,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: handlers.CashbackFailures.index
 
@@ -1074,7 +1090,7 @@ async function Server() {
 
     config: {
 
-      auth: 'sudopassword',
+      //auth: 'sudopassword',
 
       handler: sudoWires.showCSV
 

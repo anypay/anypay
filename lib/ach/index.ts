@@ -4,6 +4,7 @@ import * as Sequelize from 'sequelize';
 
 import { models } from '../models';
 
+import * as moment from 'moment';
 
 interface AchBatch_I{
   id: number;
@@ -96,29 +97,30 @@ export async function generateBatchInputs( type?:string, desc?:string):Promise<a
           }
   })
 
-  let batch = await models.AchBatch.create({
-    currency: "USD",
-    type: "ACH",
-    description: "test"
-  })
+  if( invoices.length > 0 ){
 
-  await Promise.all(invoices.map(async(invoice) =>{
-
-    await invoice.update({  ach_batch_id: batch.id })
-    await  models.AchBatchInput.create({
-      batch_id: batch.id,
-      amount: invoice.denomination_amount_paid,
-      invoice_uid: invoice.uid,
-      bank_account_id: invoice.bank_account_id
+    let batch = await models.AchBatch.create({
+      currency: "USD",
+      type: "ACH",
+      description: "test"
     })
-  }));
 
+    await Promise.all(invoices.map(async(invoice) =>{
 
-  console.log('batch.id', batch.id)
+      await invoice.update({  ach_batch_id: batch.id })
+      await  models.AchBatchInput.create({
+        batch_id: batch.id,
+        amount: invoice.denomination_amount_paid,
+        invoice_uid: invoice.uid,
+        bank_account_id: invoice.bank_account_id
+      })
+    }));
 
-  let inputs = await models.AchBatchInput.findAll({where: {batch_id: batch.id}});
+    return batch;
 
-  return inputs;
+  }
+
+  throw new Error(`No invoices to be paid out to ACH at this time (${moment().format()})`);
 
 }
 

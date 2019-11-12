@@ -1,6 +1,6 @@
 const log = require('winston');
 const Boom = require('boom');
-import { models, bankAccount, ach } from '../../../lib';
+import { models, bankAccounts, ach } from '../../../lib';
 
 import * as http from 'superagent';
 
@@ -58,24 +58,5 @@ export async function create(request, reply){
   }
 
   return account
-
-}
-
-export async function confirmTest(request, h){
-
- try{
-
-   let test = await ach.confirmTest( request.account.id, request.payload.response );
-
-   return test;
-
-
- }catch(err){
-
-    log.error(err)
-
-    return Boom.badRequest(err.message)
-
- }
 
 }

@@ -350,4 +350,24 @@ program
   });
 
 program
+  .command('generatebatch')
+  .action( async () =>{
+
+     try{
+
+       let batch = await ach.generateBatchInputs();
+
+       return batch;
+
+     }catch(error){
+
+       log.error(error)
+
+     }
+
+
+
+  })
+
+program
   .parse(process.argv);
