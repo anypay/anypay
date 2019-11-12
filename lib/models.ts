@@ -63,5 +63,11 @@ models.Shareholder.hasMany(models.ShareholderDocument, {
   as: 'shareholder_documents'
 });
 
+models.Shareholder.hasOne(models.Account, {
+  foreignKey: 'id',
+  sourceKey: 'account_id',
+  as: 'account'
+});
+
 export { models };
 
