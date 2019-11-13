@@ -331,6 +331,38 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/payroll_accounts',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PayrollAccounts.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payroll_batches',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PayrollBatches.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/shareholders/{id}',
 
     config: {
