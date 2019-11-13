@@ -4,9 +4,6 @@ import { models, bankAccounts, ach } from '../../../lib';
 
 import * as http from 'superagent';
 
-const postcode = require('postcode-validator');
-
-
 export async function show(request, h){
 
   let bankAccount = await models.BankAccount.findOne({ where: { account_id: request.account.id}})
@@ -33,7 +30,8 @@ export async function create(request, reply){
     return Boom.badRequest(`no bank found with routing number ${request.payload.routing_number}`)
   }
 
-  if(!postcode.validate(request.payload.zip, 'US')){
+  // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s14.html
+  if(!request.payload.zip.match(/^[0-9]{5}(?:-[0-9]{4})?$/)){
     return Boom.badRequest(`Invalid zip code ${request.payload.zip}`)
   }
 
@@ -56,7 +54,5 @@ export async function create(request, reply){
     log.info(error)
     return Boom.badRequest(error)
   }
-
-  return account
 
 }
