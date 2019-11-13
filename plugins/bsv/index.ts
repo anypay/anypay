@@ -10,6 +10,8 @@ import {models} from '../../lib/models';
 
 import {statsd} from '../../lib/stats/statsd'
 
+const polynym = require('polynym');
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 async function createInvoice(accountId: number, amount: number) {
@@ -23,6 +25,12 @@ async function createInvoice(accountId: number, amount: number) {
   statsd.increment('BSV_createInvoice')
 
   return invoice;
+
+}
+
+export async function transformAddress(alias){
+
+  return (await polynym.resolveAddress(alias)).address;
 
 }
 
