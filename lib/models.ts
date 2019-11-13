@@ -69,5 +69,12 @@ models.Shareholder.hasOne(models.Account, {
   as: 'account'
 });
 
+models.PayrollAccount.hasOne(models.Account, {
+  foreignKey: 'id',
+  sourceKey: 'account_id',
+  as: 'account'
+});
+
+
 export { models };
 
