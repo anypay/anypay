@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+
+import { models, accounts, addresses, invoices, initialize } from '../../lib';
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
 import { settleInvoice } from '../../lib/invoice';
@@ -14,11 +16,20 @@ const chance = new Chance();
 
 describe("Creating Invoices", () => {
 
+
+
+  before(async () => {
+
+    await initialize();
+
+  });
+
+
   it("#generateInvoice should create a new DASH invoice", async () => {
 
-    let account = await registerAccount(chance.email(), chance.word());
+    let account = await accounts.registerAccount(chance.email(), chance.word());
 
-    await setAddress({
+    await addresses.setAddress({
       account_id: account.id,
       currency: "DASH",
       address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
@@ -34,7 +45,7 @@ describe("Creating Invoices", () => {
       currency: amount.currency
     });
 
-    let invoice = await generateInvoice(account.id, amount.value, 'DASH');
+    let invoice = await invoices.generateInvoice(account.id, amount.value, 'DASH');
     
     console.log('invoice', invoice.toJSON());
 
@@ -62,7 +73,7 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'VEF',
+      currency: 'USD',
       value: 15
     };
 
@@ -88,7 +99,7 @@ describe("Creating Invoices", () => {
 
   describe("Replacing an Invoice", () => {
 
-    it.skip("#replaceInvoice should change the currency of an invoice", async () => {
+    it("#replaceInvoice should change the currency of an invoice", async () => {
 
       let account = await registerAccount(chance.email(), chance.word());
 
