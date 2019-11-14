@@ -75,6 +75,11 @@ models.PayrollAccount.hasOne(models.Account, {
   as: 'account'
 });
 
+models.PayrollPayment.hasOne(models.PayrollBatch, {
+  foreignKey: 'id',
+  sourceKey: 'payroll_batch_id',
+  as: 'payroll_batch'
+});
 
 export { models };
 

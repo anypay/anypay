@@ -363,6 +363,38 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/payroll_batches/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PayrollBatches.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/payroll_batches',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PayrollBatches.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/shareholders/{id}',
 
     config: {

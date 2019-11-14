@@ -1022,6 +1022,24 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/payroll',
+
+    options: {
+
+      auth: 'token',
+
+      // { payroll_account, payroll_payments }
+
+      handler: handlers.Payroll.show
+
+    }
+
+  });
+
   //deprecated
   server.route({
 
