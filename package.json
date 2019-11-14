@@ -67,7 +67,6 @@
     "node-cron": "^2.0.3",
     "node-statsd": "^0.1.1",
     "pg": "^7.9.0",
-    "postcode-validator": "^3.0.0",
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
     "prompt-async": "^0.9.9",

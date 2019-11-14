@@ -1,4 +1,4 @@
-const Op = require('Sequelize').Op;
+const Op = require('sequelize').Op;
 
 import * as Sequelize from 'sequelize';
 

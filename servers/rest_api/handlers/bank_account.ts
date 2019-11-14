@@ -1,11 +1,8 @@
 const log = require('winston');
 const Boom = require('boom');
-import { models, bankAccount, ach } from '../../../lib';
+import { models, bankAccounts, ach } from '../../../lib';
 
 import * as http from 'superagent';
-
-const postcode = require('postcode-validator');
-
 
 export async function show(request, h){
 
@@ -33,7 +30,7 @@ export async function create(request, reply){
     return Boom.badRequest(`no bank found with routing number ${request.payload.routing_number}`)
   }
 
-  if(!postcode.validate(request.payload.zip, 'US')){
+  if(!request.payload.zip.match("^[0-9]{5}(?:-[0-9]{4})?$")){
     return Boom.badRequest(`Invalid zip code ${request.payload.zip}`)
   }
 
@@ -45,7 +42,7 @@ export async function create(request, reply){
 
     payload.account_id = request.account.id;
 
-    account = await bankAccount.create(payload)
+    account = await bankAccounts.create(payload)
 
     log.info(account.toJSON());
 
@@ -58,24 +55,5 @@ export async function create(request, reply){
   }
 
   return account
-
-}
-
-export async function confirmTest(request, h){
-
- try{
-
-   let test = await ach.confirmTest( request.account.id, request.payload.response );
-
-   return test;
-
-
- }catch(err){
-
-    log.error(err)
-
-    return Boom.badRequest(err.message)
-
- }
 
 }
