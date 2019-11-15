@@ -159,6 +159,12 @@ function getIntersection(arrA, arrB) {
 
 export async function enableACH(account_id){
 
+  let bankAccount = await  models.BankAccount.findOne({where: {account_id: account_id}});
+
+  if(!bankAccount){
+    throw new Error(`bank account is not set for account id: ${account_id}`);
+  }
+
   const channel = await awaitChannel() 
 
   let account = await models.Account.findOne({ 

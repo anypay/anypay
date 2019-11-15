@@ -587,6 +587,28 @@ async function Server() {
     }
   });
 
+
+  server.route({
+    method: "POST",
+    path: "/achs/enable",
+    handler: ACHs.enable,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+
+  server.route({
+    method: "POST",
+    path: "/achs/disable",
+    handler: ACHs.disable,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
   server.route({
     method: "GET",
     path: "/bank_account",
