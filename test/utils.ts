@@ -1,5 +1,8 @@
 
 import * as Chance from 'chance';
+import * as assert from 'assert';
+import * as uuid from 'uuid';
+
 const chance = new Chance();
 
 import { accounts } from '../lib';
@@ -9,6 +12,8 @@ export async function generateAccount() {
 }
 
 export {
-  chance
+  chance,
+  assert,
+  uuid
 }
 
