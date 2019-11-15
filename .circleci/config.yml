@@ -17,7 +17,7 @@ jobs:
           command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
       - run:
           name: Running tests
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -i -t anypay npm test 
+          command: docker run  -e BCH_HD_PUBLIC_KEY=$BCH_HD_PUBLIC_KEY -e ANYPAY_EXCHANGE_BCH_ADDRESS=$ANYPAY_EXCHANGE_BCH_ADDRESS -e ANYPAY_EXCHANGE_BSV_ADDRESS=$ANYPAY_EXCHANGE_BSV_ADDRESS  -e ANYPAY_EXCHANGE_BTC_ADDRESS=$ANYPAY_EXCHANGE_BTC_ADDRESS -e ANYPAY_EXCHANGE_DASH_ADDRESS=$ANYPAY_EXCHANGE_DASH_ADDRESS -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -i -t anypay mocha --require=ts-node/register --timeout=20000 test/integration/*.ts test/types/*_test.ts test/models/*_test.ts test/lib/*_test.ts --exit 
       - run:
           name: Push to Docker Hub
           command: |
