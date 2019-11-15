@@ -101,7 +101,7 @@ export async function generateBatchInputs( originating_account:string, type:stri
     currency: "USD",
     type: type,
     batch_description: desc,
-    amount: invoices.reduce((a,b)=>{ a + b.denomination_amount_paid}, 0),
+    amount: invoices.reduce((a,b)=> a + b.denomination_amount_paid, 0),
     effective_date: new Date(),
     originating_account: originating_account
   })
