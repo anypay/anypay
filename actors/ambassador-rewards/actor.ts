@@ -4,6 +4,7 @@ require('dotenv').config();
 
 import { Actor, Joi, log } from 'rabbi';
 import { models } from '../../lib';
+import * as dashrpc from '../../plugins/dash/lib/jsonrpc';
 
 export async function start() {
 
@@ -97,8 +98,23 @@ export async function start() {
 
     try {
 
-      // send ambassador reward
-      // send ambassador reward and update record
+      if (invoice.currency === 'DASH') {
+
+        // send ambassador reward and update record
+        let resp = await dashrpc.rpc.call('sendtoaddress', [
+          reward.address,
+          reward.amount
+        ]);
+
+        if (resp) {
+          reward.hash = resp;
+          await reward.save();
+        }
+    
+      } else {
+
+        throw new Error(`ambassador rewards for ${invoice.currency} not yet supported`);
+      }
   
     } catch(error) {
 
