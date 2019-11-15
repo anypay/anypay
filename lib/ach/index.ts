@@ -86,20 +86,24 @@ export async function importInvoiceRangeForAchBatch(accountAchId: number): Promi
 
 }
 
-export async function generateBatchInputs( type?:string, desc?:string):Promise<any>{
+export async function generateBatchInputs( originating_account:string, type:string, desc:string):Promise<any>{
 
   let invoices = await models.Invoice.findAll({ 
           where:{
             status:[ "paid", "underpaid", "overpaid"],
             bank_account_id: { [Op.gt]: 0 },
-            ach_batch_id: { [Op.is]: null }
+            ach_batch_id: { [Op.is]: null },
+            denomination_currency: "USD"
           }
   })
 
   let batch = await models.AchBatch.create({
     currency: "USD",
-    type: "ACH",
-    description: "test"
+    type: type,
+    batch_description: desc,
+    amount: invoices.reduce((a,b)=>{ a + b.denomination_amount_paid}, 0),
+    effective_date: new Date(),
+    originating_account: originating_account
   })
 
   await Promise.all(invoices.map(async(invoice) =>{

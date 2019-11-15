@@ -348,6 +348,25 @@ program
     }
 
   });
+program
+  .command('createbatch <originating_account> <type> <desc>')
+  .action(async (originating_account, type, desc) => {
+
+      let inputs = await ach.generateBatchInputs(originating_account, type, desc);
+   
+      console.log('inputs', inputs)
+
+      let outputs = await ach.generateBatchOutputs(inputs[0].batch_id);
+            
+      console.log(outputs)
+
+      let batch = await models.AchBatch.findOne({where:{id: outputs[0].batch_id}})
+ 
+      console.log(batch.toJSON())
+
+  });
+
+
 
 program
   .parse(process.argv);

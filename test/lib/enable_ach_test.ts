@@ -9,7 +9,7 @@ const chance = new Chance();
 
 import * as dash from '../../plugins/dash/index';
 
-describe("Payment Option Library", () => {
+describe("Enable/Disable ACH", () => {
 
   var account1, account, addrs;
 

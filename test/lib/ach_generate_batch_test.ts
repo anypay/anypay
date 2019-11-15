@@ -102,7 +102,14 @@ describe("ACH Batch Library", () => {
 
     it("should create a ach batch record and update all invoices not included in a batch", async () => {
 
-      let inputs = await ach.generateBatchInputs();
+
+      let originating_account = "1234567890";
+
+      let type = "Coporate ACH";
+
+      let desc = "ACH Test";
+
+      let inputs = await ach.generateBatchInputs(originating_account, type, desc);
    
       console.log('inputs!', inputs)
 
