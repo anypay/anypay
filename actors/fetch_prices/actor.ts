@@ -12,6 +12,8 @@ import * as http from 'superagent';
 
 const async = require("async");
 
+import { getPriceOfOneDASHInVES } from '../../lib/prices/ves'
+
 ( async ()=> {
 
   let connection = await amqp.connect(process.env.AMQP_URL);
@@ -242,13 +244,13 @@ export async function start() {
 
     console.log('fetching ves prices');
 
-    let resp = await http.get('https://api.get-spark.com/ves')
+    let resp = await getPriceOfOneDASHInVES() 
 
     channel.publish('anypay.prices', 'price.update', Buffer.from(JSON.stringify({
       "currency": "DASH",
       "base" : "VES",
-      "price" : resp.body['VES'],
-      "source": 'get-sparck.com'
+      "price" : resp,
+      "source": 'dash-retail2';
     })))
 
     channel.ack(msg);
