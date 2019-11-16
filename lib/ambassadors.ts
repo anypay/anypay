@@ -166,17 +166,11 @@ export async function createClaim(ambassadorEmail: string, merchantEmail: string
     throw new Error(`account ${merchantEmail} not found`);
   }
 
-  let merchant = await models.CashbackMerchant.findOne({ where: {
-
-    account_id: merchantAccount.id
-    
-  }});
-
   let claim = await models.AmbassadorClaim.create({
 
     ambassador_id: ambassador.id,
 
-    merchant_id: merchant.id
+    merchant_account_id: merchantAccount.id
   })
 
   return claim;
@@ -240,20 +234,6 @@ export async function verifyClaim(claimId: number) {
     id: claimId
 
   }});
-
-  await models.CashbackMerchant.update({
-
-    ambassador_id: claim.ambassador_id
-
-  }, {
-
-    where: {
-
-      id: claim.merchant_id
-
-    }
-  
-  });
 
   claim.status = 'verified';
 

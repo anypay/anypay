@@ -1,43 +1,43 @@
 require('dotenv').config();
 
-import * as assert from 'assert';
-import * as Chance from 'chance';
 import { ambassadors, log, models } from '../../lib';
 
-const chance = new Chance();
+import * as utils from '../utils';
 
 describe('AmbassadorClaim Model', () => {
 
   it('#create should default to unverified', async () => {
 
-    let ambassadorEmail = chance.email();
-    let merchantEmail = chance.email();
+    try {
 
-    let ambassadorAccount = await models.Account.create({
-      email: ambassadorEmail
-    });
+      let ambassadorAccount = await utils.generateAccount();
 
-    let ambassador = await models.Ambassador.create({
-      account_id: ambassadorAccount.id
-    });
+      let ambassador = await models.Ambassador.create({
+        account_id: ambassadorAccount.id
+      });
 
-    let merchantAccount = await models.Account.create({
-      email: merchantEmail
-    });
+      let merchantAccount = await utils.generateAccount();
 
-    let merchant = await models.CashbackMerchant.create({
-      account_id: merchantAccount.id
-    });
+      let merchant = await models.CashbackMerchant.create({
+        account_id: merchantAccount.id
+      });
 
-    let claim = await ambassadors.createClaim(ambassadorEmail, merchantEmail);
+      let claim = await ambassadors.createClaim(ambassadorAccount.email, merchantAccount.email);
 
-    assert(claim.id > 0);
+      utils.assert(claim.id > 0);
 
-    assert.strictEqual(claim.status, 'unverified');
+      utils.assert.strictEqual(claim.status, 'unverified');
 
-    assert(claim.ambassador_id, ambassador.id);
+      utils.assert(claim.ambassador_id, ambassador.id);
 
-    assert(claim.merchant_id, merchant.id);
+      utils.assert(claim.merchant_account_id, merchantAccount.id);
+
+    } catch(error) {
+
+      console.error(error.message);
+      utils.assert(false);
+
+    }
 
   });
 
@@ -47,7 +47,7 @@ describe('AmbassadorClaim Model', () => {
 
     claims.forEach(claim => {
 
-      assert.strictEqual(claim.status, 'unverified');
+      utils.assert.strictEqual(claim.status, 'unverified');
 
     });
 
@@ -55,8 +55,8 @@ describe('AmbassadorClaim Model', () => {
 
   it('#listAccountClaims should list verified, unverified, rejected', async () => {
 
-    let ambassadorEmail = chance.email();
-    let merchantEmail = chance.email();
+    let ambassadorEmail = utils.chance.email();
+    let merchantEmail = utils.chance.email();
 
     let ambassadorAccount = await models.Account.create({
       email: ambassadorEmail
@@ -68,79 +68,62 @@ describe('AmbassadorClaim Model', () => {
 
     let merchantAccount = await models.Account.create({
       email: merchantEmail
-    });
-
-    let merchant = await models.CashbackMerchant.create({
-      account_id: merchantAccount.id
     });
 
     await ambassadors.createClaim(ambassadorEmail, merchantEmail);
 
     let claims = await ambassadors.listAccountClaims(ambassadorEmail);
 
-    assert(claims.length === 1);
+    utils.assert(claims.length === 1);
 
   });
 
   it('#reject should reject a claim', async () => {
 
-    let ambassadorEmail = chance.email();
-    let merchantEmail = chance.email();
+    let ambassadorEmail = utils.chance.email();
+    let merchantEmail = utils.chance.email();
 
-    let ambassadorAccount = await models.Account.create({
-      email: ambassadorEmail
-    });
+    let ambassadorAccount = await utils.generateAccount();
 
     let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await models.Account.create({
-      email: merchantEmail
-    });
+    let merchantAccount = await utils.generateAccount();
 
     let merchant = await models.CashbackMerchant.create({
       account_id: merchantAccount.id
     });
 
-    let claim = await ambassadors.createClaim(ambassadorEmail, merchantEmail);
+    let claim = await ambassadors.createClaim(ambassadorAccount.email, merchantAccount.email);
 
     await ambassadors.rejectClaim(claim.id);
 
     claim = await models.AmbassadorClaim.findOne({ where: { id: claim.id }});
 
-    assert.strictEqual(claim.status, 'rejected');
+    utils.assert.strictEqual(claim.status, 'rejected');
 
   });
 
   it('#verify should accept a claim', async () => {
 
-    let ambassadorEmail = chance.email();
-    let merchantEmail = chance.email();
-
-    let ambassadorAccount = await models.Account.create({
-      email: ambassadorEmail
-    });
+    let ambassadorAccount = await utils.generateAccount();
 
     let ambassador = await models.Ambassador.create({
       account_id: ambassadorAccount.id
     });
 
-    let merchantAccount = await models.Account.create({
-      email: merchantEmail
-    });
+    let merchantAccount = await utils.generateAccount();
 
-    let merchant = await models.CashbackMerchant.create({
-      account_id: merchantAccount.id
-    });
+    let claim = await ambassadors.createClaim(ambassadorAccount.email, merchantAccount.email);
 
-    let claim = await ambassadors.createClaim(ambassadorEmail, merchantEmail);
+    console.log('CLAIM', claim.toJSON());
 
     await ambassadors.verifyClaim(claim.id);
 
     claim = await models.AmbassadorClaim.findOne({ where: { id: claim.id }});
 
-    assert.strictEqual(claim.status, 'verified');
+    utils.assert.strictEqual(claim.status, 'verified');
 
   });
 
