@@ -36,9 +36,9 @@ export async function getPriceOfOneDollarInVES() {
 
 export async function getPriceOfOneDASHInVES() {
 
-  let resp = await http.get('https://api.get-spark.com/ves')
+  let resp = await http.get('https://rates2.dashretail.org/rates?symbol=dashves')
 
-  return resp.body['VES'];
+  return resp.body[0]['price'];
 
 }
 
