@@ -97,7 +97,7 @@ module.exports.sudoIndexUnrouted = async function(request, reply) {
     let invoices = await models.Invoice.findAll({
       where: {
         output_hash: { [Op.is]: null },
-        amount_paid: { [Op.gt]: 0 }
+        invoice_amount_paid: { [Op.gt]: 0 }
 	  }
 	});
 
