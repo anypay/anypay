@@ -407,6 +407,23 @@ async function Server() {
 
   });
 
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/invoices/unrouted',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoIndexUnrouted
+
+    }
+
+  });
+
   server.route({
 
     method: 'GET',
