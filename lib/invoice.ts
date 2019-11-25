@@ -264,6 +264,8 @@ export async function replaceInvoice(uid: string, currency: string) {
 
   invoice.invoice_currency = option.currency;
 
+  invoice.invoice_amount = option.amount;
+
   invoice.currency = option.currency;
 
   invoice.amount = option.amount;
