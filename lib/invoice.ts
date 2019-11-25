@@ -262,6 +262,8 @@ export async function replaceInvoice(uid: string, currency: string) {
     throw new Error(`currency ${currency} is not a payment option for invoice ${uid}`);
   }
 
+  invoice.invoice_currency = option.currency;
+
   invoice.currency = option.currency;
 
   invoice.amount = option.amount;
