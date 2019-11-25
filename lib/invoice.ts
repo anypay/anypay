@@ -35,6 +35,8 @@ import { computeInvoiceURI } from './uri';
 
 import { writePaymentOptions } from './payment_options';
 
+import {channel} from './amqp';
+
 interface Amount {
   currency: string;
   value: number
@@ -271,5 +273,15 @@ export async function replaceInvoice(uid: string, currency: string) {
   await invoice.save();
 
   return invoice;
+
+}
+
+export async function republishTxid( currency: string, txid: string){
+
+  currency = currency.toLowerCase()
+
+  await  channel.publish( `${currency}.anypay.global`, 'walletnotify', Buffer.from(txid))
+
+  return txid;
 
 }

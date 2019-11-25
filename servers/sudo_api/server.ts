@@ -410,6 +410,35 @@ async function Server() {
 
   server.route({
 
+    method: 'POST',
+
+    path: '/api/invoices/republish-txid',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: InvoicesController.sudoRepublishTxid,
+
+      validate: {
+        
+        payload : {
+
+          currency : Joi.string().required(),
+
+          txid : Joi.string().required()
+
+        }
+
+      }
+
+    }
+
+  });
+
+
+  server.route({
+
     method: 'GET',
 
     path: '/api/invoices/unrouted',

@@ -6,7 +6,24 @@ import * as Sequelize from 'sequelize';
 
 import { models } from '../../../lib';
 
+import {republishTxid} from '../../../lib/invoice';
+
 const log = require('winston');
+
+
+module.exports.sudoRepublishTxid = async (req, h) => {
+ 
+  let currency = req.payload.currency;
+
+  let txid = req.payload.txid;
+
+  log.info(`republishing txid ${currency} : ${txid}` );
+
+  await republishTxid( currency, txid);
+
+  return txid;
+
+}
 
 module.exports.sudoIndex = async (request, reply) => {
 
@@ -97,7 +114,8 @@ module.exports.sudoIndexUnrouted = async function(request, reply) {
     let invoices = await models.Invoice.findAll({
       where: {
         output_hash: { [Op.is]: null },
-        invoice_amount_paid: { [Op.gt]: 0 }
+        invoice_amount_paid: { [Op.gt]: 0 },
+        createdAt: { [Op.gt]: new Date(1572566400*1000)} //November 1st, 2019
 	  }
 	});
 
