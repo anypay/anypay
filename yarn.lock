@@ -409,6 +409,13 @@ axios@^0.18.1:
     follow-redirects "1.5.10"
     is-buffer "^2.0.2"
 
+axios@^0.19.0:
+  version "0.19.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.0.tgz#8e09bff3d9122e133f7b8101c8fbdd00ed3d2ab8"
+  dependencies:
+    follow-redirects "1.5.10"
+    is-buffer "^2.0.2"
+
 b64@4.x.x:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/b64/-/b64-4.0.0.tgz#c37f587f0a383c7019e821120e8c3f58f0d22772"
@@ -713,7 +720,6 @@ bs58check@^2.1.2:
 bson@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/bson/-/bson-1.1.1.tgz#4330f5e99104c4e751e7351859e2d408279f2f13"
-  integrity sha512-jCGVYLoYMHDkOsbwJZBCqwMHyH4c+wzgI9hG7Z6SZJRXWr+x58pdIbm2i9a/jFGCkRJqRUr8eoI7lDWa0hTkxg==
 
 bsv@^0.30.0:
   version "0.30.0"
@@ -3172,7 +3178,6 @@ memoizee@^0.4.3:
 memory-pager@^1.0.2:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/memory-pager/-/memory-pager-1.5.0.tgz#d8751655d22d384682741c972f2c3d6dfa3e66b5"
-  integrity sha512-ZS4Bp4r/Zoeq6+NLJpP+0Zzm0pR8whtGPf1XExKLJBAczGMnSi3It14OiNCStjQjM6NU1okjQGSxgEZN8eBYKg==
 
 methods@^1.1.1, methods@^1.1.2:
   version "1.1.2"
@@ -3379,7 +3384,6 @@ moment@^2.24.0:
 mongodb@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.3.3.tgz#509cad2225a1c56c65a331ed73a0d5d4ed5cbe67"
-  integrity sha512-MdRnoOjstmnrKJsK8PY0PjP6fyF/SBS4R8coxmhsfEU7tQ46/J6j+aSHF2n4c2/H8B+Hc/Klbfp8vggZfI0mmA==
   dependencies:
     bson "^1.1.1"
     require_optional "^1.0.1"
@@ -3945,6 +3949,12 @@ podium@3.x.x:
     hoek "5.x.x"
     joi "13.x.x"
 
+polynym@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/polynym/-/polynym-1.0.7.tgz#c7622316a16abe980dd578b5ddf999f2a45f3307"
+  dependencies:
+    axios "^0.19.0"
+
 popsicle-proxy-agent@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/popsicle-proxy-agent/-/popsicle-proxy-agent-3.0.0.tgz#b9133c55d945759ab7ee61b7711364620d3aeadc"
@@ -4155,7 +4165,6 @@ querystringify@^2.1.1:
 rabbi@^1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/rabbi/-/rabbi-1.8.0.tgz#885119fd2d70a4588db42c629c7c567193278827"
-  integrity sha512-VKO59BfOYhBgPj8XbFlnP4mjdod0DBJAy18+r1O/fPxBYC4hdGMecAiYMRqDGpbxDxwMZuMlFLPNNF8ymwzb/Q==
   dependencies:
     "@types/amqplib" "^0.5.11"
     "@types/bluebird" "^3.5.26"
@@ -4375,7 +4384,6 @@ require-main-filename@^2.0.0:
 require_optional@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/require_optional/-/require_optional-1.0.1.tgz#4cf35a4247f64ca3df8c2ef208cc494b1ca8fc2e"
-  integrity sha512-qhM/y57enGWHAe3v/NcwML6a3/vfESLe/sGM2dII+gEO0BpKRUkWZow/tyloNqJyN6kXSl3RyyM8Ll5D/sJP8g==
   dependencies:
     resolve-from "^2.0.0"
     semver "^5.1.0"
@@ -4387,7 +4395,6 @@ requires-port@^1.0.0:
 resolve-from@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/resolve-from/-/resolve-from-2.0.0.tgz#9480ab20e94ffa1d9e80a804c7ea147611966b57"
-  integrity sha1-lICrIOlP+h2egKgEx+oUdhGWa1c=
 
 resolve-url@^0.2.1:
   version "0.2.1"
@@ -4454,7 +4461,6 @@ ripemd160@^2.0.0:
 rpc-simple-wallet@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/rpc-simple-wallet/-/rpc-simple-wallet-1.1.0.tgz#fcea507f27d8cc505f8fa9a36100e21dd1663ca8"
-  integrity sha512-9XHcZ5IcwE1JXllC9dE3eT7hizTFTgnSBtlG1K44+JKWimCVHEJrt04M5V1nAJsoFlFfsWDFTc5X7ENZWzaSHQ==
   dependencies:
     "@types/mocha" "^5.2.7"
     "@types/node" "^11.12.0"
@@ -4490,7 +4496,6 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
 saslprep@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/saslprep/-/saslprep-1.0.3.tgz#4c02f946b56cf54297e347ba1093e7acac4cf226"
-  integrity sha512-/MY/PEMbk2SuY5sScONwhUDsV2p77Znkb/q3nSVstq/yQzYJOH/Azh29p9oJLsl3LnQwSvZDKagDGBsBwSooag==
   dependencies:
     sparse-bitfield "^3.0.3"
 
@@ -4790,7 +4795,6 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.1:
 sparse-bitfield@^3.0.3:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/sparse-bitfield/-/sparse-bitfield-3.0.3.tgz#ff4ae6e68656056ba4b3e792ab3334d38273ca11"
-  integrity sha1-/0rm5oZWBWuks+eSqzM004JzyhE=
   dependencies:
     memory-pager "^1.0.2"
 

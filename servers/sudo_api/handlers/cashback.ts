@@ -5,6 +5,8 @@ import * as bch from '../../../plugins/bch/lib/jsonrpc';
 
 import { log, models, database, amqp } from '../../../lib';
 
+import { getCashBackBalance } from '../../../plugins/dash/lib/cashback';
+
 import * as Boom from 'boom';
 import * as http from 'superagent';
 
@@ -103,7 +105,7 @@ export async function dashboard(req, h) {
     let totalDashPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='DASH'`);
 
     let bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
-    let dashBalance = await getDashBalance(coins['DASH'].address);
+    let dashBalance = await getCashBackBalance();
 
     return [{                                                                       
       currency: 'BCH',
@@ -137,7 +139,7 @@ export async function dashboard(req, h) {
 
 async function updateStats() {
 
-  coins['DASH'].balance = await getDashBalance(coins.DASH.address);
+  coins['DASH'].balance = await getCashBackBalance();
 
   log.info('cashback.balance', {
     coin: "DASH",
@@ -168,15 +170,3 @@ async function updateStats() {
 
 })();
 
-async function getDashBalance(address: string) {
-  console.log(`get dash balance ${address}`);
-
-  let url = `https://chainz.cryptoid.info/dash/api.dws?q=getbalance&a=${address}`;
-
-  let resp = await http.get(url);
-
-  console.log(resp.text);
-
-  return parseFloat(resp.text);
-
-}
