@@ -50,7 +50,6 @@ const InvoicesController = require("./handlers/invoices");
 const DashBoardController = require("./handlers/dashboard");
 const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
-const MerchantsController = require("./handlers/merchants");
 const WebhookHandler = new EventEmitter();
 const PaymentRequestHandler = require("./handlers/payment_request");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
@@ -1399,7 +1398,7 @@ async function Server() {
 
     options: {
 
-      handler: MerchantsController.list
+      handler: handlers.Merchants.listActiveSince
 
     }
 
@@ -1413,7 +1412,7 @@ async function Server() {
 
     options: {
 
-      handler: MerchantsController.listActiveSince
+      handler: handlers.Merchants.listActiveSince
 
     }
 
@@ -1429,7 +1428,7 @@ async function Server() {
 
     options: {
 
-      handler: MerchantsController.listMerchantCoins
+      handler: handlers.Merchants.listMerchantCoins
 
     }
 
