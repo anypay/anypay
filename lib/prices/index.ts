@@ -67,7 +67,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   let prices = await getAllPrices();
 
-  let pair = `${inputAmount.currency}/${outputCurrency}`;
+  let pair = `${outputCurrency}/${inputAmount.currency}`;
 
   var rate;
 
