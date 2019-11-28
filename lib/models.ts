@@ -75,6 +75,23 @@ models.PayrollAccount.hasOne(models.Account, {
   as: 'account'
 });
 
+models.Ambassador.hasOne(models.Account, {
+  foreignKey: 'id',
+  sourceKey: 'account_id',
+  as: 'account'
+});
+
+models.Ambassador.hasMany(models.Account, {
+  foreignKey: 'ambassador_id',
+  sourceKey: 'id',
+  as: 'merchants'
+});
+
+models.Account.hasOne(models.Ambassador, {
+  foreignKey: 'id',
+  sourceKey: 'ambassador_id',
+  as: 'ambassador'
+});
 
 export { models };
 

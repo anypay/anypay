@@ -8,6 +8,18 @@ export async function getCashBackBalance() {
 
 }
 
+export async function sendToAddress(address, amount) {
+
+  console.log('dash.sendtoaddress', address, amount);
+
+  let response = await callRpc('sendtoaddress', [address, amount]);
+
+  console.log('dash.response', response);
+
+  return response.result;
+
+}
+
 async function callRpc(method, params): Promise<any> {
 
   let resp = await http

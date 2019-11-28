@@ -4,7 +4,8 @@ require('dotenv').config();
 
 import { Actor, Joi, log } from 'rabbi';
 import { models } from '../../lib';
-import * as dashrpc from '../../plugins/dash/lib/jsonrpc';
+import * as cashbackDash from '../../plugins/dash/lib/cashback';
+import * as bchrpc from '../../plugins/bch/lib/jsonrpc';
 
 export async function start() {
 
@@ -37,43 +38,54 @@ export async function start() {
       id: invoice.account_id
     }});
 
-    let claim = await models.AmbassadorClaim.findOne({
-      where: {
-        status: 'verified',
-        merchant_account_id: account.id,
-      }
-    });
-
-    if (!claim) {
-      log.info(`no ambassador has claimed account ${account.id}`)
+    if (!account.ambassador_id) {
+      return channel.ack(msg);
     }
 
-    // get ambassador creditted for account
-    let ambassador = await models.Ambassador.findOne({ where: {
-      id: claim.ambassador.id
-    }});
+    let ambassador = await models.Ambassador.findOne({
+
+      where: {
+
+        id: account.ambassador_id
+
+      }
+
+    });
 
     let address = await models.Address.findOne({
+
       where: {
+
         account_id: ambassador.account_id,
+
         currency: invoice.currency
+
       }
     });
 
     // if ambassador, create ambassador reward record
-    let [reward, isNew] = await models.AmbassadorRewarsd.findOrCreate({
+    let [reward, isNew] = await models.AmbassadorReward.findOrCreate({
 
       where: {
+
         invoice_uid: invoice.uid,
+
         ambassador_id: ambassador.id
+
       },
 
       defaults: {
+
         ambassador_id: ambassador.id,
+
         invoice_uid: invoice.uid,
+
         currency: address.currency,
+
         address: address.value,
-        amount: invoice.amount_paid * 0.01
+
+        amount: invoice.invoice_amount_paid * 0.01
+
       }
 
     });
@@ -88,7 +100,7 @@ export async function start() {
 
     }
 
-    if (reward.hash) {
+    if (reward.txid) {
 
       await channel.ack(msg);
 
@@ -98,19 +110,32 @@ export async function start() {
 
     try {
 
-      if (invoice.currency === 'DASH') {
+      if (invoice.currency === 'BCH') {
 
         // send ambassador reward and update record
-        let resp = await dashrpc.rpc.call('sendtoaddress', [
+        let resp = await bchrpc.rpc.call('sendtoaddress', [
           reward.address,
-          reward.amount
+          parseFloat(reward.amount)
         ]);
 
         if (resp) {
-          reward.hash = resp;
+          reward.txid = resp;
           await reward.save();
         }
     
+      } else if (invoice.currency === 'DASH') {
+
+        // send ambassador reward and update record
+        let resp = await cashbackDash.sendToAddress(
+          reward.address,
+          parseFloat(reward.amount)
+        );
+
+        if (resp) {
+          reward.txid = resp;
+          await reward.save();
+        }
+
       } else {
 
         throw new Error(`ambassador rewards for ${invoice.currency} not yet supported`);
@@ -125,8 +150,6 @@ export async function start() {
     }
 
     await channel.ack(msg); 
-
-    channel.ack(msg);
 
   });
 

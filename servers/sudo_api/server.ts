@@ -1160,6 +1160,54 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/merchants/{merchant_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Merchants.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/merchants',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Merchants.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/merchants/{merchant_id}/ambassadors/{ambassador_id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.MerchantAmbassador.create
+
+    }
+
+  });
+
   return server;
 
 }

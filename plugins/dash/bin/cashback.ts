@@ -2,8 +2,7 @@
 
 import * as program from 'commander';
 
-import { getCashBackBalance } from '../lib/cashback';
-
+import { getCashBackBalance, sendToAddress } from '../lib/cashback';
 
 program
   .command('getbalance')
@@ -25,6 +24,27 @@ program
 
     }
 
+  });
+
+program
+  .command('sendtoaddress <address> <amount>')
+  .action(async (address, amount) => {
+
+    try {
+
+      let result = await sendToAddress(address, amount); 
+
+      console.log(`result: ${result}`);
+
+      process.exit(0);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+      process.exit(1);
+
+    }
   });
 
 program
