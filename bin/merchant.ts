@@ -2,9 +2,13 @@
 
 require('dotenv').config();
 
+const {Presenter} = require('yayson')({adapter: 'sequelize'})
+
 var program = require('commander');
 
 import { models, log, accounts } from '../lib';
+
+import * as JsonApiSerializer from '../lib/serializers/jsonapi';
 
 program
   .command('create <email> <password>')
@@ -15,6 +19,30 @@ program
     log.info('merchant.created', merchant.toJSON());
 
   });
+
+program
+  .command('withambassador <email>')
+  .action(async (email) => {
+
+    let result = await models.Account.findOne({
+
+      where: {
+        email
+      },
+
+      include: [{
+        model: models.Ambassador,
+        as: 'ambassador'
+      }]
+
+    })
+
+    let json = JsonApiSerializer.serializeMerchant(result);
+
+    console.log(json);
+
+  });
+
 
 program
   .command('verify <merchant_email>')
