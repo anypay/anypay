@@ -75,6 +75,64 @@ describe('Addresses Library', () => {
 
   });
 
+  it("should throw error when trying to set q style address", async () => {
+
+    let account = await registerAccount(chance.email(), chance.word());
+
+    let currency = 'BSV'
+
+   let changeset = {
+      account_id: account.id,
+      address: 'qqrud420hk929l736tzzyhyc59yx79jfhy8sd99qy',
+      currency: 'BSV'
+    };
+  
+    let error = false
+
+    try {
+
+      await addresses.setAddress(changeset)
+
+    }catch(err){
+    
+      error = true;
+
+    }
+
+    assert(error)
+
+  });
+
+  it("should set a valid bsv address", async () => {
+
+    let account = await registerAccount(chance.email(), chance.word());
+
+    let currency = 'BSV'
+
+   let changeset = {
+      account_id: account.id,
+      address: '1JUMBWB4Pan1CaoRM95UnkECYngmjHzeWS',
+      currency: 'BSV'
+    };
+  
+    let error = false
+
+    try {
+
+      await addresses.setAddress(changeset)
+
+    }catch(err){
+    
+      error = true;
+
+    }
+
+    assert(!error)
+
+  });
+
+
+
 });
 
 
