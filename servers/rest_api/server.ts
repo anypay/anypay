@@ -52,6 +52,7 @@ const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const WebhookHandler = new EventEmitter();
 const PaymentRequestHandler = require("./handlers/payment_request");
+const VendingMachineTransactions = require("./handlers/vending_transactions");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
@@ -1567,6 +1568,31 @@ async function Server() {
 
     }
   }); 
+   
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/transactions',
+
+    config: { auth : "sudopassword" },
+
+    handler:  VendingMachineTransactions.getLatestTransactions 
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/account/transactions',
+
+    config: { auth : "token" },
+
+    handler: VendingMachineTransactions.getAccountTransactions
+
+  })
 
   accountCSVReports(server);
 
