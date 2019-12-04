@@ -1594,6 +1594,18 @@ async function Server() {
 
   })
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/transactions/{serial_number}',
+
+    config: { auth : "sudopassword" },
+
+    handler: VendingMachineTransactions.getMachineTransactions
+
+  })
+
   accountCSVReports(server);
 
   return server;

@@ -35,3 +35,14 @@ export async function getLatestTransactions(request, h) {
   return records
 
 }
+
+export async function getMachineTransactions(request, h) {
+
+  let records = await models.VendingTransaction.findAll({
+    where : { 'terminal_id' : request.params.serial_number},
+    order: [ [ 'terminal_time', 'DESC' ]]       
+  });
+
+  return records
+
+}
