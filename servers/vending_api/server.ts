@@ -40,7 +40,7 @@ async function Server() {
 
   var server = new Hapi.Server({
     host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8200,
+    port: process.env.VENDING_PORT || 8200,
     routes: {
       cors: true,
       validate: {
