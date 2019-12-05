@@ -1164,6 +1164,22 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/ambassadors/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Ambassadors.show
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/merchants/{merchant_id}',
 
     config: {
