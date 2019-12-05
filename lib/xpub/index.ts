@@ -1,5 +1,6 @@
-import * as bitcoincash from 'bitcore-lib-cash';
 import * as dash from '@dashevo/dashcore-lib';
+
+const bitcoincash = require("../bitcoin_cash/bitcore").bitcore;
 
 function getBitcore(currency: string) {
 

@@ -11,6 +11,27 @@ export async function start() {
 
   Actor.create({
 
+    exchange: 'anypay:invoices',
+
+    routingkey: 'invoice:paid',
+
+    queue: 'ambassador_reward_on_invoice_paid'
+
+  })
+  .start(async (channel, msg) => {
+
+    let invoice_uid = msg.content.toString();
+
+    await channel.publish('rabbi', 'send_ambassador_reward', Buffer.from(
+      JSON.stringify({ invoice_uid })
+    ));
+
+    await channel.ack(msg);
+
+  });
+
+  Actor.create({
+
     exchange: 'rabbi',
 
     routingkey: 'send_ambassador_reward',
@@ -19,7 +40,14 @@ export async function start() {
 
     schema: Joi.object().keys({
       invoice_uid: Joi.string().required()
-    }) // optional, enforces validity of json schema
+    }), // optional, enforces validity of json schema
+    
+    env: Joi.object().keys({
+      CASHBACK_DASH_RPC_HOST: Joi.string().required(),
+      CASHBACK_DASH_RPC_PORT: Joi.string().required(),
+      CASHBACK_DASH_RPC_USER: Joi.string().required(),
+      CASHBACK_DASH_RPC_PASSWORD: Joi.string().required()
+    })
 
   })
   .start(async (channel, msg, json) => {
