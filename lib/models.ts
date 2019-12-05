@@ -87,6 +87,16 @@ models.Ambassador.hasMany(models.Account, {
   as: 'merchants'
 });
 
+models.Ambassador.hasMany(models.AmbassadorReward, {
+  foreignKey: 'ambassador_id',
+  as: 'rewards'
+});
+
+models.AmbassadorReward.belongsTo(models.Ambassador, {
+  foreignKey: 'ambassador_id',
+  as: 'ambassador'
+});
+
 models.Account.hasOne(models.Ambassador, {
   foreignKey: 'id',
   sourceKey: 'ambassador_id',
