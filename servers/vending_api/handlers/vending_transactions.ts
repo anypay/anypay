@@ -1,4 +1,4 @@
-import {models} from '../../../lib';
+import {models,log} from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -212,7 +212,18 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
 
 export async function getAccountRevenue(request, h) {
 
-  let accountId = request.auth.credentials.accessToken.account_id;
+  let accountId;
+
+  try{
+
+    accountId = request.auth.credentials.accessToken.account_id;
+
+  }catch(err){
+  }
+
+  if( !accountId ){
+    accountId = request.params.account_id;
+  }
 
   let last24Buy = await models.VendingTransaction.findAll({
     where: {
@@ -439,27 +450,27 @@ export async function getProfit(request, h) {
   const profit = {
     last24 : {
       date: moment().toDate(),
-      profit : Number(last24[0].toJSON().total),
+      value : Number(last24[0].toJSON().total),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      profit : Number(currentWeek[0].toJSON().total),
+      value : Number(currentWeek[0].toJSON().total),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      profit : Number(lastWeek[0].toJSON().total),
+      value : Number(lastWeek[0].toJSON().total),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      profit : Number(currentMonth[0].toJSON().total),
+      value : Number(currentMonth[0].toJSON().total),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      profit : Number(lastMonth[0].toJSON().total),
+      value : Number(lastMonth[0].toJSON().total),
     },
     allTime : {
       date: moment().toDate(),
-      profit : Number(allTime[0].toJSON().total),
+      value : Number(allTime[0].toJSON().total),
     }
 
   }
@@ -469,7 +480,19 @@ export async function getProfit(request, h) {
 
 export async function getAccountProfit(request, h) {
 
-  let accountId = request.auth.credentials.accessToken.account_id;
+
+  let accountId;
+
+  try{
+
+    accountId = request.auth.credentials.accessToken.account_id;
+
+  }catch(err){
+  }
+
+  if( !accountId ){
+    accountId = request.params.account_id;
+  }
 
   let last24 = await models.VendingTransaction.findAll({
     where: {
@@ -531,27 +554,27 @@ export async function getAccountProfit(request, h) {
   const profit = {
     last24 : {
       date: moment().toDate(),
-      profit : Number(last24[0].toJSON().total),
+      value : Number(last24[0].toJSON().total),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      profit : Number(currentWeek[0].toJSON().total),
+      value : Number(currentWeek[0].toJSON().total),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      profit : Number(lastWeek[0].toJSON().total),
+      value : Number(lastWeek[0].toJSON().total),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      profit : Number(currentMonth[0].toJSON().total),
+      value : Number(currentMonth[0].toJSON().total),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      profit : Number(lastMonth[0].toJSON().total),
+      value : Number(lastMonth[0].toJSON().total),
     },
     allTime : {
       date: moment().toDate(),
-      profit : Number(allTime[0].toJSON().total),
+      value : Number(allTime[0].toJSON().total),
     }
 
   }
