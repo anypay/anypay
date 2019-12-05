@@ -5,8 +5,7 @@ import { Request } from 'hapi';
 
 import { models, ambassadors } from '../../../lib';
 
-import * as _ from 'lodash';
-
+import * as _ from 'lodash'; 
 import * as Boom from 'boom';
 
 import { Op } from 'sequelize';
@@ -45,8 +44,21 @@ export async function index(req: Request) {
         where: { ambassador_id: ambassador.id }
       });
 
+      let account = await models.Account.findOne({
+        where: { id: ambassador.account_id }
+      });
+
+      var parent;
+
+      if (ambassador.parent_id) {
+
+        parent = await models.Ambassador.findOne({ where: {
+          id: ambassador.parent_id
+        }});
+      }
+
       return {
-        ambassador, rewards
+        ambassador, rewards, account, parent
       }
     
     }))
@@ -81,10 +93,25 @@ export async function show(req: Request) {
     let rewards = await models.AmbassadorReward.findAll({
       where: {
         ambassador_id: req.params.id
-      }
+      },
+
+      order: [["createdAt", "desc"]]
     });
 
-    return { ambassador, rewards };
+    var parent;
+
+    if (ambassador.parent_id) {
+
+      parent = await models.Ambassador.findOne({ where: {
+        id: ambassador.parent_id
+      }});
+    }
+
+    let account = await models.Account.findOne({
+      where: { id: ambassador.account_id }
+    });
+
+    return { ambassador, rewards, account, parent };
 
   } catch(error) {
 
