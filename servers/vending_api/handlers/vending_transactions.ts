@@ -11,12 +11,12 @@ export async function getAccountTransactions(request, h) {
 
   if( machine ){
 
-    let records = await models.VendingTransaction.findAll({
+    let vending_transactions = await models.VendingTransaction.findAll({
       where : { 'terminal_id' : machine.serial_number},
       order: [ [ 'terminal_time', 'DESC' ]]      
     });
 
-    return records
+    return { vending_transactions }
 
   }
 
@@ -26,22 +26,22 @@ export async function getAccountTransactions(request, h) {
 
 export async function getLatestTransactions(request, h) {
 
-  let records = await models.VendingTransaction.findAll({
+  let vending_transactions = await models.VendingTransaction.findAll({
     limit: 100,
     order: [ [ 'terminal_time', 'DESC' ]]       
   });
 
-  return records
+  return {vending_transactions}
 
 }
 
 export async function getMachineTransactions(request, h) {
 
-  let records = await models.VendingTransaction.findAll({
+  let vending_transactions = await models.VendingTransaction.findAll({
     where : { 'terminal_id' : request.params.serial_number},
     order: [ [ 'terminal_time', 'DESC' ]]       
   });
 
-  return records
+  return {vending_transactions}
 
 }

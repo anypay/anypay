@@ -8,6 +8,9 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
+      account_id: {
+        type: Sequelize.INTEGER
+      },
       terminal_id: {
         type: Sequelize.STRING
       },
@@ -44,13 +47,13 @@ module.exports = {
       status: {
         type: Sequelize.STRING
       },
-      detail: {
+      hash: {
         type: Sequelize.STRING
       },
-      exchange_strategy_used: {
+      exchange_price: {
         type: Sequelize.STRING
       },
-      rate_source_price: {
+      spot_price: {
         type: Sequelize.DECIMAL
       },
       fixed_transaction_fee: {
@@ -76,6 +79,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('transactions');
+    return queryInterface.dropTable('vending_transactions');
   }
 };

@@ -1,13 +1,8 @@
 require('dotenv').config();
 import * as Hapi from "hapi";
 const Joi = require('joi');
-import { log } from '../../lib';
-import { models } from '../../lib'
+import { log, models, auth } from '../../lib';
 const VendingMachineTransactions = require("./handlers/vending_transactions");
-
-import * as auth from './auth';
-
-
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -59,7 +54,7 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/vending/transactions/{serial_number}',
+    path: '/api/vending/vending_machine/{serial_number}/transactions',
 
     config: { auth : "sudopassword" },
 

@@ -1,8 +1,8 @@
 require("dotenv").config()
 
-import { hash, bcryptCompare } from '../../../lib/password';
+import { hash, bcryptCompare } from '../password';
 
-import { log,models } from '../../../lib';
+import { log,models } from '../index';
 
 export async function validateSudoPassword(request, username, password, h) {
 
