@@ -60,7 +60,7 @@ module.exports = {
         type: Sequelize.DECIMAL
       },
       expected_profit_setting: {
-        type: Sequelize.STRING
+        type: Sequelize.DECIMAL
       },
       expected_profit_value: {
         type: Sequelize.DECIMAL

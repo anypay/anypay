@@ -78,6 +78,54 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/vending/transactions/kpis/revenue',
+
+    config: { auth : "sudopassword" },
+
+    handler:  VendingMachineTransactions.getRevenue
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/account/transactions/kpis/revenue',
+
+    config: { auth : "token" },
+
+    handler:  VendingMachineTransactions.getAccountRevenue
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/transactions/kpis/profit',
+
+    config: { auth : "sudopassword" },
+
+    handler:  VendingMachineTransactions.getProfit
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/account/transactions/kpis/profit',
+
+    config: { auth : "token" },
+
+    handler:  VendingMachineTransactions.getAccountProfit
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/vending/account/transactions',
 
     config: { auth : "token" },
