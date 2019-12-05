@@ -5,7 +5,7 @@ require('dotenv').config();
 import { Actor, Joi, log } from 'rabbi';
 import { models } from '../../lib';
 import * as cashbackDash from '../../plugins/dash/lib/cashback';
-import * as bchrpc from '../../plugins/bch/lib/jsonrpc';
+import * as cashbackBCH from '../../plugins/bch/lib/cashback';
 
 export async function start() {
 
@@ -46,7 +46,12 @@ export async function start() {
       CASHBACK_DASH_RPC_HOST: Joi.string().required(),
       CASHBACK_DASH_RPC_PORT: Joi.string().required(),
       CASHBACK_DASH_RPC_USER: Joi.string().required(),
-      CASHBACK_DASH_RPC_PASSWORD: Joi.string().required()
+      CASHBACK_DASH_RPC_PASSWORD: Joi.string().required(),
+
+      CASHBACK_BCH_RPC_HOST: Joi.string().required(),
+      CASHBACK_BCH_RPC_PORT: Joi.string().required(),
+      CASHBACK_BCH_RPC_USER: Joi.string().required(),
+      CASHBACK_BCH_RPC_PASSWORD: Joi.string().required()
     })
 
   })
@@ -141,10 +146,10 @@ export async function start() {
       if (invoice.currency === 'BCH') {
 
         // send ambassador reward and update record
-        let resp = await bchrpc.rpc.call('sendtoaddress', [
+        let resp = await cashbackBCH.sendToAddress(
           reward.address,
           parseFloat(reward.amount)
-        ]);
+        );
 
         if (resp) {
           reward.txid = resp;
@@ -170,6 +175,8 @@ export async function start() {
       }
   
     } catch(error) {
+
+      console.log(error.response);
 
       // update ambassador reward record with any failure
       reward.error = error.message;
