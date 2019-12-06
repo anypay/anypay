@@ -1,9 +1,8 @@
 require('dotenv').config();
 import {models} from '../models';
 
-export function importVendingCsv(path){
+export async function importVendingCsv(path){
 
-  console.log(path)
   var fs = require('fs');
   var parse = require('csv-parse');
   var async = require('async');
@@ -40,11 +39,11 @@ export function importVendingCsv(path){
            crypto_address: line[13],
            status: line[16],
            hash: line[18],
-           exchange_price: line[20],
-           spot_price: Number(line[21]),
+           exchange_price: Number(line[20]).toFixed(2),
+           spot_price: Number(line[21]).toFixed(2),
            fixed_transaction_fee: Number(line[22]),
-           expected_profit_setting: Number(line[23]),
-           expected_profit_value: Number(line[24]),
+           expected_profit_setting: Number(line[23]).toFixed(2),
+           expected_profit_value: Number(line[24]).toFixed(2),
            name_of_crypto_setting_used: line[25]
         }
 
@@ -60,8 +59,10 @@ export function importVendingCsv(path){
     })
   });
 
-  fs.createReadStream(inputFile).pipe(parser)
+  await fs.createReadStream(inputFile).pipe(parser)
+
+  return 'done';
 
 }
 
-importVendingCsv("./lib/vending-machine/general_bytes_2016_05_04_2019-10-04.csv")
+importVendingCsv("/Users/bit1/github/anypay/lib/vending-machine/general_bytes_2016_05_04_2019-10-04.csv")

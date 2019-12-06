@@ -51,19 +51,19 @@ module.exports = {
         type: Sequelize.STRING
       },
       exchange_price: {
-        type: Sequelize.STRING
+        type: Sequelize.DECIMAL(10,2)
       },
       spot_price: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10,2)
       },
       fixed_transaction_fee: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10,2)
       },
       expected_profit_setting: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10,2)
       },
       expected_profit_value: {
-        type: Sequelize.DECIMAL
+        type: Sequelize.DECIMAL(10,2)
       },
       name_of_crypto_setting_used: {
         type: Sequelize.STRING

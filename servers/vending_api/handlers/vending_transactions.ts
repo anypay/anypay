@@ -10,20 +10,12 @@ export async function getAccountTransactions(request, h) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let machine = await models.VendingMachine.findOne({where: { account_id: accountId }})
-
-  if( machine ){
-
-    let vending_transactions = await models.VendingTransaction.findAll({
-      where : { 'terminal_id' : machine.serial_number},
+  let vending_transactions = await models.VendingTransaction.findAll({
+      where : { 'account_id' : accountId},
       order: [ [ 'terminal_time', 'DESC' ]]      
-    });
+  });
 
-    return { vending_transactions }
-
-  }
-
-  return 'No Vending Machine Associated With Account';
+  return { vending_transactions }
 
 }
 
@@ -170,39 +162,39 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
   const revenue = {
     last24 : {
       date: moment().toDate(),
-      buy : Number(last24Buy[0].toJSON().total),
-      sell : Number(last24Sell[0].toJSON().total),
-      volume : Number(last24Sell[0].toJSON().total) + Number(last24Buy[0].toJSON().total),
+      buy : Number(last24Buy[0].toJSON().total).toFixed(2),
+      sell : Number(last24Sell[0].toJSON().total).toFixed(2),
+      volume : (Number(last24Sell[0].toJSON().total) + Number(last24Buy[0].toJSON().total)).toFixed(2),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      buy : Number(currentWeekBuy[0].toJSON().total),
-      sell : Number(currentWeekSell[0].toJSON().total),
-      volume : Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total),
+      buy : Number(currentWeekBuy[0].toJSON().total).toFixed(2),
+      sell : Number(currentWeekSell[0].toJSON().total).toFixed(2),
+      volume : (Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total)).toFixed(2),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      buy : Number(lastWeekBuy[0].toJSON().total),
-      sell : Number(lastWeekSell[0].toJSON().total),
-      volume : Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total),
+      buy : Number(lastWeekBuy[0].toJSON().total).toFixed(2),
+      sell : Number(lastWeekSell[0].toJSON().total).toFixed(2),
+      volume : (Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total)).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      buy : Number(currentMonthBuy[0].toJSON().total),
-      sell : Number(currentMonthSell[0].toJSON().total),
-      volume : Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total),
+      buy : Number(currentMonthBuy[0].toJSON().total).toFixed(2),
+      sell : Number(currentMonthSell[0].toJSON().total).toFixed(2),
+      volume : (Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total)).toFixed(2),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      buy : Number(lastMonthBuy[0].toJSON().total),
-      sell : Number(lastMonthSell[0].toJSON().total),
-      volume : Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total),
+      buy : Number(lastMonthBuy[0].toJSON().total).toFixed(2),
+      sell : Number(lastMonthSell[0].toJSON().total).toFixed(2),
+      volume : (Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total)).toFixed(2),
     },
     allTime : {
       date: moment().toDate(),
-      buy : Number(allTimeBuy[0].toJSON().total),
-      sell : Number(allTimeSell[0].toJSON().total),
-      volume : Number(allTimeBuy[0].toJSON().total) + Number(allTimeSell[0].toJSON().total),
+      buy : Number(allTimeBuy[0].toJSON().total).toFixed(2),
+      sell : Number(allTimeSell[0].toJSON().total).toFixed(2),
+      volume : (Number(allTimeBuy[0].toJSON().total) + Number(allTimeSell[0].toJSON().total)).toFixed(2),
     }
 
   }
@@ -356,39 +348,39 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
   const revenue = {
     last24 : {
       date: moment().toDate(),
-      buy : Number(last24Buy[0].toJSON().total),
-      sell : Number(last24Sell[0].toJSON().total),
-      volume : Number(last24Sell[0].toJSON().total) + Number(last24Buy[0].toJSON().total),
+      buy : Number(last24Buy[0].toJSON().total).toFixed(2),
+      sell : Number(last24Sell[0].toJSON().total).toFixed(2),
+      volume : (Number(last24Sell[0].toJSON().total) + Number(last24Buy[0].toJSON().total)).toFixed(2),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      buy : Number(currentWeekBuy[0].toJSON().total),
-      sell : Number(currentWeekSell[0].toJSON().total),
-      volume : Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total),
+      buy : Number(currentWeekBuy[0].toJSON().total).toFixed(2),
+      sell : Number(currentWeekSell[0].toJSON().total).toFixed(2),
+      volume : (Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total)).toFixed(2),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      buy : Number(lastWeekBuy[0].toJSON().total),
-      sell : Number(lastWeekSell[0].toJSON().total),
-      volume : Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total),
+      buy : Number(lastWeekBuy[0].toJSON().total).toFixed(2),
+      sell : Number(lastWeekSell[0].toJSON().total).toFixed(2),
+      volume : (Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total)).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      buy : Number(currentMonthBuy[0].toJSON().total),
-      sell : Number(currentMonthSell[0].toJSON().total),
-      volume : Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total),
+      buy : Number(currentMonthBuy[0].toJSON().total).toFixed(2),
+      sell : Number(currentMonthSell[0].toJSON().total).toFixed(2),
+      volume : (Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total)).toFixed(2),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      buy : Number(lastMonthBuy[0].toJSON().total),
-      sell : Number(lastMonthSell[0].toJSON().total),
-      volume : Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total),
+      buy : Number(lastMonthBuy[0].toJSON().total).toFixed(2),
+      sell : Number(lastMonthSell[0].toJSON().total).toFixed(2),
+      volume : (Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total)).toFixed(2),
     },
     allTime : {
       date: moment().toDate(),
-      buy : Number(allTimeBuy[0].toJSON().total),
-      sell : Number(allTimeSell[0].toJSON().total),
-      volume : Number(allTimeBuy[0].toJSON().total) + Number(allTimeSell[0].toJSON().total),
+      buy : Number(allTimeBuy[0].toJSON().total).toFixed(2),
+      sell : Number(allTimeSell[0].toJSON().total).toFixed(2),
+      volume : (Number(allTimeBuy[0].toJSON().total) + Number(allTimeSell[0].toJSON().total)).toFixed(2),
     }
 
   }
@@ -450,27 +442,27 @@ export async function getProfit(request, h) {
   const profit = {
     last24 : {
       date: moment().toDate(),
-      value : Number(last24[0].toJSON().total),
+      value : Number(last24[0].toJSON().total).toFixed(2),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      value : Number(currentWeek[0].toJSON().total),
+      value : Number(currentWeek[0].toJSON().total).toFixed(2),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      value : Number(lastWeek[0].toJSON().total),
+      value : Number(lastWeek[0].toJSON().total).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      value : Number(currentMonth[0].toJSON().total),
+      value : Number(currentMonth[0].toJSON().total).toFixed(2),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      value : Number(lastMonth[0].toJSON().total),
+      value : Number(lastMonth[0].toJSON().total).toFixed(2),
     },
     allTime : {
       date: moment().toDate(),
-      value : Number(allTime[0].toJSON().total),
+      value : Number(allTime[0].toJSON().total).toFixed(2),
     }
 
   }
@@ -554,27 +546,27 @@ export async function getAccountProfit(request, h) {
   const profit = {
     last24 : {
       date: moment().toDate(),
-      value : Number(last24[0].toJSON().total),
+      value : Number(last24[0].toJSON().total).toFixed(2),
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
-      value : Number(currentWeek[0].toJSON().total),
+      value : Number(currentWeek[0].toJSON().total).toFixed(2),
     },
     lastWeek : {
       date: moment().subtract('1', 'week').startOf('week').toDate(),
-      value : Number(lastWeek[0].toJSON().total),
+      value : Number(lastWeek[0].toJSON().total).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
-      value : Number(currentMonth[0].toJSON().total),
+      value : Number(currentMonth[0].toJSON().total).toFixed(2),
     },
     lastMonth : {
       date: moment().subtract('1', 'month').startOf('month').toDate(),
-      value : Number(lastMonth[0].toJSON().total),
+      value : Number(lastMonth[0].toJSON().total).toFixed(2),
     },
     allTime : {
       date: moment().toDate(),
-      value : Number(allTime[0].toJSON().total),
+      value : Number(allTime[0].toJSON().total).toFixed(2),
     }
 
   }
