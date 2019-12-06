@@ -5,24 +5,36 @@ import * as bch from '../../../plugins/bch/lib/jsonrpc';
 
 import { log, models, database, amqp } from '../../../lib';
 
-import { getCashBackBalance } from '../../../plugins/dash/lib/cashback';
+import * as cashbackDash from '../../../plugins/dash/lib/cashback';
+import * as cashbackBch from '../../../plugins/bch/lib/cashback';
+
+async function getCashBackBalance(coin: string): Promise<number> {
+
+  switch(coin.toUpperCase()) {
+
+    case 'DASH':
+
+      return cashbackDash.getCashBackBalance()
+
+    case 'BCH':
+
+      return cashbackBch.getCashBackBalance()
+  }
+
+}
 
 import * as Boom from 'boom';
 import * as http from 'superagent';
 
-import { RPCSimpleWallet } from 'rpc-simple-wallet';
-
 const coins: any = {
 
   'DASH': {
-    address: 'Xymo4w1fDkig77VBd1s6si1mZWwKxdgXvJ',
-    wallet: new RPCSimpleWallet('DASH', 'Xymo4w1fDkig77VBd1s6si1mZWwKxdgXvJ'),
+    address: 'XjCsG5H4ijNU9iwr3MvGz6AkMMhHtYUoeB',
     balance: null
   },
 
   'BCH': {
-    address: 'bitcoincash:qp9jz20u2amv4cp5wm02zt7u00lujpdtgy48zsmlvp',
-    wallet: new RPCSimpleWallet('BCH', 'bitcoincash:qp9jz20u2amv4cp5wm02zt7u00lujpdtgy48zsmlvp'),
+    address: 'bitcoincash:qqwufkh0egq9456tf5wepxjm4p8p58dtvudek6twrf',
     balance: null
   }
 
@@ -104,8 +116,8 @@ export async function dashboard(req, h) {
     let totalBchPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='BCH'`);
     let totalDashPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='DASH'`);
 
-    let bchBalance = await coins['BCH'].wallet.getAddressUnspentBalance();
-    let dashBalance = await getCashBackBalance();
+    let bchBalance = await getCashBackBalance('BCH');
+    let dashBalance = await getCashBackBalance('DASH');
 
     return [{                                                                       
       currency: 'BCH',
@@ -139,15 +151,14 @@ export async function dashboard(req, h) {
 
 async function updateStats() {
 
-  coins['DASH'].balance = await getCashBackBalance();
+  coins['DASH'].balance = await getCashBackBalance('DASH');
 
   log.info('cashback.balance', {
     coin: "DASH",
     balance: coins['DASH'].balance
   });
 
-  await coins['BCH'].wallet.updateWallet();
-  coins['BCH'].balance = await coins['BCH'].wallet.getAddressUnspentBalance();
+  coins['BCH'].balance = await getCashBackBalance('BCH');
 
   log.info('cashback.balance', {
     coin: 'BCH',
