@@ -75,6 +75,26 @@ describe('Addresses Library', () => {
 
   });
 
+  it("should set a valid bsv address with a q style address", async () => {
+
+    let account = await registerAccount(chance.email(), chance.word());
+
+    let currency = 'BSV'
+
+   let changeset = {
+      account_id: account.id,
+      address: 'prx6fqyppvapk9qls92rkp29kge9zaqkwyvu6zcyec',
+      currency: 'BSV'
+    };
+
+    await addresses.setAddress(changeset);
+
+    let address = await models.Address.findOne({ where: { account_id: account.id, currency: 'BSV' }});
+
+    assert(validateAddress(address.value));
+
+  });
+
 });
 
 

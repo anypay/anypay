@@ -1,5 +1,10 @@
 require('dotenv').config()
 
+import * as  bchaddr from 'bchaddrjs';
+
+var toLegacyAddress = bchaddr.toLegacyAddress;
+var isCashAddress = bchaddr.isCashAddress;
+
 import * as bsv from 'bsv';
 
 import { rpc } from './lib/jsonrpc';
@@ -30,6 +35,17 @@ async function createInvoice(accountId: number, amount: number) {
 
 export async function transformAddress(alias){
 
+  try{
+          
+    if( isCashAddress(alias) ){
+    
+      return toLegacyAddress(alias)
+
+    }
+
+  }catch(err){
+
+  }
   return (await polynym.resolveAddress(alias)).address;
 
 }
