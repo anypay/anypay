@@ -35,7 +35,7 @@ const events = new EventEmitter2();
 
 export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
-  var isValid = true;
+  var isValid = false;
 
   try {
 
