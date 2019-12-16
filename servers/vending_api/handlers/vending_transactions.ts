@@ -58,9 +58,9 @@ export async function getRevenue(request, h) {
       server_time: {
         [Op.gte]: moment().subtract(24, 'hours').toDate()
       },
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let currentWeekBuy = await models.VendingTransaction.findAll({
@@ -68,9 +68,9 @@ export async function getRevenue(request, h) {
       server_time: {
         [Op.between]: [moment().startOf('week'), moment().endOf('week')]
       },
-       type : 'BUY'
+      type : 'BUY',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let currentWeekSell = await models.VendingTransaction.findAll({
@@ -78,9 +78,9 @@ export async function getRevenue(request, h) {
       server_time: {
         [Op.between]: [moment().startOf('week'), moment().endOf('week')]
       },
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
 
@@ -89,9 +89,9 @@ export async function getRevenue(request, h) {
       server_time: {
         [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1', 'week').endOf('week')]
       },
-       type : 'BUY'
+      type : 'BUY',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let lastWeekSell = await models.VendingTransaction.findAll({
@@ -99,9 +99,9 @@ export async function getRevenue(request, h) {
       server_time: {
         [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1','week').endOf('week')]
       },
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
 
@@ -110,9 +110,9 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
       server_time: {
         [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1', 'month').endOf('month')]
       },
-       type : 'BUY'
+      type : 'BUY',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let lastMonthSell = await models.VendingTransaction.findAll({
@@ -120,9 +120,9 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
       server_time: {
         [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1','month').endOf('month')]
       },
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
  let currentMonthBuy = await models.VendingTransaction.findAll({
@@ -130,9 +130,9 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
       server_time: {
         [Op.between]: [moment().startOf('month'), moment().endOf('month')]
       },
-      type : 'BUY'
+      type : 'BUY',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let currentMonthSell = await models.VendingTransaction.findAll({
@@ -140,23 +140,23 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
       server_time: {
         [Op.between]: [moment().startOf('month'), moment().endOf('month')]
       },
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   let allTimeBuy = await models.VendingTransaction.findAll({
     where: {
-      type : 'BUY'
+      type : 'BUY',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
         
   let allTimeSell = await models.VendingTransaction.findAll({
     where: {
-      type : 'SELL'
+      type : 'SELL',
     },
-    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']],
+    attributes: [[sequelize.fn('sum', sequelize.col('cash_amount')), 'total']]
   })
 
   const revenue = {
@@ -168,24 +168,28 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
+      dateEnd: moment().endOf('week').toDate(),
       buy : Number(currentWeekBuy[0].toJSON().total).toFixed(2),
       sell : Number(currentWeekSell[0].toJSON().total).toFixed(2),
       volume : (Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total)).toFixed(2),
     },
     lastWeek : {
-      date: moment().subtract('1', 'week').startOf('week').toDate(),
+      date: moment().startOf('week').subtract('1', 'week').toDate(),
+      dateEnd: moment().endOf('week').subtract('1', 'week').toDate(),
       buy : Number(lastWeekBuy[0].toJSON().total).toFixed(2),
       sell : Number(lastWeekSell[0].toJSON().total).toFixed(2),
       volume : (Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total)).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
+      dateEnd: moment().endOf('month').toDate(),
       buy : Number(currentMonthBuy[0].toJSON().total).toFixed(2),
       sell : Number(currentMonthSell[0].toJSON().total).toFixed(2),
       volume : (Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total)).toFixed(2),
     },
     lastMonth : {
-      date: moment().subtract('1', 'month').startOf('month').toDate(),
+      date: moment().startOf('month').subtract('1', 'month').toDate(),
+      dateEnd: moment().endOf('month').subtract('1', 'month').toDate(),
       buy : Number(lastMonthBuy[0].toJSON().total).toFixed(2),
       sell : Number(lastMonthSell[0].toJSON().total).toFixed(2),
       volume : (Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total)).toFixed(2),
@@ -265,7 +269,7 @@ export async function getAccountRevenue(request, h) {
  let lastWeekBuy = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1', 'week').endOf('week')]
+        [Op.between]: [moment().startOf('week').subtract('1', 'week'), moment().endOf('week').subtract('1', 'week')]
       },
       account_id: accountId,
        type : 'BUY'
@@ -276,7 +280,7 @@ export async function getAccountRevenue(request, h) {
   let lastWeekSell = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1','week').endOf('week')]
+        [Op.between]: [moment().startOf('week').subtract('1', 'week'), moment().endOf('week').subtract('1','week')]
       },
       account_id: accountId,
       type : 'SELL'
@@ -288,7 +292,7 @@ export async function getAccountRevenue(request, h) {
 let lastMonthBuy = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1', 'month').endOf('month')]
+        [Op.between]: [moment().startOf('month').subtract('1', 'month'), moment().endOf('month').subtract('1', 'month')]
       },
       account_id: accountId,
        type : 'BUY'
@@ -299,7 +303,7 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
   let lastMonthSell = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1','month').endOf('month')]
+        [Op.between]: [moment().startOf('month').subtract('1', 'month'), moment().endOf('month').subtract('1','month')]
       },
       account_id: accountId,
       type : 'SELL'
@@ -354,24 +358,28 @@ let lastMonthBuy = await models.VendingTransaction.findAll({
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
+      dateEnd: moment().endOf('week').toDate(),
       buy : Number(currentWeekBuy[0].toJSON().total).toFixed(2),
       sell : Number(currentWeekSell[0].toJSON().total).toFixed(2),
       volume : (Number(currentWeekBuy[0].toJSON().total) + Number(currentWeekSell[0].toJSON().total)).toFixed(2),
     },
     lastWeek : {
-      date: moment().subtract('1', 'week').startOf('week').toDate(),
+      date: moment().startOf('week').subtract('1', 'week').toDate(),
+      dateEnd: moment().endOf('week').subtract('1', 'week').toDate(),
       buy : Number(lastWeekBuy[0].toJSON().total).toFixed(2),
       sell : Number(lastWeekSell[0].toJSON().total).toFixed(2),
       volume : (Number(lastWeekBuy[0].toJSON().total) + Number(lastWeekSell[0].toJSON().total)).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
+      dateEnd: moment().endOf('month').toDate(),
       buy : Number(currentMonthBuy[0].toJSON().total).toFixed(2),
       sell : Number(currentMonthSell[0].toJSON().total).toFixed(2),
       volume : (Number(currentMonthBuy[0].toJSON().total) + Number(currentMonthSell[0].toJSON().total)).toFixed(2),
     },
     lastMonth : {
-      date: moment().subtract('1', 'month').startOf('month').toDate(),
+      date: moment().startOf('month').subtract('1', 'month').toDate(),
+      dateEnd: moment().endOf('month').subtract('1', 'month').toDate(),
       buy : Number(lastMonthBuy[0].toJSON().total).toFixed(2),
       sell : Number(lastMonthSell[0].toJSON().total).toFixed(2),
       volume : (Number(lastMonthBuy[0].toJSON().total) + Number(lastMonthSell[0].toJSON().total)).toFixed(2),
@@ -411,7 +419,7 @@ export async function getProfit(request, h) {
   let lastWeek = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1','week').endOf('week')]
+       [Op.between]: [moment().startOf('week').subtract('1', 'week'), moment().endOf('week').subtract('1','week')]
       },
     },
     attributes: [[sequelize.fn('sum', sequelize.col('expected_profit_value')), 'total']],
@@ -420,7 +428,7 @@ export async function getProfit(request, h) {
   let lastMonth = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1','month').endOf('month')]
+        [Op.between]: [moment().startOf('month').subtract('1', 'month'), moment().endOf('month').subtract('1','month')]
       },
     },
     attributes: [[sequelize.fn('sum', sequelize.col('expected_profit_value')), 'total']],
@@ -446,18 +454,22 @@ export async function getProfit(request, h) {
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
+      dateEnd: moment().endOf('week').toDate(),
       value : Number(currentWeek[0].toJSON().total).toFixed(2),
     },
     lastWeek : {
-      date: moment().subtract('1', 'week').startOf('week').toDate(),
+      date: moment().startOf('week').subtract('1', 'week').toDate(),
+      dateEnd: moment().endOf('week').subtract('1', 'week').toDate(),
       value : Number(lastWeek[0].toJSON().total).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
+      dateEnd: moment().endOf('month').toDate(),
       value : Number(currentMonth[0].toJSON().total).toFixed(2),
     },
     lastMonth : {
-      date: moment().subtract('1', 'month').startOf('month').toDate(),
+      date: moment().startOf('month').subtract('1', 'month').toDate(),
+      dateEnd: moment().endOf('month').subtract('1', 'month').toDate(),
       value : Number(lastMonth[0].toJSON().total).toFixed(2),
     },
     allTime : {
@@ -509,7 +521,7 @@ export async function getAccountProfit(request, h) {
   let lastWeek = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'week').startOf('week'), moment().subtract('1','week').endOf('week')]
+        [Op.between]: [moment().startOf('week').subtract('1', 'week'), moment().endOf('week').subtract('1','week')]
       },
       account_id: accountId
     },
@@ -519,7 +531,7 @@ export async function getAccountProfit(request, h) {
   let lastMonth = await models.VendingTransaction.findAll({
     where: {
       server_time: {
-        [Op.between]: [moment().subtract('1', 'month').startOf('month'), moment().subtract('1','month').endOf('month')]
+        [Op.between]: [moment().startOf('month').subtract('1', 'month'), moment().endOf('month').subtract('1','month')]
       },
       account_id: accountId
     },
@@ -550,18 +562,22 @@ export async function getAccountProfit(request, h) {
     },
     currentWeek : {
       date: moment().startOf('week').toDate(),
+      dateEnd: moment().endOf('week').toDate(),
       value : Number(currentWeek[0].toJSON().total).toFixed(2),
     },
     lastWeek : {
-      date: moment().subtract('1', 'week').startOf('week').toDate(),
+      date: moment().startOf('week').subtract('1', 'week').toDate(),
+      dateEnd: moment().endOf('week').subtract('1', 'week').toDate(),
       value : Number(lastWeek[0].toJSON().total).toFixed(2),
     },
     currentMonth : {
       date: moment().startOf('month').toDate(),
+      dateEnd: moment().endOf('month').toDate(),
       value : Number(currentMonth[0].toJSON().total).toFixed(2),
     },
     lastMonth : {
-      date: moment().subtract('1', 'month').startOf('month').toDate(),
+      date: moment().startOf('month').subtract('1', 'month').toDate(),
+      dateEnd: moment().endOf('month').subtract('1', 'month').toDate(),
       value : Number(lastMonth[0].toJSON().total).toFixed(2),
     },
     allTime : {
