@@ -61,6 +61,5 @@ export async function create(req: Hapi.Request, h) {
 
   }
 
-
 }
 
