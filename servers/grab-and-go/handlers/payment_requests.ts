@@ -123,7 +123,6 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
   }
 
-
 }
 
 async function generateInvoice(accountId, itemPrice, currency) {
