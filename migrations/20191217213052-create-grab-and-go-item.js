@@ -44,7 +44,6 @@ module.exports = {
           fields: ['account_id', 'name']
         }
       }
-
     });
   },
   down: (queryInterface, Sequelize) => {
