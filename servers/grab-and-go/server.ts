@@ -5,9 +5,8 @@ import { join } from 'path';
 import * as Hapi from 'hapi';
 
 import { log } from '../../lib';
-//import { requireHandlersDirectory } from 'rabbi';
-//import { requireHandlersDirectory } from '/Users/zyler/github/stevenzeiler/rabbi/lib/rabbi';
-import { requireHandlersDirectory } from '/Users/zyler/github/stevenzeiler/rabbi';
+
+import { requireHandlersDirectory } from 'rabbi';
 
 import { validateToken } from '../auth/hapi_validate_token';
 
