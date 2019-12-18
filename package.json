@@ -65,6 +65,7 @@
     "mailchimp-api-v3": "^1.13.0",
     "moment": "^2.22.1",
     "mongodb": "^3.3.3",
+    "mysql": "^2.17.1",
     "node-cron": "^2.0.3",
     "node-statsd": "^0.1.1",
     "pg": "^7.9.0",
