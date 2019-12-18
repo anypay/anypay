@@ -28,7 +28,7 @@ import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
 import * as auth from './auth';
-
+import * as mysql_lib from './mysql';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -66,7 +66,8 @@ export {
   routes,
   password,
   login,
-  auth
+  auth,
+  mysql_lib
 }
 
 export async function initialize() {
