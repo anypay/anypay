@@ -10,6 +10,8 @@ import { channel, awaitChannel } from '../../lib/amqp';
 
 import { attachMerchantMapRoutes } from '../map/server';
 
+import { validateToken } from '../auth/hapi_validate_token';
+
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
@@ -200,69 +202,6 @@ const validatePassword = async function(request, username, password, h) {
 
 };
 
-const validateToken = async function(request, username, password, h) {
-
-  if (!username) {
-    return {
-      isValid: false
-    };
-  }
-
-  var accessToken = await models.AccessToken.findOne({
-    where: {
-      uid: username
-    }
-  });
-
-  if (accessToken) {
-		var account = await models.Account.findOne({
-			where: {
-				id: accessToken.account_id
-			}
-		})
-		request.account = account;
-    request.account_id = accessToken.account_id;
-
-    return {
-      isValid: true,
-      credentials: { accessToken: accessToken }
-    }
-  } else {
-
-    try {
-
-      await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
-
-      request.account = account;
-      request.account_id = account.id;
-
-      return {
-
-        isValid: true,
-
-        credentials: {
-
-          admin: true
-
-        }
-
-      }
-
-    } catch(error) {
-
-      log.error(error.message);
-
-      return {
-
-        isValid: false
-
-      }
-
-    }
-
-  }
-};
-
 const getAccount = async function(request, username, password, h) {
 
   var account = await models.Account.findOne({
@@ -363,8 +302,6 @@ async function Server() {
 
     return h.continue;
   });
-
-
 
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
