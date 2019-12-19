@@ -19,8 +19,6 @@ export async function create(req: Hapi.Request, h) {
       }
     });
 
-    console.log('account', account.toJSON());
-
     // look up the item from the url parameters
     let item = await models.GrabAndGoItem.findOne({
 
