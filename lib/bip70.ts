@@ -1,10 +1,8 @@
-
-#!/usr/bin/env ts-node
-
 require('dotenv').config();
 
 import * as PaymentProtocol from 'bitcore-payment-protocol';
-import * as bitcore from 'bitcore-lib-cash';
+
+const bitcore: any = require('bitcore-lib-cash');
 
 import * as fs from 'fs';
 import { join } from 'path';

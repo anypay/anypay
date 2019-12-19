@@ -22,9 +22,9 @@ import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
 
-import * as bch from 'bitcore-lib-cash';
+const bch: any = require('bitcore-lib-cash');
 
-var bchaddr = require('bchaddrjs');
+var bchaddr: any = require('bchaddrjs');
 
 import * as address_subscription from '../../lib/address_subscription';
 

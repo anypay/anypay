@@ -148,8 +148,6 @@ export async function generateInvoice(
 
   let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
 
-  console.log('matrix', matrix);
-
   let uris = matrix.map((row) => {
     let address = row[0];
 
@@ -170,7 +168,6 @@ export async function generateInvoice(
     return row;
   });
 
-  console.log('matrix2', matrix)
 
   var invoiceParams = {
     address: invoiceChangeset.address,

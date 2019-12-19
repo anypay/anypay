@@ -83,7 +83,7 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/grab-and-go/items/{item}/purchase",
+    path: "/grab-and-go/{account_stub}/{item_stub}/purchases/new",
 
     config: {
 
@@ -124,7 +124,9 @@ if (require.main === module) {
 
 export {
 
-  start
+  start,
+
+  Server
 
 }
 
