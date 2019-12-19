@@ -11,6 +11,9 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      stub: {
+        type: Sequelize.STRING
+      },
       price: {
         type: Sequelize.DECIMAL
       },
@@ -31,6 +34,17 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE
       }
+    }, {
+
+      uniqueKeys: {
+        grab_and_go_items_unique_stub: {
+          fields: ['account_id', 'stub']
+        },
+        grab_and_go_items_unique_name: {
+          fields: ['account_id', 'name']
+        }
+      }
+
     });
   },
   down: (queryInterface, Sequelize) => {
