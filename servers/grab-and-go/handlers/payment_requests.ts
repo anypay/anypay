@@ -40,7 +40,7 @@ export async function create(req: Hapi.Request, h) {
     // create an invoice for the item
     let invoice = await invoices.generateInvoice(account.id, item.price, 'BCH');
 
-    console.log('invoice', invoice.toJSON());
+    //console.log('invoice', invoice.toJSON());
 
     let paymentRequest = await generatePaymentRequest(invoice, account);
 

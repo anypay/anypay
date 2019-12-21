@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import * as PaymentProtocol from 'bitcore-payment-protocol';
+import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 
 const bitcore: any = require('bitcore-lib-cash');
 
