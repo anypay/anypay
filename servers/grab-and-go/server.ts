@@ -93,6 +93,20 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+  server.route({
+
+    method: "GET",
+
+    path: "/oauth/square/callbacks",
+
+    config: {
+
+      handler: handlers.SquareOauthCallbacks.create
+
+    }
+
+  });
+
   return server;
 
 }
