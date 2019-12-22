@@ -2186,6 +2186,20 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.4, graceful-fs@^4.1.6:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
+grant-hapi@^4.6.5:
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/grant-hapi/-/grant-hapi-4.6.5.tgz#37243085b9e97d315092c1c83a5cde5bfd3a0b2d"
+  dependencies:
+    grant "4.6.5"
+
+grant@4.6.5:
+  version "4.6.5"
+  resolved "https://registry.yarnpkg.com/grant/-/grant-4.6.5.tgz#ffd05122df830a1ae7ff2eebbbfc85c5e1c100e8"
+  dependencies:
+    qs "^6.9.1"
+    request-compose "^1.2.1"
+    request-oauth "0.0.3"
+
 growl@1.10.5:
   version "1.10.5"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
@@ -3507,6 +3521,10 @@ nan@^2.9.2:
   version "2.12.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.12.1.tgz#7b1aa193e9aa86057e3c7bbd0ac448e770925552"
 
+nanoid@^2.1.0:
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-2.1.8.tgz#2dbb0224231b246e3b4c819de7bfea6384dabf08"
+
 nanomatch@^1.2.9:
   version "1.2.13"
   resolved "https://registry.yarnpkg.com/nanomatch/-/nanomatch-1.2.13.tgz#b87a8aa4fc0de8fe6be88895b38983ff265bd119"
@@ -3698,6 +3716,10 @@ npmlog@^4.0.1, npmlog@^4.0.2:
 number-is-nan@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/number-is-nan/-/number-is-nan-1.0.1.tgz#097b602b53422a522c1afb8790318336941a011d"
+
+oauth-sign@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/oauth-sign/-/oauth-sign-0.8.2.tgz#46a6ab7f0aead8deae9ec0565780b7d4efeb9d43"
 
 oauth-sign@~0.9.0:
   version "0.9.0"
@@ -4261,6 +4283,10 @@ qs@^6.6.0, qs@^6.7.0:
   version "6.7.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
 
+qs@^6.9.1:
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.9.1.tgz#20082c65cb78223635ab1a9eaca8875a29bf8ec9"
+
 qs@~6.5.2:
   version "6.5.2"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
@@ -4445,11 +4471,23 @@ repeat-string@^1.5.2, repeat-string@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/repeat-string/-/repeat-string-1.6.1.tgz#8dcae470e1c88abc2d600fff4a776286da75e637"
 
+request-compose@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/request-compose/-/request-compose-1.2.1.tgz#acb500bb8a3d3ad278ad2caf8f9fdf4494d2bf5d"
+
 request-function@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/request-function/-/request-function-2.0.0.tgz#27aace27f871e3c2fd48a19dad75ca384c4b8654"
   dependencies:
     error "^7.0.2"
+
+request-oauth@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/request-oauth/-/request-oauth-0.0.3.tgz#b3ea1ff857b9add3b0d49e42993a88e256d791ab"
+  dependencies:
+    oauth-sign "^0.8.2"
+    qs "^6.5.1"
+    uuid "^3.2.1"
 
 request@^2.51.0, request@^2.88.0:
   version "2.88.0"
@@ -4729,6 +4767,12 @@ shebang-regex@^1.0.0:
 shimmer@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/shimmer/-/shimmer-1.1.0.tgz#97d7377137ffbbab425522e429fe0aa89a488b35"
+
+shortid@^2.2.15:
+  version "2.2.15"
+  resolved "https://registry.yarnpkg.com/shortid/-/shortid-2.2.15.tgz#2b902eaa93a69b11120373cd42a1f1fe4437c122"
+  dependencies:
+    nanoid "^2.1.0"
 
 shot@4.x.x:
   version "4.0.4"

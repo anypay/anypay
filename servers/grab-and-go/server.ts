@@ -93,6 +93,7 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+
   server.route({
 
     method: "GET",
@@ -102,6 +103,34 @@ async function Server(): Promise<Hapi.Server> {
     config: {
 
       handler: handlers.SquareOauthCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/{item_uid}",
+
+    config: {
+
+      handler: handlers.PaymentRequests.createByItemUid
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/gg/{item_uid}",
+
+    config: {
+
+      handler: handlers.PaymentRequests.createByItemUid
 
     }
 
