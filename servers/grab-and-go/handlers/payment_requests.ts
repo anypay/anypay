@@ -46,6 +46,7 @@ export async function create(req: Hapi.Request, h) {
       item_id: item.id
 
     });
+<<<<<<< HEAD
 
     let paymentRequest = await generatePaymentRequest(invoice, account);
 
