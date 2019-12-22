@@ -93,7 +93,6 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
-
   server.route({
 
     method: "GET",
