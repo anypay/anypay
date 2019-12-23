@@ -116,7 +116,7 @@ async function Server(): Promise<Hapi.Server> {
 
     config: {
 
-      handler: handlers.SquareOauth.create
+      handler: handlers.SquareOauth.authorize
 
     }
 
