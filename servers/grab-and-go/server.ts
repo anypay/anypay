@@ -98,11 +98,25 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/oauth/square/callbacks",
+    path: "/grab-and-go/auth/square/callbacks",
 
     config: {
 
       handler: handlers.SquareOauthCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/grab-and-go/auth/square",
+
+    config: {
+
+      handler: handlers.SquareOauth.create
 
     }
 
@@ -135,6 +149,7 @@ async function Server(): Promise<Hapi.Server> {
     }
 
   });
+
 
   return server;
 

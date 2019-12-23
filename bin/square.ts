@@ -79,5 +79,40 @@ program
 
   });
 
+program
+  .command('obtaintoken <code>')
+  .action(async (code) => {
+
+    try {
+
+      var SquareConnect = require('square-connect');
+
+      var apiInstance = new SquareConnect.OAuthApi();
+
+      var body = {
+        code,
+        grant_type: 'authorization_code',
+        client_id: process.env.SQUARE_OAUTH_APPLICATION_ID,
+        client_secret: process.env.SQUARE_OAUTH_APPLICATION_SECRET
+        //redirect_uri: 'http://127.0.0.1:5200/auth/square/callbacks'
+      };
+
+      var req = new SquareConnect.ObtainTokenRequest(body);
+
+      console.log(body);
+
+      let data = await apiInstance.obtainToken(body);
+
+      console.log(data);
+
+    } catch(error) {
+
+      console.error(error);
+    }
+
+    process.exit(0);
+
+  });
+
 program.parse(process.argv);
 
