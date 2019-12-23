@@ -12,7 +12,7 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay.invoices',
+    exchange: 'anypay:invoices',
 
     routingkey: 'invoice:paid',
 
