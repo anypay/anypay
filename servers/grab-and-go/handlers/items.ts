@@ -29,7 +29,6 @@ export async function create(req: Hapi.Request, h) {
 
     return { grab_and_go_item }
 
-
   } catch(error) {
 
     return Boom.badRequest(error.message);
@@ -53,7 +52,6 @@ export async function index(req: Hapi.Request, h) {
     });
 
     return { grab_and_go_items }
-
 
   } catch(error) {
 

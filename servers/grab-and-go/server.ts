@@ -83,11 +83,54 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/grab-and-go/{account_stub}/{item_stub}/purchases/new",
+    path: "/grab-and-go/{account_stub}/{item_stub}",
 
     config: {
 
       handler: handlers.PaymentRequests.create
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: "GET",
+
+    path: "/oauth/square/callbacks",
+
+    config: {
+
+      handler: handlers.SquareOauthCallbacks.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/{item_uid}",
+
+    config: {
+
+      handler: handlers.PaymentRequests.createByItemUid
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/gg/{item_uid}",
+
+    config: {
+
+      handler: handlers.PaymentRequests.createByItemUid
 
     }
 
