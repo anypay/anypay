@@ -96,13 +96,15 @@ async function Server(): Promise<Hapi.Server> {
 
   server.route({
 
-    method: "GET",
+    method: "POST",
 
-    path: "/grab-and-go/auth/square/callbacks",
+    path: "/grab-and-go/square/oauth/codes",
 
     config: {
 
-      handler: handlers.SquareOauthCallbacks.create
+      auth: "accountToken",
+
+      handler: handlers.SquareOauthCodes.create
 
     }
 
