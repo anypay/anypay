@@ -9,7 +9,9 @@ export async function create(req, h) {
 
     let square_oauth_credentials = await models.SquareOauthCredentials.create({
 
-      code: req.payload.code
+      code: req.payload.code,
+
+      account_id: req.account.id
 
     });
 
