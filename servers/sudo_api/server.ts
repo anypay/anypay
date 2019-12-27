@@ -151,6 +151,22 @@ async function Server() {
 
   server.route({
 
+    method: "POST",
+
+    path: "/api/ach_batches",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.SudoAchBatches.create
+
+    }
+
+  });
+
+  server.route({
+
     method: "GET",
 
     path: "/api/vending_machines",
@@ -1256,6 +1272,8 @@ if (require.main === module) {
 }
 
 export {
+
+  Server,
 
   start
 

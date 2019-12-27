@@ -23,3 +23,20 @@ export async function index(req, h) {
 
 }
 
+export async function create(req, h) {
+
+  try {
+
+    let ach_batch = await  models.AchBatch.create(req.payload);
+
+    return { ach_batch };
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message);
+
+  }
+
+}
+
+
