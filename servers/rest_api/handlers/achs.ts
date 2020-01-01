@@ -7,7 +7,7 @@ import { models } from '../../../lib';
 
 import { Op } from 'sequelize';
 
-export async function index(req: Request, h: ResponseToolkit) {
+export async function index(req, h: ResponseToolkit) {
 
   try {
 

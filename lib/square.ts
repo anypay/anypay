@@ -70,6 +70,39 @@ export class SquareOauthClient {
 
   }
 
+  async getLocation(id) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/locations/${id}`)
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
+  async listOrders(locationId: string) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/locations/${locationId}/orders`)
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
+  async getOrder(id) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/orders/${id}`)
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
   async listCatalog() {
 
     let resp = await http
@@ -92,6 +125,5 @@ export class SquareOauthClient {
 
   }
 
-
-
 }
+

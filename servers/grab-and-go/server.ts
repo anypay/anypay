@@ -103,6 +103,34 @@ async function Server(): Promise<Hapi.Server> {
     config: {
 
       handler: handlers.SquareOauthCallbacks.create
+    }
+  })
+
+  server.route({
+
+    method: "POST",
+
+    path: "/grab-and-go/square/oauth/codes",
+
+    config: {
+
+      auth: "accountToken",
+
+      handler: handlers.SquareOauthCodes.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/grab-and-go/auth/square",
+
+    config: {
+
+      handler: handlers.SquareOauth.authorize
 
     }
 
@@ -136,6 +164,10 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> square-oauth
   return server;
 
 }

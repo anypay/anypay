@@ -137,22 +137,29 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
 export async function buildReportCsv(invoices: any[], filepath: string): Promise<string> {
 
-
   const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
   const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'completed', title: 'Payment Completed At'},
+      {id: 'created_at', title: 'Created at'},
+      {id: 'denomination_amount', title: 'Amount Invoiced'},
       {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
       {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
       {id: 'settlement_amount', title: 'Account Gets (USD)'},
       {id: 'external_id', title: 'Reference'},
-      {id: 'uid', title: 'Invoice ID'},
+      {id: 'uid', title: 'Invoice ID'}
     ]
   });
 
   let header = await csvStringifier.getHeaderString();
-  let records = await csvStringifier.stringifyRecords(invoices);
+
+  let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any) => {
+
+    invoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+
+    return invoice;
+    
+  }));
 
   return `${header}\t${records}`;
 
@@ -164,6 +171,22 @@ export async function buildReportCsvFromDates(accountId, start, end) {
 
   let filepath = join(__dirname,
   `../../.tmp/account-${accountId}-${start}-${end}.csv`);
+
+  return buildReportCsv(invoices, filepath);
+
+}
+
+export async function buildAllTimeReport(accountId) {
+
+  let invoices = await models.Invoice.findAll({ where: {account_id: accountId }});
+
+  invoices = invoices.map(invoice => {
+    var i = invoice.toJSON();
+    i.created_at = moment(i.createdAt).format("MM/DD/YYYY");
+    return i;
+  });
+
+  let filepath = join(__dirname, `../../.tmp/account-${accountId}-complete-history.csv`);
 
   return buildReportCsv(invoices, filepath);
 

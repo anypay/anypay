@@ -6,9 +6,9 @@ import * as uuid from 'uuid';
 
 import * as http from 'superagent';
 
-import { models } from '../lib';
-
 import * as square from '../lib/square';
+
+import { models } from '../lib';
 
 import * as program from 'commander';
 
@@ -35,11 +35,7 @@ program
     } catch(error) {
 
       console.log(error.response.body);
-
     }
-
-    process.exit(0);
-
   });
 
 program
@@ -57,11 +53,9 @@ program
     } catch(error) {
 
       console.log(error.message);
-
     }
 
     process.exit(0);
-
   });
 
 program
@@ -86,12 +80,35 @@ program
     } catch(error) {
 
       console.log('error', error);
+    }
 
+  });
+
+/*
+program
+  .command('createorder')
+  .action(async () => {
+
+    try {
+
+      let locationId = "VDT4P5TBDZGE8";
+      let catalogObjectId = "UVPRW4IZP2623CB4Z5ZLTACF";
+
+      let uid = uuid.v4();
+
+      let resp = await square.grabAndGoCreateOrder(uid, catalogObjectId, locationId);
+
+      console.log(JSON.stringify(resp));
+
+    } catch(error) {
+
+      console.error(error);
     }
 
     process.exit(0);
 
   });
+*/
 
 program
   .command('getcatalogobject <object_id>')
@@ -114,9 +131,6 @@ program
     process.exit(0);
 
   });
-
-
-
 
 program
   .command('createorder')
