@@ -77,7 +77,7 @@ program
       catalog.objects.forEach(catalogObject => {
 
         if (catalogObject.type === 'ITEM') {
-          console.log(catalogObject);
+          console.log(catalogObject.item_data.name);
         }
 
       });

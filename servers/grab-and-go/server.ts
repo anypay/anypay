@@ -152,7 +152,6 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
-
   return server;
 
 }
