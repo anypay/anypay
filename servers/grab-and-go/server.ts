@@ -164,10 +164,6 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> square-oauth
   return server;
 
 }
