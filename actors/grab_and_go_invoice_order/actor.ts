@@ -37,9 +37,7 @@ export async function start() {
 
     if (grabAndGoInvoice) {
 
-      let catalogObjectId = "UVPRW4IZP2623CB4Z5ZLTACF";
-
-      let squareOrder = await grabAndGoCreateOrder(invoiceUid, catalogObjectId);
+      let squareOrder = await grabAndGoCreateOrder(invoiceUid);
 
       log.info('square.order.created', squareOrder);
 

@@ -4,29 +4,59 @@ require('dotenv').config();
 
 import * as uuid from 'uuid';
 
+import * as http from 'superagent';
+
 import { models } from '../lib';
 
-import { grabAndGoCreateOrder } from '../lib/square';
+import * as square from '../lib/square';
 
 import * as program from 'commander';
 
 var SquareConnect = require('square-connect');
 
 program
-  .command('listlocations')
-  .action(async () => {
+  .command('gettoken <code>')
+  .action(async (code) => {
 
     try {
-      // Pass client to API
-      var api = new SquareConnect.LocationsApi();
 
-      let data:any = await api.listLocations();
+      let resp = await http
+        .post('https://connect.squareup.com/oauth2/token')
+        .set('Square-Version', '2019-12-17')
+        .send({
+          client_id: process.env.SQUARE_OAUTH_APPLICATION_ID,
+          client_secret: process.env.SQUARE_OAUTH_APPLICATION_SECRET,
+          grant_type: 'authorization_code',
+          code
+        })
 
-      console.log(JSON.stringify(data));
+      console.log(resp.body);
 
     } catch(error) {
 
-      console.error(error.message);
+      console.log(error.response.body);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('listlocations')
+  .action(async () => {
+
+    let squareClient = new square.SquareOauthClient(process.env.SQUARE_OAUTH_ACCESS_TOKEN);
+
+    try {
+
+      let locations = await squareClient.listLocations();
+
+      console.log(locations);
+
+    } catch(error) {
+
+      console.log(error.message);
 
     }
 
@@ -38,21 +68,55 @@ program
   .command('listcatalog')
   .action(async () => {
 
+    let squareClient = new square.SquareOauthClient(process.env.SQUARE_OAUTH_ACCESS_TOKEN);
+
     try {
-      // Pass client to API
-      var api = new SquareConnect.CatalogApi();
 
-      let data:any = await api.listCatalog();
+      let catalog = await squareClient.listCatalog();
 
-      console.log(JSON.stringify(data));
+      catalog.objects.forEach(catalogObject => {
+
+        if (catalogObject.type === 'ITEM') {
+          console.log(catalogObject);
+        }
+
+      });
+
 
     } catch(error) {
-      console.error(error.message);
+
+      console.log('error', error);
+
     }
 
     process.exit(0);
 
   });
+
+program
+  .command('getcatalogobject <object_id>')
+  .action(async (objectId) => {
+
+    let squareClient = new square.SquareOauthClient(process.env.SQUARE_OAUTH_ACCESS_TOKEN);
+
+    try {
+
+      let catalogObject = await squareClient.getCatalogObject(objectId);
+
+      console.log('catalog object', catalogObject);
+
+    } catch(error) {
+
+      console.log('error', error);
+
+    }
+
+    process.exit(0);
+
+  });
+
+
+
 
 program
   .command('createorder')
@@ -66,7 +130,7 @@ program
 
       let uid = uuid.v4();
 
-      let resp = await grabAndGoCreateOrder(uid, catalogObjectId, locationId);
+      let resp = await square.grabAndGoCreateOrder(uid, locationId);
 
       console.log(JSON.stringify(resp));
 

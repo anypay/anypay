@@ -39,6 +39,13 @@ export async function create(req: Hapi.Request, h) {
 
     let invoice = await invoices.generateInvoice(account.id, item.price, 'BCH');
 
+    if (item.square_catalog_object_id) {
+
+      invoice.external_id = item.square_catalog_object_id;
+
+      await invoice.save();
+    }
+
     await models.GrabAndGoInvoice.create({
 
       invoice_uid: invoice.uid,
