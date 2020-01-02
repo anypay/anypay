@@ -1,9 +1,8 @@
-import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 
 import { models } from '../../../lib';
 
-export async function create(req: Hapi.Request, h) {
+export async function create(req, h) {
 
   try {
 
@@ -37,7 +36,7 @@ export async function create(req: Hapi.Request, h) {
 
 }
 
-export async function index(req: Hapi.Request, h) {
+export async function index(req, h) {
 
   try {
 

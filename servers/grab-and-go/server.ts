@@ -37,13 +37,13 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/items",
 
-    config: {
+    options: {
 
-      auth: "accountToken",
+      auth: "accountToken"
 
-      handler: handlers.Items.index
+    },
 
-    }
+    handler: handlers.Items.index
 
   });
 
@@ -53,11 +53,11 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/items",
 
-    config: {
+    handler: handlers.Items.create,
 
-      auth: "accountToken",
+    options: {
 
-      handler: handlers.Items.create
+      auth: "accountToken"
 
     }
 
@@ -69,13 +69,13 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/payments",
 
-    config: {
+    options: {
 
-      auth: "accountToken",
+      auth: "accountToken"
 
-      handler: handlers.Payments.index
+    },
 
-    }
+    handler: handlers.Payments.index
 
   });
 
@@ -85,11 +85,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/{account_stub}/{item_stub}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.create
-
-    }
+    handler: handlers.PaymentRequests.create
 
   });
 
@@ -100,11 +96,11 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/square/oauth/codes",
 
-    config: {
+    handler: handlers.SquareOauthCodes.create,
 
-      auth: "accountToken",
+    options: {
 
-      handler: handlers.SquareOauthCodes.create
+      auth: "accountToken"
 
     }
 
@@ -116,11 +112,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/auth/square",
 
-    config: {
-
-      handler: handlers.SquareOauth.authorize
-
-    }
+    handler: handlers.SquareOauth.authorize,
 
   });
 
@@ -130,11 +122,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/{item_uid}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.createByItemUid
-
-    }
+    handler: handlers.PaymentRequests.createByItemUid
 
   });
 
@@ -144,11 +132,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/gg/{item_uid}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.createByItemUid
-
-    }
+    handler: handlers.PaymentRequests.createByItemUid
 
   });
 
