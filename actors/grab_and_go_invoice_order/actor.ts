@@ -43,6 +43,10 @@ export async function start() {
 
       log.info('square.order.created', squareOrder);
 
+      grabAndGoInvoice.square_order_id = squareOrder.order.id;
+
+      await grabAndGoInvoice.save();
+
       await channel.publish('anypay.events', 'square.order.created', Buffer.from(JSON.stringify(squareOrder)));
       } catch(error) {
 

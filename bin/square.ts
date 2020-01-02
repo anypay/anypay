@@ -166,5 +166,41 @@ program
 
   });
 
+
+program
+  .command('importgrabandgo <accountId>')
+  .action(async (accountId) => {
+
+    try {
+
+      let squareClient = new square.SquareOauthClient(token);
+
+      let catalog = squareClient.listCatalog();
+
+      let importer = squareClient.importCatalogToGrabAndGo(accountId);
+
+      importer.on('created', (item) => console.log('item.created', item));
+
+      importer.on('updated', (item) => console.log('item.updated', item));
+
+      importer.on('complete', () => process.exit(0));
+
+      // begin grab and go import
+
+      // get grab and go items
+
+      // import grab and go items
+
+      // end import and report success or failure
+
+    } catch(error) {
+
+      console.error(error);
+    }
+
+    process.exit(0);
+
+  });
+
 program.parse(process.argv);
 
