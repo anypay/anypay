@@ -53,8 +53,6 @@ export async function grabAndGoCreateOrder(invoiceUid, locationId="6T8BPZNHR3E0B
 
   let squareClient = await getClient(invoice.account_id);
 
-  console.log('client', squareClient);
-
   let data:any = await squareClient.createOrder(locationId, body);
 
   return data;
@@ -75,6 +73,39 @@ export class SquareOauthClient {
 
     let resp = await http
       .get('https://connect.squareup.com/v2/locations')
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
+  async getLocation(id) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/locations/${id}`)
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
+  async listOrders(locationId: string) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/locations/${locationId}/orders`)
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${this.accessToken}`)
+
+    return resp.body;
+
+  }
+
+  async getOrder(id) {
+
+    let resp = await http
+      .get(`https://connect.squareup.com/v2/orders/${id}`)
       .set('Content-type', 'application/json')
       .set('Authorization', `Bearer ${this.accessToken}`)
 

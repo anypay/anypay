@@ -28,6 +28,7 @@ import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
 import * as auth from './auth';
+import * as square from './square';
 import * as mysql_lib from './mysql';
 
 var oracles = ConfigureOracles(configureOracles);
@@ -67,6 +68,7 @@ export {
   password,
   login,
   auth,
+  square,
   mysql_lib
 }
 

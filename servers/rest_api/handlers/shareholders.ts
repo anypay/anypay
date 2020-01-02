@@ -20,7 +20,7 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    return Boom.badRequest({ error: error.message });
+    return Boom.badRequest(error.message);
 
   }
 
