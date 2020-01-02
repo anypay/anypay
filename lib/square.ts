@@ -3,6 +3,8 @@ var SquareConnect = require('square-connect');
 import * as uuid from 'uuid';
 import * as http from 'superagent';
 
+import { EventEmitter } from 'events';
+
 import { models } from './models';
 
 import { Op } from 'sequelize';
@@ -146,6 +148,14 @@ export class SquareOauthClient {
     console.log('resp', resp);
 
     return resp.body;
+
+  }
+
+  async importCatalogToGrabAndGo(accountId: number) {
+
+    let catalog = await this.listCatalog();
+
+    return catalog;
 
   }
 
