@@ -120,7 +120,9 @@ program
 
       let catalogObject = await squareClient.getCatalogObject(objectId);
 
-      console.log('catalog object', catalogObject);
+      console.log(catalogObject.object);
+      console.log(catalogObject.object.item_data);
+      catalogObject.object.item_data.variations.forEach(console.log);
 
     } catch(error) {
 
