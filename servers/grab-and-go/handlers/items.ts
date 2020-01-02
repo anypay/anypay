@@ -40,7 +40,7 @@ export async function index(req, h) {
 
   try {
 
-    let grab_and_go_items = models.GrabAndGoItem.findAll({
+    let grab_and_go_items = await models.GrabAndGoItem.findAll({
 
       where: {
 

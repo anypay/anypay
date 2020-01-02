@@ -161,6 +161,24 @@ export class SquareOauthClient {
 
 }
 
+export async function getToken(code: string) {
+
+  let resp = await http
+    .post('https://connect.squareup.com/oauth2/token')
+    .set('Square-Version', '2019-12-17')
+    .send({
+      client_id: process.env.SQUARE_OAUTH_APPLICATION_ID,
+      client_secret: process.env.SQUARE_OAUTH_APPLICATION_SECRET,
+      grant_type: 'authorization_code',
+      code
+    })
+
+  return resp;
+
+}
+
+
+
 export async function getClient(accountId) {
 
   let squareCreds = await models.SquareOauthCredentials.findOne({ where: {
