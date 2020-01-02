@@ -37,13 +37,18 @@ export async function start() {
 
     if (grabAndGoInvoice) {
 
-      let catalogObjectId = "UVPRW4IZP2623CB4Z5ZLTACF";
+      try {
 
-      let squareOrder = await grabAndGoCreateOrder(invoiceUid, catalogObjectId);
+      let squareOrder = await grabAndGoCreateOrder(invoiceUid);
 
       log.info('square.order.created', squareOrder);
 
       await channel.publish('anypay.events', 'square.order.created', Buffer.from(JSON.stringify(squareOrder)));
+      } catch(error) {
+
+        console.log(error);
+
+      }
 
     }
 

@@ -37,13 +37,13 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/items",
 
-    config: {
+    options: {
 
-      auth: "accountToken",
+      auth: "accountToken"
 
-      handler: handlers.Items.index
+    },
 
-    }
+    handler: handlers.Items.index
 
   });
 
@@ -53,11 +53,11 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/items",
 
-    config: {
+    handler: handlers.Items.create,
 
-      auth: "accountToken",
+    options: {
 
-      handler: handlers.Items.create
+      auth: "accountToken"
 
     }
 
@@ -69,13 +69,13 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/payments",
 
-    config: {
+    options: {
 
-      auth: "accountToken",
+      auth: "accountToken"
 
-      handler: handlers.Payments.index
+    },
 
-    }
+    handler: handlers.Payments.index
 
   });
 
@@ -85,26 +85,34 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/{account_stub}/{item_stub}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.create
-
-    }
+    handler: handlers.PaymentRequests.create
 
   });
 
 
   server.route({
 
-    method: "GET",
+    method: "POST",
 
-    path: "/oauth/square/callbacks",
+    path: "/grab-and-go/square/oauth/codes",
 
-    config: {
+    handler: handlers.SquareOauthCodes.create,
 
-      handler: handlers.SquareOauthCallbacks.create
+    options: {
+
+      auth: "accountToken"
 
     }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/grab-and-go/auth/square",
+
+    handler: handlers.SquareOauth.authorize,
 
   });
 
@@ -114,11 +122,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/{item_uid}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.createByItemUid
-
-    }
+    handler: handlers.PaymentRequests.createByItemUid
 
   });
 
@@ -128,11 +132,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/gg/{item_uid}",
 
-    config: {
-
-      handler: handlers.PaymentRequests.createByItemUid
-
-    }
+    handler: handlers.PaymentRequests.createByItemUid
 
   });
 

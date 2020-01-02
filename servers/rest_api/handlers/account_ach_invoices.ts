@@ -3,7 +3,7 @@ import { badRequest } from 'boom';
 import { models } from '../../../lib';
 import * as Sequelize from 'sequelize';
 
-export async function show(req: Request, h: ResponseToolkit) {
+export async function show(req, h: ResponseToolkit) {
 
   try {
 

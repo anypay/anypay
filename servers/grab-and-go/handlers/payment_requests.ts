@@ -22,7 +22,7 @@ export async function create(req: Hapi.Request, h) {
     console.log('account', account.toJSON());
 
     // look up the item from the url parameters
-    let item = await models.GrabAndGoItem.findOne({
+    var item = await models.GrabAndGoItem.findOne({
 
       where: {
         stub: req.params.item_stub,
@@ -31,13 +31,30 @@ export async function create(req: Hapi.Request, h) {
 
     });
 
-    console.log('item', item.toJSON());
+    console.log('ITEM', item.toJSON());
 
     if (!item) {
       throw new Error(`item ${req.params.item_stub} for account not found`);
     }
 
+
     let invoice = await invoices.generateInvoice(account.id, item.price, 'BCH');
+
+    console.log('INVOICE', invoice.toJSON());
+
+    if (item.square_catalog_object_id) {
+
+      console.log('SQUARE OBJECT ID', item.square_catalog_object_id);
+
+      invoice.external_id = item.square_catalog_object_id;
+
+      await invoice.save();
+
+    } else {
+
+      console.log('item no object id', item.toJSON());
+    
+    }
 
     await models.GrabAndGoInvoice.create({
 
@@ -94,6 +111,20 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
     let invoice = await invoices.generateInvoice(item.account_id, item.price, 'BCH');
 
+    if (item.square_catalog_object_id) {
+
+      console.log('SQUARE OBJECT ID', item.square_catalog_object_id);
+
+      invoice.external_id = item.square_catalog_object_id;
+
+      await invoice.save();
+
+    } else {
+
+      console.log('item no object id', item.toJSON());
+    
+    }
+
     await models.GrabAndGoInvoice.create({
 
       invoice_uid: invoice.uid,
@@ -122,7 +153,6 @@ export async function createByItemUid(req: Hapi.Request, h) {
     return Boom.badRequest(error.message);
 
   }
-
 
 }
 
