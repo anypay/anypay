@@ -96,7 +96,8 @@ export async function sendFrom(arr: any[]):Promise<string>{
 
   log.info("SendFrom - No BCH Address found", arr[3])
 
-  let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/4).toFixed(8)]
+  //No Ambassador 20% -> Anypay_X
+  let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/4).toFixed(4)]
 
   return await sendtomany([output1,output2])
 
