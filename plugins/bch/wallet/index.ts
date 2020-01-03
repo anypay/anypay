@@ -67,11 +67,11 @@ export async function sendFrom(arr: any[]):Promise<string>{
   //Customer -> 80%
   let output1 = [arr[1], arr[2]]
 
-  let account = await models.Account.findOne({where:{ email: arr[3] }});
+  let account = await models.Account.findOne({where:{ email: arr[0] }});
   
   if( account ){
 
-    let hostAddress = await models.Addresses.findOne({where:
+    let hostAddress = await models.Address.findOne({where:
       {
         currency: "BCH",
         account_id: account.id
