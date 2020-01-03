@@ -67,35 +67,38 @@ export async function sendFrom(arr: any[]):Promise<string>{
   //Customer -> 80%
   let output1 = [arr[1], arr[2]]
 
-  let account = arr[0]
+  let account = await models.Account.findOne({where:{ email: arr[3] }});
+  
+  if( account ){
 
-  let hostAddress = await models.Addresses.findOne({where:
-          {
-            currency: "BCH",
-            account_id: account
-          }});
+    let hostAddress = await models.Addresses.findOne({where:
+      {
+        currency: "BCH",
+        account_id: account.id
+      }});
 
-  //Terminal is hosted by Anypay account 
-  if( hostAddress ){
+    //Terminal is hosted by Anypay account 
+    if( hostAddress ){
 
-    log.info("SendFrom - BCH Address found", hostAddress.toJSON())
+      log.info("SendFrom - BCH Address found", hostAddress.toJSON())
 
-    //Terminal host -> 10%
-    let output3 = [hostAddress.value, (arr[2]/8).toFixed(8)]
+      //Terminal host -> 10%
+      let output3 = [hostAddress.value, (arr[2]/8).toFixed(8)]
 
-    //Anypay -> 10%
-    let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/8).toFixed(8)]
+      //Anypay -> 10%
+      let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/8).toFixed(8)]
 
-    return await sendtomany([output1,output2,output3])
+      return await sendtomany([output1,output2,output3])
 
-  }else{
-
-    let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/4).toFixed(8)]
-
-    return await sendtomany([output1,output2])
+    }
 
   }
 
+  log.info("SendFrom - No BCH Address found", arr[3])
+
+  let output2 = [process.env.ANYPAY_X_PROFIT_ADDRESS, (arr[2]/4).toFixed(8)]
+
+  return await sendtomany([output1,output2])
 
 }
 
