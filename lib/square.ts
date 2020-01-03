@@ -173,7 +173,7 @@ export async function getToken(code: string) {
       code
     })
 
-  return resp;
+  return resp.body;
 
 }
 

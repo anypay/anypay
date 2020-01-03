@@ -20,17 +20,9 @@ program
 
     try {
 
-      let resp = await http
-        .post('https://connect.squareup.com/oauth2/token')
-        .set('Square-Version', '2019-12-17')
-        .send({
-          client_id: process.env.SQUARE_OAUTH_APPLICATION_ID,
-          client_secret: process.env.SQUARE_OAUTH_APPLICATION_SECRET,
-          grant_type: 'authorization_code',
-          code
-        })
+      let resp = await square.getToken(code);
 
-      console.log(resp.body);
+      console.log(resp);
 
     } catch(error) {
 
