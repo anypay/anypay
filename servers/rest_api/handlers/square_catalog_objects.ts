@@ -1,6 +1,8 @@
 
 import * as Boom from 'boom';
 
+import * as shortid from 'shortid';
+
 import { models, square } from '../../../lib';
 
 async function getClient(accountId) {
@@ -25,9 +27,21 @@ export async function index (req, h) {
 
     let catalog = await squareClient.listCatalog();
 
-    return catalog;
+    createGrabAndGoItemsForCatalog(catalog, req.account.id);
+
+    let grab_and_go_items = await models.GrabAndGoItem.findAll({ where: {
+
+      account_id: req.account.id
+
+    }});
+
+    console.log('grab and go items created');
+
+    return { grab_and_go_items, catalog };
 
   } catch(error) {
+
+    console.log(error);
 
     return Boom.badRequest(error.message);
 
@@ -51,6 +65,78 @@ export async function show (req, h) {
     return Boom.badRequest(error.message);
 
   }
+
+}
+
+async function createGrabAndGoItemsForCatalog(catalog, account_id) {
+
+  let catalogObjects = catalog.objects.filter(obj => {
+
+    return obj.type === 'ITEM';
+      
+  })
+
+  var items = [];
+
+  for (let i=0; i < catalogObjects.length; i++) {
+
+    let catalogObject = catalogObjects[i];
+
+    var price;
+
+    console.log(catalogObject);
+    catalogObject.item_data.variations.forEach(console.log);;
+
+    try {
+
+      price = catalogObject.item_data.variations[0].item_variation_data.price_money.amount / 100.00;
+
+    } catch(error) {
+
+      price = 0.00;
+
+    }
+
+    let [record, isNew] = await models.GrabAndGoItem.findOrCreate({
+
+      where: {
+
+        square_catalog_object_id: catalogObject.id,
+
+        account_id
+      },
+
+      defaults: {
+
+        square_catalog_object_id: catalogObject.id,
+
+        name: catalogObject.item_data.name,
+
+        square_variation_id: catalogObject.item_data.variations[0].id,
+
+        price,
+
+        uid: shortid.generate(),
+
+        account_id
+
+      }
+    })
+
+    if (isNew) {
+
+      console.log('new record created');
+
+    } else {
+      
+      console.log('old record found', record.toJSON());
+    }
+
+    items.push(record);
+  
+  };
+
+  return items;
 
 }
 

@@ -108,6 +108,26 @@ program
   });
 
 program
+  .command('getorder <account_id> <order_id>')
+  .action(async (orderId) => {
+
+    try {
+
+      /*let resp = await square.getOrder(orderId);
+
+      console.log(JSON.stringify(resp));
+      */
+
+    } catch(error) {
+
+      console.error(error);
+    }
+
+    process.exit(0);
+
+  });
+
+program
   .command('getcatalogobject <object_id>')
   .action(async (objectId) => {
 
@@ -130,6 +150,7 @@ program
     process.exit(0);
 
   });
+  /*
 
 program
   .command('obtaintoken <code>')
@@ -201,6 +222,8 @@ program
     process.exit(0);
 
   });
+  */
 
 program.parse(process.argv);
+
 
