@@ -103,5 +103,15 @@ models.Account.hasOne(models.Ambassador, {
   as: 'ambassador'
 });
 
+models.VendingMachine.hasMany(models.VendingTransaction, {
+  foreignKey: 'vending_machine_id',
+  sourceKey: 'id',
+  as: 'transactions'
+});
+models.VendingTransaction.belongsTo(models.VendingMachine, {
+  as: 'kiosk',
+  foreignKey: 'vending_machine_id'
+});
+
 export { models };
 
