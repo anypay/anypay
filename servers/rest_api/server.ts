@@ -1418,6 +1418,16 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/kiosks",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Kiosks.index
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/square/locations",
     options: {
       auth: "token",
