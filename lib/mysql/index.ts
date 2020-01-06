@@ -6,10 +6,11 @@ export async function writeTransactionRecord(event){
 
   let vendingMachine = await models.VendingMachine.findOne({where:{terminal_id: newRow.terminal_id}})
 
-  let accountId; 
+  let accountId, vendingMachineId; 
 
   if( vendingMachine){
     accountId = vendingMachine.account_id;
+    vendingMachineId = vendingMachine.id;
   }
 
   if( newRow.type === 0){
@@ -18,6 +19,7 @@ export async function writeTransactionRecord(event){
 
   let record = {
     account_id: accountId,
+    vending_machine_id: vendingMachineId,
     terminal_id: newRow.terminal_id,
     server_time: new Date(event.timestamp),
     terminal_time: new Date(event.timestamp),
