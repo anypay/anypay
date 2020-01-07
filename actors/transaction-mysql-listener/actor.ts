@@ -17,13 +17,14 @@ const mysql = require('mysql');
 const dsn = {
   host:     process.env.MYSQL_HOST,
   user:     process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD
+  password: process.env.MYSQL_PASSWORD,
+  connectionLimit: 100
 };
 
 
 export async function start() {
 
-  const connection = mysql.createConnection(dsn);
+  const connection = mysql.createPool(dsn);
 
   const conn = await amqp.connect(process.env.AMQP_URL)
 
