@@ -58,7 +58,13 @@ async function Server() {
 
     path: '/',
 
-    handler: rpccall 
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: rpccall 
+
+    }
 
   })
 
