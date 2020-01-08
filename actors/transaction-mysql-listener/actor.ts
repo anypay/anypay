@@ -65,7 +65,16 @@ export async function start() {
 
       log.info('mysql event:', event)
 
-      await mysql_lib.writeTransactionRecord(event)
+      let tx =  await mysql_lib.writeTransactionRecord(event)
+
+      //send additional outputs
+      if( tx.type === 'BUY' && tx.status === '1' ){
+
+        let outputs = await wallet.getAdditionalOutputs( tx.id ) 
+
+        let txid = await wallet.sendAdditionalOutputs( outputs, tx.id)
+
+      }
 
     }
 
@@ -74,7 +83,7 @@ export async function start() {
   }); 
 
 }
-
+      
 if (require.main === module) {
 
   start();

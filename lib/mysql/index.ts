@@ -42,7 +42,8 @@ export async function writeTransactionRecord(event){
     fixed_transaction_fee: (newRow.fixedtransactionfee).toFixed(2),
     expected_profit_setting: (newRow.expectedprofitsetting).toFixed(2),
     expected_profit_value: (newRow.expectedprofitvalue).toFixed(2),
-    name_of_crypto_setting_used: newRow.nameofcryptosettingused      
+    name_of_crypto_setting_used: newRow.nameofcryptosettingused,
+    additional_output_strategy: vendingMachine.additional_output_strategy_id
   }
   let tx = await models.VendingTransaction.findOrCreate({
     where:{
