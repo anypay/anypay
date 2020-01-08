@@ -3,6 +3,10 @@ const uuid = require("uuid");
 import * as amqp from "amqplib";
 const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
 
+import { Actor } from 'rabbi';
+
+import { models } from '../../lib';
+
 import * as Hapi from 'hapi';
 
 require('dotenv').config();
@@ -97,7 +101,71 @@ class InvoiceSubscriptions {
 
 }
 
+class AccountSubscriptions {
+
+  subscriptions: any = {};
+
+  invoices: any = {};
+
+  handleAccountEvent(accountId, event, payload) {
+
+    console.log('handleAccountEvent', {
+      accountId, event, payload
+    });
+
+    if (this.invoices[accountId]) {
+
+      this.invoices[accountId].forEach(client => {
+        console.log(`messaging client for account ${accountId}`);
+
+        client.emit('event', { event, payload });
+
+      });
+
+    }
+  }
+
+  subscribeAccount(client, accountId) {
+
+    this.subscriptions[client.uid] = accountId;
+
+    if (!this.invoices[accountId]) {
+
+      this.invoices[accountId] = [];
+
+    }
+
+    this.invoices[accountId].push(client);
+  }
+
+  unsubscribeClient(client) {
+
+    let accountId = this.subscriptions[client.uid];
+
+    if (this.invoices[accountId]) {
+
+      this.invoices[accountId] = this.invoices[accountId].filter(c => {
+
+        return c.uid !== client.uid;
+
+      });
+
+    }
+
+    delete this.subscriptions[client.uid];
+
+  }
+
+  getSubscriptions() {
+
+    return this.subscriptions;
+
+  }
+
+}
+
 let wsSubscriptions = new InvoiceSubscriptions();  
+let accountSubscriptions = new AccountSubscriptions();  
 
 let hapiServer = new Hapi.Server({
   port: PORT,
@@ -117,9 +185,31 @@ io.on("connection", client => {
     }
   });
 
+  client.on("authenticate", async (data) => {
+    console.log('data', data);
+
+    let json = JSON.parse(data); 
+
+    let accessToken = await models.AccessToken.findOne({ where: {
+
+      uid: json.params[0]
+
+    }});
+
+    if (accessToken) {
+
+      accountSubscriptions.subscribeAccount(client, accessToken.account_id);
+
+      log.info("subscribed to account", client.uid, accessToken.account_id);
+    }
+
+  });
+
   client.on("disconnect", () => {
     let invoice = wsSubscriptions.subscriptions[client.uid];
+    let accountId = accountSubscriptions.subscriptions[client.uid];
     wsSubscriptions.unsubscribeClient(client);
+    accountSubscriptions.unsubscribeClient(client);
 
     log.info("websocket client disconnected", client.uid);
     log.info("client unsubscribed", client.uid, invoice);
@@ -165,11 +255,18 @@ if (!AMQP_URL) {
 
   await channel.assertQueue(QUEUE);
 
+  await channel.assertExchange('anypay.account_events', 'topic');
+  await channel.assertExchange('anypay:invoices', 'direct');
   await channel.assertQueue('dashback.notifications');
 
   await channel.bindQueue(QUEUE, 'anypay:invoices', 'invoice:paid');
 
   log.info(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
+
+  Actor.create({
+    exchange: 'anypay:invoices'
+  })
+  .start()
 
   channel.consume(QUEUE, message => {
 
@@ -196,6 +293,33 @@ if (!AMQP_URL) {
   }, {
 
     noAck: false
+
+  });
+
+  Actor.create({
+
+    exchange: 'anypay.account_events',
+
+    routingkey: 'accounts.*.#',
+
+    queue: 'grabandgo.accounts'
+
+  })
+  .start(async (channel, msg, json) => {
+    console.log(json);
+
+    let routingKeys = msg.fields.routingKey.split('.');
+
+    let id = routingKeys[1];
+    let event = routingKeys.slice(2, routingKeys.length).join('.');
+
+    let account = await models.Account.findOne({ where: { id }});
+
+    if (!account) { return channel.ack(msg) }
+
+    accountSubscriptions.handleAccountEvent(id, event, json);
+
+    await channel.ack(msg);
 
   });
 
