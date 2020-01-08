@@ -101,11 +101,14 @@ class InvoiceSubscriptions {
 
 }
 
-class AccountSubscriptions {
+abstract class AccountSubscriptions {
 
   subscriptions: any = {};
 
   invoices: any = {};
+
+  // override this in subclasses
+  abstract messageClient(client: any, event: string, payload: any);
 
   handleAccountEvent(accountId, event, payload) {
 
@@ -118,7 +121,8 @@ class AccountSubscriptions {
       this.invoices[accountId].forEach(client => {
         console.log(`messaging client for account ${accountId}`);
 
-        client.emit('event', { event, payload });
+        this.messageClient(client, event, payload);
+
 
       });
 
@@ -164,8 +168,28 @@ class AccountSubscriptions {
 
 }
 
+class AccountSubscriptionsWebsockets extends AccountSubscriptions {
+
+  messageClient(client: any, event: string, payload: any) {
+
+    client.send({ event, payload });
+
+  }
+
+}
+
+class AccountSubscriptionsSocketIO extends AccountSubscriptions {
+
+  messageClient(client: any, event: string, payload: any) {
+
+    client.emit('event', { event, payload });
+
+  }
+}
+
 let wsSubscriptions = new InvoiceSubscriptions();  
-let accountSubscriptions = new AccountSubscriptions();  
+let accountSubscriptionsSocketIO = new AccountSubscriptionsSocketIO();  
+let accountSubscriptionsWebsockets = new AccountSubscriptionsWebsockets();  
 
 let hapiServer = new Hapi.Server({
   port: PORT,
@@ -186,7 +210,6 @@ io.on("connection", client => {
   });
 
   client.on("authenticate", async (data) => {
-    console.log('data', data);
 
     let json = JSON.parse(data); 
 
@@ -198,18 +221,23 @@ io.on("connection", client => {
 
     if (accessToken) {
 
-      accountSubscriptions.subscribeAccount(client, accessToken.account_id);
+      accountSubscriptionsSocketIO.subscribeAccount(client, accessToken.account_id);
 
       log.info("subscribed to account", client.uid, accessToken.account_id);
+
+    } else {
+
+      log.error('authentication.failed', json);
+
     }
 
   });
 
   client.on("disconnect", () => {
     let invoice = wsSubscriptions.subscriptions[client.uid];
-    let accountId = accountSubscriptions.subscriptions[client.uid];
+    let accountId = accountSubscriptionsSocketIO.subscriptions[client.uid];
     wsSubscriptions.unsubscribeClient(client);
-    accountSubscriptions.unsubscribeClient(client);
+    accountSubscriptionsSocketIO.unsubscribeClient(client);
 
     log.info("websocket client disconnected", client.uid);
     log.info("client unsubscribed", client.uid, invoice);
@@ -317,7 +345,8 @@ if (!AMQP_URL) {
 
     if (!account) { return channel.ack(msg) }
 
-    accountSubscriptions.handleAccountEvent(id, event, json);
+    accountSubscriptionsSocketIO.handleAccountEvent(id, event, json);
+    accountSubscriptionsWebsockets.handleAccountEvent(id, event, json);
 
     await channel.ack(msg);
 
