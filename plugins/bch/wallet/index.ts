@@ -1,7 +1,7 @@
 require('dotenv').config();
 import * as bch from 'bitcore-lib-cash';
 var rp = require('request-promise');
-import {log, models} from '../../../lib';
+import {log, models, prices} from '../../../lib';
 
 interface Output{
   address: string;
@@ -105,4 +105,84 @@ export async function walletrpc(method: string, params: any){
 
   return res.result
 
+}
+
+export async function getAdditionalOutputs(vendingTransactionId:number){
+
+  let vending_tx = await models.VendingTransaction.findOne({
+    where: { id: vendingTransactionId }
+  })
+
+  let spreadPercentage = vending_tx.expected_profit_setting/100;
+
+  let spreadAmount = vending_tx.cash_amount * spreadPercentage;
+
+  let bchToSend = (await prices.convert({ currency: 'USD', value: spreadAmount}, 'BCH')).value 
+
+  let balance = await getbalance();
+
+  if( bchToSend > balance ) throw new Error(`Hot wallet has insufficent funds to send ${bchToSend}: wallet balance - ${balance}`);
+
+  let strategy = (await models.VendingOutputStrategy.findOne({ where: { id: vending_tx.additional_output_strategy_id }})).strategy
+
+  let outputs = []; 
+
+  await Promise.all(strategy.outputs.map(async (output:any) => {
+
+    let address = await models.Address.findOne({ where: {account_id: output.account_id}})
+
+    if( !address ) throw new Error(`BCH is not set for all accounts in strategy ${strategy.id}`)
+
+    outputs.push([address.value, (bchToSend*output.scaler).toFixed(5)])
+
+  }));
+
+  return outputs
+
+}
+
+export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: number):Promise<string>{
+
+  let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+
+  if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
+       
+  if( vending_tx.hash ) throw new Error(`Additional outputs already sent for vending transaction ${vending_tx.id}`);
+
+  let txid = await sendtomany(outputs);
+
+  if( txid ){
+  
+    await Promise.all( outputs.map( async (output:any)=>{
+
+      let address = await models.Address.findOne({where:{value:output[0]}})
+
+      if( !address ) throw new Error(`Cannot find account with address ${output[0]}`)
+
+      await models.VendingTransactionOutput.create({
+        vending_transaction_id: vending_tx.id,
+        strategy_id : vending_tx.additional_output_strategy_id,
+        isKioskCutomer: false,
+        account_id: address.account_id,
+        currency: 'BCH',
+        hash: txid,
+        amount: output[1]
+
+      })
+
+    }));
+
+    let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
+
+    let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
+
+    await vending_tx.update({
+        additional_output_usd_paid :  usdSum,
+        additional_output_bch_paid :  bchSum,
+        additional_output_hash : txid 
+    })
+
+  }
+
+  return txid
 }

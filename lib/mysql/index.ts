@@ -16,6 +16,10 @@ export async function writeTransactionRecord(event){
   if( newRow.type === 0){
     newRow.type = 'BUY';
   }
+  if( newRow.type === 1){
+    newRow.type = 'SELL';
+  }
+
 
   let record = {
     account_id: accountId,
