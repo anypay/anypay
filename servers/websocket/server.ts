@@ -172,7 +172,7 @@ class AccountSubscriptionsWebsockets extends AccountSubscriptions {
 
   messageClient(client: any, event: string, payload: any) {
 
-    client.send({ event, payload });
+    client.send(JSON.stringify({ event, payload }));
 
   }
 
@@ -243,11 +243,6 @@ io.on("connection", client => {
     log.info("client unsubscribed", client.uid, invoice);
   });
 });
-
-/*server.listen(PORT, () => {
-  log.info(`Serving Websockets on Port ${PORT}`);
-});
-*/
 
 
 hapiServer.route({
@@ -330,7 +325,7 @@ if (!AMQP_URL) {
 
     routingkey: 'accounts.*.#',
 
-    queue: 'grabandgo.accounts'
+    queue: 'account_events_to_websockets'
 
   })
   .start(async (channel, msg, json) => {
@@ -353,4 +348,77 @@ if (!AMQP_URL) {
   });
 
 })();
+
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({
+  host: '0.0.0.0',
+  port: process.env.WEBSOCKET_PORT || 5200
+});
+
+wss.on('connection', function connection(ws) {
+
+  console.log('ws.connected', ws);
+
+  ws.on('message', async function incoming(message) {
+
+    console.log('received: %s', message);
+
+    try {
+
+      let json = JSON.parse(message);
+
+      console.log(json);
+
+      switch(json.method) {
+
+        case 'authenticate': {
+          console.log('ws.raw.authenticate');
+
+          try {
+
+            let accessToken = await models.AccessToken.findOne({ where: {
+              uid: json.params[0]
+            }});
+
+            if (!accessToken) {
+
+              log.error('authentication.failed', json);
+            }
+
+            accountSubscriptionsWebsockets.subscribeAccount(ws, accessToken.account_id);
+
+          } catch(error) {
+
+            console.log(error);
+          }
+
+          break;
+
+        }
+
+        default: {
+
+          console.log(json);
+
+          break;
+        }
+
+      }
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+  });
+
+  ws.on('close', function close() {
+
+    console.log('disconnected');
+
+  });
+
+});
 
