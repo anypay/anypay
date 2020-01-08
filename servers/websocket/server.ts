@@ -3,6 +3,10 @@ const uuid = require("uuid");
 import * as amqp from "amqplib";
 const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
 
+import { Actor } from 'rabbi';
+
+import { models } from '../../lib';
+
 import * as Hapi from 'hapi';
 
 require('dotenv').config();
@@ -97,7 +101,95 @@ class InvoiceSubscriptions {
 
 }
 
+abstract class AccountSubscriptions {
+
+  subscriptions: any = {};
+
+  invoices: any = {};
+
+  // override this in subclasses
+  abstract messageClient(client: any, event: string, payload: any);
+
+  handleAccountEvent(accountId, event, payload) {
+
+    console.log('handleAccountEvent', {
+      accountId, event, payload
+    });
+
+    if (this.invoices[accountId]) {
+
+      this.invoices[accountId].forEach(client => {
+        console.log(`messaging client for account ${accountId}`);
+
+        this.messageClient(client, event, payload);
+
+
+      });
+
+    }
+  }
+
+  subscribeAccount(client, accountId) {
+
+    this.subscriptions[client.uid] = accountId;
+
+    if (!this.invoices[accountId]) {
+
+      this.invoices[accountId] = [];
+
+    }
+
+    this.invoices[accountId].push(client);
+  }
+
+  unsubscribeClient(client) {
+
+    let accountId = this.subscriptions[client.uid];
+
+    if (this.invoices[accountId]) {
+
+      this.invoices[accountId] = this.invoices[accountId].filter(c => {
+
+        return c.uid !== client.uid;
+
+      });
+
+    }
+
+    delete this.subscriptions[client.uid];
+
+  }
+
+  getSubscriptions() {
+
+    return this.subscriptions;
+
+  }
+
+}
+
+class AccountSubscriptionsWebsockets extends AccountSubscriptions {
+
+  messageClient(client: any, event: string, payload: any) {
+
+    client.send(JSON.stringify({ event, payload }));
+
+  }
+
+}
+
+class AccountSubscriptionsSocketIO extends AccountSubscriptions {
+
+  messageClient(client: any, event: string, payload: any) {
+
+    client.emit('event', { event, payload });
+
+  }
+}
+
 let wsSubscriptions = new InvoiceSubscriptions();  
+let accountSubscriptionsSocketIO = new AccountSubscriptionsSocketIO();  
+let accountSubscriptionsWebsockets = new AccountSubscriptionsWebsockets();  
 
 let hapiServer = new Hapi.Server({
   port: PORT,
@@ -117,19 +209,40 @@ io.on("connection", client => {
     }
   });
 
+  client.on("authenticate", async (data) => {
+
+    let json = JSON.parse(data); 
+
+    let accessToken = await models.AccessToken.findOne({ where: {
+
+      uid: json.params[0]
+
+    }});
+
+    if (accessToken) {
+
+      accountSubscriptionsSocketIO.subscribeAccount(client, accessToken.account_id);
+
+      log.info("subscribed to account", client.uid, accessToken.account_id);
+
+    } else {
+
+      log.error('authentication.failed', json);
+
+    }
+
+  });
+
   client.on("disconnect", () => {
     let invoice = wsSubscriptions.subscriptions[client.uid];
+    let accountId = accountSubscriptionsSocketIO.subscriptions[client.uid];
     wsSubscriptions.unsubscribeClient(client);
+    accountSubscriptionsSocketIO.unsubscribeClient(client);
 
     log.info("websocket client disconnected", client.uid);
     log.info("client unsubscribed", client.uid, invoice);
   });
 });
-
-/*server.listen(PORT, () => {
-  log.info(`Serving Websockets on Port ${PORT}`);
-});
-*/
 
 
 hapiServer.route({
@@ -165,11 +278,18 @@ if (!AMQP_URL) {
 
   await channel.assertQueue(QUEUE);
 
+  await channel.assertExchange('anypay.account_events', 'topic');
+  await channel.assertExchange('anypay:invoices', 'direct');
   await channel.assertQueue('dashback.notifications');
 
   await channel.bindQueue(QUEUE, 'anypay:invoices', 'invoice:paid');
 
   log.info(`bound queue ${QUEUE} to exchange anypay:invoices, invoice:paid`);
+
+  Actor.create({
+    exchange: 'anypay:invoices'
+  })
+  .start()
 
   channel.consume(QUEUE, message => {
 
@@ -199,5 +319,106 @@ if (!AMQP_URL) {
 
   });
 
+  Actor.create({
+
+    exchange: 'anypay.account_events',
+
+    routingkey: 'accounts.*.#',
+
+    queue: 'account_events_to_websockets'
+
+  })
+  .start(async (channel, msg, json) => {
+    console.log(json);
+
+    let routingKeys = msg.fields.routingKey.split('.');
+
+    let id = routingKeys[1];
+    let event = routingKeys.slice(2, routingKeys.length).join('.');
+
+    let account = await models.Account.findOne({ where: { id }});
+
+    if (!account) { return channel.ack(msg) }
+
+    accountSubscriptionsSocketIO.handleAccountEvent(id, event, json);
+    accountSubscriptionsWebsockets.handleAccountEvent(id, event, json);
+
+    await channel.ack(msg);
+
+  });
+
 })();
+
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({
+  host: '0.0.0.0',
+  port: process.env.WEBSOCKET_PORT || 5200
+});
+
+wss.on('connection', function connection(ws) {
+
+  console.log('ws.connected', ws);
+
+  ws.on('message', async function incoming(message) {
+
+    console.log('received: %s', message);
+
+    try {
+
+      let json = JSON.parse(message);
+
+      console.log(json);
+
+      switch(json.method) {
+
+        case 'authenticate': {
+          console.log('ws.raw.authenticate');
+
+          try {
+
+            let accessToken = await models.AccessToken.findOne({ where: {
+              uid: json.params[0]
+            }});
+
+            if (!accessToken) {
+
+              log.error('authentication.failed', json);
+            }
+
+            accountSubscriptionsWebsockets.subscribeAccount(ws, accessToken.account_id);
+
+          } catch(error) {
+
+            console.log(error);
+          }
+
+          break;
+
+        }
+
+        default: {
+
+          console.log(json);
+
+          break;
+        }
+
+      }
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+  });
+
+  ws.on('close', function close() {
+
+    console.log('disconnected');
+
+  });
+
+});
 
