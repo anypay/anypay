@@ -14,7 +14,7 @@ const affectedRows = [{ after: {
   cashcurrency: 'USD',
   cellphoneused: null,
   cryptoaddress: '1ErXKwhQCGV9zYAFcmfjqdEPJLp3qRELwM',
-   cryptoamount: 0.00148679,
+  cryptoamount: 0.00148679,
   cryptocurrency: 'BTC',
   cryptodiscountamount: 0,
   detail: '130ed2d4543cee8572034c4fd47d67098e7dc8d731b338a71cde4463fffb6421',
@@ -43,7 +43,7 @@ const affectedRows = [{ after: {
   withdrawn: null,
   discount_id: null,
   identity_id: null,
-  terminal_id: 1
+  terminal_id: 4
 }}];
 
 const event = {

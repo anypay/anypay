@@ -108,10 +108,12 @@ describe('BCH hot wallet test', () => {
       cash_amount: 1,
       crypto_currency: 'BTC',
       expected_profit_setting : 10,
+      expected_profit_value : .10,
       additional_output_strategy_id: strategy.id
     })
 
    let outputs = await wallet.getAdditionalOutputs( vending_tx.id ) 
+   console.log('outputs', outputs)
    let txid = await wallet.sendAdditionalOutputs( outputs, vending_tx.id)
 
    let output = await models.VendingTransactionOutput.findOne({ where:{vending_transaction_id: vending_tx.id}})

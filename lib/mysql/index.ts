@@ -11,12 +11,11 @@ const dsn = {
   connectionLimit: 100
 };
 
+const connection = mysql.createConnection(dsn);
 
 export async function getLatestTransactionRecords(){
 
   return new Promise( (resolve, reject)=>{
-
-    let connection = mysql.createConnection(dsn);
 
     connection.query('select * from transactionrecord order by Id desc limit 1000;', (err, rows, fields)=>{
   
@@ -78,7 +77,7 @@ export async function writeTransactionRecords(records:any){
         additional_output_strategy_id: vendingMachine.additional_output_strategy_id
       }
 
-      let result = await models.VendingTransaction.findOrCreate({
+      let [result, isNew] = await models.VendingTransaction.findOrCreate({
         where:{
           terminal_id: tx.terminal_id.toString(),
           hash : tx.hash,
@@ -87,6 +86,12 @@ export async function writeTransactionRecords(records:any){
         },
         defaults: tx
       })
+
+      if( isNew ){
+       
+        await writeAsVendingOutput(result)
+    
+      }
 
       return result
 
@@ -98,6 +103,28 @@ export async function writeTransactionRecords(records:any){
 
 }
 
+export async function writeAsVendingOutput(tx):Promise<any>{
+
+  if( tx.status === 'BUY' && tx.status === '1' && tx.hash){
+
+    let vendingOutput = {
+      vending_transaction_id: tx.id,
+      strategy_id : tx.additional_output_strategy_id,
+      isKioskCutomer: true,
+      currency: tx.crypto_currency,
+      amount: tx.amount, 
+      address: tx.address
+    }
+
+    let result = await models.VendingTransactionOutput.create({ vendingOutput });
+
+    return result
+
+  }
+
+  return {}
+
+}
 
 export async function writeTransactionRecord(event){
 
@@ -144,7 +171,7 @@ export async function writeTransactionRecord(event){
       name_of_crypto_setting_used: newRow.nameofcryptosettingused,
       additional_output_strategy: vendingMachine.additional_output_strategy_id
     }
-    let tx = await models.VendingTransaction.findOrCreate({
+    let [tx, isNew] = await models.VendingTransaction.findOrCreate({
       where:{
         terminal_id: record.terminal_id.toString(),
         hash : record.hash,
@@ -152,6 +179,12 @@ export async function writeTransactionRecord(event){
       },
       defaults: record
     })
+
+    if(isNew){
+    
+      await writeAsVendingOutput(tx);
+
+    }
 
     return tx
 

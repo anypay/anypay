@@ -113,11 +113,11 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
     where: { id: vendingTransactionId }
   })
 
-  let spreadPercentage = vending_tx.expected_profit_setting/100;
+  if( !vending_tx ) throw new Error(`No vending transaction found with id: ${vendingTransactionId}`)
 
-  let spreadAmount = vending_tx.cash_amount * spreadPercentage;
+  if( vending_tx.additional_output_hash ) throw new Error(`Additional output already sent`); 
 
-  let bchToSend = (await prices.convert({ currency: 'USD', value: spreadAmount}, 'BCH')).value 
+  let bchToSend = (await prices.convert({ currency: 'USD', value: vending_tx.expected_profit_value}, 'BCH')).value 
 
   let balance = await getbalance();
 
@@ -125,15 +125,39 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
   let strategy = (await models.VendingOutputStrategy.findOne({ where: { id: vending_tx.additional_output_strategy_id }})).strategy
 
+  if( !strategy ) throw new Error(`invalid additional output strategy`)
+
   let outputs = []; 
 
   await Promise.all(strategy.outputs.map(async (output:any) => {
 
     let address = await models.Address.findOne({ where: {account_id: output.account_id}})
 
+    let amount = (bchToSend*output.scaler).toFixed(5)
+
     if( !address ) throw new Error(`BCH is not set for all accounts in strategy ${strategy.id}`)
 
-    outputs.push([address.value, (bchToSend*output.scaler).toFixed(5)])
+    let vendingOutput = {
+      vending_transaction_id: vending_tx.id,
+      strategy_id : vending_tx.additional_output_strategy_id,
+      isKioskCutomer: false,
+      account_id: address.account_id,
+      currency: 'BCH',
+      amount: amount, 
+      address: address.value
+    }
+
+    let [vendingOutputRecord, isNew] = await models.VendingTransactionOutput.findOrCreate({
+      where: {  
+        vending_transaction_id: vending_tx.id,
+        account_id: address.account_id
+      },
+      defaults: vendingOutput
+    })
+
+    if(!isNew) throw new Error('Output Already Exists in Database')
+
+    outputs.push([address.value, amount])
 
   }));
 
@@ -141,48 +165,95 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
 }
 
-export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: number):Promise<string>{
+export async function validateOutputs(outputs: any[][], vending_tx_id: number): Promise<boolean>{
 
-  let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+  try{
 
-  if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
+    let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+
+    if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
        
-  if( vending_tx.hash ) throw new Error(`Additional outputs already sent for vending transaction ${vending_tx.id}`);
+    if( vending_tx.additional_output_hash ) throw new Error(`Additional outputs already sent for vending transaction ${vending_tx.id}`);
 
-  let txid = await sendtomany(outputs);
+    //Check to make sure output is valid and has not been sent
+    await Promise.all(outputs.map(async (output)=>{
 
-  if( txid ){
-  
-    await Promise.all( outputs.map( async (output:any)=>{
-
-      let address = await models.Address.findOne({where:{value:output[0]}})
-
-      if( !address ) throw new Error(`Cannot find account with address ${output[0]}`)
-
-      await models.VendingTransactionOutput.create({
-        vending_transaction_id: vending_tx.id,
-        strategy_id : vending_tx.additional_output_strategy_id,
-        isKioskCutomer: false,
-        account_id: address.account_id,
-        currency: 'BCH',
-        hash: txid,
-        amount: output[1]
-
+      let record = await models.VendingTransactionOutput.findOne({
+        where:{
+          vending_transaction_id: vending_tx_id,
+          amount: output[1],
+          address: output[0]
+        }
       })
 
-    }));
+      if(!record) throw new Error(`Invalid output vending_transaction_id: ${vending_tx_id} ${output[0]} ${output[1]}`)
 
-    let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
+      if(record.hash) throw new Error(`Output already sent`)
 
-    let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
+    }))
 
-    await vending_tx.update({
-        additional_output_usd_paid :  usdSum,
-        additional_output_bch_paid :  bchSum,
-        additional_output_hash : txid 
-    })
+    return true
+
+  }catch(err){
+
+    log.info(err)
+
+    return false
+  }
+
+}
+
+export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: number):Promise<string>{
+
+  try{ 
+
+    let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+
+    let isValid = await validateOutputs(outputs, vending_tx_id)
+
+    if(!isValid) throw new Error(`invalid outputs`);
+
+    let txid = await sendtomany(outputs);
+
+    if( txid ){
+ 
+      let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
+
+      let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
+
+      await vending_tx.update({
+          additional_output_usd_paid :  usdSum,
+          additional_output_bch_paid :  bchSum,
+          additional_output_hash : txid 
+      })
+
+      //Check to make sure output is valid and has not been sent
+      await Promise.all(outputs.map(async (output)=>{
+
+        let record = await models.VendingTransactionOutput.findOne({
+          where:{
+            vending_transaction_id: vending_tx_id,
+            amount: output[1],
+            address: output[0]
+          }
+        })
+
+        await record.update({
+          hash: txid
+        })
+
+      }))
+
+    }
+
+    return txid;
+
+  }catch(err){
+    
+    log.info(`ERROR sending additional outputs vending.tx: ${vending_tx_id}`, err)
+
+    throw new Error(err)
 
   }
 
-  return txid
 }

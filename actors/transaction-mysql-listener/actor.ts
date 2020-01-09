@@ -69,15 +69,6 @@ export async function start() {
 
       let tx =  await mysql_lib.writeTransactionRecord(event)
 
-      //send additional outputs
-      if( tx.type === 'BUY' && tx.status === '1' ){
-
-        let outputs = await wallet.getAdditionalOutputs( tx.id ) 
-
-        let txid = await wallet.sendAdditionalOutputs( outputs, tx.id)
-
-      }
-
     }
 
     channel.ack(msg);
