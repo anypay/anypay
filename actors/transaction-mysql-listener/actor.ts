@@ -2,6 +2,8 @@
 
 require('dotenv').config();
 
+import * as wallet from '../../plugins/bch/wallet';
+
 import { Actor, Joi } from 'rabbi';
 
 import {log, models, mysql_lib} from '../../lib';
