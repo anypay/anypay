@@ -102,9 +102,19 @@ describe('BCH hot wallet test', () => {
       }
     })
 
+    let vendingMachine = await models.VendingMachine.create({
+      serial_number: 'BT101620',
+      current_location_name: 'AnypayHQ',
+      current_location_address: '110 State St Portsmouth, NH',
+      machine_type: 'BATM2',
+      account_id: payout1Account.id,
+      terminal_id: 1,
+      additional_output_strategy_id: strategy.id
+    })
+
     let vending_tx = await models.VendingTransaction.create({
       account_id: vendingAccount.id,
-      terminal_id : 'BT101619',
+      terminal_id : '1',
       cash_amount: 1,
       crypto_currency: 'BTC',
       expected_profit_setting : 10,
@@ -112,16 +122,19 @@ describe('BCH hot wallet test', () => {
       additional_output_strategy_id: strategy.id
     })
 
+
    let outputs = await wallet.getAdditionalOutputs( vending_tx.id ) 
-   console.log('outputs', outputs)
+
    let txid = await wallet.sendAdditionalOutputs( outputs, vending_tx.id)
 
    let output = await models.VendingTransactionOutput.findOne({ where:{vending_transaction_id: vending_tx.id}})
 
-   assert(txid)
+   await vending_tx.reload();
 
+   assert(txid)
    assert(output.hash)
    assert(output.amount > 0)
+   assert.strictEqual(vending_tx.additional_output_hash, output.hash) 
 
  }) 
 

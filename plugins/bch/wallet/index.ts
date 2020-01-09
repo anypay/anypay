@@ -140,7 +140,7 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
     let vendingOutput = {
       vending_transaction_id: vending_tx.id,
       strategy_id : vending_tx.additional_output_strategy_id,
-      isKioskCutomer: false,
+      isKioskCustomer: false,
       account_id: address.account_id,
       currency: 'BCH',
       amount: amount, 
