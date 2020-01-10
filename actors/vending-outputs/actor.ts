@@ -25,14 +25,13 @@ export async function start() {
 
   }, 3000)
 
-
   Actor.create({
 
     exchange: 'anypay.events',
 
     routingkey: 'outputs.retry.send',
 
-    queue: 'outputs.retry.send.local',
+    queue: 'outputs.retry.send',
 
   })  
   .start(async (channel, msg) => {
@@ -70,12 +69,14 @@ export async function start() {
 
     routingkey: 'models.VendingTransaction.afterCreate',
 
-    queue: 'vending_outputs.local',
+    queue: 'vending_outputs',
 
   })  
   .start(async (channel, msg) => {
 
     let vending_tx =  JSON.parse(msg.content) 
+
+    log.info('vendingTransaction.afterCreate', vending_tx)
 
     if( vending_tx.status === 1 && vending_tx.type === 'BUY' && !vending_tx.additional_output_hash ){
 
