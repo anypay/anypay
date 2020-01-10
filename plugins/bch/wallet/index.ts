@@ -1,6 +1,7 @@
 require('dotenv').config();
 import * as bch from 'bitcore-lib-cash';
 var rp = require('request-promise');
+const Op = require('sequelize').Op;
 import {log, models, prices} from '../../../lib';
 
 interface Output{
@@ -110,12 +111,18 @@ export async function walletrpc(method: string, params: any){
 export async function getAdditionalOutputs(vendingTransactionId:number){
 
   let vending_tx = await models.VendingTransaction.findOne({
-    where: { id: vendingTransactionId }
+    where: { 
+      id: vendingTransactionId, 
+      additional_output_strategy_id:{
+        [Op.ne]: null
+      },
+      additional_output_hash: {
+        [Op.is]: null
+      },
+    }
   })
 
   if( !vending_tx ) throw new Error(`No vending transaction found with id: ${vendingTransactionId}`)
-
-  if( vending_tx.additional_output_hash ) throw new Error(`Additional output already sent`); 
 
   let bchToSend = (await prices.convert({ currency: 'USD', value: vending_tx.expected_profit_value}, 'BCH')).value 
 
@@ -158,8 +165,6 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
       defaults: vendingOutput
     })
 
-    if(!isNew) throw new Error('Output Already Exists in Database')
-
     outputs.push([address.value, amount])
 
   }));
@@ -170,17 +175,60 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
 export async function validateOutputs(outputs: any[][], vending_tx_id: number): Promise<boolean>{
 
-  try{
+  let vending_tx = await models.VendingTransaction.findOne({
+    where:{
+      id: vending_tx_id,
+      additional_output_hash:{
+        [Op.is]:null
+      }
+    }
+  });
 
-    let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+  if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
 
-    if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
+  await Promise.all(outputs.map(async (output)=>{
 
-    if( !vending_tx.hash ) throw new Error('Invalid Vending Transaction - no hash'); 
-       
-    if( vending_tx.additional_output_hash ) throw new Error(`Additional outputs already sent for vending transaction ${vending_tx.id}`);
+  let record = await models.VendingTransactionOutput.findOne({
+    where:{
+      vending_transaction_id: vending_tx_id,
+      amount: output[1],
+      address: output[0],
+      hash:{
+       [Op.is]: null
+      }
+    }
+  })
 
-    //Check to make sure output is valid and has not been sent
+  if(!record) throw new Error(`Invalid output vending_transaction_id: ${vending_tx_id} ${output[0]} ${output[1]}`)
+
+ }));
+
+ return true
+
+}
+
+export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: number):Promise<string>{
+
+  let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
+
+  let isValid = await validateOutputs(outputs, vending_tx_id)
+
+  if(!isValid) throw new Error(`invalid outputs`);
+
+  let txid = await sendtomany(outputs);
+
+  if( txid ){
+ 
+    let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
+
+    let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
+
+    await vending_tx.update({
+      additional_output_usd_paid :  usdSum,
+      additional_output_bch_paid :  bchSum,
+      additional_output_hash : txid 
+    })
+
     await Promise.all(outputs.map(async (output)=>{
 
       let record = await models.VendingTransactionOutput.findOne({
@@ -191,74 +239,14 @@ export async function validateOutputs(outputs: any[][], vending_tx_id: number): 
         }
       })
 
-      if(!record) throw new Error(`Invalid output vending_transaction_id: ${vending_tx_id} ${output[0]} ${output[1]}`)
+    await record.update({
+      hash: txid
+    })
 
-      if(record.hash) throw new Error(`Output already sent`)
-
-    }))
-
-    return true
-
-  }catch(err){
-
-    log.info(err)
-
-    return false
-  }
-
-}
-
-export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: number):Promise<string>{
-
-  try{ 
-
-    let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
-
-    let isValid = await validateOutputs(outputs, vending_tx_id)
-
-    if(!isValid) throw new Error(`invalid outputs`);
-
-    let txid = await sendtomany(outputs);
-
-    if( txid ){
- 
-      let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
-
-      let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
-
-      await vending_tx.update({
-          additional_output_usd_paid :  usdSum,
-          additional_output_bch_paid :  bchSum,
-          additional_output_hash : txid 
-      })
-
-      //Check to make sure output is valid and has not been sent
-      await Promise.all(outputs.map(async (output)=>{
-
-        let record = await models.VendingTransactionOutput.findOne({
-          where:{
-            vending_transaction_id: vending_tx_id,
-            amount: output[1],
-            address: output[0]
-          }
-        })
-
-        await record.update({
-          hash: txid
-        })
-
-      }))
-
-    }
-
-    return txid;
-
-  }catch(err){
-    
-    log.info(`ERROR sending additional outputs vending.tx: ${vending_tx_id}`, err)
-
-    throw new Error(err)
+   }))
 
   }
+
+  return txid;
 
 }
