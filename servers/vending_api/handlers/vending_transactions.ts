@@ -61,7 +61,7 @@ export async function getLatestTransactions(request, h) {
     let obj = {
       date: moment(tx.server_time).format('MMMM Do YYYY, h:mm:ss a'),
       error: '',
-      email: account.email,
+      email: 'Kiosk Customer',
       cash_amount: tx.cash_amount,
       type: tx.type,
       crypto_currency: tx.crypto_currency,
