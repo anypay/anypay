@@ -24,6 +24,8 @@ export async function sendtomany(outputs: any[][]):Promise<string>{
 
   log.info("tx broadcasted", tx[1])
 
+  if( tx[1].length !== 64 ) throw new Error('transaction invalid');
+
   return tx[1];
 }
 
@@ -58,6 +60,8 @@ export async function sendtoaddress(output: any[]):Promise<string>{
   let tx = await walletrpc('broadcast', {"tx": hex});
 
   log.info("tx broadcasted", tx[1])
+
+  if( tx[1].length !== 64 ) throw new Error('transaction invalid');
 
   return tx[1]; 
 
@@ -245,7 +249,6 @@ export async function validateOutputs(outputs: any[][], vending_tx_id: number): 
   let record = await models.VendingTransactionOutput.findOne({
     where:{
       vending_transaction_id: vending_tx_id,
-      amount: output[1],
       address: output[0],
       hash:{
        [Op.is]: null
@@ -288,13 +291,13 @@ export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: numb
       let record = await models.VendingTransactionOutput.findOne({
         where:{
           vending_transaction_id: vending_tx_id,
-          amount: output[1],
           address: output[0]
         }
       })
 
     await record.update({
-      hash: txid
+      hash: txid,
+      amount: output[1]
     })
 
    }))

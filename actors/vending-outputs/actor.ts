@@ -23,7 +23,7 @@ export async function start() {
 
     await chan.publish('anypay.events', 'outputs.retry.send', Buffer.from('outputs.retry.send'))        
 
-  }, 3000)
+  }, 10000)
 
   Actor.create({
 
