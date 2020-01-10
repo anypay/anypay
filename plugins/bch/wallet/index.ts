@@ -108,6 +108,49 @@ export async function walletrpc(method: string, params: any){
 
 }
 
+export async function createStrategy(name:string, strategy:any){
+
+  if( strategy.outputs ){
+
+    let sum = strategy.outputs.reduce((a,elem)=>{return a + elem.scaler},0);
+
+    if( sum !== 1 ) throw new Error('Invalid strategy scalers must sum to 1');
+
+    strategy.outputs = await Promise.all(strategy.outputs.map(async (output)=>{
+
+      if( output.useVendingAccountId ){
+        
+         return {
+            account_id: 0,
+            scaler: output.scaler
+         }
+    
+      }
+
+      let address = await models.Address.findOne({where:{ currency: 'BCH', account_id: output.account_id}});
+
+      if( address ){
+        return {
+          account_id: output.account_id,
+          scaler: output.scaler
+        }
+      }
+
+    }));
+
+    return await models.VendingOutputStrategy.create({
+      name: name,
+      strategy: strategy
+    });
+
+  }
+
+  throw new Error('Invalid Strategy');
+
+}
+
+
+
 export async function getAdditionalOutputs(vendingTransactionId:number){
 
   let vending_tx = await models.VendingTransaction.findOne({
@@ -138,7 +181,18 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
   await Promise.all(strategy.outputs.map(async (output:any) => {
 
-    let address = await models.Address.findOne({ where: {account_id: output.account_id}})
+    let address;
+
+    //Use vending machine owners account
+    if( output.account_id === 0){
+
+      address = await models.Address.findOne({ where: {account_id: vending_tx.account_id, currency:'BCH'}})
+
+    }else{
+   
+      address = await models.Address.findOne({ where: {account_id: output.account_id, currency:'BCH'}})
+
+    }
 
     let amount = (bchToSend*output.scaler).toFixed(5)
 
