@@ -24,6 +24,20 @@ const dsn = {
 };
 
 
+( async ()=> {
+
+  let connection = await amqp.connect(process.env.AMQP_URL);
+        
+  let chan = await connection.createChannel();
+
+  setInterval( async ()=>{
+
+    await chan.publish('anypay.mysql', 'fetch.transactionrecords', Buffer.from('fetch transaction records'))        
+
+  }, 60000 )
+
+})()
+
 export async function start() {
 
   const connection = mysql.createPool(dsn);
@@ -75,6 +89,27 @@ export async function start() {
 
   }); 
 
+  Actor.create({
+
+    exchange: 'anypay.mysql',
+
+    routingkey: 'fetch.transactionrecords',
+
+    queue: 'write.vending.transactions',
+
+  }) 
+  .start(async (channel, msg) => {
+
+     log.info('fetching transaction records');
+
+     let records = await mysql_lib.getLatestTransactionRecords();
+
+     await mysql_lib.writeTransactionRecords(records)
+
+     channel.ack(msg);
+
+  }); 
+
 }
       
 if (require.main === module) {
@@ -82,4 +117,3 @@ if (require.main === module) {
   start();
 
 }
-
