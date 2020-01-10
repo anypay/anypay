@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 
 const subscriptions = {};
 const invoices = {};
+const websockets = {};
 
 import { log } from '../../lib';
 
@@ -172,7 +173,18 @@ class AccountSubscriptionsWebsockets extends AccountSubscriptions {
 
   messageClient(client: any, event: string, payload: any) {
 
-    client.send(JSON.stringify({ event, payload }));
+    try {
+
+      console.log(JSON.stringify({ event, payload }))
+
+      client.send(JSON.stringify({ event, payload }));
+
+    } catch(error) {
+
+      console.error(error.message);
+      console.error(`error sending message to websocket client ${client.uid}`);
+
+    }
 
   }
 
@@ -182,9 +194,21 @@ class AccountSubscriptionsSocketIO extends AccountSubscriptions {
 
   messageClient(client: any, event: string, payload: any) {
 
-    client.emit('event', { event, payload });
+    try {
+
+      console.log(`client.${client.uid}`, JSON.stringify({ event, payload }));
+
+      client.emit('event', { event, payload });
+
+    } catch(error) {
+
+      console.error(error.message);
+      console.error(`error sending message to websocket client ${client.uid}`);
+
+    }
 
   }
+
 }
 
 let wsSubscriptions = new InvoiceSubscriptions();  
@@ -192,7 +216,12 @@ let accountSubscriptionsSocketIO = new AccountSubscriptionsSocketIO();
 let accountSubscriptionsWebsockets = new AccountSubscriptionsWebsockets();  
 
 let hapiServer = new Hapi.Server({
-  port: PORT,
+  port: process.env.SOCKETIO_SERVER_PORT || PORT,
+  host: '0.0.0.0'
+});
+
+let adminServer = new Hapi.Server({
+  port: process.env.WEBSOCKET_ADMIN_API_PORT || 5100,
   host: '0.0.0.0'
 });
 
@@ -200,6 +229,9 @@ const io = require("socket.io")(hapiServer.listener);
 
 io.on("connection", client => {
   client.uid = uuid.v4();
+
+  websockets[client.uid] = client;
+
   log.info("websocket client connected", client.uid);
 
   client.on("subscribe", data => {
@@ -234,6 +266,9 @@ io.on("connection", client => {
   });
 
   client.on("disconnect", () => {
+
+    delete websockets[client.uid];
+
     let invoice = wsSubscriptions.subscriptions[client.uid];
     let accountId = accountSubscriptionsSocketIO.subscriptions[client.uid];
     wsSubscriptions.unsubscribeClient(client);
@@ -244,8 +279,35 @@ io.on("connection", client => {
   });
 });
 
+adminServer.route({
 
-hapiServer.route({
+  method: 'GET',
+
+  path: '/websockets',
+
+  handler: (request, h) => {
+
+    return {
+
+      websockets: Object.values(websockets).map((client: any) => {
+
+        return {
+          client_uid: client.uid,
+          socket_id: client.id,
+          client_address: client.handshake.address,
+          connected: client.connected,
+          disconnected: client.disconnected,
+          connected_at: client.handshake.time,
+        }
+    
+      })
+    }
+
+  }
+
+})
+
+adminServer.route({
 
   method: 'GET',
 
@@ -259,7 +321,11 @@ hapiServer.route({
 
 })
 
+adminServer.start();
+console.log('Server running on %s', adminServer.info.uri);
+
 hapiServer.start();
+console.log('Server running on %s', hapiServer.info.uri);
 
 const AMQP_URL = process.env.AMQP_URL;
 if (!AMQP_URL) {
@@ -329,7 +395,6 @@ if (!AMQP_URL) {
 
   })
   .start(async (channel, msg, json) => {
-    console.log(json);
 
     let routingKeys = msg.fields.routingKey.split('.');
 
@@ -353,12 +418,10 @@ const WebSocket = require('ws');
 
 const wss = new WebSocket.Server({
   host: '0.0.0.0',
-  port: process.env.WEBSOCKET_PORT || 5200
+  port: process.env.WEBSOCKET_PORT || 3000
 });
 
 wss.on('connection', function connection(ws) {
-
-  console.log('ws.connected', ws);
 
   ws.on('message', async function incoming(message) {
 
