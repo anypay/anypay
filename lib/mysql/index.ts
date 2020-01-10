@@ -175,7 +175,8 @@ export async function writeTransactionRecord(event){
       where:{
         terminal_id: record.terminal_id.toString(),
         hash : record.hash,
-        crypto_address: record.crypto_address
+        crypto_address: record.crypto_address,
+        localtid: newRow.localtid
       },
       defaults: record
     })

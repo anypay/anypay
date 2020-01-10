@@ -136,6 +136,8 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
     let amount = (bchToSend*output.scaler).toFixed(5)
 
     if( !address ) throw new Error(`BCH is not set for all accounts in strategy ${strategy.id}`)
+    
+    let usd_amount = (await prices.convert({ currency: 'BCH', value: parseFloat(amount)}, 'USD')).value
 
     let vendingOutput = {
       vending_transaction_id: vending_tx.id,
@@ -144,7 +146,8 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
       account_id: address.account_id,
       currency: 'BCH',
       amount: amount, 
-      address: address.value
+      address: address.value,
+      usd_amount: usd_amount
     }
 
     let [vendingOutputRecord, isNew] = await models.VendingTransactionOutput.findOrCreate({
@@ -172,6 +175,8 @@ export async function validateOutputs(outputs: any[][], vending_tx_id: number): 
     let vending_tx = await models.VendingTransaction.findOne({where:{id:vending_tx_id}});
 
     if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
+
+    if( !vending_tx.hash ) throw new Error('Invalid Vending Transaction - no hash'); 
        
     if( vending_tx.additional_output_hash ) throw new Error(`Additional outputs already sent for vending transaction ${vending_tx.id}`);
 

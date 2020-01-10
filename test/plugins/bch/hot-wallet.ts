@@ -5,6 +5,7 @@ import * as assert from 'assert';
 import * as Chance from 'chance';
 import {models, prices, password} from '../../../lib';
 
+import * as moment from 'moment';
 import * as bch from '../../../plugins/bch';
 
 const chance = new Chance();
@@ -118,8 +119,18 @@ describe('BCH hot wallet test', () => {
       cash_amount: 1,
       crypto_currency: 'BTC',
       expected_profit_setting : 10,
+      type : 'BUY',
       expected_profit_value : .10,
-      additional_output_strategy_id: strategy.id
+      additional_output_strategy_id: strategy.id,
+      servertime: moment().unix(),
+      terminaltime: moment().unix(),
+      localtid: chance.word(),
+      remotetid: chance.word(),
+      cash_currency: 'USD',
+      crypto_amount: 0.00148679,
+      crpyto_address: '1ErXKwhQCGV9zYAFcmfjqdEPJLp3qRELwM',
+      status: 1,
+      hash: '130ed2d4543cee8572034c4fd47d67098e7dc8d731b338a71cde4463fffb6421'
     })
 
 
