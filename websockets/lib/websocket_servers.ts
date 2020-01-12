@@ -110,7 +110,15 @@ abstract class AccountSubscriptions {
       this.accounts[accountId].forEach(client => {
         console.log(`messaging client for account ${accountId}`);
 
-        this.messageClient(client, event, payload);
+        try {
+
+          this.messageClient(client, event, payload);
+
+        } catch(error) {
+
+          console.error(error.message);
+
+        }
 
 
       });

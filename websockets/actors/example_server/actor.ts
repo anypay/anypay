@@ -3,6 +3,9 @@ import { PrivateKey } from 'bsv';
 import { hostname } from 'os';
 import * as delay from 'delay';
 
+import { parse as parseQueryString } from 'querystring';
+import { parse as parseURL } from 'url';
+
 import { models } from '../../../lib';
 
 import { account_subscriptions } from '../../lib/websocket_servers';
@@ -28,9 +31,8 @@ export async function start() {
   const server_port = process.env.WEBSOCKET_PORT || 3000;
 
   const websocketServerConfig = {
-    host: '0.0.0.0',
     port: server_port
-  }
+  };
 
   const wss = new WebSocket.Server(websocketServerConfig);
 
@@ -56,25 +58,35 @@ export async function start() {
 
   wss.on('connection', async function connection(ws, req) {
 
-    if (!req.headers['x-access-token']) {
+    let urlToken = parseQueryString(parseURL(req.url).query).token;
+
+    console.log('URL TOKEN', urlToken);
+
+    if (!urlToken && !req.headers['x-access-token']) {
       log.info(`x-access-token header must be set with valid access token`);
       return ws.close();
     }
 
     let token = await models.AccessToken.findOne({ where: {
-      uid: req.headers['x-access-token']
-    }})
+      uid: urlToken || req.headers['x-access-token']
+    }});
 
     if (!token) {
-      log.info(`invalid access token ${req.headers['x-access-token']}`);
+      log.info(`invalid access token ${urlToken || req.headers['x-access-token']}`);
       return ws.close();
     }
+
+    console.log('token found!', token);
 
     let account = await models.Account.findOne({ where: {
       id: token.account_id
     }});
 
+    console.log('account found!', account);
+
     let websocket_id = new PrivateKey().toAddress().toString();
+
+    log.info(`client.connected ${account.email}`);
 
     ws.websocket_id = websocket_id;
     ws.account_id = account.id;
@@ -121,7 +133,7 @@ Actor.create({
 
   routingkey: 'accounts.*.#',
 
-  queue: 'account_events_to_websockets_2'
+  queue: 'account_events_to_websockets_3'
 
 })
 .start(async (channel, msg, json) => {
