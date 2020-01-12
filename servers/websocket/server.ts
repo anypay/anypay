@@ -173,11 +173,17 @@ class AccountSubscriptionsWebsockets extends AccountSubscriptions {
 
   messageClient(client: any, event: string, payload: any) {
 
-    console.log(JSON.stringify({ event, payload }))
+    try {
 
-    if (client.readyState === WebSocket.OPEN) {
+      console.log(JSON.stringify({ event, payload }))
 
       client.send(JSON.stringify({ event, payload }));
+
+    } catch(error) {
+
+      console.error(error.message);
+      console.error(`error sending message to websocket client ${client.uid}`);
+
     }
 
   }
@@ -188,9 +194,21 @@ class AccountSubscriptionsSocketIO extends AccountSubscriptions {
 
   messageClient(client: any, event: string, payload: any) {
 
-    client.emit('event', { event, payload });
+    try {
+
+      console.log(`client.${client.uid}`, JSON.stringify({ event, payload }));
+
+      client.emit('event', { event, payload });
+
+    } catch(error) {
+
+      console.error(error.message);
+      console.error(`error sending message to websocket client ${client.uid}`);
+
+    }
 
   }
+
 }
 
 let wsSubscriptions = new InvoiceSubscriptions();  
