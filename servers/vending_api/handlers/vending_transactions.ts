@@ -1,8 +1,8 @@
 import {models,log} from '../../../lib';
 
-import * as moment from 'moment';
-
 const { Op } = require('sequelize')
+
+import * as moment from 'moment';
 
 import * as sequelize from 'sequelize';
 
@@ -21,12 +21,63 @@ export async function getAccountTransactions(request, h) {
 
 export async function getLatestTransactions(request, h) {
 
-  let vending_transactions = await models.VendingTransaction.findAll({
+  let txs = await models.VendingTransaction.findAll({
     limit: 100,
-    order: [ [ 'terminal_time', 'DESC' ]]       
+    order: [ [ 'server_time', 'DESC' ]]       
   });
 
-  return {vending_transactions}
+  let vending_transactions = [];
+
+  await Promise.all( txs.map( async (tx)=>{
+
+    let outputs = await models.VendingTransactionOutput.findAll({where:{vending_transaction_id: tx.id}})
+
+    let children = []
+
+    await Promise.all(outputs.map(async(output)=>{
+
+      if(!output.isKioskCustomer){
+
+        let account = await models.Account.findOne({ where:{ id: output.account_id }});
+
+        children.push({
+          date: moment(output.createdAt).format('MMMM Do YYYY, h:mm:ss a'),
+          error: '',
+          email: account.email,
+          cash_amount: output.usd_amount,
+          type: 'Additional Output',
+          crypto_currency: output.currency,
+          crypto_amount: output.amount, 
+          hash: output.hash,
+          address: output.address,
+        })
+
+      }
+
+    }));
+
+    let account = await models.Account.findOne({where:{id: tx.account_id}});
+
+    let obj = {
+      date: moment(tx.server_time).format('MMMM Do YYYY, h:mm:ss a'),
+      error: '',
+      email: 'Kiosk Customer',
+      cash_amount: tx.cash_amount,
+      type: tx.type,
+      crypto_currency: tx.crypto_currency,
+      crypto_amount: tx.crypto_amount, 
+      hash: tx.hash,
+      address: tx.crypto_address,
+      isCollapsed: true,
+      children: children
+    }
+
+    vending_transactions.push(obj)
+  
+
+  }));
+
+  return {vending_transactions};
 
 }
 

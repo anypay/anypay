@@ -2,6 +2,8 @@
 
 require('dotenv').config();
 
+import * as wallet from '../../plugins/bch/wallet';
+
 import { Actor, Joi } from 'rabbi';
 
 import {log, models, mysql_lib} from '../../lib';
@@ -21,6 +23,20 @@ const dsn = {
   connectionLimit: 100
 };
 
+
+( async ()=> {
+
+  let connection = await amqp.connect(process.env.AMQP_URL);
+        
+  let chan = await connection.createChannel();
+
+  setInterval( async ()=>{
+
+    await chan.publish('anypay.mysql', 'fetch.transactionrecords', Buffer.from('fetch transaction records'))        
+
+  }, 60000 )
+
+})()
 
 export async function start() {
 
@@ -65,7 +81,7 @@ export async function start() {
 
       log.info('mysql event:', event)
 
-      await mysql_lib.writeTransactionRecord(event)
+      let tx =  await mysql_lib.writeTransactionRecord(event)
 
     }
 
@@ -73,11 +89,31 @@ export async function start() {
 
   }); 
 
-}
+  Actor.create({
 
+    exchange: 'anypay.mysql',
+
+    routingkey: 'fetch.transactionrecords',
+
+    queue: 'write.vending.transactions',
+
+  }) 
+  .start(async (channel, msg) => {
+
+     log.info('fetching transaction records');
+
+     let records = await mysql_lib.getLatestTransactionRecords();
+
+     await mysql_lib.writeTransactionRecords(records)
+
+     channel.ack(msg);
+
+  }); 
+
+}
+      
 if (require.main === module) {
 
   start();
 
 }
-

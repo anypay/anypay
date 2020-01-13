@@ -5,6 +5,8 @@ import * as Chance from 'chance';
 import {writeTransactionRecord} from '../../lib/mysql';
 import {models} from '../../lib';
 
+const chance = new Chance();
+
 const affectedRows = [{ after: {
   id: 4,
   autoexecuted: false,
@@ -14,7 +16,7 @@ const affectedRows = [{ after: {
   cashcurrency: 'USD',
   cellphoneused: null,
   cryptoaddress: '1ErXKwhQCGV9zYAFcmfjqdEPJLp3qRELwM',
-   cryptoamount: 0.00148679,
+  cryptoamount: 0.00148679,
   cryptocurrency: 'BTC',
   cryptodiscountamount: 0,
   detail: '130ed2d4543cee8572034c4fd47d67098e7dc8d731b338a71cde4463fffb6421',
@@ -26,7 +28,7 @@ const affectedRows = [{ after: {
   expectedprofitvalue: 0,
   feediscount: null,
   fixedtransactionfee: 0,
-  localtid: 'LAXB3D',
+  localtid: chance.word(),
   nameofcryptosettingused: 'BTC',
   note: null,
   purchased: false,
@@ -43,7 +45,7 @@ const affectedRows = [{ after: {
   withdrawn: null,
   discount_id: null,
   identity_id: null,
-  terminal_id: 1
+  terminal_id: 4
 }}];
 
 const event = {
@@ -97,8 +99,6 @@ const event = {
 }
 
 
-const chance = new Chance();
-
 describe('Mysql event listeners', () => {
  
   before(async () => {
@@ -123,7 +123,8 @@ describe('Mysql event listeners', () => {
  it("should write new transaction record to database", async () => {
 
    let tx = await writeTransactionRecord(event);
-   assert.strictEqual(tx[0].hash, '130ed2d4543cee8572034c4fd47d67098e7dc8d731b338a71cde4463fffb6421')
+   console.log(tx)
+   assert.strictEqual(tx.hash, '130ed2d4543cee8572034c4fd47d67098e7dc8d731b338a71cde4463fffb6421')
        
 
   });
