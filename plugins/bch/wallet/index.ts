@@ -163,6 +163,9 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
       additional_output_strategy_id:{
         [Op.ne]: null
       },
+      hash: {
+        [Op.ne]: null
+      },
       additional_output_hash: {
         [Op.is]: null
       },
