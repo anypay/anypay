@@ -52,6 +52,34 @@ describe('BCH hot wallet test', () => {
 
   });
 
+ it("Should create a valid strategy", async () => {
+
+   let strategy = {
+    outputs: [{
+      
+     useVendingAccountId: true,
+     scaler: .1
+
+    },{
+    
+      account_id: 3321,
+      scaler: .9
+
+    }]
+
+   }
+
+   let record = await wallet.createStrategy(chance.word(), strategy)
+
+   assert(record)
+
+   console.log(record.toJSON())
+   assert.strictEqual(record.strategy.outputs[0].account_id, 0)
+   assert.strictEqual(record.strategy.outputs[1].account_id, 3321)
+
+ });
+
+
  it("Should return a list of correct outputs with createOutputsWithStrategy", async ()=> {
 
     var vendingAccount = await models.Account.create({
@@ -87,21 +115,22 @@ describe('BCH hot wallet test', () => {
       value: 'bitcoincash:qz7nw40mnuahf7sepwurv2pwjf788g4uqvr2qtdfgr'
     })
 
-    let strategy = await models.VendingOutputStrategy.create({
-      name: "testStrategy",
-      strategy: {
+    let strategy = await wallet.createStrategy('testStrategy', {
               outputs: [ 
                 { 
                   account_id: payout1Account.id,
-                  scaler: .9
+                  scaler: .8
                 },
                 {
                   account_id: payout2Account.id,
                   scaler: .1
+                },
+                {
+                  scaler: .1,
+                  useVendingAccountId: true
                 }
               ]
-      }
-    })
+      });
 
     let vendingMachine = await models.VendingMachine.create({
       serial_number: 'BT101620',
@@ -140,13 +169,18 @@ describe('BCH hot wallet test', () => {
 
    let output = await models.VendingTransactionOutput.findOne({ where:{vending_transaction_id: vending_tx.id}})
 
+   let vendingOwnerOutput = await models.VendingTransactionOutput.findOne({ where:{
+     account_id: vendingMachine.account_id,
+     hash: txid
+   }})
+
    await vending_tx.reload();
 
+   assert(vendingOwnerOutput)
    assert(txid)
    assert(output.hash)
    assert(output.amount > 0)
    assert.strictEqual(vending_tx.additional_output_hash, output.hash) 
-
  }) 
 
 });

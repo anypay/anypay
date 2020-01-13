@@ -21,14 +21,14 @@ export async function getAccountTransactions(request, h) {
 
 export async function getLatestTransactions(request, h) {
 
-  let vending_transactions = await models.VendingTransaction.findAll({
+  let txs = await models.VendingTransaction.findAll({
     limit: 100,
-    order: [ [ 'terminal_time', 'DESC' ]]       
+    order: [ [ 'server_time', 'DESC' ]]       
   });
 
-  let txs = [];
+  let vending_transactions = [];
 
-  await Promise.all( vending_transactions.map( async (tx)=>{
+  await Promise.all( txs.map( async (tx)=>{
 
     let outputs = await models.VendingTransactionOutput.findAll({where:{vending_transaction_id: tx.id}})
 
@@ -72,12 +72,12 @@ export async function getLatestTransactions(request, h) {
       children: children
     }
 
-    txs.push(obj)
+    vending_transactions.push(obj)
   
 
   }));
 
-  return txs;
+  return {vending_transactions};
 
 }
 
