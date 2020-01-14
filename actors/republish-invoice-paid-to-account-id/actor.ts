@@ -2,11 +2,15 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, Joi, log, getChannel } from 'rabbi';
 
 import { models } from '../../lib';
 
 export async function start() {
+
+  let channel = await getChannel();
+
+  await channel.assertExchange('account_events', 'topic');
 
   Actor.create({
 
@@ -14,7 +18,7 @@ export async function start() {
 
     routingkey: 'invoice:paid',
 
-    queue: 'republish_invoice_paid_as_account_id'
+    queue: 'republish_invoice_paid_as_account_id_dev'
 
   })
   .start(async (channel, msg) => {
@@ -23,11 +27,15 @@ export async function start() {
 
     let invoice = await models.Invoice.findOne({ where: { uid }});
 
-    let routingKey = `accounts.${invoice.account_id}.invoicepaid`;
+    let routingKey1 = `accounts.${invoice.account_id}.invoicepaid`;
+    let routingKey2 = `accounts.${invoice.account_id}.invoice.paid`;
 
-    await channel.publish('anypay.events', routingKey, msg.content);
+    await channel.publish('anypay.events', routingKey1, msg.content);
+    await channel.publish('anypay.account_events', routingKey2, Buffer.from(
+      JSON.stringify(invoice.toJSON())
+    ));
 
-    log.info(routingKey, { invoice: invoice.toJSON() });
+    console.log(routingKey2, JSON.stringify(invoice.toJSON()));
 
     channel.ack(msg);
 
