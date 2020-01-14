@@ -23,7 +23,7 @@ interface ServerConnectedEvent {
 
 }
 
-var server_id;
+var server_id, queue;
 
 const websockets = {};
 
@@ -235,13 +235,15 @@ export async function start() {
 
   });
 
+  queue = `account_events_to_websockets.${address}`
+
   Actor.create({
 
     exchange: 'anypay.account_events',
 
     routingkey: 'accounts.*.#',
 
-    queue: 'account_events_to_websockets_4'
+    queue
 
   })
   .start(async (channel, msg, json) => {
@@ -292,6 +294,8 @@ process.on('SIGINT', async function() {
       server_id
     }
   })));
+
+  await channel.deleteQueue(queue);
 
   await delay(1000);
 
