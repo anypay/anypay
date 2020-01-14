@@ -6,7 +6,7 @@ import { join } from 'path';
 
 import { requireHandlersDirectory } from 'rabbi';
 
-const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
+import {getHotWallets} from './handlers/gethotwallets';
 
 const Joi = require('joi');
 
@@ -84,7 +84,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: handlers.Gethotwallets.getHotWallets 
+      handler: getHotWallets 
 
     }
 
