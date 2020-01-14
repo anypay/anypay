@@ -9,6 +9,38 @@ interface Output{
   amount: number;
 }
 
+export async function getHotWalletBalance():Promise<number>{
+  return await getbalance();
+}
+
+export async function getHotWalletAddress():Promise<string>{
+  return await getaddress();
+}
+
+export function getCurrencyCode(){
+  return "BCH";
+}
+
+export function getCurrencyName(){
+  return "Bitcoin Cash"
+}
+
+export async function getHotWallet():Promise<any>{
+
+  let currency = getCurrencyCode();
+  let balance = await getHotWalletBalance();
+  let deposit_address = await getHotWalletAddress();
+  let name = getCurrencyName();
+
+  return {
+    "currency": currency,
+    "name": name,
+    "balance": balance,
+    "deposit_address": deposit_address
+  }
+
+}
+
 export async function sendtomany(outputs: any[][]):Promise<string>{
 
   log.info( "bch.hot.wallet.sendtomany", outputs)

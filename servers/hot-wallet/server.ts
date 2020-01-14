@@ -2,6 +2,12 @@ require('dotenv').config();
 import * as Hapi from "hapi";
 import * as wallet from '../../plugins/bch/wallet';
 
+import { join } from 'path';
+
+import { requireHandlersDirectory } from 'rabbi';
+
+const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
+
 const Joi = require('joi');
 
 import { log, models, auth } from '../../lib';
@@ -67,6 +73,23 @@ async function Server() {
     }
 
   })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/hot-wallets',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Gethotwallets.getHotWallets 
+
+    }
+
+  })
+
 
   return server;
 
