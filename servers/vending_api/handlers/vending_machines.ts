@@ -28,25 +28,15 @@ export async function toggleStrategy(req,h){
 
     if(!machine.additional_output_strategy_id){
 
-      console.log(machine.toJSON())
       machine.additional_output_strategy_id = 1; 
 
-      console.log(machine.toJSON())
-      let res =  await machine.save();
+      return await machine.save();
 
-      console.log(res.toJSON())
-
-      return res
     }else{
 
-      console.log(machine.toJSON())
       machine.additional_output_strategy_id = 0; 
 
-      console.log(machine.toJSON())
-      let res =  await machine.save();
-      console.log(res.toJSON())
-
-      return res
+      return await machine.save();
 
     }
   }catch(error){
