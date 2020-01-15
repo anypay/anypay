@@ -3,6 +3,7 @@ import * as Hapi from "hapi";
 const Joi = require('joi');
 import { log, models, auth } from '../../lib';
 const VendingMachineTransactions = require("./handlers/vending_transactions");
+import * as vendingMachines from './handlers/vending_machines';
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -73,6 +74,32 @@ async function Server() {
     handler:  VendingMachineTransactions.getLatestTransactions
 
   })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/vending_machines',
+
+    config: { auth : "sudopassword" },
+
+    handler:  vendingMachines.index
+
+  })
+
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/vending/vending_machines/{id}/toggleStrategy',
+
+    config: { auth : "sudopassword" },
+
+    handler:  vendingMachines.toggleStrategy
+
+  })
+
 
   server.route({
 
