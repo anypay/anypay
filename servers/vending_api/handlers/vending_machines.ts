@@ -35,6 +35,68 @@ export async function index(req, h) {
 
 }
 
+export async function update(req, h) {
+
+  let vendingMachine = await models.VendingMachine.findOne({ where: {
+
+    id: req.params.id
+
+  }});
+
+  if (!vendingMachine) {
+
+    return {
+
+      success: false,
+
+      error: 'vendingMachine not found'
+
+    }
+
+  }
+
+  let account = await models.Account.findOne({where:{email: req.payload.email}});
+
+  if(!account) return Boom.badRequest('invalid email')
+
+  vendingMachine = await models.VendingMachine.update(
+          {
+            account_id: account.id,
+            current_location_address: account.physical_address,
+            current_location_name: account.business_name
+          }, {
+
+    where: { id: req.params.id }
+
+  });
+
+  return {
+
+    success: true,
+
+    vendingMachine
+
+  }
+
+}
+
+
+
+export async function show(req, h){
+
+  try{
+
+    let vending_machine = await models.VendingMachine.findOne({where:{ id:req.params.id}})
+
+    return {vending_machine}
+
+  }catch(error){
+
+    return Boom.badRequest(error.message);
+
+  }
+}
+
 export async function toggleStrategy(req,h){
 
   let machine = await models.VendingMachine.findOne({where:{ id:req.params.id}})

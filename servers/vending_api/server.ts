@@ -100,6 +100,19 @@ async function Server() {
 
   })
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/vending_machines/{id}',
+
+    config: { auth : "sudopassword" },
+
+    handler:  vendingMachines.show
+
+  })
+
+
 
   server.route({
 
@@ -186,6 +199,37 @@ async function Server() {
     handler: VendingMachineTransactions.getAccountTransactions
 
   })
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/vending/vending-machines/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: vendingMachines.update,
+
+      validate: {
+
+        payload: {
+
+           email: Joi.string().optional(),
+
+           current_location_address: Joi.string().optional(),
+
+           current_location_name: Joi.string().optional(),
+
+         }
+
+      }
+
+    }
+
+  });
+
 
   return server;
 
