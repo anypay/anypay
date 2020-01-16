@@ -13,7 +13,7 @@ export async function index(req, h) {
 
     await Promise.all( records.map( async(record)=>{
    
-      let account = await models.Account.findOne({where:{id:record.id}});
+      let account = await models.Account.findOne({where:{id:record.account_id}});
 
       let tmp = record.toJSON();
 
