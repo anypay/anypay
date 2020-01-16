@@ -7,7 +7,23 @@ export async function index(req, h) {
 
   try {
 
-    let vending_machines = await  models.VendingMachine.findAll();
+    let records = await  models.VendingMachine.findAll();
+
+    let vending_machines = []
+
+    await Promise.all( records.map( async(record)=>{
+   
+      let account = await models.Account.findOne({where:{id:record.id}});
+
+      let tmp = record.toJSON();
+
+      if(account){
+        tmp['email'] = account.email;
+      }
+
+      vending_machines.push(tmp)
+
+    }))
 
     return { vending_machines }
 
