@@ -30,6 +30,7 @@ import * as password from './password';
 import * as auth from './auth';
 import * as square from './square';
 import * as mysql_lib from './mysql';
+import * as kraken from './kraken';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -69,7 +70,8 @@ export {
   login,
   auth,
   square,
-  mysql_lib
+  mysql_lib,
+  kraken
 }
 
 export async function initialize() {
