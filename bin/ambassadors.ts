@@ -11,9 +11,50 @@ import {
   claimBusiness
 } from '../lib/ambassadors';
 
+import { models } from '../lib';
+
 function renderTable() {
 
 }
+
+program
+  .command('migrate')
+  .action(async () => {
+
+    let rewards = await models.AmbassadorReward.findAll({ where: {
+
+      account_id: null
+
+    }});
+
+    console.log('rewards', rewards.length);
+
+    for (let i =0; i < rewards.length; i++) {
+
+      let invoice = await models.Invoice.findOne({ where: {
+
+        uid: rewards[i].invoice_uid
+
+      }});
+
+      let ambassador = await models.Ambassador.findOne({ where: {
+
+        id: rewards[i].ambassador_id
+
+      }});
+
+      rewards[i].account_id = invoice.account_id;
+      rewards[i].ambassador_account_id = ambassador.account_id;
+
+      await rewards[i].save();
+
+      console.log(rewards[i].toJSON());
+
+    }
+
+    process.exit(0);
+
+  });
 
 program
   .command('register <email> [name]')

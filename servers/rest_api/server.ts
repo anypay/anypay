@@ -737,6 +737,15 @@ async function Server() {
 
   server.route({
     method: 'GET',
+    path: '/ambassador_accounts',
+    handler: AmbassadorsController.index,
+    options: {
+      auth: "token"
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/ambassador_claims',
     handler: AmbassadorsController.list_account_claims,
     options: {

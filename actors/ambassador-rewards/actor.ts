@@ -111,6 +111,10 @@ export async function start() {
 
         ambassador_id: ambassador.id,
 
+        ambassador_account_id: ambassador.account_id,
+
+        account_id: invoice.account_id,
+
         invoice_uid: invoice.uid,
 
         currency: address.currency,

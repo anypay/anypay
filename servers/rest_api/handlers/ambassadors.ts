@@ -38,3 +38,51 @@ module.exports.list = async function(req: Request, h: ResponseToolkit) {
 
 };
 
+export async function index(req, h: ResponseToolkit) {
+
+  // get ambassador from account
+  let ambassador = await models.Ambassador.findOne({ where: {
+
+    account_id: req.account.id
+
+  }});
+
+  if (!ambassador) {
+
+    return h.response('ambassador not found').code(404);
+
+  }
+
+  let ambassador_accounts = await models.Account.findAll({
+
+    where: {
+
+      ambassador_id: ambassador.id
+
+    },
+
+    include: [{
+
+      model: models.AmbassadorReward,
+
+      as: 'ambassador_rewards',
+
+      where: {
+
+        ambassador_account_id: req.account.id
+
+      }
+
+    }]
+
+  });
+
+  return {
+    ambassador,
+    ambassador_accounts
+  }
+ 
+  // list all accounts  
+
+}
+

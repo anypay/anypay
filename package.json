@@ -104,7 +104,7 @@
     "yargs": "^12.0.5",
     "yayson": "^2.0.8",
     "yelp-fusion": "^3.0.0",
-    "zeromq": "^4.6.0"
+    "zeromq": "^6.0.0-beta.6"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
