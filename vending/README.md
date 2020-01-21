@@ -54,3 +54,27 @@ amqp, handling all response queues, amqp errors, etc.
 The second method is `rpc_sendtoaddress` which is an example rpc client call
 to the json rpc actor.
 
+```
+        JSON-RPC Client - sendtoaddress, getbalance
+          | ⌃ 
+          | |
+          ⌄ |
+        JSON-RPC Server - sendtoaddress, getbalance
+          | ⌃ 
+          | |
+          ⌄ |
+        Core Library - sendtoaddress
+          | ⌃ 
+          | |
+          ⌄ |
+        AMQP - temporary queues 
+          | ⌃ 
+          ⌄ |
+        Core Actor - sendtoaddress
+          | ⌃ 
+          | |
+          ⌄ |
+        Bitcoin
+
+```
+
