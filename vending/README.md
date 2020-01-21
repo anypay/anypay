@@ -44,3 +44,13 @@ try {
 
 ```
 
+### JSON RPC Actor
+
+### Library
+
+The library exposes two methods, one core `sendtoaddress` method which wraps
+amqp, handling all response queues, amqp errors, etc.
+
+The second method is `rpc_sendtoaddress` which is an example rpc client call
+to the json rpc actor.
+

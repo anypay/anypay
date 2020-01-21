@@ -3,7 +3,26 @@ require('dotenv').config();
 
 import * as uuid from 'uuid';
 
+import * as jayson from 'jayson';
+
 import { connect } from 'amqplib';
+
+export function rpc_sendtoaddress(address:string, amount:number) {
+
+  return new Promise((resolve, reject) => {
+
+    const client = jayson.client.http({
+      port: process.env.VENDING_BSV_JSON_RPC_PORT
+    });
+
+    client.request('sendtoaddress', [address, amount], function(err, response) {
+      if(err) return reject(err);
+      resolve(response.result);
+    });
+
+  });
+
+}
 
 export function sendtoaddress(address: string, amount: number) {
 
