@@ -41,11 +41,14 @@ export async function start() {
     let txs = await models.VendingTransaction.findAll({ 
       where: {
         additional_output_strategy_id:{
-          [Op.ne]:null
+          [Op.ne]:null,
+          [Op.ne]:0
         },
         additional_output_hash:{
           [Op.is]:null
-        }
+        },
+        status: "1",
+        type: 'BUY'
       }
     })
     
@@ -76,9 +79,9 @@ export async function start() {
 
     let vending_tx =  JSON.parse(msg.content) 
 
-    log.info('vendingTransaction.afterCreate', vending_tx)
+    if( vending_tx.status === "1" && vending_tx.type === 'BUY' && !vending_tx.additional_output_hash && vending_tx.additional_output_strategy_id ){
 
-    if( vending_tx.status === 1 && vending_tx.type === 'BUY' && !vending_tx.additional_output_hash ){
+      log.info('vendingTransaction.afterCreate.sendAdditionalOutputs', vending_tx)
 
       try{
 

@@ -311,6 +311,7 @@ export async function sendAdditionalOutputs(outputs:any[][], vending_tx_id: numb
 
   if( txid ){
  
+    log.info("Additional Ouputput Send", txid)
     let bchSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
 
     let usdSum = (await prices.convert({ currency: 'BCH', value: bchSum}, 'USD')).value
