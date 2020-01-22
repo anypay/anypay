@@ -42,7 +42,20 @@ function WebhooksConsumer(channel: Channel) {
 
     }
 
-    if (validate.isURL(invoice.webhook_url)) {
+    var valid;
+
+    try {
+      console.log(invoice.webhook_url);
+
+      valid = validate.isURL(invoice.webhook_url)
+
+    } catch(error) {
+
+      valid = false;
+
+    }
+
+    if (valid) {
 
       try {
 
@@ -58,7 +71,7 @@ function WebhooksConsumer(channel: Channel) {
 
         log.error('webhook.failed', error.message);
 
-        channel.nack(msg);
+        channel.ack(msg);
 
       }
 

@@ -5,6 +5,11 @@ import { log, models, auth } from '../../lib';
 const VendingMachineTransactions = require("./handlers/vending_transactions");
 import * as vendingMachines from './handlers/vending_machines';
 
+const HapiSwagger = require('hapi-swagger');
+
+const Inert = require('inert');
+const Vision = require('vision');
+
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
@@ -32,6 +37,15 @@ function responsesWithSuccess({ model }) {
   }
 }
 
+const swaggerOptions = {
+    info: {
+        title: 'Anypay Kiosk Api',
+        version: '0.0.1',
+    }
+};
+
+
+
 async function Server() {
 
   var server = new Hapi.Server({
@@ -47,6 +61,16 @@ async function Server() {
     }
   });
 
+ await server.register([
+        Inert,
+        Vision,
+        {
+          plugin: HapiSwagger,
+          options: swaggerOptions
+        }
+  ]);
+
+
   await server.register(require('hapi-auth-basic'));
   server.auth.strategy("token", "basic", { validate: auth.validateToken });
   server.auth.strategy("sudopassword", "basic", { validate: auth.validateSudoPassword});
@@ -55,23 +79,19 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/vending/vending_machine/{serial_number}/transactions',
-
-    config: { auth : "sudopassword" },
-
-    handler: VendingMachineTransactions.getMachineTransactions
-
-  })
-
-  server.route({
-
-    method: 'GET',
-
     path: '/api/vending/transactions',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  VendingMachineTransactions.getLatestTransactions
+      handler:  VendingMachineTransactions.getLatestTransactions,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'returns all vending machine transactions',
+
+    }
 
   })
 
@@ -81,9 +101,17 @@ async function Server() {
 
     path: '/api/vending/vending_machines',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  vendingMachines.index
+      handler:  vendingMachines.index,
+
+      auth : "sudopassword", 
+
+      tags: ['api'],
+
+      description: 'returns list of vending machines',
+
+    }
 
   })
 
@@ -93,10 +121,38 @@ async function Server() {
     method: 'PUT',
 
     path: '/api/vending/vending_machines/{id}/toggleStrategy',
+ 
+    options: {
 
-    config: { auth : "sudopassword" },
+      handler:  vendingMachines.toggleStrategy,
 
-    handler:  vendingMachines.toggleStrategy
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Toggles Vending Machine Output Strategy ID between 0 and 1',
+
+    }
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/vending_machines/{id}',
+
+    options: {
+
+      handler:  vendingMachines.show,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Returns details of vending machine by id',
+
+    }
 
   })
 
@@ -107,9 +163,17 @@ async function Server() {
 
     path: '/api/vending/transactions/kpis/revenue',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  VendingMachineTransactions.getRevenue
+      handler:  VendingMachineTransactions.getRevenue,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Returns the volume of all vending machines by last 24 hours, last week, last month and all time',
+
+    }
 
   })
 
@@ -119,9 +183,17 @@ async function Server() {
 
     path: '/api/vending/account/transactions/kpis/revenue',
 
-    config: { auth : "token" },
+    options: {
 
-    handler:  VendingMachineTransactions.getAccountRevenue
+      handler:  VendingMachineTransactions.getAccountRevenue,
+
+      auth : "token",
+
+      tags: ['api'],
+
+      description: 'Returns the volume of all vending machines by last 24 hours, last week, last month and all time by account'
+
+    }
 
   })
 
@@ -132,12 +204,19 @@ async function Server() {
 
     path: '/api/vending/account/{account_id}/transactions/kpis/revenue',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  VendingMachineTransactions.getAccountRevenue
+      handler:  VendingMachineTransactions.getAccountRevenue,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Returns the volume of all vending machines by last 24 hours, last week, last month and all time by account'
+
+    }
 
   })
-
 
   server.route({
 
@@ -145,9 +224,17 @@ async function Server() {
 
     path: '/api/vending/transactions/kpis/profit',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  VendingMachineTransactions.getProfit
+      handler:  VendingMachineTransactions.getProfit,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Returns the spread captured of all vending machines by last 24 hours, last week, last month and all time'
+
+    }
 
   })
 
@@ -157,9 +244,17 @@ async function Server() {
 
     path: '/api/vending/account/transactions/kpis/profit',
 
-    config: { auth : "token" },
+    options: {
 
-    handler:  VendingMachineTransactions.getAccountProfit
+      handler:  VendingMachineTransactions.getAccountProfit,
+
+      auth : "token",
+
+      tags: ['api'],
+
+      description: 'Returns the spread captured of all vending machines by last 24 hours, last week, last month and all time by account'
+
+    }
 
   })
 
@@ -169,9 +264,17 @@ async function Server() {
 
     path: '/api/vending/account/{account_id}/transactions/kpis/profit',
 
-    config: { auth : "sudopassword" },
+    options: {
 
-    handler:  VendingMachineTransactions.getAccountProfit
+      handler:  VendingMachineTransactions.getAccountProfit,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Returns the spread captured of all vending machines by last 24 hours, last week, last month and all time by account'
+
+    }
 
   })
 
@@ -181,11 +284,53 @@ async function Server() {
 
     path: '/api/vending/account/transactions',
 
-    config: { auth : "token" },
+    options: {
 
-    handler: VendingMachineTransactions.getAccountTransactions
+      auth : "token",
+
+      handler: VendingMachineTransactions.getAccountTransactions,
+
+      tags: ['api'],
+
+      description: 'Returns vending transactions for an account'
+
+    }
 
   })
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/api/vending/vending-machines/{id}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: vendingMachines.update,
+
+      description: 'Updates vending machine owner by anypay account email',
+
+      tags: ['api'],
+
+      validate: {
+
+        payload: {
+
+           email: Joi.string().optional(),
+
+           current_location_address: Joi.string().optional(),
+
+           current_location_name: Joi.string().optional(),
+
+         }
+
+      }
+
+    }
+
+  });
 
   return server;
 

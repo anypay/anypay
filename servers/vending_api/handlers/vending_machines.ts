@@ -1,9 +1,10 @@
+import { Request, ResponseToolkit } from 'hapi';
 
 import * as Boom from 'boom';
 
 import { models } from '../../../lib';
 
-export async function index(req, h) {
+export async function index(req: Request, h: ResponseToolkit) {
 
   try {
 
@@ -35,26 +36,74 @@ export async function index(req, h) {
 
 }
 
+export async function update(req: Request, h: ResponseToolkit) {
+
+  let vendingMachine = await models.VendingMachine.findOne({ where: {
+
+    id: req.params.id
+
+  }});
+
+  if (!vendingMachine) return h.response('Vending Machine Not Found').code(404);
+
+  let account = await models.Account.findOne({where:{email: req.payload.email}});
+
+  if(!account) return h.response("Invalid Email").code(404);
+
+  vendingMachine.account_id = account.id;
+
+  vendingMachine.current_location_address = account.physical_address,
+
+  vendingMachine.current_location_name =  account.business_name
+
+  await vendingMachine.save();
+
+  return { vendingMachine }
+
+}
+
+
+
+export async function show(req, h){
+
+  try{
+
+    let vending_machine = await models.VendingMachine.findOne({where:{ id:req.params.id}})
+
+    if (!vending_machine) return h.response('Vending Machine Not Found').code(404);
+
+    return {vending_machine}
+
+  }catch(error){
+
+    return Boom.badRequest(error.message);
+
+  }
+}
+
 export async function toggleStrategy(req,h){
 
-  let machine = await models.VendingMachine.findOne({where:{ id:req.params.id}})
+  let vendingMachine = await models.VendingMachine.findOne({where:{ id:req.params.id}})
 
   try{
 
 
-    if(!machine.additional_output_strategy_id){
+    if(!vendingMachine.additional_output_strategy_id){
 
-      machine.additional_output_strategy_id = 1; 
+      vendingMachine.additional_output_strategy_id = 1; 
 
-      return await machine.save();
+      await vendingMachine.save();
 
     }else{
 
-      machine.additional_output_strategy_id = 0; 
+      vendingMachine.additional_output_strategy_id = 0; 
 
-      return await machine.save();
+      await vendingMachine.save();
 
     }
+
+    return {vendingMachine}
+
   }catch(error){
 
     return Boom.badRequest(error.message);
