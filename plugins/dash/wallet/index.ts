@@ -4,11 +4,7 @@ require('dotenv').config();
 
 export async function getHotWalletBalance():Promise<number>{
 
-  let url = `https://insight.dash.org/insight-api/addr/${process.env.DASH_HOT_WALLET_ADDRESS}/?noTxList=1` 
-
-  let result = (await http.get(url)).body
-
-  return result.balance + result.unconfirmedBalance;
+  return parseFloat((await walletrpc('getbalance', [])).confirmed)
 
 }
 
@@ -40,3 +36,17 @@ export async function getHotWallet():Promise<any>{
 
 }
 
+async function walletrpc(method, params) {
+
+  let body = { jsonrpc: "2.0", method: method, params: params, id: 1 };
+
+  let url = `http://${process.env.DASH_HOT_WALLET_HOST}:${process.env.DASH_HOT_WALLET_PORT}`;
+
+  let resp = await http
+    .post(url)
+    .send(body)
+    .auth(process.env.DASH_HOT_WALLET_USER, process.env.DASH_HOT_WALLET_PASSWORD);
+
+  return resp.body.result;
+
+}
