@@ -65,6 +65,7 @@
     "joi": "^14.3.1",
     "jsonschema": "^1.2.2",
     "jsonwebtoken": "^8.3.0",
+    "knex": "^0.20.8",
     "kraken-api": "^1.0.0",
     "mailchimp-api-v3": "^1.13.0",
     "moment": "^2.22.1",
