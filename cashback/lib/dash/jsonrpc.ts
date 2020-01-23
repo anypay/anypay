@@ -15,8 +15,8 @@ class JsonRpc {
       try {
 
         http
-          .post(`http://${process.env.DASH_RPC_HOST}:${process.env.DASH_RPC_PORT}`)
-          .auth(process.env.DASH_RPC_USER, process.env.DASH_RPC_PASSWORD)
+          .post(`http://${process.env.CASHBACK_DASH_RPC_HOST}:${process.env.CASHBACK_DASH_RPC_PORT}`)
+          .auth(process.env.CASHBACK_DASH_RPC_USER, process.env.CASHBACK_DASH_RPC_PASSWORD)
           .timeout({
             response: 10000,  // Wait 5 seconds for the server to start sending,
             deadline: 10000, // but allow 1 minute for the file to finish loading.
