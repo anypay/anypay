@@ -1,5 +1,5 @@
 
-import { models } from './models';
+import { models } from '../models';
 
 var FCM = require('fcm-node');
 
