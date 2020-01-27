@@ -3,34 +3,14 @@ const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
-import { log } from '../../../lib';
+import { log, models } from '../../../lib';
 import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
-
-import { models } from '../../../lib';
 
 module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let account = await models.Account.find({ where: { id: accountId }})
-
-  let addresses = {
-
-    'BTC': account.bitcoin_payout_address,
-
-    'DASH': account.dash_payout_address,
-
-    'BCH': account.bitcoin_cash_address,
-
-    'ZEC': account.zcash_t_address,
-
-    'LTC': account.litecoin_address,
-
-    'DOGE': account.dogecoin_address,
-
-    'XRP': account.ripple_address
-
-  };
+  let account = await models.Account.findOne({ where: { id: accountId }})
 
   let accountAddresses = await models.Address.findAll({
 
@@ -38,6 +18,8 @@ module.exports.list = async function(request, reply) {
 
   })
   
+  let addresses = {};
+
   accountAddresses.forEach(address => {
 
     addresses[address.currency] = address.value;
@@ -55,7 +37,6 @@ module.exports.update = async function(request, reply) {
   let address = request.payload.address;
 
   let accountId = request.auth.credentials.accessToken.account_id;
-
 
   var changeset = {
 

@@ -544,6 +544,15 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/active-coins",
+    handler: CoinsController.getActiveCoins,
+    options: {
+      tags: ['api'],
+    }
+  });
+
+  server.route({
     method: "POST",
     path: "/invoices",
     handler: InvoicesController.create,

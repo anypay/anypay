@@ -1,4 +1,4 @@
-import {accounts}  from '../../../lib';
+import {accounts, models}  from '../../../lib';
 
 import * as Joi from 'joi';
 
@@ -38,6 +38,14 @@ module.exports.list = async function(request, reply) {
   return {
     'coins': sortBCHFirst(coins)
   };
+}
+
+module.exports.getActiveCoins = async function( request, reply){
+
+  let coins = await models.Coin.findAll({where:{ unavailable: false}});
+
+  return {coins}
+
 }
 
 function sortBCHFirst(data) {
