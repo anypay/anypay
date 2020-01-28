@@ -58,7 +58,7 @@
     "flipit": "^2.0.3",
     "got": "^9.6.0",
     "grant-hapi": "^4.6.5",
-    "handlebars": "^4.1.0",
+    "handlebars": "^4.7.2",
     "hapi": "^18.1.0",
     "hapi-auth-basic": "^5.0.0",
     "hapi-swagger": "^9.1.1",
