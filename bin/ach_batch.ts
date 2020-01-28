@@ -6,6 +6,9 @@ import * as program from 'commander';
 
 import { models, log } from '../lib';
 import * as ach from '../lib/ach';
+import * as wire from '../lib/wire';
+
+import { BigNumber } from 'bignumber.js';
 
 import * as fs from 'fs';
 
@@ -346,6 +349,58 @@ program
       }
 
     }
+
+  });
+
+program
+  .command('generate_latest_ach')
+  .action(async () => {
+
+    // check if there is already an outstanding ach batch with no batch id
+
+    let latestBatch = await models.AchBatch.findOne({
+
+      order: [['createdAt', 'DESC']]
+
+    })
+
+    if (!latestBatch.batch_id) {
+
+      throw new Error('An outstanding ACH Batch still needs to be sent and updated with Batch ID')
+    }
+
+    let invoices = await wire.getInvoices(latestBatch.last_invoice_uid);
+
+    let sum = invoices.reduce((sum, invoice) => {
+
+      let amount_paid = new BigNumber(invoice.denomination_amount_paid); 
+      let cash_back = new BigNumber(invoice.cashback_denomination_amount); 
+
+      return sum.plus(amount_paid).minus(cash_back);
+    
+    }, new BigNumber(0)).toNumber();
+
+    console.log(`${invoices.length} payments for next batch totaling $${sum}`);
+
+    let newBatch = await models.AchBatch.create({
+
+      last_invoice_uid: invoices[invoices.length - 1].uid,
+
+      type: 'ACH',
+
+      batch_description: 'ACH batch from sudo admin',
+
+      originating_account: 'TD Bank ACH',
+
+      currency: 'USD',
+
+      amount: sum
+
+    });
+
+    console.log(newBatch.toJSON());
+
+    // look up last invoice_uid from ach_batches table
 
   });
 

@@ -14,6 +14,13 @@ start invoice and and end invoice. That way we can keep track
 of the latest ACH paid, and use its ending invoice as 
 refernce to replace Derrick's email accounting.
 
-1) Auto-generate the email for Derrick to send every day, and
-send it to him.
+1. At 11am generate an email to Derrick containing a message
+
+```
+Your ACH transfer to eGifter today will be $3921.62 to Account Number [ACCOUNT NUMBER]
+
+Please send the transfer and then record the ACH Batch ID and Effective Date
+in the sudo dashboard here: https://sudo.anypayinc.com/#/record-ach-batch
+
+```
 
