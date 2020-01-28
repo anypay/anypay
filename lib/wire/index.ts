@@ -49,7 +49,7 @@ async function getInvoicesByDates(accountId, start, end) {
   return invoices;
 }
 
-async function getInvoices(invoiceUID: string) {
+export async function getInvoices(invoiceUID: string) {
 
   /*:
    * 1) Check to see when last invoice was
@@ -58,6 +58,10 @@ async function getInvoices(invoiceUID: string) {
    */
 
   let invoice = await models.Invoice.findOne({ where: { uid: invoiceUID }});
+
+  if (!invoice) {
+    throw new Error(`invoice ${invoiceUID} not found`);
+  }
 
   let account = await models.Account.findOne({
     where: { id: invoice.account_id }
@@ -77,7 +81,9 @@ async function getInvoices(invoiceUID: string) {
 
       }
 
-    }
+    },
+
+    order: [['createdAt', 'DESC']]
 
   });
 

@@ -5,6 +5,10 @@ import * as Boom from 'boom';
 
 import { models } from '../../../lib';
 
+import { Op } from 'sequelize';
+
+import * as moment from 'moment';
+
 export async function index(req: Request, h: ResponseToolkit) {
 
   try {
@@ -33,9 +37,19 @@ export async function update(req: Request, h: ResponseToolkit) {
 
   try {
 
+    if (!req.payload.batch_id) {
+      throw new Error('batch_id required');
+    }
+
+    if (!req.payload.effective_date) {
+      throw new Error('effective_date required');
+    }
+
     let updatedRecord = await models.AchBatch.update({
 
-      bank_batch_id: req.payload.batch_id,
+      batch_id: req.payload.batch_id,
+
+      effective_date: moment(req.payload.effective_date).toDate(),
 
     }, {
 
@@ -43,7 +57,7 @@ export async function update(req: Request, h: ResponseToolkit) {
 
         id: req.params.id,
 
-        bank_batch_id: 0
+        batch_id: { [Op.eq]: null }
 
       },
 
