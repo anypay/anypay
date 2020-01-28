@@ -4,6 +4,8 @@ import { Request, ResponseToolkit } from 'hapi';
 import * as Boom from 'boom';
 
 import { models } from '../../../lib';
+import * as wire from '../../../lib/wire';
+import { sendEmail } from '../../../lib/email';
 
 import { Op } from 'sequelize';
 
@@ -65,6 +67,8 @@ export async function update(req: Request, h: ResponseToolkit) {
 
     });
 
+    sendAchReport(req.params.id);
+
     return { ach: updatedRecord };
 
   } catch(error) {
@@ -72,6 +76,14 @@ export async function update(req: Request, h: ResponseToolkit) {
     return Boom.badRequest(error.message)
 
   }
+
+}
+
+async function sendAchReport(batch_id) {
+
+  let report = await wire.buildAchBatchEmailReport(batch_id);
+
+  await sendEmail('steven@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
 
 }
 

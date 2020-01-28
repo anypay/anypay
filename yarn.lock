@@ -5823,9 +5823,9 @@ querystringify@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/querystringify/-/querystringify-2.1.1.tgz#60e5a5fd64a7f8bfa4d2ab2ed6fdf4c85bad154e"
 
-rabbi@1.10.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/rabbi/-/rabbi-1.10.0.tgz#a54436d904c1cf695be141cb968d382eb08ac21e"
+rabbi@1.10.5:
+  version "1.10.5"
+  resolved "https://registry.yarnpkg.com/rabbi/-/rabbi-1.10.5.tgz#2a8ce50481fc727748fa49b43561c31b73483276"
   dependencies:
     "@types/amqplib" "^0.5.11"
     "@types/bluebird" "^3.5.26"
@@ -5845,6 +5845,7 @@ rabbi@1.10.0:
     lodash.reject "^4.6.0"
     mkdirp "^0.5.1"
     mocha "^6.2.0"
+    moment "^2.24.0"
     public-ip "^4.0.0"
     superagent "^5.0.5"
     ts-node "^8.3.0"

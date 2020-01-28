@@ -384,7 +384,9 @@ program
 
     let newBatch = await models.AchBatch.create({
 
-      last_invoice_uid: invoices[invoices.length - 1].uid,
+      first_invoice_uid: invoices[invoices.length - 1].uid,
+
+      last_invoice_uid: invoices[0].uid,
 
       type: 'ACH',
 
@@ -401,6 +403,11 @@ program
     console.log(newBatch.toJSON());
 
     // look up last invoice_uid from ach_batches table
+    // buildAchBatchEmailReport
+
+    let report = await wire.buildAchBatchEmailReport(newBatch.id)
+
+    console.log(report);
 
   });
 
