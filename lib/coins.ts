@@ -7,7 +7,7 @@ var coins = [];
 
 export async function refreshCoins() {
 
-  coins = await models.Coin.findAll({where: {unavailable: false}});
+  coins = await models.Coin.findAll();
 
   emitter.emit('coins.refreshed');
 
