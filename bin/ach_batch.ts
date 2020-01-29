@@ -7,6 +7,7 @@ import * as program from 'commander';
 import { models, log } from '../lib';
 import * as ach from '../lib/ach';
 import * as wire from '../lib/wire';
+import { sendEmail } from '../lib/email';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -361,6 +362,28 @@ program
       let batch = await ach.generateLatestBatch();
 
       console.log(batch.toJSON());
+
+    } catch(error) {
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('send_ach_report_email <batch_id> <email>')
+  .action(async (batch_id, email) => {
+
+    try {
+
+      let report = await wire.buildAchBatchEmailReport(batch_id);
+
+      let resp = await sendEmail(email, '[ACH EMAIL TO SEND EGIFTER]', report);
+
+      console.log(resp);
 
     } catch(error) {
 
