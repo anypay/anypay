@@ -4,6 +4,9 @@ import * as wire from '../wire';
 import { BigNumber } from 'bignumber.js';
 import * as Sequelize from 'sequelize';
 
+
+import { Op } from 'sequelize';
+
 import { models } from '../models';
 
 export async function getInvoiceRange(startUid:string, endUid:string, where:any={}) {
@@ -78,7 +81,17 @@ export async function generateLatestBatch() {
 
   let latestBatch = await models.AchBatch.findOne({
 
-    order: [['createdAt', 'DESC']]
+    where: {
+
+      effective_date: {
+
+        [Op.ne]: null
+
+      }
+
+    },
+
+    order: [['effective_date', 'DESC']]
 
   })
 

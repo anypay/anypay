@@ -5,6 +5,8 @@ import * as moment from 'moment';
 
 import { readFileSync } from 'fs';
 
+import * as mustache from 'mustache';
+
 import { Op } from 'sequelize';
 
 import * as Handlebars from 'handlebars';
@@ -131,13 +133,16 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
     uid: batch.last_invoice_uid
   }});
 
-  let templateSource = readFileSync(join(__dirname, './template.hbs'));
+  let templateSource = readFileSync(join(__dirname, './template.mustache'));
 
-  let template = Handlebars.compile(templateSource.toString('utf8'));
+  //let template = Handlebars.compile(templateSource.toString('utf8'));
 
   let invoices = await models.Invoice.findAll({
     where: {
       account_id: firstInvoice.account_id,
+      status: {
+        [Op.ne]: 'unpaid'
+      },
 
       id: {
         [Op.gte]: firstInvoice.id,
@@ -149,7 +154,7 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
   let start_date = moment(firstInvoice.completed_at).format('MM-DD-YYYY');
   let end_date = moment(lastInvoice.completed_at).format('MM-DD-YYYY');
 
-  let content = template({
+  let content = mustache.render(templateSource.toString('utf8'), {
     reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
     invoices,
     total: batch.amount,
