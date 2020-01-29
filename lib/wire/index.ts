@@ -49,7 +49,7 @@ async function getInvoicesByDates(accountId, start, end) {
   return invoices;
 }
 
-async function getInvoices(invoiceUID: string) {
+export async function getInvoices(invoiceUID: string) {
 
   /*:
    * 1) Check to see when last invoice was
@@ -58,6 +58,10 @@ async function getInvoices(invoiceUID: string) {
    */
 
   let invoice = await models.Invoice.findOne({ where: { uid: invoiceUID }});
+
+  if (!invoice) {
+    throw new Error(`invoice ${invoiceUID} not found`);
+  }
 
   let account = await models.Account.findOne({
     where: { id: invoice.account_id }
@@ -77,7 +81,9 @@ async function getInvoices(invoiceUID: string) {
 
       }
 
-    }
+    },
+
+    order: [['createdAt', 'DESC']]
 
   });
 
@@ -101,6 +107,59 @@ async function getInvoices(invoiceUID: string) {
   });
 
   return invoices;
+
+}
+export async function buildAchBatchEmailReport(ach_batch_id: number) {
+
+  let batch = await models.AchBatch.findOne({ where: { id: ach_batch_id }});
+
+  let previousBatch = await models.AchBatch.findOne({
+
+    where: {
+      id: { [Op.lt]: batch.id }
+    },
+
+    order: [['id', 'desc']]
+
+  });
+
+  let firstInvoice = await models.Invoice.findOne({ where: {
+    uid: batch.first_invoice_uid
+  }});
+
+  let lastInvoice = await models.Invoice.findOne({ where: {
+    uid: batch.last_invoice_uid
+  }});
+
+  let templateSource = readFileSync(join(__dirname, './template.hbs'));
+
+  let template = Handlebars.compile(templateSource.toString('utf8'));
+
+  let invoices = await models.Invoice.findAll({
+    where: {
+      account_id: firstInvoice.account_id,
+
+      id: {
+        [Op.gte]: firstInvoice.id,
+        [Op.lte]: lastInvoice.id
+      }
+    }
+  })
+
+  let start_date = moment(firstInvoice.completed_at).format('MM-DD-YYYY');
+  let end_date = moment(lastInvoice.completed_at).format('MM-DD-YYYY');
+
+  let content = template({
+    reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
+    invoices,
+    total: batch.amount,
+    batch_id: batch.batch_id,
+    effective_date: moment(batch.effective_date).format('dddd, MMMM Do YYYY'),
+    start_date,
+    end_date
+  });
+
+  return content;
 
 }
 

@@ -6,6 +6,9 @@ import * as program from 'commander';
 
 import { models, log } from '../lib';
 import * as ach from '../lib/ach';
+import * as wire from '../lib/wire';
+
+import { BigNumber } from 'bignumber.js';
 
 import * as fs from 'fs';
 
@@ -346,6 +349,26 @@ program
       }
 
     }
+
+  });
+
+program
+  .command('generate_latest_ach')
+  .action(async () => {
+
+    try {
+
+      let batch = await ach.generateLatestBatch();
+
+      console.log(batch.toJSON());
+
+    } catch(error) {
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
 
   });
 
