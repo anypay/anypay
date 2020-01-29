@@ -27,6 +27,24 @@ export async function create(req, h) {
 
   try {
 
+    if (!req.payload.last_invoice_uid) {
+
+      return Boom.badRequest('last_invoice_uid must be provided in payload');
+
+    }
+
+    let invoice = await models.Invoice.findOne({ where: {
+
+      uid: req.payload.last_invoice_uid
+
+    }});
+
+    if (!invoice) {
+
+      return Boom.badRequest('invoice not found for last_invoice_uid');
+
+    }
+
     let ach_batch = await  models.AchBatch.create(req.payload);
 
     return { ach_batch };
@@ -38,5 +56,4 @@ export async function create(req, h) {
   }
 
 }
-
 

@@ -10,7 +10,7 @@ import { recordCustomerCashback } from '../../lib/persistence';
 import { sendToAddress } from '../../lib';
 import { isCached, cacheInvoice } from './lib/debounce_cache';
 
-import * as models from '../../models';
+import {models} from '../../../lib';
 
 export async function start() {
 

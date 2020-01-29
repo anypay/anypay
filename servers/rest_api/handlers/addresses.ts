@@ -12,25 +12,9 @@ module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let account = await models.Account.find({ where: { id: accountId }})
+  let account = await models.Account.findOne({ where: { id: accountId }})
 
-  let addresses = {
-
-    'BTC': account.bitcoin_payout_address,
-
-    'DASH': account.dash_payout_address,
-
-    'BCH': account.bitcoin_cash_address,
-
-    'ZEC': account.zcash_t_address,
-
-    'LTC': account.litecoin_address,
-
-    'DOGE': account.dogecoin_address,
-
-    'XRP': account.ripple_address
-
-  };
+  let addresses = {};
 
   let accountAddresses = await models.Address.findAll({
 
