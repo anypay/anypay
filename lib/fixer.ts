@@ -1,5 +1,4 @@
 import {models} from './index';
-import * as Sequelize from 'Sequelize';
 import * as http from 'superagent';
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY
