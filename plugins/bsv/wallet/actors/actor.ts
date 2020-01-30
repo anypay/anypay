@@ -26,7 +26,13 @@ export async function start() {
 
     routingkey: 'bsv.sendtoaddress',
 
-    queue: 'anypay.vending.bsv.sendtoaddress'
+    queue: 'anypay.vending.bsv.sendtoaddress',
+
+    queueOptions: {
+
+      autoDelete: true
+
+    }
 
   })
   .start(async (channel, msg, json) => {
@@ -90,7 +96,13 @@ export async function start() {
 
     routingkey: 'bsv.sendtomany',
 
-    queue: 'anypay.vending.bsv.sendtomany'
+    queue: 'anypay.vending.bsv.sendtomany',
+
+    queueOptions: {
+
+      autoDelete: true
+
+    }
 
   })
   .start(async (channel, msg, json) => {

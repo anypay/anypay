@@ -18,14 +18,15 @@ export async function start() {
   let conn = await amqp.connect(process.env.AMQP_URL)
 
   let chan = await conn.createChannel();
-
+/*
   setInterval( async ()=>{
 
     await chan.publish('anypay.events', 'outputs.retry.send', Buffer.from('outputs.retry.send'))        
 
   }, 10000)
-
+*/
   //Fallback retry
+/*
   Actor.create({
 
     exchange: 'anypay.events',
@@ -69,6 +70,7 @@ export async function start() {
     channel.ack(msg);
 
   }); 
+*/
 
   Actor.create({
 
@@ -143,7 +145,6 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
   if( !strategy ) throw new Error(`invalid additional output strategy`)
 
-  console.log(strategy)
   let outputs = []; 
 
   await Promise.all(strategy.outputs.map(async (output:any) => {
@@ -272,5 +273,3 @@ export async function sendAdditionalOutputs(vendingTxid: number):Promise<any>{
   return txid;
 
 }
-
-

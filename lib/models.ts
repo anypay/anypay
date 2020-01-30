@@ -31,6 +31,16 @@ models.CashbackCustomerPayment.belongsTo(models.Invoice, {
   foreignKey: 'invoice_id'
 });
 
+models.VendingTransaction.hasMany(models.VendingTransactionOutput, {
+  foreignKey: 'vending_transaction_id',
+  as: 'outputs'
+});
+
+models.VendingTransactionOutput.belongsTo(models.VendingTransaction, {
+  foreignKey: 'vending_transaction_id',
+  as: 'vending_transaction'
+});
+
 models.AchBatch.hasMany(models.AccountAch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
