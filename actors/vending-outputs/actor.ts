@@ -12,12 +12,12 @@ import * as amqp from 'amqplib';
 
 const Op = require('sequelize').Op;
 
-
 export async function start() {
 
   let conn = await amqp.connect(process.env.AMQP_URL)
 
   let chan = await conn.createChannel();
+
 /*
   setInterval( async ()=>{
 
@@ -25,15 +25,20 @@ export async function start() {
 
   }, 10000)
 */
-  //Fallback retry
-/*
+
   Actor.create({
 
     exchange: 'anypay.events',
 
-    routingkey: 'outputs.retry.send',
+    routingkey: 'vending.additional.outputs.retry',
 
-    queue: 'outputs.retry.send',
+    queue: 'vending.additional.outputs.retry',
+
+    queueOptions: {
+
+      autoDelete: true
+
+    }
 
   })  
   .start(async (channel, msg) => {
@@ -70,7 +75,6 @@ export async function start() {
     channel.ack(msg);
 
   }); 
-*/
 
   Actor.create({
 
@@ -78,7 +82,13 @@ export async function start() {
 
     routingkey: 'models.VendingTransaction.afterCreate',
 
-    queue: 'vending_outputs_local',
+    queue: 'vending.additional.outputs',
+
+    queueOptions: {
+
+      autoDelete: true
+
+    }
 
   })  
   .start(async (channel, msg) => {
@@ -89,18 +99,10 @@ export async function start() {
 
     if( vending_tx.status === "1" && vending_tx.type === 'BUY' && !vending_tx.additional_output_hash ){
 
-      try{
+      let txid = await sendAdditionalOutputs( vending_tx.id)
 
-        let txid = await sendAdditionalOutputs( vending_tx.id)
+      log.info(`vending.transaction.${vending_tx.id}.output.send txid: ${txid}`)
 
-        log.info(`vending.transaction.${vending_tx.id}.output.send txid: ${txid}`)
-
-      }catch(err){
-    
-        log.info(`ERROR vending.transaction.${vending_tx.id}.output.send ${err}`)
-
-      }
-           
     }
 
     channel.ack(msg);
@@ -162,7 +164,7 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
     }
 
-    let amount = (bsvToSend*output.scaler).toFixed(5)
+    let amount = (bsvToSend*output.scaler).toFixed(8)
 
     if( !address ) throw new Error(`BSV address is not set for all accounts in strategy ${strategy.id}`)
     
@@ -197,32 +199,19 @@ export async function getAdditionalOutputs(vendingTransactionId:number){
 
 export async function validateOutputs(outputs: any[][], vending_tx_id: number): Promise<boolean>{
 
-  let vending_tx = await models.VendingTransaction.findOne({
-    where:{
-      id: vending_tx_id,
-      additional_output_hash:{
-        [Op.is]:null
-      }
-    }
-  });
-
-  if( !vending_tx ) throw new Error('Invalid Vending Transaction Id - Cannot send additonal outputs'); 
-
   await Promise.all(outputs.map(async (output)=>{
-
-  let record = await models.VendingTransactionOutput.findOne({
-    where:{
-      vending_transaction_id: vending_tx_id,
-      address: output[0],
-      hash:{
-       [Op.is]: null
+    let record = await models.VendingTransactionOutput.findOne({
+      where:{
+        vending_transaction_id: vending_tx_id,
+        address: output[0],
+        hash:{
+         [Op.is]: null
+        }
       }
-    }
-  })
+    })
 
-  if(!record) throw new Error(`Invalid output vending_transaction_id: ${vending_tx_id} ${output[0]} ${output[1]}`)
-
- }));
+    if(!record) throw new Error(`Invalid output vending_transaction_id: ${vending_tx_id} ${output[0]} ${output[1]}`)
+   }));
 
  return true
 
@@ -242,13 +231,7 @@ export async function sendAdditionalOutputs(vendingTxid: number):Promise<any>{
 
   if( txid ){
  
-    let bsvSum = outputs.reduce((a,b) => a+parseFloat(b[1]),0)
-
-    let usdSum = (await prices.convert({ currency: 'BSV', value: bsvSum}, 'USD')).value
-
     await vendingTx.update({
-      additional_output_fiat_paid :  usdSum,
-      additional_output_crypto_paid :  bsvSum,
       additional_output_hash : txid 
     })
 
@@ -261,10 +244,10 @@ export async function sendAdditionalOutputs(vendingTxid: number):Promise<any>{
         }
       })
 
-    await record.update({
-      hash: txid,
-      amount: output[1]
-    })
+      await record.update({
+        hash: txid,
+        amount: output[1]
+      })
 
    }))
 
