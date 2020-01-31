@@ -14,18 +14,6 @@ const Op = require('sequelize').Op;
 
 export async function start() {
 
-  let conn = await amqp.connect(process.env.AMQP_URL)
-
-  let chan = await conn.createChannel();
-
-/*
-  setInterval( async ()=>{
-
-    await chan.publish('anypay.events', 'outputs.retry.send', Buffer.from('outputs.retry.send'))        
-
-  }, 10000)
-*/
-
   Actor.create({
 
     exchange: 'anypay.events',
