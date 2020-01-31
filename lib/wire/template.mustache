@@ -1,0 +1,27 @@
+
+<p>Hey Ally, Mark, and Judy,<p>
+<p>An ACH was just scheduled to be sent to eGifter on {{effective_date}} for the amount of ${{total}}. ACH confirmation #{{batch_id}}.
+
+<p>That covers the following invoices from {{start_date}} - {{end_date}}:</p>
+
+<p>----------------------------------------</p>
+
+{{#invoices}}
+<p>Payment completed at: {{completed_at}}</p>
+<p>Amount paid: ${{denomination_amount_paid}}</p>
+<p>Minus Dash Back: ${{cashback_denomination_amount}}</p>
+<p>eGifter Gets: ${{settlement_amount}}</p>
+<p>Reference: {{external_id}}</p>
+<p>Invoice ID: {{uid}}</p>
+<br/>
+{{/invoices}}
+
+<p>----------------------------------------</p>
+
+<p>Total: ${{total}}</p>
+
+<p>Best,</p>
+
+<p>Derrick</p>
+<p>AnypayInc.com</p>
+<p>202.489.9284 (direct)</p>
