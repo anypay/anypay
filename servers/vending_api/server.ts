@@ -4,6 +4,7 @@ const Joi = require('joi');
 import { log, models, auth } from '../../lib';
 const VendingMachineTransactions = require("./handlers/vending_transactions");
 import * as vendingMachines from './handlers/vending_machines';
+import * as AdditionalOutputController from './handlers/additional_outputs';
 
 const HapiSwagger = require('hapi-swagger');
 
@@ -90,6 +91,46 @@ async function Server() {
       tags: ['api'],
 
       description: 'returns all vending machine transactions',
+
+    }
+
+  })
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/vending/additional-outputs/retry',
+
+    options: {
+
+      handler:  AdditionalOutputController.retry,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Looks for additional outputs to be sent and retrys',
+
+    }
+
+  })
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/vending/additional-outputs/failures',
+
+    options: {
+
+      handler:  AdditionalOutputController.failures,
+
+      auth : "sudopassword",
+
+      tags: ['api'],
+
+      description: 'Looks for additional outputs to be sent and retrys',
 
     }
 
