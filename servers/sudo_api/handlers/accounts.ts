@@ -3,6 +3,7 @@ const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
+const { Op } = require('sequelize')
 
 import { geocode } from '../../../lib/googlemaps';
 
@@ -30,10 +31,34 @@ export async function sudoShow (request, reply) {
    var account = await models.Account.findOne({
     where: {
       id: request.params.account_id
-    }
+    },include:[{
+      model: models.Address,
+      as: 'addresses'
+    },{
+      model: models.Invoice,
+      where:{
+        status: {
+          [Op.ne]: 'unpaid',
+        }
+      },
+      order: [['id', 'DESC']],
+      limit: 100,
+      as: 'invoices'
+    },{
+      model: models.VendingMachine,
+      as: 'vending_machines'
+    },
+    {
+      model: models.VendingTransaction,
+      as: 'vending_transactions'
+    },{
+      model: models.VendingTransactionOutput,
+      as: 'vending_transaction_outputs'
+    }]
   });
 
-   return account;
+  return account;
+
 };
 
 export async function sudoAccountWithEmail (request, reply) {
