@@ -4,44 +4,7 @@ require('dotenv').config();
 
 import * as uuid from 'uuid';
 
-import * as jayson from 'jayson';
-
 import { connect } from 'amqplib';
-
-export function rpc_sendtoaddress(address:string, amount:number) {
-
-  return new Promise((resolve, reject) => {
-
-    const client = jayson.client.http({
-      port: 80,
-      host: 'e865ffba.ngrok.io'
-    });
-
-    client.request('sendtoaddress', [address, amount], function(err, response) {
-      if(err) return reject(err);
-      resolve(response.result);
-    });
-
-  });
-
-}
-export function rpc_getbalance() {
-
-  return new Promise((resolve, reject) => {
-
-    const client = jayson.client.http({
-      port: 80,
-      host: 'e865ffba.ngrok.io'
-    });
-
-    client.request('getbalance', [], function(err, response) {
-      if(err) return reject(err);
-      resolve(response.result);
-    });
-
-  });
-
-}
 
 export function getbalance(){
 
