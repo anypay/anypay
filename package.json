@@ -52,6 +52,7 @@
     "docsify": "^4.10.2",
     "dotenv": "^8.1.0",
     "eventemitter2": "^5.0.1",
+    "eventsource": "^1.0.7",
     "fcm-node": "^1.5.2",
     "figlet": "^1.2.0",
     "firebase-admin": "^8.9.1",
