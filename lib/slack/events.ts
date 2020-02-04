@@ -14,3 +14,19 @@ export async function publishEventToSlack(message: string) {
       })
   }
 }
+
+export async function publishRabbi(message: string) {
+
+  let url =
+  'https://chat.anypay.global/hooks/aLfLzb4YwwgmEQ96r/PoLSobBt6iqnCPQj4dW9MpBb5Cwmxvj7NNdQof72pSP6x6Wt';
+
+
+  let result = await http
+    .post(url)
+    .send({
+      text: message
+    })
+
+  return result.response;
+}
+
