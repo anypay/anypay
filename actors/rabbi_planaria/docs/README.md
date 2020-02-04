@@ -1,3 +1,3 @@
-# Headline
+# Actor: Rabbi Planaria
 
-> An awesome project.
+> ts-node actors/rabbi_planaria/actor.ts
