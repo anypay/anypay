@@ -2,8 +2,6 @@
 
 require('dotenv').config();
 
-const { planaria } = require("./neonplanaria")
-const MongoClient = require('mongodb')
 const EventSource = require('eventsource')
 
 import { Actor, Joi, log, getChannel } from 'rabbi'; 
