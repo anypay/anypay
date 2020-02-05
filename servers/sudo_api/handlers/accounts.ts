@@ -86,7 +86,7 @@ export async function sudoShow (request, reply) {
 
   }
 
-  return account;
+  return {account};
 
 };
 
