@@ -145,7 +145,7 @@ async function Server() {
         
         payload : {
 
-          amount: Joi.integer().required()
+          amount: Joi.number().required()
 
         }
 
