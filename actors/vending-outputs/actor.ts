@@ -6,6 +6,8 @@ import * as wallet from '../../plugins/bsv/wallet';
 
 import { Actor, Joi } from 'rabbi';
 
+const BigNumber: any = require('bignumber.js');
+
 import {log, models, prices} from '../../lib';
 
 import * as amqp from 'amqplib';
@@ -53,8 +55,10 @@ export async function start() {
     })
     
     let txids = await Promise.all(vendingTransactions.map(async(tx)=>{
-     
-      return await sendAdditionalOutputs(tx.id)
+
+      const opreturn = ['1BLZW7d4viDyreJsBPTnHJc4Wz127JUUp9', '0.0.1', tx.terminal_id, tx.localtid, tx.remotetid, tx.cash_amount, tx.cash_currency, tx.crypto_currency, tx.hash]
+
+      return await sendAdditionalOutputs(tx.id, opreturn)
 
     }));
     
@@ -87,7 +91,10 @@ export async function start() {
 
     if( vending_tx.status === "1" && vending_tx.type === 'BUY' && !vending_tx.additional_output_hash ){
 
-      let txid = await sendAdditionalOutputs( vending_tx.id)
+
+      const opreturn = ['1BLZW7d4viDyreJsBPTnHJc4Wz127JUUp9', '0.0.1', vending_tx.terminal_id, vending_tx.localtid, vending_tx.remotetid, vending_tx.cash_amount, vending_tx.cash_currency, vending_tx.crypto_currency, vending_tx.hash]
+
+      let txid = await sendAdditionalOutputs( vending_tx.id, opreturn)
 
       log.info(`vending.transaction.${vending_tx.id}.output.send txid: ${txid}`)
 
@@ -205,7 +212,7 @@ export async function validateOutputs(outputs: any[][], vending_tx_id: number): 
 
 }
 
-export async function sendAdditionalOutputs(vendingTxid: number):Promise<any>{
+export async function sendAdditionalOutputs(vendingTxid: number, msg?: string[]):Promise<any>{
 
   let vendingTx = await models.VendingTransaction.findOne({where:{id:vendingTxid}});
 
@@ -215,7 +222,7 @@ export async function sendAdditionalOutputs(vendingTxid: number):Promise<any>{
 
   if(!isValid) throw new Error(`invalid outputs`);
 
-  let txid = await wallet.sendtomany(outputs);
+  let txid = await wallet.sendtomany(outputs, msg);
 
   if( txid ){
  

@@ -26,6 +26,7 @@ function hash(password) {
 }
 
 export async function sudoShow (request, reply) {
+
   console.log("sudo show", request.params);
 
    var account = await models.Account.findOne({
@@ -54,8 +55,36 @@ export async function sudoShow (request, reply) {
     },{
       model: models.VendingTransactionOutput,
       as: 'vending_transaction_outputs'
+    },
+    {
+      model: models.Ambassador,
+      as: 'ambassador'
+    },{
+      model: models.AmbassadorReward,
+      as: 'ambassador_rewards'
     }]
   });
+
+  let ambassador = await models.Ambassador.findOne({ 
+    where: {
+      account_id: account.id 
+    },
+    include:[
+      {
+        model: models.Account,
+        as: 'merchants'
+      },{
+        model: models.AmbassadorReward,
+        as: 'rewards'
+      }
+    ]
+  })
+
+  if( ambassador){
+
+    account = Object.assign(ambassador.toJSON(), account.toJSON())
+
+  }
 
   return account;
 
