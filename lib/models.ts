@@ -152,6 +152,12 @@ models.Account.hasMany(models.VendingTransaction, {
   as: 'vending_transactions'
 });
 
+models.Account.hasMany(models.AmbassadorReward, {
+  foreignKey: 'ambassador_account_id',
+  sourceKey: 'id',
+  as: 'ambassador_rewards'
+});
+
 models.VendingTransaction.belongsTo(models.Account, {
   as: 'vending_transactions',
   foreignKey: 'account_id'

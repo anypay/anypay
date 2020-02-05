@@ -58,7 +58,19 @@ export async function start() {
 
       const opreturn = ['1BLZW7d4viDyreJsBPTnHJc4Wz127JUUp9', '0.0.1', tx.terminal_id, tx.localtid, tx.remotetid, tx.cash_amount, tx.cash_currency, tx.crypto_currency, tx.hash]
 
-      return await sendAdditionalOutputs(tx.id, opreturn)
+      try{
+      
+        return await sendAdditionalOutputs(tx.id, opreturn)
+
+      }catch(err){
+
+        log.info('error', err)
+
+        await models.vendingTransaction.update({
+          additional_output_error: err
+        }, {where: { id: tx.id }});
+
+      }
 
     }));
     
