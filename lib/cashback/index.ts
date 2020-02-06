@@ -97,7 +97,10 @@ export async function listFailures(): Promise<any[]> {
     `select cashback_customer_payments.*, invoices.account_id, invoices.uid from
     cashback_customer_payments inner join invoices on invoices.id =
     cashback_customer_payments.invoice_id where  invoices.status = 'paid'
-    and transaction_hash is null order
+    and transaction_hash is null
+    and cashback_customer_payments.amount > 0
+    and cashback_customer_payments.cashback_merchant_id is not null
+    and cashback_customer_payments.currency in ('BCH', 'DASH') order
     by "createdAt" desc;`
   );
 
