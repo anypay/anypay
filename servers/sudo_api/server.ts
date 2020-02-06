@@ -117,6 +117,48 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/cash_deposits",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.CashDeposits.index,
+
+    }
+
+  });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/api/cash_deposits",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.CashDeposits.create,
+
+      validate: {
+        
+        payload : {
+
+          amount: Joi.number().required()
+
+        }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/merchant_groups",
 
     config: {
