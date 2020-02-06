@@ -503,6 +503,17 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/account/rewards",
+    handler: AccountsController.getRewards,
+    options: {
+      auth: "token",
+      tags: ['api'],
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/account",
     handler: AccountsController.update,
