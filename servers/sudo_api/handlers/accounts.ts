@@ -25,45 +25,35 @@ function hash(password) {
   });
 }
 
-export async function sudoShow (request, reply) {
 
-  console.log("sudo show", request.params);
+export async function showAddresses(request, reply){
 
-   var account = await models.Account.findOne({
+  var account = await models.Account.findOne({
     where: {
       id: request.params.account_id
     },include:[{
       model: models.Address,
       as: 'addresses'
-    },{
-      model: models.Invoice,
-      where:{
-        status: {
-          [Op.ne]: 'unpaid',
-        }
-      },
-      order: [['id', 'DESC']],
-      limit: 100,
-      as: 'invoices'
-    },{
-      model: models.VendingMachine,
-      as: 'vending_machines'
-    },
-    {
-      model: models.VendingTransaction,
-      as: 'vending_transactions'
-    },{
-      model: models.VendingTransactionOutput,
-      as: 'vending_transaction_outputs'
-    },
-    {
+    }]
+  })
+
+  return {account}
+
+}
+
+export async function showAmbassadorRewards(request, reply){
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    },include:[{
       model: models.Ambassador,
       as: 'ambassador'
     },{
       model: models.AmbassadorReward,
       as: 'ambassador_rewards'
     }]
-  });
+  })
 
   let ambassador = await models.Ambassador.findOne({ 
     where: {
@@ -73,11 +63,7 @@ export async function sudoShow (request, reply) {
       {
         model: models.Account,
         as: 'merchants'
-      },{
-        model: models.AmbassadorReward,
-        as: 'rewards'
-      }
-    ]
+      }]
   })
 
   if( ambassador){
@@ -86,6 +72,41 @@ export async function sudoShow (request, reply) {
 
   }
 
+  return {account};
+
+}
+
+export async function showKioskRewards(request, reply){
+
+   var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    },include:[{
+      model: models.VendingMachine,
+      as: 'vending_machines'
+    },
+    {
+      model: models.VendingTransaction,
+      as: 'vending_transactions'
+    },{
+      model: models.VendingTransactionOutput,
+      as: 'vending_transaction_outputs'
+    }]
+  });
+
+  return {account}
+
+}
+
+export async function sudoShow (request, reply) {
+
+  console.log("sudo show", request.params);
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    }
+  });
   return {account};
 
 };

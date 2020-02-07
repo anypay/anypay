@@ -1060,6 +1060,51 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: "/api/accounts/{account_id}/addresses",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.showAddresses
+
+    }
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/api/accounts/{account_id}/ambassador-rewards",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.showAmbassadorRewards
+
+    }
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: "/api/accounts/{account_id}/kiosk-rewards",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: AccountsController.showKioskRewards
+
+    }
+  });
+
+  server.route({
+
     method: "GET",
 
     path: "/accounts/{id}/roi",
