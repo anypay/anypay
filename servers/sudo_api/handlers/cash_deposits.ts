@@ -12,7 +12,11 @@ export async function create(req, h) {
 
 export async function index(req, h) { 
 
-  let cash_deposits = await models.CashDeposit.findAll();
+  let cash_deposits = await models.CashDeposit.findAll({
+    order: [[
+      "createdAt", "DESC"
+    ]]
+  });
 
   return { cash_deposits }
 
