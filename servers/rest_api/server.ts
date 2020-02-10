@@ -509,7 +509,6 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
 
