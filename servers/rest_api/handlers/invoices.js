@@ -296,6 +296,7 @@ module.exports.createPublic = async (request, reply) => {
   
   let addressesMap = addresses.reduce((set, record) => {
     set[record.currency] = set[record.address];
+    return set;
   });
 
   if (addressesMap['BCH']) {
