@@ -6,7 +6,7 @@ import * as uuid from 'uuid';
 
 import { connect } from 'amqplib';
 
-export function getbalance(){
+export function getbalance():Promise<number>{
 
   return new Promise(async (resolve, reject)=>{
 
@@ -19,6 +19,41 @@ export function getbalance(){
 
 }
 
+export function getaddress(){
+  return process.env.BSV_HOT_WALLET_ADDRESS
+}
+
+export async function getHotWalletBalance():Promise<number>{
+  return await getbalance();
+}
+
+export async function getHotWalletAddress():Promise<string>{
+  return await getaddress();
+}
+
+export function getCurrencyCode(){
+  return "BSV";
+}
+
+export function getCurrencyName(){
+  return "Bitcoin"
+}
+
+export async function getHotWallet():Promise<any>{
+
+  let currency = getCurrencyCode();
+  let balance = await getHotWalletBalance();
+  let deposit_address = await getHotWalletAddress();
+  let name = getCurrencyName();
+
+  return {
+    "currency": currency,
+    "name": name,
+    "balance": balance,
+    "deposit_address": deposit_address
+  }
+
+}
 
 export function sendtoaddress(address: string, amount: number) {
 
@@ -106,7 +141,7 @@ export function sendtoaddress(address: string, amount: number) {
 }
 
 
-export function sendtomany(outputs: any[][]) {
+export function sendtomany(outputs: any[][], opreturn: string[] = [] ){
 
   return new Promise(async (resolve, reject) => {
 
@@ -121,6 +156,8 @@ export function sendtomany(outputs: any[][]) {
     let message = JSON.stringify({
 
       outputs: outputs,
+
+      msg: opreturn,
 
       uid
 
