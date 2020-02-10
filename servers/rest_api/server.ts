@@ -503,6 +503,16 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/account/rewards",
+    handler: AccountsController.getRewards,
+    options: {
+      auth: "token",
+      tags: ['api'],
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/account",
     handler: AccountsController.update,

@@ -120,6 +120,7 @@ export async function start() {
 
     datapay.send({
       safe: true,
+      data: json.msg,
       pay: {
         to: options,
         key: privateKey
