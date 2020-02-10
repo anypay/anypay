@@ -570,7 +570,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
-    handler: InvoicesController.create,
+    handler: InvoicesController.createPublic,
     options: {
       auth: "getaccount",
       tags: ['api'],
