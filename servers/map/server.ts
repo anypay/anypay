@@ -100,6 +100,9 @@ export async function attachMerchantMapRoutes(server) {
 
     }});
 
+    let cashback = false;
+    if (cashbackMerchant) { cashback = cashbackMerchant.enabled };
+
     let jar = await tipjar.getTipJar(account.id, 'BCH');
 
     return {
@@ -107,7 +110,7 @@ export async function attachMerchantMapRoutes(server) {
       business_address: account.business_address,
       latitude: parseFloat(account.latitude),
       longitude: parseFloat(account.longitude),
-      cash_back_enabled: cashbackMerchant.enabled,
+      cash_back_enabled: cashback,
       tipjar_address: jar.address,
       image_url: account.image_url,
       account_id: account.id,
