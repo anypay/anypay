@@ -132,6 +132,7 @@ export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
       denomination_amount_paid: paymentAmount.times(price).toFixed(2),
       hash: payment.hash,
       locked: payment.locked,
+      replace_by_fee: payment.replace_by_fee,
       status: 'underpaid',
       paidAt: new Date(),
       complete: true,
