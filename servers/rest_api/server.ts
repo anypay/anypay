@@ -24,7 +24,6 @@ import { hash, bcryptCompare } from '../../lib/password';
 import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-import * as DASHAddressForwardCallbacks from './handlers/dash_address_forward_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
 /* Import all handlers from './handlers directory */
