@@ -3,6 +3,7 @@ const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
+const { Op } = require('sequelize')
 
 import { geocode } from '../../../lib/googlemaps';
 
@@ -24,16 +25,90 @@ function hash(password) {
   });
 }
 
-export async function sudoShow (request, reply) {
-  console.log("sudo show", request.params);
+
+export async function showAddresses(request, reply){
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    },include:[{
+      model: models.Address,
+      as: 'addresses'
+    }]
+  })
+
+  return {account}
+
+}
+
+export async function showAmbassadorRewards(request, reply){
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    },include:[{
+      model: models.Ambassador,
+      as: 'ambassador'
+    },{
+      model: models.AmbassadorReward,
+      as: 'ambassador_rewards'
+    }]
+  })
+
+  let ambassador = await models.Ambassador.findOne({ 
+    where: {
+      account_id: account.id 
+    },
+    include:[
+      {
+        model: models.Account,
+        as: 'merchants'
+      }]
+  })
+
+  if( ambassador){
+
+    account = Object.assign(ambassador.toJSON(), account.toJSON())
+
+  }
+
+  return {account};
+
+}
+
+export async function showKioskRewards(request, reply){
 
    var account = await models.Account.findOne({
     where: {
       id: request.params.account_id
-    }
+    },include:[{
+      model: models.VendingMachine,
+      as: 'vending_machines'
+    },
+    {
+      model: models.VendingTransaction,
+      as: 'vending_transactions'
+    },{
+      model: models.VendingTransactionOutput,
+      as: 'vending_transaction_outputs'
+    }]
   });
 
-   return account;
+  return {account}
+
+}
+
+export async function sudoShow (request, reply) {
+
+  console.log("sudo show", request.params);
+
+  var account = await models.Account.findOne({
+    where: {
+      id: request.params.account_id
+    }
+  });
+  return {account};
+
 };
 
 export async function sudoAccountWithEmail (request, reply) {
