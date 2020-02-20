@@ -837,7 +837,7 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/invoices/{uid}/bip270",
+    path: "/r/{uid}",
     handler: handlers.BsvPaymentRequest.show 
   })
 
