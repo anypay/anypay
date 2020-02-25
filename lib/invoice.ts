@@ -179,10 +179,11 @@ export async function generateInvoice(
     status: 'unpaid',
     uid: uid,
     uri,
+    convert_to_bank: account.convert_to_bank,
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
-  }
+  };
 
   var invoice = await models.Invoice.create(invoiceParams);
 
@@ -210,7 +211,9 @@ export async function generateInvoice(
     });
   }))
 
-  return invoice;
+  return Object.assign(invoice, {
+    payment_options: paymentOptions
+  });
 
 }
 
