@@ -1,5 +1,9 @@
 # Bitcoin SV Payment Protocol
 
+This documents outlines how wallets interact with the Anypay Bitcoin Payment's API to enable truly peer-to-peer payments on Bitcoin.
+
+![Protocol  Diagram](https://bico.media/4152ca1152fd13e4ed170347c0aa94ae8c0f5d674c10b0e5af814fe816964cf1)
+
 ## Messages
 
 The wallet and server will exchange a total of three messages before
@@ -13,6 +17,20 @@ following.
 
 ### Payment Request
 
+The wallet will GET the url and a payment request will be returned with an attached header of application/bitcoin-sv-payment-request.
+
+The payment request will have the following structure:
+
+PaymentRequest {
+    network // string. required. always set to "bitcoin".
+    outputs // an array of outputs. required, but can have zero elements.
+    creationTimestamp // number. required.
+    expirationTimestamp // number. optional.
+    memo // string. optional.
+    paymentUrl // string. required.
+    merchantData // string. optional.
+}
+
 Once you have a payment request URL the wallet will tell the server
 that it would like to receive the corresponding payment request message
 for a Bitcoin SV payment. To indicate to the server your wallet would
@@ -20,7 +38,7 @@ like to pay with Bitcoin SV attach a header field explaining so in
 your request:
 
 ```
-let uri = `pay:?r=https://nrgcty.com/r/3g93ksj`
+let uri = `pay:?r=https://api.anypayinc.com/r/3g93ksj`
 
 let payment_request_url = parse_payment_request_url(uri);
 
@@ -52,7 +70,7 @@ Output {
 
 | Field        | Purpose           |
 | ------------- |:-------------:|
-| amount      | Number of satoshis (0.00000001 BTC) to be paid.
+| amount      | Number of satoshis (0.00000001 BSV) to be paid.
 | script      | A "TxOut" script where payment should be sent, formatted as a hexadecimal string.
 | description | An optional description such as "tip" or "sales tax". Maximum length is 50 characters.
 
@@ -61,18 +79,6 @@ your wallet will receive in the payment request. These fields should always be v
 before proceeding. Specifically check that the `creationTimestamp` is valid and in
 the past, as well as the `expirationTimestamp` is in the future (has yet to occur).
 Of course make sure the `network` property says `bitcoin-sv`.
-
-```
-PaymentRequest {
-    network // string. required. always set to "bitcoin".
-    outputs // an array of outputs. required, but can have zero elements.
-    creationTimestamp // number. required.
-    expirationTimestamp // number. optional.
-    memo // string. optional.
-    paymentUrl // string. required.
-    merchantData // string. optional.
-}
-```
 
 Your wallet has everything it needs to construct the output transaction.
 Next get together the inputs you would like to use for the payment and
@@ -92,7 +98,6 @@ let payment_request = {
 }
 
 ```
-
 
 ### Payment
 
