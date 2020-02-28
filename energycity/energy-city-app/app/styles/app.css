@@ -1,0 +1,92 @@
+
+a {
+  color: black;
+}
+.navbar .badge {
+  margin-top:1.5em;
+  margin-left:1em;
+}
+
+.float-left {
+  float: left;
+}
+
+.bodycontainer {
+  margin: 0 auto;
+  margin-top: 1em;
+}
+
+.logo {
+  width: 50px;
+  margin-right:0.5em;
+}
+
+h1 {
+  color: #eee;
+}
+
+a {
+  color: black;
+}
+
+p, a, li {
+  text-align:center;
+}
+
+td {
+
+}
+
+h1 a {
+
+  color: #eee;
+
+}
+a:visited {
+  text-decoration: none;
+}
+
+a:clicked {
+  text-decoration: none;
+}
+ul, li {
+  list-style: none;
+}
+li {
+  padding: 1em 0em;
+  border-bottom: 1px solid #aaa;
+  width: 100%
+}
+ul {
+  padding:0;
+}
+.half-left {
+  width:50%;
+  float:left;
+  text-align:left;
+}
+
+.half-right {
+  width:50%;
+  float:right;
+  text-align:right;
+}
+.clear {
+  clear:both;
+}
+
+h4 {
+  text-align:left
+}
+h2 {
+  text-align:center;
+  width:100%;
+  padding-bottom:1em;
+  padding-top:0.5em;
+  background-color:white;
+  border-bottom:2px solid #aaa;
+}
+li:last-child {
+  
+  border-bottom: 0px;
+}
