@@ -31,7 +31,7 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     network:"dash",
     outputs: [{
       address: address.toString(),
-      script: address.toString(),
+      script: script.toString(),
       amount: dashToSatoshis(paymentOption.amount)
     }, {
       script: anypayScript.toString(),
