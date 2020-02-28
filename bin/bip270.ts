@@ -15,7 +15,7 @@ program
     //.get(`https://api.anypayinc.com/r/${invoiceUID}`)
       .get(`http://localhost:8000/r/${invoiceUID}`)
       .set({
-        'accept': 'application/bitcoin-sv-payment-request'
+        'accept': 'application/bitcoinsv-paymentrequest'
       })
 
     console.log(response.body);
@@ -46,6 +46,32 @@ program
     datapay.send(config, console.log);
 
   });
+
+program
+  .command('getpaymentrequest <invoice_uid> <currency>')
+  .action(async (invoiceUID, currency) => {
+
+    var accept;
+
+    switch(currency) {
+    case 'BSV':
+      accept = 'application/bitcoinsv-paymentrequest'
+      break;
+    case 'DASH':
+      accept = 'application/dash-paymentrequest'
+      break;
+    }
+
+    let response = await http
+      .get(`http://127.0.0.1:8000/r/${invoiceUID}`)
+      .set({
+        'accept': accept
+      });
+
+    console.log(response);
+
+  });
+
 
 program.parse(process.argv);
 

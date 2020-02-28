@@ -1,5 +1,5 @@
 require('dotenv').config();
-import * as bitcoin from 'bsv';
+import * as dash from '@dashevo/dashcore-lib';
 
 import {models} from '../../../lib';
 
@@ -20,23 +20,22 @@ interface PaymentRequest{
 }
 
 export async function generatePaymentRequest(invoice: any, paymentOption: any):Promise<PaymentRequest>{
-  console.log('invoice', invoice);
-  console.log('invoice', invoice);
 
-  let address = new bitcoin.Address(paymentOption.address);
+  let address = new dash.Address(paymentOption.address);
+  let script = new dash.Script(address);
 
-  let script = new bitcoin.Script(address);
-
-  let anypayAddress = new bitcoin.Address(process.env.BIP_270_EXTRA_OUTPUT_ADDRESS);
-  let anypayScript = new bitcoin.Script(anypayAddress);
+  let anypayAddress = new dash.Address(process.env.BIP_270_DASH_EXTRA_OUTPUT_ADDRESS);
+  let anypayScript = new dash.Script(anypayAddress);
 
   let request = {
-    network:"bitcoin-sv",
+    network:"dash",
     outputs: [{
-      script: script.toString(),
-      amount: bsvToSatoshis(paymentOption.amount)
+      address: address.toString(),
+      script: address.toString(),
+      amount: dashToSatoshis(paymentOption.amount)
     }, {
       script: anypayScript.toString(),
+      address: anypayAddress.toString(),
       amount: 1000
     }],
     time: Date.now() / 1000 | 0,
@@ -52,6 +51,6 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
 
 }
 
-function bsvToSatoshis(bsv): number{
-  return bsv * 100000000;
+function dashToSatoshis(dash): number{
+  return dash * 100000000;
 }
