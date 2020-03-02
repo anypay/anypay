@@ -1,0 +1,23 @@
+
+<!--<nav class="navbar navbar-light" style="background-color: #039454;">-->
+<nav class="navbar navbar-dark " style="background-color: #039454;">
+
+  <div class='container'>
+    <div class='float-left'>
+      <img class='float-left logo' src="/white.png"/>
+      <h1 class='float-left'>{{#link-to "cities"}}Energy City{{/link-to}}</h1>
+      {{#if connected}}
+        <span class="badge badge-success">connected</span>
+      {{else}}
+        <span class="badge badge-dark">not connected</span>
+      {{/if}}
+    </div>
+  </div>
+
+</nav>
+
+<div class='container bodycontainer'>
+
+  {{outlet}}
+
+</div>

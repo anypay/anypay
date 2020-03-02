@@ -7,6 +7,7 @@ export interface Payment {
   output_hash?: string;
   confirmations?: number;
   locked?: boolean;
+  replace_by_fee?: boolean;
   output_currency?: boolean;
   output_amount?: boolean;
   output_address?: boolean;

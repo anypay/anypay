@@ -273,6 +273,91 @@ module.exports.create = async (request, reply) => {
 
 };
 
+module.exports.createPublic = async (request, reply) => {
+
+  /*
+    Dynamicallly look up coin and corresponding plugin given the currency
+    provided.
+  */
+  var currency;
+
+  log.info(`controller:invoices,action:create`);
+
+
+	if (!(request.payload.amount > 0)) {
+		throw Boom.badRequest('amount must be greater than zero')	
+	}
+
+  let addresses = await models.Address.findAll({ where: {
+
+    account_id: request.account.id
+
+  }})
+  
+  let addressesMap = addresses.reduce((set, record) => {
+
+    set[record.currency] = record.value;
+    return set;
+  }, {});
+
+  if (addressesMap['BCH']) {
+    currency = 'BCH';
+  } else if (addressesMap['DASH']) {
+    currency = 'DASH';
+  } else if (addressesMap['BSV']) {
+    currency = 'BSV';
+  } else {
+    currency = addresses[0].currency;
+  }
+
+  // bch first, then dash, then bsv, then 
+
+	log.info('amount is greater than zero')
+
+  try {
+
+    let plugin = await plugins.findForCurrency(currency);
+
+    log.info('plugin.createInvoice');
+
+    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
+
+    if(invoice){
+   
+      log.info('invoice.created', invoice.toJSON());
+
+    }
+
+    invoice.redirect_url = request.payload.redirect_url;
+
+    invoice.webhook_url = request.payload.webhook_url;
+
+    invoice.external_id = request.payload.external_id;
+
+    invoice.is_public_request = true;
+
+    await invoice.save();
+
+    let payment_options = await models.PaymentOption.findAll({where: {
+      invoice_uid: invoice.uid
+    }});
+
+    invoice.payment_options = payment_options;
+
+    return sanitizeInvoice(invoice);
+
+  } catch(error) {
+
+    console.log(error);
+
+    log.error(error.message);
+
+    throw Boom.badRequest(error.message);
+
+  }
+
+};
+
 function sanitizeInvoice(invoice) {
 
   let resp = invoice.toJSON();
