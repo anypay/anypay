@@ -184,5 +184,27 @@ models.VendingTransaction.belongsTo(models.VendingMachine, {
   foreignKey: 'vending_machine_id'
 });
 
+models.Account.hasMany(models.AccountTag, {
+  as: 'tags',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+});
+
+models.AccountTag.belongsTo(models.Account, {
+  as: 'account',
+  foreignKey: 'account_id'
+});
+
+models.Account.hasMany(models.Tipjar, {
+  as: 'tipjars',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+});
+
+models.Tipjar.belongsTo(models.Account, {
+  as: 'account',
+  foreignKey: 'account_id'
+});
+
 export { models };
 
