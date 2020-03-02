@@ -88,6 +88,8 @@ export async function create(req: Hapi.Request, h) {
 export async function createByItemUid(req: Hapi.Request, h) {
 
   console.log('params', req.params);
+  console.log('payment protcol full request:');
+  console.log(req);
 
   // https://anypayinc.com/grab-and-go/freshpress-portsmouth/green-on-fleet/purchase
   // /grab-and-go/:account_stub/:item_stub/purchase

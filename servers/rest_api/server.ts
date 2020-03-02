@@ -822,14 +822,27 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.show 
+    handler: handlers.PaymentRequest.show 
 
   })
 
   server.route({
     method: "POST",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.create 
+    handler: handlers.PaymentRequest.create 
+
+  })
+
+  server.route({
+    method: "GET",
+    path: "/r/{uid}",
+    handler: handlers.BsvPaymentRequest.show 
+  })
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/bip270",
+    handler: handlers.BsvPaymentRequest.create 
 
   })
 
