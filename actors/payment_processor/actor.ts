@@ -1,45 +1,81 @@
 require('dotenv').config();
 
-const amqp = require("amqplib");
-
-import { Connection, connect, Channel, Message } from 'amqplib';
-
 import { log, models } from '../../lib';
 
-import {PaymentConsumer} from '../../servers/processor/payments/main'
+import {handlePayment, updateOutput} from '../../lib/payment_processor'
 
-const AMQP_URL = process.env.AMQP_URL;
+import { notify } from '../../lib/slack/notifier';
 
-const PAYMENT_QUEUE  = "anypay:payments:received";
+import { Actor } from 'rabbi';
 
 async function start() {
-        
-  amqp.connect(AMQP_URL).then(async (conn: Connection) => {
 
-    let channel: Channel = await conn.createChannel()
-
-    log.info("amqp:channel:connected");
-
-    await channel.assertQueue(PAYMENT_QUEUE, { durable: true });
-
-    await channel.assertExchange('anypay', 'fanout');
-
-    await channel.assertExchange('anypay.payments', 'direct');
-
-    await channel.assertExchange('anypay:invoices', 'direct');
-
-    await channel.bindQueue(PAYMENT_QUEUE, 'anypay.payments', 'payment');
-
-    let consumer = PaymentConsumer(channel);
-
-    log.info('consume channel', PAYMENT_QUEUE);
-
-    channel.consume(PAYMENT_QUEUE, consumer, { noAck: false });
-
+  Actor.create({
+    exchange: 'anypay.payments',
+    routingkey: 'payment',
+    queue: 'anypay:payments:received'
   })
-  .catch(error => {
+  .start(async (channel, msg, payment) => {
+    console.log('payment.received', JSON.stringify(payment));
 
-    log.error(error.message);
+    try {
+
+      var invoice;
+      
+      invoice = await models.Invoice.findOne({
+        where: {
+          currency: payment.currency,
+          address: payment.address,
+          status: "unpaid"
+        },
+        order: [['createdAt', 'DESC']]
+      });
+
+      if (!invoice) {
+
+        await updateOutput(payment)
+
+        log.error('no unpaid invoice found matching currency and address');
+
+        return channel.ack(msg);
+
+      }
+
+      let invoiceUID = invoice.uid;
+
+      invoice = invoice.toJSON();
+
+      invoice = await handlePayment(invoice, payment);
+
+      log.info("invoices:paid", invoice.uid);
+
+      await channel.publish('anypay:invoices', 'invoice:paid', new Buffer(invoice.uid));
+
+      let account = await models.Account.findOne({
+        where: {
+          id: invoice.account_id
+        }
+      });
+
+      invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
+
+      if (account.email !== 'diagnostic@anypay.global') {
+
+        notify(
+          `invoice.${invoice.status} ${account.email} ${invoice.currency} https://anypayapp.com/invoices/${invoice.uid}`
+        );
+
+      } 
+
+      await channel.ack(msg);
+
+    } catch(error) {
+
+      log.error(error.message);
+
+      await channel.ack(msg);
+
+    }
 
   });
 
@@ -56,4 +92,5 @@ if (require.main === module) {
   start();
 
 }
+
 

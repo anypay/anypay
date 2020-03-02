@@ -1,0 +1,23 @@
+{{outlet}}
+
+<table class='table table-striped'>
+  {{#each cities as |city|}}
+    <tr>
+      <td>
+        {{#link-to "city" city.city_tag}}
+          {{city.name}}
+        {{/link-to}}
+      </td>
+
+      <td>
+        {{#if city.accounts}}
+          <a target="_blank" >
+            <span class="badge badge-success">{{city.accounts.length}}</span>
+          </a>
+        {{/if}}
+      </td>
+
+    </tr>
+  {{/each}}
+</table>
+

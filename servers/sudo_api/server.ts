@@ -1202,6 +1202,34 @@ async function Server() {
 
   server.route({
 
+    method: 'POST',
+
+    path: '/cities',
+
+    config: {
+
+      handler: handlers.Cities.create
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'PUT',
+
+    path: '/cities/{id}',
+
+    config: {
+
+      handler: handlers.Cities.update
+
+    }
+
+  });
+
+  server.route({
+
     method: 'GET',
 
     path: '/yelp_businesses',
