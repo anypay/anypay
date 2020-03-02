@@ -2,7 +2,9 @@
 import { models } from '../models';
 import * as http from 'superagent';
 
-const bch: any = require("../bitcoin_cash/bitcore").bitcore;
+//const bch: any = require("../bitcoin_cash/bitcore").bitcore;
+
+const bch = require('bitcore-lib-cash');
 
 interface iTipJar {
   account_id: number;

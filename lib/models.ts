@@ -113,6 +113,67 @@ models.Account.hasOne(models.Ambassador, {
   as: 'ambassador'
 });
 
+models.Account.hasMany(models.Address, {
+  foreignKey: 'account_id',
+  sourceKey: 'id',
+  as: 'addresses'
+});
+
+models.Address.belongsTo(models.Account, {
+  as: 'address',
+  foreignKey: 'account_id'
+})
+
+models.Account.hasMany(models.Invoice, {
+  foreignKey: 'account_id',
+  sourceKey: 'id',
+  as: 'invoices'
+});
+
+models.Invoice.belongsTo(models.Account, {
+  as: 'invoice',
+  foreignKey: 'account_id'
+})
+
+models.Account.hasMany(models.VendingMachine, {
+  foreignKey: 'account_id',
+  sourceKey: 'id',
+  as: 'vending_machines'
+});
+
+models.VendingMachine.belongsTo(models.Account, {
+  as: 'kiosk',
+  foreignKey: 'account_id'
+})
+
+models.Account.hasMany(models.VendingTransaction, {
+  foreignKey: 'account_id',
+  sourceKey: 'id',
+  as: 'vending_transactions'
+});
+
+models.Account.hasMany(models.AmbassadorReward, {
+  foreignKey: 'ambassador_account_id',
+  sourceKey: 'id',
+  as: 'ambassador_rewards'
+});
+
+models.VendingTransaction.belongsTo(models.Account, {
+  as: 'vending_transactions',
+  foreignKey: 'account_id'
+})
+
+models.Account.hasMany(models.VendingTransactionOutput, {
+  foreignKey: 'account_id',
+  sourceKey: 'id',
+  as: 'vending_transaction_outputs'
+});
+
+models.VendingTransactionOutput.belongsTo(models.Account, {
+  as: 'vending_transaction_outputs',
+  foreignKey: 'account_id'
+})
+
 models.VendingMachine.hasMany(models.VendingTransaction, {
   foreignKey: 'vending_machine_id',
   sourceKey: 'id',
@@ -121,6 +182,28 @@ models.VendingMachine.hasMany(models.VendingTransaction, {
 models.VendingTransaction.belongsTo(models.VendingMachine, {
   as: 'kiosk',
   foreignKey: 'vending_machine_id'
+});
+
+models.Account.hasMany(models.AccountTag, {
+  as: 'tags',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+});
+
+models.AccountTag.belongsTo(models.Account, {
+  as: 'account',
+  foreignKey: 'account_id'
+});
+
+models.Account.hasMany(models.Tipjar, {
+  as: 'tipjars',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+});
+
+models.Tipjar.belongsTo(models.Account, {
+  as: 'account',
+  foreignKey: 'account_id'
 });
 
 export { models };

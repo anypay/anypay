@@ -1,6 +1,7 @@
 import * as bchWallet from '../../../plugins/bch/wallet';
 import * as btcWallet from '../../../plugins/btc/wallet';	
 import * as dashWallet from '../../../plugins/dash/wallet';
+import * as bsvWallet from '../../../plugins/bsv/wallet';
 import * as Boom from 'boom';
 
 
@@ -14,7 +15,9 @@ export async function getHotWallets(){
 
     let dash = await dashWallet.getHotWallet();
 
-    let wallets = [btc, bch, dash]	   
+    let bsv = await bsvWallet.getHotWallet();
+
+    let wallets = [btc, bch, dash, bsv]	   
 
     return {wallets}    
 
