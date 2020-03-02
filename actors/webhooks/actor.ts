@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-import { connect, Channel, Message } from 'amqplib';
-
 import { log, models } from '../../lib';
+
+import { Actor } from 'rabbi'
 
 import * as http from 'superagent';
 
@@ -10,24 +10,12 @@ import * as validate from 'validator';
 
 async function start() {
 
-  log.info('actor.start webhooks');
-
-  let connection = await connect(process.env.AMQP_URL);
-
-  let channel = await connection.createChannel();
-
-  await channel.assertQueue('webhooks.invoice.tosend', { durable: true });
- 
-  await channel.bindQueue('webhooks.invoice.tosend', 'anypay:invoices', 'invoice:paid');
-
-  channel.consume('webhooks.invoice.tosend', WebhooksConsumer(channel));
-
-}
-
-function WebhooksConsumer(channel: Channel) {
-
-  return async function(msg: Message) {
-
+  Actor.create({
+    exchange: 'anypay:invoices',
+    bindingkey: 'invoice:paid',
+    queue: 'webhooks.invoice.tosend'
+  })
+  .start(async (channel, msg) => {
     let uid = msg.content.toString();
 
     let invoice = await models.Invoice.findOne({ where: { uid }});
@@ -84,7 +72,8 @@ function WebhooksConsumer(channel: Channel) {
 
     }
 
-  }
+  });
+
 
 }
 
