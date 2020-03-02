@@ -15,7 +15,6 @@ import { validateToken } from '../auth/hapi_validate_token';
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
-import * as addressRoutesActor from '../../actors/address_routes/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -823,14 +822,27 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.show 
+    handler: handlers.PaymentRequest.show 
 
   })
 
   server.route({
     method: "POST",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.create 
+    handler: handlers.PaymentRequest.create 
+
+  })
+
+  server.route({
+    method: "GET",
+    path: "/r/{uid}",
+    handler: handlers.BsvPaymentRequest.show 
+  })
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/bip270",
+    handler: handlers.BsvPaymentRequest.create 
 
   })
 

@@ -7,11 +7,16 @@ import { models, square } from '../../../lib';
 
 async function getClient(accountId) {
 
-  let squareCreds = await models.SquareOauthCredentials.findOne({ where: {
+  let squareCreds = await models.SquareOauthCredentials.findOne({
+    where: {
 
-    account_id: accountId
+      account_id: accountId,
 
-  }});
+    },
+
+    order: [["createdAt", "DESC"]]
+  
+  });
 
   let squareClient = new square.SquareOauthClient(squareCreds.access_token);
 
@@ -21,9 +26,9 @@ async function getClient(accountId) {
 
 export async function index (req, h) {
 
-  let squareClient = await getClient(req.account.id);
-
   try {
+
+    let squareClient = await getClient(req.account.id);
 
     let catalog = await squareClient.listCatalog();
 

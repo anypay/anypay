@@ -1,0 +1,35 @@
+.env
+node_modules/
+# See https://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+/tmp
+
+# dependencies
+/node_modules
+/bower_components
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage/*
+/libpeerconnection.log
+npm-debug.log*
+yarn-error.log
+testem.log
+
+# ember-try
+.node_modules.ember-try/
+bower.json.ember-try
+package.json.ember-try
+
+corber/tmp-livereload
+corber/cordova/node_modules
+corber/cordova/package.json
+corber/cordova/package-lock.json
+corber/cordova/platforms/*
+!corber/cordova/platforms/.gitkeep
+corber/cordova/plugins/*
+!corber/cordova/plugins/.gitkeep
+corber/cordova/www/*
+!corber/cordova/www/.gitkeep
