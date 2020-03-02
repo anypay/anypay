@@ -3,6 +3,5 @@ node_modules/
 *.swp
 .sqlite
 nbproject/
-dist/
 .env
 production.env

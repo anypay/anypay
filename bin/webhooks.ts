@@ -14,13 +14,15 @@ program
 
     try {
 
-      let resp = sendWebhookForInvoice(invoiceUid);
+      let resp:any = await sendWebhookForInvoice(invoiceUid);
+
+      console.log(resp);
 
       console.log(resp.statusCode, resp.body);
 
     } catch(error) {
 
-      log.error(error.message);
+      console.log('error', error);
 
     }
 
