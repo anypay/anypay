@@ -15,7 +15,6 @@ import { validateToken } from '../auth/hapi_validate_token';
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
-import * as addressRoutesActor from '../../actors/address_routes/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -24,7 +23,6 @@ import { hash, bcryptCompare } from '../../lib/password';
 import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-import * as DASHAddressForwardCallbacks from './handlers/dash_address_forward_callbacks';
 import * as AddressRoutes from './handlers/address_routes';
 
 /* Import all handlers from './handlers directory */
@@ -570,7 +568,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
-    handler: InvoicesController.create,
+    handler: InvoicesController.createPublic,
     options: {
       auth: "getaccount",
       tags: ['api'],
@@ -824,14 +822,27 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.show 
+    handler: handlers.PaymentRequest.show 
 
   })
 
   server.route({
     method: "POST",
     path: "/invoices/{uid}/bip70",
-    handler: PaymentRequestHandler.create 
+    handler: handlers.PaymentRequest.create 
+
+  })
+
+  server.route({
+    method: "GET",
+    path: "/r/{uid}",
+    handler: handlers.BsvPaymentRequest.show 
+  })
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/bip270",
+    handler: handlers.BsvPaymentRequest.create 
 
   })
 
