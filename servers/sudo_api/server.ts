@@ -16,19 +16,8 @@ import * as accountInvoices from './handlers/account_invoices';
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 
 import { join } from 'path';
+
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
-
-const sudoWires = require("./handlers/wire_reports");
-
-const SudoAccounts = require("./handlers/sudo_accounts");
-
-const AccountsController = require("./handlers/accounts");
-
-const InvoicesController = require("./handlers/invoices");
-
-const PricesController = require("./handlers/prices");
-
-const SudoCoins = require("./handlers/sudo_coins");
 
 import { sudoLogin } from './handlers/sudo_login';
 
@@ -234,7 +223,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.destroy
+      handler: handlers.Accounts.destroy
 
     }
 
@@ -250,7 +239,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoShow
+      handler: handlers.Accounts.sudoShow
 
     }
 
@@ -266,7 +255,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoAccountWithEmail
+      handler: handlers.Accounts.sudoAccountWithEmail
 
     }
 
@@ -282,7 +271,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.list
+      handler: handlers.SudoCoins.list
 
     }
   });
@@ -297,7 +286,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.activate
+      handler: handlers.SudoCoins.activate
 
     }
 
@@ -313,7 +302,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.deactivate
+      handler: handlers.SudoCoins.deactivate
 
     }
 
@@ -330,7 +319,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.index
+      handler: handlers.Accounts.index
 
     }
 
@@ -459,7 +448,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoIndex
+      handler: handlers.Invoices.sudoIndex
 
     }
 
@@ -476,7 +465,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoRepublishTxid,
+      handler: handlers.Invoices.sudoRepublishTxid,
 
       validate: {
         
@@ -505,7 +494,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoIndexUnrouted
+      handler: handlers.Invoices.sudoIndexUnrouted
 
     }
 
@@ -521,7 +510,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoIndex
+      handler: handlers.Prices.sudoIndex
 
     }
 
@@ -537,7 +526,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoShow
+      handler: handlers.Prices.sudoShow
 
     }
 
@@ -553,7 +542,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoUpdate
+      handler: handlers.Prices.sudoUpdate
 
     }
 
@@ -569,7 +558,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoShow
+      handler: handlers.Invoices.sudoShow
 
     }
 
@@ -774,7 +763,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoAccounts.update,
+      handler: handlers.SudoAccounts.update,
 
       validate: {
 
@@ -1068,7 +1057,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showAddresses
+      handler: handlers.Accounts.showAddresses
 
     }
   });
@@ -1083,7 +1072,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showAmbassadorRewards
+      handler: handlers.Accounts.showAmbassadorRewards
 
     }
   });
@@ -1098,7 +1087,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showKioskRewards
+      handler: handlers.Accounts.showKioskRewards
 
     }
   });
@@ -1113,7 +1102,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.calculateROI
+      handler: handlers.Accounts.calculateROI
 
     }
   });
@@ -1128,7 +1117,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.accountVolume
+      handler: handlers.Accounts.accountVolume
 
     }
   });
@@ -1180,7 +1169,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoWires.show
+      handler: handlers.WireReports.show
 
     }
 
@@ -1269,7 +1258,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoWires.showCSV
+      handler: handlers.WireReports.showCSV
 
     }
 
@@ -1290,6 +1279,36 @@ async function Server() {
     }
 
   });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/ambassadors',
+
+    config: {
+
+      validate: {
+        
+        payload : {
+
+          name: Joi.string().required(),
+
+          account_id: Joi.number().required()
+
+        }
+
+      },
+
+      auth: 'sudopassword',
+
+      handler: handlers.Ambassadors.create
+
+    }
+
+  });
+
+
 
   server.route({
 
