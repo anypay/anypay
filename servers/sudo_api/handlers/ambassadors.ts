@@ -10,6 +10,20 @@ import * as Boom from 'boom';
 
 import { Op } from 'sequelize';
 
+export async function create(req: Request) {
+
+  let account = await models.Account.findOne({ where: { id: req.payload.account_id }});
+
+  if (!account) {
+    return Boom.badRequest('account not found');  
+  }
+
+  let ambassador = await models.Ambassador.create(req.payload);
+
+  return { ambassador };
+
+}
+
 export async function index(req: Request) {
 
   try {

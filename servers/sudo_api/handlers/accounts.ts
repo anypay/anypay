@@ -126,8 +126,13 @@ export async function index(request, reply) {
 
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
+  let where = {};
 
-  var accounts = await models.Account.findAll({ offset, limit });
+  if (request.query.email) {
+    where['email'] = request.query.email;
+  }
+
+  var accounts = await models.Account.findAll({ where, offset, limit });
 
   return accounts;
 };
