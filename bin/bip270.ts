@@ -12,13 +12,12 @@ program
 
 
     let response = await http
-    //.get(`https://api.anypayinc.com/r/${invoiceUID}`)
-      .get(`http://localhost:8000/r/${invoiceUID}`)
+      .get(`https://api.anypayinc.com/r/${invoiceUID}`)
       .set({
         'accept': 'application/bitcoinsv-paymentrequest'
       })
 
-    console.log(response.body);
+    console.log(response);
 
     let outputs = response.body.outputs.map(output => {
 
@@ -63,7 +62,7 @@ program
     }
 
     let response = await http
-      .get(`http://127.0.0.1:8000/r/${invoiceUID}`)
+      .get(`https://api.anypayinc.com/r/${invoiceUID}`)
       .set({
         'accept': accept
       });

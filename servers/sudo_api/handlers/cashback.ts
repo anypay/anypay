@@ -116,8 +116,31 @@ export async function dashboard(req, h) {
     let totalBchPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='BCH'`);
     let totalDashPaid = await database.query(`select sum(amount) from cashback_customer_payments where currency='DASH'`);
 
-    let bchBalance = await getCashBackBalance('BCH');
-    let dashBalance = await getCashBackBalance('DASH');
+    var bchBalance, dashBalance;
+
+    try {
+
+      bchBalance = await getCashBackBalance('BCH');
+
+    } catch(error) {
+
+      bchBalance = '?'
+
+      console.log('error getting BCH balance', error.message);
+
+    }
+
+    try {
+
+      dashBalance = await getCashBackBalance('DASH');
+
+    } catch(error) {
+
+      bchBalance = '?'
+
+      console.log('error getting DASH balance', error.message);
+
+    }
 
     return [{                                                                       
       currency: 'BCH',
