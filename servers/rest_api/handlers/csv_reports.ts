@@ -38,7 +38,7 @@ export async function accountCSVReports(server) {
 
       let filename = `anypay_report_${start_formatted}_${end_formatted}.csv`
 
-      let response = h.response(content).header("Content-Disposition", `attachment;filename=${filename}`);
+      let response = h.response(content).header("Content-Disposition", `attachment;filename=anypay_report.csv`);
 
       return response;
 
