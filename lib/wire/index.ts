@@ -205,7 +205,7 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
   const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'completed_at', title: 'Paid at'},
+      {id: 'paid_at', title: 'Paid at'},
       {id: 'denomination_amount', title: 'Amount Invoiced'},
       {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
       {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
