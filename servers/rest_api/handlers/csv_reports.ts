@@ -38,7 +38,9 @@ export async function accountCSVReports(server) {
 
       let filename = `anypay_report_${start_formatted}_${end_formatted}.csv`
 
-      let response = h.response(content).header("Content-Disposition", `attachment;filename=anypay_report.csv`);
+      let response = h.response(content)
+        .header("Content-Disposition", `attachment;filename="${filename}"`)
+        .header("Content-Type", 'text/csv');
 
       return response;
 
@@ -75,7 +77,9 @@ export async function accountCSVReports(server) {
 
       let filename = `anypay_report_complete.csv`
 
-      let response = h.response(content).header("Content-Disposition", `attachment;filename=${filename}`);
+      let response = h.response(content)
+        .header("Content-Disposition", `attachment;filename="${filename}"`)
+        .header("Content-Type", 'text/csv');
 
       return response;
 
