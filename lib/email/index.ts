@@ -6,6 +6,9 @@ import {emitter} from '../events'
 import * as database from '../database';
 const log = require("winston");
 const moment = require('moment');
+
+import { email as rabbiEmail } from 'rabbi';
+
 AWS.config.update({ region: "us-east-1" });
 //require('./createtemplate')
 
@@ -112,41 +115,38 @@ export async function addressChangedEmail(changeset) {
 
 export async function invoicePaidEmail(invoice){  
 
-  const account = await  models.Account.findOne({ where: {id:invoice.account_id}})
+  console.log(invoice);
 
-  const template = {
-   
-    uid: invoice.uid,
+  let account = await models.Account.findOne({ where: {
+    id: invoice.account_id
+  }});
+
+  console.log(account.toJSON());
+
+  let variables = {
+    invoice_paid_date_time: invoice.completed_at,
     currency: invoice.currency,
-    amount_paid: invoice.invoice_amount_paid.toString(),
+    invoiceUID: invoice.uid,
+    denomination_currency: invoice.denomination_currency,
+    amount_paid: invoice.invoice_amount_paid,
     denomination_amount_paid: invoice.denomination_amount_paid,
-    denomination: invoice.denomination_currency,
-    paidAt : moment(invoice.paidAt).toString()
-
-  }
-
-  const params = {
-    Destination: { /* required */
-        ToAddresses: [account.email]
-    },
-    Source: 'receipts@anypayapp.com', /* required */
-    Template: 'Anypay_paid', /* required */
-    TemplateData: JSON.stringify(template), /* required */
-    Tags: [
-      {
-        Name: 'Anypay_Receipt', /* required */
-        Value: 'receipt' /* required */
-      }
-    ],
-    ReplyToAddresses: [
-      'support@anypayapp.com',
-    ],
+    businessName: account.business_name,
+    businessStreetAddress: account.business_street_address,
+    businessCity: account.business_city,
+    businessState: account.business_state,
+    businessZip: account.business_zip
   };
 
-  log.info('email.sent', account.email, "receipt") 
+  console.log(variables);
 
-  return new AWS.SES({apiVersion: '2010-12-01'}).sendTemplatedEmail(params).promise()
+  let resp = await rabbiEmail.sendEmail(
+    'invoice_paid_receipt',
+    account.email,
+    'receipts@anypayinc.com',
+    variables
+  )
 
+  return resp;
 }
 
 export async function firstInvoicePaidEmail(invoice){
