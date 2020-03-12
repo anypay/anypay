@@ -42,7 +42,57 @@ The above will generate an invoice for $85 in BCH.
 
 ## Payment Options
 
-Each invoice may have more than one payment option.
+Each invoice may have several  payment options, which can retrieved using a URL:
+
+```
+GET https://api.anypayinc.com/invoices/d3e5187c-6d3f-4d31-ac51-6c7b74326677/payment_options
+
+//result
+{
+  payment_options: [
+    {
+      id: 45855,
+      invoice_uid: "d3e5187c-6d3f-4d31-ac51-6c7b74326677",
+      currency: "BSV",
+      address: "19nuy1gP2f7tM8pPjMCEZatLK4Ew5qeDXD",
+      amount: "0.03622",
+      uri: "bitcoin:19nuy1gP2f7tM8pPjMCEZatLK4Ew5qeDXD?sv&amount=0.03622&label=Anypay HQ&avatarUrl=https://bico.media/8fb689ac8e69f222489e9732cf224bcfdc70ed532d5c35f10097bc97fe4d68f0.png",
+      createdAt: "2020-03-12T13:23:07.968Z",
+      updatedAt: "2020-03-12T13:23:07.968Z"
+    },
+    {
+      id: 45856,
+      invoice_uid: "d3e5187c-6d3f-4d31-ac51-6c7b74326677",
+      currency: "DASH",
+      address: "XdY4446H4Pfgbc77yj6ydtmvqT6ZUTN6gs",
+      amount: "0.0976",
+      uri: "dash:XdY4446H4Pfgbc77yj6ydtmvqT6ZUTN6gs?amount=0.0976&is=1",
+      createdAt: "2020-03-12T13:23:07.968Z",
+      updatedAt: "2020-03-12T13:23:07.968Z"
+    },
+    {
+      id: 45857,
+      invoice_uid: "d3e5187c-6d3f-4d31-ac51-6c7b74326677",
+      currency: "BTC",
+      address: "1Ko1MDEtuqPuvnySCguLqCbC2soU7UamDi",
+      amount: "0.00087",
+      uri: "bitcoin:1Ko1MDEtuqPuvnySCguLqCbC2soU7UamDi?amount=0.00087",
+      createdAt: "2020-03-12T13:23:07.968Z",
+      updatedAt: "2020-03-12T13:23:07.968Z"
+    },
+    {
+      id: 45858,
+      invoice_uid: "d3e5187c-6d3f-4d31-ac51-6c7b74326677",
+      currency: "BCH",
+      address: "bitcoincash:qqfeqxg5ug46lskldanjx3rr8pz9w3xfrqyye9ulh4",
+      amount: "0.02611",
+      uri: "bitcoincash:qqfeqxg5ug46lskldanjx3rr8pz9w3xfrqyye9ulh4?amount=0.02611",
+      createdAt: "2020-03-12T13:23:07.968Z",
+      updatedAt: "2020-03-12T13:23:07.968Z"
+    }
+  ]
+}
+```
 
 ## Checking Status of Invoice
 
