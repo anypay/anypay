@@ -2,7 +2,8 @@ require('dotenv').config();
 
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 
-const bitcore: any = require('bitcore-lib-cash');
+const bitcoreBCH: any = require('bitcore-lib-cash');
+const bitcoreDASH: any = require('@dashevo/dashcore-lib');
 
 import * as fs from 'fs';
 import { join } from 'path';
@@ -16,31 +17,73 @@ import { join } from 'path';
  *
  */
 
+function buildOutputs(invoice, account) {
+    var outputs = [];
+
+  switch (invoice.currency) {
+
+
+    case 'BCH':
+
+      outputs = ((outputs) => {
+
+        var output = new PaymentProtocol.Output();
+        const script = bitcoreBCH.Script.buildPublicKeyHashOut(invoice.address)
+
+        output.$set('amount', invoice.amount * 100000000); // BCH -> satoshis
+        output.$set('script', script.toBuffer());
+
+        outputs.push(output);
+
+        /* Output2 is Anypay: $0.01 per transaction on top*/
+        var output2 = new PaymentProtocol.Output();
+        const script2 =bitcoreBCH.Script.buildPublicKeyHashOut('bitcoincash:qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6')
+
+        output2.$set('amount', 5000);
+        output2.$set('script', script2.toBuffer());
+
+        outputs.push(output2);
+
+        return outputs;
+
+      })([]);
+
+      return outputs;
+
+    case 'DASH':
+
+      var output = new PaymentProtocol.Output();
+      const script = bitcoreDASH.Script.buildPublicKeyHashOut(invoice.address)
+
+      output.$set('amount', invoice.amount * 100000000); // DASH -> satoshis
+      output.$set('script', script.toBuffer());
+
+      outputs.push(output);
+
+      /* Output2 is Anypay: $0.01 per transaction on top*/
+      var output2 = new PaymentProtocol.Output();
+      const script2 =bitcoreDASH.Script.buildPublicKeyHashOut('Xwh247FF6SWymYLiJsMjM1BfrqVkzya6wh')
+
+      output2.$set('amount', 5000);
+      output2.$set('script', script2.toBuffer());
+
+      outputs.push(output2);
+
+      return outputs;
+
+      return outputs;
+
+    default:
+      throw new Error('currency not supported');
+  }
+
+}
+
+
 export function generatePaymentRequest(invoice, account) {
 
   // build outputs
-  let outputs = ((outputs) => {
-
-    var output = new PaymentProtocol.Output();
-    const script = bitcore.Script.buildPublicKeyHashOut(invoice.address)
-
-    output.$set('amount', invoice.amount * 100000000); // BCH -> satoshis
-    output.$set('script', script.toBuffer());
-
-    outputs.push(output);
-
-    /* Output2 is Anypay: $0.01 per transaction on top*/
-    var output2 = new PaymentProtocol.Output();
-    const script2 =bitcore.Script.buildPublicKeyHashOut('bitcoincash:qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6')
-
-    output2.$set('amount', 5000);
-    output2.$set('script', script2.toBuffer());
-
-    outputs.push(output2);
-
-    return outputs;
-
-  })([]);
+  let outputs = buildOutputs(invoice,account);
 
   console.log('outputs', outputs);
 
@@ -68,7 +111,7 @@ export function generatePaymentRequest(invoice, account) {
   pd.set('required_fee_rate', 1);
   pd.set('merchant_data', invoice.uid); // identify the request
 
-  var paypro = new PaymentProtocol('BCH');
+  var paypro = new PaymentProtocol(invoice.currency);
 
   paypro.makePaymentRequest();
 

@@ -11,6 +11,18 @@ export async function create(req: Hapi.Request, h) {
   // https://anypayinc.com/grab-and-go/freshpress-portsmouth/green-on-fleet/purchase
   // /grab-and-go/:account_stub/:item_stub/purchase
 
+  console.log(req.headers);
+
+  var currency;
+
+  if (req.headers.accept === 'application/dash-paymentrequest') {
+    currency = 'DASH';
+  } else if (req.headers.accept === 'application/bitcoincash-paymentrequest') {
+    currency = 'BCH';
+  } else if (req.headers.accept === 'application/bitcoinsv-paymentrequest') {
+    currency = 'BSV';
+  } 
+
   try {
 
     let account = await models.Account.findOne({
@@ -37,10 +49,9 @@ export async function create(req: Hapi.Request, h) {
       throw new Error(`item ${req.params.item_stub} for account not found`);
     }
 
+    let invoice = await invoices.generateInvoice(account.id, item.price, currency);
 
-    let invoice = await invoices.generateInvoice(account.id, item.price, 'BCH');
-
-    console.log('INVOICE', invoice.toJSON());
+    console.log('INVOICE CREATED', invoice.toJSON());
 
     if (item.square_catalog_object_id) {
 
@@ -91,6 +102,18 @@ export async function createByItemUid(req: Hapi.Request, h) {
   console.log('payment protcol full request:');
   console.log(req);
 
+  var currency;
+
+  if (req.headers.accept === 'application/dash-paymentrequest') {
+    currency = 'DASH';
+  } else if (req.headers.accept === 'application/bitcoincash-paymentrequest') {
+    currency = 'BCH';
+  } else if (req.headers.accept === 'application/bitcoinsv-paymentrequest') {
+    currency = 'BSV';
+  } 
+
+
+
   // https://anypayinc.com/grab-and-go/freshpress-portsmouth/green-on-fleet/purchase
   // /grab-and-go/:account_stub/:item_stub/purchase
 
@@ -111,7 +134,7 @@ export async function createByItemUid(req: Hapi.Request, h) {
       throw new Error(`item ${req.params.item_uid} for account not found`);
     }
 
-    let invoice = await invoices.generateInvoice(item.account_id, item.price, 'BCH');
+    let invoice = await invoices.generateInvoice(item.account_id, item.price, currency);
 
     if (item.square_catalog_object_id) {
 
