@@ -14,13 +14,13 @@ module.exports = {
       depositMethodId: {
         type: Sequelize.STRING
       },
-      settlementMethodId: {
+      settleMethodId: {
         type: Sequelize.STRING
       },
       depositAddress_address: {
         type: Sequelize.STRING
       },
-      settlementAddress_address: {
+      settleAddress_address: {
         type: Sequelize.STRING
       },
       invoice_uid: {

@@ -6,11 +6,17 @@ import { convert } from './prices'
 import { toSatoshis } from './pay'
 import { computeInvoiceURI } from './uri'
 
-interface PaymentOption {
+export interface PaymentOption {
   invoice_uid: string;
   currency: string;
   address: string;
   amount: number;
+}
+
+export function writePaymentOption(option: PaymentOption) {
+
+  return models.PaymentOption.create(option);
+
 }
 
 export function writePaymentOptions(options: PaymentOption[]) {

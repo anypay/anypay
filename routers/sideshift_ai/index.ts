@@ -1,6 +1,8 @@
 
 import { models } from '../../lib/models';
+import { writePaymentOption } from '../../lib/payment_options';
 import * as http from 'superagent';
+import { computeInvoiceURI } from '../../lib/uri';
 
 import BigNumber from 'bignumber.js';
 
@@ -22,6 +24,10 @@ interface NewSidesiftQuote {
 interface SideshiftPair {
   inputCurrency: string;
   outputCurrency: string;
+}
+
+export async function generateInvoice(accountRoute, amount, ) {
+
 }
 
 export async function getNewAddress(accountRoute: AccountRoute): Promise<any> {
@@ -61,9 +67,9 @@ export async function convertAmount(outputAmount, outputCurrency, inputCurrency)
     throw new Error(`must route more than ${min_output.toNumber()}`);
   }
 
-  let inputAmount = outputAmount.dividedBy(rate);
+  let inputAmount = output_amount.dividedBy(rate);
 
-  return inputAmount.toNumber();
+  return parseFloat(inputAmount.toNumber().toFixed(6));
 }
 
 async function getPair(pair: SideshiftPair): Promise<any> {
@@ -89,23 +95,78 @@ async function getPair(pair: SideshiftPair): Promise<any> {
 }
 
 async function createQuote(newQuote: NewSidesiftQuote): Promise<any> {
+  console.log('sideshift.createquote', newQuote);
+
+  let params = {
+    depositMethodId: newQuote.inputCurrency.toLowerCase(),
+    settleMethodId: newQuote.outputCurrency.toLowerCase(),
+    settleAddress: newQuote.outputAddress
+  }
+
+  console.log('sideshift.createquote.params', params);
 
   let response = await http
     .post('https://sideshift.ai/api/quotes')
-    .send({
-      depositMethodId: newQuote.inputCurrency.toLowerCase(),
-      settlementMethodId: newQuote.outputCurrency.toLowerCase(),
-      settlementAddress: newQuote.outputAddress
-    })
+    .send(params)
 
   let record = await models.SideshiftQuote.create({
     quoteId: response.body.quoteId,
     depositMethodId: response.body.depositMethodId,
-    settlementMethodId: response.body.settlementMethodId,
+    settleMethodId: response.body.settleMethodId,
     depositAddress_address: response.body.depositAddress.address,
-    settlementAddress_address: response.body.settlementAddress.address
+    settleAddress_address: response.body.settleAddress.address
   })
 
   return record;
 
 }
+import { PaymentOption } from '../../lib/payment_options';
+
+export async function createPaymentOption(invoice, accountRoute) {
+
+  let account = await models.Account.findOne({ where: { id:
+    accountRoute.account_id }});
+
+  if (invoice.denomination_currency !== 'USD') {
+
+    throw new Error('only conversion to USD available at this time');
+
+  }
+
+  //  { currency, address, amount, invoice_uid }
+  let address = await getNewAddress(accountRoute);
+
+  let currency = accountRoute.input_currency.toLowerCase();
+
+  let amount = await convertAmount(invoice.denomination_amount, 'usdc', currency);
+
+  let uri = computeInvoiceURI({
+    currency,
+    amount,
+    address,
+    business_name: account.business_name,
+    image_url: account.image_url
+  });
+
+
+  let paymentOption = {
+    
+    invoice_uid: invoice.uid,
+
+    address,
+
+    amount,
+
+    currency,
+
+    uri
+  }
+
+  let record = await writePaymentOption(paymentOption);
+
+  console.log('payment_option.created', record.toJSON());
+
+  return record;
+
+}
+

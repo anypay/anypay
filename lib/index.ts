@@ -35,6 +35,7 @@ import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
+import * as routers from './routers';
 
 var initialized = false;
 
@@ -73,6 +74,7 @@ export {
   plugins,
   prices,
   receipts,
+  routers,
   routes,
   settings,
   settlements,

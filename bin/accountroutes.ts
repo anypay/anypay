@@ -5,8 +5,8 @@ import * as program from 'commander';
 import { models, log } from '../lib';
 
 program
-  .command('create <email> <input_currency> <output_currency> <output_address>')
-  .action(async (email, input_currency, output_currency, output_address) => {
+  .command('create <email> <input_currency> <output_currency> <output_address> [router_name]')
+  .action(async (email, input_currency, output_currency, output_address, router_name) => {
 
     let account = await models.Account.findOne({ where: { email } });
 
@@ -37,7 +37,9 @@ program
 
       output_currency,
 
-      output_address
+      output_address,
+
+      router_name
 
     });
 

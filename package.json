@@ -19,6 +19,7 @@
     "@google/maps": "^0.5.5",
     "@rodrigogs/mysql-events": "^0.6.0",
     "@types/axios": "^0.14.0",
+    "@types/bignumber.js": "^5.0.0",
     "@types/bluebird": "^3.5.20",
     "amqplib": "^0.5.2",
     "anypay": "0.0.7",
