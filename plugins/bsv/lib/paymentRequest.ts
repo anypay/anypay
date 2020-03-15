@@ -1,5 +1,6 @@
 require('dotenv').config();
 import * as bitcoin from 'bsv';
+import BigNumber from 'bignumber.js';
 
 import {models} from '../../../lib';
 
@@ -33,10 +34,10 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
   let request = {
     network:"bitcoin-sv",
     outputs: [{
-      script: script.toString(),
+      script: script.toHex(),
       amount: bsvToSatoshis(paymentOption.amount)
     }, {
-      script: anypayScript.toString(),
+      script: anypayScript.toHex(),
       amount: 1000
     }],
     time: Date.now() / 1000 | 0,
@@ -53,5 +54,9 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
 }
 
 function bsvToSatoshis(bsv): number{
-  return bsv * 100000000;
+  let amt = new BigNumber(bsv); 
+  let scalar = new BigNumber(100000000);
+
+  return amt.times(scalar).toNumber();
 }
+
