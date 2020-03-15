@@ -1,4 +1,4 @@
-import { coins } from '../../../lib';
+import { getChannel } from 'rabbi';
 
 export async function list(req, h) {
 
@@ -14,6 +14,8 @@ export async function activate(req, h) {
 
   await coins.activateCoin(req.payload.code);
 
+  await channel.publish('anypay.events', 'activatecoin', req.payload.coin);
+
   return true;
 
 }
@@ -25,6 +27,8 @@ export async function deactivate(req, h) {
   }
 
   await coins.deactivateCoin(req.payload.code);
+
+  await channel.publish('anypay.events', 'deactivatecoin', req.payload.coin);
 
   return true;
 
