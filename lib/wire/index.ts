@@ -156,8 +156,16 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
 
   let content = mustache.render(templateSource.toString('utf8'), {
     reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
-    invoices,
-    total: batch.amount,
+    invoices: invoices.map(invoice => {
+
+      return Object.assign(invoice, {
+        denomination_amount_paid: invoice.denomination_amount_paid.toFixed(2),
+        cashback_denomination_amount: invoice.cashback_denomination_amount.toFixed(2),
+        settlement_amount: invoice.settlement_amount.toFixed(2) 
+      });
+
+    }),
+    total: batch.amount.toFixed(2),
     batch_id: batch.batch_id,
     effective_date: moment(batch.effective_date).format('dddd, MMMM Do YYYY'),
     start_date,
