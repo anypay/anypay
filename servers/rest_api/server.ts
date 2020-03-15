@@ -262,6 +262,9 @@ async function Server() {
         options: {
           stripUnknown: true
         }
+      },
+      files: {
+          relativeTo: join(__dirname, '../../docs')
       }
     }
   });
@@ -1617,6 +1620,28 @@ async function Server() {
   }); 
 
   accountCSVReports(server);
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/{param*}',
+
+    handler: {
+
+      directory: {
+
+        path: '.',
+
+        redirectToSlash: true,
+
+        index: true,
+
+      }
+
+    }
+
+  });
 
   return server;
 
