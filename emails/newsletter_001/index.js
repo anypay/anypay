@@ -6,7 +6,7 @@ const Handlebars = require("handlebars");
 let body = fs_1.readFileSync(path_1.join(__dirname, 'email.html'));
 let template = Handlebars.compile(body.toString());
 exports.default = {
-    title: "Example email for from Rabbi Email module",
+    title: "“Did it work?” Now you know!",
     template,
     body: template({})
 };
