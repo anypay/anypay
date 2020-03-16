@@ -1374,6 +1374,103 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: `/api/emails`,
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Emails.index
+
+    }
+
+  });
+
+  /**
+  ** SEQUELIZE AUTO_GENERATED HANDLERS EXPERIMENT
+  function sequelizeHandler(handlerType, model) {
+ 
+  };
+
+
+  Object.keys(models).forEach(modelName => {
+
+    let model = models[modelName];
+
+    let resource_path_base = camelToSnake(modelName);
+
+    server.route({
+
+      method: 'GET',
+
+      path: `/api/sequelze/${resource_path_base}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('index', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'GET',
+
+      path: `/api/sequelze/${resource_path_base}/{id}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('show', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'POST',
+
+      path: `/api/sequelze/${resource_path_base}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('create', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'DELETE',
+
+      path: `/api/sequelze/${resource_path_base}/{id}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('delete', model)
+
+      }
+
+    });
+
+  });
+  **  END SEQUELIZE AUTO GENERATED HANDLERS EXPERIMENT
+  ****/
+
   return server;
 
 }
@@ -1413,3 +1510,9 @@ export {
 
 }
 
+
+function camelToSnake(string) {
+ return string.replace(/[\w]([A-Z])/g, function(m) {
+   return m[0] + "_" + m[1];
+ }).toLowerCase();
+}
