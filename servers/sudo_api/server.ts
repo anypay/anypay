@@ -7,6 +7,7 @@ import { log, database, models, password } from '../../lib';
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import { sendWebhookForInvoice } from '../../lib/webhooks';
+import * as Boom from 'boom';
 
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
@@ -971,6 +972,8 @@ async function Server() {
         }catch(err){
 
           console.log(err)
+
+          return Boom.badRequest(err.message);
 
         }
       }
