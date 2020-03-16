@@ -1,4 +1,5 @@
 import { getChannel } from 'rabbi';
+import { coins } from '../../../lib';
 
 export async function list(req, h) {
 
@@ -7,6 +8,8 @@ export async function list(req, h) {
 }
 
 export async function activate(req, h) {
+
+  let channel = await getChannel();
 
   if (!req.payload.code) {
     throw new Error('code must be provided');
@@ -21,6 +24,8 @@ export async function activate(req, h) {
 }
 
 export async function deactivate(req, h) {
+
+  let channel = await getChannel();
 
   if (!req.payload.code) {
     throw new Error('code must be provided');
