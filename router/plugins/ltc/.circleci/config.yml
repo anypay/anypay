@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:10
+        environment:
+          JOBS: 1
+    steps:
+      - checkout
+
+      - setup_remote_docker:
+          filters:
+            branches:
+              only:
+                - master
+                - staging
+      - run:
+          name: Build docker image
+          command: docker build -t ltc.anypay.global .
+
+      - add_ssh_keys
+
+      - deploy:
+          command: |
+            ./push_to_docker.sh
+            ssh chef@ltc.anypay.global "sudo /opt/ltc.anypay.global/deploy.sh"
+

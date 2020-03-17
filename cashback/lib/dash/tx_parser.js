@@ -26,11 +26,21 @@ function getTxJsonFromRawTx(rawTx) {
 }
 
 function getChangeAddressFromTxJsonAndDestination(txJson, destinationAddress) {
+  console.log(txJson);
 
-  return txJson.vout.map(output => {
+  let changeAddress = txJson.vout.map(output => {
     return output.scriptPubKey.addresses[0];
   })
   .filter(address => address != destinationAddress)[0]
+
+  return changeAddress;
+}
+
+async function getSendingAddressesFromInvoice(invoice) {
+
+	let rawTx = await getRawTxFromHash(invoice.hash);
+	let txJson = await getTxJsonFromRawTx(rawTx);
+
 }
 
 async function getChangeAddressFromInvoice(invoice) {
@@ -48,6 +58,20 @@ async function getChangeAddressFromInvoice(invoice) {
   let changeAddress = getChangeAddressFromTxJsonAndDestination(
 		txJson, invoice.address
 	)
+
+  if (!changeAddress) {
+
+    let inputTx = await getRawTxFromHash(txJson.vin[0].txid);
+
+    console.log('inputtx', inputTx);
+
+    let inputTxJson = await getTxJsonFromRawTx(inputTx);
+
+    console.log('inputtxjson', inputTxJson);
+    
+    changeAddress = inputTxJson.vout[0].scriptPubKey.addresses[0];
+
+  }
 
 	return changeAddress;
 }
