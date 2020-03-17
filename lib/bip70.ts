@@ -71,8 +71,6 @@ function buildOutputs(invoice, account) {
 
       return outputs;
 
-      return outputs;
-
     default:
       throw new Error('currency not supported');
   }
@@ -141,5 +139,4 @@ export function generatePaymentRequest(invoice, account) {
   return paypro;
 
 }
-
 
