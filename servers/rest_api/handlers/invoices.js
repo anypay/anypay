@@ -240,7 +240,9 @@ module.exports.create = async (request, reply) => {
 
       let price = invoice.denomination_amount / invoice.amount;
 
-      invoice.cashback_amount = request.payload.cashback_amount / price;
+      invoice.cashback_amount = parseFloat(
+        (request.payload.cashback_amount / price).toFixed(5)
+      );
 
       console.log('cashback amount', invoice.cashback_amount);
 

@@ -15,6 +15,7 @@ import { validateToken } from '../auth/hapi_validate_token';
 const HapiSwagger = require("hapi-swagger");
 
 import * as pricesActor from '../../actors/prices/actor';
+import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
@@ -262,6 +263,9 @@ async function Server() {
         options: {
           stripUnknown: true
         }
+      },
+      files: {
+          relativeTo: join(__dirname, '../../docs')
       }
     }
   });
@@ -1618,6 +1622,28 @@ async function Server() {
 
   accountCSVReports(server);
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/{param*}',
+
+    handler: {
+
+      directory: {
+
+        path: '.',
+
+        redirectToSlash: true,
+
+        index: true,
+
+      }
+
+    }
+
+  });
+
   return server;
 
 }
@@ -1637,6 +1663,8 @@ async function start () {
     pricesActor.start();
 
   }
+
+  ActivateDeactivateCoinActor.start();
 
   await sequelize.sync()
 
