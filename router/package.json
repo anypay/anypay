@@ -1,0 +1,66 @@
+{
+  "name": "router.anypay.global",
+  "version": "0.1.0",
+  "description": "Address Forwarding Service",
+  "main": "actors/server/actor.ts",
+  "scripts": {
+    "test": "mocha --require=ts-node/register test/**/*_test.ts",
+    "build": "tsc",
+    "start": "ts-node actors/index.ts",
+    "actors:btc": "cd plugins/btc && rabbi start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anypay/bch.anypay.global.git"
+  },
+  "keywords": [
+    "bitcoin",
+    "bitcoincash",
+    "bch",
+    "cryptocurrency"
+  ],
+  "author": "Steven Zeiler",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anypay/bch.anypay.global/issues"
+  },
+  "homepage": "https://github.com/anypay/bch.anypay.global#readme",
+  "dependencies": {
+    "@dashevo/dashcore-lib": "^0.17.9",
+    "@types/amqplib": "^0.5.9",
+    "@types/hapi": "^18.0.0",
+    "@types/lodash": "^4.14.121",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.12.18",
+    "@types/validator": "^10.11.3",
+    "@types/winston": "^2.4.4",
+    "amqplib": "^0.5.3",
+    "bchaddrjs": "^0.3.2",
+    "bignumber.js": "^8.1.1",
+    "bitbox-sdk": "^8.10.1",
+    "bitcore-lib": "^8.6.0",
+    "bitcore-lib-cash": "^0.19.0",
+    "bitcore-lib-dash": "^0.15.3",
+    "bitcore-lib-litecoin": "^0.13.17",
+    "bsv": "^0.30.0",
+    "bunnies": "^1.2.1",
+    "cron": "^1.6.0",
+    "dotenv": "^6.2.0",
+    "hapi": "^18.0.0",
+    "joi": "^14.3.1",
+    "lodash": "^4.17.11",
+    "mocha": "^5.2.0",
+    "pg": "^7.8.0",
+    "rabbi": "^1.7.1",
+    "sequelize": "^5.9.4",
+    "sequelize-cli": "^5.5.0",
+    "slpjs": "^0.21.3",
+    "superagent": "^4.1.0",
+    "typescript": "^3.5.3",
+    "underscore": "^1.9.1",
+    "uuid": "^3.3.3",
+    "validator": "^11.1.0",
+    "winston": "^3.1.0",
+    "zeromq": "^5.1.0"
+  }
+}

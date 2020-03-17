@@ -1,0 +1,17 @@
+{
+  "development": {
+    "use_env_variable": "RVN_DATABASE_URL",
+    "dialect": "postgresql"
+  },
+  "test": {
+    "username": "postgres",
+    "password": null,
+    "database": "test_bch_anypay_global",
+    "host": "127.0.0.1",
+    "dialect": "postgresql"
+  },
+  "production": {
+    "use_env_variable": "RVN_DATABASE_URL",
+    "dialect": "postgresql"
+  }
+}

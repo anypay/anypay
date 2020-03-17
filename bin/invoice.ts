@@ -8,6 +8,10 @@ import { generateInvoice } from '../lib/invoice';
 
 import { log, models } from '../lib';
 
+import { invoicePaidEmail } from '../lib/email';
+
+import { email } from 'rabbi';
+
 program
   .command('generate <email> <denomination_amount> <currency>')
   .action(async (email, denominationAmount, currency) => {
@@ -19,6 +23,27 @@ program
     let invoice = await generateInvoice(account.id, amount, currency);
 
     log.info('invoice.generated', invoice.toJSON());
+
+    process.exit(0);
+
+  });
+
+program
+  .command('sendemailreceipt <invoice_uid>')
+  .action(async (uid) => {
+
+    try {
+
+      let invoice = await models.Invoice.findOne({ where: {
+        uid
+      }});
+
+      let resp = await invoicePaidEmail(invoice);
+
+    } catch(error) {
+
+      console.log(error);
+    }
 
     process.exit(0);
 

@@ -10,24 +10,24 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay.events',
+    exchange: 'anypay:invoices',
 
-    routingkey: 'invoice.payment',
+    routingkey: 'invoice:paid',
 
-    queue: 'invoice.email',
+    queue: 'send_invoice_paid_email_receipt',
 
   })
   .start(async (channel, msg) => {
 
-    let uid = msg.content.toString()
+    let uid = msg.content.toString();
 
     let invoice = await models.Invoice.findOne({
  
       where: { uid: uid }
 
-    })
+    });
 
-    await email.invoicePaidEmail(invoice.toJSON())
+    await email.invoicePaidEmail(invoice.toJSON());
 
     channel.ack(msg);
 

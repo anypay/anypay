@@ -1,5 +1,6 @@
 require('dotenv').config();
 import * as dash from '@dashevo/dashcore-lib';
+import BigNumber from 'bignumber.js';
 
 import {models} from '../../../lib';
 
@@ -31,10 +32,10 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     network:"dash",
     outputs: [{
       address: address.toString(),
-      script: script.toString(),
+      script: script.toHex(),
       amount: dashToSatoshis(paymentOption.amount)
     }, {
-      script: anypayScript.toString(),
+      script: anypayScript.toHex(),
       address: anypayAddress.toString(),
       amount: 1000
     }],
@@ -52,5 +53,9 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
 }
 
 function dashToSatoshis(dash): number{
-  return dash * 100000000;
+  let amt = new BigNumber(dash); 
+  let scalar = new BigNumber(100000000);
+
+  return amt.times(scalar).toNumber();
 }
+

@@ -7,6 +7,7 @@ import { log, database, models, password } from '../../lib';
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import { sendWebhookForInvoice } from '../../lib/webhooks';
+import * as Boom from 'boom';
 
 import * as cashbackMerchants from './handlers/cashback_merchants';
 import * as cashback from './handlers/cashback';
@@ -16,19 +17,8 @@ import * as accountInvoices from './handlers/account_invoices';
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 
 import { join } from 'path';
+
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
-
-const sudoWires = require("./handlers/wire_reports");
-
-const SudoAccounts = require("./handlers/sudo_accounts");
-
-const AccountsController = require("./handlers/accounts");
-
-const InvoicesController = require("./handlers/invoices");
-
-const PricesController = require("./handlers/prices");
-
-const SudoCoins = require("./handlers/sudo_coins");
 
 import { sudoLogin } from './handlers/sudo_login';
 
@@ -234,7 +224,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.destroy
+      handler: handlers.Accounts.destroy
 
     }
 
@@ -250,7 +240,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoShow
+      handler: handlers.Accounts.sudoShow
 
     }
 
@@ -266,7 +256,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoAccountWithEmail
+      handler: handlers.Accounts.sudoAccountWithEmail
 
     }
 
@@ -282,7 +272,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.list
+      handler: handlers.SudoCoins.list
 
     }
   });
@@ -297,7 +287,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.activate
+      handler: handlers.SudoCoins.activate
 
     }
 
@@ -313,7 +303,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoCoins.deactivate
+      handler: handlers.SudoCoins.deactivate
 
     }
 
@@ -330,7 +320,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.index
+      handler: handlers.Accounts.index
 
     }
 
@@ -459,7 +449,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoIndex
+      handler: handlers.Invoices.sudoIndex
 
     }
 
@@ -476,7 +466,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoRepublishTxid,
+      handler: handlers.Invoices.sudoRepublishTxid,
 
       validate: {
         
@@ -505,7 +495,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoIndexUnrouted
+      handler: handlers.Invoices.sudoIndexUnrouted
 
     }
 
@@ -521,7 +511,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoIndex
+      handler: handlers.Prices.sudoIndex
 
     }
 
@@ -537,7 +527,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoShow
+      handler: handlers.Prices.sudoShow
 
     }
 
@@ -553,7 +543,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: PricesController.sudoUpdate
+      handler: handlers.Prices.sudoUpdate
 
     }
 
@@ -569,7 +559,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: InvoicesController.sudoShow
+      handler: handlers.Invoices.sudoShow
 
     }
 
@@ -774,7 +764,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: SudoAccounts.update,
+      handler: handlers.SudoAccounts.update,
 
       validate: {
 
@@ -983,6 +973,8 @@ async function Server() {
 
           console.log(err)
 
+          return Boom.badRequest(err.message);
+
         }
       }
 
@@ -1068,7 +1060,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showAddresses
+      handler: handlers.Accounts.showAddresses
 
     }
   });
@@ -1083,7 +1075,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showAmbassadorRewards
+      handler: handlers.Accounts.showAmbassadorRewards
 
     }
   });
@@ -1098,7 +1090,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.showKioskRewards
+      handler: handlers.Accounts.showKioskRewards
 
     }
   });
@@ -1113,7 +1105,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.calculateROI
+      handler: handlers.Accounts.calculateROI
 
     }
   });
@@ -1128,7 +1120,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: AccountsController.accountVolume
+      handler: handlers.Accounts.accountVolume
 
     }
   });
@@ -1180,7 +1172,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoWires.show
+      handler: handlers.WireReports.show
 
     }
 
@@ -1269,7 +1261,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoWires.showCSV
+      handler: handlers.WireReports.showCSV
 
     }
 
@@ -1290,6 +1282,36 @@ async function Server() {
     }
 
   });
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/ambassadors',
+
+    config: {
+
+      validate: {
+        
+        payload : {
+
+          name: Joi.string().required(),
+
+          account_id: Joi.number().required()
+
+        }
+
+      },
+
+      auth: 'sudopassword',
+
+      handler: handlers.Ambassadors.create
+
+    }
+
+  });
+
+
 
   server.route({
 
@@ -1355,6 +1377,103 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: `/api/emails`,
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Emails.index
+
+    }
+
+  });
+
+  /**
+  ** SEQUELIZE AUTO_GENERATED HANDLERS EXPERIMENT
+  function sequelizeHandler(handlerType, model) {
+ 
+  };
+
+
+  Object.keys(models).forEach(modelName => {
+
+    let model = models[modelName];
+
+    let resource_path_base = camelToSnake(modelName);
+
+    server.route({
+
+      method: 'GET',
+
+      path: `/api/sequelze/${resource_path_base}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('index', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'GET',
+
+      path: `/api/sequelze/${resource_path_base}/{id}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('show', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'POST',
+
+      path: `/api/sequelze/${resource_path_base}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('create', model)
+
+      }
+
+    });
+
+    server.route({
+
+      method: 'DELETE',
+
+      path: `/api/sequelze/${resource_path_base}/{id}`,
+
+      config: {
+
+        auth: 'sudopassword',
+
+        handler: sequelizeHandler('delete', model)
+
+      }
+
+    });
+
+  });
+  **  END SEQUELIZE AUTO GENERATED HANDLERS EXPERIMENT
+  ****/
+
   return server;
 
 }
@@ -1394,3 +1513,9 @@ export {
 
 }
 
+
+function camelToSnake(string) {
+ return string.replace(/[\w]([A-Z])/g, function(m) {
+   return m[0] + "_" + m[1];
+ }).toLowerCase();
+}
