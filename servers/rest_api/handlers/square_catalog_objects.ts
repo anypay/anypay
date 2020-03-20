@@ -30,7 +30,7 @@ export async function index (req, h) {
 
     let squareClient = await getClient(req.account.id);
 
-    let catalog = await squareClient.listCatalog();
+    let catalog = await squareClient.fullCatalog();
 
     createGrabAndGoItemsForCatalog(catalog, req.account.id);
 
@@ -89,9 +89,6 @@ async function createGrabAndGoItemsForCatalog(catalog, account_id) {
 
     var price;
 
-    console.log(catalogObject);
-    catalogObject.item_data.variations.forEach(console.log);;
-
     try {
 
       price = catalogObject.item_data.variations[0].item_variation_data.price_money.amount / 100.00;
@@ -102,40 +99,66 @@ async function createGrabAndGoItemsForCatalog(catalog, account_id) {
 
     }
 
-    let [record, isNew] = await models.GrabAndGoItem.findOrCreate({
+    var record, isNew;
 
-      where: {
+    try {
 
-        square_catalog_object_id: catalogObject.id,
+      [record, isNew] = await models.GrabAndGoItem.findOrCreate({
 
-        account_id
-      },
+        where: {
 
-      defaults: {
+          square_catalog_object_id: catalogObject.id,
 
-        square_catalog_object_id: catalogObject.id,
+          account_id
+        },
 
-        name: catalogObject.item_data.name,
+        defaults: {
 
-        square_variation_id: catalogObject.item_data.variations[0].id,
+          square_catalog_object_id: catalogObject.id,
 
-        price,
+          name: catalogObject.item_data.name,
 
-        uid: shortid.generate(),
+          square_variation_id: catalogObject.item_data.variations[0].id,
 
-        account_id
+          price,
 
-      }
-    })
+          uid: shortid.generate(),
+
+          account_id
+
+        }
+      })
+
+    } catch(error) {
+
+      continue;
+
+    }
 
     if (isNew) {
 
-      console.log('new record created');
+      console.log('new record created', record.toJSON());
 
     } else {
-      
+   
+      try {
+
+        price = catalogObject.item_data.variations[0].item_variation_data.price_money.amount / 100.00;
+
+      } catch(error) {
+
+        price = 0.00;
+
+      }
+
+      record.price = price;
+
+      await record.save();
+ 
       console.log('old record found', record.toJSON());
     }
+
+    console.log('PUSH', record.toJSON());
 
     items.push(record);
   
