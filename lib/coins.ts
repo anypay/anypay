@@ -5,9 +5,15 @@ import { emitter } from '../lib/events';
 
 var coins = [];
 
+var coinsByCode = {}
+
 export async function refreshCoins() {
 
   coins = await models.Coin.findAll();
+
+  coinsByCode = coins.reduce((acc, coin) => {
+    acc[coin.code] = coin; 
+  }, {});
 
   emitter.emit('coins.refreshed');
 
@@ -74,6 +80,16 @@ export async function activateCoin(code) {
 export function getCoin(code: string) {
 
   return coins.find(coin => coin.code === code);
+
+}
+
+export function coinIsEnabled(coinCode) {
+
+  if (!coinsByCode[coinCode]){ 
+    return false;
+  }
+
+  return !coinsByCode[coinCode].unavailable;
 
 }
 

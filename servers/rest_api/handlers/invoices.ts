@@ -481,6 +481,8 @@ function sanitizeInvoice(invoice) {
   delete resp.id;
   delete resp.dollar_amount;
 
+  resp.payment_options = invoice.payment_options;
+
   return resp;
 }
 

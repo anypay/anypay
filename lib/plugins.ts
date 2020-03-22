@@ -72,6 +72,10 @@ class Plugins {
       throw new Error('plugin does not implement getNewAddress')
     }
 
+    if(!this.plugins[currency]){
+      return null;
+    }
+
     let input = await this.plugins[currency].getNewAddress(address);
 
     return input;

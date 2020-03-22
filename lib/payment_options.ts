@@ -13,9 +13,19 @@ export interface PaymentOption {
   amount: number;
 }
 
+export interface PaymentOptionOpts {
+  router: string;
+}
+
 export function writePaymentOption(option: PaymentOption) {
 
   return models.PaymentOption.create(option);
+
+}
+
+export function createPaymentOption(invoice: any, currency:string, opts?: PaymentOptionOpts) {
+
+  return {};
 
 }
 
