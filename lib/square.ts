@@ -115,14 +115,45 @@ export class SquareOauthClient {
 
   }
 
-  async listCatalog() {
+  async listCatalog(cursor?: string) {
+
+    let url = 'https://connect.squareup.com/v2/catalog/list';
+    if (cursor) {
+      url = `${url}?cursor=${cursor}`;
+    }
 
     let resp = await http
-      .get('https://connect.squareup.com/v2/catalog/list')
+      .get(url)
       .set('Content-type', 'application/json')
       .set('Authorization', `Bearer ${this.accessToken}`)
 
     return resp.body;
+
+  }
+
+  async fullCatalog() {
+
+    let objects = [];
+
+    var lastPage = false;
+    var cursor;
+
+    while (!lastPage) {
+
+      let catalog = await this.listCatalog(cursor)
+
+      catalog.objects.map(o => objects.push(o));
+
+      if (catalog.cursor) {
+        cursor = catalog.cursor;
+      } else {
+        cursor = null;
+        lastPage = true;
+      }
+      
+    }
+
+    return { objects };
 
   }
 
