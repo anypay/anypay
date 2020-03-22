@@ -13,6 +13,8 @@ export async function refreshCoins() {
 
   coinsByCode = coins.reduce((acc, coin) => {
     acc[coin.code] = coin; 
+
+    return acc;
   }, {});
 
   emitter.emit('coins.refreshed');
@@ -78,8 +80,13 @@ export async function activateCoin(code) {
 }
 
 export function getCoin(code: string) {
+  console.log(coinsByCode);
 
-  return coins.find(coin => coin.code === code);
+  let coin = coinsByCode[code];
+
+  console.log('coin', coin);
+
+  return coin;
 
 }
 
@@ -92,4 +99,6 @@ export function coinIsEnabled(coinCode) {
   return !coinsByCode[coinCode].unavailable;
 
 }
+
+refreshCoins();
 

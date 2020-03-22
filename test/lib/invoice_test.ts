@@ -7,6 +7,8 @@ import { registerAccount, setAddressScalar } from '../../lib/accounts';
 import { setAddress, setDenomination } from '../../lib/core';
 import * as assert from 'assert';
 
+import { log } from '../../lib';
+
 import * as Chance from 'chance';
 import * as moment from 'moment';
 
@@ -18,7 +20,7 @@ describe("Creating Invoices", () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
-    await setAddress({
+    let addr = await setAddress({
       account_id: account.id,
       currency: "DASH",
       address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
@@ -35,13 +37,19 @@ describe("Creating Invoices", () => {
     });
 
     let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-    
-    console.log('invoice', invoice.toJSON());
+
+    console.log("IIIII");
+    log.info(JSON.stringify({ invoice: invoice }));
+
+    log.info(`amount.value ${amount.value}`);
+    log.info(`invoice.denomination_amount ${invoice.denomination_amount}`);
 
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
+    log.info(`invoice.amount`, invoice.amount);
     assert(invoice.amount > 0);
+
     assert.strictEqual(invoice.currency, 'DASH');
 
     assert(invoice.invoice_amount > 0);
@@ -55,7 +63,7 @@ describe("Creating Invoices", () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
-    await setAddress({
+    let addr = await setAddress({
       account_id: account.id,
       currency: "DASH",
       address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
@@ -72,17 +80,19 @@ describe("Creating Invoices", () => {
     });
 
     let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-    
-    console.log('INVOICE', invoice.toJSON());
+
+    log.info(JSON.stringify({ invoice: invoice }));
 
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
     assert(invoice.amount > 0);
-    assert.strictEqual(invoice.currency, 'DASH');
 
-    assert(invoice.invoice_amount > 0);
-    assert.strictEqual(invoice.invoice_currency, 'DASH');
+    let option = invoice.payment_options.find(opt => opt.currency = 'DASH');
+
+    assert.strictEqual(option.currency, 'DASH');
+
+    assert(option.amount > 0);
 
   });
 

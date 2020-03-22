@@ -152,7 +152,8 @@
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate --url=$DATABASE_URL",
-    "db:seed:prices": "ts-node test/seed_prices.ts"
+    "db:seed:prices": "ts-node test/seed_prices.ts",
+    "test:adhoc": "mocha --require=ts-node/register --timeout=20000 test/lib/roi_test.ts"
   },
   "keywords": [],
   "author": "",
