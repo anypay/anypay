@@ -845,7 +845,7 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/invoices/{uid}/bip270",
+    path: "/invoices/{uid}/pay",
     handler: handlers.BsvPaymentRequest.create 
 
   })
