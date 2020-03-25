@@ -90,3 +90,15 @@ li:last-child {
   
   border-bottom: 0px;
 }
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box div {
+  width: 100px;
+  height: 100px;
+}
+

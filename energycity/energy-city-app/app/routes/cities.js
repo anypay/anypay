@@ -22,6 +22,7 @@ export default Ember.Route.extend({
     const socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
     controller.set('socket', socket);
 
+
   }
 
 });
