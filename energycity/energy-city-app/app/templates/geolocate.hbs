@@ -1,0 +1,19 @@
+{{outlet}}
+
+<div class="box">
+
+  {{#if geolocating}}
+
+    <div>
+      <h1 class='flex-center'>Locating Nearby Businesses</h1>
+    </div>
+
+  {{else}}
+
+    <div>
+      <h1 class='flex-center'>{{location.address.city}}</h1>
+    </div>
+
+  {{/if}}
+
+</div>
