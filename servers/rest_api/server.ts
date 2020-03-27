@@ -545,6 +545,21 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/invoices/{invoice_uid}/notes",
+    handler: handlers.InvoiceNotes.create,
+    options: {
+      validate: {
+        payload: {
+          note: Joi.string().required()
+        }
+      },
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/coins",
     handler: CoinsController.list,
