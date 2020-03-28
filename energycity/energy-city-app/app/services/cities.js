@@ -6,14 +6,34 @@ export default Ember.Service.extend({
   cities: null,
 
   async listCities() {
-    let result = await Ember.$.ajax({
-      method: "GET",
-      url: `${config.apiEndpoint}/api/cities`
-    })
 
-    this.set('cities', result.cities);
+    if (this.get('cities')) {
+      
+      Ember.$.ajax({
+        method: "GET",
+        url: `${config.apiEndpoint}/api/cities`
+      })
+      .then(result => {
 
-    return result.cities;
+        this.set('cities', result.cities);
+
+      });
+
+      return this.get('cities');
+      
+    } else {
+
+      let result = await Ember.$.ajax({
+        method: "GET",
+        url: `${config.apiEndpoint}/api/cities`
+      })
+
+      this.set('cities', result.cities);
+
+      return result.cities;
+
+    }
+
   },
 
   async getCity(city_tag) {

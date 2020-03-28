@@ -62,7 +62,7 @@ program
 
     try {
 
-      let catalog = await squareClient.listCatalog();
+      let catalog = await squareClient.fullCatalog();
 
       catalog.objects.forEach(catalogObject => {
 

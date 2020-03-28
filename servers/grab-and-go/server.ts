@@ -112,7 +112,7 @@ async function Server(): Promise<Hapi.Server> {
 
     path: "/grab-and-go/auth/square",
 
-    handler: handlers.SquareOauth.authorize,
+    handler: handlers.SquareOauth.authorize
 
   });
 

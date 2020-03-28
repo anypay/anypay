@@ -4,6 +4,8 @@ import { inject as service } from '@ember/service';
 
 export default Ember.Route.extend({
 
+  geolocation: service(),
+
   socketIOService: service('socket-io'),
 
   setupController(controller) {
