@@ -23,60 +23,85 @@ function hash(password) {
 
 export async function update(req, h) {
 
-  let account = await models.Account.findOne({ where: {
+  try {
 
-    id: req.account.id
+    let account = await models.Account.findOne({ where: {
 
-  }});
+      id: req.account.id
 
-  if (!account) {
+    }});
+
+    if (!account) {
+
+      return {
+
+        success: false,
+
+        error: 'account not found'
+
+      }
+
+    }
+
+    let updateAttrs: any = Object.assign(req.payload, {});
+
+    if (updateAttrs.physical_address) {
+
+      try {
+
+        let geolocation = await geocode(updateAttrs.physical_address);
+
+        updateAttrs.latitude = geolocation.lat;
+        updateAttrs.longitude = geolocation.lng;
+
+      } catch (error) {
+
+        log.error('error geocoding address', error.message);
+
+      }
+
+    }
+
+    if (updateAttrs.ambassador_email) {
+      let ambassadorAccount = await models.Account.findOne({
+        where: {
+          email: updateAttrs.ambassador_email
+        }
+      });
+
+      if (!ambassadorAccount) {
+        throw new Error('ambassador email does not exist');
+      }
+
+      updateAttrs['ambassador_id'] = ambassadorAccount.id;
+
+    }
+
+    delete updateAttrs['ambassador_email'];
+
+    await models.Account.update(updateAttrs, {
+
+      where: { id: req.account.id }
+
+    });
+
+    account = await models.Account.findOne({ where: {
+
+      id: req.account.id
+
+    }});
 
     return {
 
-      success: false,
+      success: true,
 
-      error: 'account not found'
-
-    }
-
-  }
-
-  let updateAttrs: any = Object.assign(req.payload, {});
-
-  if (updateAttrs.physical_address) {
-
-    try {
-
-      let geolocation = await geocode(updateAttrs.physical_address);
-
-      updateAttrs.latitude = geolocation.lat;
-      updateAttrs.longitude = geolocation.lng;
-
-    } catch (error) {
-
-      log.error('error geocoding address', error.message);
+      account
 
     }
 
-  }
+  } catch(error) {
 
-  await models.Account.update(updateAttrs, {
-
-    where: { id: req.account.id }
-
-  });
-
-  account = await models.Account.findOne({ where: {
-
-    id: req.account.id
-
-  }});
-
-  return {
-
-    success: true,
-
-    account
+    return Boom.badRequest(error.message);
 
   }
 
