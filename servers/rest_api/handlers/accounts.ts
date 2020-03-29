@@ -189,10 +189,36 @@ export async function create (request, reply) {
 
 
 export async function show (request, reply) {
-  let accountId = request.auth.credentials.accessToken.account_id;
-  var account = await models.Account.findOne({ where: { id: accountId } })
 
-  return account;
+  var account = request.account,
+      ambassador,
+      addresses,
+      tipjars
+
+  if (account.ambassador_id) {
+    ambassador = await models.Account.findOne({
+      where: {
+        id: account.ambassador_id
+      },
+      attributes: ['id', 'email'] 
+    });
+  }
+
+  addresses = await models.Address.findAll({ where: {
+    account_id: account.id
+  }});
+
+  tipjars = await models.Tipjar.findAll({ where: {
+    account_id: account.id
+  }});
+
+  return  {
+    account,
+    ambassador,
+    addresses,
+    tipjars
+  }
+
 };
 
 export async function getRewards(request, reply) {
