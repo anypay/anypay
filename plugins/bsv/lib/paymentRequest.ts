@@ -12,17 +12,18 @@ interface Output{
 interface PaymentRequest{
     network:string;
     outputs :Output[];
-    time: number;
     creationTimestamp: Date;
     expirationTimestamp: Date;
     memo: string;
     paymentUrl:string; 
-
+    merchantData: string;
 }
 
 export async function generatePaymentRequest(invoice: any, paymentOption: any):Promise<PaymentRequest>{
   console.log('invoice', invoice);
   console.log('invoice', invoice);
+
+  let account = await models.Account.findOne({ where: { id: invoice.account_id }});
 
   let address = new bitcoin.Address(paymentOption.address);
 
@@ -40,11 +41,15 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
       script: anypayScript.toHex(),
       amount: 1000
     }],
-    time: Date.now() / 1000 | 0,
     creationTimestamp: invoice.createdAt,
     expirationTimestamp: invoice.expiry,
-    memo: "Energy City Invoice",
+    memo: "Bitcoin SV Payment Request | Anypay Inc",
     paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay`,
+    merchantData: JSON.stringify({
+      invoiceUid: invoice.uid,
+      merchantName: account.business_name,
+      avatarUrl: account.image_url
+    })
   }
 
   console.log(request)
