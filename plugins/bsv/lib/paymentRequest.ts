@@ -3,6 +3,7 @@ import * as bitcoin from 'bsv';
 import BigNumber from 'bignumber.js';
 
 import {models} from '../../../lib';
+import * as moment from 'moment';
 
 interface Output{
   script: string;
@@ -12,8 +13,8 @@ interface Output{
 interface PaymentRequest{
     network:string;
     outputs :Output[];
-    creationTimestamp: Date;
-    expirationTimestamp: Date;
+    creationTimestamp: number;
+    expirationTimestamp: number;
     memo: string;
     paymentUrl:string; 
     merchantData: string;
@@ -41,8 +42,8 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
       script: anypayScript.toHex(),
       amount: 1000
     }],
-    creationTimestamp: invoice.createdAt,
-    expirationTimestamp: invoice.expiry,
+    creationTimestamp: moment(invoice.createdAt).unix(),
+    expirationTimestamp: moment(invoice.expiry).unix(),
     memo: "Bitcoin SV Payment Request | Anypay Inc",
     paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay`,
     merchantData: JSON.stringify({
