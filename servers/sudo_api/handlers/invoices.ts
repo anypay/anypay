@@ -6,6 +6,8 @@ import * as Sequelize from 'sequelize';
 
 import { models } from '../../../lib';
 
+import * as hapiSequelize from '../../../lib/hapi_sequelize';
+
 import {republishTxid} from '../../../lib/invoice';
 
 const log = require('winston');
@@ -106,8 +108,9 @@ module.exports.sudoShow = async function(request, reply) {
 
 }
 
-
 module.exports.sudoIndexUnrouted = async function(request, reply) {
+
+  let { order, limit, offset } = hapiSequelize.parseRequest(request);
 
   try {
 
@@ -116,10 +119,14 @@ module.exports.sudoIndexUnrouted = async function(request, reply) {
         output_hash: { [Op.is]: null },
         invoice_amount_paid: { [Op.gt]: 0 },
         createdAt: { [Op.gt]: new Date(1572566400*1000)} //November 1st, 2019
-	  }
-	});
+      },
 
-   return invoices
+      order,
+      limit,
+      offset
+    });
+
+    return { invoices }
 
   } catch(error) {
 	  log.error(error);
