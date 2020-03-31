@@ -44,7 +44,7 @@ async function handleBSV(req, h) {
 
   let response = h.response(content);
 
-  response.type('application/bitcoinsv-paymentrequest');
+  response.type('application/json');
 
   response.header('x-signature-type', 'ecc');
 

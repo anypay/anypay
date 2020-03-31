@@ -262,14 +262,19 @@ module.exports.create = async (request, reply) => {
 
     invoice.payment_options = payment_options;
 
-    return sanitizeInvoice(invoice);
+    let sanitized = sanitizeInvoice(invoice);
+
+    return Object.assign({
+      invoice: sanitized,
+      payment_options
+    }, sanitized);
 
   } catch(error) {
     console.log(error);
 
     log.error(error.message);
 
-    throw Boom.badRequest(error.message);
+    return Boom.badRequest(error.message);
 
   }
 
@@ -377,7 +382,6 @@ module.exports.show = async function(request, reply) {
 
   log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
 
-
   try {
 
 	  let invoice = await models.Invoice.findOne({
@@ -398,7 +402,14 @@ module.exports.show = async function(request, reply) {
 
       invoice.payment_options = payment_options;
 
-      return sanitizeInvoice(invoice);
+      let sanitized = sanitizeInvoice(invoice);
+
+      let resp = Object.assign({
+        invoice: sanitized,
+        payment_options
+      }, sanitized)
+
+      return resp;
 
 	  } else {
 
@@ -407,7 +418,11 @@ module.exports.show = async function(request, reply) {
 	    throw new Error('invoice not found')
 	  }
   } catch(error) {
-	  log.error(error.message);
+
+    console.log(error);
+
+    return Boom.badRequest(error.message);
+
   }
 
 
