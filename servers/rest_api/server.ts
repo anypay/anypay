@@ -35,7 +35,6 @@ const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 import * as dashtext from '../../lib/dash/dashtext';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
-const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const TipJars = require("./handlers/tipjars");
 const SudoAccounts = require("./handlers/sudo/accounts");
@@ -424,7 +423,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts",
-    handler: AccountsController.create,
+    handler: handlers.Accounts.create,
     options: {
       tags: ['api'],
       validate: {
@@ -437,7 +436,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/anonymous-accounts",
-    handler: AccountsController.registerAnonymous,
+    handler: handlers.Accounts.registerAnonymous,
     options: {
       auth: "token",
       tags: ['api'],
@@ -451,7 +450,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/anonymous-accounts",
-    handler: AccountsController.createAnonymous,
+    handler: handlers.Accounts.createAnonymous,
     options: {
       tags: ['api']
     },
@@ -509,7 +508,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account",
-    handler: AccountsController.show,
+    handler: handlers.Accounts.show,
     options: {
       auth: "token",
       tags: ['api'],
@@ -520,7 +519,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account/rewards",
-    handler: AccountsController.getRewards,
+    handler: handlers.Accounts.getRewards,
     options: {
       auth: "token",
       tags: ['api'],
@@ -530,7 +529,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/account",
-    handler: AccountsController.update,
+    handler: handlers.Accounts.update,
     options: {
       auth: "token",
       tags: ['api']
@@ -552,6 +551,21 @@ async function Server() {
     path: "/achs/{account_ach_id}/invoices",
     handler: handlers.AccountAchInvoices.show,
     options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{invoice_uid}/notes",
+    handler: handlers.InvoiceNotes.create,
+    options: {
+      validate: {
+        payload: {
+          note: Joi.string().required()
+        }
+      },
       auth: "token",
       tags: ['api']
     }
@@ -1177,7 +1191,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.index
+      handler: handlers.Accounts.index
 
     }
 
@@ -1245,7 +1259,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.destroy
+      handler: handlers.Accounts.destroy
 
     }
 
@@ -1262,7 +1276,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoShow
+      handler: handlers.Accounts.sudoShow
 
     }
 
@@ -1279,7 +1293,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoAccountWithEmail
+      handler: handlers.Accounts.sudoAccountWithEmail
 
     }
 
@@ -1449,7 +1463,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: AccountsController.calculateROI
+      handler: handlers.Accounts.calculateROI
 
     }
   });
