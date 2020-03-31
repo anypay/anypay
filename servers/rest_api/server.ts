@@ -282,6 +282,19 @@ async function Server() {
       request.headers['x-content-type'] = 'application/payment';
     }
 
+    if ('application/bitcoinsv-payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
+    }
+
+    if ('application/bitcoinsv-paymentack' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
+      request.headers['x-accept'] = 'application/bitcoinsv-paymentack';
+    }
+
+
+
     if ('application/verify-payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/verify-payment';
