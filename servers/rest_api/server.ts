@@ -132,7 +132,7 @@ const validatePassword = async function(request, username, password, h) {
 
   var account = await models.Account.findOne({
     where: {
-      email: username
+      email: username.toLowerCase()
     }
   });
 
