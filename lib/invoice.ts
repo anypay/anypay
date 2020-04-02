@@ -179,6 +179,7 @@ export async function generateInvoice(
     status: 'unpaid',
     uid: uid,
     uri,
+    should_settle: account.should_settle,
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
     dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
