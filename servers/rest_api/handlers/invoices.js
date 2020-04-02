@@ -402,11 +402,16 @@ module.exports.show = async function(request, reply) {
 
       invoice.payment_options = payment_options;
 
+      let notes = await models.InvoiceNote.findAll({where: {
+        invoice_uid: invoice.uid
+      }});
+
       let sanitized = sanitizeInvoice(invoice);
 
       let resp = Object.assign({
         invoice: sanitized,
-        payment_options
+        payment_options,
+        notes
       }, sanitized)
 
       return resp;
