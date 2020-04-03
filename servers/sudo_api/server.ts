@@ -149,6 +149,94 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/bitpay_settlements/not_settled",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BitpaySettlements.notSettled
+
+    }
+
+  });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/api/bitpay_settlements",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BitpaySettlements.create,
+
+      validate: {
+        
+        payload : {
+
+          invoice_uid: Joi.string().required()
+
+        }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/bitpay_settlements",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BitpaySettlements.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "PUT",
+
+    path: "/api/bitpay_settlements/{invoice_uid}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BitpaySettlements.update,
+
+      validate: {
+        
+        payload : {
+
+          txid: Joi.string().required(),
+
+          currency: Joi.string().required(),
+
+          amount: Joi.number().required()
+
+        }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/merchant_groups",
 
     config: {
