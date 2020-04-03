@@ -163,6 +163,22 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/api/settlements/{invoice_uid}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BitpaySettlements.show
+
+    }
+
+  });
+
+  server.route({
+
     method: "POST",
 
     path: "/api/bitpay_settlements",

@@ -23,6 +23,31 @@ export async function create(req, h) {
 
 }
 
+export async function show(req, h) {
+
+  try {
+
+    let settlement = await models.Settlement.findOne({
+      where: {
+        invoice_uid: req.params.invoice_uid
+      }
+    });
+
+    if (!settlement) {
+
+      return Boom.notFound();
+    }
+
+    return { settlement }
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message);
+
+  }
+
+}
+
 export async function update(req, h) {
 
   try {
