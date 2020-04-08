@@ -2,7 +2,7 @@ import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/l
 
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
 
-import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
+//import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
 import {models} from '../../../lib';
 
@@ -99,6 +99,7 @@ async function handleDASH(req, h) {
 
 }
 
+/*
 async function handleBCH(req, h) {
 
   const params = req.params;
@@ -154,6 +155,7 @@ async function handleBCH(req, h) {
   return response;
 
 }
+*/
 
 export async function show(req, h) {
 
@@ -169,12 +171,14 @@ export async function show(req, h) {
         resp = await handleBSV(req, h)
 
         return resp;
+      /*
 
       case 'application/bitcoincash-paymentrequest':
 
         resp = await handleBCH(req, h)
 
         return resp;
+      */
 
       case 'application/dash-paymentrequest':
 

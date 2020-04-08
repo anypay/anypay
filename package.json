@@ -111,7 +111,7 @@
     "yayson": "^2.0.8",
     "yelp-fusion": "^3.0.0",
     "zeromq": "^4.6.0",
-    "protobuf": "^6.8.9"
+    "protobufjs": "^6.8.9"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
