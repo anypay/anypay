@@ -136,6 +136,16 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+  server.route({
+
+    method: "GET",
+
+    path: "/gg/dash/{item_uid}",
+
+    handler: handlers.DashPaymentRequests.createByItemUid
+
+  });
+
   return server;
 
 }

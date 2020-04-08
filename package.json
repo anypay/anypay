@@ -1,5 +1,5 @@
 {
-  "name": "payment-service",
+  "name": "anypay",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -83,6 +83,7 @@
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
     "prompt-async": "^0.9.9",
+    "protobufjs": "^5.0.3",
     "qr": "^0.2.4",
     "qrcode-terminal": "^0.11.0",
     "rabbi": "^1.13.0",
