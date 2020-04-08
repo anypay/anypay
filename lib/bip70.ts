@@ -16,6 +16,14 @@ import { join } from 'path';
  *
  */
 
+interface PaymentRequestInvoice {
+  address: string;
+  amount: number;
+  denomination_amount: number;
+  denomination_currency: string;
+  uid: string;
+}
+
 export function generatePaymentRequest(invoice, account) {
 
   // build outputs
@@ -60,7 +68,7 @@ export function generatePaymentRequest(invoice, account) {
 
   } else {
 
-    pd.set('memo', `Invoice for ${invoice.denomination_amount} ${invoice.denomination_currencyr} | AnypayInc.com`);
+    pd.set('memo', `Invoice for ${invoice.denomination_amount} ${invoice.denomination_currency} | AnypayInc.com`);
 
   }
 
