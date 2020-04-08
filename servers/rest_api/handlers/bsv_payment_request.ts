@@ -44,7 +44,7 @@ async function handleBSV(req, h) {
 
   let response = h.response(content);
 
-  response.type('application/bitcoinsv-paymentrequest');
+  response.type('application/json');
 
   response.header('x-signature-type', 'ecc');
 
@@ -158,29 +158,47 @@ export async function create(req, h) {
 
   if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
 
-    req.payload.transactions.forEach(async (hex) => {
+    let hex = req.payload.transaction;
 
-      console.log("BROADCAST", hex);
+    console.log("BROADCAST", hex);
 
-      try {
+    try {
 
-        let resp = await rpc.call('sendrawtransaction', [hex]);
+      let resp = await rpc.call('sendrawtransaction', [hex]);
 
-        console.log('resp', resp);
+      console.log('resp', resp);
 
-      } catch(error) {
+    } catch(error) {
 
-        console.log('could not broadcast transaction', hex);
+      console.log('could not broadcast transaction', hex);
 
+      var code;
+
+      if (error.message === 'Internal Server Error') {
+        code = 400;
+      } else {
+        code = 500;
       }
 
-    });
+      return h.response({
+
+        payment: {
+
+          transaction: req.payload.transaction,
+
+        },
+
+        error: `transaction rejected with error: ${error.message}`
+
+      }).code(code);
+
+    }
 
     return {
 
       payment: {
 
-        transactions: req.payload.transactions 
+        transaction: req.payload.transaction
 
       },
 

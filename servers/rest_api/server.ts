@@ -35,7 +35,6 @@ const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 import * as dashtext from '../../lib/dash/dashtext';
 
 const sudoWires = require("./handlers/sudo/wire_reports");
-const AccountsController = require("./handlers/accounts");
 const SudoCoins = require("./handlers/sudo_coins");
 const TipJars = require("./handlers/tipjars");
 const SudoAccounts = require("./handlers/sudo/accounts");
@@ -133,7 +132,7 @@ const validatePassword = async function(request, username, password, h) {
 
   var account = await models.Account.findOne({
     where: {
-      email: username
+      email: username.toLowerCase()
     }
   });
 
@@ -282,6 +281,19 @@ async function Server() {
       request.headers['x-content-type'] = 'application/payment';
     }
 
+    if ('application/bitcoinsv-payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
+    }
+
+    if ('application/bitcoinsv-paymentack' === request.headers['accept']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
+      request.headers['x-accept'] = 'application/bitcoinsv-paymentack';
+    }
+
+
+
     if ('application/verify-payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/verify-payment';
@@ -411,7 +423,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts",
-    handler: AccountsController.create,
+    handler: handlers.Accounts.create,
     options: {
       tags: ['api'],
       validate: {
@@ -424,7 +436,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/anonymous-accounts",
-    handler: AccountsController.registerAnonymous,
+    handler: handlers.Accounts.registerAnonymous,
     options: {
       auth: "token",
       tags: ['api'],
@@ -438,7 +450,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/anonymous-accounts",
-    handler: AccountsController.createAnonymous,
+    handler: handlers.Accounts.createAnonymous,
     options: {
       tags: ['api']
     },
@@ -496,7 +508,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account",
-    handler: AccountsController.show,
+    handler: handlers.Accounts.show,
     options: {
       auth: "token",
       tags: ['api'],
@@ -507,7 +519,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account/rewards",
-    handler: AccountsController.getRewards,
+    handler: handlers.Accounts.getRewards,
     options: {
       auth: "token",
       tags: ['api'],
@@ -517,7 +529,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/account",
-    handler: AccountsController.update,
+    handler: handlers.Accounts.update,
     options: {
       auth: "token",
       tags: ['api']
@@ -1179,7 +1191,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.index
+      handler: handlers.Accounts.index
 
     }
 
@@ -1247,7 +1259,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.destroy
+      handler: handlers.Accounts.destroy
 
     }
 
@@ -1264,7 +1276,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoShow
+      handler: handlers.Accounts.sudoShow
 
     }
 
@@ -1281,7 +1293,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: AccountsController.sudoAccountWithEmail
+      handler: handlers.Accounts.sudoAccountWithEmail
 
     }
 
@@ -1451,7 +1463,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: AccountsController.calculateROI
+      handler: handlers.Accounts.calculateROI
 
     }
   });
