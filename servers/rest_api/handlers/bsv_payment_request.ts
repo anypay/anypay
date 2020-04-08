@@ -66,6 +66,8 @@ async function handleBCH(req, h) {
   response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
   response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
   response.header('digest', `SHA-256=${digest}`);
+  response.header('Content-Type', 'application/bitcoincash-paymentrequest');
+  response.header('Accept', 'application/bitcoincash-payment');
 
   return response;
 
