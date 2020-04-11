@@ -1,5 +1,7 @@
 
 import { models } from '../../lib/models';
+import { convert } from '../../lib/prices';
+import {plugins} from '../../lib/plugins';
 import { writePaymentOption } from '../../lib/payment_options';
 import * as http from 'superagent';
 import { computeInvoiceURI } from '../../lib/uri';
@@ -31,6 +33,7 @@ export async function generateInvoice(accountRoute, amount, ) {
 }
 
 export async function getNewAddress(accountRoute: AccountRoute): Promise<any> {
+
   // create quote in sideshift
   // save sideshift quote in database
   let sideshiftQuote = await createQuote({
@@ -80,8 +83,6 @@ async function getPair(pair: SideshiftPair): Promise<any> {
   let response = await http
     .get(`https://sideshift.ai/api/pairs/${input}/${output}`)
 
-  console.log('sideshift.pair.response', response.body);
-
   let record = await models.SideshiftPair.create({
     input: input,
     output: output,
@@ -95,7 +96,6 @@ async function getPair(pair: SideshiftPair): Promise<any> {
 }
 
 async function createQuote(newQuote: NewSidesiftQuote): Promise<any> {
-  console.log('sideshift.createquote', newQuote);
 
   let params = {
     depositMethodId: newQuote.inputCurrency.toLowerCase(),
@@ -103,11 +103,19 @@ async function createQuote(newQuote: NewSidesiftQuote): Promise<any> {
     settleAddress: newQuote.outputAddress
   }
 
-  console.log('sideshift.createquote.params', params);
+  var response;
 
-  let response = await http
-    .post('https://sideshift.ai/api/quotes')
-    .send(params)
+  try {
+
+    response = await http
+      .post('https://sideshift.ai/api/quotes')
+      .send(params)
+
+  } catch(error) {
+
+    console.log("SIDESHIFT QUOTE ERROR", error);
+
+  }
 
   let record = await models.SideshiftQuote.create({
     quoteId: response.body.quoteId,
@@ -136,9 +144,20 @@ export async function createPaymentOption(invoice, accountRoute) {
   //  { currency, address, amount, invoice_uid }
   let address = await getNewAddress(accountRoute);
 
+  console.log("SIDESHIFT GOT ADDRESS", address);
+
   let currency = accountRoute.input_currency.toLowerCase();
 
-  let amount = await convertAmount(invoice.denomination_amount, 'usdc', currency);
+  let outputAmount = await convert({
+    currency: invoice.denomination_currency,
+    value: invoice.denomination_amount
+  }, accountRoute.input_currency);
+
+  let amount = await convertAmount(
+    outputAmount.value,
+    accountRoute.output_currency.toLowerCase(),
+    currency
+  );
 
   let uri = computeInvoiceURI({
     currency,
@@ -157,7 +176,7 @@ export async function createPaymentOption(invoice, accountRoute) {
 
     amount,
 
-    currency,
+    currency: currency.toUpperCase(),
 
     uri
   }
@@ -165,6 +184,10 @@ export async function createPaymentOption(invoice, accountRoute) {
   let record = await writePaymentOption(paymentOption);
 
   console.log('payment_option.created', record.toJSON());
+
+  let plugin = await plugins.findForCurrency(currency.toUpperCase())
+
+  plugin.watchAddress(address);
 
   return record;
 

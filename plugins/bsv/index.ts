@@ -168,6 +168,12 @@ export async function getNewAddress(deprecatedParam){
 
 }
 
+export function watchAddress(address) {
+
+  return rpc.call('importaddress', [address, "", false, false])
+
+}
+
 function deriveAddress(xkey, nonce){
 
   let address = new bsv.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()

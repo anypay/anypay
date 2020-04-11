@@ -22,7 +22,8 @@ program
 
     let invoice = await generateInvoice(account.id, amount, currency);
 
-    log.info('invoice.generated', invoice.toJSON());
+    console.log('invoice generate', invoice.uid);
+    console.log('payment options', invoice.payment_options.length);
 
     process.exit(0);
 

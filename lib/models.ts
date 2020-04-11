@@ -224,6 +224,8 @@ models.Invoice.hasMany(models.InvoiceNote, {
   foreignKey: 'invoice_uid',
   sourceKey: 'uid'
 });
+models.Invoice.hasMany(models.PaymentOption);
+models.PaymentOption.belongsTo(models.Invoice);
 
 export { models };
 

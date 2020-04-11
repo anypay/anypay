@@ -129,6 +129,15 @@ export async function getNewAddress(record: I_Address) {
 
 async function publishToNode(transaction: string): Promise<string> {
   return rpc.call('sendrawtransaction', [transaction])
+
+}
+
+function deriveAddress(xkey, nonce){
+
+  let address = new dash.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
+
+  return address 
+
 }
 
 export async function broadcastTx(transaction: string): Promise<string> {
