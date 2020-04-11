@@ -144,14 +144,12 @@ export async function createPaymentOption(invoice, accountRoute) {
   //  { currency, address, amount, invoice_uid }
   let address = await getNewAddress(accountRoute);
 
-  console.log("SIDESHIFT GOT ADDRESS", address);
-
   let currency = accountRoute.input_currency.toLowerCase();
 
   let outputAmount = await convert({
     currency: invoice.denomination_currency,
     value: invoice.denomination_amount
-  }, accountRoute.input_currency);
+  }, accountRoute.output_currency);
 
   let amount = await convertAmount(
     outputAmount.value,
@@ -160,7 +158,7 @@ export async function createPaymentOption(invoice, accountRoute) {
   );
 
   let uri = computeInvoiceURI({
-    currency,
+    currency: currency.toUpperCase(),
     amount,
     address,
     business_name: account.business_name,
@@ -182,8 +180,6 @@ export async function createPaymentOption(invoice, accountRoute) {
   }
 
   let record = await writePaymentOption(paymentOption);
-
-  console.log('payment_option.created', record.toJSON());
 
   let plugin = await plugins.findForCurrency(currency.toUpperCase())
 
