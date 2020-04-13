@@ -39,7 +39,7 @@ export async function show(req: Request, h: ResponseToolkit) {
 
   try {
 
-    let ach_batch = await models.AccountAch.findOne({
+    let ach_batch = await models.AchBatch.findOne({
       where: { id: req.params.ach_batch_id }
     });
 
