@@ -1,4 +1,6 @@
-import { log, invoices, plugins } from './';
+import { plugins } from './plugins';
+import { log } from './logger';
+import * as invoices from './invoice';
 
 export async function settleInvoice(invoice) {
 
@@ -19,4 +21,16 @@ export async function settleInvoice(invoice) {
   }
 
 }
+
+import { join } from 'path';
+
+var settlements: any = require('require-all')({
+  dirname: join(__dirname, '../settlements'),
+  filter      :  /(.+)\.ts$/,
+  map: function(name, path) {
+    return name;
+  }
+});
+
+export { settlements }
 

@@ -776,6 +776,21 @@ async function Server() {
 
   });
 
+
+  server.route({
+    method: "GET",
+
+    path: "/api/ach_batches/{ach_batch_id}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Achs.show
+    }
+
+  });
+
   server.route({
 
     method: "PUT",

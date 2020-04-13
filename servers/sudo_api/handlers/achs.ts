@@ -35,6 +35,28 @@ export async function index(req: Request, h: ResponseToolkit) {
 
 }
 
+export async function show(req: Request, h: ResponseToolkit) {
+
+  try {
+
+    let ach_batch = await models.AccountAch.findOne({
+      where: { id: req.params.ach_batch_id }
+    });
+
+    let invoices = await models.Invoice.findAll({ where: {
+      ach_batch_id: req.params.ach_batch_id
+    }});
+
+    return { ach_batch, invoices };
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message)
+
+  }
+
+}
+
 export async function update(req: Request, h: ResponseToolkit) {
 
   try {

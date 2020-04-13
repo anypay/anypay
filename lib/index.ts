@@ -32,6 +32,7 @@ import * as square from './square';
 import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
+import { settlements } from './settlements';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -73,7 +74,8 @@ export {
   square,
   mysql_lib,
   kraken,
-  receipts
+  receipts,
+  settlements
 }
 
 export async function initialize() {
