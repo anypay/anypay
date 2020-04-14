@@ -5,7 +5,9 @@ import { inject as service } from '@ember/service';
 
 export default Ember.Route.extend({
 
-  cities: service('cities'),
+  geolocation: service(),
+
+  cities: service(),
 
   socketIOService: service('socket-io'),
 
@@ -15,11 +17,16 @@ export default Ember.Route.extend({
 
   },
 
-  setupController(controller, model) {
+  async setupController(controller, model) {
+
+    let location = await this.get("geolocation").getLocation();
 
     console.log(model);
 
     controller.set('city', model);
+    controller.set('location', location);
+
+    console.log('location', location);
 
     Ember.Logger.info('city', { city: model });
 

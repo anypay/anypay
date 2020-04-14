@@ -62,7 +62,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/city.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/city.js should pass ESLint\n\n20:5 - Unexpected console statement. (no-console)\n58:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/city.js should pass ESLint\n\n24:5 - Unexpected console statement. (no-console)\n29:5 - Unexpected console statement. (no-console)\n65:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/geolocate.js', function (assert) {
@@ -72,12 +72,12 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('services/cities.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'services/cities.js should pass ESLint\n\n');
+    assert.ok(false, 'services/cities.js should pass ESLint\n\n55:5 - Unexpected console statement. (no-console)\n59:5 - Unexpected console statement. (no-console)\n70:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('services/geolocation.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'services/geolocation.js should pass ESLint\n\n11:7 - \'geolocator\' is not defined. (no-undef)\n37:13 - Unexpected console statement. (no-console)\n40:11 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'services/geolocation.js should pass ESLint\n\n15:7 - \'geolocator\' is not defined. (no-undef)\n41:13 - Unexpected console statement. (no-console)\n44:11 - Unexpected console statement. (no-console)\n91:2 - Unnecessary semicolon. (no-extra-semi)');
   });
 });
 define('energy-city-app/tests/helpers/destroy-app', ['exports'], function (exports) {
