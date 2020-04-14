@@ -1,6 +1,10 @@
 import Ember from 'ember';
 import { Promise } from 'rsvp';
 
+function toRad (value) {
+  return (value * Math.PI) / 180;
+}
+
 export default Ember.Service.extend({
 
   location: null,
@@ -41,7 +45,48 @@ export default Ember.Service.extend({
           resolve(location);
       });
     });
+  },
+
+  getDistance(from, to) {
+    const fromLat = from.latitude;
+    const fromLon = from.longitude;
+    const toLat = to.latitude;
+    const toLon = to.longitude;
+
+    const earthRadius = 6378137;
+
+    const distance =
+        Math.acos(
+            normalizeACosArg(
+                Math.sin(toRad(toLat)) * Math.sin(toRad(fromLat)) +
+                    Math.cos(toRad(toLat)) *
+                        Math.cos(toRad(fromLat)) *
+                        Math.cos(toRad(fromLon) - toRad(toLon))
+            )
+        ) * earthRadius;
+
+    const accuracy = 1;
+
+    return Math.round(distance / accuracy) * accuracy;
+  },
+
+  async getLocation() {
+    let location = this.get('location');
+    if (!location) {
+      location = await this.geolocate();
+    }
+    return location;
   }
 
-
 });
+
+function normalizeACosArg (val) {
+    if (val > 1) {
+        return 1;
+    }
+    if (val < -1) {
+        return -1;
+    }
+    return val;
+};
+
