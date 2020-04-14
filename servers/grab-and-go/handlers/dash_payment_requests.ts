@@ -31,6 +31,7 @@ export async function create(req: Hapi.Request, h) {
       }
     });
 
+
     console.log('account', account.toJSON());
 
     // look up the item from the url parameters
@@ -99,8 +100,8 @@ export async function create(req: Hapi.Request, h) {
 export async function createByItemUid(req: Hapi.Request, h) {
 
   console.log('params', req.params);
-  console.log('payment protcol full request:');
-  console.log(req);
+  console.log('payment protcol headers:');
+  console.log(req.headers);
 
   var currency;
 
@@ -112,7 +113,7 @@ export async function createByItemUid(req: Hapi.Request, h) {
     currency = 'BSV';
   } 
 
-
+  console.log('ITEM UID', req.params.item_uid);
 
   // https://anypayinc.com/grab-and-go/freshpress-portsmouth/green-on-fleet/purchase
   // /grab-and-go/:account_stub/:item_stub/purchase
@@ -128,11 +129,12 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
     });
 
-    console.log('item', item.toJSON());
-
     if (!item) {
       throw new Error(`item ${req.params.item_uid} for account not found`);
     }
+
+    console.log('item', item);
+    console.log('item', item.toJSON());
 
     let invoice = await invoices.generateInvoice(item.account_id, item.price, currency);
 
@@ -164,9 +166,9 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
     const response = h.response(paymentRequest.serialize());
 
-    response.type('application/bitcoincash-paymentrequest');
-    response.header('Content-Type', 'application/bitcoincash-paymentrequest');
-    response.header('Accept', 'application/bitcoincash-payment');
+    response.type('application/dash-paymentrequest');
+    response.header('Content-Type', 'application/dash-paymentrequest');
+    response.header('Accept', 'application/dash-payment');
 
     return response;
 
