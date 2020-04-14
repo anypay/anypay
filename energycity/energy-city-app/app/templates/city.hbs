@@ -3,6 +3,7 @@
 <button class='btn btn-large float-left'>
   {{#link-to "cities"}}all cities{{/link-to}}
 </button>
+
 <h2 class='banner'>{{city.name}}</h2>
 
   <ul>
@@ -11,6 +12,7 @@
         <div class='half-left'>
         <a target="_blank" href="https://anypayapp.com/pay/{{location.stub}}">
           <h4>{{location.business_name}}</h4>
+          <i>{{location.distance}}meters</i>
           <span class="badge badge-primary">Pay Now</span>
         </a>
         </div>

@@ -1406,9 +1406,41 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
   exports.default = Ember.Route.extend({
 
-    cities: Ember.inject.service('cities'),
+    geolocation: Ember.inject.service(),
+
+    cities: Ember.inject.service(),
 
     socketIOService: Ember.inject.service('socket-io'),
 
@@ -1416,67 +1448,98 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
 
       return this.get('cities').getCity(params.city);
     },
-    setupController: function setupController(controller, model) {
+    setupController: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(controller, model) {
+        var location, locations, socket;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return this.get("geolocation").getLocation();
 
-      console.log(model);
+              case 2:
+                location = _context.sent;
 
-      controller.set('city', model);
 
-      Ember.Logger.info('city', { city: model });
+                console.log(model);
 
-      var locations = model.accounts.map(function (account) {
+                controller.set('city', model);
+                controller.set('location', location);
 
-        var assign = {};
+                console.log('location', location);
 
-        var bch_tipjar = account.tipjars.find(function (jar) {
-          return jar.currency === 'BCH';
-        });
+                Ember.Logger.info('city', { city: model });
 
-        if (bch_tipjar) {
+                locations = model.accounts.map(function (account) {
 
-          assign['bch_tipjar'] = bch_tipjar;
-        }
+                  var assign = {};
 
-        var bsv_tipjar = account.tipjars.find(function (jar) {
-          return jar.currency === 'BSV';
-        });
+                  var bch_tipjar = account.tipjars.find(function (jar) {
+                    return jar.currency === 'BCH';
+                  });
 
-        if (bsv_tipjar) {
+                  if (bch_tipjar) {
 
-          assign['bsv_tipjar'] = bsv_tipjar;
-        }
+                    assign['bch_tipjar'] = bch_tipjar;
+                  }
 
-        var dash_tipjar = account.tipjars.find(function (jar) {
-          return jar.currency === 'DASH';
-        });
+                  var bsv_tipjar = account.tipjars.find(function (jar) {
+                    return jar.currency === 'BSV';
+                  });
 
-        if (dash_tipjar) {
+                  if (bsv_tipjar) {
 
-          assign['dash_tipjar'] = dash_tipjar;
-        }
+                    assign['bsv_tipjar'] = bsv_tipjar;
+                  }
 
-        return Object.assign(account, assign);
-      });
+                  var dash_tipjar = account.tipjars.find(function (jar) {
+                    return jar.currency === 'DASH';
+                  });
 
-      console.log(locations);
+                  if (dash_tipjar) {
 
-      controller.set('locations', locations);
+                    assign['dash_tipjar'] = dash_tipjar;
+                  }
 
-      var socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
-      controller.set('socket', socket);
+                  return Object.assign(account, assign);
+                });
 
-      socket.on('invoice.created', controller.handleInvoiceCreated, controller);
-      socket.on('invoice.paid', controller.handleInvoicePaid, controller);
 
-      socket.on('close', function () {
-        controller.set('connected', false);
-        Ember.Logger.info('socket.disconnected');
-      });
+                console.log(locations);
 
-      socket.on('error', function (error) {
-        Ember.Logger.info('socket.error', error.message);
-      });
-    }
+                controller.set('locations', locations);
+
+                socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+
+                controller.set('socket', socket);
+
+                socket.on('invoice.created', controller.handleInvoiceCreated, controller);
+                socket.on('invoice.paid', controller.handleInvoicePaid, controller);
+
+                socket.on('close', function () {
+                  controller.set('connected', false);
+                  Ember.Logger.info('socket.disconnected');
+                });
+
+                socket.on('error', function (error) {
+                  Ember.Logger.info('socket.error', error.message);
+                });
+
+              case 17:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function setupController(_x, _x2) {
+        return _ref.apply(this, arguments);
+      }
+
+      return setupController;
+    }()
   });
 });
 define('energy-city-app/routes/geolocate', ['exports'], function (exports) {
@@ -1647,6 +1710,7 @@ define('energy-city-app/services/cities', ['exports', 'ember-get-config'], funct
   exports.default = Ember.Service.extend({
 
     cities: null,
+    geolocation: Ember.inject.service(),
 
     listCities: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
@@ -1703,25 +1767,46 @@ define('energy-city-app/services/cities', ['exports', 'ember-get-config'], funct
     }(),
     getCity: function () {
       var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(city_tag) {
+        var location, city, accounts;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                _context2.next = 2;
+                return this.get('geolocation').getLocation();
+
+              case 2:
+                location = _context2.sent;
+
                 if (this.get('cities')) {
-                  _context2.next = 3;
+                  _context2.next = 6;
                   break;
                 }
 
-                _context2.next = 3;
+                _context2.next = 6;
                 return this.listCities();
 
-              case 3:
-                return _context2.abrupt('return', this.get('cities').find(function (city) {
+              case 6:
+                city = this.get('cities').find(function (city) {
 
                   return city.city_tag === city_tag;
-                }));
+                });
 
-              case 4:
+
+                console.log('BZ', city);
+
+                accounts = this.orderByDistance(location.coords, city.accounts);
+
+
+                console.log("ACCOUNTS", accounts);
+
+                city.accounts = accounts;
+
+                // order by distance from you, add distance
+
+                return _context2.abrupt('return', city);
+
+              case 12:
               case 'end':
                 return _context2.stop();
             }
@@ -1734,59 +1819,172 @@ define('energy-city-app/services/cities', ['exports', 'ember-get-config'], funct
       }
 
       return getCity;
-    }()
-  });
-});
-define('energy-city-app/services/geolocation', ['exports'], function (exports) {
-  'use strict';
+    }(),
+    orderByDistance: function orderByDistance(coordinates, businesses) {
+      var _this2 = this;
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = Ember.Service.extend({
+      console.log('businesses', businesses);
 
-    location: null,
+      return businesses.map(function (business) {
 
-    geolocate: function geolocate(options) {
-      var _this = this;
-
-      return new Ember.RSVP.Promise(function (resolve, reject) {
-
-        geolocator.config({
-          language: "en",
-          google: {
-            version: "3",
-            key: "AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA"
-          }
+        return Object.assign(business, {
+          distance: _this2.get('geolocation').getDistance(coordinates, {
+            latitude: business.latitude,
+            longitude: business.longitude
+          })
         });
-
-        options = Object.assign({
-          enableHighAccuracy: false,
-          timeout: 5000,
-          maximumWait: 10000, // max wait time for desired accuracy
-          maximumAge: 0, // disable cache
-          desiredAccuracy: 30, // meters
-          fallbackToIP: true, // fallback to IP if Geolocation fails or rejected
-          addressLookup: true, // requires Google API key if true
-          timezone: true // requires Google API key if true
-        }, options);
-
-        _this.set('geolocating', true);
-
-        window.geolocator.locate(options, function (err, location) {
-          _this.set('location', location);
-          _this.set('geolocating', false);
-
-          if (err) {
-            console.log(err);
-            return reject(err);
-          }
-          console.log(location);
-          resolve(location);
-        });
+      }).sort(function (a, b) {
+        return a.distance - b.distance;
       });
     }
   });
+});
+define('energy-city-app/services/geolocation', ['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    function _asyncToGenerator(fn) {
+        return function () {
+            var gen = fn.apply(this, arguments);
+            return new Promise(function (resolve, reject) {
+                function step(key, arg) {
+                    try {
+                        var info = gen[key](arg);
+                        var value = info.value;
+                    } catch (error) {
+                        reject(error);
+                        return;
+                    }
+
+                    if (info.done) {
+                        resolve(value);
+                    } else {
+                        return Promise.resolve(value).then(function (value) {
+                            step("next", value);
+                        }, function (err) {
+                            step("throw", err);
+                        });
+                    }
+                }
+
+                return step("next");
+            });
+        };
+    }
+
+    function toRad(value) {
+        return value * Math.PI / 180;
+    }
+
+    exports.default = Ember.Service.extend({
+
+        location: null,
+
+        geolocate: function geolocate(options) {
+            var _this = this;
+
+            return new Ember.RSVP.Promise(function (resolve, reject) {
+
+                geolocator.config({
+                    language: "en",
+                    google: {
+                        version: "3",
+                        key: "AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA"
+                    }
+                });
+
+                options = Object.assign({
+                    enableHighAccuracy: false,
+                    timeout: 5000,
+                    maximumWait: 10000, // max wait time for desired accuracy
+                    maximumAge: 0, // disable cache
+                    desiredAccuracy: 30, // meters
+                    fallbackToIP: true, // fallback to IP if Geolocation fails or rejected
+                    addressLookup: true, // requires Google API key if true
+                    timezone: true // requires Google API key if true
+                }, options);
+
+                _this.set('geolocating', true);
+
+                window.geolocator.locate(options, function (err, location) {
+                    _this.set('location', location);
+                    _this.set('geolocating', false);
+
+                    if (err) {
+                        console.log(err);
+                        return reject(err);
+                    }
+                    console.log(location);
+                    resolve(location);
+                });
+            });
+        },
+        getDistance: function getDistance(from, to) {
+            var fromLat = from.latitude;
+            var fromLon = from.longitude;
+            var toLat = to.latitude;
+            var toLon = to.longitude;
+
+            var earthRadius = 6378137;
+
+            var distance = Math.acos(normalizeACosArg(Math.sin(toRad(toLat)) * Math.sin(toRad(fromLat)) + Math.cos(toRad(toLat)) * Math.cos(toRad(fromLat)) * Math.cos(toRad(fromLon) - toRad(toLon)))) * earthRadius;
+
+            var accuracy = 1;
+
+            return Math.round(distance / accuracy) * accuracy;
+        },
+        getLocation: function () {
+            var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+                var location;
+                return regeneratorRuntime.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                location = this.get('location');
+
+                                if (location) {
+                                    _context.next = 5;
+                                    break;
+                                }
+
+                                _context.next = 4;
+                                return this.geolocate();
+
+                            case 4:
+                                location = _context.sent;
+
+                            case 5:
+                                return _context.abrupt('return', location);
+
+                            case 6:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this);
+            }));
+
+            function getLocation() {
+                return _ref.apply(this, arguments);
+            }
+
+            return getLocation;
+        }()
+    });
+
+
+    function normalizeACosArg(val) {
+        if (val > 1) {
+            return 1;
+        }
+        if (val < -1) {
+            return -1;
+        }
+        return val;
+    };
 });
 define('energy-city-app/services/socket-io', ['exports', 'ember-websockets/services/socket-io'], function (exports, _socketIo) {
   'use strict';
@@ -1844,7 +2042,7 @@ define("energy-city-app/templates/city", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "6SVKXjLM", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n        \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"https://anypayapp.com/pay/\",[19,1,[\"stub\"]]]]],[7],[0,\"\\n          \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"half-right\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"bch_tipjar\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[19,1,[\"bch_tipjar\",\"address\"]],null],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"BCH Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[19,1,[\"bsv_tipjar\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"bitcoin:\",[19,1,[\"bsv_tipjar\",\"address\"]]]]],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-warning\"],[7],[0,\"BSV Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"money-button\"],[10,\"data-to\",[26,[[20,[\"bsv_tipjar\",\"address\"]]]]],[9,\"data-type\",\"tip\"],[9,\"data-label\",\"BSV Tip\"],[9,\"data-currency\",\"USD\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "aSlBsPkM", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n        \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"https://anypayapp.com/pay/\",[19,1,[\"stub\"]]]]],[7],[0,\"\\n          \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n          \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"half-right\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"bch_tipjar\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[19,1,[\"bch_tipjar\",\"address\"]],null],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"BCH Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[19,1,[\"bsv_tipjar\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"bitcoin:\",[19,1,[\"bsv_tipjar\",\"address\"]]]]],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-warning\"],[7],[0,\"BSV Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"money-button\"],[10,\"data-to\",[26,[[20,[\"bsv_tipjar\",\"address\"]]]]],[9,\"data-type\",\"tip\"],[9,\"data-label\",\"BSV Tip\"],[9,\"data-currency\",\"USD\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
 });
 define('energy-city-app/templates/components/ember-popper-targeting-parent', ['exports', 'ember-popper/templates/components/ember-popper-targeting-parent'], function (exports, _emberPopperTargetingParent) {
   'use strict';
@@ -1918,6 +2116,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+c1f05dbf"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+754a3bb9"});
 }
 //# sourceMappingURL=energy-city-app.map
