@@ -249,7 +249,9 @@ export async function show(req, h) {
 
       default:
 
-        return Boom.badRequest('currency not supported');
+        resp = await handleBSV(req, h)
+
+        return resp;
 
     }
 
@@ -281,9 +283,7 @@ export async function create(req, h) {
 
     }
 
-  }
-
-  if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
+  } else if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
 
     let hex = req.payload.transaction;
 
@@ -333,9 +333,7 @@ export async function create(req, h) {
 
     }
 
-  }
-
-  if (req.headers['x-content-type'] === 'application/dash-payment') {
+  } else if (req.headers['x-content-type'] === 'application/dash-payment') {
 
     req.payload.transactions.forEach(async (hex) => {
 
@@ -360,6 +358,56 @@ export async function create(req, h) {
       payment: {
 
         transactions: req.payload.transactions 
+
+      },
+
+      memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+
+    }
+
+  } else {
+
+    let hex = req.payload.transaction;
+
+    console.log("BROADCAST", hex);
+
+    try {
+
+      let resp = await rpc.call('sendrawtransaction', [hex]);
+
+      console.log('resp', resp);
+
+    } catch(error) {
+
+      console.log('could not broadcast transaction', hex);
+
+      var code;
+
+      if (error.message === 'Internal Server Error') {
+        code = 400;
+      } else {
+        code = 500;
+      }
+
+      return h.response({
+
+        payment: {
+
+          transaction: req.payload.transaction,
+
+        },
+
+        error: `transaction rejected with error: ${error.message}`
+
+      }).code(code);
+
+    }
+
+    return {
+
+      payment: {
+
+        transaction: req.payload.transaction
 
       },
 
