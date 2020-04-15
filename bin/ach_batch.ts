@@ -4,7 +4,7 @@ require('dotenv').config();
 
 import * as program from 'commander';
 
-import { models, log } from '../lib';
+import { models, log, database } from '../lib';
 import * as ach from '../lib/ach';
 import * as wire from '../lib/wire';
 import { sendEmail } from '../lib/email';
@@ -14,6 +14,7 @@ import { BigNumber } from 'bignumber.js';
 import * as fs from 'fs';
 
 import { join } from 'path';
+import { Op } from 'sequelize';
 
 import * as csvParse from 'csv-parse';
 
@@ -384,6 +385,115 @@ program
       let resp = await sendEmail(email, '[ACH EMAIL TO SEND EGIFTER]', report);
 
       console.log(resp);
+
+    } catch(error) {
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+
+program
+  .command('invoices_without_ach_batch <account_email>')
+  .action(async (email) => {
+
+    let account = await models.Account.findOne({ where: {
+      email
+    }});
+
+    let query = `select count(*) from invoices where account_id = ${account.id}
+      and ach_batch_id is null`;
+
+    let result = await database.query(query);
+
+    console.log(`${result[0][0].count} invoices need ach_batch_id`);
+
+    process.exit(0);
+
+  });
+
+program
+  .command('invoices_with_ach_batch <account_email>')
+  .action(async (email) => {
+
+    let account = await models.Account.findOne({ where: {
+      email
+    }});
+
+    let query = `select count(*) from invoices where account_id = ${account.id}
+      and ach_batch_id is not null`;
+
+    let result = await database.query(query);
+
+    console.log(`${result[0][0].count} invoices have ach_batch_id`);
+
+    process.exit(0);
+
+  });
+
+program
+  .command('backfill_ach_batch_id_invoices <batch_id> <account_email>')
+  .action(async (batch_id, email) => {
+
+    let account = await models.Account.findOne({ where: {
+      email
+    }});
+
+    let batch = await models.AchBatch.findOne({ where: {
+      id: batch_id
+    }});
+
+    try {
+
+      let firstInvoice = await models.Invoice.findOne({ where: {
+        uid: batch.first_invoice_uid
+      }});
+
+      let lastInvoice = await models.Invoice.findOne({ where: {
+        uid: batch.last_invoice_uid
+      }});
+
+      //find all invoices in range for ach batch
+      let invoices = await models.Invoice.findAll({
+        where: {
+          account_id: account.id,
+          status: {
+            [Op.ne]: 'unpaid'
+          },
+          id: {
+            [Op.gte]: firstInvoice.id,
+            [Op.lte]: lastInvoice.id
+          },
+          ach_batch_id: {
+            [Op.eq]: null
+          }
+        }
+      });
+
+      console.log(`${invoices.length} invoices found for that batch`);
+
+      let sum = invoices.reduce((sum, invoice) => {
+        sum = sum + invoice.denomination_amount_paid;
+        sum = sum - invoice.cashback_denomination_amount;
+        return sum;
+      }, 0);
+
+      sum = parseFloat(sum.toFixed(2));
+
+      console.log(`totallying $${sum} -> should be $${batch.amount}`);
+
+
+      for (let i = 0; i < invoices.length; i++) {
+        let invoice = invoices[i];
+        if (!invoice.ach_batch_id) {
+          invoice.ach_batch_id = batch.id;
+          await invoice.save();
+        }
+      }
 
     } catch(error) {
 
