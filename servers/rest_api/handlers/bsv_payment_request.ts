@@ -4,6 +4,8 @@ import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
+import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
+
 import {models} from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
@@ -335,7 +337,18 @@ export async function create(req, h) {
 
   } else if (req.headers['x-content-type'] === 'application/dash-payment') {
 
-    req.payload.transactions.forEach(async (hex) => {
+    var protocol = new PaymentProtocol('DASH');
+
+    protocol.makePayment();
+
+    console.log('string', req.payload.toString());
+    console.log('hex', req.payload.toString('hex'));
+
+    let payment = protocol.deserialize(req.payload, 'Payment');
+
+    console.log("payment deserialized", payment);
+
+    payment.message.transactions.forEach(async (hex) => {
 
       console.log("BROADCAST", hex);
 
@@ -353,17 +366,22 @@ export async function create(req, h) {
 
     });
 
-    return {
+    let paymentAck = new PaymentProtocol('DASH');
 
-      payment: {
+    paymentAck.makePaymentACK();
 
-        transactions: req.payload.transactions 
+    paymentAck.set('payment', payment.message);
+    let memo = "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+    paymentAck.set('memo', memo);
 
-      },
+    let response = h.response(paymentAck.serialize());
 
-      memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+    response.type('application/dash-paymentack');
 
-    }
+    response.header('Content-Type', 'application/dash-paymentack');
+    response.header('Accept', 'application/dash-paymentack');
+
+    return response;
 
   } else {
 
