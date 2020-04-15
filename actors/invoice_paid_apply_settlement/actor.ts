@@ -27,21 +27,7 @@ export async function start() {
 
     });
 
-    if (!invoice.should_settle) {
-      return channel.ack(msg);
-    }
-
-    let account = await models.Account.findOne({
-      where: { id: invoice.account_id }
-    });
-
-    if (!account.settlement_strategy) {
-      return channel.ack(msg);
-    }
-
-    let strategy = settlements.findByName(account.settlement_strategy);
-
-    await strategy.apply(invoice);
+    await settlements.settleInvoice(invoice);
 
     channel.ack(msg);
 

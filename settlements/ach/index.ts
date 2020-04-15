@@ -15,7 +15,7 @@ export async function apply(invoice) {
 
 async function getCurrentActiveBatch(account_id) {
 
-  let batch = await models.AchBatch.findOrCreate({
+  let [batch] = await models.AchBatch.findOrCreate({
     where: {
       account_id,
       status: 'active'
@@ -23,7 +23,8 @@ async function getCurrentActiveBatch(account_id) {
 
     defaults: {
       account_id,
-      status: 'active'
+      status: 'active',
+      batch_description: `ach batch for account ${account_id}`
     }
   });
 
