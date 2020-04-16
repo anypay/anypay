@@ -4,6 +4,8 @@ import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
+import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
+
 import {models} from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
@@ -249,7 +251,9 @@ export async function show(req, h) {
 
       default:
 
-        return Boom.badRequest('currency not supported');
+        resp = await handleBSV(req, h)
+
+        return resp;
 
     }
 
@@ -281,9 +285,7 @@ export async function create(req, h) {
 
     }
 
-  }
-
-  if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
+  } else if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
 
     let hex = req.payload.transaction;
 
@@ -333,11 +335,20 @@ export async function create(req, h) {
 
     }
 
-  }
+  } else if (req.headers['x-content-type'] === 'application/dash-payment') {
 
-  if (req.headers['x-content-type'] === 'application/dash-payment') {
+    var protocol = new PaymentProtocol('DASH');
 
-    req.payload.transactions.forEach(async (hex) => {
+    protocol.makePayment();
+
+    console.log('string', req.payload.toString());
+    console.log('hex', req.payload.toString('hex'));
+
+    let payment = protocol.deserialize(req.payload, 'Payment');
+
+    console.log("payment deserialized", payment);
+
+    payment.message.transactions.forEach(async (hex) => {
 
       console.log("BROADCAST", hex);
 
@@ -355,11 +366,66 @@ export async function create(req, h) {
 
     });
 
+    let paymentAck = new PaymentProtocol('DASH');
+
+    paymentAck.makePaymentACK();
+
+    paymentAck.set('payment', payment.message);
+    let memo = "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
+    paymentAck.set('memo', memo);
+
+    let response = h.response(paymentAck.serialize());
+
+    response.type('application/dash-paymentack');
+
+    response.header('Content-Type', 'application/dash-paymentack');
+    response.header('Accept', 'application/dash-paymentack');
+
+    return response;
+
+  } else {
+
+    let hex = req.payload.transaction;
+
+    console.log("BROADCAST", hex);
+
+    try {
+
+      let resp = await rpc.call('sendrawtransaction', [hex]);
+
+      console.log('resp', resp);
+
+    } catch(error) {
+
+      console.log('could not broadcast transaction', hex);
+
+      var code;
+
+      if (error.message === 'Internal Server Error') {
+        code = 400;
+      } else {
+        code = 500;
+      }
+
+      return h.response({
+
+        payment: {
+
+          transaction: req.payload.transaction,
+
+        },
+
+        error: `transaction rejected with error: ${error.message}`
+
+      }).code(code);
+
+    }
+
     return {
 
       payment: {
 
-        transactions: req.payload.transactions 
+        transaction: req.payload.transaction
 
       },
 
