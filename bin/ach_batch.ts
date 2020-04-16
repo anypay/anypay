@@ -9,6 +9,8 @@ import * as ach from '../lib/ach';
 import * as wire from '../lib/wire';
 import { sendEmail } from '../lib/email';
 
+import * as moment from 'moment';
+
 import { BigNumber } from 'bignumber.js';
 
 import * as fs from 'fs';
@@ -355,12 +357,14 @@ program
   });
 
 program
-  .command('generate_latest_ach')
-  .action(async () => {
+  .command('generate_latest_ach <end_date> [note]')
+  .action(async (end_date, note) => {
+
+    end_date = moment(end_date).toDate();
 
     try {
 
-      let batch = await ach.generateLatestBatch();
+      let batch = await ach.generateLatestBatch(end_date, note);
 
       console.log(batch.toJSON());
 
