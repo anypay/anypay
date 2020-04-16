@@ -131,7 +131,7 @@ export async function generateLatestBatch(endDate, note) {
 
     batch_description: note || 'ACH batch from sudo admin',
 
-    originating_account: 'Mercury Bank',
+    originating_account: 'Mercury Bank ACH',
 
     currency: 'USD',
 
