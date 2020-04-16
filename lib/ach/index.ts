@@ -77,7 +77,7 @@ export async function importInvoiceRangeForAchBatch(accountAchId: number): Promi
 
 }
 
-export async function generateLatestBatch() {
+export async function generateLatestBatch(endDate, note) {
 
   let latestBatch = await models.AchBatch.findOne({
 
@@ -91,7 +91,7 @@ export async function generateLatestBatch() {
 
     },
 
-    order: [['effective_date', 'DESC']]
+    order: [['id', 'DESC']]
 
   })
 
@@ -101,6 +101,14 @@ export async function generateLatestBatch() {
   }
 
   let invoices = await wire.getInvoices(latestBatch.last_invoice_uid);
+
+  // filter invoices on or after the end date
+
+  invoices = invoices.filter(invoice => {
+
+    return invoice.completed_at < endDate;
+
+  });
 
   let sum = invoices.reduce((sum, invoice) => {
 
@@ -121,9 +129,9 @@ export async function generateLatestBatch() {
 
     type: 'ACH',
 
-    batch_description: 'ACH batch from sudo admin',
+    batch_description: note || 'ACH batch from sudo admin',
 
-    originating_account: 'TD Bank ACH',
+    originating_account: 'Mercury Bank ACH',
 
     currency: 'USD',
 
