@@ -1,24 +1,27 @@
 import { plugins } from './plugins';
+import { models } from './models';
 import { log } from './logger';
 import * as invoices from './invoice';
 
 export async function settleInvoice(invoice) {
 
-  let plugin = await plugins.findForCurrency(invoice.output_currency);
-
-  if (typeof plugin['settleInvoice'] === 'function') {
-
-    let payment = await plugin['settleInvoice'](invoice);
-
-    invoice = await invoices.settleInvoice(invoice, payment); 
-
-    return invoice;
-    
-  } else {
-
-    log.info(`settleInvoice not implemented for ${invoice.output_currency} plugin`);
-
+  if (!invoice.should_settle) {
+    throw new Error('invoice should not settle')
   }
+
+  let account = await models.Account.findOne({
+    where: { id: invoice.account_id }
+  });
+
+  if (!account.settlement_strategy) {
+    throw new Error('no settlement strategy');
+  }
+
+  let strategy = findByName(account.settlement_strategy);
+
+  console.log("strategy", strategy);
+
+  await strategy.apply(invoice);
 
 }
 
@@ -32,5 +35,8 @@ var settlements: any = require('require-all')({
   }
 });
 
-export { settlements }
+export function findByName(name) {
+  return settlements[name].index;
+}
+
 

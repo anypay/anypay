@@ -122,6 +122,7 @@
     "ts-node": "^6.0.5"
   },
   "scripts": {
+    "runtest": "mocha --require=ts-node/register $TEST_PATH --timeout=10000",
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",
