@@ -30,8 +30,6 @@ interface Route{
 
 export async function getAddressRouteFromTx(tx):Promise<Route>{
 
-  console.log('getting tx for: ', tx)
-
   var route;
 
   var value;
@@ -44,10 +42,7 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
 
       route = await lookupOutputFromInput('BTC', address)
 
-      console.log(`route found for ${address}`)
-
     } catch(error) {
-
 
       console.error(error.message);
 
@@ -83,14 +78,8 @@ export function transformHexToPayments(hex: string): Payment[]{
   let tx = new btc.Transaction(hex)
 
   var replace_by_fee = tx.isRBF();
-  console.log('replace_by_fee', replace_by_fee);
-  console.log(tx.toJSON());
 
   if (replace_by_fee) {
-
-    console.log(tx.toJSON());
-
-    console.log('Replace By Fee Detected', JSON.stringify(tx.toJSON()));
 
     rocketchat.notify(`Replace By Fee Detected: ${JSON.stringify(tx.toJSON())}`);
 
