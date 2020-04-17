@@ -51,8 +51,6 @@ async function awaitChannel() {
 
 export async function publishEvent(key: string, payload: any) {
 
-  log.info(key, payload);
-
   if (typeof payload !== 'string') {
 
     payload = JSON.stringify(payload);

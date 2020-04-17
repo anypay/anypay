@@ -24,7 +24,6 @@ export async function start() {
 
   })
   .start(async (channel, msg, json) => {
-    console.log(json);
 
     if (json.currency !== 'DASH') {
 
@@ -36,8 +35,6 @@ export async function start() {
     log.info(json);
 
     let resp = await rpcCall('importaddress', [json.address, json.uid, false]); 
-
-    console.log(resp);
 
     await channel.ack(msg);
 

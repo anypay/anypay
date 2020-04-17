@@ -29,8 +29,6 @@ interface Route{
 
 export async function getAddressRouteFromTx(tx):Promise<Route>{
 
-  console.log('getting tx for: ', tx)
-
   var route;
 
   var value;
@@ -43,10 +41,7 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
 
       route = await lookupOutputFromInput('BSV', address)
 
-      console.log(`route found for ${address}`, route)
-
     } catch(error) {
-
 
       console.error(error.message);
 
@@ -73,8 +68,6 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
 export async function broadcastSignedTx(tx: bsv.Transaction): Promise<string>{
  
   let txid =  await rpcCall('sendrawtransaction', [tx.toString()])
-  console.log('result', txid)
-  console.log('tx', tx)
   return txid;
 
 }
@@ -118,7 +111,6 @@ export function transformHexToPayments(hex: string): Payment[]{
 
   }
 
-  console.log(payments)
   return payments
 
 }
@@ -144,8 +136,6 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bsv.Tra
   if (input.satoshis < fee) {
 
      throw(new RangeError(`Fee: ${fee} satoshis is greater than the unspent output: ${input.satoshis} satoshis`));
-
-     return;
   }
 
   let utxo = {

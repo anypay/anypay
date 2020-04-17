@@ -21,8 +21,6 @@ export async function start() {
 
     let tx = await rpcCall('gettransaction', [msg.content.toString()] )
 
-    console.log(tx)
-
     channel.publish('anypay.router', 'transaction.dash', Buffer.from(JSON.stringify(tx)))
           
     channel.ack(msg);

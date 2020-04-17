@@ -29,8 +29,6 @@ interface Route{
 
 export async function getAddressRouteFromTx(tx):Promise<Route>{
 
-  console.log('getting tx for: ', tx)
-
   var route;
 
   var value;
@@ -38,13 +36,10 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
   for (let i=0; i < tx.outputs.length; i++) {
 
     let address = tx.outputs[i].script.toAddress().toString();
-    console.log('Tx Address', address)
 
     try {
 
       route = await lookupOutputFromInput('DASH', address)
-
-      console.log(`route found for ${address}`)
 
     } catch(error) {
 
