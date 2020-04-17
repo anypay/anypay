@@ -1,0 +1,1 @@
+{"version":3,"file":"callbacks.js","sourceRoot":"./","sources":["plugins/rvn/lib/callbacks.ts"],"names":[],"mappings":";;;;;;;;;;;AACA,mCAAmC;AAEnC,SAAsB,WAAW,CAAC,GAAG,EAAE,QAAQ;;QAE7C,IAAI,IAAI,GAAG,MAAM,IAAI;aAClB,IAAI,CAAC,GAAG,CAAC;aACT,IAAI,CAAC,QAAQ,CAAC,CAAC;QAElB,OAAO,IAAI,CAAC;IAEd,CAAC;CAAA;AARD,kCAQC"}

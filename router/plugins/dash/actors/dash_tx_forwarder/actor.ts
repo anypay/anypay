@@ -49,8 +49,6 @@ export async function start() {
 
     let forwarder = forwarderFactory.newForwarder({ hex: json.hex });
 
-    console.log(forwarder)
-
     await forwarder.getAddressRoute();
 
     console.log("address route found")
@@ -61,19 +59,19 @@ export async function start() {
 
     await forwarder.buildOutput();
 
-    console.log("output build")
+    console.log("output build", forwarder.output_hash)
 
     await forwarder.signOutput();
 
-    console.log("output signed")
+    console.log("output signed", forwarder.output_hash)
 
     await forwarder.broadcastOutput();
 
-    console.log("output broadcasted")
+    console.log("output broadcast", forwarder.output_hash);
 
     await forwarder.publishForwarded();
 
-    console.log("published forwarded");
+    console.log("published forwarded", forwarder.output_hash);
 
     channel.ack(msg);
 

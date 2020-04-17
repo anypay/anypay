@@ -138,7 +138,7 @@ export async function forwardPayment(txid: string, blockPriority = 12): Promise<
 
       output_currency: route.output_currency,
 
-      output_hash: newtx 
+      output_hash: newtx
     
     });
 
@@ -170,3 +170,4 @@ function satoshisToBTC(sat){
   return sat/100000000
 
 }*/
+//# sourceMappingURL=forwardPayment.js.map
