@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import * as http from 'superagent';
 
-import { getAddressRoute } from '../../anypay-ach/lib/routes';
+import { getAddressRoute } from '../../lib/routes';
 
 interface Address {
   currency: string;
