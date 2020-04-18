@@ -207,7 +207,10 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
       });
 
-      paymentRequest = await createBSVRequest(invoice, paymentOption);
+      paymentRequest = await createBSVRequest(invoice, paymentOption, {
+        name: item.name,
+        image_url: item.image_url
+      });
 
       response = h.response(paymentRequest);
 

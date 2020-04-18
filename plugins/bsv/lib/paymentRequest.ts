@@ -20,9 +20,16 @@ interface PaymentRequest{
     merchantData: string;
 }
 
-export async function generatePaymentRequest(invoice: any, paymentOption: any):Promise<PaymentRequest>{
-  console.log('invoice', invoice);
-  console.log('invoice', invoice);
+interface PaymentRequestOptions {
+  image_url?: string;
+  name?: string;
+}
+
+export async function generatePaymentRequest(
+  invoice: any,
+  paymentOption: any,
+  opts: PaymentRequestOptions={})
+:Promise<PaymentRequest>{
 
   let account = await models.Account.findOne({ where: { id: invoice.account_id }});
 
@@ -32,6 +39,9 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
 
   let anypayAddress = new bitcoin.Address(process.env.BIP_270_EXTRA_OUTPUT_ADDRESS);
   let anypayScript = new bitcoin.Script(anypayAddress);
+
+  var merchantName = opts.name || account.business_name;
+  var avatarUrl = opts.image_url || account.image_url;
 
   let request = {
     network:"bitcoin-sv",
@@ -44,12 +54,12 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     }],
     creationTimestamp: moment(invoice.createdAt).unix(),
     expirationTimestamp: moment(invoice.expiry).unix(),
-    memo: "Bitcoin SV Payment Request | Anypay Inc",
+    memo: "Bitcoin SV Payment Request by Anypay Inc",
     paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay`,
     merchantData: JSON.stringify({
       invoiceUid: invoice.uid,
-      merchantName: account.business_name,
-      avatarUrl: account.image_url
+      merchantName,
+      avatarUrl
     })
   }
 
