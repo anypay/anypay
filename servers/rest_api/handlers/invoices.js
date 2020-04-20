@@ -351,7 +351,12 @@ module.exports.createPublic = async (request, reply) => {
 
     invoice.payment_options = payment_options;
 
-    return sanitizeInvoice(invoice);
+    let sanitized = sanitizeInvoice(invoice);
+
+    return Object.assign({
+      invoice: sanitized,
+      payment_options
+    }, sanitized);
 
   } catch(error) {
 
