@@ -1892,7 +1892,7 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
                     language: "en",
                     google: {
                         version: "3",
-                        key: "AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA"
+                        key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8"
                     }
                 });
 
@@ -2116,6 +2116,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+754a3bb9"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+9aad9cfe"});
 }
 //# sourceMappingURL=energy-city-app.map

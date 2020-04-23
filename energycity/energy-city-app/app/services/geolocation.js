@@ -16,7 +16,7 @@ export default Ember.Service.extend({
           language: "en",
           google: {
               version: "3",
-              key: "AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA"
+              key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8"
           }
       });
 
