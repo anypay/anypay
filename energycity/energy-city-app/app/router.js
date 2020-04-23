@@ -7,10 +7,10 @@ const Router = Ember.Router.extend({
 });
 
 Router.map(function() {
-  this.route('geolocate', { path: '/' });
+  //this.route('geolocate', { path: '/' });
   this.route('city', { path: '/cities/:city' });
   this.route('business', { path: '/:city/businesses/:stub' });
-  this.route('cities');
+  this.route('cities', { path: '/' });
 });
 
 export default Router;
