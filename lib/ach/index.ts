@@ -121,7 +121,7 @@ export async function generateLatestBatch(endDate, note) {
 
   console.log(`${invoices.length} payments for next batch totaling $${sum}`);
 
-  let newBatch = await models.AchBatch.create({
+  let ach_batch = await models.AchBatch.create({
 
     first_invoice_uid: invoices[invoices.length - 1].uid,
 
@@ -139,7 +139,10 @@ export async function generateLatestBatch(endDate, note) {
 
   });
 
-  console.log(newBatch.toJSON());
+  await Promise.all(invoices.map(async (invoice) => {
+    invoice.ach_batch_id = ach_batch.id
+    await invoice.save();
+  }));
 
-  return newBatch;
+  return { ach_batch, invoices };
 }
