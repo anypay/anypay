@@ -133,6 +133,9 @@ export async function ambassadorRewardEmail(invoice_uid){
     id: ambassador.account_id
   }});
 
+  let business = await models.Account.findOne({ where: {
+    id: invoice.account_id
+  }});
 
   // compute denomination amount
   // get the price of the currency at that time
@@ -156,11 +159,11 @@ export async function ambassadorRewardEmail(invoice_uid){
     denomination_currency: invoice.denomination_currency,
     amount_paid: reward.invoice_amount_paid,
     denomination_amount_paid: denomination_amount,
-    businessName: account.business_name,
-    businessStreetAddress: account.business_street_address,
-    businessCity: account.business_city,
-    businessState: account.business_state,
-    businessZip: account.business_zip
+    businessName: business.business_name,
+    businessStreetAddress: business.business_street_address,
+    businessCity: business.business_city,
+    businessState: business.business_state,
+    businessZip: business.business_zip
   };
 
   console.log(variables);

@@ -7,7 +7,7 @@ import { models } from '../../lib';
 import * as cashbackDash from '../../plugins/dash/lib/cashback';
 import * as cashbackBCH from '../../plugins/bch/lib/cashback';
 import { publishJson } from '../../lib/amqp';
-
+const bch: any =  require('bitcore-lib-cash');
 import * as ambassadorRewardEmailActor from '../ambassador_reward_email/actor';
 
 ambassadorRewardEmailActor.start();
@@ -149,6 +149,7 @@ export async function start() {
     }
 
     if (reward.txid) {
+      log.info(`txid: ${reward.txid}`);
 
       await channel.ack(msg);
 
@@ -160,11 +161,17 @@ export async function start() {
 
       if (invoice.currency === 'BCH') {
 
+        address = reward.address;
+        if (reward.address.match(/^xpub/)) {
+          let xpub = new bch.HDPublicKey(reward.address);
+          address = xpub.deriveChild(0).publicKey.toAddress().toString();
+        }
+
         let amount = reward.amount.toFixed(6);
         console.log('bch amount to send', amount);
         // send ambassador reward and update record
         let resp = await cashbackBCH.sendToAddress(
-          reward.address,
+          address,
           reward.amount.toFixed(6)
         );
 
@@ -195,7 +202,7 @@ export async function start() {
   
     } catch(error) {
 
-      console.log(error.response);
+      console.log(error.response.body);
       let msg = error.response.body.error.message;
       console.log("ERROR MESSAGE", msg);
 
