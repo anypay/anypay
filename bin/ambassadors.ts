@@ -11,6 +11,11 @@ import {
   claimBusiness
 } from '../lib/ambassadors';
 
+import { wait, awaitChannel } from '../lib/amqp';
+import {  models } from '../lib/models';
+import {  database } from '../lib';
+import { Op } from 'sequelize';
+
 function renderTable() {
 
 }
@@ -80,6 +85,44 @@ program
 
     console.log(table.toString());
 
+    process.exit(0);
+
+  });
+
+program
+  .command('pay_failed_rewards <currency> [limit]')
+  .action(async (currency, limit=10) => {
+
+    let channel = await awaitChannel();
+
+    let result = await database.query(`select * from ambassador_rewards where
+    currency ='${currency}' and  txid is null order by id limit ${limit}`);
+
+    let rewards = result[0]; 
+
+/*
+    let rewards = await models.AmbassadorReward.findAll({
+      where: {
+        currency
+      },
+      limit,
+      txid: {
+        [Op.eq]: null
+      },
+      order: [['id', 'desc']]
+    })
+    */
+
+    for (let i=0; i<rewards.length; i++) {
+      let reward = rewards[i];
+      console.log('reward', reward);
+
+      await channel.sendToQueue('ambassador_reward_on_invoice_paid',
+      Buffer.from(reward.invoice_uid));
+    }
+
+    await wait(1000);
+  
     process.exit(0);
 
   });

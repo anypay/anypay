@@ -6,6 +6,11 @@ import { Actor, Joi, log } from 'rabbi';
 import { models } from '../../lib';
 import * as cashbackDash from '../../plugins/dash/lib/cashback';
 import * as cashbackBCH from '../../plugins/bch/lib/cashback';
+import { publishJson } from '../../lib/amqp';
+const bch: any =  require('bitcore-lib-cash');
+import * as ambassadorRewardEmailActor from '../ambassador_reward_email/actor';
+
+ambassadorRewardEmailActor.start();
 
 export async function start() {
 
@@ -66,10 +71,14 @@ export async function start() {
       uid: json.invoice_uid
     }});
 
+    log.info('got invoice');
+
     // get account from invoice
     let account = await models.Account.findOne({ where: {
       id: invoice.account_id
     }});
+
+    log.info('got account', account.toJSON());
 
     if (!account.ambassador_id) {
       return channel.ack(msg);
@@ -84,6 +93,12 @@ export async function start() {
       }
 
     });
+
+    log.info('got ambassador', ambassador.toJSON());
+
+    if (!ambassador) {
+      return channel.ack(msg);
+    }
 
     let address = await models.Address.findOne({
 
@@ -134,6 +149,7 @@ export async function start() {
     }
 
     if (reward.txid) {
+      log.info(`txid: ${reward.txid}`);
 
       await channel.ack(msg);
 
@@ -145,10 +161,18 @@ export async function start() {
 
       if (invoice.currency === 'BCH') {
 
+        address = reward.address;
+        if (reward.address.match(/^xpub/)) {
+          let xpub = new bch.HDPublicKey(reward.address);
+          address = xpub.deriveChild(0).publicKey.toAddress().toString();
+        }
+
+        let amount = reward.amount.toFixed(6);
+        console.log('bch amount to send', amount);
         // send ambassador reward and update record
         let resp = await cashbackBCH.sendToAddress(
-          reward.address,
-          parseFloat(reward.amount)
+          address,
+          reward.amount.toFixed(6)
         );
 
         if (resp) {
@@ -161,7 +185,7 @@ export async function start() {
         // send ambassador reward and update record
         let resp = await cashbackDash.sendToAddress(
           reward.address,
-          parseFloat(reward.amount)
+          reward.amount.toFixed(6)
         );
 
         if (resp) {
@@ -173,13 +197,17 @@ export async function start() {
 
         throw new Error(`ambassador rewards for ${invoice.currency} not yet supported`);
       }
+
+      await publishJson(channel, 'anypay', 'ambassador_reward_paid', reward.toJSON());
   
     } catch(error) {
 
-      console.log(error.response);
+      console.log(error.response.body);
+      let msg = error.response.body.error.message;
+      console.log("ERROR MESSAGE", msg);
 
       // update ambassador reward record with any failure
-      reward.error = error.message;
+      reward.error = msg;
       await reward.save();
 
     }
