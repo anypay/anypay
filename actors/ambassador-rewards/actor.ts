@@ -6,11 +6,14 @@ import { Actor, Joi, log } from 'rabbi';
 import { models } from '../../lib';
 import * as cashbackDash from '../../plugins/dash/lib/cashback';
 import * as cashbackBCH from '../../plugins/bch/lib/cashback';
+import { startActors } from '../../lib/rabbi';
 import { publishJson } from '../../lib/amqp';
 const bch: any =  require('bitcore-lib-cash');
-import * as ambassadorRewardEmailActor from '../ambassador_reward_email/actor';
 
-ambassadorRewardEmailActor.start();
+startActors([
+  'ambassador_reward_email',
+  'ambassador_reward_rocketchat'
+]);
 
 export async function start() {
 
