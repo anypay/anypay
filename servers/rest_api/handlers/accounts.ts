@@ -8,6 +8,7 @@ import { geocode } from '../../../lib/googlemaps';
 import {emitter} from '../../../lib/events'
 
 import { models } from '../../../lib';
+import { awaitChannel } from '../../../lib/amqp';
 
 import { getROI } from '../../../lib/roi';
 
@@ -84,6 +85,16 @@ export async function update(req, h) {
       where: { id: req.account.id }
 
     });
+
+    if (updateAttrs['ambassador_id']) {
+      let channel = await awaitChannel();
+      await channel.publish('anypay', 'ambassador_claim_created', Buffer.from(
+        JSON.stringify({
+          account_id: account.id,
+          ambassador_id: updateAttrs['ambassador_id'],
+        })
+      ));
+    }
 
     account = await models.Account.findOne({ where: {
 
