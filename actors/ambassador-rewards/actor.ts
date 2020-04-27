@@ -13,7 +13,8 @@ const bch: any =  require('bitcore-lib-cash');
 startActors([
   'ambassador_reward_email',
   'ambassador_reward_rocketchat',
-  'email_sudo_ambassador_claim_created'
+  'email_sudo_ambassador_claim_created',
+  'ambassador_merchant_approved_email'
 ]);
 
 export async function start() {
