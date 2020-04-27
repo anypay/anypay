@@ -103,11 +103,10 @@ export async function update(req: Request, h: ResponseToolkit) {
 
 async function sendAchReport(batch_id) {
 
-  let report = await wire.buildAchBatchEmailReport(batch_id);
-
-  await sendEmail('steven@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
-  await sendEmail('derrick@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
-  await sendEmail('brandon@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
+  wire.sendAchReportEmail(batch_id, 'steven@anypayinc.com');
+  wire.sendAchReportEmail(batch_id, 'derrick@anypayinc.com');
+  wire.sendAchReportEmail(batch_id, 'accounting@egifter.com');
+  wire.sendAchReportEmail(batch_id, 'judy@egifter.com');
 
 }
 

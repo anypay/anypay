@@ -390,11 +390,7 @@ program
 
     try {
 
-      let report = await wire.buildAchBatchEmailReport(batch_id);
-
-      let resp = await sendEmail(email, '[ACH EMAIL TO SEND EGIFTER]', report);
-
-      console.log(resp);
+      await wire.sendAchReportEmail(batch_id, email);
 
     } catch(error) {
 

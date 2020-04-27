@@ -3,6 +3,8 @@ import { models } from '../models';
 
 import * as moment from 'moment';
 
+import { email as rabbiEmail } from 'rabbi';
+
 import { readFileSync } from 'fs';
 
 import * as mustache from 'mustache';
@@ -173,6 +175,39 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
   });
 
   return content;
+
+}
+
+export async function sendAchReportEmail(ach_batch_id: number, email: string) {
+
+  let batch = await models.AchBatch.findOne({ where: { id: ach_batch_id }});
+  let invoices = await models.Invoice.findAll({ where: { ach_batch_id }});
+
+  batch = Object.assign(batch.toJSON(), {
+    amount: batch.amount.toFixed(2)
+  })
+
+  var variables = {
+    batch,
+    invoices: invoices.map(invoice => {
+      invoice = invoice.toJSON();
+
+      return Object.assign(invoice, {
+        denomination_amount_paid: invoice.denomination_amount_paid.toFixed(2),
+        cashback_denomination_amount: invoice.cashback_denomination_amount.toFixed(2),
+        settlement_amount: invoice.settlement_amount.toFixed(2)
+      })
+    }),
+    start_date: moment(invoices[0].completed_at).format('MM-DD-YYYY'),
+    end_date: moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY')
+  };
+
+  let resp = await rabbiEmail.sendEmail(
+    'ach_sent_with_invoices',
+    email,
+    'derrick@anypayinc.com',
+    variables
+  )
 
 }
 
