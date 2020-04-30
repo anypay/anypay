@@ -3,10 +3,12 @@
 require('dotenv').config();
 
 import { Actor, Joi } from 'rabbi';
+import { system } from '../../lib/rabbi/system';
+import { publishJson } from '../../lib/rabbi';
 
-import {email, models} from '../../lib';
+import { generateCodeForInvoice } from '../../lib/truereviews';
 
-export async function start() {
+export const start = system(() => {
 
   Actor.create({
 
@@ -21,23 +23,31 @@ export async function start() {
 
     let uid = msg.content.toString();
 
-    let invoice = await models.Invoice.findOne({
+    let trueReviewsCode = await generateCodeForInvoice(uid);
+
+    await publishJson(channel, 'anypay', 'truereviews.token.created', trueReviewsCode)
  
-      where: { uid: uid }
+    channel.ack(msg);
 
-    });
+  });
 
-    await email.invoicePaidEmail(invoice.toJSON());
+  Actor.create({
+
+    exchange: 'anypay',
+
+    routingkey: 'truereviews.token.created',
+
+    queue: 'log_true_reviews_create_token_created',
+
+  })
+  .start(async (channel, msg, json) => {
+
+    console.log('truereviews.token.created', json);
 
     channel.ack(msg);
 
   });
 
+});
 
-}
 
-if (require.main === module) {
-
-  start();
-
-}
