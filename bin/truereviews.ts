@@ -2,27 +2,17 @@
 
 import * as program from 'commander';
 
-import * as http from 'superagent'
+import { generateCodeForInvoice } from '../lib/truereviews';
 
 program
-  .command('generatecode')
-  .action(async () => {
-
-    let place = 'ChIJrTtOeQu_4okRBoiuYJEQGJ8';
+  .command('generatecode <invoice_uid>')
+  .action(async (invoice_uid) => {
 
     try {
 
-      let resp = await http
-        .post('https://truereviews.io/api/anypay/token')
-        .set('trApiKey', 'anypaydev')
-        .send({
-          data: {
-            location: place
-          },
-          amount: "$5.00"
-        })
+      let resp = await generateCodeForInvoice(invoice_uid);
 
-      console.log(resp.body);
+      console.log(resp);
 
     } catch(error) {
 
