@@ -9,7 +9,7 @@ const Router = Ember.Router.extend({
 Router.map(function() {
   //this.route('geolocate', { path: '/' });
   this.route('city', { path: '/cities/:city' });
-  this.route('business', { path: '/:city/businesses/:stub' });
+  this.route('business', { path: '/businesses/:stub' });
   this.route('cities', { path: '/' });
   this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
   this.route('payments');

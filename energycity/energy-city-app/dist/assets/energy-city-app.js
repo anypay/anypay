@@ -963,6 +963,172 @@ define('energy-city-app/controllers/application', ['exports'], function (exports
 
   }, _defineProperty(_Ember$Controller$ext, 'geolocation', null), _defineProperty(_Ember$Controller$ext, 'socket', null), _defineProperty(_Ember$Controller$ext, 'connected', false), _defineProperty(_Ember$Controller$ext, 'session', Ember.inject.service()), _Ember$Controller$ext));
 });
+define('energy-city-app/controllers/business', ['exports', 'ember-get-config'], function (exports, _emberGetConfig) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  var calculator = [];
+
+  var _generateInvoice = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(account_id, amount, accessToken) {
+      var headers, resp;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              console.log('generate', account_id);
+              headers = {
+                'Authorization': 'Basic ' + btoa(accessToken + ":")
+              };
+              _context.next = 4;
+              return Ember.$.ajax({
+                method: 'POST',
+                url: '/invoices',
+                data: {
+                  amount: parseFloat(amount),
+                  account_id: parseInt(account_id),
+                  redirect_url: 'https://nrg.city/#/payments'
+                },
+                headers: headers
+              });
+
+            case 4:
+              resp = _context.sent;
+              return _context.abrupt('return', resp);
+
+            case 6:
+            case 'end':
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    return function _generateInvoice(_x, _x2, _x3) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  exports.default = Ember.Controller.extend({
+    session: Ember.inject.service(),
+    amount: '0.00',
+
+    isShowNextButton: Ember.computed('amount', function () {
+      return this.get("amount") > 0;
+    }),
+
+    actions: {
+      calculatorPress: function calculatorPress(event) {
+        var n = Ember.$(event.target).html();
+        var decimalIndex = calculator.indexOf('.');
+        if (decimalIndex > 0 && decimalIndex === calculator.length - 3) {
+          return;
+        }
+        if (n === '.') {
+          if (decimalIndex !== -1) {
+            return;
+          }
+          if (calculator.length === 0) {
+            return;
+          }
+        }
+        console.log("calculator press", n);
+        calculator.push(n);
+        var decimalPlaces = this.get('denominationCurrency.decimal_places') || 2;
+        var total = parseFloat(calculator.join('')) / Math.pow(10, decimalPlaces);
+        this.set('amount', total.toFixed(decimalPlaces));
+
+        console.log('amount', this.get('amount'));
+        if (parseFloat(this.get('amount')) > 0) {
+          Ember.$("#collect-amount").show();
+        } else {
+          Ember.$("#collect-amount").hide();
+        }
+      },
+      pressBackspace: function pressBackspace() {
+        console.log('back');
+        calculator.splice(-1, 1);
+        var decimalPlaces = this.get('denominationCurrency.decimal_places') || 2;
+        var total = calculator.join('') / Math.pow(10, decimalPlaces || 0);
+        console.log('total', total);
+        this.set('amount', total.toFixed(decimalPlaces));
+      },
+      clearCalculator: function clearCalculator() {
+        calculator = [];
+        this.set('amount', this.getAmountMask());
+        Ember.$("#collect-amount").hide();
+      },
+      generateInvoice: function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+          var token, resp;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  token = this.get('session')['session']['content']['authenticated']['token'];
+
+
+                  $('.loading').show();
+                  _context2.next = 4;
+                  return _generateInvoice(this.get('business').id, this.get('amount'), token);
+
+                case 4:
+                  resp = _context2.sent;
+
+                  console.log(resp);
+
+                  window.location = 'https://anypayapp.com/invoices/' + resp.invoice.uid;
+
+                case 7:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function generateInvoice() {
+          return _ref2.apply(this, arguments);
+        }
+
+        return generateInvoice;
+      }()
+    }
+
+  });
+});
 define('energy-city-app/controllers/cities', ['exports'], function (exports) {
   'use strict';
 
@@ -990,6 +1156,8 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
     connected: false,
 
     locations: [],
+
+    session: Ember.inject.service(),
 
     handleInvoicePaid: function handleInvoicePaid(invoice) {
 
@@ -1133,6 +1301,266 @@ define('energy-city-app/helpers/cancel-all', ['exports', 'ember-concurrency/help
     }
   });
 });
+define('energy-city-app/helpers/is-after', ['exports', 'ember-moment/helpers/is-after'], function (exports, _isAfter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isAfter.default;
+    }
+  });
+});
+define('energy-city-app/helpers/is-before', ['exports', 'ember-moment/helpers/is-before'], function (exports, _isBefore) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isBefore.default;
+    }
+  });
+});
+define('energy-city-app/helpers/is-between', ['exports', 'ember-moment/helpers/is-between'], function (exports, _isBetween) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isBetween.default;
+    }
+  });
+});
+define('energy-city-app/helpers/is-same-or-after', ['exports', 'ember-moment/helpers/is-same-or-after'], function (exports, _isSameOrAfter) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSameOrAfter.default;
+    }
+  });
+});
+define('energy-city-app/helpers/is-same-or-before', ['exports', 'ember-moment/helpers/is-same-or-before'], function (exports, _isSameOrBefore) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSameOrBefore.default;
+    }
+  });
+});
+define('energy-city-app/helpers/is-same', ['exports', 'ember-moment/helpers/is-same'], function (exports, _isSame) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _isSame.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-add', ['exports', 'ember-moment/helpers/moment-add'], function (exports, _momentAdd) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentAdd.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-calendar', ['exports', 'ember-moment/helpers/moment-calendar'], function (exports, _momentCalendar) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentCalendar.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-diff', ['exports', 'ember-moment/helpers/moment-diff'], function (exports, _momentDiff) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentDiff.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-duration', ['exports', 'ember-moment/helpers/moment-duration'], function (exports, _momentDuration) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentDuration.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-format', ['exports', 'ember-moment/helpers/moment-format'], function (exports, _momentFormat) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFormat.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-from-now', ['exports', 'ember-moment/helpers/moment-from-now'], function (exports, _momentFromNow) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFromNow.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-from', ['exports', 'ember-moment/helpers/moment-from'], function (exports, _momentFrom) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentFrom.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-subtract', ['exports', 'ember-moment/helpers/moment-subtract'], function (exports, _momentSubtract) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentSubtract.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-to-date', ['exports', 'ember-moment/helpers/moment-to-date'], function (exports, _momentToDate) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentToDate.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-to-now', ['exports', 'ember-moment/helpers/moment-to-now'], function (exports, _momentToNow) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentToNow.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-to', ['exports', 'ember-moment/helpers/moment-to'], function (exports, _momentTo) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _momentTo.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment-unix', ['exports', 'ember-moment/helpers/unix'], function (exports, _unix) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _unix.default;
+    }
+  });
+});
+define('energy-city-app/helpers/moment', ['exports', 'ember-moment/helpers/moment'], function (exports, _moment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _moment.default;
+    }
+  });
+});
+define('energy-city-app/helpers/now', ['exports', 'ember-moment/helpers/now'], function (exports, _now) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _now.default;
+    }
+  });
+});
 define('energy-city-app/helpers/perform', ['exports', 'ember-concurrency/helpers/perform'], function (exports, _perform) {
   'use strict';
 
@@ -1172,6 +1600,38 @@ define('energy-city-app/helpers/task', ['exports', 'ember-concurrency/helpers/ta
     enumerable: true,
     get: function () {
       return _task.default;
+    }
+  });
+});
+define('energy-city-app/helpers/unix', ['exports', 'ember-moment/helpers/unix'], function (exports, _unix) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _unix.default;
+    }
+  });
+});
+define('energy-city-app/helpers/utc', ['exports', 'ember-moment/helpers/utc'], function (exports, _utc) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(exports, 'default', {
+    enumerable: true,
+    get: function () {
+      return _utc.default;
+    }
+  });
+  Object.defineProperty(exports, 'utc', {
+    enumerable: true,
+    get: function () {
+      return _utc.utc;
     }
   });
 });
@@ -1445,7 +1905,7 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
   Router.map(function () {
     //this.route('geolocate', { path: '/' });
     this.route('city', { path: '/cities/:city' });
-    this.route('business', { path: '/:city/businesses/:stub' });
+    this.route('business', { path: '/businesses/:stub' });
     this.route('cities', { path: '/' });
     this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
     this.route('payments');
@@ -1509,17 +1969,83 @@ define('energy-city-app/routes/application', ['exports', 'ember-simple-auth/mixi
     }
   });
 });
-define('energy-city-app/routes/business', ['exports'], function (exports) {
+define('energy-city-app/routes/business', ['exports', 'ember-simple-auth/mixins/authenticated-route-mixin'], function (exports, _authenticatedRouteMixin) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Route.extend({
-    model: function model(params) {
-      // params.stub will give the info needed to look up the business
-    },
-    setupController: function setupController(controller, model) {}
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = Ember.Route.extend(_authenticatedRouteMixin.default, {
+    session: Ember.inject.service(),
+
+    model: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(params) {
+        var token, resp;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                token = this.get('session')['session']['content']['authenticated']['token'];
+                _context.next = 3;
+                return Ember.$.ajax({
+                  method: 'GET',
+                  url: '/businesses/' + params.stub,
+                  headers: {
+                    'Authorization': 'Basic ' + btoa(token + ':')
+                  }
+                });
+
+              case 3:
+                resp = _context.sent;
+                return _context.abrupt('return', resp);
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function model(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return model;
+    }(),
+    setupController: function setupController(controller, model) {
+      controller.set('business', model);
+    }
   });
 });
 define('energy-city-app/routes/cities', ['exports'], function (exports) {
@@ -1589,6 +2115,7 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
     //geolocation: service(),
 
     cities: Ember.inject.service(),
+    session: Ember.inject.service(),
 
     socketIOService: Ember.inject.service('socket-io'),
 
@@ -1975,7 +2502,7 @@ define('energy-city-app/routes/payments', ['exports', 'ember-simple-auth/mixins/
 
               case 3:
                 resp = _context.sent;
-                return _context.abrupt('return', resp);
+                return _context.abrupt('return', resp.invoices);
 
               case 5:
               case 'end':
@@ -1992,6 +2519,9 @@ define('energy-city-app/routes/payments', ['exports', 'ember-simple-auth/mixins/
       return model;
     }(),
     setupController: function setupController(controller, model) {
+
+      console.log(model);
+
       controller.set('payments', model);
     }
   });
@@ -2319,6 +2849,17 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
         return val;
     };
 });
+define('energy-city-app/services/moment', ['exports', 'ember-moment/services/moment', 'energy-city-app/config/environment'], function (exports, _moment, _environment) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  var get = Ember.get;
+  exports.default = _moment.default.extend({
+    defaultFormat: get(_environment.default, 'moment.outputFormat')
+  });
+});
 define('energy-city-app/services/session', ['exports', 'ember-simple-auth/services/session'], function (exports, _session) {
   'use strict';
 
@@ -2367,7 +2908,7 @@ define("energy-city-app/templates/application", ["exports"], function (exports) 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "xcoPEHtm", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n      \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"NrgCty\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"        \"],[4,\"link-to\",[\"logout\"],null,{\"statements\":[[0,\"sign out\"]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"a\"],[9,\"href\",\"/auth/moneybutton\"],[7],[0,\"sign in\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "LIN7VyGi", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n      \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"NrgCty\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"        \"],[4,\"link-to\",[\"logout\"],null,{\"statements\":[[0,\"sign out\"]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"a\"],[9,\"href\",\"/auth/moneybutton\"],[7],[0,\"sign in\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
 });
 define("energy-city-app/templates/business", ["exports"], function (exports) {
   "use strict";
@@ -2375,7 +2916,7 @@ define("energy-city-app/templates/business", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "w8JotxNJ", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"La Maison Navarre\"],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n  \"],[6,\"h2\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n  \"],[6,\"h2\"],[7],[0,\"Leave a Tip\"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n  \"],[6,\"h2\"],[7],[0,\"Service People\"],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/business.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "a5iwKoeH", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"La Maison Navarre\"],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"container page-layout page-layout--background-primary\\n  calculator-pad-top noselect\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"invoice-amount\"],[7],[0,\"\\n\"],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"invoice-amount\"],[9,\"id\",\"invoice-amount\"],[7],[6,\"span\"],[7],[0,\"$\"],[1,[18,\"amount\"],false],[8],[0,\" \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"page-layout__content calculator-pad-top noselect\"],[9,\"style\",\"display: block;\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row calculator-pad noselect\"],[9,\"id\",\"calculator-pad\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-1\"],[7],[0,\"1\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-2\"],[7],[0,\"2\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-3\"],[7],[0,\"3\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-4\"],[7],[0,\"4\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-5\"],[7],[0,\"5\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-6\"],[7],[0,\"6\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-7\"],[7],[0,\"7\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-8\"],[7],[0,\"8\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-9\"],[7],[0,\"9\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect invisible\"],[9,\"id\",\"calculator-delete\"],[7],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-0\"],[7],[0,\"0\"],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"col-sm-4\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"pressBackspace\"],null],null],[9,\"id\",\"calculator-backspace\"],[7],[0,\"\\n            \"],[6,\"img\"],[9,\"class\",\"left-chevron-back\"],[10,\"src\",[26,[[18,\"rootURL\"],\"left-chevron.png\"]]],[7],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"col-sm-4 invisible\"],[7],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"div\"],[9,\"class\",\"invoice-page__controls\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"new-invoice-next-button\"],[10,\"src\",[26,[[18,\"rootURL\"],\"img/Green_Anypay_Next_Arrow.svg\"]]],[3,\"action\",[[19,0,[]],\"generateInvoice\"]],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[2,\"\\n<section>\\n  <h2>Leave a Tip</h2>\\n</section>\\n\\n<section>\\n  <h2>Service People</h2>\\n</section>\\n\"],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/business.hbs" } });
 });
 define("energy-city-app/templates/cities", ["exports"], function (exports) {
   "use strict";
@@ -2391,7 +2932,7 @@ define("energy-city-app/templates/city", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "aSlBsPkM", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n        \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"https://anypayapp.com/pay/\",[19,1,[\"stub\"]]]]],[7],[0,\"\\n          \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n          \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"half-right\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"bch_tipjar\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[19,1,[\"bch_tipjar\",\"address\"]],null],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"BCH Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[19,1,[\"bsv_tipjar\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"bitcoin:\",[19,1,[\"bsv_tipjar\",\"address\"]]]]],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-warning\"],[7],[0,\"BSV Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"money-button\"],[10,\"data-to\",[26,[[20,[\"bsv_tipjar\",\"address\"]]]]],[9,\"data-type\",\"tip\"],[9,\"data-label\",\"BSV Tip\"],[9,\"data-currency\",\"USD\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "QrKxcU3w", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"business\",[19,1,[\"stub\"]]],null,{\"statements\":[[0,\"              \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n              \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n              \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"            \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"https://anypayapp.com/pay/\",[19,1,[\"stub\"]]]]],[7],[0,\"\\n              \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n              \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n              \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"half-right\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"bch_tipjar\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[19,1,[\"bch_tipjar\",\"address\"]],null],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"BCH Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[19,1,[\"bsv_tipjar\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"bitcoin:\",[19,1,[\"bsv_tipjar\",\"address\"]]]]],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-warning\"],[7],[0,\"BSV Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"money-button\"],[10,\"data-to\",[26,[[20,[\"bsv_tipjar\",\"address\"]]]]],[9,\"data-type\",\"tip\"],[9,\"data-label\",\"BSV Tip\"],[9,\"data-currency\",\"USD\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
 });
 define('energy-city-app/templates/components/ember-popper-targeting-parent', ['exports', 'ember-popper/templates/components/ember-popper-targeting-parent'], function (exports, _emberPopperTargetingParent) {
   'use strict';
@@ -2457,7 +2998,7 @@ define("energy-city-app/templates/payments", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "JTWUpF3Y", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/payments.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "EPkHQuLc", "block": "{\"symbols\":[\"payment\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"My Payments\"],[8],[0,\"\\n\\n\"],[6,\"ul\"],[9,\"class\",\"payments-list\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"payments\"]]],null,{\"statements\":[[0,\"\\n  \"],[6,\"li\"],[7],[0,\"\\n    \"],[6,\"h2\"],[7],[1,[19,1,[\"account\",\"business_name\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"invoice_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"denomination_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"denomination_currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[25,\"moment-format\",[[19,1,[\"completed_at\"]],\"dddd, MMMM Do YYYY hh:mm a\"],null],false],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/payments.hbs" } });
 });
 define("energy-city-app/templates/root", ["exports"], function (exports) {
   "use strict";
@@ -2489,6 +3030,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+352b4191"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+1ebf8bdf"});
 }
 //# sourceMappingURL=energy-city-app.map

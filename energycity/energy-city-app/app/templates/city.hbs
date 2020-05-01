@@ -10,11 +10,20 @@
   {{#each locations as |location|}}
     <li>
         <div class='half-left'>
-        <a target="_blank" href="https://anypayapp.com/pay/{{location.stub}}">
-          <h4>{{location.business_name}}</h4>
-          <i>{{location.distance}}meters</i>
-          <span class="badge badge-primary">Pay Now</span>
-        </a>
+
+          {{#if session.isAuthenticated}}
+            {{#link-to "business" location.stub}}
+              <h4>{{location.business_name}}</h4>
+              <i>{{location.distance}}meters</i>
+              <span class="badge badge-primary">Pay Now</span>
+            {{/link-to}}
+          {{else}}
+            <a target="_blank" href="https://anypayapp.com/pay/{{location.stub}}">
+              <h4>{{location.business_name}}</h4>
+              <i>{{location.distance}}meters</i>
+              <span class="badge badge-primary">Pay Now</span>
+            </a>
+          {{/if}}
         </div>
 
         <div class='half-right'>

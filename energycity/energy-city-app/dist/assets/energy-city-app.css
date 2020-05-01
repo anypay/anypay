@@ -102,3 +102,79 @@ li:last-child {
   height: 100px;
 }
 
+
+#calculator-pad {
+  margin: 0 auto;
+  width: 100%;
+}
+#calculator-pad {
+  margin: 0 auto;
+  width: 100%;
+}
+#calculator-pad div {
+  width: 32%;
+  float: left;
+  font-weight: lighter;
+  font-size: 30px;
+  text-align: center;
+  padding: .7em 0.4em;
+  border-radius: 10px;
+  margin:.4%;
+  cursor: pointer;
+}
+#calculator-pad div:focus {
+  outline: none;
+}
+.new-invoice-next-button {
+  width:100px;
+  margin: 0 auto;
+}
+.invoice-page__controls {
+  text-align:center;
+}
+.left-chevron-back {
+  width: 40px;
+}
+.invoice-amount {
+  text-align:center;
+  color:black;
+}
+.bodycontainer h1{
+  text-align:center;
+}
+
+* Absolute Center Spinner */
+.loading {
+  position: fixed;
+  z-index: 999;
+  height: 2em;
+  width: 2em;
+  overflow: visible;
+  margin: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* Transparent Overlay */
+.loading:before {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.3);
+}
+
+
+.payments-list li {
+  border-bottom: 1px solid #aaa;
+  padding: 1em;
+}
+
+.payments-list li h2 {
+  border-bottom: 0px;
+}

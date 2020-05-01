@@ -17,11 +17,14 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
       }
     });
 
-    return resp;
+    return resp.invoices;
 
   },
 
   setupController(controller, model) {
+
+    console.log(model);
+
     controller.set('payments', model);
   }
 

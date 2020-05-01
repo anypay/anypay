@@ -1,1 +1,15 @@
 {{outlet}}
+<h1>My Payments</h1>
+
+<ul class='payments-list'>
+{{#each payments as |payment|}}
+
+  <li>
+    <h2>{{payment.account.business_name}}</h2>
+    <p>{{payment.invoice_amount_paid}} {{payment.currency}}</p>
+    <p>{{payment.denomination_amount_paid}} {{payment.denomination_currency}}</p>
+    <p>{{moment-format payment.completed_at "dddd, MMMM Do YYYY hh:mm a" }}</p>
+  </li>
+
+{{/each}}
+</ul>
