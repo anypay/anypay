@@ -11,6 +11,10 @@ Router.map(function() {
   this.route('city', { path: '/cities/:city' });
   this.route('business', { path: '/:city/businesses/:stub' });
   this.route('cities', { path: '/' });
+  this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
+  this.route('payments');
+  this.route('logout');
+  this.route('index');
 });
 
 export default Router;

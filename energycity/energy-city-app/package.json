@@ -47,6 +47,7 @@
     "ember-get-config": "^0.2.4",
     "ember-load-initializers": "^1.0.0",
     "ember-resolver": "^4.0.0",
+    "ember-simple-auth": "^3.0.0",
     "ember-source": "~2.15.0",
     "ember-websockets": "^7.2.0",
     "ember-welcome-page": "^3.0.0",

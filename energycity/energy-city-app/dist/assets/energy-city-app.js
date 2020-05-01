@@ -20,6 +20,90 @@ define('energy-city-app/app', ['exports', 'energy-city-app/resolver', 'ember-loa
 
   exports.default = App;
 });
+define('energy-city-app/authenticators/token', ['exports', 'ember-simple-auth/authenticators/base'], function (exports, _base) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = _base.default.extend({
+    restore: function restore(data) {
+      return Ember.RSVP.Promise.resolve(data);
+    },
+    authenticate: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(code, state) {
+        var resp;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                //get signed webtoken using moneybutton oauth code and state
+                Ember.Logger.log('authenticate', code);
+
+                _context.next = 3;
+                return $.ajax({
+                  method: 'POST',
+                  url: 'http://localhost:3000/auth/moneybutton',
+                  data: { code: code, state: state }
+                });
+
+              case 3:
+                resp = _context.sent;
+
+
+                console.log("RESP", resp);
+
+                return _context.abrupt('return', Ember.RSVP.Promise.resolve({ token: resp.token }));
+
+              case 6:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function authenticate(_x, _x2) {
+        return _ref.apply(this, arguments);
+      }
+
+      return authenticate;
+    }(),
+    invalidate: function invalidate() {
+      return Ember.RSVP.Promise.resolve();
+    }
+  });
+});
 define('energy-city-app/components/bs-accordion', ['exports', 'ember-bootstrap/components/bs-accordion'], function (exports, _bsAccordion) {
   'use strict';
 
@@ -877,7 +961,7 @@ define('energy-city-app/controllers/application', ['exports'], function (exports
 
     currentLocation: null
 
-  }, _defineProperty(_Ember$Controller$ext, 'geolocation', null), _defineProperty(_Ember$Controller$ext, 'socket', null), _defineProperty(_Ember$Controller$ext, 'connected', false), _Ember$Controller$ext));
+  }, _defineProperty(_Ember$Controller$ext, 'geolocation', null), _defineProperty(_Ember$Controller$ext, 'socket', null), _defineProperty(_Ember$Controller$ext, 'connected', false), _defineProperty(_Ember$Controller$ext, 'session', Ember.inject.service()), _Ember$Controller$ext));
 });
 define('energy-city-app/controllers/cities', ['exports'], function (exports) {
   'use strict';
@@ -935,6 +1019,16 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
         _loop(i);
       }
     }
+  });
+});
+define('energy-city-app/controllers/moneybutton-auth-redirect', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Controller.extend({
+    queryParams: ['code', 'state']
   });
 });
 define('energy-city-app/helpers/-link-to-params', ['exports', 'ember-angle-bracket-invocation-polyfill/helpers/-link-to-params'], function (exports, _linkToParams) {
@@ -1154,6 +1248,26 @@ define('energy-city-app/initializers/ember-data', ['exports', 'ember-data/setup-
     initialize: _setupContainer.default
   };
 });
+define('energy-city-app/initializers/ember-simple-auth', ['exports', 'energy-city-app/config/environment', 'ember-simple-auth/configuration', 'ember-simple-auth/initializers/setup-session', 'ember-simple-auth/initializers/setup-session-service', 'ember-simple-auth/initializers/setup-session-restoration'], function (exports, _environment, _configuration, _setupSession, _setupSessionService, _setupSessionRestoration) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-simple-auth',
+
+    initialize: function initialize(registry) {
+      var config = _environment.default['ember-simple-auth'] || {};
+      config.rootURL = _environment.default.rootURL || _environment.default.baseURL;
+      _configuration.default.load(config);
+
+      (0, _setupSession.default)(registry);
+      (0, _setupSessionService.default)(registry);
+      (0, _setupSessionRestoration.default)(registry);
+    }
+  };
+});
 define('energy-city-app/initializers/export-application-global', ['exports', 'energy-city-app/config/environment'], function (exports, _environment) {
   'use strict';
 
@@ -1282,6 +1396,18 @@ define("energy-city-app/instance-initializers/ember-data", ["exports", "ember-da
     initialize: _initializeStoreService.default
   };
 });
+define('energy-city-app/instance-initializers/ember-simple-auth', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = {
+    name: 'ember-simple-auth',
+
+    initialize: function initialize() {}
+  };
+});
 define('energy-city-app/modifiers/ref', ['exports', 'ember-ref-modifier/modifiers/ref'], function (exports, _ref) {
   'use strict';
 
@@ -1321,21 +1447,43 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
     this.route('city', { path: '/cities/:city' });
     this.route('business', { path: '/:city/businesses/:stub' });
     this.route('cities', { path: '/' });
+    this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
+    this.route('payments');
+    this.route('logout');
+    this.route('index');
   });
 
   exports.default = Router;
 });
-define('energy-city-app/routes/application', ['exports'], function (exports) {
+define('energy-city-app/routes/application', ['exports', 'ember-simple-auth/mixins/application-route-mixin'], function (exports, _applicationRouteMixin) {
   'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.Route.extend({
+  exports.default = Ember.Route.extend(_applicationRouteMixin.default, {
 
     geolocation: Ember.inject.service(),
 
     socketIOService: Ember.inject.service('socket-io'),
+
+    sessionAlreadyAuthenticated: function sessionAlreadyAuthenticated() {
+
+      console.log('TT');
+      this.transitionTo('cities');
+    },
+
+    sessionAuthenticationSucceeded: function sessionAuthenticationSucceeded() {
+
+      try {
+        console.log("TRANSITION");
+
+        this.transitionTo('cities');
+      } catch (err) {
+        console.log('error catch:', err);
+        //this.get('errorManager').catchError(err, 'application', 'route', 'sessionAuthenticationSucceeded - try-catch');
+      }
+    },
 
     setupController: function setupController(controller) {
 
@@ -1652,6 +1800,202 @@ define('energy-city-app/routes/geolocate', ['exports'], function (exports) {
     }()
   });
 });
+define('energy-city-app/routes/index', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({
+    setupController: function setupController() {
+      this.transitionTo('cities');
+    }
+  });
+});
+define('energy-city-app/routes/logout', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({
+    session: Ember.inject.service('session'),
+
+    setupController: function setupController() {
+      var _this = this;
+
+      this.get('session').invalidate().then(function () {
+        _this.transitionTo('login');
+      });
+    }
+  });
+});
+define('energy-city-app/routes/moneybutton-auth-redirect', ['exports', 'ember-simple-auth/mixins/unauthenticated-route-mixin'], function (exports, _unauthenticatedRouteMixin) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = Ember.Route.extend(_unauthenticatedRouteMixin.default, {
+    session: Ember.inject.service(),
+
+    model: function model(params) {
+      return params;
+    },
+
+
+    routeIfAlreadyAuthenticated: 'payments',
+    routeAfterAuthenticated: 'payments',
+
+    setupController: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(controller, model) {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+
+                controller.set('signing_in', true);
+
+                _context.prev = 1;
+                _context.next = 4;
+                return this.get('session').authenticate('authenticator:token', model.code, model.state);
+
+              case 4:
+                _context.next = 9;
+                break;
+
+              case 6:
+                _context.prev = 6;
+                _context.t0 = _context['catch'](1);
+
+
+                console.log('error', _context.t0);
+
+              case 9:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this, [[1, 6]]);
+      }));
+
+      function setupController(_x, _x2) {
+        return _ref.apply(this, arguments);
+      }
+
+      return setupController;
+    }()
+  });
+});
+define('energy-city-app/routes/payments', ['exports', 'ember-simple-auth/mixins/authenticated-route-mixin'], function (exports, _authenticatedRouteMixin) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = Ember.Route.extend(_authenticatedRouteMixin.default, {
+    session: Ember.inject.service(),
+
+    model: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var token, resp;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                token = this.get('session')['session']['content']['authenticated']['token'];
+                _context.next = 3;
+                return Ember.$.ajax({
+                  method: 'GET',
+                  url: '/payments',
+                  headers: {
+                    'Authorization': 'Basic ' + btoa(token + ':')
+                  }
+                });
+
+              case 3:
+                resp = _context.sent;
+                return _context.abrupt('return', resp);
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function model() {
+        return _ref.apply(this, arguments);
+      }
+
+      return model;
+    }(),
+    setupController: function setupController(controller, model) {
+      controller.set('payments', model);
+    }
+  });
+});
 define('energy-city-app/services/ajax', ['exports', 'ember-ajax/services/ajax'], function (exports, _ajax) {
   'use strict';
 
@@ -1820,6 +2164,14 @@ define('energy-city-app/services/cities', ['exports', 'ember-get-config'], funct
     }
   });
 });
+define('energy-city-app/services/cookies', ['exports', 'ember-cookies/services/cookies'], function (exports, _cookies) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _cookies.default;
+});
 define('energy-city-app/services/geolocation', ['exports'], function (exports) {
     'use strict';
 
@@ -1967,6 +2319,14 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
         return val;
     };
 });
+define('energy-city-app/services/session', ['exports', 'ember-simple-auth/services/session'], function (exports, _session) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _session.default;
+});
 define('energy-city-app/services/socket-io', ['exports', 'ember-websockets/services/socket-io'], function (exports, _socketIo) {
   'use strict';
 
@@ -1993,13 +2353,21 @@ define('energy-city-app/services/websockets', ['exports', 'ember-websockets/serv
     }
   });
 });
+define('energy-city-app/session-stores/application', ['exports', 'ember-simple-auth/session-stores/adaptive'], function (exports, _adaptive) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = _adaptive.default.extend();
+});
 define("energy-city-app/templates/application", ["exports"], function (exports) {
   "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "uuMBSv61", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n      \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"NrgCty\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "xcoPEHtm", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n      \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"NrgCty\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"        \"],[4,\"link-to\",[\"logout\"],null,{\"statements\":[[0,\"sign out\"]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"a\"],[9,\"href\",\"/auth/moneybutton\"],[7],[0,\"sign in\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
 });
 define("energy-city-app/templates/business", ["exports"], function (exports) {
   "use strict";
@@ -2067,6 +2435,30 @@ define("energy-city-app/templates/geolocate", ["exports"], function (exports) {
   });
   exports.default = Ember.HTMLBars.template({ "id": "0/sXA3sB", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"box\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"geolocating\"]]],null,{\"statements\":[[0,\"\\n    \"],[6,\"div\"],[7],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"flex-center\"],[7],[0,\"Locating Nearby Businesses\"],[8],[0,\"\\n    \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n    \"],[6,\"div\"],[7],[0,\"\\n      \"],[6,\"h1\"],[9,\"class\",\"flex-center\"],[7],[1,[20,[\"location\",\"address\",\"city\"]],false],[8],[0,\"\\n    \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]}],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/geolocate.hbs" } });
 });
+define("energy-city-app/templates/index", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "4bL8NOQ6", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/index.hbs" } });
+});
+define("energy-city-app/templates/moneybutton-auth-redirect", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "jMYMO83m", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"  Signed In\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"  Signing In\\n\"]],\"parameters\":[]}],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/moneybutton-auth-redirect.hbs" } });
+});
+define("energy-city-app/templates/payments", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "JTWUpF3Y", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/payments.hbs" } });
+});
 define("energy-city-app/templates/root", ["exports"], function (exports) {
   "use strict";
 
@@ -2097,6 +2489,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+136c60c2"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+91f70bf8"});
 }
 //# sourceMappingURL=energy-city-app.map
