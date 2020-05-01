@@ -178,3 +178,7 @@ li:last-child {
 .payments-list li h2 {
   border-bottom: 0px;
 }
+
+.true-reviews-logo {
+  width: 100px;
+}

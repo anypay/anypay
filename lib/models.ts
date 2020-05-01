@@ -67,6 +67,19 @@ models.AccountAchInvoice.hasOne(models.Invoice, {
   as: 'invoice'
 });
 
+models.Invoice.hasOne(models.TrueReviewsToken, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'true_reviews_token'
+});
+
+models.TrueReviewsToken.belongsTo(models.Invoice, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'invoice'
+});
+
+
 models.Shareholder.hasMany(models.ShareholderDocument, {
   foreignKey: 'shareholder_id',
   sourceKey: 'id',

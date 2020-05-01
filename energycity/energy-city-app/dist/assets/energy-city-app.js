@@ -2998,7 +2998,7 @@ define("energy-city-app/templates/payments", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "EPkHQuLc", "block": "{\"symbols\":[\"payment\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"My Payments\"],[8],[0,\"\\n\\n\"],[6,\"ul\"],[9,\"class\",\"payments-list\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"payments\"]]],null,{\"statements\":[[0,\"\\n  \"],[6,\"li\"],[7],[0,\"\\n    \"],[6,\"h2\"],[7],[1,[19,1,[\"account\",\"business_name\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"invoice_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"denomination_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"denomination_currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[25,\"moment-format\",[[19,1,[\"completed_at\"]],\"dddd, MMMM Do YYYY hh:mm a\"],null],false],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/payments.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "eyX0V1N7", "block": "{\"symbols\":[\"payment\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\"],[6,\"h1\"],[7],[0,\"My Payments\"],[8],[0,\"\\n\\n\"],[6,\"ul\"],[9,\"class\",\"payments-list\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"payments\"]]],null,{\"statements\":[[0,\"\\n  \"],[6,\"li\"],[7],[0,\"\\n    \"],[6,\"h2\"],[7],[1,[19,1,[\"account\",\"business_name\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"invoice_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[19,1,[\"denomination_amount_paid\"]],false],[0,\" \"],[1,[19,1,[\"denomination_currency\"]],false],[8],[0,\"\\n    \"],[6,\"p\"],[7],[1,[25,\"moment-format\",[[19,1,[\"completed_at\"]],\"dddd, MMMM Do YYYY hh:mm a\"],null],false],[8],[0,\"\\n\"],[4,\"if\",[[19,1,[\"true_reviews_token\"]]],null,{\"statements\":[[0,\"      \"],[6,\"a\"],[10,\"href\",[19,1,[\"true_reviews_token\",\"redeemURL\"]],null],[9,\"target\",\"_blank\"],[7],[0,\"\\n        \"],[6,\"img\"],[9,\"class\",\"true-reviews-logo\"],[9,\"src\",\"/img/true_reviews_logo.png\"],[7],[8],[0,\"\\n      \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/payments.hbs" } });
 });
 define("energy-city-app/templates/root", ["exports"], function (exports) {
   "use strict";
@@ -3030,6 +3030,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+1ebf8bdf"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+8f1c5314"});
 }
 //# sourceMappingURL=energy-city-app.map

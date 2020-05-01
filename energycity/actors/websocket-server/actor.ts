@@ -208,6 +208,9 @@ export async function start() {
           include: [{
             model: models.Account,
             as: 'account'
+          }, {
+            model: models.TrueReviewsToken,
+            as: 'true_reviews_token'
           }]
         });
 

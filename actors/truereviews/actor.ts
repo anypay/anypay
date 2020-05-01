@@ -6,6 +6,8 @@ import { Actor, Joi } from 'rabbi';
 import { system } from '../../lib/rabbi/system';
 import { publishJson } from '../../lib/rabbi';
 
+import { models } from '../../lib/models';
+
 import { generateCodeForInvoice } from '../../lib/truereviews';
 
 export const start = system(() => {
@@ -25,7 +27,32 @@ export const start = system(() => {
 
     let trueReviewsCode = await generateCodeForInvoice(uid);
 
+    console.log('truereviews.code', trueReviewsCode);
+
     await publishJson(channel, 'anypay', 'truereviews.token.created', trueReviewsCode)
+
+    let [record, isNew] = await models.TrueReviewsToken.findOrCreate({
+      where: {
+        invoice_uid: uid
+      },
+      defaults: {
+        invoice_uid: uid,
+        origin: trueReviewsCode.origin,
+        timestamp: trueReviewsCode.createdAt,
+        redeemURL: trueReviewsCode.redeemURL,
+        code: trueReviewsCode.code,
+        placeID: trueReviewsCode.place.placeID
+      }
+    })
+
+    if (isNew) {
+
+      console.log('truereviews.code.recorded', record.toJSON());
+
+    } else {
+
+      console.log('truereviews.code.alreadyexists', record.toJSON());
+    }
  
     channel.ack(msg);
 
