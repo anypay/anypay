@@ -78,6 +78,7 @@
     "mysql": "^2.17.1",
     "node-cron": "^2.0.3",
     "node-statsd": "^0.1.1",
+    "parent-module": "^2.0.0",
     "pg": "^7.9.0",
     "polynym": "^1.0.7",
     "postgresql": "0.0.1",

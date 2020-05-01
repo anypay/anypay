@@ -11,6 +11,7 @@ import { models } from '../../../lib';
 import { awaitChannel } from '../../../lib/amqp';
 
 import { getROI } from '../../../lib/roi';
+import { awaitChannel } from '../../../lib/amqp';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -74,7 +75,23 @@ export async function update(req, h) {
         throw new Error('ambassador email does not exist');
       }
 
-      updateAttrs['ambassador_id'] = ambassadorAccount.id;
+      let ambassador = await models.Ambassador.findOne({
+        where: { account_id: ambassadorAccount.id }
+      })
+
+      if (ambassador) {
+
+        updateAttrs['ambassador_id'] = ambassador.id;
+
+        let channel = await awaitChannel();
+
+        await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
+          account_id: req.account.id,
+          ambassador_id: ambassador.id,
+          ambassador_email: updateAttrs.ambassador_email
+        })));
+
+      }
 
     }
 
