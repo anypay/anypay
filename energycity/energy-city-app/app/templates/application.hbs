@@ -4,7 +4,13 @@
 
   <div class='container'>
     <div class='float-left'>
-      <img class='float-left logo' src="/white.png"/>
+      {{#if this.session.isAuthenticated}}
+        {{#link-to "payments"}}
+          <img class='float-left logo' src="/white.png"/>
+        {{/link-to}}
+      {{else}}
+        <img class='float-left logo' src="/white.png"/>
+      {{/if}}
       <h1 class='float-left'>{{#link-to "cities"}}NrgCty{{/link-to}}</h1>
       {{#if connected}}
         <span class="badge badge-success">connected</span>
