@@ -7,6 +7,9 @@ import * as database from '../database';
 const log = require("winston");
 const moment = require('moment');
 
+import { getBlockExplorerTxidUrl } from '../block_explorer';
+
+
 import { email as rabbiEmail } from 'rabbi';
 
 AWS.config.update({ region: "us-east-1" });
@@ -110,6 +113,70 @@ export async function addressChangedEmail(changeset) {
 
   return sendEmail(account.email, subject, body);
 
+}
+
+export async function ambassadorRewardEmail(invoice_uid){  
+
+  let invoice = await models.Invoice.findOne({ where: {
+    uid: invoice_uid
+  }});
+
+  let reward = await models.AmbassadorReward.findOne({ where: {
+    invoice_uid: invoice.uid
+  }});
+
+  let ambassador = await models.Ambassador.findOne({ where: {
+    id: reward.ambassador_id
+  }});
+
+  let account = await models.Account.findOne({ where: {
+    id: ambassador.account_id
+  }});
+
+  let business = await models.Account.findOne({ where: {
+    id: invoice.account_id
+  }});
+
+  // compute denomination amount
+  // get the price of the currency at that time
+  // x dollars per currency
+  let price = invoice.denomination_amount_paid / invoice.invoice_amount_paid;
+
+  let denomination_amount = (reward.amount * price).toFixed(4);
+
+  console.log(account.toJSON());
+
+  let rewardExplorerUrl = getBlockExplorerTxidUrl(reward);
+
+  let variables = {
+    invoice_paid_date_time: invoice.completed_at,
+    currency: reward.currency,
+    rewardTxid: reward.txid,
+    rewardAmount: reward.amount,
+    rewardAddress: reward.address,
+    rewardCurrency: reward.currency,
+    rewardExplorerUrl,
+    denomination_currency: invoice.denomination_currency,
+    amount_paid: reward.invoice_amount_paid,
+    denomination_amount_paid: denomination_amount,
+    businessName: business.business_name,
+    businessStreetAddress: business.business_street_address,
+    businessCity: business.business_city,
+    businessState: business.business_state,
+    businessZip: business.business_zip
+  };
+
+  console.log(variables);
+  console.log('destination', account.email);
+
+  let resp = await rabbiEmail.sendEmail(
+    'ambassador_reward',
+    account.email,
+    'receipts@anypayinc.com',
+    variables
+  )
+
+  return resp;
 }
 
 

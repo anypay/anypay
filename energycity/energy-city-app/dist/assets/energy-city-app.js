@@ -1317,10 +1317,10 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
   });
 
   Router.map(function () {
-    this.route('geolocate', { path: '/' });
+    //this.route('geolocate', { path: '/' });
     this.route('city', { path: '/cities/:city' });
     this.route('business', { path: '/:city/businesses/:stub' });
-    this.route('cities');
+    this.route('cities', { path: '/' });
   });
 
   exports.default = Router;
@@ -1438,7 +1438,7 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
 
   exports.default = Ember.Route.extend({
 
-    geolocation: Ember.inject.service(),
+    //geolocation: service(),
 
     cities: Ember.inject.service(),
 
@@ -1450,24 +1450,18 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
     },
     setupController: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(controller, model) {
-        var location, locations, socket;
+        var locations, socket;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return this.get("geolocation").getLocation();
-
-              case 2:
-                location = _context.sent;
-
-
-                console.log(model);
-
-                controller.set('city', model);
+                /*
+                 let location = await this.get("geolocation").getLocation();
+                 console.log(model);
+                 controller.set('city', model);
                 controller.set('location', location);
-
-                console.log('location', location);
+                 console.log('location', location);
+                */
 
                 Ember.Logger.info('city', { city: model });
 
@@ -1526,7 +1520,7 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
                   Ember.Logger.info('socket.error', error.message);
                 });
 
-              case 17:
+              case 10:
               case 'end':
                 return _context.stop();
             }
@@ -1767,46 +1761,33 @@ define('energy-city-app/services/cities', ['exports', 'ember-get-config'], funct
     }(),
     getCity: function () {
       var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(city_tag) {
-        var location, city, accounts;
+        var city;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
-                return this.get('geolocation').getLocation();
-
-              case 2:
-                location = _context2.sent;
-
                 if (this.get('cities')) {
-                  _context2.next = 6;
+                  _context2.next = 3;
                   break;
                 }
 
-                _context2.next = 6;
+                _context2.next = 3;
                 return this.listCities();
 
-              case 6:
+              case 3:
                 city = this.get('cities').find(function (city) {
 
                   return city.city_tag === city_tag;
                 });
 
-
-                console.log('BZ', city);
-
-                accounts = this.orderByDistance(location.coords, city.accounts);
-
-
-                console.log("ACCOUNTS", accounts);
-
-                city.accounts = accounts;
+                /*let accounts =  this.orderByDistance(location.coords, city.accounts);
+                 city.accounts = accounts;*/
 
                 // order by distance from you, add distance
 
                 return _context2.abrupt('return', city);
 
-              case 12:
+              case 5:
               case 'end':
                 return _context2.stop();
             }
@@ -1892,7 +1873,7 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
                     language: "en",
                     google: {
                         version: "3",
-                        key: "AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA"
+                        key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8"
                     }
                 });
 
@@ -2116,6 +2097,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+754a3bb9"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+136c60c2"});
 }
 //# sourceMappingURL=energy-city-app.map

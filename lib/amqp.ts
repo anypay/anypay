@@ -27,6 +27,12 @@ async function awaitChannel() {
 
 }
 
+export async function publishJson(channel, exchange, routingkey, json) {
+  return channel.publish(exchange, routingkey, Buffer.from(
+    JSON.stringify(json)
+  ));
+}
+
 (async function() {
 
   connection = await connect(process.env.AMQP_URL);

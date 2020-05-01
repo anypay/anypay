@@ -1404,6 +1404,22 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/api/ambassador_rewards',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.AmbassadorRewards.index
+
+    }
+
+  });
+
+  server.route({
+
     method: 'POST',
 
     path: '/api/ambassadors',
