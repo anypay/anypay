@@ -62,7 +62,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/city.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/city.js should pass ESLint\n\n24:5 - Unexpected console statement. (no-console)\n29:5 - Unexpected console statement. (no-console)\n65:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/city.js should pass ESLint\n\n67:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/geolocate.js', function (assert) {
@@ -72,7 +72,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('services/cities.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'services/cities.js should pass ESLint\n\n55:5 - Unexpected console statement. (no-console)\n59:5 - Unexpected console statement. (no-console)\n70:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'services/cities.js should pass ESLint\n\n66:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('services/geolocation.js', function (assert) {

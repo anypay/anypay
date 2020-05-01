@@ -12,7 +12,7 @@ export async function sendToAddress(address, amount) {
 
   console.log('bch.sendtoaddress', address, amount);
 
-  let response = await callRpc('sendtoaddress', [address, amount]);
+  let response = await callRpc('sendtoaddress', [address, parseFloat(amount)]);
 
   console.log('bch.response', response);
 

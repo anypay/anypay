@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 import * as program from 'commander';
+import * as assert from 'assert';
 
 import { models, log, database } from '../lib';
 import * as ach from '../lib/ach';
@@ -364,9 +365,14 @@ program
 
     try {
 
-      let batch = await ach.generateLatestBatch(end_date, note);
+      let {ach_batch, invoices}= await ach.generateLatestBatch(end_date, note);
 
-      console.log(batch.toJSON());
+      invoices.forEach(invoice => {
+        assert(invoice.ach_batch_id = ach_batch.id);
+      });
+
+      console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
+      console.log(ach_batch.toJSON());
 
     } catch(error) {
 
