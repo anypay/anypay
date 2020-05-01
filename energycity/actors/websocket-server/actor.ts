@@ -211,7 +211,8 @@ export async function start() {
           }, {
             model: models.TrueReviewsToken,
             as: 'true_reviews_token'
-          }]
+          }],
+          order: [['id', 'desc']]
         });
 
         return { invoices };
