@@ -216,9 +216,6 @@ export async function start() {
 
       let query = request.query;
 
-      console.log('REQ' request);
-      console.log('QUERY' query);
-
       return h.redirect(`/#/auth/moneybutton/redirect?code=${query.code}&state=${query.state}`)
 
     }
