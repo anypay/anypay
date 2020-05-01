@@ -120,10 +120,10 @@
     "@types/node": "^10.1.2",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
-    "ts-node": "^6.0.5"
+    "ts-node": "^6.2.0"
   },
   "scripts": {
-    "runtest": "mocha --require=ts-node/register $TEST_PATH --timeout=10000",
+    "runtest": "mocha --require=ts-node/register $TEST_PATH --timeout=10000 --exit",
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",

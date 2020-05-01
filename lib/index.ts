@@ -33,6 +33,7 @@ import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
+import * as bip70 from './bip70';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -47,35 +48,36 @@ var initialized = false;
 })();
 
 export {
-  oracles,
-  amqp,
-  cashback,
-  models,
   accounts,
-  settings,
-  prices,
-  forwards,
-  ambassadors,
-  log,
-  database,
-  dashwatch,
-  coins,
   addresses,
-  plugins,
-  invoices,
-  xpub,
-  blockcypher,
-  tipjar,
-  email,
-  routes,
-  password,
-  login,
+  ambassadors,
+  amqp,
   auth,
-  square,
-  mysql_lib,
+  bip70,
+  blockcypher,
+  cashback,
+  coins,
+  dashwatch,
+  database,
+  email,
+  forwards,
+  invoices,
   kraken,
+  log,
+  login,
+  models,
+  mysql_lib,
+  oracles,
+  password,
+  plugins,
+  prices,
   receipts,
-  settlements
+  routes,
+  settings,
+  settlements,
+  square,
+  tipjar,
+  xpub
 }
 
 export async function initialize() {
@@ -86,5 +88,4 @@ export async function initialize() {
   }
 
 }
-
 
