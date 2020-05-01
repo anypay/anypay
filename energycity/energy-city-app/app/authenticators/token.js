@@ -11,7 +11,7 @@ export default Base.extend({
 
     let resp = await $.ajax({
       method: 'POST',
-      url: 'http://localhost:3000/auth/moneybutton',
+      url: '/auth/moneybutton',
       data: { code, state }
     })
 

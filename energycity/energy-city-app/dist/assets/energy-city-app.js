@@ -73,7 +73,7 @@ define('energy-city-app/authenticators/token', ['exports', 'ember-simple-auth/au
                 _context.next = 3;
                 return $.ajax({
                   method: 'POST',
-                  url: 'http://localhost:3000/auth/moneybutton',
+                  url: '/auth/moneybutton',
                   data: { code: code, state: state }
                 });
 
@@ -2489,6 +2489,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+91f70bf8"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+352b4191"});
 }
 //# sourceMappingURL=energy-city-app.map
