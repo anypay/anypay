@@ -10799,6 +10799,106 @@ define("ember-cookies/clear-all-cookies", ["exports", "ember-cookies/utils/seria
     });
   }
 });
+define("ember-macro-helpers/test-support/compute", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = _default;
+
+  function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+  function _default(_ref) {
+    var assert = _ref.assert,
+        _ref$baseClass = _ref.baseClass,
+        baseClass = _ref$baseClass === void 0 ? Ember.Component : _ref$baseClass,
+        computed = _ref.computed,
+        properties = _ref.properties,
+        strictEqual = _ref.strictEqual,
+        deepEqual = _ref.deepEqual,
+        assertion = _ref.assertion,
+        assertReadOnly = _ref.assertReadOnly;
+    var MyComponent = baseClass.extend({
+      computed: computed
+    });
+    var subject;
+
+    try {
+      subject = MyComponent.create({
+        renderer: {}
+      });
+    } catch (err) {
+      // this is for ember < 2.10
+      // can remove once only support 2.12
+      subject = MyComponent.create();
+    } // compute initial value
+    // to test recomputes
+
+
+    Ember.get(subject, 'computed');
+    Ember.setProperties(subject, properties);
+    var result = Ember.get(subject, 'computed');
+
+    function doAssertion(result) {
+      if (assertion) {
+        assert.ok(assertion(result));
+      } else if (deepEqual) {
+        assert.deepEqual(result, deepEqual);
+      } else if (assertReadOnly) {
+        var func = function func() {
+          return Ember.set(subject, 'computed', 'assert read only');
+        };
+
+        assert.throws(func, /Cannot set read-only property/);
+      } else if (assert) {
+        assert.strictEqual(result, strictEqual);
+      }
+    }
+
+    var promise;
+
+    if (result && _typeof(result) === 'object' && typeof result.then === 'function') {
+      promise = result.then(doAssertion);
+    } else {
+      doAssertion(result);
+    }
+
+    return {
+      subject: subject,
+      result: result,
+      promise: promise
+    };
+  }
+});
+define("ember-macro-helpers/test-support/expect-imports", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = _default;
+  var exclude = ['__esModule', 'default']; // helps prevent forgetting to test a new import
+
+  function _default(assert, obj) {
+    assert.expect(Object.getOwnPropertyNames(obj).filter(function (p) {
+      return exclude.indexOf(p) === -1;
+    }).length);
+  }
+});
+define("ember-macro-helpers/test-support/index", ["exports", "ember-macro-helpers/test-support/compute"], function (_exports, _compute) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(_exports, "compute", {
+    enumerable: true,
+    get: function get() {
+      return _compute.default;
+    }
+  });
+});
 define('ember-qunit/adapter', ['exports', 'qunit', '@ember/test-helpers/has-ember-version'], function (exports, _qunit, _hasEmberVersion) {
   'use strict';
 

@@ -8,6 +8,7 @@ export default Ember.Route.extend({
   //geolocation: service(),
 
   cities: service(),
+  session: service(),
 
   socketIOService: service('socket-io'),
 

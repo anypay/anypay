@@ -131,7 +131,7 @@ models.Account.hasMany(models.Invoice, {
 });
 
 models.Invoice.belongsTo(models.Account, {
-  as: 'invoice',
+  as: 'account',
   foreignKey: 'account_id'
 })
 

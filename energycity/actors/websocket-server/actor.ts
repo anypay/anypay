@@ -7,6 +7,8 @@ import * as Boom from 'boom';
 
 import { join } from 'path';
 
+import { Op } from 'sequelize';
+
 import { Actor } from 'rabbi';
 
 import * as http from 'superagent';
@@ -25,6 +27,8 @@ import { decodeWebtoken } from '../../lib/webtoken';
 import { models } from '../../../lib/models';
 
 import { Subscriptions } from './lib/subscriptions';
+
+import { createPublicInvoice } from '../../../servers/rest_api/handlers/invoices';
 
 let wsSubscriptions = new Subscriptions();  
 
@@ -193,8 +197,21 @@ export async function start() {
           throw new Error('energy city account not found')
         }
 
-        // replace with query for database later
-        return [];
+
+        let invoices = await models.Invoice.findAll({
+          where: {
+            energycity_account_id: account.id,
+            status: {
+              [Op.ne]: 'unpaid'
+            }
+          },
+          include: [{
+            model: models.Account,
+            as: 'account'
+          }]
+        });
+
+        return { invoices };
 
       } catch(error) {
 
@@ -220,6 +237,68 @@ export async function start() {
 
     }
   });
+
+  hapiServer.route({
+
+    method: 'POST',
+
+    path: '/invoices',
+
+    options: {
+      auth: 'webtoken'
+    },
+
+    handler: async (request, h) => {
+
+      let profile = request.profile;
+
+      let energycity_account = await models.EnergyCityAccount.findOne({
+        where: {
+          moneybutton_id: parseInt(request.profile.id)
+        }
+      })
+
+      let params = Object.assign(request.payload, {
+        energycity_account_id: energycity_account.id
+      });
+
+      console.log('params', params);
+
+      let invoice = await createPublicInvoice(request.payload.account_id, params);
+
+      return invoice;
+
+    }
+  });
+
+  hapiServer.route({
+
+    method: 'GET',
+
+    path: '/businesses/{stub}',
+
+    handler: async (request, h) => {
+
+      let account = await models.Account.findOne({
+        where: { stub: request.params.stub }
+      });
+
+      if (!account) {
+        return Boom.badRequest('no account found');
+      }
+
+      return {
+        id: account.id,
+        business_name: account.business_name,
+        physical_address: account.physical_address,
+        latitude: account.latitude,
+        longitude: account.longitude
+      }
+
+    }
+  })
+
+
 
   hapiServer.route({
 
