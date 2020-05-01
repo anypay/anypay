@@ -11,6 +11,14 @@
       {{else}}
         <span class="badge badge-dark">not connected</span>
       {{/if}}
+
+
+      {{#if this.session.isAuthenticated}}
+        {{#link-to "logout"}}sign out{{/link-to}}
+      {{else}}
+        <a href="/auth/moneybutton">sign in</a>
+      {{/if}}
+
     </div>
   </div>
 
