@@ -38,7 +38,7 @@ describe('Dash Payment Requests Using BIP70', () => {
 
   describe('Generating a Payment Request for invoice',async  () => {
 
-    it('should receive a protobuf-encoded Payment message', async () => {
+    it.skip('should receive a protobuf-encoded Payment message', async () => {
 
       // create an invoice
       // get the Payment Request and validate the outputs match the invoice
