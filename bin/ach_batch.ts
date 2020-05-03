@@ -361,6 +361,10 @@ program
   .command('generate_latest_ach <end_date> [note]')
   .action(async (end_date, note) => {
 
+    if (!note) {
+      note = `ACH batch from command line using ${end_date} as last invoice date` 
+    }
+
     end_date = moment(end_date).toDate();
 
     try {
