@@ -353,7 +353,7 @@ module.exports.createPublic = async (request, reply) => {
   try {
 
     let response = await createPublicInvoice(
-      request.account.id, request.payload.amount);
+      request.account.id, request.payload);
 
     return response;
 
