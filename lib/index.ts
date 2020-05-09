@@ -34,6 +34,7 @@ import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
 import * as bip70 from './bip70';
+import * as clicksend from './clicksend';
 
 var oracles = ConfigureOracles(configureOracles);
 
@@ -56,6 +57,7 @@ export {
   bip70,
   blockcypher,
   cashback,
+  clicksend,
   coins,
   dashwatch,
   database,
