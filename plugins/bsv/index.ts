@@ -33,6 +33,29 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
+export async function getPaymail(alias) {
+
+  try {
+
+    let address = (await polynym.resolveAddress(alias)).address;
+
+    if (address) {
+
+      return address;
+
+    } else {
+
+      return null;
+    }
+  } catch(error) {
+
+    return null;
+
+  }
+
+}
+
+
 export async function transformAddress(alias){
 
   try{

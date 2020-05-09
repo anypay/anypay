@@ -4,6 +4,7 @@ interface AddressChangeSet {
   currency: string;
   address: string;
   metadata?: string;
+  paymail?: string;
 }
 
 interface DenominationChangeset {

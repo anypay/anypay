@@ -28,6 +28,11 @@ module.exports = function(environment) {
     }
   };
 
+  ENV['ember-simple-auth'] = {
+    routeAfterAuthentication:    'payments',
+    routeIfAlreadyAuthenticated: 'payments'
+  };
+
   if (environment === 'development') {
     ENV.apiEndpoint = 'http://127.0.0.1:3000'
     ENV.apiEndpoint = 'https://nrgcty.com'

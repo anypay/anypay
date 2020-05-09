@@ -4,13 +4,27 @@
 
   <div class='container'>
     <div class='float-left'>
-      <img class='float-left logo' src="/white.png"/>
+      {{#if this.session.isAuthenticated}}
+        {{#link-to "payments"}}
+          <img class='float-left logo' src="/white.png"/>
+        {{/link-to}}
+      {{else}}
+        <img class='float-left logo' src="/white.png"/>
+      {{/if}}
       <h1 class='float-left'>{{#link-to "cities"}}NrgCty{{/link-to}}</h1>
       {{#if connected}}
         <span class="badge badge-success">connected</span>
       {{else}}
         <span class="badge badge-dark">not connected</span>
       {{/if}}
+
+
+      {{#if this.session.isAuthenticated}}
+        {{#link-to "logout"}}sign out{{/link-to}}
+      {{else}}
+        <a href="/auth/moneybutton">sign in</a>
+      {{/if}}
+
     </div>
   </div>
 
@@ -18,6 +32,7 @@
 
 <div class='container bodycontainer'>
 
+<div style='display:none' class="loading"></div>
   {{outlet}}
 
 </div>

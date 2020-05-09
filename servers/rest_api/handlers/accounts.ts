@@ -204,6 +204,33 @@ export async function create (request, reply) {
   }
 }
 
+export async function showPublic (req, h) {
+
+  let account = await models.Account.findOne({
+    where: {
+      email: req.params.email
+    }
+  });
+
+  if (!account) {
+    return Boom.notFound();
+  }
+
+  let addresses = await models.Address.findAll({
+
+    where: {
+      account_id: account.id
+    }
+
+  });
+
+  return {
+    id: account.id,
+    email: account.email,
+    coins: addresses.map(a => a.currency)
+  }
+
+}
 
 export async function show (request, reply) {
 

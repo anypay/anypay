@@ -27,7 +27,8 @@ export async function generateCodeForInvoice(uid: string) {
         .set('trApiKey', process.env.TRUEREVIEWS_API_KEY)
         .send({
           data: {
-            location: account.google_place_id
+            location: account.google_place_id,
+            invoice_uid: invoice.uid
           },
           amount: `${invoice.denomination_amount_paid}`
         })
