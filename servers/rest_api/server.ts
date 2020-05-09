@@ -434,6 +434,16 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/accounts/{email}",
+    handler: handlers.Accounts.showPublic,
+    options: {
+      tags: ['api'],
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
+    },
+  });
+
+  server.route({
     method: "PUT",
     path: "/anonymous-accounts",
     handler: handlers.Accounts.registerAnonymous,
