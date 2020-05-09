@@ -5,60 +5,11 @@ var async = require("async");
 import { log, models } from '../../lib';
 import { publish } from '../../lib/amqp';
 
-import { getVESPrice } from '../../lib/prices/localbitcoins';
-import { getPriceOfOneDASHInVES } from '../../lib/prices/ves';
-import { getAllPrices, setPrice } from '../../lib/prices';
+import { setPrice } from '../../lib/prices';
 
 import * as http from 'superagent';
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
-
-async function updateVESPrice() {
-
-  log.info('update VES price');
-
-  let dashPrice = await getPriceOfOneDASHInVES();
-
-  let allPrices = await getAllPrices();
-
-  let btcPrice = dashPrice * allPrices['DASH'];
-
-  if (btcPrice && btcPrice > 0) {
-
-    await setPrice('VES', btcPrice, 'ves', 'BTC');
-
-  }
-
-}
-
-async function updateDashPrices() {
-
-  log.info('update DASH prices');
-
-  let resp = await http.get('https://rates2.dashretail.org/rates?source=dashretail');
-
-  let currencies = resp.body
-
-  for (let i=0; i<currencies.length; i++) {
-
-    let currency = currencies[i];
-
-    if (currency.baseCurrency === 'DASH') {
-
-      console.log({
-        quote: currency.quoteCurrency,
-        price: currency.price,
-        base: currency.baseCurrency
-      })
-
-      setPrice('DASH', parseFloat(currency.price),
-      'https://rates2.dashretail.org/rates?source=dashretail', currency.quoteCurrency);
-
-    }
-
-  }
-
-}
 
 export async function start() {
 
