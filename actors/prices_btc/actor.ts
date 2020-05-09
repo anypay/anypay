@@ -12,11 +12,9 @@ import { setPrice } from '../../lib/prices';
 
 export async function start() {
 
-  await amqp.publish('update_btc_prices');
-
   Actor.create({
 
-    exchange: 'anypay',
+    exchange: 'anypay.events',
 
     routingkey: 'update_btc_prices',
 
@@ -35,8 +33,6 @@ export async function start() {
 
         let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
 
-        console.log('price.set', record.toJSON());
-
       });
 
       prices.map(price => {
@@ -51,8 +47,6 @@ export async function start() {
       .forEach(async (price) => {
 
         let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
-
-        console.log('price.set', record.toJSON());
 
       });
 

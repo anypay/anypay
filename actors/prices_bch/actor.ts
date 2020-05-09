@@ -9,15 +9,12 @@ import { models, amqp } from '../../lib';
 import * as fixer from '../../lib/fixer';
 
 import { setPrice, Price } from '../../lib/prices';
-import { getCryptoPrice } from '../../lib/prices/crypto';
 
 export async function start() {
 
-  await amqp.publish('update_bch_prices');
-
   Actor.create({
 
-    exchange: 'anypay',
+    exchange: 'anypay.events',
 
     routingkey: 'update_bch_prices',
 
@@ -28,18 +25,12 @@ export async function start() {
 
     log.info('update_bch_prices', msg.content.toString());
 
-    let cryptoPrice = await getCryptoPrice('BCH', 'USD')
-
-    console.log('CRYPTOPRICE', cryptoPrice);
-
     let BCH_USD_PRICE = await models.Price.findOne({
       where: {
         base_currency: 'USD',
         currency: 'BCH'
       }
     });
-
-    console.log('BCH_USD_PRICE', BCH_USD_PRICE.value);
 
     try {
 
@@ -49,31 +40,13 @@ export async function start() {
         }
       });
 
-      Promise.all(prices.map(async (price) => {
+      prices.map(async (price) => {
 
-        let value = price.value / BCH_USD_PRICE.value
+        let value = price.value * BCH_USD_PRICE.value
 
-        let record = await setPrice('BCH', value, 'fixer•coinmarketcap', price.base_currency);
+        await setPrice('BCH', value, 'fixer•coinmarketcap', price.base_currency);
+        await setPrice(price.base_currency, 1 / value, 'fixer•coinmarketcap', 'BCH');
 
-        return record;
-
-      })).then(results => {
-
-        results.map((price: Price) => {
-
-          return {
-            base_currency: price.currency,
-            currency: price.base_currency,
-            value: 1 / price.value,
-            source: price.source
-          }
-
-        })
-        .forEach(async (price) => {
-
-          let record = await setPrice(price.currency, price.value, 'fixer•coinmarketcap', price.base_currency);
-
-        });
       })
 
     } catch(error) {

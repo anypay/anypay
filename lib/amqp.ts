@@ -31,7 +31,7 @@ export async function publish(routingKey: string, json={}) {
 
   let channel = await awaitChannel();
 
-  return publishJson(channel, 'anypay', routingKey, json);
+  return publishJson(channel, 'anypay.events', routingKey, json);
 }
 
 export async function publishJson(channel, exchange, routingkey, json) {

@@ -10,15 +10,13 @@ import * as http from 'superagent';
 
 export async function start() {
 
-  await amqp.publish('update_prices_dash');
-
   Actor.create({
 
-    exchange: 'anypay',
+    exchange: 'anypay.events',
 
-    routingkey: 'update_prices_dash',
+    routingkey: 'update_dash_prices',
 
-    queue: 'update_prices_dash'
+    queue: 'update_dash_prices'
 
   })
   .start(async (channel, msg) => {

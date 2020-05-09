@@ -1,11 +1,8 @@
+require('dotenv').config();
 
 import * as http from 'superagent';
 
-const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY
-
-const url = `http://data.fixer.io/api/latest?access_key=${apiKey}&base=usd`
-
-var cache;
+const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
 export interface Price {
   base_currency: string;
@@ -22,8 +19,6 @@ export async function fetchCurrencies(base_currency): Promise<Price[]> {
 
   let response = await http.get(url);
 
-  console.log(response)
-
   let rates = response.body.rates;
 
   return Object.keys(rates).map((currency) => {
@@ -36,35 +31,5 @@ export async function fetchCurrencies(base_currency): Promise<Price[]> {
      }
   })
 
-}
-
-async function updateCurrencies() {
-
-  let response = await http.get(url);
-
-  cache = response.body;
-
-  return;
-}
-
-setInterval(async () => {
-    console.log('update base currencies rates');
-    await updateCurrencies();
-
-}, 1000 * 60 * 60 * 12); // every twelve hours
-
-(async () => {
-
-  await updateCurrencies();
-
-})()
-
-export async function getCurrencies() {
-
-  if (!cache) {
-    await updateCurrencies();
-  }
-
-  return cache;
 }
 
