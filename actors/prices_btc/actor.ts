@@ -50,6 +50,25 @@ export async function start() {
 
       });
 
+      let BTC_USD = await models.Price.findOne({
+        where: {
+          currency: 'BTC',
+          base_currency: 'USD' 
+        }
+      });
+
+      let USD_VES = await models.Price.findOne({
+        where: {
+          currency: 'USD',
+          base_currency: 'VES' 
+        }
+      });
+
+      let BTC_VES = BTC_USD.value * USD_VES.value;
+
+      await setPrice('BTC', BTC_VES, 'dollartoday•coinmarketcap', 'VES');
+      await setPrice('VES', 1 / BTC_VES, 'dollartoday•coinmarketcap', 'BTC');
+
     } catch(error) {
 
       console.log(error);

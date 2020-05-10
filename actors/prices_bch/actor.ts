@@ -42,6 +42,10 @@ export async function start() {
 
       prices.map(async (price) => {
 
+        if (price.base_currency === 'BCH' || price.currency === 'BCH') {
+          return
+        }
+
         let value = price.value * BCH_USD_PRICE.value
 
         await setPrice('BCH', value, 'fixer•coinmarketcap', price.base_currency);

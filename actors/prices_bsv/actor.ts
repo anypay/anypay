@@ -33,6 +33,7 @@ export async function start() {
     });
 
     console.log('BSV_USD_PRICE', BSV_USD_PRICE.value);
+    console.log('1/BSV_USD_PRICE', 1 / BSV_USD_PRICE.value);
 
     try {
 
@@ -43,6 +44,12 @@ export async function start() {
       });
 
       prices.map(async (price) => {
+
+        if (price.currency === 'BSV' || price.base_currency === 'BSV') {
+
+          console.log(price.toJSON());
+          return;
+        }
 
         let value = price.value * BSV_USD_PRICE.value
 
