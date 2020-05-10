@@ -1,10 +1,4 @@
 
-import { getLegacyPrices } from './legacy';
-import { getCryptoPrices } from './crypto';
-import { getVESPrice } from './localbitcoins';
-
-import * as database from '../database';
-
 import { log } from '../logger';
 
 import { models } from '../models';

@@ -1,9 +1,5 @@
 require('dotenv').config();
 
-import {ConfigureOracles} from './oracles'
-
-import {configureOracles} from '../config/oracles';
-
 import * as amqp from './amqp';
 import * as accounts from './accounts';
 import * as login from './account_login';
@@ -36,8 +32,6 @@ import * as settlements from './settlements';
 import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
 
-var oracles = ConfigureOracles(configureOracles);
-
 var initialized = false;
 
 (async function() {
@@ -69,7 +63,6 @@ export {
   login,
   models,
   mysql_lib,
-  oracles,
   password,
   plugins,
   prices,

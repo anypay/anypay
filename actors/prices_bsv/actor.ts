@@ -12,11 +12,9 @@ import { setPrice, Price } from '../../lib/prices';
 
 export async function start() {
 
-  await amqp.publish('update_bsv_prices');
-
   Actor.create({
 
-    exchange: 'anypay',
+    exchange: 'anypay.events',
 
     routingkey: 'update_bsv_prices',
 
@@ -34,6 +32,9 @@ export async function start() {
       }
     });
 
+    console.log('BSV_USD_PRICE', BSV_USD_PRICE.value);
+    console.log('1/BSV_USD_PRICE', 1 / BSV_USD_PRICE.value);
+
     try {
 
       let prices = await models.Price.findAll({
@@ -42,31 +43,19 @@ export async function start() {
         }
       });
 
-      Promise.all(prices.map(async (price) => {
+      prices.map(async (price) => {
 
-        let value = price.value / BSV_USD_PRICE.value
+        if (price.currency === 'BSV' || price.base_currency === 'BSV') {
 
-        let record = await setPrice('BSV', value, 'fixer•coinmarketcap', price.base_currency);
+          console.log(price.toJSON());
+          return;
+        }
 
-        return record;
+        let value = price.value * BSV_USD_PRICE.value
 
-      })).then(results => {
+        await setPrice('BSV', value, 'fixer•coinmarketcap', price.base_currency);
+        await setPrice(price.base_currency, 1 / value, 'fixer•coinmarketcap', 'BSV');
 
-        results.map((price: Price) => {
-
-          return {
-            base_currency: price.currency,
-            currency: price.base_currency,
-            value: 1 / price.value,
-            source: price.source
-          }
-
-        })
-        .forEach(async (price) => {
-
-          let record = await setPrice(price.currency, price.value, 'fixer|coinmarketcap', price.base_currency);
-
-        });
       })
 
     } catch(error) {
