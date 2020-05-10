@@ -179,49 +179,6 @@ async function handleBSV(req, h) {
 
 }
 
-
-/*
-async function handleDASH(req, h) {
-
-  const params = req.params;
-
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
-
-  let paymentOption = await models.PaymentOption.findOne({
-  
-    where: {
-
-      invoice_uid: req.params.uid,
-
-      currency: 'DASH'
-
-    }
-  });
-
-  console.log('payment option', paymentOption.toJSON());
-
-  let content = await createDASHRequest(invoice, paymentOption);
-
-  let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex'); 
-
-  var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
-
-  var signature = Message(digest).sign(privateKey); 
-
-  let response = h.response(content);
-
-  response.type('application/dash-paymentrequest');
-
-  response.header('x-signature-type', 'ecc');
-  response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
-  response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
-  response.header('digest', `SHA-256=${digest}`);
-
-  return response;
-
-}
-*/
-
 export async function show(req, h) {
 
   console.log(req);
