@@ -2,14 +2,13 @@ require('dotenv').config();
 
 import { publish } from '../../lib/amqp';
 
-/*require('../prices_bch/actor').start();
+require('../prices_bch/actor').start();
 require('../prices_bsv/actor').start();
 require('../prices_dash/actor').start();
 require('../prices_btc/actor').start();
 require('../prices_usd/actor').start();
 require('../prices_usd_crypto/actor').start();
 require('../prices_ves/actor').start();
-*/
 
 export async function start() {
 
