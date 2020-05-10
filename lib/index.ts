@@ -1,9 +1,5 @@
 require('dotenv').config();
 
-import {ConfigureOracles} from './oracles'
-
-import {configureOracles} from '../config/oracles';
-
 import * as amqp from './amqp';
 import * as accounts from './accounts';
 import * as login from './account_login';
@@ -34,8 +30,7 @@ import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
 import * as bip70 from './bip70';
-
-var oracles = ConfigureOracles(configureOracles);
+import * as clicksend from './clicksend';
 
 var initialized = false;
 
@@ -56,6 +51,7 @@ export {
   bip70,
   blockcypher,
   cashback,
+  clicksend,
   coins,
   dashwatch,
   database,
@@ -67,7 +63,6 @@ export {
   login,
   models,
   mysql_lib,
-  oracles,
   password,
   plugins,
   prices,

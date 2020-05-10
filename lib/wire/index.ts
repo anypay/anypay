@@ -254,6 +254,8 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
       {id: 'settlement_amount', title: 'Account Gets (USD)'},
       {id: 'external_id', title: 'Reference'},
+      {id: 'currency', title: 'Currency'},
+      {id: 'amount', title: 'Amount Paid (Crypto)'},
       {id: 'uid', title: 'Invoice ID'}
     ]
   });
