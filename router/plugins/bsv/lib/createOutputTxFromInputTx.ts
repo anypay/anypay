@@ -35,11 +35,7 @@ export function createOutputTxFromInputTx(inputTx, route, privateKey, fee = .000
     "script": input.script.toHex() 
   }
 
-  console.log(utxo)
-
   let amountToSpend = input.satoshis - fee 
-
-  console.log(amountToSpend)
 
   let outputTx = new Transaction()
     .from(utxo)

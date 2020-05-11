@@ -49,8 +49,6 @@ export async function start() {
 
     let forwarder = forwarderFactory.newForwarder({ hex: json.hex });
 
-    console.log(forwarder)
-
     await forwarder.getAddressRoute();
 
     console.log("address route found")

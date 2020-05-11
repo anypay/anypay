@@ -147,6 +147,32 @@ async function Server() {
 
   server.route({
 
+    method: "POST",
+
+    path: "/api/clicksend/postcards",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.ClicksendPostcards.create,
+
+      validate: {
+        
+        payload : {
+
+          google_place_id: Joi.string().required()
+
+        }
+
+      }
+
+    }
+
+  });
+
+  server.route({
+
     method: "GET",
 
     path: "/api/bitpay_settlements/not_settled",
@@ -1397,6 +1423,22 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: handlers.Ambassadors.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/ambassador_rewards',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.AmbassadorRewards.index
 
     }
 

@@ -1,9 +1,9 @@
 import Ember from 'ember';
-import { inject } from '@ember/service';
+import { inject as service } from '@ember/service';
 
 export default Ember.Controller.extend({
 
-  geolocation: inject(),
+  geolocation: service(),
 
   currentLocation: null,
 
@@ -11,6 +11,8 @@ export default Ember.Controller.extend({
 
   socket: null,
 
-  connected: false
+  connected: false,
+
+  session: service()
 
 });

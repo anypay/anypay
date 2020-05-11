@@ -1,9 +1,5 @@
 require('dotenv').config();
 
-import {ConfigureOracles} from './oracles'
-
-import {configureOracles} from '../config/oracles';
-
 import * as amqp from './amqp';
 import * as accounts from './accounts';
 import * as login from './account_login';
@@ -33,8 +29,8 @@ import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
-
-var oracles = ConfigureOracles(configureOracles);
+import * as bip70 from './bip70';
+import * as clicksend from './clicksend';
 
 var initialized = false;
 
@@ -47,35 +43,36 @@ var initialized = false;
 })();
 
 export {
-  oracles,
-  amqp,
-  cashback,
-  models,
   accounts,
-  settings,
-  prices,
-  forwards,
-  ambassadors,
-  log,
-  database,
-  dashwatch,
-  coins,
   addresses,
-  plugins,
-  invoices,
-  xpub,
-  blockcypher,
-  tipjar,
-  email,
-  routes,
-  password,
-  login,
+  ambassadors,
+  amqp,
   auth,
-  square,
-  mysql_lib,
+  bip70,
+  blockcypher,
+  cashback,
+  clicksend,
+  coins,
+  dashwatch,
+  database,
+  email,
+  forwards,
+  invoices,
   kraken,
+  log,
+  login,
+  models,
+  mysql_lib,
+  password,
+  plugins,
+  prices,
   receipts,
-  settlements
+  routes,
+  settings,
+  settlements,
+  square,
+  tipjar,
+  xpub
 }
 
 export async function initialize() {
@@ -86,5 +83,4 @@ export async function initialize() {
   }
 
 }
-
 

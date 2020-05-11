@@ -1,11 +1,50 @@
 {{outlet}}
 
-<h1>La Maison Navarre</h1>
+<h1>{{business.business_name}}</h1>
 
 <section>
-  <h2>Pay Now</h2>
+    <div class="container page-layout page-layout--background-primary
+  calculator-pad-top noselect">
+    <div class='invoice-amount'>
+      {{!-- <img id="recent-invoices-button" src="{{rootURL}}list-button.png" onclick={{action 'showRecent'}}/> --}}
+      <h1 class='invoice-amount' id='invoice-amount'><span>${{amount}}</span> </h1>
+    </div>
+    <div class='page-layout__content calculator-pad-top noselect' style='display: block;'>
+      <div class="row calculator-pad noselect" id="calculator-pad">
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-1'>1</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-2'>2</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-3'>3</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-4'>4</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-5'>5</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-6'>6</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-7'>7</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-8'>8</div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-9'>9</div>
+        <div class="col-sm-4 noselect invisible" id='calculator-delete'></div>
+        <div class="col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-0'>0</div>
+        {{#if isShowNextButton}}
+          <div class="col-sm-4" onclick={{action 'pressBackspace'}} id='calculator-backspace'>
+            <img class='left-chevron-back' src="{{rootURL}}left-chevron.png"/>
+          </div>
+        {{else}}
+          <div class="col-sm-4 invisible" >
+          </div>
+        {{/if}}
+      </div>
+
+      <div class='invoice-page__controls'>
+
+        {{#if isShowNextButton}}
+        <img {{action "generateInvoice"}} class="new-invoice-next-button" src="{{rootURL}}img/Green_Anypay_Next_Arrow.svg"/>
+        {{/if}}
+      </div>
+
+    </div>
+
+  </div>
 </section>
 
+<!--
 <section>
   <h2>Leave a Tip</h2>
 </section>
@@ -13,3 +52,4 @@
 <section>
   <h2>Service People</h2>
 </section>
+-->

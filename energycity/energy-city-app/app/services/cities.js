@@ -40,7 +40,7 @@ export default Ember.Service.extend({
 
   async getCity(city_tag) {
 
-    let location = await this.get('geolocation').getLocation();
+    //let location = await this.get('geolocation').getLocation();
 
     if (!this.get('cities')) {
       await this.listCities(); 
@@ -52,13 +52,9 @@ export default Ember.Service.extend({
 
     });
 
-    console.log('BZ', city);
+    /*let accounts =  this.orderByDistance(location.coords, city.accounts);
 
-    let accounts =  this.orderByDistance(location.coords, city.accounts);
-
-    console.log("ACCOUNTS", accounts);
-
-    city.accounts = accounts;
+    city.accounts = accounts;*/
 
     // order by distance from you, add distance
 

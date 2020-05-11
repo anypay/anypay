@@ -40,7 +40,6 @@ export async function publishJson(channel, exchange, routingkey, json) {
   ));
 }
 
-
 (async function() {
 
   connection = await connect(process.env.AMQP_URL);

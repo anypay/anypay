@@ -107,8 +107,6 @@ export async function publishTxnsForAddress(address) {
 
     let tx = txns[i];
 
-    console.log(tx);
-
     await channel.publish(exchange, routingKey, new Buffer(tx));
 
   }
@@ -131,8 +129,6 @@ export async function createAddressForward(options: AddressForwardOptions) {
 
   }
 
-  log.info('createaddressforward', options);
-
   let input_address = await getNewAddress();
 
   let record = await models.AddressForward.create(Object.assign(options, {
@@ -149,13 +145,9 @@ export async function sweepDust() {
 
   let fee = (new BigNumber(0.01)).dividedBy(price);
 
-  console.log('ten cents', fee);
-
   let unspent = (await rpcCall('listunspent', [0])).slice(0, 10);
 
   let change = 'bitcoincash:qz7lh923zdpw6mwtrwsh5kz6y73avghxagup3qlpw5';
-
-  console.log('unspent', unspent);
 
   let dustInputs = _.filter(unspent, utxo => {
 
@@ -175,8 +167,6 @@ export async function sweepDust() {
 
   });
 
-  console.log('dust inputs', dustInputs);
-
   let changeInputs = _.filter(unspent, utxo => {
 
     return utxo.address === change;
@@ -188,8 +178,6 @@ export async function sweepDust() {
     return sum.plus(input.amount);
   
   }, new BigNumber(0));
-
-  console.log('total dust', totalDust.toNumber());
 
   if (totalDust.toNumber() === 0) {
 
@@ -208,7 +196,6 @@ export async function sweepDust() {
     var changeInput = underscore.max(changeInputs, function(i) {
       return i.amount;
     });
-    console.log("change input", changeInput);
 
     let changeInputAmount = new BigNumber(changeInput.amount);
 

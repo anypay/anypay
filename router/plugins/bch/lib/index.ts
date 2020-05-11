@@ -29,8 +29,6 @@ interface Route{
 
 export async function getAddressRouteFromTx(tx):Promise<Route>{
 
-  console.log('getting tx for: ', tx)
-
   var route;
 
   var value;
@@ -42,8 +40,6 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
     try {
 
       route = await lookupOutputFromInput('BCH', address)
-
-      console.log(`route found for ${address}`)
 
     } catch(error) {
 

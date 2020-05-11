@@ -10,6 +10,7 @@ import {emitter} from '../../../lib/events'
 import { models } from '../../../lib';
 
 import { getROI } from '../../../lib/roi';
+import { awaitChannel } from '../../../lib/amqp';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -73,7 +74,23 @@ export async function update(req, h) {
         throw new Error('ambassador email does not exist');
       }
 
-      updateAttrs['ambassador_id'] = ambassadorAccount.id;
+      let ambassador = await models.Ambassador.findOne({
+        where: { account_id: ambassadorAccount.id }
+      })
+
+      if (ambassador) {
+
+        updateAttrs['ambassador_id'] = ambassador.id;
+
+        let channel = await awaitChannel();
+
+        await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
+          account_id: req.account.id,
+          ambassador_id: ambassador.id,
+          ambassador_email: updateAttrs.ambassador_email
+        })));
+
+      }
 
     }
 
@@ -187,6 +204,33 @@ export async function create (request, reply) {
   }
 }
 
+export async function showPublic (req, h) {
+
+  let account = await models.Account.findOne({
+    where: {
+      email: req.params.email
+    }
+  });
+
+  if (!account) {
+    return Boom.notFound();
+  }
+
+  let addresses = await models.Address.findAll({
+
+    where: {
+      account_id: account.id
+    }
+
+  });
+
+  return {
+    id: account.id,
+    email: account.email,
+    coins: addresses.map(a => a.currency)
+  }
+
+}
 
 export async function show (request, reply) {
 

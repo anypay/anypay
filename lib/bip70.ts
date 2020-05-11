@@ -106,7 +106,9 @@ export function generatePaymentRequest(invoice, account) {
   }
 
   pd.set('payment_url', `https://anypayinc.com/payments/${invoice.uid}`);
-  pd.set('required_fee_rate', 1);
+  if (invoice.currency === 'BCH') {
+    pd.set('required_fee_rate', 1);
+  }
   pd.set('merchant_data', invoice.uid); // identify the request
 
   var paypro = new PaymentProtocol(invoice.currency);
@@ -140,3 +142,4 @@ export function generatePaymentRequest(invoice, account) {
 
 }
 
+export { PaymentProtocol }

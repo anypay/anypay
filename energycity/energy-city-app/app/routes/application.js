@@ -2,11 +2,32 @@ import Ember from 'ember';
 
 import { inject as service } from '@ember/service';
 
-export default Ember.Route.extend({
+import ApplicationRouteMixin from 'ember-simple-auth/mixins/application-route-mixin';
+
+export default Ember.Route.extend(ApplicationRouteMixin, {
 
   geolocation: service(),
 
   socketIOService: service('socket-io'),
+
+  sessionAlreadyAuthenticated: function() {
+  
+    console.log('TT');
+    this.transitionTo('cities');
+  },
+
+  sessionAuthenticationSucceeded: function() {
+
+    try {
+      console.log("TRANSITION");
+
+      this.transitionTo('cities');
+
+    } catch(err) {
+      console.log('error catch:', err);
+      //this.get('errorManager').catchError(err, 'application', 'route', 'sessionAuthenticationSucceeded - try-catch');
+    }
+  },
 
   setupController(controller) {
 

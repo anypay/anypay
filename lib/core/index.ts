@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import {plugins} from '../plugins';
 
+import * as bsv from 'bsv';
+
 import {
   AddressChangeSet,
   DenominationChangeset
@@ -16,6 +18,8 @@ import {models} from "../models";
 import * as logger from "winston";
 
 import {checkAddressForPayments} from '../../plugins/dash/lib/check_for_payments';
+
+import {getPaymail as bsvGetPaymail} from '../../plugins/bsv';
 
 import { handlePayment } from '../payment_processor';
 
@@ -33,13 +37,46 @@ import {EventEmitter2} from 'eventemitter2';
 
 const events = new EventEmitter2(); 
 
+async  function getPaymail(currency, address) {
+
+  if (currency !== 'BSV') {
+    return null;
+  }
+
+  let paymail = await bsvGetPaymail(address);
+
+  if (paymail) {
+
+    try {
+
+      new bsv.Address(address); 
+
+      return null;
+
+    } catch(error) {
+
+      return address;
+
+    }
+
+  }
+
+}
+
 export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   var isValid = false;
+  var paymail;
 
   try {
 
     let plugin = await plugins.findForCurrency(changeset.currency);
+
+    let paymail = await getPaymail(changeset.currency, changeset.address);
+
+    console.log('paymail', paymail);
+
+    changeset.paymail = paymail;
 
     if (plugin.transformAddress) {
 
@@ -55,7 +92,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   } catch(error) {
 
-    console.error(error)
+    console.error(error.message)
     console.error('unable to validate address with plugin');
 
   }
@@ -82,7 +119,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
     }
 
     await address.update({
-      value: changeset.address
+      value: changeset.address,
+      paymail: changeset.paymail
     });
 
   } else {
@@ -90,7 +128,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
     address = await models.Address.create({
       account_id: changeset.account_id,
       currency: changeset.currency,
-      value: changeset.address
+      value: changeset.address,
+      paymail: changeset.paymail
     });
 
   }
