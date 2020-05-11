@@ -1500,6 +1500,22 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/kraken_invoice_sell_orders',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.KrakenInvoiceSellOrders.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: `/api/emails`,
 
     config: {
