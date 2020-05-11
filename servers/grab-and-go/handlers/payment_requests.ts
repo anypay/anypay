@@ -1,7 +1,11 @@
-import * as Hapi from 'hapi';
-import * as Boom from 'boom';
+import * as Hapi from 'hapi'; import * as Boom from 'boom';
 
 import { generatePaymentRequest } from '../../../lib/bip70';
+
+import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/lib/paymentRequest';
+
+import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
+
 import { models, invoices } from '../../../lib';
 
 export async function create(req: Hapi.Request, h) {
@@ -19,7 +23,7 @@ export async function create(req: Hapi.Request, h) {
     currency = 'DASH';
   } else if (req.headers.accept === 'application/bitcoincash-paymentrequest') {
     currency = 'BCH';
-  } else if (req.headers.accept === 'application/bitcoinsv-paymentrequest') {
+  } else {
     currency = 'BSV';
   } 
 
@@ -108,11 +112,9 @@ export async function createByItemUid(req: Hapi.Request, h) {
     currency = 'DASH';
   } else if (req.headers.accept === 'application/bitcoincash-paymentrequest') {
     currency = 'BCH';
-  } else if (req.headers.accept === 'application/bitcoinsv-paymentrequest') {
+  } else {
     currency = 'BSV';
   } 
-
-
 
   // https://anypayinc.com/grab-and-go/freshpress-portsmouth/green-on-fleet/purchase
   // /grab-and-go/:account_stub/:item_stub/purchase
@@ -160,15 +162,67 @@ export async function createByItemUid(req: Hapi.Request, h) {
 
     let account = await models.Account.findOne({ where: { id: item.account_id }});
 
-    let paymentRequest = await generatePaymentRequest(invoice, account);
+    var paymentRequest, response;
 
-    const response = h.response(paymentRequest.serialize());
+    switch(currency) {
+    case 'BCH':
 
-    response.type('application/bitcoincash-paymentrequest');
-    response.header('Content-Type', 'application/bitcoincash-paymentrequest');
-    response.header('Accept', 'application/bitcoincash-payment');
+      paymentRequest = await generatePaymentRequest(invoice, account);
 
-    return response;
+      response = h.response(paymentRequest.serialize());
+
+      response.type('application/bitcoincash-paymentrequest');
+
+      response.header('Content-Type', 'application/bitcoincash-paymentrequest');
+
+      response.header('Accept', 'application/bitcoincash-payment');
+
+      return response;
+
+    case 'DASH':
+
+      paymentRequest = await generatePaymentRequest(invoice, account);
+
+      response = h.response(paymentRequest.serialize());
+
+      response.type('application/dash-paymentrequest');
+
+      response.header('Content-Type', 'application/dash-paymentrequest');
+
+      response.header('Accept', 'application/dash-payment');
+
+      return response;
+
+    case 'BSV':
+
+      let paymentOption = await models.PaymentOption.findOne({
+      
+        where: {
+
+          invoice_uid: invoice.uid,
+
+          currency: 'BSV'
+
+        }
+
+      });
+
+      paymentRequest = await createBSVRequest(invoice, paymentOption, {
+        name: item.name,
+        image_url: item.image_url
+      });
+
+      response = h.response(paymentRequest);
+
+      response.type('application/json'); 
+
+      response.header('Content-Type', 'application/json');
+
+      response.header('Accept', 'application/json');
+
+      return response;
+    }
+
 
   } catch(error) {
 

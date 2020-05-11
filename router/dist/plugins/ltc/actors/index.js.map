@@ -1,0 +1,1 @@
+{"version":3,"file":"index.js","sourceRoot":"./","sources":["plugins/ltc/actors/index.ts"],"names":[],"mappings":";;;;;;;;;;;AACA,yCAAyC;AACzC,2CAA2C;AAC3C,qDAAqD;AAErD,SAAe,KAAK;;QAElB,MAAM,CAAC,KAAK,EAAE,CAAC;QAEf,YAAY,CAAC,KAAK,EAAE,CAAC;QAErB,OAAO,CAAC,KAAK,EAAE,CAAC;IAElB,CAAC;CAAA;AAED,IAAI,OAAO,CAAC,IAAI,KAAK,MAAM,EAAE;IAE3B,KAAK,EAAE,CAAC;CAET"}

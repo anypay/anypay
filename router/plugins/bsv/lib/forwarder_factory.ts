@@ -127,8 +127,6 @@ export class TxForwarder {
 
     this.output_amount = satoshisToBSV(this.outputTx.outputAmount);
 
-    console.log('output_amount', this.output_amount)
-
     return this.outputTx;
 
   }
@@ -173,8 +171,6 @@ export class TxForwarder {
 
        await this.broadcastOutput();
     }
-
-    console.log(this.output_hash)
 
     await this.config.amqpChannel.publish('anypay.router', 'router.transaction.forwarded',
       Buffer.from(JSON.stringify({

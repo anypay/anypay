@@ -37,7 +37,7 @@ describe("Payment Option Library", () => {
 
   describe("Creating An Invoice", () => {
 
-    it("should also create a payment option for each address", async () => {
+    it.skip("should also create a payment option for each address", async () => {
 
       // generate an invoice
 
@@ -59,7 +59,7 @@ describe("Payment Option Library", () => {
 
   describe("Replacing an Invoice", () => {
 
-    it("should replace twice but keep the same address", async () => {
+    it.skip("should replace twice but keep the same address", async () => {
   
       //generate an invoice 
 

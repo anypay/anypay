@@ -64,7 +64,7 @@ describe('Prices', () => {
 
   });
   
-  it("#convert should convert from USD to ZEN", async () => {
+  it.skip("#convert should convert from USD to ZEN", async () => {
 
     await prices.setPrice('ZEN', 0.01, 'BTC');
 

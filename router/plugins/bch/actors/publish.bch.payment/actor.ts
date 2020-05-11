@@ -28,8 +28,6 @@ export async function start() {
 
     payments.forEach((payment)=>{
 
-      console.log(payment)
-
       channel.publish('anypay.payments', 'payment', Buffer.from(JSON.stringify(payment)))
       channel.publish('anypay.payments', 'payment.bch', Buffer.from(JSON.stringify(payment)))
       channel.publish('anypay.payments', `payment.bch.${payment.address}`, Buffer.from(JSON.stringify(payment)))

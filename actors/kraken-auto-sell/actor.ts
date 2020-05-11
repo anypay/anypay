@@ -12,6 +12,8 @@ const SLACK_URL = 'https://chat.anypay.global/hooks/pupH8EqX6Hz3WCAeh/RopsnAYceW
 
 const RISK = 0.001;
 
+const MINIMUM_BALANCE = 0;
+
 export async function start() {
 
   /*
@@ -53,6 +55,8 @@ export async function start() {
 
 async function stopLossAnyNewDASH(channel) {
 
+  log.info('stopLossAnyNewDASH');
+
   let balances = await kraken.getBalancesBreakdown();
 
   let availableBalance = balances['DASH'].available;
@@ -65,12 +69,17 @@ async function stopLossAnyNewDASH(channel) {
 
   log.info(`kraken.ticker.DASH.lastprice:${lastPrice}`, lastPrice);
 
-  if (availableBalance > 10) {
+  let result = await kraken.sellAllDASH();
+
+  console.log(result);
+  /*
+
+  if (availableBalance > MINIMUM_BALANCE) {
 
     // calculate stop loss price as maxiumum 10% drawdown
     let stopLossPrice = parseFloat((lastPrice * (1 - RISK)).toFixed(3));
 
-    let order = await kraken.sellStopLoss('DASHUSD', stopLossPrice, availableBalance - 10);
+    let order = await kraken.sellStopLoss('DASHUSD', stopLossPrice, availableBalance);
 
     log.info('kraken.order.placed.sell.stoploss', order);
 
@@ -79,6 +88,7 @@ async function stopLossAnyNewDASH(channel) {
     )); 
 
   }
+  */
 
 }
 
@@ -87,3 +97,4 @@ if (require.main === module) {
   start();
 
 }
+

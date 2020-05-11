@@ -100,3 +100,54 @@ export async function createAddressRoute(options: ProposedPaymentOption) {
   return addressRoute;
 
 }
+
+export async function getAddressRoute(input_address, input_currency) {
+
+  let addressRoute = await models.AddressRoute.findOne({ where : {
+
+    input_address,
+
+    input_currency
+
+  }});
+
+  if (!addressRoute) {
+
+    throw new Error('no route found for input address and currency');
+
+  }
+
+  let route = {
+
+    input: {
+
+      address: input_address,
+
+      currency: input_currency
+    },
+
+    output: {
+
+      address: addressRoute.output_address,
+
+      currency: addressRoute.output_currency
+
+    },
+
+    expires: addressRoute.expires
+  }
+
+  let hdKey = await models.Hdkeyaddresses.findOne({where:{
+     address:input_address,
+     currency:input_currency
+  }})
+
+  if( hdKey ){
+
+    route['HDKeyAddress'] = hdKey.toJSON()
+
+  }
+
+  return route
+
+}

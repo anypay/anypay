@@ -1,13 +1,14 @@
 
-import { getLegacyPrices } from './legacy';
-import { getCryptoPrices } from './crypto';
-import { getVESPrice } from './localbitcoins';
-
-import * as database from '../database';
-
 import { log } from '../logger';
 
 import { models } from '../models';
+
+export interface Price {
+  base_currency: string;
+  currency: string;
+  value: number;
+  source: string;
+}
 
 const MAX_DECIMALS = 5;
 
@@ -20,35 +21,6 @@ interface Conversion {
   input: Amount;
   output: Amount;
   timestamp: Date
-};
-
-async function getAllPrices() {
-
-  let prices = await models.Price.findAll();
-
-  prices = prices.reduce(function(acc, price) {
-
-    let pair = `${price.currency}/${price.base_currency}`;
-
-    if (acc[pair]) {
-
-      if (price.createdAt > acc[pair].createdAt) {
-
-        acc[pair] = parseFloat(price.value);
-
-      }
-
-    } else {
-
-      acc[pair] = parseFloat(price.value);
-
-    }
-
-    return acc;
-
-  }, {});
-
-  return prices;
 };
 
 async function createConversion(inputAmount: Amount, outputCurrency: string): Promise<Conversion> {
@@ -65,31 +37,23 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
 
 async function convert(inputAmount: Amount, outputCurrency: string, precision?: number): Promise<Amount> {
 
-  let prices = await getAllPrices();
+  // input currency is the account's denomination 
+  // output currency is the payment option currency
 
-  let pair = `${outputCurrency}/${inputAmount.currency}`;
+  let where = {
+    base_currency: inputAmount.currency,
+    currency: outputCurrency
+  };
 
-  var rate;
+  let price = await models.Price.findOne({ where });
 
-  if (prices[pair]) {
-
-    log.info(`found direct price pair ${pair} ${prices[pair]}`);
-    rate = 1 / prices[pair];
-
+  if (price) {
+    console.log('price found', price.toJSON());
   } else {
-
-    if (inputAmount.currency === 'USD') {
-      prices[`USD/USD`] = 1;
-    }
-
-    rate =  prices[`${inputAmount.currency}/USD`] / prices[`${outputCurrency}/USD`];
-
-    log.info(`using USD to convert prices ${outputCurrency} / ${inputAmount.currency} : ${rate}`);
-
+    console.log('price not found');
   }
 
-
-  let targetAmount = inputAmount.value * rate;
+  let targetAmount = inputAmount.value * price.value;
 
   return {
     currency: outputCurrency,
@@ -97,7 +61,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   };
 };
 
-export async function setPrice(currency, value, source,  base_currency = 'BTC') {
+export async function setPrice(currency:string, value:number, source:string,  base_currency:string) {
 
   log.info("set price", currency, value, base_currency);
 
@@ -139,7 +103,6 @@ export async function setPrice(currency, value, source,  base_currency = 'BTC') 
 }
 
 export {
-  convert, createConversion,
-  getAllPrices
+  convert, createConversion
 };
 

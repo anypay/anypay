@@ -286,6 +286,16 @@ async function Server() {
       request.headers['x-content-type'] = 'application/bitcoinsv-payment';
     }
 
+    if ('application/dash-payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/dash-payment';
+    }
+
+    if ('application/dash-payment' === request.headers['accept']) {
+      request.headers['accept'] = 'application/json';
+      request.headers['x-accept'] = 'application/dash-payment';
+    }
+
     if ('application/bitcoinsv-paymentack' === request.headers['accept']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/bitcoinsv-payment';
@@ -429,6 +439,16 @@ async function Server() {
       validate: {
         payload: models.Account.Credentials,
       },
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/accounts/{email}",
+    handler: handlers.Accounts.showPublic,
+    options: {
+      tags: ['api'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });

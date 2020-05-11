@@ -6,7 +6,6 @@ const program = require('commander')
 
 import { getPriceOfOneDollarInVES } from '../lib/prices/ves';
 import { getVESPrice } from '../lib/localbitcoins';
-import { getAllPrices } from '../lib/prices';
 import { createConversion } from '../lib/prices';
 
 program
@@ -37,11 +36,7 @@ program
 
     let usdPrice = await getPriceOfOneDollarInVES();
 
-    let allPrices = await getAllPrices();
-
-    let btcPrice = usdPrice * allPrices['USD'];
-
-    console.log(`one BTC equals ${btcPrice} VES`);
+    console.log(`one USD equals ${usdPrice} VES`);
 
   });
 
@@ -52,18 +47,6 @@ program
     let price = await getVESPrice();
 
     console.log(`one BTC equals ${price} VES on localbitcoins.com`);
-
-  });
-
-program
-  .command('getallprices')
-  .action(async () => {
-
-    let allPrices = await getAllPrices();
-
-    console.log(allPrices);
-
-    process.exit(0);
 
   });
 

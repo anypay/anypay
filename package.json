@@ -78,6 +78,7 @@
     "mysql": "^2.17.1",
     "node-cron": "^2.0.3",
     "node-statsd": "^0.1.1",
+    "parent-module": "^2.0.0",
     "pg": "^7.9.0",
     "polynym": "^1.0.7",
     "postgresql": "0.0.1",
@@ -119,10 +120,10 @@
     "@types/node": "^10.1.2",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
-    "ts-node": "^6.0.5"
+    "ts-node": "^6.2.0"
   },
   "scripts": {
-    "runtest": "mocha --require=ts-node/register $TEST_PATH --timeout=10000",
+    "runtest": "mocha --require=ts-node/register $TEST_PATH --timeout=10000 --exit",
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",

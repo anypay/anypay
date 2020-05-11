@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import * as KrakenClient from 'kraken-api';
 
+import { database, models } from '../';
+
 const kraken = new KrakenClient(process.env.KRAKEN_KEY, process.env.KRAKEN_SECRET);
 
 export async function getDASHBalance() {
@@ -109,9 +111,13 @@ export async function listClosedOrders() {
 
 }
 
-export async function listTrades() {
+export async function listTrades(options={}) {
 
-  let trades = await kraken.api('TradesHistory');
+  options = Object.assign({
+    type: 'all'
+  }, options);
+
+  let trades = await kraken.api('TradesHistory', options);
 
   return trades;
 
@@ -211,3 +217,54 @@ export async function sellAllDASH() {
   }
 
 }
+
+export async function syncAllNewTrades() {
+
+  var newTrades = [true];
+
+  while (newTrades.length > 0) {
+
+    newTrades = await syncNewTrades();
+
+    console.log(`${newTrades.length} new trades recorded`);
+
+  }
+
+}
+  
+
+export async function syncNewTrades() {
+
+  let tradeCount = await database.query(`select count(*) from "KrakenTrades";`);
+
+  let offset = parseInt(tradeCount[0][0].count)
+
+  let response = await listTrades({ ofs: offset });
+
+  let newTrades = await Promise.all(Object.keys(response.result.trades).map(async (tradeId) => {
+
+    let trade = response.result.trades[tradeId];
+
+    let [record, isNew] = await models.KrakenTrade.findOrCreate({
+
+      where: {
+        ordertxid: trade.ordertxid            
+      },
+
+      defaults: trade
+
+    });
+
+    if (isNew) {
+
+      return record;
+    }
+
+  }));
+
+  newTrades = newTrades.filter(t => !!t);
+
+  return newTrades;
+
+}
+
