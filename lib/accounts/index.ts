@@ -110,6 +110,32 @@ export async function setPhysicalAddress(email: string, address: string): Promis
 
 }
 
+export async function setAddressScalar(account_id: number, currency: string, price_scalar: number) {
+
+  let result = await models.Address.update({
+    price_scalar 
+  }, {
+    where: {
+      account_id,
+      currency
+    }
+  })
+
+}
+
+export async function setAddressNote(account_id: number, currency: string, note: string) {
+
+  await models.Address.update({
+    note 
+  }, {
+    where: {
+      account_id,
+      currency
+    }
+  })
+
+}
+
 export async function getAccountAddress(accountId: number, currency: string): Promise<AccountAddress> {
 
   let coins = await getSupportedCoins(accountId);

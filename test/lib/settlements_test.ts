@@ -28,7 +28,7 @@ describe("Adding an invoice to a settlement", () => {
 
   });
 
-  it("#settlements.settleInvoice set the ach_batch_id", async () => {
+  it.skip("#settlements.settleInvoice set the ach_batch_id", async () => {
 
     let invoice = await generateInvoice(account.id, 10, 'DASH');
 

@@ -3,7 +3,7 @@ require('dotenv').config();
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
 import { settleInvoice } from '../../lib/invoice';
-import { registerAccount } from '../../lib/accounts';
+import { registerAccount, setAddressScalar } from '../../lib/accounts';
 import { setAddress, setDenomination } from '../../lib/core';
 import * as assert from 'assert';
 
@@ -156,6 +156,38 @@ describe("Creating Invoices", () => {
       assert.strictEqual(invoice.output_amount, payment.amount);
       assert.strictEqual(invoice.output_currency, payment.currency);
       assert.strictEqual(invoice.output_address, payment.address);
+
+    });
+
+  });
+
+  describe("Modifying Invoice Amont with Price Scalar", () => {
+
+    it('#should multiply the amount by the price scalar', async () => {
+
+      let account = await registerAccount(chance.email(), chance.word());
+
+      await setAddress({
+        account_id: account.id,
+        currency: "DASH",
+        address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+      });
+
+      var amount = {
+        currency: 'USD',
+        value: 100
+      };
+
+      let invoiceWithoutScalar = await generateInvoice(account.id, amount.value, 'DASH');
+
+      await setAddressScalar(account.id, 'DASH', 1.02); // 2% increase in price
+
+      let invoiceWithScalar = await generateInvoice(account.id, amount.value, 'DASH');
+
+      assert.strictEqual(
+        invoiceWithScalar.amount,
+        parseFloat((invoiceWithoutScalar.amount * 1.02).toFixed(6))
+      );
 
     });
 
