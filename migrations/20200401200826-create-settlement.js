@@ -37,7 +37,7 @@ module.exports = {
       }
     });
 
-    await queryInterface.renameColumn('invoices', 'convert_to_bank', 'should_settle');
+    //await queryInterface.renameColumn('invoices', 'convert_to_bank', 'should_settle');
 
     await queryInterface.addColumn('accounts', 'should_settle', {
       type: Sequelize.BOOLEAN,

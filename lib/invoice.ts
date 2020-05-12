@@ -7,6 +7,8 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import { BigNumber } from 'bignumber.js';
+
 import * as _ from 'underscore';
 
 import { createAddressRoute } from './routes';
@@ -81,6 +83,15 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
 };
 
+function applyScalar(invoiceAmount, scalar) {
+  let nScalar = new BigNumber(scalar);
+  let nAmount = new BigNumber(invoiceAmount.value);
+
+  return Object.assign(invoiceAmount, {
+    value: parseFloat(nScalar.times(nAmount).toNumber().toFixed(6))
+  });
+}
+
 export async function generateInvoice(
 
   accountId: number,
@@ -102,19 +113,23 @@ export async function generateInvoice(
 
   let coin = getCoin(invoiceCurrency);
 
-  let invoiceAmount = await convert({
-    currency: account.denomination,
-    value: denominationAmountValue
-  }, invoiceCurrency, coin.precision);
 
-  let invoiceAmounts = await Promise.all(addresses.map((address) => {
+  let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
 
-    return convert({
+    let conversion = await convert({
       currency: account.denomination,
       value: denominationAmountValue
     }, address.currency, coin.precision);
 
+    if (address.price_scalar) {
+      conversion = applyScalar(conversion, address.price_scalar);
+    }
+
+    return conversion;
+
   }));
+
+  let invoiceAmount: any = invoiceAmounts.find((elem:any)=> elem.currency === invoiceCurrency);
 
   let newAddresses = await Promise.all(addresses.map(async (address:any) => {
     let newAddress = await getNewInvoiceAddress(accountId, address.currency);
@@ -125,8 +140,6 @@ export async function generateInvoice(
   }));
 
   let address:any = newAddresses.find((elem:any)=> elem.currency === invoiceCurrency);
-
-  console.log('newAddresses', newAddresses);
 
   let invoiceChangeset: InvoiceChangeset = {
     accountId,
