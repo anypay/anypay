@@ -6,7 +6,9 @@ import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
 import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
-import {models} from '../../../lib';
+import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
+
+import {models, amqp} from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
@@ -346,11 +348,29 @@ export async function create(req, h) {
 
     console.log("BROADCAST", hex);
 
+    /* BSV transaction using p2p
+       Need to parse the payments from the raw transaction
+    */
+
+    let payments = await transformHexToPayments(hex);
+
+    console.log('PAYMENTS', payments);
+
     try {
 
       let resp = await rpc.call('sendrawtransaction', [hex]);
 
       console.log('resp', resp);
+
+      let channel = await amqp.awaitChannel();
+
+      payments.forEach(payment => {
+
+        channel.publish('anypay.payments', 'payment', Buffer.from(
+          JSON.stringify(payment)
+        ));
+
+      });
 
     } catch(error) {
 
