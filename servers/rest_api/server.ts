@@ -958,6 +958,22 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'POST',
+
+    path: '/moneybutton/webhooks',
+
+    options: {
+
+      handler: handlers.MoneybuttonWebhooks.create
+
+    }
+
+  });
+
+
+
   //deprecated
   server.route({
 
