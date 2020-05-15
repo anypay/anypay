@@ -14,7 +14,6 @@ import { validateToken } from '../auth/hapi_validate_token';
 
 const HapiSwagger = require("hapi-swagger");
 
-import * as pricesActor from '../../actors/prices/actor';
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 import * as sudoAddresses from './handlers/sudo_addresses';
 import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
@@ -1720,12 +1719,6 @@ if (require.main === module) {
 }
 
 async function start () {
-
-  if (process.env.START_PRICES_ACTOR) {
-
-    pricesActor.start();
-
-  }
 
   ActivateDeactivateCoinActor.start();
 
