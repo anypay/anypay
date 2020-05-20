@@ -75,7 +75,8 @@ function sendPasswordResetEmail(email) {
         Body: {
           Text: {
             Charset: "UTF-8",
-            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link below:\n\nhttps://anypayinc.com/admin/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link
+            below:\n\nhttps://anypayapp.com/#/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
