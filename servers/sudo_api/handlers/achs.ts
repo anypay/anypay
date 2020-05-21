@@ -7,6 +7,8 @@ import { models } from '../../../lib';
 import * as wire from '../../../lib/wire';
 import { sendEmail } from '../../../lib/email';
 
+import { sendEgifterAchReceipt } from '../../../lib/ach';
+
 import { Op } from 'sequelize';
 
 import * as moment from 'moment';
@@ -103,11 +105,8 @@ export async function update(req: Request, h: ResponseToolkit) {
 
 async function sendAchReport(batch_id) {
 
-  let report = await wire.buildAchBatchEmailReport(batch_id);
-
-  await sendEmail('steven@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
-  await sendEmail('derrick@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
-  await sendEmail('brandon@anypayinc.com', '[ACH EMAIL TO SEND EGIFTER]', report);
+  await sendEgifterAchReceipt(batch_id, 'steven@anypayinc.com');
+  await sendEgifterAchReceipt(batch_id, 'derrick@anypayinc.com');
 
 }
 
