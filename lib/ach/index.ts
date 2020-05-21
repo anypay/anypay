@@ -4,6 +4,8 @@ import * as wire from '../wire';
 import { BigNumber } from 'bignumber.js';
 import * as Sequelize from 'sequelize';
 
+import * as moment from 'moment';
+import { email as rabbiEmail } from 'rabbi';
 
 import { Op } from 'sequelize';
 
@@ -146,3 +148,54 @@ export async function generateLatestBatch(endDate, note) {
 
   return { ach_batch, invoices };
 }
+
+export async function sendEgifterAchReceipt(ach_batch_id, email) {
+
+  let invoices = await models.Invoice.findAll({
+
+    where: {
+
+      ach_batch_id
+
+    },
+
+    order: [["id", "desc"]]
+
+  });
+
+  let batch = await models.AchBatch.findOne({
+    where: { id: ach_batch_id }
+  });
+
+  invoices = invoices.map(invoice => {
+
+    let json = invoice.toJSON();
+
+    json.egifter_receives = (json.denomination_amount_paid - json.cashback_denomination_amount).toFixed(2);
+
+    json.denomination_amount_paid = json.denomination_amount_paid.toFixed(2);
+    json.cashback_denomination_amount = json.cashback_denomination_amount.toFixed(2);
+
+    return json;
+  
+  });
+
+  console.log(`${invoices.length} invoices found`);
+
+  let date = moment(invoices[0].completed_at).format('L');
+
+  let resp = await rabbiEmail.sendEmail(
+    'egifter-ach-receipt',
+    email,
+    'receipts@anypayinc.com',
+    {
+      invoices,
+      batch: batch.toJSON(),
+      date
+    }
+  )
+
+  return resp;
+
+}
+
