@@ -382,6 +382,16 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/grab_and_go_items",
+    handler: handlers.GrabAndGoItems.index,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/invoices",
     handler: InvoicesController.index,
     options: {
