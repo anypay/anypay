@@ -4,7 +4,7 @@ import { BigNumber } from 'bignumber.js';
 
 export async function defaultAmount(invoice, merchant): Promise<number> {
 
-  let rate = new BigNumber(0.1) // 10% back
+  let rate = new BigNumber(0.01) // 1% back
 
   var amount = new BigNumber(invoice.amount).times(rate);
 
