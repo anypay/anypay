@@ -1503,6 +1503,62 @@ async function Server() {
   });
 
   server.route({
+
+    method: 'GET',
+
+    path: '/sms_numbers',
+
+    options: {
+
+      auth: "token",
+
+      handler: handlers.SmsNumbers.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'DELETE',
+
+    path: '/sms_numbers/{id}',
+
+    options: {
+
+      auth: "token",
+
+      handler: handlers.SmsNumbers.destroy
+
+    }
+
+  });
+
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/sms_numbers',
+
+    options: {
+
+      auth: "token",
+
+      handler: handlers.SmsNumbers.create,
+
+      validate: {
+        payload: Joi.object().keys({
+          phone_number: Joi.string().required(),
+          name: Joi.string()
+        })
+      }
+
+    }
+
+  });
+
+  server.route({
     method: "GET",
     path: "/accounts/roi",
     options: {
