@@ -23,14 +23,15 @@ export async function generateCodeForInvoice(uid: string) {
   }
 
   let resp = await http
-        .post('https://truereviews.io/api/anypay/token')
+        .post('https://truereviews.io/api/veritas/token')
         .set('trApiKey', process.env.TRUEREVIEWS_API_KEY)
         .send({
           data: {
+            application: "anypay",
             location: account.google_place_id,
+            amount: `${invoice.denomination_amount_paid}`,
             invoice_uid: invoice.uid
-          },
-          amount: `${invoice.denomination_amount_paid}`
+          }
         })
 
   return resp.body;
