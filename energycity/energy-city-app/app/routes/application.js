@@ -5,6 +5,7 @@ import { inject as service } from '@ember/service';
 import ApplicationRouteMixin from 'ember-simple-auth/mixins/application-route-mixin';
 
 export default Ember.Route.extend(ApplicationRouteMixin, {
+  messageBus: Ember.inject.service('message-bus'),
 
   geolocation: service(),
 
@@ -40,6 +41,16 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
       Ember.Logger.info('socket.connected');
       socket.emit('subscribe');
       Ember.Logger.info('socket.subscribed');
+    });
+
+    socket.on('invoice.created', (invoice) => {
+      console.log("INVOICE CREATED", invoice);
+      this.get('messageBus').publish(`accounts_${invoice.account_id}_invoice_created`, invoice);
+    });
+
+    socket.on('close', () => {
+      controller.set('connected', false);
+      Ember.Logger.info('socket.disconnected');
     });
 
     socket.on('close', () => {
