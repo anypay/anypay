@@ -20,6 +20,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'components/location-list.js should pass ESLint\n\n');
   });
 
+  QUnit.test('components/money-button.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'components/money-button.js should pass ESLint\n\n');
+  });
+
   QUnit.test('controllers/application.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'controllers/application.js should pass ESLint\n\n10:3 - Duplicate key \'geolocation\'. (no-dupe-keys)');
@@ -62,12 +67,12 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/application.js should pass ESLint\n\n15:5 - Unexpected console statement. (no-console)\n22:7 - Unexpected console statement. (no-console)\n27:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/application.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n23:7 - Unexpected console statement. (no-console)\n28:7 - Unexpected console statement. (no-console)\n47:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/business.js', function (assert) {
     assert.expect(1);
-    assert.ok(true, 'routes/business.js should pass ESLint\n\n');
+    assert.ok(false, 'routes/business.js should pass ESLint\n\n42:5 - Unexpected console statement. (no-console)\n44:5 - Unexpected console statement. (no-console)\n76:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/cities.js', function (assert) {
@@ -222,6 +227,35 @@ define('energy-city-app/tests/integration/components/location-list-test', ['embe
     assert.equal(this.$().text().trim(), 'template block text');
   });
 });
+define('energy-city-app/tests/integration/components/money-button-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleForComponent)('money-button', 'Integration | Component | money button', {
+    integration: true
+  });
+
+  (0, _emberQunit.test)('it renders', function (assert) {
+    // Set any properties with this.set('myProperty', 'value');
+    // Handle any actions with this.on('myAction', function(val) { ... });
+
+    this.render(Ember.HTMLBars.template({
+      "id": "4mdNgptU",
+      "block": "{\"symbols\":[],\"statements\":[[1,[18,\"money-button\"],false]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), '');
+
+    // Template block usage:
+    this.render(Ember.HTMLBars.template({
+      "id": "gG0J82x8",
+      "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[4,\"money-button\",null,null,{\"statements\":[[0,\"      template block text\\n\"]],\"parameters\":[]},null],[0,\"  \"]],\"hasEval\":false}",
+      "meta": {}
+    }));
+
+    assert.equal(this.$().text().trim(), 'template block text');
+  });
+});
 define('energy-city-app/tests/test-helper', ['energy-city-app/tests/helpers/resolver', 'ember-qunit', 'ember-cli-qunit'], function (_resolver, _emberQunit, _emberCliQunit) {
   'use strict';
 
@@ -256,6 +290,11 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
   QUnit.test('integration/components/location-list-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'integration/components/location-list-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('integration/components/money-button-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'integration/components/money-button-test.js should pass ESLint\n\n');
   });
 
   QUnit.test('test-helper.js', function (assert) {
