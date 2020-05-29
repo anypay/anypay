@@ -93,7 +93,7 @@ module.exports.sudoShow = async function(request, reply) {
         where: { invoice_id: invoice.id }
       });
 
-      data.wehobooks = await models.Webhook.findAll({
+      data.webhooks = await models.Webhook.findAll({
         where: { invoice_uid: invoice.uid }
       });
 

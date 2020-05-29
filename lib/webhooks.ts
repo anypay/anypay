@@ -4,7 +4,7 @@ import { log } from './logger';
 
 import * as http from 'superagent';
 
-export async function sendWebhookForInvoice(invoiceUid: string) {
+export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
   let invoice = await models.Invoice.findOne({ where: {
     uid: invoiceUid
@@ -12,7 +12,6 @@ export async function sendWebhookForInvoice(invoiceUid: string) {
 
   var started_at = new Date();
   var invoice_uid = invoice.uid;
-  var type = 'invoice';
   var url = invoice.webhook_url;
   var response_code, response_body, ended_at, error;
   var resp;
