@@ -6,7 +6,7 @@ export async function create(req, h) {
 
   try {
 
-    let record = await sendWebhookForInvoice(req.params.uid); 
+    let record = await sendWebhookForInvoice(req.params.uid, 'sudo_api');
 
     return { webhook: record.toJSON() };
 
