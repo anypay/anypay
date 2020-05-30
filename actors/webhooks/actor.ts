@@ -12,7 +12,7 @@ export async function start() {
 
     exchange: 'anypay:invoices',
 
-    bindingkey: 'invoice:paid',
+    routingkey: 'invoice:paid',
 
     queue: 'webhooks.invoice.tosend'
 
