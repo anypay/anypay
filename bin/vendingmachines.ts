@@ -33,4 +33,36 @@ program
 
   });
 
+program
+  .command('payout <vending_machine_id> <amount> <address> <txid>')
+  .action(async (id, amount, address, txid) => {
+
+    var machine = await models.VendingMachine.findOne({ where: {
+
+      id
+
+    }});
+
+    if (machine) {
+
+      let payout = await models.VendingPayout.create({
+        vending_machine_id: id,
+        amount,
+        address,
+        txid
+      })
+
+      console.log('payout.created', payout.toJSON());
+
+    } else {
+
+      console.log('vending machine not found');
+
+    }
+
+    process.exit(0);
+
+
+  });
+
 program.parse(process.argv);
