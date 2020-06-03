@@ -3,6 +3,7 @@
 import * as program from 'commander';
 import { ambassadorRewardEmail } from '../lib/email';
 import { sendEgifterAchReceipt } from '../lib/ach';
+import { email as rabbiEmail } from 'rabbi';
 
 program
   .command('ambassador_reward <invoice_uid>')
@@ -11,6 +12,28 @@ program
     try {
 
       let resp = await ambassadorRewardEmail(invoice_uid)
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('welcome <email_address>')
+  .action(async (email) => {
+
+    try {
+
+      let resp = await rabbiEmail.sendEmail('welcome', email, 'derrick@anypayinc.com', {
+        email 
+      })
 
       console.log(resp);
 

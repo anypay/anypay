@@ -59,9 +59,7 @@ export async function sendEmail(recipient, subject, body) {
 
 export async function newAccountCreatedEmail(account) {
 
-  let template = templates['new_account_created'];
-
-  return sendEmail(account.email, template.subject, template.body);
+  return rabbiEmail.sendEmail('welcome', account.email, 'derrick@anypayinc.com', { email: account.email });
 
 };
 
