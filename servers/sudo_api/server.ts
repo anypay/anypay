@@ -342,6 +342,23 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: "GET",
+
+    path: "/api/vending_machines/{id}",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: vendingMachines.show
+
+    }
+
+  });
+
+
 
   server.route({
 
