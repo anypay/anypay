@@ -22,7 +22,7 @@ anypay --api --websockets --blockcypher --actors --payments
 
 The staging environment is available at https://api.staging.anypay.global,
 which is configured to be accessed by the staging point of sale app at
-https://pos.staging.anypay.global.
+https://staging.anypayinc.com.
 
 Code is deployed to staging via the `staging` branch using the following
 process.
