@@ -21,7 +21,7 @@ import { Op } from 'sequelize';
 
 import * as csvParse from 'csv-parse';
 
-import { importInvoiceRangeForAchBatch } from '../lib/ach';
+import { importInvoiceRangeForAchBatch, createNextACH } from '../lib/ach';
 
 const _cliProgress = require('cli-progress');
 
@@ -359,13 +359,11 @@ program
 
 program
   .command('generate_latest_ach <end_date> [note]')
-  .action(async (end_date, note) => {
+  .action(async (date) => {
 
-    if (!note) {
-      note = `ACH batch from command line using ${end_date} as last invoice date` 
-    }
+    let note = `ACH batch from command line using invoices for ${date}` 
 
-    end_date = moment(end_date).toDate();
+    let end_date = moment(date).add(1, 'day').toDate();
 
     try {
 
@@ -518,6 +516,20 @@ program
     process.exit(0);
 
   });
+
+program
+  .command('create_next_ach')
+  .action(async () => {
+
+     let batch: any = await createNextACH();
+
+    if (!batch) {
+
+      console.log('no new batches to create');
+
+    }
+  
+  })
 
 program
   .parse(process.argv);

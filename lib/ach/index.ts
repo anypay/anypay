@@ -11,6 +11,16 @@ import { Op } from 'sequelize';
 
 import { models } from '../models';
 
+export async function createNextACH() {
+
+  // get latest ach batch
+  //
+  // get date of one transaction in batch
+  // add one more day
+  // generate batch for that day
+
+}
+
 export async function getInvoiceRange(startUid:string, endUid:string, where:any={}) {
 
   let start = await models.Invoice.findOne({ where: { uid: startUid }});
