@@ -1,8 +1,13 @@
+import * as Hapi from 'hapi';
+
 import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/lib/paymentRequest';
 
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
+
+import { BigNumber } from 'bignumber.js';
+import * as moment from 'moment';
 
 import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
@@ -17,6 +22,75 @@ import * as Boom from 'boom';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
+
+async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+
+  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
+
+  let account = await models.Account.findOne({ where: {
+
+    id: invoice.account_id
+  }});
+
+  let currency = req.headers['x-currency'];
+
+  if (!currency) {
+    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
+    currency = 'BCH'
+  }
+
+  let paymentOption = await models.PaymentOption.findOne({
+
+    where: {
+
+      invoice_uid: req.params.uid,
+
+      currency
+
+    }
+  });
+
+  if (!paymentOption) {
+    return Boom.notFound();
+  }
+
+  let amount = new BigNumber(paymentOption.amount);
+  var address = paymentOption.address;
+
+  if (address.match(/\:/)) {
+    address = address.split(':')[1];
+  }
+
+  const paymentRequest = {
+    "network": "main",
+    "currency": currency,
+    "requiredFeeRate": 1,
+    "outputs": [
+        {
+            "amount": amount.times(100000000).toNumber(),
+            "address": address
+        }
+    ],
+    "time": moment(invoice.createdAt).toDate(),
+    "expires": moment(invoice.createdAt).add(15, 'minutes').toDate(),
+    "memo": `Payment request for Anypay invoice ${invoice.uid}`,
+    "paymentUrl": `https://anypayinc.com/payments/edge/${currency}/${invoice.uid}`,
+    "paymentId": invoice.uid
+  }
+
+  let response = h.response(paymentRequest);
+
+  response.type('application/payment-request');
+
+  response.header('Content-Type', 'application/payment-request');
+
+  response.header('Accept', 'application/payment');
+
+  return response;
+
+
+
+}
 
 async function handleBCH(req, h) {
 
@@ -185,6 +259,12 @@ export async function show(req, h) {
 
   console.log(req);
   var resp;
+
+  if (req.headers['x-requested-with'] === 'co.edgesecure.app') {
+
+    return handleEdge(req, h);
+
+  }
 
   try {
 
