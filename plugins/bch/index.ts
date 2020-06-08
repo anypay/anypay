@@ -28,6 +28,12 @@ var bchaddr: any = require('bchaddrjs');
 
 import * as address_subscription from '../../lib/address_subscription';
 
+export async function submitTransaction(rawTx: string) {
+
+  return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+
 export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
   var inputAddress;
 

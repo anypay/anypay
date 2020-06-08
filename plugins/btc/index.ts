@@ -13,6 +13,12 @@ import {models} from '../../lib/models';
 import {rpc} from './jsonrpc';
 
 
+export async function submitTransaction(rawTx: string) {
+
+  return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
