@@ -31,6 +31,22 @@ async function Server(): Promise<Hapi.Server> {
 
   server.auth.strategy("accountToken", "basic", { validate: validateToken});
 
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment-request' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-request';
+    }
+
+    return h.continue;
+
+  });
+
   server.route({
 
     method: "GET",
@@ -135,6 +151,17 @@ async function Server(): Promise<Hapi.Server> {
     handler: handlers.PaymentRequests.createByItemUid
 
   });
+
+  server.route({
+
+    method: "POST",
+
+    path: "/payments/edge/{currency}/{uid}",
+
+    handler: handlers.PaymentRequests.submitPayment
+
+  });
+
 
   server.route({
 

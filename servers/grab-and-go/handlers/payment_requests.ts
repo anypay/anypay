@@ -6,7 +6,7 @@ import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/l
 
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
 
-import { models, invoices } from '../../../lib';
+import { models, invoices, plugins } from '../../../lib';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -101,7 +101,7 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
   if (!currency) {
     //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV')
-    currency = 'DASH'
+    currency = 'BCH'
   }
 
   let { invoice, item } = await createGrabAndGoInvoice(req.params.item_uid, currency);
@@ -129,8 +129,6 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     "paymentId": invoice.uid
   }
 
-  console.log(paymentRequest);
-
   let response = h.response(paymentRequest);
 
   response.type('application/payment-request');
@@ -140,6 +138,35 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
   response.header('Accept', 'application/payment');
 
   return response;
+
+}
+
+export async function submitPayment(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+
+  try {
+
+    let plugin = await plugins.findForCurrency(req.params.currency);
+
+    await Promise.all(
+
+      req.payload.transactions.map(async (transaction) => {
+
+        let resp = await plugin.submitTransaction(transaction);
+
+        console.log(transaction, resp);
+
+      })
+    )
+
+    return req.payload;
+
+  } catch(error) {
+
+    console.log(error.message);
+
+    return Boom.badRequest(error.message);
+
+  }
 
 }
 

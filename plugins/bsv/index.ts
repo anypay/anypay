@@ -19,6 +19,12 @@ const polynym = require('polynym');
 
 var WAValidator = require('anypay-wallet-address-validator');
 
+export async function submitTransaction(rawTx: string) {
+
+  return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+
 async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()

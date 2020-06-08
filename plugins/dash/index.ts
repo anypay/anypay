@@ -34,6 +34,13 @@ export function validateAddress(address: string){
   return valid;
 
 }
+
+export async function submitTransaction(rawTx: string) {
+
+  return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+
 export async function createInvoice(accountId: number, amount: number) {
 
   let start = new Date().getTime()
