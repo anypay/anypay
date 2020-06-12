@@ -32,7 +32,7 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
 
   setupController(controller) {
 
-    const socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+    const socket = this.get("socketIOService").socketFor('wss://anypay.city');
 
     controller.set('socket', socket);
 
