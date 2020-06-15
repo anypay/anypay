@@ -35,7 +35,7 @@ module.exports = function(environment) {
 
   if (environment === 'development') {
     ENV.apiEndpoint = 'http://127.0.0.1:3000'
-    ENV.apiEndpoint = 'https://nrgcty.com'
+    ENV.apiEndpoint = 'https://anypay.city'
     // ENV.APP.LOG_RESOLVER = true;
     // ENV.APP.LOG_ACTIVE_GENERATION = true;
     // ENV.APP.LOG_TRANSITIONS = true;
@@ -55,7 +55,7 @@ module.exports = function(environment) {
   }
 
   if (environment === 'production') {
-    ENV.apiEndpoint = 'https://nrgcty.com'
+    ENV.apiEndpoint = 'https://anypay.city'
 
   }
 
