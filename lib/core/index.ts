@@ -65,7 +65,7 @@ async  function getPaymail(currency, address) {
 
 export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
-  var isValid = false;
+  var isValid = true;
   var paymail;
 
   try {

@@ -36,6 +36,7 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
     if (accountCoins[coin.code]) {
 
       accountCoins[coin.code]['name'] = coin.name;
+      accountCoins[coin.code]['icon'] = coin.logo_url || `https://pos.anypay.global/${coin.code.toLowerCase()}.png`;
 
       accountCoins[coin.code].unavailable = coin.unavailable;
 
@@ -45,7 +46,7 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
         code: coin.code,
         name: coin.name,
         enabled: false,
-        icon: `https://pos.anypay.global/${coin.code.toLowerCase()}.png`
+        icon: coin.logo_url || `https://pos.anypay.global/${coin.code.toLowerCase()}.png`
       };
 
     }

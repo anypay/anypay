@@ -62,6 +62,10 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
     uri = `${params.address}?amount=${params.amount}&label=Anypay-Gold`;
 
+  } else if (params.currency === 'USDH') {
+
+    uri = `${params.address}?amount=${params.amount}&label=Honest-Coin-USDH`;
+
   } else {
 
     uri = `${protocol}:${params.address}?amount=${params.amount}`;
