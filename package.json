@@ -29,6 +29,7 @@
     "bcrypt": "^3.0.6",
     "bcrypt-nodejs": "0.0.3",
     "bignumber.js": "^8.0.2",
+    "bitbox-sdk": "^8.11.2",
     "bitcoincashjs": "^0.1.14",
     "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-lib": "^0.16.0",

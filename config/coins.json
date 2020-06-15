@@ -8,6 +8,12 @@
     },
 
     {
+      "code": "USDH",
+      "name": "Honest Coin USD",
+      "icon_url": "https://bico.media/4a79881c06eef0057b4ab97fe82bb52587ed11dfff6747194157f6eeba1bd443.jpg"
+    },
+
+    {
       "code": "LTC",
       "name": "Litecoin",
       "icon_url": "https://pos.anypay.global/ltc.png"
