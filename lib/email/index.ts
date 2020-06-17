@@ -59,7 +59,7 @@ export async function sendEmail(recipient, subject, body) {
 
 export async function newAccountCreatedEmail(account) {
 
-  return rabbiEmail.sendEmail('welcome', account.email, 'derrick@anypayinc.com', { email: account.email });
+  return rabbiEmail.sendEmail('welcome', account.email, 'Anypay Inc<noreply@anypayinc.com>', { email: account.email });
 
 };
 
@@ -92,24 +92,23 @@ export async function unpaidInvoiceEmail(invoiceId) {
 
 };
 
-export async function addressChangedEmail(changeset) {
-  
-  let template = templates['address_changed']
+export async function addressChangedEmail(address_id: number) {
 
-  let subject = template.subject
-
-  subject = subject.replace("CURRENCY", changeset.currency)
-  subject = subject.replace("CURRENCY", changeset.currency)
-
-  let body = template.body
-  body = body.replace("ADDRESS", changeset.address)
-  body = body.replace("CURRENCY", changeset.currency)
-
-  let account = await models.Account.findOne({ where: {
-    id: changeset.account_id
+  let address = await models.Address.findOne({ where: {
+    id: address_id
   }});
 
-  return sendEmail(account.email, subject, body);
+  let account = await models.Account.findOne({ where: {
+    id: address.account_id
+  }});
+
+  return rabbiEmail.sendEmail('address_updated', account.email, 'Anypay Inc<noreply@anypayinc.com>', {
+    currency: address.currency,
+    address: address.value,
+    updated_at_time: address.updated_at,
+    notePresent: !!address.note,
+    note: address.note
+  });
 
 }
 
