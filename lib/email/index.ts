@@ -296,8 +296,3 @@ emitter.on('invoice.paid.first', (invoice)=>{
 
 })
 
-emitter.on('invoice.paid', (invoice)=>{
-
-  checkInvoicePaidCount(invoice)
-
-})
