@@ -21,8 +21,6 @@ export async function listCities() {
 
   let cityTags = await database.query(query);
 
-  console.log('CITY TAGS', cityTags[0]);
-
   let cityRecords = await anypay.models.City.findAll({
 
     where: {
@@ -32,8 +30,6 @@ export async function listCities() {
     }
 
   });
-
-  console.log(cityRecords);
 
   let cityRecordsTagMap = cityRecords.reduce(function(map, record) {
 
@@ -103,9 +99,6 @@ export async function listCities() {
 
     let record = cityRecordsTagMap[tagName]
 
-    console.log("TAG NAME", tagName);
-    console.log("RECORD", record);
-
     return {
       city: record,
       name: record.name,
@@ -114,6 +107,24 @@ export async function listCities() {
     }
   
   })
+
+  result = result.sort((a,b) => {
+
+    if (a.name === 'Porcfest') {
+
+      return -1
+
+    }
+    if (b.name === 'Porcfest') {
+
+      return 1;
+
+    }
+
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+
+
+  });
 
   return result;
 
