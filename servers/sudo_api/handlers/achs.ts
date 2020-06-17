@@ -7,11 +7,31 @@ import { models } from '../../../lib';
 import * as wire from '../../../lib/wire';
 import { sendEmail } from '../../../lib/email';
 
-import { sendEgifterAchReceipt } from '../../../lib/ach';
+import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
 
 import { Op } from 'sequelize';
 
 import * as moment from 'moment';
+
+export async function create(req: Request, h: ResponseToolkit) {
+
+  try {
+
+    console.log('sudo.api.createNextAch');
+  
+    let { ach_batch, invoices } = await createNextACH();
+
+    return { ach_batch, invoices };
+
+  } catch(error) {
+
+    console.log(error);
+
+    return Boom.badRequest(error.message)
+
+  }
+
+}
 
 export async function index(req: Request, h: ResponseToolkit) {
 
