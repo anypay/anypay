@@ -4,6 +4,8 @@ import * as wire from '../wire';
 import { BigNumber } from 'bignumber.js';
 import * as Sequelize from 'sequelize';
 
+import * as assert from 'assert';
+
 import * as moment from 'moment';
 import { email as rabbiEmail } from 'rabbi';
 
@@ -13,11 +15,59 @@ import { models } from '../models';
 
 export async function createNextACH() {
 
-  // get latest ach batch
-  //
-  // get date of one transaction in batch
-  // add one more day
-  // generate batch for that day
+  let unsent = await models.AchBatch.findOne({
+
+    where : {
+      batch_id: { [Op.is]: null }
+    }, 
+
+    order: [['id', 'desc']],
+
+    limit: 1
+
+  });
+
+  if (unsent) {
+    console.log('unsent ach found');
+
+    let invoices = await models.Invoice.findAll({
+      where: {ach_batch_id: unsent.id}
+    })
+
+    return {ach_batch: unsent, invoices}
+  }
+ 
+  console.log('no unsent ach found');
+
+  let latest = await models.AchBatch.findOne({
+
+    where : {
+      batch_id: { [Op.not]: null }
+    }, 
+
+    order: [['id', 'desc']],
+
+    limit: 1
+
+  });
+
+  console.log(latest);
+
+  let lastInvoice = await models.Invoice.findOne({
+    where: { uid: latest.last_invoice_uid }
+  })
+
+  let batch_date = moment(lastInvoice.paidAt).format('MM-DD-YYYY');
+
+  console.log('last batch date', batch_date);
+
+  let nextBatchDate = moment(lastInvoice.paidAt).add(1, 'day').format('MM-DD-YYYY');
+
+  console.log('next batch date', nextBatchDate);
+
+  let {ach_batch, invoices} = await  generateBatchForDate(nextBatchDate);
+
+  return {ach_batch, invoices}
 
 }
 
@@ -122,6 +172,16 @@ export async function generateLatestBatch(endDate, note) {
 
   });
 
+  if (invoices.length === 0) {
+
+    console.log(`no invoices paid on ${moment(endDate).format('DD/MM/YYYY')}`);
+
+    endDate = moment(endDate).add(1, 'days').toDate();
+
+    return generateLatestBatch(endDate, note)
+
+  }
+
   let sum = invoices.reduce((sum, invoice) => {
 
     let amount_paid = new BigNumber(invoice.denomination_amount_paid); 
@@ -194,13 +254,17 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
 
   let date = moment(invoices[0].completed_at).format('L');
 
+  batch = batch.toJSON();
+
+  batch.amount = batch.amount.toFixed(2);
+
   let resp = await rabbiEmail.sendEmail(
     'egifter-ach-receipt',
     email,
     'receipts@anypayinc.com',
     {
       invoices,
-      batch: batch.toJSON(),
+      batch,
       date
     }
   )
@@ -208,4 +272,21 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
   return resp;
 
 }
+
+export async function generateBatchForDate(MMDDYY) {
+
+  let note = `ACH batch from command line using invoices for ${MMDDYY}` 
+
+  let end_date = moment(MMDDYY).add(1, 'day').toDate();
+
+  let {ach_batch, invoices}= await generateLatestBatch(end_date, note);
+
+  invoices.forEach(invoice => {
+    assert(invoice.ach_batch_id = ach_batch.id);
+  });
+
+  return {ach_batch, invoices};
+
+}
+
 

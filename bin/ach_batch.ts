@@ -361,17 +361,9 @@ program
   .command('generate_latest_ach <end_date> [note]')
   .action(async (date) => {
 
-    let note = `ACH batch from command line using invoices for ${date}` 
-
-    let end_date = moment(date).add(1, 'day').toDate();
-
     try {
 
-      let {ach_batch, invoices}= await ach.generateLatestBatch(end_date, note);
-
-      invoices.forEach(invoice => {
-        assert(invoice.ach_batch_id = ach_batch.id);
-      });
+      let {ach_batch, invoices} = await ach.generateBatchForDate(date);
 
       console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
       console.log(ach_batch.toJSON());
@@ -521,13 +513,17 @@ program
   .command('create_next_ach')
   .action(async () => {
 
-     let batch: any = await createNextACH();
+     let {ach_batch, invoices} = await createNextACH();
 
-    if (!batch) {
+    if (!ach_batch) {
 
       console.log('no new batches to create');
 
     }
+
+    console.log(ach_batch.toJSON());
+
+    process.exit(0);
   
   })
 
