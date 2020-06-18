@@ -906,6 +906,19 @@ async function Server() {
   })
 
   server.route({
+    method: "GET",
+    path: "/csv/r",
+    options: {
+      handler: handlers.CsvPaymentRequest.show,
+      validate: {
+        query: {
+          csv_url:  Joi.string().required()
+        }
+      }
+    }
+  })
+
+  server.route({
     method: "POST",
     path: "/invoices/{uid}/pay",
     handler: handlers.BsvPaymentRequest.create 
