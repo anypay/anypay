@@ -120,7 +120,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
     await address.update({
       value: changeset.address,
-      paymail: changeset.paymail
+      paymail: changeset.paymail,
+      note: null
     });
 
   } else {

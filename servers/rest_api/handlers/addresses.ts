@@ -46,12 +46,13 @@ export async function index(req, h) {
 
 module.exports.update = async function(request, reply) {
 
+  console.log('update address');
+
   let currency = request.params.currency;
 
   let address = request.payload.address;
 
-  let accountId = request.auth.credentials.accessToken.account_id;
-
+  let accountId = request.account.id;
 
   var changeset = {
 
