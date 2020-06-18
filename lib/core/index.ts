@@ -134,6 +134,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   }
 
+  changeset.address_id = address.id;
+
   emitter.emit('address.set', changeset);
   events.emit('address:set', changeset);
 

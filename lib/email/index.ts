@@ -285,7 +285,7 @@ emitter.on('invoice.created', (invoice)=>{
 
 emitter.on('address.set', (changeset)=>{
 
-  addressChangedEmail(changeset) 
+  addressChangedEmail(changeset.address_id) 
 
 })
 
