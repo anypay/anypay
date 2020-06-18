@@ -524,6 +524,34 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/account_addresses",
+    handler: handlers.Addresses.index,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/addresses/{id}/notes",
+    handler: handlers.AddressNotes.update,
+    options: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        params: {
+          id: Joi.number().required()
+        },
+        payload: {
+          note: Joi.string().required()
+        }
+      }
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/addresses/{currency}",
     handler: AddressesController.update,

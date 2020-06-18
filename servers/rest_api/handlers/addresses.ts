@@ -32,6 +32,18 @@ module.exports.list = async function(request, reply) {
 
 };
 
+export async function index(req, h) {
+
+  let addresses = await models.Address.findAll({
+
+    where: { account_id: req.account.id }
+
+  })
+  
+  return { addresses };
+
+};
+
 module.exports.update = async function(request, reply) {
 
   let currency = request.params.currency;
