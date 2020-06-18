@@ -5,6 +5,7 @@ interface AddressChangeSet {
   address: string;
   metadata?: string;
   paymail?: string;
+  address_id?: number;
 }
 
 interface DenominationChangeset {
