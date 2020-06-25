@@ -299,12 +299,17 @@ export async function createPublicInvoice(account_id, payload) {
     return set;
   }, {});
 
-  if (addressesMap['BCH']) {
+  /*
+   * Order of preference goes BSV, BCH, DASH
+   *
+   */
+
+  if (addressesMap['BSV']) {
+    currency = 'BSV';
+  } else if (addressesMap['BCH']) {
     currency = 'BCH';
   } else if (addressesMap['DASH']) {
     currency = 'DASH';
-  } else if (addressesMap['BSV']) {
-    currency = 'BSV';
   } else {
     currency = addresses[0].currency;
   }
