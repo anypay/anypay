@@ -132,7 +132,7 @@ export function generatePaymentRequest(invoice, account) {
 
   }
 
-  pd.set('payment_url', `https://anypayinc.com/payments/${invoice.uid}`);
+  pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay`);
   if (invoice.currency === 'BCH') {
     pd.set('required_fee_rate', 1);
   }
