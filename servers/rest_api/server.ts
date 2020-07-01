@@ -301,6 +301,11 @@ async function Server() {
       request.headers['x-accept'] = 'application/dash-payment';
     }
 
+    if ('application/dash-paymentack' === request.headers['accept']) {
+      request.headers['accept'] = 'application/json';
+      request.headers['x-accept'] = 'application/dash-paymentack';
+    }
+
     if ('application/bitcoinsv-paymentack' === request.headers['accept']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/bitcoinsv-payment';

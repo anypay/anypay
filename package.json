@@ -17,6 +17,7 @@
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
     "@rodrigogs/mysql-events": "^0.6.0",
+    "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.20",
     "@types/winston": "^2.4.4",
     "amqplib": "^0.5.2",

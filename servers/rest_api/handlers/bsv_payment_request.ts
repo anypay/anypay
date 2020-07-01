@@ -374,7 +374,7 @@ export async function create(req, h) {
 
     }
 
-  } else if (req.headers['x-content-type'] === 'application/dash-payment') {
+  } else if (req.headers['x-accept'] === 'application/dash-paymentack') {
 
     var protocol = new PaymentProtocol('DASH');
 
