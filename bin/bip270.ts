@@ -5,6 +5,8 @@ import * as program from 'commander';
 import * as http from 'superagent';
 import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
+import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
+const axios = require('axios');
 
 program
   .command('payinvoice <invoice_uid>')
@@ -50,24 +52,47 @@ program
   .command('getpaymentrequest <invoice_uid> <currency>')
   .action(async (invoiceUID, currency) => {
 
-    var accept;
+    var accept, response;
 
     switch(currency) {
     case 'BSV':
       accept = 'application/bitcoinsv-paymentrequest'
+
+      response = await http
+    //    .get(`https://api.anypayinc.com/r/${invoiceUID}`)
+        .get(`http://localhost:8000/r/${invoiceUID}`)
+        .set({
+          'accept': accept
+        });
+
+      console.log(response);
       break;
     case 'DASH':
       accept = 'application/dash-paymentrequest'
+
+      response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
+        responseType: 'arraybuffer',
+        headers: {
+          'accept': accept
+        }
+      })
+
+      console.log(response.data);
+
+      var data = PaymentProtocol.PaymentRequest.decode(response.data);
+
+      console.log(data.serialized_payment_details);
+
+      let details = PaymentProtocol.PaymentDetails.decode(data.serialized_payment_details);
+
+      console.log(details);
+      console.log(details.merchant_data.toString());
+
+      //console.log(PaymentProtocol.MerchantData.decode(details.merchant_data));
+
       break;
     }
 
-    let response = await http
-      .get(`https://api.anypayinc.com/r/${invoiceUID}`)
-      .set({
-        'accept': accept
-      });
-
-    console.log(response);
 
   });
 
