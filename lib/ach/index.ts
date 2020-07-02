@@ -252,7 +252,7 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
 
   console.log(`${invoices.length} invoices found`);
 
-  let date = moment(invoices[0].completed_at).format('L');
+  let date = moment(invoices[0].completed_at).format('LL');
 
   batch = batch.toJSON();
 
