@@ -21,7 +21,7 @@ import { Op } from 'sequelize';
 
 import * as csvParse from 'csv-parse';
 
-import { importInvoiceRangeForAchBatch, createNextACH } from '../lib/ach';
+import { importInvoiceRangeForAchBatch, createNextACH, sendEgifterAchReceipt } from '../lib/ach';
 
 const _cliProgress = require('cli-progress');
 
@@ -523,6 +523,23 @@ program
 
     console.log(ach_batch.toJSON());
 
+    process.exit(0);
+  
+  })
+
+program
+  .command('send_egifter_email <ach_batch_id>')
+  .action(async (ach_batch_id) => {
+
+    try {
+
+      await sendEgifterAchReceipt(ach_batch_id, 'accounting@egifter.com')
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
     process.exit(0);
   
   })

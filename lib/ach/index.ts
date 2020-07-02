@@ -258,16 +258,25 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
 
   batch.amount = batch.amount.toFixed(2);
 
-  let resp = await rabbiEmail.sendEmail(
-    'egifter-ach-receipt',
-    email,
-    'receipts@anypayinc.com',
-    {
+  let resp = await rabbiEmail.send({
+    templateName: 'egifter-ach-receipt',
+    to: [email],
+    from: 'receipts@anypayinc.com',
+    cc: ['judy@egifter.com'],
+    bcc: [
+      'steven@anypayinc.com',
+      'derrick@anypayinc.com'
+    ],
+    replyTo: [
+      'steven@anypayinc.com',
+      'derrick@anypayinc.com'
+    ],
+    vars: {
       invoices,
       batch,
       date
     }
-  )
+  })
 
   return resp;
 
