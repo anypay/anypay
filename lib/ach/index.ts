@@ -271,6 +271,7 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
       'steven@anypayinc.com',
       'derrick@anypayinc.com'
     ],
+    subject: `ACH Sent From Anypay $${batch.amount} - for ${date}`,
     vars: {
       invoices,
       batch,
