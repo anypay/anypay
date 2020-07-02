@@ -533,7 +533,7 @@ program
 
     try {
 
-      await sendEgifterAchReceipt(ach_batch_id, 'steven@spacedisco.com')
+      await sendEgifterAchReceipt(ach_batch_id, 'accounting@egifter.com')
 
     } catch(error) {
 
