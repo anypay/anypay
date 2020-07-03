@@ -36,13 +36,17 @@ export async function create(req, h) {
 
     console.log('content-type or accept is correct for posting DASH BIP70 Payments');
 
-    let data = PaymentProtocol.PaymentRequest.decode(req.payload);
+    let data = PaymentProtocol.Payment.decode(req.payload);
 
     console.log('Payment', data);
 
-    return {
+    for (const transaction of data.transactions) {
 
-      success: true
+      console.log(transaction.toString('hex'));
+
+      let resp = await rpc.call('sendrawtransaction', [transaction.toString('hex')]);
+
+      console.log(resp);
 
     }
 
