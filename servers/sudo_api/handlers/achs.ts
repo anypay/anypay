@@ -125,8 +125,7 @@ export async function update(req: Request, h: ResponseToolkit) {
 
 async function sendAchReport(batch_id) {
 
-  await sendEgifterAchReceipt(batch_id, 'steven@anypayinc.com');
-  await sendEgifterAchReceipt(batch_id, 'derrick@anypayinc.com');
+  await sendEgifterAchReceipt(batch_id, 'accounting@egifter.com');
 
 }
 

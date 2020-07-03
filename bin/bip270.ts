@@ -6,6 +6,7 @@ import * as http from 'superagent';
 import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
+const axios = require('axios');
 
 import { Bip70DashPayer } from '../lib/bip70/dash';
 const axios = require('axios');
@@ -39,7 +40,6 @@ program
     process.exit(0);
   
   });
-
 
 program
   .command('payinvoice <invoice_uid>')
@@ -103,8 +103,7 @@ program
     case 'DASH':
       accept = 'application/dash-paymentrequest'
 
-      //response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
-      response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
+      response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
         responseType: 'arraybuffer',
         headers: {
           'accept': accept
@@ -152,7 +151,6 @@ program
 
       break;
     }
-
 
   });
 
