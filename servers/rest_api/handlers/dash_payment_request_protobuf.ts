@@ -54,7 +54,7 @@ export async function create(req, h) {
 
     ack.set('payment', payment);
 
-    let response = h.response(ack.serialize());
+    let response = h.response(ack.toBuffer());
 
     response.type('application/dash-paymentack');
 
