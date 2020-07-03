@@ -36,11 +36,11 @@ export async function create(req, h) {
 
     console.log('content-type or accept is correct for posting DASH BIP70 Payments');
 
-    let data = PaymentProtocol.Payment.decode(req.payload);
+    let payment = PaymentProtocol.Payment.decode(req.payload);
 
-    console.log('Payment', data);
+    console.log('Payment', payment);
 
-    for (const transaction of data.transactions) {
+    for (const transaction of payment.transactions) {
 
       console.log(transaction.toString('hex'));
 
@@ -50,6 +50,19 @@ export async function create(req, h) {
 
     }
 
+    let ack = new PaymentProtocol.PaymentACK();
+
+    ack.set('payment', payment);
+
+    let response = h.response(ack.serialize());
+
+    response.type('application/dash-paymentack');
+
+    return response;
+
+  } else {
+
+    return { success: false }
   }
 
 }
