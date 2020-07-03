@@ -132,7 +132,21 @@ export function generatePaymentRequest(invoice, account) {
 
   }
 
-  pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay`);
+  switch(invoice.currency) {
+  case 'BCH':
+    pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay/bip70/bch`);
+    break;
+  case 'DASH':
+    pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay/bip70/dash`);
+    break;
+  case 'BSV':
+    pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay/bip270/bsv`);
+    break;
+  case 'BTC':
+    pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay/bip70/btc`);
+    break;
+  }
+
   if (invoice.currency === 'BCH') {
     pd.set('required_fee_rate', 1);
   }

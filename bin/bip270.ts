@@ -9,7 +9,6 @@ import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 const axios = require('axios');
 
 import { Bip70DashPayer } from '../lib/bip70/dash';
-const axios = require('axios');
 
 program
   .command('paydashinvoice <invoice_uid>')
@@ -92,8 +91,8 @@ program
       accept = 'application/bitcoinsv-paymentrequest'
 
       response = await http
-    //    .get(`https://api.anypayinc.com/r/${invoiceUID}`)
-        .get(`http://localhost:8000/r/${invoiceUID}`)
+        .get(`https://api.anypayinc.com/r/${invoiceUID}`)
+    //    .get(`http://localhost:8000/r/${invoiceUID}`)
         .set({
           'accept': accept
         });
