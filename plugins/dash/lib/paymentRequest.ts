@@ -43,7 +43,7 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     creationTimestamp: invoice.createdAt,
     expirationTimestamp: invoice.expiry,
     memo: "Energy City Invoice",
-    paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay`,
+    paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay/bip70/dash`,
   }
 
   console.log(request)

@@ -927,10 +927,22 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/invoices/{uid}/bip70",
+    path: "/invoices/{uid}/pay/bip70/bch",
     handler: handlers.PaymentRequest.create 
 
   })
+
+  server.route({
+    method: "POST",
+    path: "/invoices/{uid}/pay/bip70/dash",
+    handler: handlers.DashPaymentRequestProtobuf.create,
+    config: {
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  });
 
   server.route({
     method: "GET",
@@ -953,11 +965,9 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/invoices/{uid}/pay",
+    path: "/invoices/{uid}/pay/bip270/bsv",
     handler: handlers.BsvPaymentRequest.create 
-
   })
-
 
   server.route({
     method: "POST",
