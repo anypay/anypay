@@ -364,6 +364,8 @@ export async function create(req, h) {
 
     return {
 
+      success: true,
+
       payment: {
 
         transaction: req.payload.transaction

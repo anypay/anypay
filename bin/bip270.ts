@@ -8,6 +8,39 @@ import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 const axios = require('axios');
 
+import { Bip70DashPayer } from '../lib/bip70/dash';
+const axios = require('axios');
+
+program
+  .command('paydashinvoice <invoice_uid>')
+  .action(async (invoiceUID) => {
+
+    try {
+
+      let payer = new Bip70DashPayer(invoiceUID); 
+
+      let payment_request = await payer.fetchPaymentRequest();
+
+      console.log(payment_request);
+
+      let unspent_coins = await payer.fetchUnspentCoins();
+
+      console.log(unspent_coins);
+
+      let transaction = await payer.buildTransaction();
+
+      console.log(transaction);
+
+    } catch(error) { 
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
+  
+  });
+
 program
   .command('payinvoice <invoice_uid>')
   .action(async (invoiceUID) => {
@@ -52,7 +85,7 @@ program
   .command('getpaymentrequest <invoice_uid> <currency>')
   .action(async (invoiceUID, currency) => {
 
-    var accept, response;
+    var accept, response, details, data;
 
     switch(currency) {
     case 'BSV':
@@ -65,7 +98,7 @@ program
           'accept': accept
         });
 
-      console.log(response);
+      console.log(response.body);
       break;
     case 'DASH':
       accept = 'application/dash-paymentrequest'
@@ -79,11 +112,37 @@ program
 
       console.log(response.data);
 
-      var data = PaymentProtocol.PaymentRequest.decode(response.data);
+      data = PaymentProtocol.PaymentRequest.decode(response.data);
 
       console.log(data.serialized_payment_details);
 
-      let details = PaymentProtocol.PaymentDetails.decode(data.serialized_payment_details);
+      details = PaymentProtocol.PaymentDetails.decode(data.serialized_payment_details);
+
+      console.log(details);
+      console.log(details.merchant_data.toString());
+
+      //console.log(PaymentProtocol.MerchantData.decode(details.merchant_data));
+
+      break;
+
+    case 'BCH':
+      accept = 'application/bitcoincash-paymentrequest'
+
+      //response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
+      response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
+        responseType: 'arraybuffer',
+        headers: {
+          'accept': accept
+        }
+      })
+
+      console.log(response.data);
+
+      data = PaymentProtocol.PaymentRequest.decode(response.data);
+
+      console.log(data.serialized_payment_details);
+
+      details = PaymentProtocol.PaymentDetails.decode(data.serialized_payment_details);
 
       console.log(details);
       console.log(details.merchant_data.toString());
@@ -92,7 +151,6 @@ program
 
       break;
     }
-
 
   });
 
