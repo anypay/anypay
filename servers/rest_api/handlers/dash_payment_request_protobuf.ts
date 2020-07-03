@@ -1,7 +1,10 @@
 import {generatePaymentRequest} from '../../../plugins/dash/lib/paymentRequest';
+import {awaitChannel} from '../../../lib/amqp';
 import * as Hapi from 'hapi';
 
 import { rpc } from '../../../plugins/dash/lib/jsonrpc'
+
+import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
@@ -27,7 +30,15 @@ export async function create(req, h) {
 
   if (isCorrectContentType(req) || isCorrectAccept(req)) {
 
+    let channel = await awaitChannel();
+
+    await channel.publish('anypay', 'dash.bip70.payments', req.payload);
+
     console.log('content-type or accept is correct for posting DASH BIP70 Payments');
+
+    let data = PaymentProtocol.PaymentRequest.decode(req.payload);
+
+    console.log('Payment', data);
 
     return {
 
