@@ -151,6 +151,65 @@ async function handleBCH(req, h) {
 
 }
 
+async function handleBTC(req, h) {
+
+  const params = req.params;
+
+  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
+
+  let account = await models.Account.findOne({ where: {
+
+    id: invoice.account_id
+
+  }});
+
+  let paymentOption = await models.PaymentOption.findOne({
+
+    where: {
+
+      invoice_uid: req.params.uid,
+
+      currency: 'BTC'
+
+    }
+  });
+
+  if (!paymentOption) {
+    return Boom.notFound();
+  }
+
+  console.log('payment option', paymentOption.toJSON());
+
+  let content = await createBCHRequest({
+    address: paymentOption.address,
+    amount: paymentOption.amount,
+    currency: 'BTC',
+    denomination_amount: invoice.denomination_amount,
+    denomination_currency: invoice.denomination_currency,
+    uid: invoice.uid
+  }, account);
+
+  let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex');
+
+  var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
+
+  var signature = Message(digest).sign(privateKey);
+
+  let response = h.response(content.serialize());
+
+  response.type('application/bitcoin-paymentrequest');
+
+  response.header('x-signature-type', 'ecc');
+  response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
+  response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
+  response.header('digest', `SHA-256=${digest}`);
+  response.header('Content-Type', 'application/bitcoin-paymentrequest');
+  response.header('Accept', 'application/bitcoin-payment');
+
+  return response;
+
+}
+
 async function handleDASH(req, h) {
 
   const params = req.params;
@@ -269,6 +328,12 @@ export async function show(req, h) {
   try {
 
     switch (req.headers.accept) {
+
+      case 'application/bitcoin-paymentrequest':
+
+        resp = await handleBTC(req, h)
+
+        return resp;
 
       case 'application/bitcoinsv-paymentrequest':
 
