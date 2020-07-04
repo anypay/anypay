@@ -28,10 +28,13 @@ function getTxJsonFromRawTx(rawTx) {
 function getChangeAddressFromTxJsonAndDestination(txJson, destinationAddress) {
   console.log(txJson);
 
+  let feeAddress = 'Xwh247FF6SWymYLiJsMjM1BfrqVkzya6wh';
+
   let changeAddress = txJson.vout.map(output => {
     return output.scriptPubKey.addresses[0];
   })
-  .filter(address => address != destinationAddress)[0]
+  .filter(address => address != destinationAddress)
+  .filter(address => address != feeAddress)[0]
 
   return changeAddress;
 }
