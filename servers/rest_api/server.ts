@@ -945,6 +945,18 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/invoices/{uid}/pay/bip70/btc",
+    handler: handlers.BtcPaymentRequestProtobuf.create,
+    config: {
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/r/{uid}",
     handler: handlers.BsvPaymentRequest.show 
