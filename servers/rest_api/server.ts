@@ -928,7 +928,13 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{uid}/pay/bip70/bch",
-    handler: handlers.PaymentRequest.create 
+    handler: handlers.PaymentRequest.create,
+    config: {
+      payload: {
+        output: 'data',
+        parse: false
+      }
+    }
 
   })
 

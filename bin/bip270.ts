@@ -127,8 +127,8 @@ program
     case 'BCH':
       accept = 'application/bitcoincash-paymentrequest'
 
-      //response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
-      response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
+      response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
+      //response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
         responseType: 'arraybuffer',
         headers: {
           'accept': accept
