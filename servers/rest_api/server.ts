@@ -50,7 +50,6 @@ const DashBoardController = require("./handlers/dashboard");
 const AmbassadorsController = require("./handlers/ambassadors");
 const DashWatchController = require("./handlers/dashwatch_reports");
 const WebhookHandler = new EventEmitter();
-const PaymentRequestHandler = require("./handlers/payment_request");
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
@@ -928,7 +927,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{uid}/pay/bip70/bch",
-    handler: handlers.PaymentRequest.create,
+    handler: handlers.BchPaymentRequestProtobuf.create,
     config: {
       payload: {
         output: 'data',
