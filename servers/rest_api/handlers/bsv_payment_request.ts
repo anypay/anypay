@@ -282,6 +282,12 @@ export async function show(req, h) {
 
         return resp;
 
+      case 'application/simpleledger-paymentrequest':
+
+        resp = await handleBCH(req, h)
+
+        return resp;
+
       case 'application/dash-paymentrequest':
 
         resp = await handleDASH(req, h)
