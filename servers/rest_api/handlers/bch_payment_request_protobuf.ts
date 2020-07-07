@@ -10,11 +10,11 @@ const bitcoin = require('bsv');
 const Message = require('bsv/message'); 
 
 function isCorrectContentType(req: Hapi.Request) {
-  return req.headers['x-content-type'] === 'application/bitcoincash-payment'
+  return req.headers['content-type'] === 'application/bitcoincash-payment'
 }
 
 function isCorrectAccept(req: Hapi.Request) {
-  return req.headers['x-accept'] === 'application/bitcoincash-paymentack'
+  return req.headers['accept'] === 'application/bitcoincash-paymentack'
 }
 
 export async function create(req, h) {
