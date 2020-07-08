@@ -997,13 +997,31 @@ async function Server() {
 
       }})
 
-      let code = await dashtext.generateCode(
-        invoice.address,
-        invoice.invoice_amount,
-        invoice.uid
-      );
+      let account = await models.Account.findOne({ where: {
 
-      return code;
+        id: invoice.account_id
+
+      }});
+
+      if (account.dash_text_enabled) {
+
+        let code = await dashtext.generateCode(
+          invoice.address,
+          invoice.invoice_amount,
+          invoice.uid
+        );
+
+        return code;
+
+      } else {
+
+        return {
+          resp: "AccountUnsupported",
+          error: "account does not have dash text enabled",
+          success: false
+        }
+
+      }
  
     },
     options: {
