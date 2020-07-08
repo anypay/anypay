@@ -1165,7 +1165,16 @@ define('energy-city-app/controllers/cities', ['exports'], function (exports) {
 
     socket: null,
 
-    connected: false
+    connected: false,
+
+    actions: {
+      cityClicked: function cityClicked(city) {
+
+        console.log('city clicked', city.city_tag);
+
+        this.transitionToRoute('city', city.city_tag);
+      }
+    }
 
   });
 });
@@ -1212,7 +1221,16 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
       for (var i = 0; i < locations.length; i++) {
         _loop(i);
       }
+    },
+
+
+    actions: {
+      businessClicked: function businessClicked(business) {
+        console.log('business clicked!', business);
+        window.open('https://app.anypayinc.com/pay/' + business.stub);
+      }
     }
+
   });
 });
 define('energy-city-app/controllers/moneybutton-auth-redirect', ['exports'], function (exports) {
@@ -2207,7 +2225,7 @@ define('energy-city-app/routes/cities', ['exports'], function (exports) {
       Ember.Logger.info(model);
       controller.set('cities', model);
 
-      var socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+      var socket = this.get("socketIOService").socketFor('wss://anypay.city');
       controller.set('socket', socket);
     }
   });
@@ -2317,7 +2335,7 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
 
                 controller.set('locations', locations);
 
-                socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+                socket = this.get("socketIOService").socketFor('wss://anypay.city');
 
                 controller.set('socket', socket);
 
@@ -3059,7 +3077,7 @@ define("energy-city-app/templates/application", ["exports"], function (exports) 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "hfWX5r3E", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"payments\"],null,{\"statements\":[[0,\"          \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"Anypay City\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"        \"],[4,\"link-to\",[\"logout\"],null,{\"statements\":[[0,\"sign out\"]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"a\"],[9,\"href\",\"/auth/moneybutton\"],[7],[0,\"sign in\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ba4zzzw2", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: #039454;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"payments\"],null,{\"statements\":[[0,\"          \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/white.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"Anypay City\"]],\"parameters\":[]},null],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"connected\"]]],null,{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"connected\"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"span\"],[9,\"class\",\"badge badge-dark\"],[7],[0,\"not connected\"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"\\n\"],[0,\"\\n    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
 });
 define("energy-city-app/templates/business", ["exports"], function (exports) {
   "use strict";
@@ -3075,7 +3093,7 @@ define("energy-city-app/templates/cities", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "IAH9Qt7o", "block": "{\"symbols\":[\"city\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-striped\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"cities\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[7],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"link-to\",[\"city\",[19,1,[\"city_tag\"]]],null,{\"statements\":[[0,\"          \"],[1,[19,1,[\"name\"]],false],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"accounts\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[1,[19,1,[\"accounts\",\"length\"]],false],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/cities.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "hynj9YAG", "block": "{\"symbols\":[\"city\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"table table-striped\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"cities\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"cityClicked\",[19,1,[]]],null],null],[7],[0,\"\\n      \"],[6,\"td\"],[7],[0,\"\\n        \"],[1,[19,1,[\"name\"]],false],[0,\"\\n      \"],[8],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"accounts\"]]],null,{\"statements\":[[0,\"          \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[1,[19,1,[\"accounts\",\"length\"]],false],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/cities.hbs" } });
 });
 define("energy-city-app/templates/city", ["exports"], function (exports) {
   "use strict";
@@ -3083,7 +3101,7 @@ define("energy-city-app/templates/city", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "QrKxcU3w", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"business\",[19,1,[\"stub\"]]],null,{\"statements\":[[0,\"              \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n              \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n              \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"            \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"https://anypayapp.com/pay/\",[19,1,[\"stub\"]]]]],[7],[0,\"\\n              \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n              \"],[6,\"i\"],[7],[1,[19,1,[\"distance\"]],false],[0,\"meters\"],[8],[0,\"\\n              \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n            \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"half-right\"],[7],[0,\"\\n\"],[4,\"if\",[[19,1,[\"bch_tipjar\"]]],null,{\"statements\":[[0,\"          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[19,1,[\"bch_tipjar\",\"address\"]],null],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-success\"],[7],[0,\"BCH Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[4,\"if\",[[19,1,[\"bsv_tipjar\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"a\"],[9,\"target\",\"_blank\"],[10,\"href\",[26,[\"bitcoin:\",[19,1,[\"bsv_tipjar\",\"address\"]]]]],[7],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-warning\"],[7],[0,\"BSV Tip\"],[8],[0,\"\\n          \"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"money-button\"],[10,\"data-to\",[26,[[20,[\"bsv_tipjar\",\"address\"]]]]],[9,\"data-type\",\"tip\"],[9,\"data-label\",\"BSV Tip\"],[9,\"data-currency\",\"USD\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"        \"],[8],[0,\"\\n\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "5SBhsPBH", "block": "{\"symbols\":[\"location\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"button\"],[9,\"class\",\"btn btn-large float-left\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"all cities\"]],\"parameters\":[]},null],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"h2\"],[9,\"class\",\"banner\"],[7],[1,[20,[\"city\",\"name\"]],false],[8],[0,\"\\n\\n  \"],[6,\"ul\"],[7],[0,\"\\n\\n\"],[4,\"each\",[[19,0,[\"locations\"]]],null,{\"statements\":[[0,\"    \"],[6,\"li\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"businessClicked\",[19,1,[]]],null],null],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"\\n\"],[4,\"link-to\",[\"business\",[19,1,[\"stub\"]]],null,{\"statements\":[[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n            \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n            \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n          \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]},null],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"half-left\"],[7],[0,\"\\n          \"],[6,\"h4\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"span\"],[9,\"class\",\"badge badge-primary\"],[7],[0,\"Pay Now\"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n\"]],\"parameters\":[]}],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"clear\"],[7],[8],[0,\"\\n\\n\"]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/city.hbs" } });
 });
 define('energy-city-app/templates/components/ember-popper-targeting-parent', ['exports', 'ember-popper/templates/components/ember-popper-targeting-parent'], function (exports, _emberPopperTargetingParent) {
   'use strict';
@@ -3189,6 +3207,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+32ec8603"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+1a9211e5"});
 }
 //# sourceMappingURL=energy-city-app.map

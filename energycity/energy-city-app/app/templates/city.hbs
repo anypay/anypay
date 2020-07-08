@@ -7,48 +7,33 @@
 <h2 class='banner'>{{city.name}}</h2>
 
   <ul>
+
   {{#each locations as |location|}}
-    <li>
+    <li onclick={{action 'businessClicked' location}}>
+      {{#if session.isAuthenticated}}
+
+        {{#link-to "business" location.stub}}
+
+          <div class='half-left'>
+            <h4>{{location.business_name}}</h4>
+            <span class="badge badge-primary">Pay Now</span>
+          </div>
+
+        {{/link-to}}
+
+      {{else}}
+
         <div class='half-left'>
-
-          {{#if session.isAuthenticated}}
-            {{#link-to "business" location.stub}}
-              <h4>{{location.business_name}}</h4>
-              <i>{{location.distance}}meters</i>
-              <span class="badge badge-primary">Pay Now</span>
-            {{/link-to}}
-          {{else}}
-            <a target="_blank" href="https://anypayapp.com/pay/{{location.stub}}">
-              <h4>{{location.business_name}}</h4>
-              <i>{{location.distance}}meters</i>
-              <span class="badge badge-primary">Pay Now</span>
-            </a>
-          {{/if}}
+          <h4>{{location.business_name}}</h4>
+          <span class="badge badge-primary">Pay Now</span>
         </div>
 
-        <div class='half-right'>
-        {{#if location.bch_tipjar}}
-          <a target="_blank" href={{location.bch_tipjar.address}}>
-            <span class="badge badge-success">BCH Tip</span>
-          </a>
-        {{/if}}
-        {{#if location.bsv_tipjar}}
+      {{/if}}
 
-          <a target="_blank" href="bitcoin:{{location.bsv_tipjar.address}}">
-            <span class="badge badge-warning">BSV Tip</span>
-          </a>
-          <div class="money-button"
-            data-to="{{bsv_tipjar.address}}"
-            data-type="tip"
-            data-label="BSV Tip"
-            data-currency="USD"
-          ></div>
-        {{/if}}
-        </div>
-
-    <div class='clear'></div>
+      <div class='clear'></div>
     </li>
     <div class='clear'></div>
+
   {{/each}}
   </ul>
 

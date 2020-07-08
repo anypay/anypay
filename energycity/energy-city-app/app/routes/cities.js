@@ -19,7 +19,7 @@ export default Ember.Route.extend({
     Ember.Logger.info(model);
     controller.set('cities', model);
 
-    const socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+    const socket = this.get("socketIOService").socketFor('wss://anypay.city');
     controller.set('socket', socket);
 
 

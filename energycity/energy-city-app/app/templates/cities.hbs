@@ -2,18 +2,14 @@
 
 <table class='table table-striped'>
   {{#each cities as |city|}}
-    <tr>
+    <tr onclick={{action 'cityClicked' city}}>
       <td>
-        {{#link-to "city" city.city_tag}}
-          {{city.name}}
-        {{/link-to}}
+        {{city.name}}
       </td>
 
       <td>
         {{#if city.accounts}}
-          <a target="_blank" >
-            <span class="badge badge-success">{{city.accounts.length}}</span>
-          </a>
+          <span class="badge badge-success">{{city.accounts.length}}</span>
         {{/if}}
       </td>
 
