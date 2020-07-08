@@ -69,7 +69,7 @@ export default Ember.Route.extend({
 
     controller.set('locations', locations);
 
-    const socket = this.get("socketIOService").socketFor('wss://nrgcty.com');
+    const socket = this.get("socketIOService").socketFor('wss://anypay.city');
     controller.set('socket', socket);
 
     socket.on('invoice.created', controller.handleInvoiceCreated, controller);
