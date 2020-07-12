@@ -6,15 +6,12 @@ import { Actor, Joi, log } from 'rabbi';
 
 import { models, amqp } from '../../lib';
 
-import * as fixer from '../../lib/fixer';
-
 import { setPrice } from '../../lib/prices';
 
 export async function start() {
 
   await amqp.publish('update_usd_prices');
   await amqp.publish('update_usd_crypto_prices');
-
 
   Actor.create({
 
@@ -31,28 +28,7 @@ export async function start() {
 
     try {
 
-      let prices = await fixer.fetchCurrencies('USD');
-
-      prices.forEach(async (price) => {
-
-        let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
-
-      });
-
-      prices.map(price => {
-
-        return {
-          base_currency: price.currency,
-          currency: price.base_currency,
-          value: 1 / price.value,
-          source: price.source
-        }
-      })
-      .forEach(async (price) => {
-
-        let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
-
-      });
+      await updateUSDPrices();
 
     } catch(error) {
 

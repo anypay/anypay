@@ -5,8 +5,77 @@ require('dotenv').config();
 const program = require('commander')
 
 import { getPriceOfOneDollarInVES } from '../lib/prices/ves';
+import { log } from '../lib';
 import { getVESPrice } from '../lib/localbitcoins';
-import { createConversion } from '../lib/prices';
+import { createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
+
+import { updateCryptoUSDPrices } from '../lib/prices/crypto';
+
+program
+  .command('update_crypto_prices')
+  .action(async () => {
+
+    try {
+
+      log.info('updating crypto prices');
+
+      await updateCryptoUSDPrices();
+
+      log.info('updated crypto prices');
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('update_usd')
+  .action(async () => {
+
+    try {
+
+      log.info('updating usd prices');
+
+      await updateUSDPrices();
+
+      log.info('updated usd prices');
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('update_crypto_usd <currency>')
+  .action(async (currency) => {
+
+    try {
+
+      log.info('updating crypto usd price', currency);
+
+      await updateCryptoUSDPrice(currency);
+
+      log.info('updated crypto usd price', currency);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
 
 program
   .command('convert <baseamount> <basecurrency> <targetcurrency>')

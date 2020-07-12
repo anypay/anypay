@@ -3,6 +3,8 @@ import { log } from '../logger';
 
 import { models } from '../models';
 
+import * as fixer from '../../lib/fixer';
+
 export interface Price {
   base_currency: string;
   currency: string;
@@ -99,6 +101,67 @@ export async function setPrice(currency:string, value:number, source:string,  ba
   }
 
   return price;
+
+}
+
+export async function updateCryptoUSDPrice(currency) {
+
+  let BCH_USD_PRICE = await models.Price.findOne({
+    where: {
+      base_currency: 'USD',
+      currency
+    }
+  });
+
+  console.log('CRYPRO_USD_PRICE', BCH_USD_PRICE);
+
+  let prices = await models.Price.findAll({
+    where: {
+      currency: 'USD'
+    }
+  });
+
+  console.log('prices', prices);
+
+  return Promise.all(prices.map(async (price) => {
+
+    if (price.base_currency === currency || price.currency === currency) {
+      return
+    }
+
+    let value = price.value * BCH_USD_PRICE.value
+
+    await setPrice(currency, value, 'fixer•coinmarketcap', price.base_currency);
+    await setPrice(price.base_currency, 1 / value, 'fixer•coinmarketcap', currency);
+
+  }))
+
+}
+
+export async function updateUSDPrices() {
+
+  let prices = await fixer.fetchCurrencies('USD');
+
+  await Promise.all(prices.map(async (price) => {
+
+    let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
+
+  }))
+
+  return Promise.all(prices.map(price => {
+
+    return {
+      base_currency: price.currency,
+      currency: price.base_currency,
+      value: 1 / price.value,
+      source: price.source
+    }
+  })
+  .map((price) => {
+
+    return setPrice(price.currency, price.value, price.source, price.base_currency);
+
+  }));
 
 }
 
