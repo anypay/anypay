@@ -12,7 +12,7 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
-import { models } from '../../../lib';
+import { models, invoices } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -471,6 +471,25 @@ module.exports.show = async function(request, reply) {
 	      uid: invoiceId
 	    }
 	  });
+
+    if (invoices.isExpired(invoice)) {
+
+      var oldInvoiceId = invoice.id;
+
+      log.info('invoice expired');
+
+      invoice = await invoices.generateInvoice(
+        invoice.account_id,
+        invoice.denomination_amount,
+        invoice.currency,
+        invoice.uid
+      )
+
+      await models.Invoice.destroy({ where: { id: oldInvoiceId }});
+
+    } else {
+      log.info('invoice not yet expired');
+    }
 
 	  if (invoice) {
 
