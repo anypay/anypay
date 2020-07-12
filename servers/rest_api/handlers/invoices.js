@@ -472,6 +472,17 @@ module.exports.show = async function(request, reply) {
 	    }
 	  });
 
+    if (invoices.isExpired(invoice)) {
+
+      invoice = await invoices.generateInvoice({
+        accountId: invoice.account_id,
+        denominationAmountValue: invoice.denomination_amount,
+        invoiceCurrency: invoice.currency,
+        uid: invoice.uid
+      })
+
+    }
+
 	  if (invoice) {
 
 	    log.info('invoice.requested', invoice.toJSON());

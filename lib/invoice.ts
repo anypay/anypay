@@ -8,6 +8,7 @@ import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
 import { BigNumber } from 'bignumber.js';
+import * as moment from 'moment';
 
 import * as _ from 'underscore';
 
@@ -296,3 +297,11 @@ export async function republishTxid( currency: string, txid: string){
   return txid;
 
 }
+
+export function isExpired(invoice) {
+  let expiry = moment(invoice.expiry);  
+  let now = moment()
+
+  return now > expiry;
+}
+
