@@ -43,6 +43,11 @@ export async function index (request, reply) {
 
     },
 
+    include: [{
+      model: models.notes,
+      as: 'notes'
+    }],
+
     order: [
       ['createdAt', 'DESC']
     ],
