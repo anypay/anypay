@@ -12,6 +12,30 @@ import { createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/
 import { updateCryptoUSDPrices } from '../lib/prices/crypto';
 
 program
+  .command('seed_prices')
+  .action(async () => {
+
+    try {
+
+      log.info('updating USD prices');
+
+      await updateUSDPrices();
+
+      log.info('updating crypto prices');
+
+      await updateCryptoUSDPrices();
+
+      log.info('updated crypto prices');
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+  });
+
+program
   .command('update_crypto_prices')
   .action(async () => {
 
