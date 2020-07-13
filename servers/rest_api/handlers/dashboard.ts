@@ -3,7 +3,7 @@ const Joi = require('joi');
 import { database, models } from '../../../lib';
 var InvoiceResponse = require('../../../lib/models/invoice').Response;
 
-module.exports.index = function(request, reply) {
+export async function index (request, reply) {
   let accountId = 14;
   let currentDate = new Date();
   let currentYear = currentDate.getFullYear();
@@ -29,7 +29,3 @@ module.exports.index = function(request, reply) {
     });
 }
 
-module.exports.IndexResponse = Joi.object({
-    invoices: Joi.array().items(InvoiceResponse).required().label('Invoices'),
-    targetDate: Joi.date(),
-}).label('InvoiceIndexResponse');
