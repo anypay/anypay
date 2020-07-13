@@ -7,12 +7,10 @@ import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
 import { log } from '../../lib';
-import { channel, awaitChannel } from '../../lib/amqp';
 
 import { attachMerchantMapRoutes } from '../map/server';
 
-import { validateToken } from '../auth/hapi_validate_token';
-
+import { validateToken, validateAdminToken } from '../auth/hapi_validate_token';
 
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 
@@ -28,10 +26,6 @@ import { join } from 'path';
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 /* end handlers import */
 
-console.log(handlers);
-
-import * as dashtext from '../../lib/dash/dashtext';
-
 const AccountLogin = require("../../lib/account_login");
 
 const sequelize = require("../../lib/database");
@@ -40,15 +34,7 @@ const Joi = require('joi');
 
 import { httpAuthCoinOracle } from './auth/auth_coin_oracle';
 
-import {createConversion } from '../../lib/prices';
-import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
-
 import { models } from '../../lib'
-import {createCoinTextInvoice} from '../../lib/cointext'
-
-const currencyMap = require('../../config/currency_map.js')
-
-const Fixer = require('../../lib/fixer');
 
 import {events} from '../../lib/core';
 import {notify} from '../../lib/slack/notifier';
@@ -64,28 +50,6 @@ events.on('address:set', async (changeset) => {
   await notify(`address:set:${JSON.stringify(value)}`);
 
 });
-
-import * as jwt from '../../lib/jwt';
-
-const validateAdminToken = async function(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
-
-  try {
-
-    let token = await jwt.verifyToken(username);
-
-    return {
-      isValid: true,
-      token
-    }
-
-  } catch(error) {
-
-    return {
-      isValid: false
-    }
-
-  }
-}
 
 const validatePassword = async function(request, username, password, h) {
 
@@ -132,17 +96,10 @@ const validatePassword = async function(request, username, password, h) {
 
   }
 
-  log.info('NO VALID USER PASSWORD');
-  log.info('CHECKING SUDO PASSWORD');
-
   // check for sudo password
   try {
-    log.info('password', password);
-    log.info('hash', process.env.SUDO_PASSWORD_HASH);
 
     await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
-
-    log.info('compare.success');
 
   } catch(error) {
 
@@ -679,29 +636,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/base_currencies",
-    handler: async (request, h) => {
-
-      var currencies = await Fixer.getCurrencies();
-
-      var rates = currencies.rates;
-
-      let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
-
-      rates['VES'] = vesPrice;
-
-      let sortedCurrencies = Object.keys(rates).sort();
-
-      currencies.rates = sortedCurrencies.reduce((map, key) => {
-
-        map[key] = rates[key];
-
-        return map;
-
-      }, {});
-
-      return currencies;
-
-    },
+    handler: handlers.BaseCurrencies.index,
     options: {
       tags: ['api']
     }
@@ -815,20 +750,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
-    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
-
-      let inputAmount = {
-
-        currency: req.params.oldcurrency,
-
-        value: parseFloat(req.params.oldamount)
-
-      };
-
-      let conversion = await createConversion(inputAmount, req.params.newcurrency);
-
-      return {conversion};
-    },
+    handler: handlers.PriceConversions.show,
     options: {
       tags: ['api']
     }
@@ -860,7 +782,6 @@ async function Server() {
     method: "GET",
     path: "/invoices/{uid}/bip70",
     handler: handlers.PaymentRequest.show 
-
   })
 
   server.route({
@@ -873,7 +794,6 @@ async function Server() {
         parse: false
       }
     }
-
   })
 
   server.route({
@@ -928,41 +848,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{uid}/dashtext_payments",
-    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
-
-      let invoice = await models.Invoice.findOne({ where: {
-      
-        uid: req.params.uid
-
-      }})
-
-      let account = await models.Account.findOne({ where: {
-
-        id: invoice.account_id
-
-      }});
-
-      if (account.dash_text_enabled) {
-
-        let code = await dashtext.generateCode(
-          invoice.address,
-          invoice.invoice_amount,
-          invoice.uid
-        );
-
-        return code;
-
-      } else {
-
-        return {
-          resp: "AccountUnsupported",
-          error: "account does not have dash text enabled",
-          success: false
-        }
-
-      }
- 
-    },
+    handler: handlers.DashtextPayments.create,
     options: {
       tags: ['api']
     }
@@ -971,179 +857,83 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{uid}/cointext_payments",
-    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
-
-    let invoice = await models.Invoice.findOne({ where: {
-    
-      uid: req.params.uid
-
-    }})
-
-      return  createCoinTextInvoice(invoice.address, invoice.invoice_amount, invoice.invoice_currency)
- 
-    },
+    handler: handlers.Cointext.create,
     options: {
       tags: ['api']
     }
   });
 
   server.route({
-
     method: 'POST',
-
     path: '/moneybutton/webhooks',
-
-    options: {
-
-      handler: handlers.MoneybuttonWebhooks.create
-
-    }
-
+    handler: handlers.MoneybuttonWebhooks.create
   });
 
   server.route({
-
     method: 'GET',
-
     path: '/dashwatch/reports/{month}',
-
-    options: {
-
-      handler: handlers.DashwatchReports.reportForMonth
-
-    }
-
+    handler: handlers.DashwatchReports.reportForMonth
   });
 
   server.route({
-
     method: 'GET',
-
     path: '/merchants',
-
-    options: {
-
-      handler: handlers.Merchants.listActiveSince
-
-    }
-
+    handler: handlers.Merchants.listActiveSince
   });
 
   server.route({
-
     method: 'GET',
-
     path: '/active-merchants',
-
-    options: {
-
-      handler: handlers.Merchants.listActiveSince
-
-    }
-
+    handler: handlers.Merchants.listActiveSince
   });
 
   server.route({
-
     method: 'GET',
-
     path: '/active-merchant-coins',
-
-    options: {
-
-      handler: handlers.Merchants.listMerchantCoins
-
-    }
-
-  });
-  server.route({
-
-    method: 'POST',
-
-    path: '/test/webhooks',
-
-    options: {
-
-      handler: async function(req, h) {
-
-        log.info('WEBHOOK', req.payload)
-
-        return true;
-
-      }
-
-    }
+    handler: handlers.Merchants.listMerchantCoins
   });
 
+  // DEPRECATED
   server.route({
-
     method: 'GET',
-
     path: '/address_routes/{input_currency}/{input_address}',
-
     options: {
-
-      auth: "authoracle",
-
-      handler: handlers.AddressRoutes.show
-
-    }
-
+      auth: "authoracle"
+    },
+    handler: handlers.AddressRoutes.show
   });
 
   server.route({
-
     method: 'GET',
-
     path: '/sms_numbers',
-
     options: {
-
-      auth: "token",
-
-      handler: handlers.SmsNumbers.index
-
-    }
-
+      auth: "token"
+    },
+    handler: handlers.SmsNumbers.index
   });
 
   server.route({
-
     method: 'DELETE',
-
     path: '/sms_numbers/{id}',
-
+    handler: handlers.SmsNumbers.destroy,
     options: {
-
-      auth: "token",
-
-      handler: handlers.SmsNumbers.destroy
-
+      auth: "token"
     }
-
   });
 
   server.route({
-
     method: 'POST',
-
     path: '/sms_numbers',
-
+    handler: handlers.SmsNumbers.create,
     options: {
-
       auth: "token",
-
-      handler: handlers.SmsNumbers.create,
-
       validate: {
         payload: Joi.object().keys({
           phone_number: Joi.string().required(),
           name: Joi.string()
         })
       }
-
     }
-
   });
 
   server.route({
@@ -1153,7 +943,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       handler: handlers.Accounts.calculateROI
-
     }
   });
 
@@ -1251,121 +1040,36 @@ async function Server() {
     method: "GET",
     path: "/currency-map",
     options: {
-      //tags: ['api'],
-      handler:(req: Hapi.Request, h: Hapi.ResponseToolkit) => {
-
-        return currencyMap.map
-
-      }
+      handler: handlers.CurrencyMap.index
     }
   });
 
   server.route({
-    method: 'PUT',
-    path: '/account/watch_address_webhook',
-    options: {
-      auth: 'token',
-      validate: {
-        payload: Joi.object().keys({
-          webhook_url: Joi.string().uri().required()
-        })
-      },
-
-      handler: async (req: Hapi.Request, h) => {
-
-        req['account']['watch_address_webhook_url'] = req.payload['webhook_url']
-
-        try {
-
-          await req['account'].save();
-
-          return { success: true}
-
-        } catch(error) {
-
-          return { success: false}
-
-        }
-
-      }
-    }
-  });
-
-  server.route({
-
     method: 'POST',
     path: '/dash/watch_addresses',
-
     options: {
-
-      auth: "token",
-
-      handler: async (req: any, h) => {
-
-        await awaitChannel();
-
-        switch(req.account.email) {
-
-        case 'lorenzo@dashtext.io':
-
-          break;
-
-        case 'steven@anypay.global':
-
-          break;
-
-        default:
-
-          console.log('not authorized');
-
-          return {succes: false}
-
-        }
-
-        let buffer = Buffer.from(JSON.stringify({
-          account_email: req.account.email,
-          address: req.payload.address
-        }))
-
-        await channel.publish('anypay.payments', 'addresses.watch', buffer);
-
-        return { success: true }
-
-      }
-
-    }
+      auth: "token"
+    },
+    handler: handlers.DashWatchAddresses.create
   }); 
 
   accountCSVReports(server);
 
   server.route({
-
     method: 'GET',
-
     path: '/{param*}',
-
     handler: {
-
       directory: {
-
         path: '.',
-
         redirectToSlash: true,
-
         index: true,
-
       }
-
     }
-
   });
 
   return server;
 
 }
-
-
-  
 
 if (require.main === module) {
 

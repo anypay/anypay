@@ -1,5 +1,29 @@
 
+import * as Hapi from 'hapi';
+
+import * as jwt from '../../lib/jwt';
+
 import { models, log, password } from '../../lib';
+
+export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
+
+  try {
+
+    let token = await jwt.verifyToken(username);
+
+    return {
+      isValid: true,
+      token
+    }
+
+  } catch(error) {
+
+    return {
+      isValid: false
+    }
+
+  }
+}
 
 async function validateToken (request, username, password, h) {
 
