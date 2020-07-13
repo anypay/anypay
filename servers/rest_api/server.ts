@@ -4,6 +4,7 @@ require('dotenv').config();
 import('bitcore-lib')
 
 import * as Hapi from "hapi";
+const HapiSwagger = require("hapi-swagger");
 
 import { log } from '../../lib';
 import { channel, awaitChannel } from '../../lib/amqp';
@@ -12,18 +13,14 @@ import { attachMerchantMapRoutes } from '../map/server';
 
 import { validateToken } from '../auth/hapi_validate_token';
 
-const HapiSwagger = require("hapi-swagger");
 
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
-import * as sudoAddresses from './handlers/sudo_addresses';
-import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
 
 import { hash, bcryptCompare } from '../../lib/password';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-import * as AddressRoutes from './handlers/address_routes';
 
 /* Import all handlers from './handlers directory */
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
@@ -31,49 +28,23 @@ import { join } from 'path';
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 /* end handlers import */
 
+console.log(handlers);
+
 import * as dashtext from '../../lib/dash/dashtext';
 
-const sudoWires = require("./handlers/sudo/wire_reports");
-const SudoCoins = require("./handlers/sudo_coins");
-const TipJars = require("./handlers/tipjars");
-const SudoAccounts = require("./handlers/sudo/accounts");
-const DenominationsController = require("./handlers/denominations");
-const PasswordsController = require("./handlers/passwords");
-const AccessTokensController = require("./handlers/access_tokens");
-const AddressesController = require("./handlers/addresses");
-const CoinsController = require("./handlers/coins");
 const AccountLogin = require("../../lib/account_login");
-const sequelize = require("../../lib/database");
-const EventEmitter = require("events").EventEmitter;
-const InvoicesController = require("./handlers/invoices");
-const DashBoardController = require("./handlers/dashboard");
-const AmbassadorsController = require("./handlers/ambassadors");
-const DashWatchController = require("./handlers/dashwatch_reports");
-const WebhookHandler = new EventEmitter();
-import * as SudoPaymentForwards from "./handlers/payment_forwards";
-import * as CoinOraclePayments from "./handlers/coin_oracle_payments";
 
-import { sudoLogin } from './handlers/sudo_login';
-import * as sudoTipjars from './handlers/sudo/tipjars';
-import * as CashbackMerchants from './handlers/cashback_merchants';
+const sequelize = require("../../lib/database");
+
 const Joi = require('joi');
 
-import {dashbackTotalsAlltime} from './handlers/dashback_controller';
-import {dashbackTotalsByMonth} from './handlers/dashback_controller';
-
-import { validateSudoPassword } from './auth/sudo_admin_password';
 import { httpAuthCoinOracle } from './auth/auth_coin_oracle';
 
 import {createConversion } from '../../lib/prices';
 import { getPriceOfOneDollarInVES } from '../../lib/prices/ves';
 
-import * as monthlyChartsController from './handlers/monthly_totals';
-import * as accountMonthlyChartsController from './handlers/account_monthly_totals';
-import * as totals from './handlers/totals';
 import { models } from '../../lib'
 import {createCoinTextInvoice} from '../../lib/cointext'
-
-import * as ACHs from './handlers/achs';
 
 const currencyMap = require('../../config/currency_map.js')
 
@@ -92,10 +63,6 @@ events.on('address:set', async (changeset) => {
 
   await notify(`address:set:${JSON.stringify(value)}`);
 
-});
-
-WebhookHandler.on("webhook", payload => {
-  console.log("payload", payload);
 });
 
 import * as jwt from '../../lib/jwt';
@@ -311,8 +278,6 @@ async function Server() {
       request.headers['x-accept'] = 'application/bitcoinsv-paymentack';
     }
 
-
-
     if ('application/verify-payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/verify-payment';
@@ -361,7 +326,6 @@ async function Server() {
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
-  server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
   server.auth.strategy("authoracle", "basic", { validate: httpAuthCoinOracle});
 
   attachMerchantMapRoutes(server);
@@ -369,7 +333,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    handler: InvoicesController.show,
+    handler: handlers.Invoices.show,
     options: {
       tags: ['api'],
       validate: {
@@ -403,27 +367,25 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices",
-    handler: InvoicesController.index,
+    handler: handlers.Invoices.index,
     options: {
       auth: "token",
-      tags: ['api'],
-      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
+      tags: ['api']
     }
   });
   server.route({
     method: "GET",
     path: "/dashboard",
-    handler: DashBoardController.index,
+    handler: handlers.Dashboard.index,
     options: {
-      auth: "token",
-      plugins: responsesWithSuccess({ model: DashBoardController.IndexResponse })
+      auth: "token"
     }
   });
 
   server.route({
     method: "POST",
     path: "/invoices/{uid}/replacements",
-    handler: InvoicesController.replace,
+    handler: handlers.Invoices.replace,
     options: {
       auth: "token",
       tags: ['api'],
@@ -434,18 +396,9 @@ async function Server() {
 
     method: "GET",
     path: "/tipjars/{currency}",
-    handler: TipJars.show,
+    handler: handlers.Tipjars.show,
     options: {
       auth: "token"
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/sudo/accounts/{account_id}/tipjars/{currency}",
-    handler: sudoTipjars.show,
-    options: {
-      auth: "sudopassword"
     }
   });
 
@@ -508,7 +461,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/access_tokens",
-    handler: AccessTokensController.create,
+    handler: handlers.AccessTokens.create,
     options: {
       auth: "password",
       tags: ['api'],
@@ -519,11 +472,11 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/addresses",
-    handler: AddressesController.list,
+    handler: handlers.Addresses.list,
     options: {
       auth: "token",
       tags: ['api'],
-      plugins: responsesWithSuccess({ model: AddressesController.PayoutAddresses }),
+      plugins: responsesWithSuccess({ model: handlers.Addresses.PayoutAddresses }),
     }
   });
 
@@ -558,7 +511,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/addresses/{currency}",
-    handler: AddressesController.update,
+    handler: handlers.Addresses.update,
     options: {
       auth: "token",
       tags: ['api'],
@@ -566,7 +519,7 @@ async function Server() {
         params: {
           currency: Joi.string().required()
         },
-        payload: AddressesController.PayoutAddressUpdate
+        payload: handlers.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
     }
@@ -606,7 +559,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/achs",
-    handler: ACHs.index,
+    handler: handlers.Achs.index,
     options: {
       auth: "token",
       tags: ['api']
@@ -641,18 +594,18 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/coins",
-    handler: CoinsController.list,
+    handler: handlers.Coins.list,
     options: {
       tags: ['api'],
       auth: "token",
-      plugins: responsesWithSuccess({ model: CoinsController.CoinsIndexResponse }),
+      plugins: responsesWithSuccess({ model: handlers.Coins.CoinsIndexResponse }),
     }
   });
 
   server.route({
     method: "POST",
     path: "/invoices",
-    handler: InvoicesController.create,
+    handler: handlers.Invoices.create,
     options: {
       auth: "token",
       tags: ['api'],
@@ -666,7 +619,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
-    handler: InvoicesController.createPublic,
+    handler: handlers.Invoices.createPublic,
     options: {
       auth: "getaccount",
       tags: ['api'],
@@ -680,33 +633,33 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/password-resets",
-    handler: PasswordsController.reset,
+    handler: handlers.Passwords.reset,
     options: {
       tags: ['api'],
       validate: {
-        payload: PasswordsController.PasswordReset,
+        payload: handlers.Passwords.PasswordReset,
       },
-      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
+      plugins: responsesWithSuccess({ model: handlers.Passwords.Success }),
     }
   });
 
   server.route({
     method: "POST",
     path: "/password-resets/{uid}",
-    handler: PasswordsController.claim,
+    handler: handlers.Passwords.claim,
     options: {
       tags: ['api'],
       validate: {
-        payload: PasswordsController.PasswordResetClaim,
+        payload: handlers.Passwords.PasswordResetClaim,
       },
-      plugins: responsesWithSuccess({ model: PasswordsController.Success }),
+      plugins: responsesWithSuccess({ model: handlers.Passwords.Success }),
     }
   });
 
   server.route({
     method: "PUT",
     path: "/settings/denomination",
-    handler: DenominationsController.update,
+    handler: handlers.Denominations.update,
     options: {
       tags: ['api'],
       auth: "token"
@@ -716,7 +669,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/settings/denomination",
-    handler: DenominationsController.show,
+    handler: handlers.Denominations.show,
     options: {
       tags: ['api'],
       auth: "token"
@@ -757,61 +710,61 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/totals/monthly/usd",
-    handler: monthlyChartsController.usd
+    handler: handlers.MonthlyTotals.usd
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/btc",
-    handler: monthlyChartsController.btc
+    handler: handlers.MonthlyTotals.btc
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/dash",
-    handler: monthlyChartsController.dash
+    handler: handlers.MonthlyTotals.dash
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/transactions/{coin}",
-    handler: monthlyChartsController.totalTransactionsByCoin
+    handler: handlers.MonthlyTotals.totalTransactionsByCoin
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/bch",
-    handler: monthlyChartsController.bch
+    handler: handlers.MonthlyTotals.bch
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/total",
-    handler: monthlyChartsController.total
+    handler: handlers.MonthlyTotals.total
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/accounts",
-    handler: monthlyChartsController.accounts
+    handler: handlers.MonthlyTotals.accounts
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/denomination/{denomination}",
-    handler: monthlyChartsController.denomination
+    handler: handlers.MonthlyTotals.denomination
   });
 
   server.route({
     method: "GET",
     path: "/totals/monthly/denominations",
-    handler: monthlyChartsController.denominations
+    handler: handlers.MonthlyTotals.denominations
   });
 
   server.route({
     method: "GET",
     path: "/account/totals/monthly/{currency}",
-    handler: accountMonthlyChartsController.byCurrency,
+    handler: handlers.AccountMonthlyTotals.byCurrency,
     options: {
       auth: "token"
     }
@@ -820,31 +773,31 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/totals/monthly/count",
-    handler: monthlyChartsController.count
+    handler: handlers.MonthlyTotals.count
   });
 
   server.route({
     method: "GET",
     path: "/dashback/totals/alltime",
-    handler: dashbackTotalsAlltime
+    handler: handlers.DashbackController.dashbackTotalsAlltime
   });
 
   server.route({
     method: "GET",
     path: "/dashback/totals/monthly",
-    handler: dashbackTotalsByMonth
+    handler: handlers.DashbackController.dashbackTotalsByMonth
   });
 
   server.route({
     method: "GET",
     path: "/totals/merchants",
-    handler: totals.merchants
+    handler: handlers.Totals.merchants
   });
 
   server.route({
     method: 'GET',
     path: '/ambassador_claims',
-    handler: AmbassadorsController.list_account_claims,
+    handler: handlers.Ambassadors.list_account_claims,
     options: {
       auth: "token"
     }
@@ -853,26 +806,12 @@ async function Server() {
   server.route({
     method: 'POST',
     path: '/ambassador_claims',
-    handler: AmbassadorsController.claim_merchant,
+    handler: handlers.Ambassadors.claim_merchant,
     options: {
       auth: "token"
     }
   });
   
-  server.route({
-    method: "GET",
-    path: "/sudo/tokenvalidations",
-    handler: async (req: Hapi.Request, h: Hapi.ResponseToolkit) => {
-
-      return {
-        token: req.auth['token']
-      };
-    },
-    options: {
-      auth: "adminwebtoken"
-    }
-  });
-
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
@@ -898,7 +837,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/{input_currency}/payments",
-    handler: CoinOraclePayments.create,
+    handler: handlers.CoinOraclePayments.create,
     options: {
       tags: ['api'],
       validate: {
@@ -1048,23 +987,6 @@ async function Server() {
     }
   });
 
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/auth',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoLogin
-
-    }
-
-  });
-
   server.route({
 
     method: 'POST',
@@ -1079,434 +1001,6 @@ async function Server() {
 
   });
 
-
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/wires/reportsinceinvoice/{invoice_uid}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoWires.show
-
-    }
-
-  });
-
- //deprecated
-  server.route({
-
-    method: 'PUT',
-
-    path: '/sudo/accounts/{id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoAccounts.update,
-
-      validate: {
-
-        payload: {
-
-          denomination: Joi.string().optional(),
-
-          physical_address: Joi.string().optional(),
-
-          business_name: Joi.string().optional(),
-
-          latitude: Joi.number().optional(),
-
-          longitude: Joi.number().optional(),
-
-          image_url: Joi.string().optional()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/addresses',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoAddresses.index
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/bank_accounts',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.index
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/bank_accounts',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.create
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/bank_accounts/{id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.show
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'DELETE',
-
-    path: '/sudo/bank_accounts/{id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.del
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoAddresses.lockAddress
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'DELETE',
-
-    path: '/sudo/accounts/{account_id}/addresses/{currency}/locks',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: sudoAddresses.unlockAddress
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/dashback/merchants',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoList
-
-    }
-
-  });
-
-  //derecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/dashback/merchants/{email}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoShow
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/dashback/merchants/{email}/activate',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoActivate
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/dashback/merchants/{email}/deactivate',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoDeactivate
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/accounts',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Accounts.index
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/payment_forwards',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoPaymentForwards.index
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/payment_forwards/{id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoPaymentForwards.show
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/invoices',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: InvoicesController.sudoIndex
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'DELETE',
-
-    path: '/sudo/accounts/{account_id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Accounts.destroy
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/accounts/{account_id}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Accounts.sudoShow
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/account-by-email/{email}',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Accounts.sudoAccountWithEmail
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/ambassadors',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: AmbassadorsController.list
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'GET',
-
-    path: '/sudo/coins',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoCoins.list
-
-    }
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/coins/activate',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoCoins.activate
-
-    }
-
-  });
-
-  //deprecated
-  server.route({
-
-    method: 'POST',
-
-    path: '/sudo/coins/deactivate',
-
-    options: {
-
-      auth: 'sudopassword',
-
-      handler: SudoCoins.deactivate
-
-    }
-
-  });
-
   server.route({
 
     method: 'GET',
@@ -1515,7 +1009,7 @@ async function Server() {
 
     options: {
 
-      handler: DashWatchController.reportForMonth
+      handler: handlers.DashwatchReports.reportForMonth
 
     }
 
@@ -1548,8 +1042,6 @@ async function Server() {
     }
 
   });
-
-
 
   server.route({
 
@@ -1593,7 +1085,7 @@ async function Server() {
 
       auth: "authoracle",
 
-      handler: AddressRoutes.show
+      handler: handlers.AddressRoutes.show
 
     }
 
@@ -1630,7 +1122,6 @@ async function Server() {
     }
 
   });
-
 
   server.route({
 

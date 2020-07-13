@@ -16,7 +16,7 @@ import { models, invoices } from '../../../lib';
 
 import * as moment from 'moment';
 
-module.exports.index = async (request, reply) => {
+export async function index (request, reply) {
 
   /*
 
@@ -115,46 +115,7 @@ module.exports.index = async (request, reply) => {
   }
 };
 
-module.exports.sudoIndex = async (request, reply) => {
-
-  log.info(`controller:invoices,action:index`, request.query);
-
-  let where = {}
-
-  if (request.query.currency) {
-    where['currency'] = request.query.currency;
-  }
-
-  if (request.query.denomination) {
-    where['denomination'] = request.query.denomination;
-  }
-
-  if (request.query.account_id) {
-    where['account_id'] = request.query.account_id;
-  }
-
-  if (request.query.status) {
-    where['status'] = request.query.status;
-  }
-
-  var invoices = await models.Invoice.findAll({
-
-    where,
-
-    order: [
-      request.query.order || ['createdAt', 'DESC']
-    ],
-
-    offset: parseInt(request.query.offset) || 0,
-
-    limit: parseInt(request.query.limit) || 100
-
-  });
-
-  return { invoices };
-};
-
-module.exports.replace = async (request, reply) => {
+export async function replace (request, reply) {
 
   let invoiceId = request.params.uid;
 
@@ -181,7 +142,7 @@ module.exports.replace = async (request, reply) => {
 
 }
 
-module.exports.create = async (request, reply) => {
+export async function create (request, reply) {
 
   /*
     Dynamicallly look up coin and corresponding plugin given the currency
@@ -348,7 +309,7 @@ export async function createPublicInvoice(account_id, payload) {
 
 }
 
-module.exports.createPublic = async (request, reply) => {
+export async function createPublic (request, reply) {
 
   try {
 
@@ -458,7 +419,7 @@ function sanitizeInvoice(invoice) {
   return resp;
 }
 
-module.exports.show = async function(request, reply) {
+export async function show(request, reply) {
 
   let invoiceId = request.params.invoice_id;
 
