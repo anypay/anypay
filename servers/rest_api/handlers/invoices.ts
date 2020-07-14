@@ -144,6 +144,8 @@ export async function replace (request, reply) {
 
 export async function create (request, reply) {
 
+  var currency_specified = false;
+
   /*
     Dynamicallly look up coin and corresponding plugin given the currency
     provided.
@@ -151,11 +153,21 @@ export async function create (request, reply) {
 
   log.info(`controller:invoices,action:create`);
 
-	if (!request.payload.currency) {
-		throw Boom.badRequest('no currency paramenter provided')
+	if (request.payload.currency) {
+
+    currency_specified = true;
+
+  } else {
+
+    log.info('currency parameter provided')
+
+    let addresses = await models.Address.findAll({
+      where: { account_id: request.account.id }
+    });
+
+    request.payload.currency = addresses[0].currency;
 	}
 
-	log.info('currency parameter provided')
 
 	if (!(request.payload.amount > 0)) {
 		throw Boom.badRequest('amount must be greater than zero')	
@@ -176,6 +188,8 @@ export async function create (request, reply) {
       log.info('invoice.created', invoice.toJSON());
 
     }
+
+    invoice.currency_specified = currency_specified;
 
     if (request.payload.redirect_url) {
 
