@@ -87,12 +87,9 @@ describe("Creating Invoices", () => {
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
     assert(invoice.amount > 0);
+    assert.strictEqual(invoice.currency, 'DASH');
 
-    let option = invoice.payment_options.find(opt => opt.currency = 'DASH');
-
-    assert.strictEqual(option.currency, 'DASH');
-
-    assert(option.amount > 0);
+    assert(moment(invoice.expiry));
 
   });
 

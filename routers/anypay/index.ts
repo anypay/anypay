@@ -1,7 +1,7 @@
 import {convert} from '../../lib/prices';
 import {models} from '../../lib';
 import {plugins} from '../../lib/plugins';
-import {getNewInvoiceAddress} from '../../lib/invoice';
+import {getNewInvoiceAddress, applyScalar} from '../../lib/invoice';
 import { computeInvoiceURI } from '../../lib/uri';
 import { writePaymentOption } from '../../lib/payment_options';
 
@@ -17,12 +17,24 @@ export async function createPaymentOption(invoice, route) {
     return null;
   }
 
+  let accountAddress = await models.Address.findOne({
+    where: {
+      currency: route.output_currency,
+      account_id: route.account_id
+    }
+  });
+
   let address: any = await getNewInvoiceAddress(invoice.account_id, route.input_currency);
 
   let amount = await convert({
     currency: invoice.denomination_currency,
     value: invoice.denomination_amount,
   }, route.input_currency);
+
+
+  if (accountAddress.price_scalar) {
+    amount = applyScalar(amount, accountAddress.price_scalar)
+  }
 
   let uri = computeInvoiceURI({
     currency: route.input_currency,
