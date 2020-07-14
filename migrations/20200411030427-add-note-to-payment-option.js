@@ -2,7 +2,7 @@
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('payment_options', 'note', { id: Sequelize.STRING });
+    return queryInterface.addColumn('payment_options', 'note', { type: Sequelize.STRING });
   },
 
   down: (queryInterface, Sequelize) => {

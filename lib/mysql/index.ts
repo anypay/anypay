@@ -191,5 +191,5 @@ export async function writeTransactionRecord(event){
 
   }
 
-  throw new Error(`No vending machine record associated with terminal id: ${newRow.id}`)
+  //throw new Error(`No vending machine record associated with terminal id: ${newRow.id}`)
 }

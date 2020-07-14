@@ -288,7 +288,7 @@ export async function create (request, reply) {
 
     console.log("INVOICE NOTE");
 
-    let sanitized = sanitizeInvoice(invoice.toJSON());
+    let sanitized = sanitizeInvoice(invoice);
 
     console.log("SANITIZED", sanitized);
 
@@ -400,7 +400,7 @@ export async function createPublic (request, reply) {
 
 function sanitizeInvoice(invoice) {
 
-  let resp = invoice;
+  let resp = invoice.toJSON();
 
   delete resp.webhook_url;
   delete resp.id;
@@ -441,6 +441,7 @@ export async function show(request, reply) {
       await models.Invoice.destroy({ where: { id: oldInvoiceId }});
 
     } else {
+
       log.info('invoice not yet expired');
     }
   
@@ -462,21 +463,17 @@ export async function show(request, reply) {
 
       let resp = Object.assign({
         invoice: sanitized,
-        payment_options,
-        notes
+        payment_options: payment_options.map(o => o.toJSON()),
+        notes: notes.map(o => o.toJSON())
       }, sanitized)
 
-      return resp;
+      return resp
+    }
 
-	  } else {
 
-	    log.error('no invoice found', invoiceId);
-
-	    throw new Error('invoice not found')
-	  }
   } catch(error) {
 
-    console.log(error);
+    console.log('error', error);
 
     return Boom.badRequest(error.message);
 

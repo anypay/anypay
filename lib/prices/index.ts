@@ -51,7 +51,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   let price = await models.Price.findOne({ where });
 
-  let targetAmount = inputAmount.value * price.value;
+  let targetAmount = inputAmount.value * parseFloat(price.value);
 
   return {
     currency: outputCurrency,
