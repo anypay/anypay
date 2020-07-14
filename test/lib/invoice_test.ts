@@ -44,6 +44,8 @@ describe("Creating Invoices", () => {
     log.info(`amount.value ${amount.value}`);
     log.info(`invoice.denomination_amount ${invoice.denomination_amount}`);
 
+    console.log('INVOICE', invoice.toJSON());
+    console.log('AMOUNT', amount);
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
