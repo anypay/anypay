@@ -447,7 +447,7 @@ export async function show(request, reply) {
 	    }
 	  });
 
-    if (invoices.isExpired(invoice)) {
+    if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
       var oldInvoiceId = invoice.id;
 
