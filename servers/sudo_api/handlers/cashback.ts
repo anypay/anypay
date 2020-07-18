@@ -8,6 +8,7 @@ import { log, models, database, amqp } from '../../../lib';
 import * as cashbackDash from '../../../plugins/dash/lib/cashback';
 import * as cashbackBch from '../../../plugins/bch/lib/cashback';
 
+
 async function getCashBackBalance(coin: string): Promise<number> {
 
   switch(coin.toUpperCase()) {
@@ -34,7 +35,7 @@ const coins: any = {
   },
 
   'BCH': {
-    address: 'bitcoincash:qqwufkh0egq9456tf5wepxjm4p8p58dtvudek6twrf',
+    address: cashbackBch.getCashBackAddress(),
     balance: null
   }
 
