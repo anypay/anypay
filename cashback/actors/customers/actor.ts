@@ -143,7 +143,7 @@ export async function start() {
 
       } catch(error) {
 
-        console.log('ERROR', error.response.body);
+        console.log('ERROR', error);
 
         return channel.ack(message);
 
