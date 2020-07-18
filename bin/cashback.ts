@@ -6,14 +6,66 @@ let program = require('commander');
 
 import { log, cashback } from '../lib';
 
+import { buildSendToAddress, getAddressBalance, getCashBackBalance } from '../plugins/bch/lib/cashback';
+import { sendToAddress } from '../cashback/lib';
+
 program
-  .command('getambassadoraddressforinvoice <invoice_uid>')
-  .action(async (invoiceUID) => {
+  .command('getbalance <currency> [address]')
+  .action(async (currency, address) => {
+    var balance;
 
-    let address = await cashback.getAmbassadorAddressForInvoice(invoiceUID);
+    if (address) {
 
-    log.info(address);
+      balance = await getAddressBalance(address);
+      
+    } else {
 
+      balance = await getCashBackBalance()
+
+    }
+
+    console.log(balance);
+
+    process.exit(0);
+
+  });
+
+program
+  .command('buildsend <currency> <address> <amount>')
+  .action(async (currency, address, amount) => {
+
+    let tx = await buildSendToAddress(address, parseInt(amount))
+
+    console.log(tx);
+
+    console.log(tx.toHex());
+
+    process.exit(0);
+
+  });
+
+program
+  .command('sendtoaddress <currency> <address> <amount_satoshis>')
+  .action(async (currency, address, amountSatoshis) => {
+
+    try {
+
+      let txid = await sendToAddress({
+        address,
+        amount: parseFloat((amountSatoshis / 100000000).toFixed(6)),
+        currency: 'BCH'
+      })
+
+      console.log(txid);
+
+    } catch(error) {
+
+      console.log(error);
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
 
   });
 

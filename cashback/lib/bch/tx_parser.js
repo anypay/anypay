@@ -29,10 +29,13 @@ function getTxJsonFromRawTx(rawTx) {
 
 function getChangeAddressFromTxJsonAndDestination(txJson, destinationAddress) {
 
+  let feeAddress = 'bitcoincash:qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6';
+
   return txJson.vout.map(output => {
     return output.scriptPubKey.addresses[0];
   })
-  .filter(address => address != destinationAddress)[0]
+  .filter(address => address != destinationAddress)
+  .filter(address => address != feeAddress)[0]
 }
 
 async function getChangeAddressFromInvoice(invoice) {

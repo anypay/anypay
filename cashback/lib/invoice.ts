@@ -3,10 +3,14 @@ import * as postgres from './postgres';
 
 export async function findByUid(uid: string) {
 
-  let invoice = (await postgres('invoices')
+  let invoices = (await postgres('invoices')
                .select('id', 'uid', 'address', 'hash', 'amount', 'account_id', 'currency', 'cashback_amount', 'status')
                .where('uid', uid)
-               .limit(1))[0];
+               .limit(1));
+
+  console.log('cashback.invoice', invoices);
+
+  let invoice = invoices[0];
 
   invoice.cashback_amount = parseFloat(invoice.cashback_amount);
 

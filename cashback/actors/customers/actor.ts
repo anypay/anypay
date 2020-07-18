@@ -77,6 +77,8 @@ export async function start() {
 
       if (!cashbackMerchant.enabled) {
 
+        console.log('cashback merchant not enabled');
+
         return channel.ack(message);
 
       }

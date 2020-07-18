@@ -13,6 +13,8 @@ interface SendOptions {
 import * as dashrpc from './dash/jsonrpc';
 import * as bchrpc from './bch/jsonrpc';
 
+import { sendToAddress as bch_sendToAddress } from '../../plugins/bch/lib/cashback';
+
 export async function sendToAddress(options: SendOptions): Promise<string> {
 
   var resp;
@@ -27,7 +29,7 @@ export async function sendToAddress(options: SendOptions): Promise<string> {
 
     case 'BCH':
 
-      resp = await bchrpc.rpc.call('sendtoaddress', [options.address, options.amount]);
+      resp = await bch_sendToAddress(options.address, parseInt((options.amount * 100000000).toFixed(0)));
 
       break;
 
