@@ -6,6 +6,8 @@ import { rpc } from '../../../plugins/dash/lib/jsonrpc'
 
 import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
+import { transformHexToPayments } from '../../../router/plugins/dash/lib';
+
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
@@ -42,11 +44,27 @@ export async function create(req, h) {
 
     for (const transaction of payment.transactions) {
 
-      console.log(transaction.toString('hex'));
+      let hex = transaction.toString('hex')
 
-      let resp = await rpc.call('sendrawtransaction', [transaction.toString('hex')]);
+      console.log('hex', hex);
+
+      let resp = await rpc.call('sendrawtransaction', [hex]);
 
       console.log(resp);
+
+      let payments = transformHexToPayments(hex);
+
+      for (let payment of payments) {
+
+        await channel.publish('anypay.payments', 'payment', Buffer.from(
+          JSON.stringify(
+            Object.assign(payment, {
+              invoice_uid: req.params.uid
+            })
+          )
+        ))
+
+      }
 
     }
 
