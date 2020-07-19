@@ -56,12 +56,14 @@ export async function create(req, h) {
 
       for (let payment of payments) {
 
+        let anypayPayment = Object.assign(payment, {
+          invoice_uid: req.params.uid
+        })
+
+        console.log('anypay.payment.publish', anypayPayment)
+
         await channel.publish('anypay.payments', 'payment', Buffer.from(
-          JSON.stringify(
-            Object.assign(payment, {
-              invoice_uid: req.params.uid
-            })
-          )
+          JSON.stringify(anypayPayment)
         ))
 
       }
