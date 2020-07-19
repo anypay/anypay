@@ -4,6 +4,8 @@ import * as Hapi from 'hapi';
 
 let BITBOX = require('bitbox-sdk').BITBOX;
 
+const bitbox = new BITBOX();
+
 import { badRequest } from 'boom';
 
 import { rpc } from '../../../plugins/bch/lib/jsonrpc'
@@ -52,7 +54,7 @@ export async function create(req, h) {
 
       try {
 
-        let resp = await BITBOX.RawTransactions.sendRawTransaction(hex);
+        let resp = await bitbox.RawTransactions.sendRawTransaction(hex);
 
         console.log(resp);
 
