@@ -2,6 +2,26 @@ require('dotenv').config()
 
 import * as  bchaddr from 'bchaddrjs';
 
+import * as Minercraft from 'minercraft';
+
+
+export async function broadcastTx(hex) {
+
+  let miners = [
+    new Minercraft({
+      url: "https://merchantapi.matterpool.io"
+    }),
+    new Minercraft({
+      url: "https://merchantapi.taal.com"
+    })
+  ]
+
+  return Promise.race(miners.map(miner => {
+    return miner.tx.push(hex); 
+  }))
+
+}
+
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
 

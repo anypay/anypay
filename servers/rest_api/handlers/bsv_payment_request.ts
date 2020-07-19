@@ -16,6 +16,7 @@ import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
 import {models, amqp} from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
+import * as bsvPlugin from '../../../plugins/bsv'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
 
 import * as Boom from 'boom';
@@ -504,14 +505,15 @@ export async function create(req, h) {
     /* BSV transaction using p2p
        Need to parse the payments from the raw transaction
     */
-
-    let payments = await transformHexToPayments(hex);
-
-    console.log('PAYMENTS', payments);
-
     try {
 
-      let resp = await rpc.call('sendrawtransaction', [hex]);
+      let payments = await transformHexToPayments(hex);
+
+      console.log('PAYMENTS', payments);
+
+      ///let resp = await rpc.call('sendrawtransaction', [hex]);
+
+      let resp = await bsvPlugin.broadcastTx(hex);
 
       console.log('resp', resp);
 
@@ -523,9 +525,14 @@ export async function create(req, h) {
           JSON.stringify(payment)
         ));
 
+        channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
+          JSON.stringify({ hex })
+        ));
+
       });
 
     } catch(error) {
+      console.log(error);
 
       console.log('could not broadcast transaction', hex);
 
