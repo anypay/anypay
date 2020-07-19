@@ -4,7 +4,11 @@ import * as Boom from 'boom';
 import { awaitChannel } from '../../../lib/amqp';
 import { log } from '../../../lib/logger';
 
+import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
+
 export async function create(req, h) {
+
+  log.info('moneybutton.webhook', req.payload);
 
   try {
 
@@ -14,13 +18,21 @@ export async function create(req, h) {
       throw new Error('invalid moneybutton webhook secret');
     }
 
-    log.info('moneybutton_webhook', payment);
-
     const channel = await awaitChannel();
 
-    channel.publish('anypay.events', 'moneybutton_webhook', Buffer.from(
+    await channel.publish('anypay.events', 'moneybutton_webhook', Buffer.from(
       JSON.stringify(payment) 
     ))
+
+    let payments = transformHexToPayments(payment.rawtx);
+
+    payments.forEach(anypayPayment => {
+
+      channel.publish('anypay.payments', 'payment', Buffer.from(
+        JSON.stringify(anypayPayment)
+      ));
+
+    });
 
     return { success: true }
 
