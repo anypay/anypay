@@ -160,10 +160,32 @@ export async function generateInvoice(
     image_url: account.image_url
   });
 
+  var invoiceParams = {
+    address: invoiceChangeset.address,
+    invoice_amount: invoiceChangeset.invoiceAmount.value,
+    invoice_currency: invoiceChangeset.invoiceAmount.currency,
+    denomination_currency: invoiceChangeset.denominationAmount.currency,
+    denomination_amount: invoiceChangeset.denominationAmount.value,
+    account_id: invoiceChangeset.accountId,
+    status: 'unpaid',
+    uid: uid,
+    uri,
+    should_settle: account.should_settle,
+    amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
+    currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
+    dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
+  }
+
+  var invoice = await models.Invoice.create(invoiceParams);
+
   let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
 
   let uris = matrix.map((row) => {
     let address = row[0];
+
+    if (address.currency === 'BSV') {
+      return `pay:?r=https://api.anypayinc.com/r/${invoice.uid}`
+    }
 
     return  computeInvoiceURI({
       currency: address.currency,
@@ -183,23 +205,6 @@ export async function generateInvoice(
   });
 
 
-  var invoiceParams = {
-    address: invoiceChangeset.address,
-    invoice_amount: invoiceChangeset.invoiceAmount.value,
-    invoice_currency: invoiceChangeset.invoiceAmount.currency,
-    denomination_currency: invoiceChangeset.denominationAmount.currency,
-    denomination_amount: invoiceChangeset.denominationAmount.value,
-    account_id: invoiceChangeset.accountId,
-    status: 'unpaid',
-    uid: uid,
-    uri,
-    should_settle: account.should_settle,
-    amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
-    currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
-    dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
-  }
-
-  var invoice = await models.Invoice.create(invoiceParams);
 
   let paymentOptions = matrix.map(row => {
 
