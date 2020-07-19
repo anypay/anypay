@@ -14,12 +14,21 @@ import * as moment from 'moment';
 
 export async function updateOutput(payment: Payment){
 
+  let where = {
+    currency: payment.currency,
+    address: payment.address
+  }
+
+  if (payment.invoice_uid) {
+    where['uid'] = payment.invoice_uid
+  }
+
   let invoice = await models.Invoice.findOne({
-    where: {
-      currency: payment.currency,
-      address: payment.address,
-    },
+
+    where,
+
     order: [['createdAt', 'DESC']]
+
   });
 
   if( invoice && payment.output_hash ){
