@@ -63,11 +63,11 @@ export async function start() {
 
     await forwarder.signOutput();
 
-    console.log("output signed")
+    console.log("output signed", forwarder.outputTx)
 
     await forwarder.broadcastOutput();
 
-    console.log("output broadcasted")
+    console.log("output broadcasted", forwarder.output_hash)
 
     await forwarder.publishForwarded();
 

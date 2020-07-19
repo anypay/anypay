@@ -102,6 +102,9 @@ export async function transformAddress(alias){
 
 export async function getNewAddress(deprecatedParam){
 
+  return deprecatedParam.value;
+
+  /*
   //Create a new HDKeyAddress 
   let record = await models.Hdkeyaddresses.create({
 
@@ -118,6 +121,7 @@ export async function getNewAddress(deprecatedParam){
   rpc.call('importaddress', [record.address, "", false, false])
 
   return record.address;
+  */
 
 }
 

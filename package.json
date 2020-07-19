@@ -14,6 +14,7 @@
     "anypay": "./bin/anypay.ts"
   },
   "dependencies": {
+    "@dashevo/dapi-grpc": "^0.13.0",
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
     "@rodrigogs/mysql-events": "^0.6.0",
@@ -75,6 +76,7 @@
     "knex": "^0.20.8",
     "kraken-api": "^1.0.0",
     "mailchimp-api-v3": "^1.13.0",
+    "minercraft": "0.0.8",
     "moment": "^2.22.1",
     "mongodb": "^3.3.3",
     "mustache": "^4.0.0",

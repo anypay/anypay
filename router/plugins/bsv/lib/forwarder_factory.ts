@@ -2,6 +2,8 @@ import { Channel } from 'amqplib';
 import * as bsv from 'bsv';
 import * as lib from './index';
 
+import {  broadcastTx } from '../../../../plugins/bsv';
+
 interface RPCConfig {
   host: string;
   port: string;
@@ -155,9 +157,13 @@ export class TxForwarder {
 
       await this.signOutput();
     }
+
+    let result = await broadcastTx(this.outputTx.toString());
+
+    console.log('router.bsv.broadcast.result', result);
     
     // broadcast signed transaction
-    this.output_hash = await lib.broadcastSignedTx(this.outputTx)
+    this.output_hash = result.txid;
 
     this.outputBroadcast = true;
 
