@@ -19,15 +19,23 @@ export async function start() {
 
       console.log('json', json);
 
+      let where = {
+
+        currency: json.currency,
+
+        address: json.address
+
+      }
+
+      if (json.invoice_uid) {
+      
+        where['invoice_uid'] = json.invoice_uid
+
+      }
+
       try {
 
-        let option = await models.PaymentOption.findOne({ where: {
-
-          currency: json.currency,
-
-          address: json.address
-
-        }});
+        let option = await models.PaymentOption.findOne({ where });
 
         console.log(option);
 

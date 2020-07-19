@@ -522,7 +522,9 @@ export async function create(req, h) {
       payments.forEach(payment => {
 
         channel.publish('anypay.payments', 'payment', Buffer.from(
-          JSON.stringify(payment)
+          JSON.stringify(Object.assign(payment, {
+            invoice_uid: req.params.uid 
+          }))
         ));
 
         channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
