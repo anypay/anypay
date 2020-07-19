@@ -2,6 +2,10 @@ import {generatePaymentRequest} from '../../../plugins/bch/lib/paymentRequest';
 import {awaitChannel} from '../../../lib/amqp';
 import * as Hapi from 'hapi';
 
+let BITBOX = require('bitbox-sdk').BITBOX;
+
+import { badRequest } from 'boom';
+
 import { rpc } from '../../../plugins/bch/lib/jsonrpc'
 
 import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
@@ -44,9 +48,21 @@ export async function create(req, h) {
 
       console.log(transaction.toString('hex'));
 
-      let resp = await rpc.call('sendrawtransaction', [transaction.toString('hex')]);
+      let hex = transaction.toString('hex');
 
-      console.log(resp);
+      try {
+
+        let resp = await BITBOX.RawTransactions.sendRawTransaction(hex);
+
+        console.log(resp);
+
+      } catch(error) {
+
+        console.log('bch.sendrawtransaction.error', error);
+
+        return badRequest(error);
+
+      }
 
     }
 
