@@ -7,3 +7,5 @@ if (require.main === module) {
 
 }
 
+export { start }
+

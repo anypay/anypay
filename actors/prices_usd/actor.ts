@@ -6,7 +6,7 @@ import { Actor, Joi, log } from 'rabbi';
 
 import { models, amqp } from '../../lib';
 
-import { setPrice } from '../../lib/prices';
+import { setPrice, updateUSDPrices } from '../../lib/prices';
 
 export async function start() {
 
