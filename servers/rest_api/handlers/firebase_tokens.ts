@@ -13,12 +13,26 @@ export async function show(req, h) {
 
 }
 
-export async function update(req, h) {
+export async function index(req, h) {
+
+  let firebase_tokens = await models.FirebaseToken.findAll({
+    where: {
+      account_id: req.account.id
+    }
+  });
+
+  return firebase_tokens
+
+}
+
+export async function create(req, h) {
 
   let [firebase_token, isNew] = await models.FirebaseToken.findOrCreate({
 
     where: {
-      account_id: req.account.id
+      account_id: req.account.id,
+
+      token: req.payload.firebase_token
     },
 
     defaults: {
@@ -30,15 +44,13 @@ export async function update(req, h) {
     }
   })
 
-  if (!isNew) {
-
-    firebase_token.token = req.payload.firebase_token; 
-
-    await firebase_token.save();
-
-  }
-
   return { firebase_token }
+
+}
+
+export async function update(req, h) {
+
+  return create(req, h)
 
 }
 

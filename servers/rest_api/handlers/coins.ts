@@ -19,11 +19,13 @@ import * as Joi from 'joi';
  *       "coins": [{
  *         "code": "BTC",
  *         "name": "bitcoin",
- *         "enabled": false
+ *         "enabled": false,
+ *         "supported": true
  *       },{
  *        "code": "DASH",
  *        "name": "dash",
- *        "enabled": true
+ *        "enabled": true,
+ *         "supported": false
  *       }]
  *     }
  */
@@ -52,6 +54,7 @@ const Coin = Joi.object({
   code: Joi.string().required(),
   name: Joi.string().required(),
   enabled: Joi.boolean().required(),
+  supported: Joi.boolean().required(),
 }).label('Coin')
 
 module.exports.CoinsIndexResponse = Joi.object({
