@@ -15,7 +15,8 @@ export async function sendFromAddress(source: string, destination: string, amoun
 
   let sum = 0;
 
-  const fee = 0.00001;
+  //const fee = 0.00001;
+  const fee = 0.00010;
 
   matchingUnspent.forEach(u => {
 
