@@ -1027,6 +1027,16 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/firebase_token",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.FirebaseTokens.create
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/firebase_token",
     options: {

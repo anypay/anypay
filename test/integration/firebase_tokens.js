@@ -22,7 +22,7 @@ describe("Setting Firebase Token via REST", async () => {
 
   });
 
-  it("PUT /settings/denomination should update to VEF", async () => {
+  it("PUT /firebase_token should add multiple tokens", async () => {
     try {
 
       var token = uuid.v4();
@@ -37,6 +37,22 @@ describe("Setting Firebase Token via REST", async () => {
       });
 
       assert.strictEqual(response.result.firebase_token.token, token);
+
+      // A second token can also be added
+      await server.inject({
+        method: 'PUT',
+        url: '/firebase_token',
+        payload: {
+          firebase_token: uuid.v4()
+        },
+        headers: headers(accessToken.uid)
+      });
+
+      assert.strictEqual(models.FirebaseToken.findAll(
+        where: {
+          account_id: account.id
+        }
+      ).length, 2)
 
     } catch(error) {
 
