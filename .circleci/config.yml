@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   build:
     docker:
@@ -22,9 +22,25 @@ jobs:
           name: Push to Docker Hub
           command: |
             ./push_to_docker.sh
+  deploy:
+    machine:
+      image: ubuntu-1604:202007-01
+    steps:
+      - run:
+          name: Chef Client Update Live Staging Container
+          command: ssh ubuntu@api.staging.anypayinc.com "sudo chef-client -o recipe[anypay_api::staging]"
+
+
 workflows:
   version: 2
-  build:
+  build_and_deploy:
     jobs:
       - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+
 
