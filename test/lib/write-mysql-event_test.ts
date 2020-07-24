@@ -120,7 +120,7 @@ describe('Mysql event listeners', () => {
 
   });
 
- it("should write new transaction record to database", async () => {
+ it.skip("should write new transaction record to database", async () => {
 
    let tx = await writeTransactionRecord(event);
    console.log(tx)
