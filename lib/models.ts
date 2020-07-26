@@ -219,5 +219,11 @@ models.Tipjar.belongsTo(models.Account, {
   foreignKey: 'account_id'
 });
 
+models.Invoice.hasMany(models.InvoiceNote, {
+  as: 'notes',
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid'
+});
+
 export { models };
 

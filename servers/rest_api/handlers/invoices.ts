@@ -44,7 +44,7 @@ export async function index (request, reply) {
     },
 
     include: [{
-      model: models.notes,
+      model: models.InvoiceNote,
       as: 'notes'
     }],
 
