@@ -47,7 +47,8 @@ export async function start() {
 
           if (option.currency !== invoice.currency) {
 
-            await invoices.replaceInvoice(option.invoice_uid, option.currency);
+            console.log('replace currency', { uid: option.invoice_uid, currency: option.currency });
+            let resp = await invoices.replaceInvoice(option.invoice_uid, option.currency);
 
             // process payment again through standard payment processor actor.
             await channel.publish('anypay.payments', 'payment', msg.content);
