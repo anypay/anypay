@@ -943,7 +943,9 @@ async function Server() {
 
            longitude: Joi.number().optional(),
 
-           image_url: Joi.string().optional()
+           image_url: Joi.string().optional(),
+
+           website_url: Joi.string().optional()
 
          }
 
