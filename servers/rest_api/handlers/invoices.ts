@@ -12,7 +12,7 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
-import { models, invoices } from '../../../lib';
+import { models, invoices, coins } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -113,6 +113,7 @@ export async function index (request, reply) {
 
   } catch(error) {
 
+    log.error(error);
     log.error(error.message);
 
     return { error: error.message };
@@ -147,6 +148,41 @@ export async function replace (request, reply) {
 
 }
 
+function selectCurrency(addresses) {
+
+  let currency = addresses.reduce((c, address) => {
+    console.log('C', c)
+
+    if (c) {
+
+      return c;
+
+    } else {
+
+      if (!coins.getCoin(address.currency).unavailable) {
+
+        c = address.currency
+
+      }
+
+    }
+
+    console.log('c', c);
+
+    return c;
+
+  }, null);
+
+  if (!currency) {
+
+    throw new Error('no address set for any active coins');
+
+  }
+
+  return currency;
+
+}
+
 export async function create (request, reply) {
 
   var currency_specified = false;
@@ -160,17 +196,27 @@ export async function create (request, reply) {
 
 	if (request.payload.currency) {
 
+    log.info('currency parameter provided')
+
     currency_specified = true;
 
   } else {
 
-    log.info('currency parameter provided')
+    log.info('no currency parameter provided')
+
+    /*
+      Find the first address that is from a coin that is currently active
+      and set that as the invoice currency. This is a hack because the
+      invoice currency actually does not matter any more since moving to
+      payment options.
+    */
 
     let addresses = await models.Address.findAll({
       where: { account_id: request.account.id }
     });
 
-    request.payload.currency = addresses[0].currency;
+
+    request.payload.currency = selectCurrency(addresses);
 	}
 
 
