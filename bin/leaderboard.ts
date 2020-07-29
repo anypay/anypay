@@ -4,41 +4,58 @@ require('dotenv').config();
 
 import * as program from 'commander';
 
-import { database, models } from '../lib';
+import { database, models, leaderboard } from '../lib';
+
+program
+  .command('summary')
+  .action(async () => {
+
+    let summary: leaderboard.LeaderboardSummary = await leaderboard.getSummary();
+    
+    console.log(summary);
+
+    process.exit(0);
+
+  });
+
 
 program
   .command('ls')
   .action(async () => {
     try {
 
-      let accountInvoicesCounts = await database.query(`select account_id, count(*) from
-          invoices where status = 'paid' and "createdAt" > '07-01-2019' group by
-          account_id order by count desc;`);
+      let list: any[] = await leaderboard.list();
 
+      let allLength = list.length;
 
-      let result = await Promise.all(accountInvoicesCounts[0].map(async (i) => {
+      list = list.filter((i: any) => {
+        if (i.account.business_name) {
+          return true;
+        }
+      });
 
-        let account = await models.Account.findOne({where: { id: i.account_id }})
+      list.map((i: any) => {
 
-        return {
-          account_id: i.account_id,
-          count: i.count,
-          account: account.toJSON()
+        if (i.account.business_name) {
+  
+          console.log({ email: i.account.email, count: i.count })
+
+          console.log({ business: i.account.business_name, email: i.account.email, count: i.count })
+
         }
 
-      }));
-
-      result.map((i: any) => {
-
-        console.log({ email: i.account.email, count: i.count })
-
       });
+
+      console.log('# PAYMENTS', allLength);
+      console.log('# WITH BUSINESS NAME', list.length);
 
     } catch(error) {
 
       console.error(error.message);
 
     }
+
+    process.exit(0);
 
   });
 

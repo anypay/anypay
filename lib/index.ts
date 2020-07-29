@@ -31,6 +31,7 @@ import * as receipts from './receipts';
 import * as settlements from './settlements';
 import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
+import * as leaderboard from './leaderboard';
 
 var initialized = false;
 
@@ -59,6 +60,7 @@ export {
   forwards,
   invoices,
   kraken,
+  leaderboard,
   log,
   login,
   models,
