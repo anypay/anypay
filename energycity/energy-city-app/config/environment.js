@@ -7,6 +7,7 @@ module.exports = function(environment) {
     environment,
     rootURL: '',
     locationType: 'hash',
+    anypayAPI: 'https://api.staging.anypayinc.com',
     EmberENV: {
       FEATURES: {
         // Here you can enable experimental features on an ember canary build
