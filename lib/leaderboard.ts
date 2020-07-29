@@ -9,6 +9,52 @@ export interface LeaderboardSummary {
   business_name_and_payment: number;
 }
 
+export interface Leaderboard {
+  one_payment: any[];
+  address_set: any[];
+  business_name: any[];
+  business_name_and_payment: any[];
+}
+
+function sanitize(array: any[]): any[] {
+
+  return array.map(p => {
+    return {
+      business_name: p.business_name,
+      count: p.count
+    }
+  });
+
+}
+
+export function sanitizeLeaderboard(l: Leaderboard): Leaderboard {
+
+  return {
+    one_payment: sanitize(l.one_payment),
+    address_set: sanitize(l.address_set),
+    business_name: sanitize(l.business_name),
+    business_name_and_payment: sanitize(l.business_name_and_payment)
+  };
+
+}
+
+export async function getLeaderboard() {
+
+  let one_payment = await list();
+
+  let address_set = await listAccountsAddressSet();
+
+  let business_name = await listAccountWithBusinessName();
+
+  return {
+    one_payment: one_payment,
+    address_set: address_set,
+    business_name: business_name,
+    business_name_and_payment: []
+  }
+
+}
+
 export async function getSummary() {
 
   let one_payment = await list();
@@ -38,8 +84,8 @@ async function listAccountWithBusinessName() {
 
 async function listAccountsAddressSet() {
 
-  let accountsAddressSet = await database.query(`select account_id from
-      addresses  group by account_id`);
+  let accountsAddressSet = await database.query(`select * from accounts where id in (select account_id from
+      addresses group by account_id)`);
 
   return accountsAddressSet[0];
 }
