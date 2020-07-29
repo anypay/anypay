@@ -1233,6 +1233,14 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
 
   });
 });
+define('energy-city-app/controllers/leaderboard', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Controller.extend({});
+});
 define('energy-city-app/controllers/moneybutton-auth-redirect', ['exports'], function (exports) {
   'use strict';
 
@@ -1955,6 +1963,7 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
     this.route('payments');
     this.route('logout');
     this.route('index');
+    this.route('leaderboard');
   });
 
   exports.default = Router;
@@ -2495,6 +2504,31 @@ define('energy-city-app/routes/index', ['exports'], function (exports) {
     }
   });
 });
+define('energy-city-app/routes/leaderboard', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Route.extend({
+
+    leaderboard: Ember.inject.service(),
+
+    model: function model() {
+      return this.get('leaderboard').getLeaderboard();
+    },
+    setupController: function setupController(controller, model) {
+
+      controller.set('leaderboard', model.map(function (i) {
+        return i.account;
+      }).filter(function (a) {
+        return !!a.business_name;
+      }).filter(function (a) {
+        return a.id !== 1177;
+      }));
+    }
+  });
+});
 define('energy-city-app/routes/logout', ['exports'], function (exports) {
   'use strict';
 
@@ -3005,6 +3039,91 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
         return val;
     };
 });
+define('energy-city-app/services/leaderboard', ['exports', 'ember-get-config'], function (exports, _emberGetConfig) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = Ember.Service.extend({
+
+    leaderboard: null,
+
+    getLeaderboard: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var resp;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                if (this.get('leaderboard')) {
+                  _context.next = 6;
+                  break;
+                }
+
+                _context.next = 3;
+                return Ember.$.ajax({
+                  method: "GET",
+                  url: _emberGetConfig.default.anypayAPI + '/leaderboard'
+                });
+
+              case 3:
+                resp = _context.sent;
+
+
+                this.set('leaderboard', resp.leaderboard);
+
+                return _context.abrupt('return', this.get('leaderboard'));
+
+              case 6:
+                return _context.abrupt('return', this.get('leaderboard'));
+
+              case 7:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function getLeaderboard() {
+        return _ref.apply(this, arguments);
+      }
+
+      return getLeaderboard;
+    }()
+  });
+});
 define('energy-city-app/services/message-bus', ['exports', 'ember-message-bus/services/message-bus'], function (exports, _messageBus) {
   'use strict';
 
@@ -3161,6 +3280,14 @@ define("energy-city-app/templates/index", ["exports"], function (exports) {
   });
   exports.default = Ember.HTMLBars.template({ "id": "4bL8NOQ6", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/index.hbs" } });
 });
+define("energy-city-app/templates/leaderboard", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "NhAf2tuQ", "block": "{\"symbols\":[\"account\",\"i\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[0,\"Leaderboard\"],[8],[0,\"\\n\\n\"],[6,\"table\"],[9,\"class\",\"leaderboard table table-striped\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"leaderboard\"]]],null,{\"statements\":[[0,\"    \"],[6,\"tr\"],[7],[0,\"\\n\\n      \"],[6,\"td\"],[7],[0,\"\\n        \"],[1,[19,2,[]],false],[0,\") \"],[1,[19,1,[\"business_name\"]],false],[0,\"\\n      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\"]],\"parameters\":[1,2]},null],[8],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/leaderboard.hbs" } });
+});
 define("energy-city-app/templates/moneybutton-auth-redirect", ["exports"], function (exports) {
   "use strict";
 
@@ -3207,6 +3334,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+1a9211e5"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+b3fe6e1f"});
 }
 //# sourceMappingURL=energy-city-app.map

@@ -45,6 +45,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(false, 'controllers/city.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n22:5 - Unexpected console statement. (no-console)\n27:7 - Unexpected console statement. (no-console)\n47:7 - Unexpected console statement. (no-console)');
   });
 
+  QUnit.test('controllers/leaderboard.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'controllers/leaderboard.js should pass ESLint\n\n');
+  });
+
   QUnit.test('controllers/moneybutton-auth-redirect.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'controllers/moneybutton-auth-redirect.js should pass ESLint\n\n');
@@ -95,6 +100,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'routes/index.js should pass ESLint\n\n');
   });
 
+  QUnit.test('routes/leaderboard.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/leaderboard.js should pass ESLint\n\n');
+  });
+
   QUnit.test('routes/logout.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'routes/logout.js should pass ESLint\n\n');
@@ -118,6 +128,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('services/geolocation.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'services/geolocation.js should pass ESLint\n\n15:7 - \'geolocator\' is not defined. (no-undef)\n41:13 - Unexpected console statement. (no-console)\n44:11 - Unexpected console statement. (no-console)\n91:2 - Unnecessary semicolon. (no-extra-semi)');
+  });
+
+  QUnit.test('services/leaderboard.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'services/leaderboard.js should pass ESLint\n\n3:20 - \'service\' is defined but never used. (no-unused-vars)');
   });
 });
 define('energy-city-app/tests/helpers/destroy-app', ['exports'], function (exports) {

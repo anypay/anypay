@@ -15,6 +15,7 @@ Router.map(function() {
   this.route('payments');
   this.route('logout');
   this.route('index');
+  this.route('leaderboard');
 });
 
 export default Router;
