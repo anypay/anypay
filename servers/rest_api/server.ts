@@ -1063,6 +1063,12 @@ async function Server() {
     handler: handlers.DashWatchAddresses.create
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/leaderboard',
+    handler: handlers.Leaderboard.index
+  }); 
+
   accountCSVReports(server);
 
   server.route({
