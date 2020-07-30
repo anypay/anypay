@@ -3,11 +3,9 @@ const log = require('winston');
 const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
-import { geocode } from '../../../lib/googlemaps';
-
 import {emitter} from '../../../lib/events'
 
-import { models } from '../../../lib';
+import { models, accounts } from '../../../lib';
 
 import { getROI } from '../../../lib/roi';
 import { awaitChannel } from '../../../lib/amqp';
@@ -15,9 +13,9 @@ import { awaitChannel } from '../../../lib/amqp';
 function hash(password) {
   return new Promise((resolve, reject) => {
 
-    bcrypt.hash(password, 10, (error, hash) => {
-      if (error) { return reject(error) }
-      resolve(hash);
+      bcrypt.hash(password, 10, (error, hash) => {
+        if (error) { return reject(error) }
+        resolve(hash);
     })
   });
 }
@@ -26,87 +24,7 @@ export async function update(req, h) {
 
   try {
 
-    let account = await models.Account.findOne({ where: {
-
-      id: req.account.id
-
-    }});
-
-    if (!account) {
-
-      return {
-
-        success: false,
-
-        error: 'account not found'
-
-      }
-
-    }
-
-    let updateAttrs: any = Object.assign(req.payload, {});
-
-    if (updateAttrs.physical_address) {
-
-      try {
-
-        let geolocation = await geocode(updateAttrs.physical_address);
-
-        updateAttrs.latitude = geolocation.lat;
-        updateAttrs.longitude = geolocation.lng;
-
-      } catch (error) {
-
-        log.error('error geocoding address', error.message);
-
-      }
-
-    }
-
-    if (updateAttrs.ambassador_email) {
-      let ambassadorAccount = await models.Account.findOne({
-        where: {
-          email: updateAttrs.ambassador_email
-        }
-      });
-
-      if (!ambassadorAccount) {
-        throw new Error('ambassador email does not exist');
-      }
-
-      let ambassador = await models.Ambassador.findOne({
-        where: { account_id: ambassadorAccount.id }
-      })
-
-      if (ambassador) {
-
-        updateAttrs['ambassador_id'] = ambassador.id;
-
-        let channel = await awaitChannel();
-
-        await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
-          account_id: req.account.id,
-          ambassador_id: ambassador.id,
-          ambassador_email: updateAttrs.ambassador_email
-        })));
-
-      }
-
-    }
-
-    delete updateAttrs['ambassador_email'];
-
-    await models.Account.update(updateAttrs, {
-
-      where: { id: req.account.id }
-
-    });
-
-    account = await models.Account.findOne({ where: {
-
-      id: req.account.id
-
-    }});
+    let account = await accounts.updateAccount(req.account, req.payload);
 
     return {
 

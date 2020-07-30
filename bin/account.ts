@@ -22,6 +22,34 @@ program
   });
 
 program
+  .command('update <email> <attribute> <value>')
+  .action(async (email, attr, value) => {
+
+    try {
+
+      let account = await accounts.findByEmail(email)
+
+      let params = {}
+
+      params[attr] = value;
+
+      account = await accounts.updateAccount(account, params)
+
+      console.log(account.toJSON());
+
+    } catch(error) {
+
+      console.log(error);
+
+      process.exit(0);
+  
+    }
+
+  });
+
+
+
+program
   .command('addtag <email> <tag>')
   .action(async (email, tag) => {
     try {
