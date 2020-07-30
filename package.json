@@ -105,6 +105,7 @@
     "socket.io-client": "^2.0.3",
     "square-connect": "^2.20191217.0",
     "superagent": "^3.5.2",
+    "tonicpow-js": "^0.1.75",
     "twilio": "^3.43.1",
     "typescript": "^2.7.2",
     "typings": "^2.1.1",
