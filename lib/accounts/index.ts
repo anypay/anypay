@@ -1,12 +1,112 @@
 const bcrypt = require('bcrypt');
 
 import { models } from '../models';
+import { awaitChannel } from '../amqp';
 import { log } from '../logger';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
 import {emitter} from '../events'
 import {AccountAddress} from '../core/types';
+
+import * as geocoder from '../googlemaps';
+
+export async function findByEmail(email) {
+
+  return models.Account.findOne({ where: { email }});
+
+}
+
+export async function updateAccount(account, payload) {
+
+  if (!account) {
+
+    return {
+
+      success: false,
+
+      error: 'account not found'
+
+    }
+
+  }
+
+  let updateAttrs: any = Object.assign(payload, {});
+
+  if (updateAttrs.physical_address) {
+
+    try {
+
+      let geocodeResult = await geocoder.geocodeFull(updateAttrs.physical_address, account.id);
+
+      let city = geocoder.parseCity(geocodeResult);
+      let state = geocoder.parseState(geocodeResult);
+      let country = geocoder.parseCountry(geocodeResult);
+
+      let geolocation = geocodeResult.geometry.location
+
+      updateAttrs.latitude = geolocation.lat;
+      updateAttrs.longitude = geolocation.lng;
+      updateAttrs.city = city.long_name;
+      updateAttrs.state = state.short_name;
+      updateAttrs.country = country.short_name;
+
+    } catch (error) {
+
+      log.error('error geocoding address', error.message);
+
+    }
+
+  }
+
+  if (updateAttrs.ambassador_email) {
+    let ambassadorAccount = await models.Account.findOne({
+      where: {
+        email: updateAttrs.ambassador_email
+      }
+    });
+
+    if (!ambassadorAccount) {
+      throw new Error('ambassador email does not exist');
+    }
+
+    let ambassador = await models.Ambassador.findOne({
+      where: { account_id: ambassadorAccount.id }
+    })
+
+    if (ambassador) {
+
+      updateAttrs['ambassador_id'] = ambassador.id;
+
+      let channel = await awaitChannel();
+
+      await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
+        account_id: account.id,
+        ambassador_id: ambassador.id,
+        ambassador_email: updateAttrs.ambassador_email
+      })));
+
+    }
+
+  }
+
+  delete updateAttrs['ambassador_email'];
+
+  await models.Account.update(updateAttrs, {
+
+    where: { id: account.id }
+
+  });
+
+  account = await models.Account.findOne({ where: {
+
+    id: account.id
+
+  }});
+
+  return account
+
+}
 
 export async function findAllWithTags(tags: string[]): Promise<any> {
 
