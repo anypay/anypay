@@ -90,7 +90,9 @@ async function listAccountsAddressSet() {
   return accountsAddressSet[0];
 }
 
-export async function list() {
+var leaderboardCache;
+
+export async function updateCache() {
 
   let accountInvoicesCounts = await database.query(`select account_id, count(*) from
       invoices where status = 'paid' and "createdAt" > '07-01-2019' group by
@@ -108,6 +110,19 @@ export async function list() {
 
   }));
 
+  leaderboardCache = result;
+
   return result;
+
+}
+
+export async function list() {
+  
+  if (!leaderboardCache) {
+
+    await updateCache();
+  }
+
+  return leaderboardCache;
 
 }
