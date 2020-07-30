@@ -21,6 +21,7 @@ import { Payment } from '../types/interfaces';
 import * as http from 'superagent';
 
 import {emitter} from './events'
+import {getDiscount} from './discounts'
 
 const log = require("winston");
 
@@ -93,6 +94,21 @@ function applyScalar(invoiceAmount, scalar) {
   });
 }
 
+function applyDiscount(invoiceAmount, discount) {
+
+  if (discount.percent === 0) {
+    return invoiceAmount;
+  }
+
+  let nDiscountPercent = new BigNumber(discount.percent);
+  let nScalar = (new BigNumber(1)).minus(nDiscountPercent.dividedBy(100));
+  let nAmount = new BigNumber(invoiceAmount.value);
+
+  return Object.assign(invoiceAmount, {
+    value: parseFloat(nScalar.times(nAmount).toNumber().toFixed(6))
+  });
+}
+
 export async function generateInvoice(
 
   accountId: number,
@@ -107,6 +123,8 @@ export async function generateInvoice(
   let addresses = await models.Address.findAll({ where: {
     account_id: account.id
   }});
+
+  let discount = await getDiscount(accountId);
 
   addresses = _.reject(addresses, (address) => {
     return getCoin(address.currency).unavailable;
@@ -124,6 +142,10 @@ export async function generateInvoice(
 
     if (address.price_scalar) {
       conversion = applyScalar(conversion, address.price_scalar);
+    }
+
+    if (discount) {
+      conversion = applyDiscount(conversion, discount);
     }
 
     return conversion;

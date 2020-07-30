@@ -5,9 +5,38 @@ require('dotenv').config();
 import { models, log, accounts } from '../lib';
 import { getSupportedCoins } from '../lib/accounts';
 import { registerAccount } from '../lib/accounts';
+import * as discounts from '../lib/discounts';
 import { setAddress } from '../lib/core';
 
 var program = require("commander");
+
+program
+  .command('getdiscount <email> [coin]')
+  .action(async (email, coin) => {
+
+    let account = await models.Account.findOne({ where: { email }});
+
+    let discount = await discounts.getDiscount(account.id, coin);
+
+    console.log(discount.toJSON());
+
+    process.exit(0);
+
+  });
+
+program
+  .command('setdiscount <email> <percent> [coin]')
+  .action(async (email, percent, coin) => {
+
+    let account = await models.Account.findOne({ where: { email }});
+
+    let discount = await discounts.setDiscount(account.id, percent, coin);
+
+    console.log(discount.toJSON());
+
+    process.exit(0);
+
+  });
 
 program
   .command('listcoins <email>')
