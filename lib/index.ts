@@ -32,6 +32,7 @@ import * as settlements from './settlements';
 import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
+import * as events from './events';
 
 var initialized = false;
 
@@ -57,6 +58,7 @@ export {
   dashwatch,
   database,
   email,
+  events,
   forwards,
   invoices,
   kraken,
