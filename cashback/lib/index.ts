@@ -14,6 +14,7 @@ import * as dashrpc from './dash/jsonrpc';
 import * as bchrpc from './bch/jsonrpc';
 
 import { sendToAddress as bch_sendToAddress } from '../../plugins/bch/lib/cashback';
+import { _sendToAddress as dash_sendToAddress } from '../../plugins/dash/lib/cashback';
 
 export async function sendToAddress(options: SendOptions): Promise<string> {
 
@@ -23,7 +24,7 @@ export async function sendToAddress(options: SendOptions): Promise<string> {
 
     case 'DASH':
 
-      resp = await dashrpc.rpc.call('sendtoaddress', [options.address, options.amount]);
+      resp = await dash_sendToAddress(options.address, options.amount);
 
       break;
 
