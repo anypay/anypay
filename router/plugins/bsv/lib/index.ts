@@ -9,6 +9,7 @@ interface Payment{
   hash: string;
   currency: string;
   address: string;
+  invoice_uid?: string;
 }
 
 interface Route{
