@@ -54,12 +54,18 @@ export async function updateOutput(payment: Payment){
 export async function receivePayment(payment: Payment) {
   log.info('receive payment', payment);
 
+  let where = {
+    currency: payment.currency,
+    address: payment.address,
+    status: "unpaid"
+  }
+
+  if (payment.invoice_uid) {
+    where['uid'] = payment.invoice_uid;
+  }
+
   let invoice = await models.Invoice.findOne({
-    where: {
-      currency: payment.currency,
-      address: payment.address,
-      status: "unpaid"
-    },
+    where,
     order: [['createdAt', 'DESC']]
   });
 
@@ -92,6 +98,11 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
       payment
     });
 
+  }
+
+  if (payment.invoice_uid && payment.invoice_uid !== invoice.uid) {
+    log.info('invoice uid does not match payment invoice_uid')
+    return;
   }
 
   /* End Expiration Check */

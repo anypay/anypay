@@ -38,9 +38,17 @@ export async function create(req, h) {
 
     payments.forEach(anypayPayment => {
 
-      channel.publish('anypay.payments', 'payment', Buffer.from(
-        JSON.stringify(anypayPayment)
-      ));
+      anypayPayment.invoice_uid = req.payload.payment.buttonId;
+
+      if (req.payload.payment.buttonId) {
+
+        log.info('anypay.payment', anypayPayment);
+
+        channel.publish('anypay.payments', 'payment', Buffer.from(
+          JSON.stringify(anypayPayment)
+        ));
+
+      }
 
     });
 
