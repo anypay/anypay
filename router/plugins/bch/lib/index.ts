@@ -1,4 +1,4 @@
-import * as bch from 'bitcore-lib-cash';
+const bch = require('bitcore-lib-cash');
 import { lookupOutputFromInput } from '../../../lib/router_client'
 let Transaction = bch.Transaction
 let Script = bch.Script
@@ -66,7 +66,7 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
 
 }
 
-export async function broadcastSignedTx(tx: bch.Transaction): Promise<string>{
+export async function broadcastSignedTx(tx): Promise<string>{
  
   return await rpcCall('sendrawtransaction', [tx.toString()])
 
@@ -89,7 +89,7 @@ export function transformHexToPayments(hex: string): Payment[]{
 
 }
 
-export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Transaction{
+export function createOutputTxFromInputTx(inputTx, route,fee = 0.00002 ): any { // bch.Transaction
 
   let utxos = inputTx.outputs.reduce((result, output, index)  => {
 
@@ -110,8 +110,6 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Tra
   if (input.satoshis < fee) {
 
      throw(new RangeError(`Fee: ${fee} satoshis is greater than the unspent output: ${input.satoshis} satoshis`));
-
-     return;
   }
 
   let utxo = {
@@ -132,7 +130,7 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Tra
 
 }
 
-export function signTransaction(tx: bch.Transaction, pk: bch.PrivateKey):bch.Transaction{
+export function signTransaction(tx, pk):any{
   return tx.sign(pk)            
 }
 
@@ -151,6 +149,6 @@ export async function getSmartFee(numberOfConf){
 
 }
 
-export function derivePrivateKey(pk: bch.HDPrivateKey ,nonce): bch.PrivateKey{
+export function derivePrivateKey(pk,nonce): any{
   return  pk.deriveChild(nonce).privateKey.toString() 
 }
