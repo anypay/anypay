@@ -185,32 +185,36 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    let subscription = await address_subscription.createSubscription('BCH', address)
+    //let subscription = await address_subscription.createSubscription('BCH', address)
 
   } else {
 
-           //Create a new HDKeyAddress
-     let record = await models.Hdkeyaddresses.create({
+    return record.value;
 
-        currency:'BCH',
+   /*
+   //Create a new HDKeyAddress
+   let record = await models.Hdkeyaddresses.create({
 
-        xpub_key:process.env.BCH_HD_PUBLIC_KEY
+      currency:'BCH',
 
-      })
+      xpub_key:process.env.BCH_HD_PUBLIC_KEY
 
-      record.address = deriveAddress(process.env.BCH_HD_PUBLIC_KEY, record.id)
+    })
 
-      console.log('Importing address', record.address)
+    record.address = deriveAddress(process.env.BCH_HD_PUBLIC_KEY, record.id)
 
-      await record.save()
+    console.log('Importing address', record.address)
 
-      rpc.call('importaddress', [record.address, "", false, false])
+    await record.save()
 
+    //rpc.call('importaddress', [record.address, "", false, false])
 
-      return record.address;
+    return record.address;
+    */
 
   }
 
+  /*
   rpc.call('importaddress', [address, 'false', false])
 
     .then(result => {
@@ -223,6 +227,8 @@ export async function getNewAddress(record: I_Address) {
       console.log('rpcerror', error); 
 
     });
+
+  */
 
   return address;
 

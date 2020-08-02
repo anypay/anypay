@@ -80,6 +80,8 @@ program
 
   });
 
+program.option('-D, --dev', 'use local development API server');
+
 program
   .command('getpaymentrequest <invoice_uid> <currency>')
   .action(async (invoiceUID, currency) => {
@@ -127,8 +129,10 @@ program
     case 'BCH':
       accept = 'application/bitcoincash-paymentrequest'
 
-      response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
-      //response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
+      var host = !!program.dev ? 'http://localhost:8000' : 'https://api.anypayinc.com';
+      console.log(`USING API ${host}`);
+
+      response = await axios.get(`${host}/r/${invoiceUID}`, {
         responseType: 'arraybuffer',
         headers: {
           'accept': accept

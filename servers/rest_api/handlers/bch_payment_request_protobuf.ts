@@ -4,6 +4,8 @@ import * as Hapi from 'hapi';
 
 let BITBOX = require('bitbox-sdk').BITBOX;
 
+import { transformHexToPayments } from '../../../router/plugins/bch/lib';
+
 const bitbox = new BITBOX();
 
 import { badRequest } from 'boom';
@@ -57,6 +59,14 @@ export async function create(req, h) {
         let resp = await bitbox.RawTransactions.sendRawTransaction(hex);
 
         console.log(resp);
+
+        let payments = transformHexToPayments(hex);
+
+        for (const payment in payments) {
+
+          await channel.publish('anypay.payments', 'payment', Buffer.from(JSON.stringify(payment)))
+
+        }
 
       } catch(error) {
 
