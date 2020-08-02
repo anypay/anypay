@@ -125,7 +125,7 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     "time": moment().toDate(),
     "expires": moment().add(15, 'minutes').toDate(),
     "memo": `Payment request for Anypay invoice ${invoice.uid}`,
-    "paymentUrl": `https://anypayinc.com/payments/edge/${invoice.currency}/${invoice.uid}`,
+    "paymentUrl": `https://api.anypayinc.com/payments/edge/${invoice.currency}/${invoice.uid}`,
     "paymentId": invoice.uid
   }
 

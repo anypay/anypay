@@ -25,6 +25,13 @@ function isCorrectAccept(req: Hapi.Request) {
   return req.headers['accept'] === 'application/bitcoincash-paymentack'
 }
 
+export async function createEdge(req, h) {
+  console.log(req);
+  return {
+    success: false
+  }
+}
+
 export async function create(req, h) {
 
   console.log('REQUEST');

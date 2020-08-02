@@ -798,6 +798,12 @@ async function Server() {
 
   server.route({
     method: "POST",
+    path: "/payments/edge/BCH/{uid}",
+    handler: handlers.BchPaymentRequestProtobuf.createEdge
+  })
+
+  server.route({
+    method: "POST",
     path: "/invoices/{uid}/pay/bip70/dash",
     handler: handlers.DashPaymentRequestProtobuf.create,
     config: {
