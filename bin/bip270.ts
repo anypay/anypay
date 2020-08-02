@@ -6,9 +6,34 @@ import * as http from 'superagent';
 import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
+
+import { transformHexToPayments } from '../router/plugins/bch/lib';
+import { awaitChannel } from '../lib/amqp';
 const axios = require('axios');
 
 import { Bip70DashPayer } from '../lib/bip70/dash';
+
+program
+  .command('publishbch <uid> <hex>')
+  .action(async (uid, hex) => {
+    let payments = transformHexToPayments(hex)  
+
+    console.log('payments', payments);
+
+    let channel = await awaitChannel();
+
+    payments.forEach(payment => {
+
+      channel.publish('anypay.payments', 'payment', Buffer.from(
+
+        JSON.stringify(Object.assign(payment, {invoice_uid: uid })) 
+
+
+      ))
+
+    });
+
+  })
 
 program
   .command('paydashinvoice <invoice_uid>')

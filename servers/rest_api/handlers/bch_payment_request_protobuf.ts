@@ -62,20 +62,19 @@ export async function create(req, h) {
 
         let payments = transformHexToPayments(hex);
 
-        for (const payment in payments) {
+        console.log('payments', payments);
 
-          let p = Object.assign(payment, {
-            invoice_uid: req.params.uid
-          })
+        payments.forEach(payment => {
 
-          console.log('anypay.payment', p);
+          console.log('payment', Object.assign(payment, {invoice_uid: req.params.uid })) 
 
-          let buffer = Buffer.from(JSON.stringify(p));
+          channel.publish('anypay.payments', 'payment', Buffer.from(
 
+            JSON.stringify(Object.assign(payment, {invoice_uid: req.params.uid })) 
 
-          await channel.publish('anypay.payments', 'payment', buffer);
+          ))
 
-        }
+        });
 
       } catch(error) {
 
