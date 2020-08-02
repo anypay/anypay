@@ -26,7 +26,7 @@ function isCorrectAccept(req: Hapi.Request) {
 }
 
 export async function createEdge(req, h) {
-  console.log(req);
+  console.log('CREATE EDGE', req);
   return {
     success: false
   }
