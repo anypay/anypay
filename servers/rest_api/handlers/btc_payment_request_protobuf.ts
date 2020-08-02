@@ -2,6 +2,7 @@ import {awaitChannel} from '../../../lib/amqp';
 import * as Hapi from 'hapi';
 
 import { rpc } from '../../../plugins/btc/jsonrpc'
+import { publishBTC } from '../../../lib/blockcypher'
 
 import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
@@ -45,7 +46,8 @@ export async function create(req, h) {
 
       console.log(transaction.toString('hex'));
 
-      let resp = await rpc.call('sendrawtransaction', [transaction.toString('hex')]);
+      //let resp = await rpc.call('sendrawtransaction', [transaction.toString('hex')]);
+      let resp = await publishBTC(transaction.toString('hex'));
 
       console.log(resp);
 

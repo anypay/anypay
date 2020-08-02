@@ -8,6 +8,16 @@ import { models } from '../models';
 
 const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypay.global";
 
+export async function publishBTC(hex) {
+
+  let resp = await http.post(`https://api.blockcypher.com/v1/bcy/test/txs/push?token=${token}`).send({
+    tx: hex
+  });
+
+  return resp.body.hash;
+
+}
+
 function createWebhook(address) {
   return new Promise((resolve, reject) => {
     let webhook = {
