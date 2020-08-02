@@ -109,7 +109,9 @@ export async function generateInvoice(
   }});
 
   addresses = _.reject(addresses, (address) => {
-    return getCoin(address.currency).unavailable;
+    let coin = getCoin(address.currency);
+    if (!coin) { return true }
+    return coin.unavailable;
   });
 
   let coin = getCoin(invoiceCurrency);
@@ -157,7 +159,8 @@ export async function generateInvoice(
     amount: invoiceChangeset.invoiceAmount.value,
     address: invoiceChangeset.address,
     business_name: account.business_name,
-    image_url: account.image_url
+    image_url: account.image_url,
+    invoice_uid: uid
   });
 
   var invoiceParams = {
@@ -192,7 +195,8 @@ export async function generateInvoice(
       amount: row[1].value,
       address: row[2].address,
       business_name: account.business_name,
-      image_url: account.image_url
+      image_url: account.image_url,
+      invoice_uid: invoice.uid
     });
   });
 
