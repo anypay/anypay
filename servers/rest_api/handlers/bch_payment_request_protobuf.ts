@@ -87,7 +87,8 @@ export async function create(req, h) {
               invoice_uid: req.params.uid,
               address: payment.address.split(':')[1]
             })) 
-          })
+
+          ))
 
         });
 
