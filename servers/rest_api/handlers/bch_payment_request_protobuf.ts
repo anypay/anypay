@@ -81,6 +81,14 @@ export async function create(req, h) {
 
           ))
 
+          channel.publish('anypay.payments', 'payment', Buffer.from(
+
+            JSON.stringify(Object.assign(payment, {
+              invoice_uid: req.params.uid,
+              address: payment.address.split(':')[1]
+            })) 
+          })
+
         });
 
       } catch(error) {
