@@ -10,11 +10,23 @@ const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockc
 
 export async function publishBTC(hex) {
 
-  let resp = await http.post(`https://api.blockcypher.com/v1/bcy/test/txs/push?token=${token}`).send({
-    tx: hex
-  });
+  try {
 
-  return resp.body.hash;
+    let resp = await http.post(`https://api.blockcypher.com/v1/bcy/test/txs/push?token=${token}`).send({
+      tx: hex
+    });
+
+    console.log('RESP', resp);
+
+    return resp.body.hash;
+
+  } catch(error) {
+
+    console.log(error);
+
+    throw error;
+
+  }
 
 }
 
