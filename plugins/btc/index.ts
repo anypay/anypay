@@ -30,23 +30,9 @@ export function validateAddress(address: string){
 }
 
 export async function getNewAddress(deprecatedParam){
+  console.log('deprecated', deprecatedParam);
 
-  //Create a new HDKeyAddress 
-  let record = await models.Hdkeyaddresses.create({
-
-    currency:'BTC',
-
-    xpub_key:process.env.BTC_HD_PUBLIC_KEY
-
-  })
-
-  record.address = deriveAddress(process.env.BTC_HD_PUBLIC_KEY, record.id)
-
-  await record.save()
-
-  rpc.call('importaddress', [record.address, "", false, false])
-
-  return record.address;
+  return deprecatedParam.value;
 
 }
 
