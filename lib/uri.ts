@@ -5,6 +5,7 @@ interface InvoiceURIParams {
   currency: string;
   image_url?: string;
   business_name?: string;
+  invoice_uid?: string;
 }
 
 export function computeInvoiceURI(params: InvoiceURIParams) {
@@ -32,7 +33,11 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   if (params.currency === 'BCH') {
 
-    uri = `${params.address}?amount=${params.amount}`;
+    uri = `${protocol}:?r=https://api.anypayinc.com/r/${params.invoice_uid}`;
+
+  } else if (params.currency === 'BTC') {
+
+    uri = `${protocol}:?r=https://api.anypayinc.com/r/${params.invoice_uid}`;
 
   } else if (params.currency === 'XRP') {
 
