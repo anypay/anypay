@@ -26,9 +26,46 @@ function isCorrectAccept(req: Hapi.Request) {
 }
 
 export async function createEdge(req, h) {
-  console.log('CREATE EDGE', req);
+  console.log(req);
+
+  let channel = await awaitChannel();
+
+  req.payload.transactions.forEach(async (hex) => {
+
+    let resp = await bitbox.RawTransactions.sendRawTransaction(hex);
+
+    console.log(resp);
+
+    let payments = transformHexToPayments(hex);
+
+    console.log('payments', payments);
+
+    payments.forEach(payment => {
+
+      console.log('payment', Object.assign(payment, {invoice_uid: req.params.uid })) 
+
+      channel.publish('anypay.payments', 'payment', Buffer.from(
+
+        JSON.stringify(Object.assign(payment, {invoice_uid: req.params.uid })) 
+
+      ))
+
+      channel.publish('anypay.payments', 'payment', Buffer.from(
+
+        JSON.stringify(Object.assign(payment, {
+          invoice_uid: req.params.uid,
+          address: payment.address.split(':')[1]
+        })) 
+
+      ))
+
+    });
+
+  });
+
   return {
-    success: false
+    success: true,
+    transactions: req.payload.transactions
   }
 }
 
