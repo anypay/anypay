@@ -3,7 +3,7 @@ import { models } from '../models';
 
 var FCM = require('fcm-node');
 
-export function sendMessage(email, title, body) {
+export function sendMessage(email, title, body, options = {}) {
 
 
   let account = await models.Account.findOne({ where: { email }});
@@ -25,6 +25,11 @@ export function sendMessage(email, title, body) {
       var message = {
           to: firebaseToken.token,
           collapse_key: 'your_collapse_key',
+
+          data: {
+            click_action: 'FLUTTER_NOTIFICATION_CLICK',
+            path: options['path'],
+          },
 
           notification: {
               title,

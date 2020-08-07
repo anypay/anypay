@@ -56,6 +56,7 @@ export async function start() {
           `accounts.${invoice.account_id}.grab_and_go.payment`,
           Buffer.from(JSON.stringify({
             amount: invoice.denomination_amount_paid,
+            invoice_uid: invoiceUid,
             item_name: item.name
           }))
         );
