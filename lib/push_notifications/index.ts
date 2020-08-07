@@ -3,8 +3,11 @@ import { models } from '../models';
 
 var FCM = require('fcm-node');
 
-export function sendMessage(email, title, body, options = {}) {
+interface FirebaseOptions {
+  path?: string;
+}
 
+export async function sendMessage(email, title, body, options: FirebaseOptions = {}) {
 
   let account = await models.Account.findOne({ where: { email }});
 
@@ -18,17 +21,20 @@ export function sendMessage(email, title, body, options = {}) {
   var serverKey = process.env.FIREBASE_SERVER_KEY; //put your server key here
   var fcm = new FCM(serverKey);
 
-  if (firebaseTokens.length == 0) { return reject(new Error('no firebase token found')) }
+  if (firebaseTokens.length == 0) { throw new Error('no firebase token found') }
 
   var promises = firebaseTokens.map(firebaseToken => {
     return new Promise(async (resolve, reject) => {
+
+      console.log('token', firebaseToken.toJSON());
+
       var message = {
           to: firebaseToken.token,
           collapse_key: 'your_collapse_key',
 
           data: {
             click_action: 'FLUTTER_NOTIFICATION_CLICK',
-            path: options['path'],
+            path: options.path,
           },
 
           notification: {
@@ -39,7 +45,9 @@ export function sendMessage(email, title, body, options = {}) {
 
       fcm.send(message, function(err, response){
           if (err) {
-            return reject(err);
+            console.error(err);
+            //return reject(err);
+            resolve();
           } else {
             resolve(response);
           }
