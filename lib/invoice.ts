@@ -34,6 +34,8 @@ import {convert} from './prices';
 
 import {getCoin} from './coins';
 
+import * as uuid from 'uuid';
+
 import { computeInvoiceURI } from './uri';
 
 import { writePaymentOptions } from './payment_options';
@@ -102,6 +104,8 @@ export async function generateInvoice(
 
 ): Promise<any> {
 
+  uid = !!uid ? uid : uuid.v4();
+
   var account = await models.Account.findOne({ where: { id: accountId }});
 
   let addresses = await models.Address.findAll({ where: {
@@ -115,7 +119,6 @@ export async function generateInvoice(
   });
 
   let coin = getCoin(invoiceCurrency);
-
 
   let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
 
@@ -154,15 +157,6 @@ export async function generateInvoice(
     invoiceAmount
   };
 
-  let uri = computeInvoiceURI({
-    currency: invoiceChangeset.invoiceAmount.currency,
-    amount: invoiceChangeset.invoiceAmount.value,
-    address: invoiceChangeset.address,
-    business_name: account.business_name,
-    image_url: account.image_url,
-    invoice_uid: uid
-  });
-
   var invoiceParams = {
     address: invoiceChangeset.address,
     invoice_amount: invoiceChangeset.invoiceAmount.value,
@@ -171,12 +165,14 @@ export async function generateInvoice(
     denomination_amount: invoiceChangeset.denominationAmount.value,
     account_id: invoiceChangeset.accountId,
     status: 'unpaid',
-    uid: uid,
-    uri,
+    uid,
+    uri: computeInvoiceURI({
+      currency: 'ANYPAY',
+      uid
+    }),
     should_settle: account.should_settle,
     amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
     currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
-    dollar_amount: invoiceChangeset.denominationAmount.value // DEPRECATED
   }
 
   var invoice = await models.Invoice.create(invoiceParams);
@@ -186,20 +182,11 @@ export async function generateInvoice(
   let uris = matrix.map((row) => {
     let address = row[0];
 
-    if (address.currency === 'BSV') {
-      return `pay:?r=https://api.anypayinc.com/r/${invoice.uid}`
-    }
-
     return  computeInvoiceURI({
       currency: address.currency,
-      amount: row[1].value,
-      address: row[2].address,
-      business_name: account.business_name,
-      image_url: account.image_url,
-      invoice_uid: invoice.uid
+      uid
     });
   });
-
 
   matrix = matrix.map((row, i) => {
 
@@ -207,8 +194,6 @@ export async function generateInvoice(
 
     return row;
   });
-
-
 
   let paymentOptions = matrix.map(row => {
 
