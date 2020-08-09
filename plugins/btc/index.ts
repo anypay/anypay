@@ -19,11 +19,25 @@ export async function submitTransaction(rawTx: string) {
 
 }
 
+export function transformAddress(address: string) {
+
+  if (address.match(':')) {
+
+    address = address.split(':')[1]
+
+  }
+
+  return address;
+
+}
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'BTC')
+
+  console.log(address, valid);
 
   return valid;
 
