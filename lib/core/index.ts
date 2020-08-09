@@ -66,36 +66,27 @@ async  function getPaymail(currency, address) {
 export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   var isValid = true;
-  var paymail;
 
-  try {
+  let plugin = await plugins.findForCurrency(changeset.currency);
 
-    let plugin = await plugins.findForCurrency(changeset.currency);
+  let paymail = await getPaymail(changeset.currency, changeset.address);
 
-    let paymail = await getPaymail(changeset.currency, changeset.address);
+  console.log('paymail', paymail);
 
-    console.log('paymail', paymail);
+  changeset.paymail = paymail;
 
-    changeset.paymail = paymail;
+  if (plugin.transformAddress) {
 
-    if (plugin.transformAddress) {
-
-      changeset.address = await plugin.transformAddress(changeset.address);
-
-    }
-
-    if (plugin.validateAddress) {
-
-      isValid = await plugin.validateAddress(changeset.address);
-
-    }
-
-  } catch(error) {
-
-    console.error(error.message)
-    console.error('unable to validate address with plugin');
+    changeset.address = await plugin.transformAddress(changeset.address);
 
   }
+
+  if (plugin.validateAddress) {
+
+    isValid = await plugin.validateAddress(changeset.address);
+
+  }
+
 
   if(!isValid){
   

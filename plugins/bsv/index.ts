@@ -59,7 +59,7 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-export async function getPaymail(alias) {
+export async function getPaymail(alias: string) {
 
   try {
 
@@ -82,20 +82,36 @@ export async function getPaymail(alias) {
 }
 
 
-export async function transformAddress(alias){
+export async function transformAddress(alias: string){
 
-  try{
-          
-    if( isCashAddress(alias) ){
-    
-      return toLegacyAddress(alias)
+  try {
+
+    try{
+            
+      if( isCashAddress(alias) ){
+      
+        return toLegacyAddress(alias)
+
+      }
+
+
+    }catch(err){
 
     }
 
-  }catch(err){
+    if (alias.match(':')) {
 
+      alias = alias.split(':')[1];
+
+    }
+
+    console.log('ALIAS', alias);
+
+    return (await polynym.resolveAddress(alias)).address;
+
+  } catch(error) {
+    throw new Error('invalid BSV address');
   }
-  return (await polynym.resolveAddress(alias)).address;
 
 }
 
