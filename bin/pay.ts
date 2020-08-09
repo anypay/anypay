@@ -5,7 +5,7 @@ require('dotenv').config();
 import * as program from 'commander';
 
 import { models } from '../lib/models';
-//import { buildOutputs } from '../lib/bip70';
+import { buildOutputs } from '../lib/pay';
 //import { generatePaymentRequest } from '../plugins/bsv/lib/paymentRequest';
 //import { verifyPayment } from '../lib/pay/bip_70';
 import { getBitcore } from '../lib/bitcore';
@@ -24,6 +24,28 @@ program
 
   });
 
+program
+  .command('buildoutputs <invoice_uid> <currency> <protocol>')
+  .action(async (invoice_uid, currency, protocol) => {
+
+    try {
+
+      let payment_option = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
+
+      let outputs = await buildOutputs(Object.assign(payment_option, { protocol }));
+
+      console.log(outputs);
+
+    } catch(error) {
+
+      console.error(error);
+
+    }
+
+    process.exit();
+  
+  });
+
 /*
 program
   .command('verify <invoice_uid> <currency> <tx_hex>')
@@ -35,23 +57,9 @@ program
 
       console.log('PAYMENT OPTION', payment_option.toJSON());
 
-      if (currency === 'BSV') {
+      let outputs = await buildOutputs(payment_option);
 
-        let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }});
-
-
-        let paymentRequest = await generatePaymentRequest(invoice, payment_option);
-
-        console.log(paymentRequest);
-
-        let outputs = paymentRequest.outputs;
-
-      } else {
-
-        verifyPayment(payment_option, hex);
-
-      }
-
+      console.log(outputs);
 
     } catch(error) {
 

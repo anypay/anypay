@@ -24,7 +24,7 @@ const feesFiat = {
   }
 }
 
-interface Fee {
+export interface Fee {
   address: string;
   amount: number;
 }
