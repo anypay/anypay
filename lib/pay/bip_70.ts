@@ -12,6 +12,10 @@ import { getFee, Fee } from './fees';
 
 */
 
+interface Bip70PaymentRequest {
+
+}
+
 export async function buildOutputs(payment_option: PaymentOption): Promise<PaymentOutput[]> {
 
   let bitcore = getBitcore(payment_option.currency);
@@ -37,6 +41,12 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
   outputs.push(output2);
 
   return outputs;
+
+}
+
+export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip70PaymentRequest> {
+
+  return {};
 
 }
 

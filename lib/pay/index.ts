@@ -7,6 +7,10 @@ import * as bip70 from './bip_70';
 import * as bip270 from './bip_270';
 import * as jsonV2 from './json_v2';
 
+import * as fees from './fees';
+
+export { fees }
+
 export async function verifyPayment(v: VerifyPayment) {
 
   let bitcore = getBitcore(v.payment_option.currency)
@@ -18,6 +22,30 @@ export async function verifyPayment(v: VerifyPayment) {
   for (let output of outputs) {
 
     verifyOutput(tx.outputs, output.script, output.amount);
+  }
+
+}
+
+export async function buildPaymentRequest(paymentOption): Promise<any> {
+
+  switch(paymentOption.protocol) {
+
+  case 'BIP70':
+
+    return bip70.buildPaymentRequest(paymentOption);
+
+  case 'BIP270':
+
+    return bip270.buildPaymentRequest(paymentOption);
+
+  case 'JSONV2':
+
+    return jsonV2.buildPaymentRequest(paymentOption);
+
+  default:
+
+    throw new Error(`protocol ${paymentOption.protocol} not supported`)
+
   }
 
 }

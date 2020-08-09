@@ -1,16 +1,18 @@
 
 import { PaymentOutput, PaymentOption } from './types';
 
-import { getBitcore } from '../bitcore';
+import { getBitcore, toSatoshis } from '../bitcore';
 import { getFee, Fee } from './fees';
-
-import { BigNumber } from 'bignumber.js';
 
 /*
 
   BIP270 Protocol In The Context Of the Anypay Pay Protocol
 
 */
+
+interface Bip270PaymentRequest {
+
+}
 
 export async function buildOutputs(paymentOption: PaymentOption): Promise<PaymentOutput[]> {
 
@@ -35,10 +37,9 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<Paymen
 
 }
 
-function toSatoshis(amount): number{
-  let amt = new BigNumber(amount); 
-  let scalar = new BigNumber(100000000);
+export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
 
-  return amt.times(amount).toNumber();
+  return {};
+
 }
 

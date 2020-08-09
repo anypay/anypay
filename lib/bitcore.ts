@@ -3,6 +3,8 @@ const bch = require('bitcore-lib-cash');
 const dash = require('@dashevo/dashcore-lib');
 const bsv = require('bsv');
 
+import { BigNumber } from 'bignumber.js';
+
 export function getBitcore(currency) {
 
   switch(currency) {
@@ -17,3 +19,11 @@ export function getBitcore(currency) {
   }
 
 }
+
+export function toSatoshis(amount): number{
+  let amt = new BigNumber(amount); 
+  let scalar = new BigNumber(100000000);
+
+  return amt.times(amount).toNumber();
+}
+

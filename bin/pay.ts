@@ -5,18 +5,14 @@ require('dotenv').config();
 import * as program from 'commander';
 
 import { models } from '../lib/models';
-import { buildOutputs } from '../lib/pay';
-//import { generatePaymentRequest } from '../plugins/bsv/lib/paymentRequest';
-//import { verifyPayment } from '../lib/pay/bip_70';
-import { getBitcore } from '../lib/bitcore';
 
-import { getFee } from '../lib/pay/fees';
+import { buildOutputs, buildPaymentRequest, fees } from '../lib/pay';
 
 program
   .command('getfee <currency>')
   .action(async (currency) => {
 
-    let fee = await getFee(currency);
+    let fee = await fees.getFee(currency);
 
     console.log(fee);
 
@@ -35,6 +31,28 @@ program
       let outputs = await buildOutputs(Object.assign(payment_option, { protocol }));
 
       console.log(outputs);
+
+    } catch(error) {
+
+      console.error(error);
+
+    }
+
+    process.exit();
+  
+  });
+
+program
+  .command('buildpaymentrequest <invoice_uid> <currency> <protocol>')
+  .action(async (invoice_uid, currency, protocol) => {
+
+    try {
+
+      let paymentOption = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
+
+      let paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol }));
+
+      console.log(paymentRequest);
 
     } catch(error) {
 
