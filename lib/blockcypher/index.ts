@@ -12,7 +12,7 @@ export async function publishBTC(hex) {
 
   try {
 
-    let resp = await http.post(`https://api.blockcypher.com/v1/bcy/test/txs/push?token=${token}`).send({
+    let resp = await http.post(`https://api.blockcypher.com/v1/btc/main/txs/push?token=${token}`).send({
       tx: hex
     });
 
