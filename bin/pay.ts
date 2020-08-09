@@ -9,6 +9,27 @@ import { models } from '../lib/models';
 import { buildOutputs } from '../lib/bip70';
 import { generatePaymentRequest } from '../plugins/bsv/lib/paymentRequest';
 
+function verifyOutput(outputs, script, amount) {
+
+  var targetScript = script.buffer.toString('hex')
+
+  var targetAmount = amount.toNumber();
+
+  let matchingOutput = outputs.filter(output => {
+
+    let script = output.script.buffer.toString('hex');
+    let amount = output.amount.toNumber();
+
+    return script === targetScript && amount === targetAmount;
+
+  });
+
+  if (matchingOutput.length === 0) {
+    throw new Error(`Missing required output ${targetScript} ${targetAmount}`) 
+  }
+
+}
+
 program
   .command('verify <invoice_uid> <currency> <tx_hex>')
   .action(async (invoice_uid, currency, hex) => {
@@ -27,6 +48,8 @@ program
 
       var tx = new bitcore.Transaction(hex);
 
+      var outputs;
+
       console.log(tx);
 
       tx.outputs.map(output => {
@@ -43,13 +66,19 @@ program
 
         console.log(paymentRequest);
 
+        outputs = paymentRequest.outputs;
+
       } else {
 
-        let outputs = buildOutputs(payment_option);
-
-        console.log(outputs);
+        outputs = buildOutputs(payment_option);
 
       }
+
+      console.log(outputs);
+
+      outputs.forEach(output => {
+        verifyOutput(outputs, output.script, output.amount);
+      })
 
     } catch(error) {
 
