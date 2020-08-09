@@ -18,7 +18,7 @@ import { join } from 'path';
  *
  */
 
-function buildOutputs(invoice, account) {
+export function buildOutputs(invoice) {
     var outputs = [];
 
   switch (invoice.currency) {
@@ -108,7 +108,7 @@ function buildOutputs(invoice, account) {
 export function generatePaymentRequest(invoice, account) {
 
   // build outputs
-  let outputs = buildOutputs(invoice,account);
+  let outputs = buildOutputs(invoice);
 
   console.log('outputs', outputs);
 
