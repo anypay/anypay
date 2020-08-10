@@ -49,12 +49,6 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   let price = await models.Price.findOne({ where });
 
-  if (price) {
-    console.log('price found', price.toJSON());
-  } else {
-    console.log('price not found', where);
-  }
-
   let targetAmount = inputAmount.value * price.value;
 
   return {

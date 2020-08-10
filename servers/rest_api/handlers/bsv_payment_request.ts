@@ -18,13 +18,14 @@ import {models, amqp} from '../../../lib';
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
 import * as bsvPlugin from '../../../plugins/bsv'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
+import { buildPaymentRequest as jsonV2BuildPaymentRequest} from '../../../lib/pay/json_v2';
 
 import * as Boom from 'boom';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
-async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
 
@@ -55,29 +56,7 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     return Boom.notFound();
   }
 
-  let amount = new BigNumber(paymentOption.amount);
-  var address = paymentOption.address;
-
-  if (address.match(/\:/)) {
-    address = address.split(':')[1];
-  }
-
-  const paymentRequest = {
-    "network": "main",
-    "currency": currency,
-    "requiredFeeRate": 1,
-    "outputs": [
-        {
-            "amount": amount.times(100000000).toNumber(),
-            "address": address
-        }
-    ],
-    "time": moment(invoice.createdAt).toDate(),
-    "expires": moment(invoice.createdAt).add(15, 'minutes').toDate(),
-    "memo": `Payment request for Anypay invoice ${invoice.uid}`,
-    "paymentUrl": `https://api.anypayinc.com/payments/edge/${currency}/${invoice.uid}`,
-    "paymentId": invoice.uid
-  }
+  const paymentRequest = await jsonV2BuildPaymentRequest(paymentOption);
 
   let response = h.response(paymentRequest);
 
@@ -88,9 +67,6 @@ async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
   response.header('Accept', 'application/payment');
 
   return response;
-
-
-
 }
 
 async function handleBCH(req, h) {
@@ -320,48 +296,55 @@ export async function show(req, h) {
   console.log(req);
   var resp;
 
-  if (req.headers['x-requested-with'] === 'co.edgesecure.app') {
-
-    return handleEdge(req, h);
-
-  }
-
   try {
 
     switch (req.headers.accept) {
 
+      case 'application/paymentrequest':
+
+        // jsonv2
+        resp = await handleJsonV2(req, h)
+
+        return resp;
+
       case 'application/bitcoin-paymentrequest':
 
+        // bip70
         resp = await handleBTC(req, h)
 
         return resp;
 
       case 'application/bitcoinsv-paymentrequest':
 
+        // bip270
         resp = await handleBSV(req, h)
 
         return resp;
 
       case 'application/bitcoincash-paymentrequest':
 
+        // bip70
         resp = await handleBCH(req, h)
 
         return resp;
 
       case 'application/simpleledger-paymentrequest':
 
+        // bip70
         resp = await handleBCH(req, h)
 
         return resp;
 
       case 'application/dash-paymentrequest':
 
+        // bip70
         resp = await handleDASH(req, h)
 
         return resp;
 
       default:
 
+        // bip270
         resp = await handleBSV(req, h)
 
         return resp;
