@@ -32,7 +32,7 @@ export async function createEdge(req, h) {
 
     let channel = await awaitChannel();
 
-    for (let hex in req.payload.transactions) { 
+    for (let hex of req.payload.transactions) { 
 
       console.log('jsonv2.bch.submittransaction', hex)
 
