@@ -18,7 +18,7 @@ import {models, amqp} from '../../../lib';
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
 import * as bsvPlugin from '../../../plugins/bsv'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
-import { buildPaymentRequest as jsonV2BuildPaymentRequest} from '../../../lib/pay/json_v2';
+import { buildPaymentRequest } from '../../../lib/pay';
 
 import * as Boom from 'boom';
 
@@ -56,7 +56,7 @@ async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     return Boom.notFound();
   }
 
-  const paymentRequest = await jsonV2BuildPaymentRequest(paymentOption);
+  const paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'JSONV2' }));
 
   let response = h.response(paymentRequest);
 
@@ -300,7 +300,7 @@ export async function show(req, h) {
 
     switch (req.headers.accept) {
 
-      case 'application/paymentrequest':
+      case 'application/payment-request':
 
         // jsonv2
         resp = await handleJsonV2(req, h)
