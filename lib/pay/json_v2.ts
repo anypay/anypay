@@ -46,7 +46,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
     "time": moment(paymentOption.createdAt).toDate(),
     "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
     "memo": `Payment request for Anypay invoice ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/${paymentOption.currency}/${paymentOption.invoice_uid}`,
+    "paymentUrl": `${BASE_URL}/payments/edge/${paymentOption.currency}/${paymentOption.invoice_uid}`,
     "paymentId": paymentOption.invoice_uid
   }
 
