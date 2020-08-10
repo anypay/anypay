@@ -25,7 +25,53 @@ import * as Boom from 'boom';
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
-async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+export async function submitJsonV2(req, h) {
+
+  try {
+    
+    for (const transaction of req.payload.transactions) {
+
+      console.log('jsonv2.bsv.submittransaction', transaction);
+
+      let resp = await bsvPlugin.broadcastTx(transaction);
+
+      console.log('jsonv2.bsv.submittransaction.response', resp);
+
+      let payments = await transformHexToPayments(transaction);
+
+      let channel = await amqp.awaitChannel();
+
+      for (let payment of payments) {
+
+        channel.publish('anypay.payments', 'payment', Buffer.from(
+          JSON.stringify(Object.assign(payment, {
+            invoice_uid: req.params.uid 
+          }))
+        ));
+
+        channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
+          JSON.stringify({ transaction })
+        ));
+
+      }
+
+      return {
+        success: true,
+        transactions: req.payload.transactions
+      }
+    }
+
+  } catch(error) {
+
+    console.error('jsonv2.bsv.submittransaction.error', error);
+
+    return Boom.badRequest(error);
+
+  }
+
+}
+
+export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
 

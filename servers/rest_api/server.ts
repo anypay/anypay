@@ -804,6 +804,24 @@ async function Server() {
 
   server.route({
     method: "POST",
+    path: "/payments/edge/BTC/{uid}",
+    handler: handlers.BtcPaymentRequestProtobuf.submitJsonV2
+  })
+
+  server.route({
+    method: "POST",
+    path: "/payments/edge/BSV/{uid}",
+    handler: handlers.BsvPaymentRequest.submitJsonV2
+  });
+
+  server.route({
+    method: "POST",
+    path: "/payments/edge/DASH/{uid}",
+    handler: handlers.DashPaymentRequestProtobuf.submitJsonV2
+  });
+
+  server.route({
+    method: "POST",
     path: "/invoices/{uid}/pay/bip70/dash",
     handler: handlers.DashPaymentRequestProtobuf.create,
     config: {

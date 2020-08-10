@@ -1,6 +1,8 @@
 import {awaitChannel} from '../../../lib/amqp';
 import * as Hapi from 'hapi';
 
+import * as Boom from 'boom';
+
 import { rpc } from '../../../plugins/btc/jsonrpc'
 import { publishBTC } from '../../../lib/blockcypher'
 
@@ -19,16 +21,55 @@ function isCorrectAccept(req: Hapi.Request) {
   return req.headers['accept'] === 'application/bitcoin-paymentack'
 }
 
+export async function submitJsonV2(req, h) {
+
+  try {
+
+    let channel = await awaitChannel();
+
+    for (const transaction of req.payload.transactions) {
+
+      console.log('jsonv2.btc.publishtransaction', transaction);
+
+      let resp = await publishBTC(transaction);
+
+      console.log('btc.publishtransaction.response', resp);
+
+      let payments = transformHexToPayments(transaction)
+
+      for (let payment of payments) {
+
+        console.log('payment', Object.assign(payment, {invoice_uid: req.params.uid })) 
+
+        channel.publish('anypay.payments', 'payment', Buffer.from(
+
+          JSON.stringify(Object.assign(payment, {invoice_uid: req.params.uid })) 
+
+        ))
+
+      }
+
+    }
+
+    return {
+
+      success: true,
+
+      transactions: req.payload.transactions
+
+    }
+
+  } catch(error) {
+
+    console.log(error);
+
+    return Boom.badRequest(error);
+
+  }
+
+}
+
 export async function create(req, h) {
-
-  console.log('REQUEST');
-  console.log(req);
-
-  console.log('HEADERS');
-  console.log(req.headers);
-
-  console.log('PAYLOAD');
-  console.log(req.payload);
 
   if (isCorrectContentType(req) || isCorrectAccept(req)) {
 

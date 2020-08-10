@@ -28,40 +28,52 @@ function isCorrectAccept(req: Hapi.Request) {
 export async function createEdge(req, h) {
   console.log(req);
 
-  let channel = await awaitChannel();
+  try {
 
-  req.payload.transactions.forEach(async (hex) => {
+    let channel = await awaitChannel();
 
-    let resp = await bitbox.RawTransactions.sendRawTransaction(hex);
+    for (let hex in req.payload.transactions) { 
 
-    console.log(resp);
+      console.log('jsonv2.bch.submittransaction', hex)
 
-    let payments = transformHexToPayments(hex);
+      let resp = await bitbox.RawTransactions.sendRawTransaction(hex);
 
-    console.log('payments', payments);
+      console.log('jsonv2.bch.submittransaction.response', resp)
 
-    payments.forEach(payment => {
+      let payments = transformHexToPayments(hex);
 
-      console.log('payment', Object.assign(payment, {invoice_uid: req.params.uid })) 
+      console.log('jsonv2.bch.payments', payments);
 
-      channel.publish('anypay.payments', 'payment', Buffer.from(
+      for (let payment of payments) {
 
-        JSON.stringify(Object.assign(payment, {invoice_uid: req.params.uid })) 
+        console.log('payment', Object.assign(payment, {invoice_uid: req.params.uid })) 
 
-      ))
+        channel.publish('anypay.payments', 'payment', Buffer.from(
 
-      channel.publish('anypay.payments', 'payment', Buffer.from(
+          JSON.stringify(Object.assign(payment, {invoice_uid: req.params.uid })) 
 
-        JSON.stringify(Object.assign(payment, {
-          invoice_uid: req.params.uid,
-          address: payment.address.split(':')[1]
-        })) 
+        ))
 
-      ))
+        channel.publish('anypay.payments', 'payment', Buffer.from(
 
-    });
+          JSON.stringify(Object.assign(payment, {
+            invoice_uid: req.params.uid,
+            address: payment.address.split(':')[1]
+          })) 
 
-  });
+        ))
+
+      }
+
+    }
+
+  } catch(error) {
+
+    console.log(error);
+
+    return badRequest(error);
+
+  }
 
   return {
     success: true,
