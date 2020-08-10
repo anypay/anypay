@@ -31,7 +31,19 @@ export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'DASH')
 
-  return valid;
+  return valid
+
+}
+
+export function transformAddress(address: string){
+
+  if (address.match(':')) {
+
+    address = address.split(':')[1]
+
+  }
+
+  return address;
 
 }
 
