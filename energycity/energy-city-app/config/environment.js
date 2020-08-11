@@ -34,6 +34,19 @@ module.exports = function(environment) {
     routeIfAlreadyAuthenticated: 'payments'
   };
 
+  ENV['ember-google-maps'] = {
+    key: 'AIzaSyDhRQ6D7LUf8H_qUG3_HrZfT9i6a6zn3Ls', // Using .env files in this example
+    language: 'en',
+    region: 'GB',
+    protocol: 'https',
+    version: '3.41',
+    libraries: ['geometry', 'places'], // Optional libraries
+    // client: undefined,
+    // channel: undefined,
+    // baseUrl: '//maps.googleapis.com/maps/api/js',
+    // mapIds: ['1234', '2345'],
+  }
+
   if (environment === 'development') {
     ENV.apiEndpoint = 'http://127.0.0.1:3000'
     ENV.apiEndpoint = 'https://anypay.city'

@@ -16,6 +16,8 @@ Router.map(function() {
   this.route('logout');
   this.route('index');
   this.route('leaderboard');
+  this.route('invoice', { path: '/invoice/:uid' });
+  this.route('map');
 });
 
 export default Router;

@@ -32,7 +32,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/business.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/business.js should pass ESLint\n\n2:8 - \'config\' is defined but never used. (no-unused-vars)\n8:1 - Unexpected console statement. (no-console)\n49:7 - Unexpected console statement. (no-console)\n55:7 - Unexpected console statement. (no-console)\n64:7 - Unexpected console statement. (no-console)\n68:7 - Unexpected console statement. (no-console)\n82:7 - \'$\' is not defined. (no-undef)\n84:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'controllers/business.js should pass ESLint\n\n2:8 - \'config\' is defined but never used. (no-unused-vars)\n8:1 - Unexpected console statement. (no-console)\n48:7 - Unexpected console statement. (no-console)\n54:7 - Unexpected console statement. (no-console)\n63:7 - Unexpected console statement. (no-console)\n67:7 - Unexpected console statement. (no-console)\n81:7 - \'$\' is not defined. (no-undef)\n83:7 - Unexpected console statement. (no-console)\n85:7 - \'$\' is not defined. (no-undef)');
   });
 
   QUnit.test('controllers/cities.js', function (assert) {
@@ -77,7 +77,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/business.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/business.js should pass ESLint\n\n42:5 - Unexpected console statement. (no-console)\n44:5 - Unexpected console statement. (no-console)\n76:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/business.js should pass ESLint\n\n41:5 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n75:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/cities.js', function (assert) {
@@ -100,6 +100,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'routes/index.js should pass ESLint\n\n');
   });
 
+  QUnit.test('routes/invoice.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'routes/invoice.js should pass ESLint\n\n');
+  });
+
   QUnit.test('routes/leaderboard.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'routes/leaderboard.js should pass ESLint\n\n');
@@ -108,6 +113,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('routes/logout.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'routes/logout.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('routes/map.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n19:5 - Unexpected console statement. (no-console)\n26:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
@@ -372,6 +382,16 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/routes/index-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/routes/invoice-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/invoice-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/routes/map-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/routes/map-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/routes/moneybutton-auth-redirect-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/routes/moneybutton-auth-redirect-test.js should pass ESLint\n\n');
@@ -542,6 +562,32 @@ define('energy-city-app/tests/unit/routes/index-test', ['ember-qunit'], function
   'use strict';
 
   (0, _emberQunit.moduleFor)('route:index', 'Unit | Route | index', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('energy-city-app/tests/unit/routes/invoice-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:invoice', 'Unit | Route | invoice', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var route = this.subject();
+    assert.ok(route);
+  });
+});
+define('energy-city-app/tests/unit/routes/map-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('route:map', 'Unit | Route | map', {
     // Specify the other units that are required for this test.
     // needs: ['controller:foo']
   });

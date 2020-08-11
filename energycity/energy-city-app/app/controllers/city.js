@@ -44,8 +44,9 @@ export default Ember.Controller.extend({
 
   actions: {
     businessClicked(business) {
-      console.log('business clicked!', business);
-      window.open(`https://app.anypayinc.com/pay/${business.stub}`)
+      console.log('business clicked!', business)
+      this.transitionToRoute('business', business)
+      //window.open(`https://app.anypayinc.com/pay/${business.stub}`)
     }
   }
 

@@ -10799,6 +10799,207 @@ define("ember-cookies/clear-all-cookies", ["exports", "ember-cookies/utils/seria
     });
   }
 });
+define("ember-google-maps/test-support/helpers", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.trigger = trigger;
+  _exports.getDirectionsQuery = getDirectionsQuery;
+
+  /**
+   * Wrap the Google Maps trigger method in an Ember runloop.
+   */
+  function trigger(component, eventName) {
+    for (var _len = arguments.length, options = new Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
+      options[_key - 2] = arguments[_key];
+    }
+
+    Ember.run(function () {
+      var _google$maps$event;
+
+      (_google$maps$event = google.maps.event).trigger.apply(_google$maps$event, [component, eventName].concat(options));
+    });
+  }
+
+  function getDirectionsQuery(directions) {
+    var _directions$request = directions.request,
+        origin = _directions$request.origin,
+        destination = _directions$request.destination;
+    return {
+      origin: origin.query,
+      destination: destination.query
+    };
+  }
+});
+define("ember-google-maps/test-support/index", ["exports", "ember-google-maps/test-support/setup-action-tracking", "ember-google-maps/test-support/setup-map-test", "ember-google-maps/test-support/helpers"], function (_exports, _setupActionTracking, _setupMapTest, _helpers) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  Object.defineProperty(_exports, "setupActionTracking", {
+    enumerable: true,
+    get: function get() {
+      return _setupActionTracking.default;
+    }
+  });
+  Object.defineProperty(_exports, "setupMapTest", {
+    enumerable: true,
+    get: function get() {
+      return _setupMapTest.default;
+    }
+  });
+  Object.defineProperty(_exports, "getDirectionsQuery", {
+    enumerable: true,
+    get: function get() {
+      return _helpers.getDirectionsQuery;
+    }
+  });
+  Object.defineProperty(_exports, "trigger", {
+    enumerable: true,
+    get: function get() {
+      return _helpers.trigger;
+    }
+  });
+});
+define("ember-google-maps/test-support/setup-action-tracking", ["exports"], function (_exports) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = setupActionTracking;
+  _exports.ActionTracker = void 0;
+
+  function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+  function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+  function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+  var ActionTracker = /*#__PURE__*/function () {
+    function ActionTracker() {
+      _classCallCheck(this, ActionTracker);
+
+      var Tracked = Ember.Object.extend();
+      this.tracked = Tracked.create();
+    }
+
+    _createClass(ActionTracker, [{
+      key: "seen",
+      value: function seen(name) {
+        var _this = this;
+
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (!name) {
+          return;
+        }
+
+        var _options$timeout = options.timeout,
+            timeout = _options$timeout === void 0 ? 10000 : _options$timeout;
+        return new Ember.RSVP.Promise(function (resolve, reject) {
+          var target = _this.tracked[name];
+
+          var observed = function observed() {
+            _this.tracked[name].observed = true;
+            resolve(_this.tracked[name]);
+          };
+
+          if (target && target.observed === false) {
+            observed();
+          }
+
+          _this.tracked.addObserver(name, _this, observed);
+
+          setTimeout(function () {
+            reject(new Error("Timed out waiting for ".concat(name, ".")));
+          }, timeout);
+        });
+      }
+    }, {
+      key: "track",
+      value: function track(name, value) {
+        var _ref = this.tracked[name] || {},
+            previous = _ref.current,
+            _ref$count = _ref.count,
+            count = _ref$count === void 0 ? 0 : _ref$count;
+
+        this.tracked.set(name, {
+          current: value,
+          previous: previous,
+          count: ++count,
+          observed: false
+        });
+      }
+    }]);
+
+    return ActionTracker;
+  }();
+
+  _exports.ActionTracker = ActionTracker;
+
+  function setupActionTracking(hooks) {
+    hooks.beforeEach(function () {
+      var _this2 = this;
+
+      this.actionTracker = new ActionTracker();
+
+      this.trackAction = function () {
+        var _this2$actionTracker;
+
+        return (_this2$actionTracker = _this2.actionTracker).track.apply(_this2$actionTracker, arguments);
+      };
+
+      this.seenAction = function () {
+        var _this2$actionTracker2;
+
+        return (_this2$actionTracker2 = _this2.actionTracker).seen.apply(_this2$actionTracker2, arguments);
+      };
+    });
+  }
+});
+define("ember-google-maps/test-support/setup-map-test", ["exports", "ember-google-maps/components/g-map"], function (_exports, _gMap) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = setupMapTest;
+
+  /**
+   * Register a waiter for map component testing.
+   *
+   * Once all the components are done initializing, the `g-map` publicAPI will be
+   * available in the testing context as `gMapAPI`.
+   */
+  function setupMapTest(hooks) {
+    hooks.beforeEach(function () {
+      var testContext = this;
+      var waiterFulfilled = false;
+      this.owner.register('component:g-map', _gMap.default.extend({
+        didInsertElement: function didInsertElement() {
+          var _this = this;
+
+          this._super.apply(this, arguments);
+
+          Ember.Test.registerWaiter(function () {
+            if (_this._componentsInitialized === true) {
+              if (!waiterFulfilled) {
+                testContext.gMapAPI = _this.publicAPI;
+                waiterFulfilled = true;
+              }
+
+              return true;
+            }
+          });
+        }
+      }));
+    });
+  }
+});
 define("ember-macro-helpers/test-support/compute", ["exports"], function (_exports) {
   "use strict";
 

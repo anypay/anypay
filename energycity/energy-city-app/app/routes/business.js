@@ -1,10 +1,9 @@
 
 import Ember from 'ember';
 import { inject as service } from '@ember/service';
-import AuthenticatedRouteMixin from 'ember-simple-auth/mixins/authenticated-route-mixin';
 import $ from 'jquery';
 
-export default Ember.Route.extend(AuthenticatedRouteMixin, {
+export default Ember.Route.extend({
   session: service(),
   messageBus: Ember.inject.service('message-bus'),
 
@@ -74,7 +73,7 @@ export default Ember.Route.extend(AuthenticatedRouteMixin, {
 
   deactivate() {
     console.log('destroy business route');
-    this.get('messageBus').unsubscribe(`accounts_${this.get('business').id}_invoice_created`, this, this.handleInvoiceCreated);
+    //this.get('messageBus').unsubscribe(`accounts_${this.get('business').id}_invoice_created`, this, this.handleInvoiceCreated);
     $('.pay-bottom-tray').addClass('pay-bottom-tray--is-hidden');
     $('.pay-bottom-tray').removeClass('pay-bottom-tray--is-shown');
   },

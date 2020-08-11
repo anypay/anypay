@@ -1,15 +1,15 @@
 
 <!--<nav class="navbar navbar-light" style="background-color: #039454;">-->
-<nav class="navbar navbar-dark " style="background-color: #039454;">
+<nav class="navbar navbar-dark " style="background-color: black;">
 
   <div class='container'>
     <div class='float-left'>
       {{#if this.session.isAuthenticated}}
         {{#link-to "payments"}}
-          <img class='float-left logo' src="/white.png"/>
+          <img class='float-left logo' src="/anypay_circle.png"/>
         {{/link-to}}
       {{else}}
-        <img class='float-left logo' src="/white.png"/>
+        <img class='float-left logo' src="/anypay_circle.png"/>
       {{/if}}
       <h1 class='float-left'>{{#link-to "cities"}}Anypay City{{/link-to}}</h1>
       {{#if connected}}
@@ -27,6 +27,9 @@
       --}}
 
     </div>
+    {{#link-to "map"}}
+      <img class='float-right map-icon' src="/map_icon.svg"/>
+    {{/link-to}}
   </div>
 
 </nav>

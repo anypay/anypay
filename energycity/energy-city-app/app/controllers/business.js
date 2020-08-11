@@ -11,11 +11,10 @@ console.log('generate', account_id);
   };
   let resp = await Ember.$.ajax({
     method: 'POST',
-    url: `/invoices`,
+    url: `https://api.anypayinc.com/accounts/${account_id}/invoices`,
     data: {
-      amount: parseFloat(amount),
-      account_id: parseInt(account_id),
-      redirect_url: 'https://nrg.city/#/payments'
+      amount: parseFloat(amount)
+      //redirect_url: 'https://anypay.city/'
     },
     headers: headers
   })
@@ -81,9 +80,11 @@ export default Ember.Controller.extend({
 
       $('.loading').show();
       let resp = await generateInvoice(this.get('business').id, this.get('amount'), token);
-      console.log(resp);
+      console.log('GENERATED!', resp);
 
-      window.location = `https://anypayapp.com/invoices/${resp.invoice.uid}`;
+      $('.loading').hide();
+
+      window.location = `https://app.anypayinc.com/invoices/${resp.invoice.uid}`;
     }
 
   }
