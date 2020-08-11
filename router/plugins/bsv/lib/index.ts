@@ -4,6 +4,8 @@ let Transaction = bsv.Transaction
 let Script = bsv.Script
 import {rpcCall} from './jsonrpc';
 
+import { fromSatoshis, toSatoshis } from '../../../../lib/pay'
+
 interface Payment{
   amount: number;
   hash: string;
@@ -92,7 +94,7 @@ export function transformHexToPayments(hex: string): Payment[]{
 
         currency: 'BSV',
         hash: tx.hash.toString(),
-        amount: satoshisToBSV(tx.outputs[i].satoshis) + payments[paymentIndex].amount,
+        amount: fromSatoshis(tx.outputs[i].satoshis) + payments[paymentIndex].amount,
         address: tx.outputs[i].script.toAddress().toString()
 
       }
@@ -103,7 +105,7 @@ export function transformHexToPayments(hex: string): Payment[]{
 
         currency: 'BSV',
         hash: tx.hash.toString(),
-        amount: satoshisToBSV(tx.outputs[i].satoshis),
+        amount: fromSatoshis(tx.outputs[i].satoshis),
         address: tx.outputs[i].script.toAddress().toString()
 
       })
@@ -132,7 +134,7 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bsv.Tra
  
   let index = utxos[0].index
 
-  fee = bsvToSatoshis(fee)
+  fee = toSatoshis(fee)
 
   if (input.satoshis < fee) {
 
@@ -159,13 +161,6 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bsv.Tra
 
 export function signTransaction(tx: bsv.Transaction, pk: bsv.PrivateKey):bsv.Transaction{
   return tx.sign(pk)            
-}
-
-function satoshisToBSV(sats: number): number{
-  return sats/100000000
-}
-function bsvToSatoshis(bsv): number{
-  return bsv*100000000 | 0;
 }
 
 export async function getSmartFee(numberOfConf){

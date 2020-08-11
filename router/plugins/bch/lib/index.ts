@@ -4,6 +4,8 @@ let Transaction = bch.Transaction
 let Script = bch.Script
 import {rpcCall} from './jsonrpc';
 
+import { fromSatoshis, toSatoshis } from '../../../../lib/pay'
+
 interface Payment{
   amount: number;
   hash: string;
@@ -82,7 +84,7 @@ export function transformHexToPayments(hex: string): Payment[]{
           return {
             currency: 'BCH',
             hash: tx.hash.toString(),
-            amount: satoshisToBCH(output.satoshis),
+            amount: fromSatoshis(output.satoshis),
             address: output.script.toAddress().toString()
           }
   })
@@ -105,7 +107,7 @@ export function createOutputTxFromInputTx(inputTx, route,fee = 0.00002 ): any { 
  
   let index = utxos[0].index
 
-  fee = bchToSatoshis(fee)
+  fee = toSatoshis(fee)
 
   if (input.satoshis < fee) {
 
@@ -132,13 +134,6 @@ export function createOutputTxFromInputTx(inputTx, route,fee = 0.00002 ): any { 
 
 export function signTransaction(tx, pk):any{
   return tx.sign(pk)            
-}
-
-function satoshisToBCH(sats: number): number{
-  return sats/100000000
-}
-function bchToSatoshis(bch): number{
-  return bch*100000000 | 0;
 }
 
 export async function getSmartFee(numberOfConf){

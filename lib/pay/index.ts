@@ -3,6 +3,8 @@ import { VerifyPayment, PaymentOutput, PaymentOption } from './types';
 
 import { getBitcore } from '../bitcore';
 
+import { BigNumber } from 'bignumber.js';
+
 import * as bip70 from './bip_70';
 import * as bip270 from './bip_270';
 import * as jsonV2 from './json_v2';
@@ -91,6 +93,20 @@ export function verifyOutput(outputs, script, amount) {
   if (matchingOutput.length === 0) {
     throw new Error(`Missing required output ${targetScript} ${targetAmount}`) 
   }
+
+}
+
+const SATOSHIS = 100000000
+
+export function toSatoshis(decimal: number): number {
+
+  return (new BigNumber(decimal)).times(SATOSHIS).toNumber()
+
+}
+
+export function fromSatoshis(integer: number): number {
+
+  return (new BigNumber(integer)).dividedBy(SATOSHIS).toNumber()
 
 }
 
