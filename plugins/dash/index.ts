@@ -93,30 +93,9 @@ export async function getNewAddress(record: I_Address) {
 
   var address;
 
-  /* 
-   * Example extended public key:
-   *
-   * xpub6CwejPWLBbxgg9hhVUA8kT2RL83ARa1kAk3v564a72kPEyu3sX9GtVNn2UgYDu5aX94Xy3V8ZtwrcJ9QiM7ekJHdq5VpLLyMn4Bog9H5aBS
-   *
-   * (stevenzeiler dash android wallet)
-   *
-   */
-
   if (record.value.match(/^xpub/)) {
 
-    address = record.value;
-
-    //address contains metadata 
-    /*
-    * example xpub key given by DASH official wallet 
-    *xpub6CfwhFo3F2UmpqM19kE1P7W3JTZ5ieUBYNcYt8fxpYcvUU1hgMvzuBsZeS2Ujq7zV1XH1m1mDudS43nMBC1oBmM1rvqZ4H3KvGWz7KxaP4f?c=1514577265&h=bip32
-    *
-    */
-    if(address.length == 132){
-	address = address.substring(0,111)
-    }
-
-    address = xpub.generateAddress('DASH', address, record.nonce);
+    address = xpub.generateAddress('DASH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -132,50 +111,15 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    let subscription = await address_subscription.createSubscription('DASH', address)
+    return address;
 
   } else {
 
-    //Create a new HDKeyAddress 
-      let record = await models.Hdkeyaddresses.create({
-
-      currency:'DASH',
-
-      xpub_key:process.env.DASH_HD_PUBLIC_KEY
-
-     })
-
-     record.address = deriveAddress(process.env.DASH_HD_PUBLIC_KEY, record.id)
-
-     await record.save()
-
-     try{
-
-       rpc.call('importaddress', [record.address, "", false, false])
-
-     }catch(error){
-
-        console.log(error)
-     }
-     return record.address;
+    return record.value;
 
   }
 
-  return address;
-
 }
-
-
-function deriveAddress(xkey, nonce){
-
-  let address = new dash.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
-
-}
-
-
-
 
 async function checkAddressForPayments(address:string, currency:string){
 
