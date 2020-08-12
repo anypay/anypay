@@ -76,7 +76,6 @@ export {
   receipts,
   routers,
   routes,
-  routers,
   settings,
   settlements,
   slack,

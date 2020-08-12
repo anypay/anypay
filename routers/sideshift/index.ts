@@ -159,10 +159,7 @@ export async function createPaymentOption(invoice, accountRoute) {
 
   let uri = computeInvoiceURI({
     currency: currency.toUpperCase(),
-    amount,
-    address,
-    business_name: account.business_name,
-    image_url: account.image_url
+    uid: invoice.uid
   });
 
 

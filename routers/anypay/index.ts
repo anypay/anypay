@@ -38,10 +38,7 @@ export async function createPaymentOption(invoice, route) {
 
   let uri = computeInvoiceURI({
     currency: route.input_currency,
-    amount: amount.value,
-    address: address.value,
-    business_name: account.business_name,
-    image_url: account.image_url
+    uid: invoice.uid
   });
 
   let paymentOption = {

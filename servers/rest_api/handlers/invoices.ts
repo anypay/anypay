@@ -4,7 +4,7 @@ const uuid = require('uuid')
 
 import { Op } from 'sequelize';
 
-import {replaceInvoice} from '../../../lib/invoice';
+import { replaceInvoice, sanitizeForPublic } from '../../../lib/invoice';
 
 import {emitter} from '../../../lib/events';
 
@@ -288,7 +288,7 @@ export async function create (request, reply) {
 
     console.log("INVOICE NOTE");
 
-    let sanitized = sanitizeInvoice(invoice);
+    let sanitized = sanitizeInvoice(invoice)
 
     console.log("SANITIZED", sanitized);
 
@@ -400,13 +400,15 @@ export async function createPublic (request, reply) {
 
 function sanitizeInvoice(invoice) {
 
-  let resp = invoice.toJSON();
+  if (typeof invoice.toJSON === 'function') {
+    invoice = invoice.toJSON()
+  }
 
-  delete resp.webhook_url;
-  delete resp.id;
-  delete resp.dollar_amount;
+  delete invoice.webhook_url;
+  delete invoice.id;
+  delete invoice.dollar_amount;
 
-  return resp;
+  return invoice;
 }
 
 export async function show(request, reply) {
