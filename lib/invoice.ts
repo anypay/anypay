@@ -34,7 +34,7 @@ import {convert} from './prices';
 
 import {getCoin} from './coins';
 
-import * as uuid from 'uuid';
+import * as shortid from 'shortid'
 
 import { computeInvoiceURI } from './uri';
 
@@ -104,7 +104,7 @@ export async function generateInvoice(
 
 ): Promise<any> {
 
-  uid = !!uid ? uid : uuid.v4();
+  uid = !!uid ? uid : shortid.generate();
 
   var account = await models.Account.findOne({ where: { id: accountId }});
 
