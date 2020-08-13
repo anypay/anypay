@@ -55,6 +55,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'controllers/moneybutton-auth-redirect.js should pass ESLint\n\n');
   });
 
+  QUnit.test('controllers/pay.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'controllers/pay.js should pass ESLint\n\n2:8 - \'config\' is defined but never used. (no-unused-vars)\n8:1 - Unexpected console statement. (no-console)\n48:7 - Unexpected console statement. (no-console)\n54:7 - Unexpected console statement. (no-console)\n63:7 - Unexpected console statement. (no-console)\n67:7 - Unexpected console statement. (no-console)\n81:7 - \'$\' is not defined. (no-undef)\n83:7 - Unexpected console statement. (no-console)\n85:7 - \'$\' is not defined. (no-undef)');
+  });
+
   QUnit.test('initializers/websockets.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'initializers/websockets.js should pass ESLint\n\n');
@@ -77,7 +82,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/business.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/business.js should pass ESLint\n\n41:5 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n75:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/business.js should pass ESLint\n\n27:5 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n45:5 - Unexpected console statement. (no-console)\n77:5 - Unexpected console statement. (no-console)\n84:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/cities.js', function (assert) {
@@ -123,6 +128,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'routes/moneybutton-auth-redirect.js should pass ESLint\n\n2:8 - \'$\' is defined but never used. (no-unused-vars)\n26:7 - Unexpected console statement. (no-console)');
+  });
+
+  QUnit.test('routes/pay.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'routes/pay.js should pass ESLint\n\n27:5 - Unexpected console statement. (no-console)\n44:5 - Unexpected console statement. (no-console)\n46:5 - Unexpected console statement. (no-console)\n78:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/payments.js', function (assert) {

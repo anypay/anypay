@@ -1461,6 +1461,173 @@ define('energy-city-app/controllers/moneybutton-auth-redirect', ['exports'], fun
     queryParams: ['code', 'state']
   });
 });
+define('energy-city-app/controllers/pay', ['exports', 'ember-get-config'], function (exports, _emberGetConfig) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  var calculator = [];
+
+  var _generateInvoice = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(account_id, amount, accessToken) {
+      var headers, resp;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              console.log('generate', account_id);
+              headers = {
+                'Authorization': 'Basic ' + btoa(accessToken + ":")
+              };
+              _context.next = 4;
+              return Ember.$.ajax({
+                method: 'POST',
+                url: 'https://api.anypayinc.com/accounts/' + account_id + '/invoices',
+                data: {
+                  amount: parseFloat(amount)
+                  //redirect_url: 'https://anypay.city/'
+                },
+                headers: headers
+              });
+
+            case 4:
+              resp = _context.sent;
+              return _context.abrupt('return', resp);
+
+            case 6:
+            case 'end':
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    return function _generateInvoice(_x, _x2, _x3) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  exports.default = Ember.Controller.extend({
+    session: Ember.inject.service(),
+    amount: '0.00',
+
+    isShowNextButton: Ember.computed('amount', function () {
+      return this.get("amount") > 0;
+    }),
+
+    actions: {
+      calculatorPress: function calculatorPress(event) {
+        var n = Ember.$(event.target).html();
+        var decimalIndex = calculator.indexOf('.');
+        if (decimalIndex > 0 && decimalIndex === calculator.length - 3) {
+          return;
+        }
+        if (n === '.') {
+          if (decimalIndex !== -1) {
+            return;
+          }
+          if (calculator.length === 0) {
+            return;
+          }
+        }
+        console.log("calculator press", n);
+        calculator.push(n);
+        var decimalPlaces = this.get('denominationCurrency.decimal_places') || 2;
+        var total = parseFloat(calculator.join('')) / Math.pow(10, decimalPlaces);
+        this.set('amount', total.toFixed(decimalPlaces));
+
+        console.log('amount', this.get('amount'));
+        if (parseFloat(this.get('amount')) > 0) {
+          Ember.$("#collect-amount").show();
+        } else {
+          Ember.$("#collect-amount").hide();
+        }
+      },
+      pressBackspace: function pressBackspace() {
+        console.log('back');
+        calculator.splice(-1, 1);
+        var decimalPlaces = this.get('denominationCurrency.decimal_places') || 2;
+        var total = calculator.join('') / Math.pow(10, decimalPlaces || 0);
+        console.log('total', total);
+        this.set('amount', total.toFixed(decimalPlaces));
+      },
+      clearCalculator: function clearCalculator() {
+        calculator = [];
+        this.set('amount', this.getAmountMask());
+        Ember.$("#collect-amount").hide();
+      },
+      generateInvoice: function () {
+        var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+          var token, resp;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  token = this.get('session')['session']['content']['authenticated']['token'];
+
+
+                  $('.loading').show();
+                  _context2.next = 4;
+                  return _generateInvoice(this.get('business').id, this.get('amount'), token);
+
+                case 4:
+                  resp = _context2.sent;
+
+                  console.log('GENERATED!', resp);
+
+                  $('.loading').hide();
+
+                  window.location = 'https://app.anypayinc.com/invoices/' + resp.invoice.uid;
+
+                case 8:
+                case 'end':
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function generateInvoice() {
+          return _ref2.apply(this, arguments);
+        }
+
+        return generateInvoice;
+      }()
+    }
+
+  });
+});
 define('energy-city-app/helpers/-link-to-params', ['exports', 'ember-angle-bracket-invocation-polyfill/helpers/-link-to-params'], function (exports, _linkToParams) {
   'use strict';
 
@@ -2213,6 +2380,7 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
     //this.route('geolocate', { path: '/' });
     this.route('city', { path: '/cities/:city' });
     this.route('business', { path: '/businesses/:stub' });
+    this.route('pay', { path: '/businesses/:stub/pay' });
     this.route('cities', { path: '/' });
     this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
     this.route('payments');
@@ -2373,8 +2541,10 @@ define('energy-city-app/routes/business', ['exports'], function (exports) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+
+                console.log('PARAMS', params);
                 token = this.get('session')['session']['content']['authenticated']['token'];
-                _context2.next = 3;
+                _context2.next = 4;
                 return Ember.$.ajax({
                   method: 'GET',
                   url: '/businesses/' + params.stub,
@@ -2383,11 +2553,11 @@ define('energy-city-app/routes/business', ['exports'], function (exports) {
                   }
                 });
 
-              case 3:
+              case 4:
                 resp = _context2.sent;
-                return _context2.abrupt('return', resp);
+                return _context2.abrupt('return', Object.assign(resp, { stub: params.stub }));
 
-              case 5:
+              case 6:
               case 'end':
                 return _context2.stop();
             }
@@ -2465,6 +2635,7 @@ define('energy-city-app/routes/business', ['exports'], function (exports) {
       Ember.$('.pay-bottom-tray').removeClass('pay-bottom-tray--is-shown');
     },
     setupController: function setupController(controller, model) {
+      console.log('model', model);
       controller.set('business', model);
       this.get('messageBus').subscribe('accounts_' + model.id + '_invoice_created', this, this.handleInvoiceCreated);
     }
@@ -2946,6 +3117,188 @@ define('energy-city-app/routes/moneybutton-auth-redirect', ['exports', 'ember-si
 
       return setupController;
     }()
+  });
+});
+define('energy-city-app/routes/pay', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  exports.default = Ember.Route.extend({
+    session: Ember.inject.service(),
+    messageBus: Ember.inject.service('message-bus'),
+
+    getInvoice: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(uid) {
+        var token, resp;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                token = this.get('session')['session']['content']['authenticated']['token'];
+                _context.next = 3;
+                return Ember.$.ajax({
+                  method: 'GET',
+                  url: 'https://api.anypayinc.com/invoices/' + uid,
+                  headers: {
+                    'Authorization': 'Basic ' + btoa(token + ':')
+                  }
+                });
+
+              case 3:
+                resp = _context.sent;
+                return _context.abrupt('return', resp);
+
+              case 5:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function getInvoice(_x) {
+        return _ref.apply(this, arguments);
+      }
+
+      return getInvoice;
+    }(),
+    model: function () {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(params) {
+        var token, resp;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+
+                console.log('PARAMS', params);
+
+                token = this.get('session')['session']['content']['authenticated']['token'];
+                _context2.next = 4;
+                return Ember.$.ajax({
+                  method: 'GET',
+                  url: '/businesses/' + params.stub,
+                  headers: {
+                    'Authorization': 'Basic ' + btoa(token + ':')
+                  }
+                });
+
+              case 4:
+                resp = _context2.sent;
+                return _context2.abrupt('return', resp);
+
+              case 6:
+              case 'end':
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+
+      function model(_x2) {
+        return _ref2.apply(this, arguments);
+      }
+
+      return model;
+    }(),
+    handleInvoiceCreated: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(invoice) {
+        var bsvOption, div;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                console.log('handle invoice created', invoice);
+                _context3.next = 3;
+                return this.getInvoice(invoice.uid);
+
+              case 3:
+                invoice = _context3.sent;
+
+                console.log('fetched invoice', invoice);
+
+                bsvOption = invoice.payment_options.find(function (option) {
+                  return option.currency === 'BSV';
+                });
+
+
+                if (bsvOption) {
+                  Ember.$('.pay-bottom-tray').removeClass('pay-bottom-tray--is-hidden');
+                  Ember.$('.pay-bottom-tray').addClass('pay-bottom-tray--is-shown');
+
+                  div = document.getElementById('my-money-button');
+
+
+                  this.controller.set('bsvAmount', bsvOption.denomination_amount);
+
+                  window.moneyButton.render(div, {
+                    outputs: [{
+                      to: bsvOption.address,
+                      amount: bsvOption.amount,
+                      currency: 'BSV'
+                    }, {
+                      to: 'steven@simply.cash',
+                      amount: 0.0002,
+                      currency: 'BSV'
+                    }]
+                  });
+                }
+
+              case 7:
+              case 'end':
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function handleInvoiceCreated(_x3) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return handleInvoiceCreated;
+    }(),
+    deactivate: function deactivate() {
+      console.log('destroy business route');
+      //this.get('messageBus').unsubscribe(`accounts_${this.get('business').id}_invoice_created`, this, this.handleInvoiceCreated);
+      Ember.$('.pay-bottom-tray').addClass('pay-bottom-tray--is-hidden');
+      Ember.$('.pay-bottom-tray').removeClass('pay-bottom-tray--is-shown');
+    },
+    setupController: function setupController(controller, model) {
+      controller.set('business', model);
+      this.get('messageBus').subscribe('accounts_' + model.id + '_invoice_created', this, this.handleInvoiceCreated);
+    }
   });
 });
 define('energy-city-app/routes/payments', ['exports', 'ember-simple-auth/mixins/authenticated-route-mixin'], function (exports, _authenticatedRouteMixin) {
@@ -3531,7 +3884,7 @@ define("energy-city-app/templates/business", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "Dz0oaOqi", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[1,[20,[\"business\",\"business_name\"]],false],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"container page-layout page-layout--background-primary\\n  calculator-pad-top noselect\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"invoice-amount\"],[7],[0,\"\\n\"],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"invoice-amount\"],[9,\"id\",\"invoice-amount\"],[7],[6,\"span\"],[7],[0,\"$\"],[1,[18,\"amount\"],false],[8],[0,\" \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"page-layout__content calculator-pad-top noselect\"],[9,\"style\",\"display: block;\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row calculator-pad noselect\"],[9,\"id\",\"calculator-pad\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-1\"],[7],[0,\"1\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-2\"],[7],[0,\"2\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-3\"],[7],[0,\"3\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-4\"],[7],[0,\"4\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-5\"],[7],[0,\"5\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-6\"],[7],[0,\"6\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-7\"],[7],[0,\"7\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-8\"],[7],[0,\"8\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-9\"],[7],[0,\"9\"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect invisible\"],[9,\"id\",\"calculator-delete\"],[7],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-0\"],[7],[0,\"0\"],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"col-sm-4\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"pressBackspace\"],null],null],[9,\"id\",\"calculator-backspace\"],[7],[0,\"\\n            \"],[6,\"img\"],[9,\"class\",\"left-chevron-back\"],[10,\"src\",[26,[[18,\"rootURL\"],\"left-chevron.png\"]]],[7],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"col-sm-4 invisible\"],[7],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"div\"],[9,\"class\",\"invoice-page__controls\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"new-invoice-next-button\"],[10,\"src\",[26,[[18,\"rootURL\"],\"img/Green_Anypay_Next_Arrow.svg\"]]],[3,\"action\",[[19,0,[]],\"generateInvoice\"]],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"pay-bottom-tray pay-bottom-tray--is-hidden\"],[7],[0,\"\\n\\n  \"],[6,\"p\"],[7],[0,\"Swipe to pay $\"],[1,[18,\"bsvAmount\"],false],[8],[0,\"\\n  \"],[1,[18,\"money-button\"],false],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"my-money-button\"],[7],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"cd-panel cd-panel--from-right js-cd-panel-main\"],[7],[0,\"\\n   \"],[6,\"header\"],[9,\"class\",\"cd-panel__header\"],[7],[0,\"\\n      \"],[6,\"h1\"],[7],[0,\"Title Goes Here\"],[8],[0,\"\\n      \"],[6,\"a\"],[9,\"href\",\"#0\"],[9,\"class\",\"cd-panel__close js-cd-close\"],[7],[0,\"Close\"],[8],[0,\"\\n   \"],[8],[0,\"\\n\\n   \"],[6,\"div\"],[9,\"class\",\"cd-panel__container\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"cd-panel__content\"],[7],[0,\"\\n         \"],[2,\" your side panel content here \"],[0,\"\\n      \"],[8],[0,\" \"],[2,\" cd-panel__content \"],[0,\"\\n   \"],[8],[0,\" \"],[2,\" cd-panel__container \"],[0,\"\\n\"],[8],[0,\" \"],[2,\" cd-panel \"],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/business.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "Vh5HoCWL", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[1,[20,[\"business\",\"business_name\"]],false],[8],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"business\",\"image_url\"]]],null,{\"statements\":[[0,\"  \"],[6,\"section\"],[9,\"class\",\"business-image\"],[7],[0,\"\\n    \"],[6,\"img\"],[10,\"src\",[26,[[20,[\"business\",\"image_url\"]]]]],[7],[8],[0,\"\\n  \"],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"\\n\"],[6,\"section\"],[7],[0,\"\\n  \"],[4,\"link-to\",[\"pay\",[19,0,[\"business\"]]],null,{\"statements\":[[6,\"button\"],[9,\"class\",\"link-to-pay-now\"],[7],[0,\"Pay Now\"],[8]],\"parameters\":[]},null],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"pay-bottom-tray pay-bottom-tray--is-hidden\"],[7],[0,\"\\n\\n  \"],[6,\"p\"],[7],[0,\"Swipe to pay $\"],[1,[18,\"bsvAmount\"],false],[8],[0,\"\\n  \"],[1,[18,\"money-button\"],false],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"my-money-button\"],[7],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"cd-panel cd-panel--from-right js-cd-panel-main\"],[7],[0,\"\\n   \"],[6,\"header\"],[9,\"class\",\"cd-panel__header\"],[7],[0,\"\\n      \"],[6,\"h1\"],[7],[0,\"Title Goes Here\"],[8],[0,\"\\n      \"],[6,\"a\"],[9,\"href\",\"#0\"],[9,\"class\",\"cd-panel__close js-cd-close\"],[7],[0,\"Close\"],[8],[0,\"\\n   \"],[8],[0,\"\\n\\n   \"],[6,\"div\"],[9,\"class\",\"cd-panel__container\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"cd-panel__content\"],[7],[0,\"\\n         \"],[2,\" your side panel content here \"],[0,\"\\n      \"],[8],[0,\" \"],[2,\" cd-panel__content \"],[0,\"\\n   \"],[8],[0,\" \"],[2,\" cd-panel__container \"],[0,\"\\n\"],[8],[0,\" \"],[2,\" cd-panel \"],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/business.hbs" } });
 });
 define("energy-city-app/templates/cities", ["exports"], function (exports) {
   "use strict";
@@ -3665,6 +4018,14 @@ define("energy-city-app/templates/moneybutton-auth-redirect", ["exports"], funct
   });
   exports.default = Ember.HTMLBars.template({ "id": "jMYMO83m", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[0,\"  Signed In\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"  Signing In\\n\"]],\"parameters\":[]}],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/moneybutton-auth-redirect.hbs" } });
 });
+define("energy-city-app/templates/pay", ["exports"], function (exports) {
+  "use strict";
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.HTMLBars.template({ "id": "vqA8NTj6", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"h1\"],[7],[1,[20,[\"business\",\"business_name\"]],false],[8],[0,\"\\n\\n\"],[6,\"section\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"container page-layout page-layout--background-primary\\n  calculator-pad-top noselect\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"invoice-amount\"],[7],[0,\"\\n\"],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"invoice-amount\"],[9,\"id\",\"invoice-amount\"],[7],[6,\"span\"],[7],[0,\"$\"],[1,[18,\"amount\"],false],[8],[0,\" \"],[8],[0,\"\\n    \"],[8],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"page-layout__content calculator-pad-top noselect\"],[9,\"style\",\"display: block;\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"row calculator-pad noselect\"],[9,\"id\",\"calculator-pad\"],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-1\"],[7],[0,\"1\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-2\"],[7],[0,\"2\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-3\"],[7],[0,\"3\"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-4\"],[7],[0,\"4\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-5\"],[7],[0,\"5\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-6\"],[7],[0,\"6\"],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-7\"],[7],[0,\"7\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-8\"],[7],[0,\"8\"],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-9\"],[7],[0,\"9\"],[8],[0,\"\\n        \"],[8],[0,\"\\n\\n        \"],[6,\"div\"],[9,\"class\",\"row\"],[7],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect invisible\"],[9,\"id\",\"calculator-delete\"],[7],[8],[0,\"\\n          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4 noselect\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"calculatorPress\"],null],null],[9,\"id\",\"calculator-0\"],[7],[0,\"0\"],[8],[0,\"\\n        \"],[8],[0,\"\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"calculator-button col-sm-4\"],[10,\"onclick\",[25,\"action\",[[19,0,[]],\"pressBackspace\"],null],null],[9,\"id\",\"calculator-backspace\"],[7],[0,\"\\n            \"],[6,\"img\"],[9,\"class\",\"left-chevron-back\"],[10,\"src\",[26,[[18,\"rootURL\"],\"left-chevron.png\"]]],[7],[8],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]},{\"statements\":[[0,\"          \"],[6,\"div\"],[9,\"class\",\"col-sm-4 invisible\"],[7],[0,\"\\n          \"],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[8],[0,\"\\n\\n      \"],[6,\"div\"],[9,\"class\",\"invoice-page__controls\"],[7],[0,\"\\n\\n\"],[4,\"if\",[[19,0,[\"isShowNextButton\"]]],null,{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"new-invoice-next-button\"],[10,\"src\",[26,[[18,\"rootURL\"],\"img/Green_Anypay_Next_Arrow.svg\"]]],[3,\"action\",[[19,0,[]],\"generateInvoice\"]],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"      \"],[8],[0,\"\\n\\n    \"],[8],[0,\"\\n\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"pay-bottom-tray pay-bottom-tray--is-hidden\"],[7],[0,\"\\n\\n  \"],[6,\"p\"],[7],[0,\"Swipe to pay $\"],[1,[18,\"bsvAmount\"],false],[8],[0,\"\\n  \"],[1,[18,\"money-button\"],false],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"my-money-button\"],[7],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"cd-panel cd-panel--from-right js-cd-panel-main\"],[7],[0,\"\\n   \"],[6,\"header\"],[9,\"class\",\"cd-panel__header\"],[7],[0,\"\\n      \"],[6,\"h1\"],[7],[0,\"Title Goes Here\"],[8],[0,\"\\n      \"],[6,\"a\"],[9,\"href\",\"#0\"],[9,\"class\",\"cd-panel__close js-cd-close\"],[7],[0,\"Close\"],[8],[0,\"\\n   \"],[8],[0,\"\\n\\n   \"],[6,\"div\"],[9,\"class\",\"cd-panel__container\"],[7],[0,\"\\n      \"],[6,\"div\"],[9,\"class\",\"cd-panel__content\"],[7],[0,\"\\n         \"],[2,\" your side panel content here \"],[0,\"\\n      \"],[8],[0,\" \"],[2,\" cd-panel__content \"],[0,\"\\n   \"],[8],[0,\" \"],[2,\" cd-panel__container \"],[0,\"\\n\"],[8],[0,\" \"],[2,\" cd-panel \"],[0,\"\\n\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/pay.hbs" } });
+});
 define("energy-city-app/templates/payments", ["exports"], function (exports) {
   "use strict";
 
@@ -3722,6 +4083,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+151d72a7"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+77b583f7"});
 }
 //# sourceMappingURL=energy-city-app.map

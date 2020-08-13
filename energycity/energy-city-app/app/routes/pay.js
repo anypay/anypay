@@ -23,8 +23,9 @@ export default Ember.Route.extend({
   },
 
   async model(params) {
- 
+
     console.log('PARAMS', params);
+
     let token = this.get('session')['session']['content']['authenticated']['token']
 
     let resp = await $.ajax({
@@ -35,7 +36,7 @@ export default Ember.Route.extend({
       }
     });
 
-    return Object.assign(resp, { stub: params.stub });
+    return resp;
 
   },
 
@@ -81,7 +82,6 @@ export default Ember.Route.extend({
   },
 
   setupController(controller, model) {
-    console.log('model', model);
     controller.set('business', model);
     this.get('messageBus').subscribe(`accounts_${model.id}_invoice_created`, this, this.handleInvoiceCreated);
   }

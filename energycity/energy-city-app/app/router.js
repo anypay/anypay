@@ -10,6 +10,7 @@ Router.map(function() {
   //this.route('geolocate', { path: '/' });
   this.route('city', { path: '/cities/:city' });
   this.route('business', { path: '/businesses/:stub' });
+  this.route('pay', { path: '/businesses/:stub/pay' });
   this.route('cities', { path: '/' });
   this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
   this.route('payments');

@@ -295,6 +295,7 @@ export async function start() {
         id: account.id,
         business_name: account.business_name,
         physical_address: account.physical_address,
+        image_url: account.image_url,
         latitude: account.latitude,
         longitude: account.longitude
       }

@@ -123,6 +123,7 @@ li:last-child {
 }
 
 
+/*
 #calculator-pad {
   margin: 0 auto;
   width: 100%;
@@ -133,19 +134,19 @@ li:last-child {
   width: 100%;
 }
 #calculator-pad div {
-  width: 32%;
+  width: 100%;
   float: left;
   font-weight: lighter;
-  font-size: 30px;
   text-align: center;
   padding: .7em 0.4em;
   border-radius: 10px;
-  margin:.4%;
   cursor: pointer;
+  margin-left: 1em;
 }
 #calculator-pad div:focus {
   outline: none;
 }
+*/
 .new-invoice-next-button {
   width:100px;
   margin: 0 auto;
@@ -311,3 +312,31 @@ iframe {
   right:0px;
 }
 
+.link-to-pay-now {
+  width: 100%;
+  margin-top: 3em;
+  padding: 1em;
+  font-family: Ubuntu;
+  font-weight: bold;
+  border: 0px;
+}
+
+.business-image {
+  text-align:center;
+}
+
+.business-image img {
+  max-height: 250px;
+  max-width: 100%;
+}
+
+.row {
+  width: 100%;
+}
+
+.calculator-button  {
+  width: 33%;
+}
+.container {
+  max-width: 400px;
+}
