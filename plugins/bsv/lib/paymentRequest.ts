@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import {models} from '../../../lib';
 import * as moment from 'moment';
+import { toSatoshis } from '../../../lib/pay';
 
 interface Output{
   script: string;
@@ -47,7 +48,7 @@ export async function generatePaymentRequest(
     network:"bitcoin-sv",
     outputs: [{
       script: script.toHex(),
-      amount: bsvToSatoshis(paymentOption.amount)
+      amount: toSatoshis(paymentOption.amount)
     }, {
       script: anypayScript.toHex(),
       amount: 1000
@@ -67,12 +68,5 @@ export async function generatePaymentRequest(
 
   return request
 
-}
-
-function bsvToSatoshis(bsv): number{
-  let amt = new BigNumber(bsv); 
-  let scalar = new BigNumber(100000000);
-
-  return amt.times(scalar).toNumber();
 }
 
