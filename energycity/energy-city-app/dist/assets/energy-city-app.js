@@ -2991,46 +2991,246 @@ define('energy-city-app/routes/logout', ['exports'], function (exports) {
   });
 });
 define('energy-city-app/routes/map', ['exports'], function (exports) {
-  'use strict';
+    'use strict';
 
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.default = Ember.Route.extend({
-    actions: {
-      didTransition: function didTransition() {
-        console.log('DID TRANSITION');
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Route.extend({
+        actions: {
+            didTransition: function didTransition() {
+                console.log('DID TRANSITION');
 
-        Ember.$('.ember-google-map').css({
-          position: 'fixed',
-          top: '50px',
-          bottom: '0px',
-          left: '0px',
-          right: '0px'
-        });
-      }
-    },
+                Ember.$('.ember-google-map').css({
+                    position: 'fixed',
+                    top: '50px',
+                    bottom: '0px',
+                    left: '0px',
+                    right: '0px'
+                });
+            }
+        },
 
-    setupController: function setupController() {
-      console.log('SETUP CONTROLLER');
-      setTimeout(function () {
+        model: function model() {
 
-        Ember.$('.ember-google-map').css('position', 'fixed');
-      }, 1000);
+            return Ember.$.getJSON('https://api.anypayinc.com/active-merchants');
+        },
+        setupController: function setupController(controller, model) {
+            var frequencyIcons = {
 
-      Ember.run.scheduleOnce('afterRender', this, function () {
-        console.log('AFTER RENDER');
+                'one-week': '/google-map-marker-512-green.png',
 
-        Ember.$('.ember-google-map').css({
-          position: 'fixed',
-          top: '50px',
-          bottom: '0px',
-          left: '0px',
-          right: '0px'
-        });
-      });
-    }
-  });
+                'one-month': '/google-map-marker-yellow.png',
+
+                'three-months': '/google-map-marker-512.png',
+
+                'inactive': '/google-map-marker-512-grey.png',
+
+                'bitcoincom': '/bitcoincomlogo.png'
+
+            };
+
+            controller.set('icons', frequencyIcons);
+
+            console.log('model', model);
+
+            controller.set('mapStyles', [{
+                "featureType": "all",
+                "elementType": "labels",
+                "stylers": [{
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "saturation": 36
+                }, {
+                    "color": "#000000"
+                }, {
+                    "lightness": 40
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "visibility": "on"
+                }, {
+                    "color": "#000000"
+                }, {
+                    "lightness": 16
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.icon",
+                "stylers": [{
+                    "visibility": "off"
+                }]
+            }, {
+                "featureType": "administrative",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 20
+                }]
+            }, {
+                "featureType": "administrative",
+                "elementType": "geometry.stroke",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 17
+                }, {
+                    "weight": 1.2
+                }]
+            }, {
+                "featureType": "administrative.country",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "administrative.locality",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#c4c4c4"
+                }]
+            }, {
+                "featureType": "administrative.neighborhood",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "landscape",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 20
+                }]
+            }, {
+                "featureType": "poi",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 21
+                }, {
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "poi.business",
+                "elementType": "geometry",
+                "stylers": [{
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }, {
+                    "lightness": "0"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "geometry.stroke",
+                "stylers": [{
+                    "visibility": "off"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#ffffff"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 18
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#575757"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#ffffff"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "color": "#2c2c2c"
+                }]
+            }, {
+                "featureType": "road.local",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 16
+                }]
+            }, {
+                "featureType": "road.local",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#999999"
+                }]
+            }, {
+                "featureType": "transit",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 19
+                }]
+            }, {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#0077C0"
+                }, {
+                    "lightness": 60
+
+                }]
+            }]);
+
+            controller.set('merchants', model.merchants);
+            console.log('SETUP CONTROLLER');
+            setTimeout(function () {
+
+                Ember.$('.ember-google-map').css('position', 'fixed');
+            }, 1000);
+
+            Ember.run.scheduleOnce('afterRender', this, function () {
+                console.log('AFTER RENDER');
+
+                Ember.$('.ember-google-map').css({
+                    position: 'fixed',
+                    top: '50px',
+                    bottom: '0px',
+                    left: '0px',
+                    right: '0px'
+                });
+            });
+        }
+    });
 });
 define('energy-city-app/routes/moneybutton-auth-redirect', ['exports', 'ember-simple-auth/mixins/unauthenticated-route-mixin'], function (exports, _unauthenticatedRouteMixin) {
   'use strict';
@@ -4008,7 +4208,7 @@ define("energy-city-app/templates/map", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "I+okQddr", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"map\"],[7],[0,\"\\n    \"],[1,[25,\"g-map\",null,[[\"lat\",\"lng\",\"zoom\"],[\"13.7563\",\"100.5018\",10]]],false],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/map.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "ga8EuLEz", "block": "{\"symbols\":[\"g\",\"l\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"map\"],[7],[0,\"\\n\"],[4,\"g-map\",null,[[\"lat\",\"lng\",\"styles\",\"zoom\"],[\"13.7563\",\"100.5018\",[19,0,[\"mapStyles\"]],12]],{\"statements\":[[4,\"each\",[[19,0,[\"merchants\"]]],null,{\"statements\":[[0,\"        \"],[1,[25,\"component\",[[19,1,[\"marker\"]]],[[\"lat\",\"lng\"],[[19,2,[\"latitude\"]],[19,2,[\"longitude\"]]]]],false],[0,\"\\n\"]],\"parameters\":[2]},null]],\"parameters\":[1]},null],[0,\"  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/map.hbs" } });
 });
 define("energy-city-app/templates/moneybutton-auth-redirect", ["exports"], function (exports) {
   "use strict";
@@ -4083,6 +4283,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+77b583f7"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+db20242c"});
 }
 //# sourceMappingURL=energy-city-app.map

@@ -122,7 +122,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n19:5 - Unexpected console statement. (no-console)\n26:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n41:5 - Unexpected console statement. (no-console)\n310:5 - Unexpected console statement. (no-console)\n317:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
