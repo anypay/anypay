@@ -125,6 +125,13 @@ export async function getNewAddress(record: I_Address) {
 
 }
 
+export async function broadcastTx(transaction: string): Promise<string> {
+
+  let resp = await rpc.call('sendrawtransaction', [transaction]);
+
+  return resp.result;
+}
+
 async function checkAddressForPayments(address:string, currency:string){
 
   log.info(`dash.checkAddressForPayments.${address}`);
