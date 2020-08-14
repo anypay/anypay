@@ -61,6 +61,10 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 
   let fee: Fee = await getFee(paymentOption.currency);
 
+  if (paymentOption.fee) {
+    fee.amount = paymentOption.fee;
+  }
+
   let amount = new BigNumber(paymentOption.amount);
   var address = paymentOption.address;
 

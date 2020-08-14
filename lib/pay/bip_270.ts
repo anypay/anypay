@@ -27,9 +27,11 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<Paymen
 
   let outputs = [{
     script: script.toHex(),
+    address: address.toString(),
     amount: toSatoshis(paymentOption.amount)
   }, {
     script: feeScript.toHex(),
+    address: feeAddress.toSTring(),
     amount: fee.amount
   }]
 

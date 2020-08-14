@@ -22,6 +22,12 @@ export async function submitTransaction(rawTx: string) {
 
 }
 
+export async function broadcastTx(rawTx: string) {
+
+  return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+
 export function transformAddress(address: string) {
 
   if (address.match(':')) {
