@@ -4,12 +4,15 @@
 
 */
 
+require('dotenv').config();
+
 import * as moment from 'moment';
 
 import { PaymentOutput, PaymentOption } from './types';
 import { BigNumber } from 'bignumber.js';
 
 import { getFee, Fee } from './fees';
+import { getBaseURL } from './environment';
 
 interface JsonV2Output {
   address: string;
@@ -32,7 +35,7 @@ interface PaymentRequestOptions {
 
 }
 
-const BASE_URL = process.env.NODE_ENV === 'staging' ? 'https://api.staging.anypayinc.com' : 'https://api.anypayinc.com'
+const BASE_URL = getBaseURL();
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions = {}): Promise<JsonV2PaymentRequest> {
 
@@ -46,7 +49,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
     "time": moment(paymentOption.createdAt).toDate(),
     "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
     "memo": `Payment request for Anypay invoice ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/payments/edge/${paymentOption.currency}/${paymentOption.invoice_uid}`,
+    "paymentUrl": `${BASE_URL}/payments/jsonv2/${paymentOption.currency}/${paymentOption.invoice_uid}`,
     "paymentId": paymentOption.invoice_uid
   }
 

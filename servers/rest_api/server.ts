@@ -778,11 +778,14 @@ async function Server() {
     }
   });
 
+  /*
+  DEPRECATED
   server.route({
     method: "GET",
     path: "/invoices/{uid}/bip70",
     handler: handlers.PaymentRequest.show 
   })
+  */
 
   server.route({
     method: "POST",
@@ -798,27 +801,9 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/payments/edge/BCH/{uid}",
-    handler: handlers.BchPaymentRequestProtobuf.createEdge
+    path: "/payments/jsonv2/{currency}/{uid}",
+    handler: handlers.PaymentRequests.submitJsonV2
   })
-
-  server.route({
-    method: "POST",
-    path: "/payments/edge/BTC/{uid}",
-    handler: handlers.BtcPaymentRequestProtobuf.submitJsonV2
-  })
-
-  server.route({
-    method: "POST",
-    path: "/payments/edge/BSV/{uid}",
-    handler: handlers.BsvPaymentRequest.submitJsonV2
-  });
-
-  server.route({
-    method: "POST",
-    path: "/payments/edge/DASH/{uid}",
-    handler: handlers.DashPaymentRequestProtobuf.submitJsonV2
-  });
 
   server.route({
     method: "POST",

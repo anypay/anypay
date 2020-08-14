@@ -322,3 +322,15 @@ export function isExpired(invoice) {
   return now > expiry;
 }
 
+export async function ensureInvoice(uid: string): Promise<any> {
+
+  let invoice = await models.Invoice.findOne({ where: { uid }});
+
+  if (!invoice) {
+    throw  new Error(`invoice ${uid} not found`)
+  }
+
+  return invoice;
+
+}
+

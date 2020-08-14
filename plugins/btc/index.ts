@@ -12,6 +12,9 @@ import {models} from '../../lib/models';
 
 import {rpc} from './jsonrpc';
 
+import { transformHexToPayments } from '../../router/plugins/btc/lib';
+
+export { transformHexToPayments }
 
 export async function submitTransaction(rawTx: string) {
 

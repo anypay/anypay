@@ -4,6 +4,8 @@ interface InvoiceURIParams {
   uid: string;
 }
 
+import { getBaseURL } from './pay/environment';
+
 const protocols = {
   'DASH': 'dash',
   'ZEC': 'zcash',
@@ -24,7 +26,9 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   const protocol = protocols[params.currency] || 'pay';
 
-  const uri = `${protocol}:?r=https://api.anypayinc.com/r/${params.uid}`;
+  const baseUrl = getBaseURL();
+
+  const uri = `${protocol}:?r=${baseUrl}/r/${params.uid}`;
 
   return uri;
 

@@ -25,6 +25,10 @@ import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
 
+import { transformHexToPayments } from '../../router/plugins/dash/lib';
+
+export { transformHexToPayments }
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){

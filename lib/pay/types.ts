@@ -17,7 +17,7 @@ export interface VerifyPayment {
 
 export interface PaymentOutput {
   amount: number;
-  script: string;
+  address: string;
 }
 
 
