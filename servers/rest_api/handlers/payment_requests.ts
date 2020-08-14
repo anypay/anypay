@@ -92,7 +92,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     let resp = await plugin.broadcastTx(transaction)
 
-    console.log(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.response`, resp)
+    console.log(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`)
 
     let payments = await plugin.transformHexToPayments(transaction)
 
