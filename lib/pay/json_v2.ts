@@ -38,8 +38,13 @@ interface PaymentRequestOptions {
 const BASE_URL = getBaseURL();
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions = {}): Promise<JsonV2PaymentRequest> {
+  var outputs;
 
-  let outputs = await buildOutputs(paymentOption)
+  if (paymentOption.outputs) {
+    outputs = paymentOption.outputs
+  } else {
+    outputs = await buildOutputs(paymentOption)
+  }
 
   const paymentRequest = {
     "network": "main",

@@ -8,6 +8,7 @@ export interface PaymentOption {
   protocol?: string;
   fee?: number;
   createdAt?: Date;
+  outputs?: PaymentOutput[];
 }
 
 export interface VerifyPayment {

@@ -5,6 +5,8 @@ import { models } from '../models';
 
 import * as fixer from '../../lib/fixer';
 
+import * as http from 'superagent';
+
 export interface Price {
   base_currency: string;
   currency: string;
@@ -50,6 +52,8 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   console.log('PRICE WHERE', where);
 
   let price = await models.Price.findOne({ where });
+
+  console.log("PRICE", price);
 
   let targetAmount = inputAmount.value * price.value;
 
@@ -160,6 +164,52 @@ export async function updateUSDPrices() {
     return setPrice(price.currency, price.value, price.source, price.base_currency);
 
   }));
+
+}
+
+export async function updateDashPrices() {
+
+  let resp = await http.get('https://rates2.dashretail.org/rates?source=dashretail');
+
+  let currencies = resp.body
+
+  for (let i=0; i<currencies.length; i++) {
+
+    let currency = currencies[i];
+
+    if (currency.baseCurrency === 'DASH') {
+
+      console.log({
+        base_currency: currency.baseCurrency,
+        currency: currency.quoteCurrency,
+        amount: parseFloat(currency.price),
+        source: 'rates2.dashretail.org/rates?source=dashretail'
+      })
+
+      setPrice(
+        currency.quoteCurrency,
+        parseFloat(currency.price),
+        'https://rates2.dashretail.org/rates?source=dashretail',
+        currency.baseCurrency
+      );
+
+      let price=  {
+        base_currency: currency.quoteCurrency,
+        currency: currency.baseCurrency,
+        value: 1 / parseFloat(currency.price),
+        source: 'rates2.dashretail.org/rates?source=dashretail'
+      }
+
+      setPrice(
+        price.currency,
+        price.value,
+        price.source,
+        price.base_currency
+      );
+
+    }
+
+  }
 
 }
 

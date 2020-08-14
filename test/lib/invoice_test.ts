@@ -73,7 +73,7 @@ describe("Creating Invoices", () => {
 
     let invoice = await generateInvoice(account.id, amount.value, 'DASH');
     
-    console.log('invoice', invoice.toJSON());
+    console.log('INVOICE', invoice.toJSON());
 
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
