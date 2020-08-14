@@ -10,11 +10,12 @@ module.exports = {
       },
       invoice_uid: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: false/*,
         references: {
           model: "invoices",
           key: "uid"
         }
+        */
       },
       txid: {
         type: Sequelize.STRING,
