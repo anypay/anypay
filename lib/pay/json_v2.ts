@@ -77,15 +77,21 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
     address = address.split(':')[1];
   }
 
-  let outputs = [{
-    "amount": amount.times(100000000).toNumber(),
-    "address": address
-  }, {
-    "amount": fee.amount,
-    "address": fee.address
-  }]
+  if (paymentOption.outputs) {
 
-  return outputs;
+    return paymentOption.outputs;
+
+  } else {
+
+    return [{
+      "amount": amount.times(100000000).toNumber(),
+      "address": address
+    }, {
+      "amount": fee.amount,
+      "address": fee.address
+    }]
+
+  }
 
 }
 

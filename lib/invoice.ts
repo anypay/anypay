@@ -203,6 +203,12 @@ export async function generateInvoice(
 
     let fee = await getFee(row[0].currency)
 
+    var address = row[2].address;
+    
+    if (address.match(':')) {
+      return address.split(':')[1]
+    }
+
     return {
       invoice_uid: invoice.uid,
       currency: row[0].currency,
