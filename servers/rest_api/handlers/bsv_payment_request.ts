@@ -1,10 +1,10 @@
 import * as Hapi from 'hapi';
 
-import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/lib/paymentRequest';
-
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
+
+import { verifyPayment, buildPaymentRequest } from '../../../lib/pay';
 
 import { handleJsonV2 } from './payment_requests';
 
@@ -224,7 +224,7 @@ async function handleBSV(req, h) {
 
   console.log('payment option', paymentOption.toJSON());
 
-  let content = await createBSVRequest(invoice, paymentOption);
+  let content = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'BIP270'}));
 
   let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex'); 
 
