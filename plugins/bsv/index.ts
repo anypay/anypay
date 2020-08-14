@@ -5,6 +5,10 @@ import * as  bchaddr from 'bchaddrjs';
 import * as Minercraft from 'minercraft';
 
 
+import { transformHexToPayments } from '../../router/plugins/bsv/lib';
+
+export { transformHexToPayments }
+
 export async function broadcastTx(hex) {
 
   let miners = [

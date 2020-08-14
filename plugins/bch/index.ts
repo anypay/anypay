@@ -22,6 +22,10 @@ import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
 
+import { transformHexToPayments } from '../../router/plugins/bch/lib';
+
+export { transformHexToPayments }
+
 const bch: any = require('bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');

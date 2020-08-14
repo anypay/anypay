@@ -6,6 +6,8 @@ import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
+import { handleJsonV2 } from '../payment_requests';
+
 import { BigNumber } from 'bignumber.js';
 import * as moment from 'moment';
 
@@ -13,107 +15,16 @@ import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
 import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
 
-import {models, amqp} from '../../../lib';
+import { models, amqp, plugins } from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
 import * as bsvPlugin from '../../../plugins/bsv'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
-import { buildPaymentRequest } from '../../../lib/pay';
 
 import * as Boom from 'boom';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
-
-export async function submitJsonV2(req, h) {
-
-  try {
-    
-    for (const transaction of req.payload.transactions) {
-
-      console.log('jsonv2.bsv.submittransaction', transaction);
-
-      let resp = await bsvPlugin.broadcastTx(transaction);
-
-      console.log('jsonv2.bsv.submittransaction.response', resp);
-
-      let payments = await transformHexToPayments(transaction);
-
-      let channel = await amqp.awaitChannel();
-
-      for (let payment of payments) {
-
-        channel.publish('anypay.payments', 'payment', Buffer.from(
-          JSON.stringify(Object.assign(payment, {
-            invoice_uid: req.params.uid 
-          }))
-        ));
-
-        channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
-          JSON.stringify({ transaction })
-        ));
-
-      }
-
-      return {
-        success: true,
-        transactions: req.payload.transactions
-      }
-    }
-
-  } catch(error) {
-
-    console.error('jsonv2.bsv.submittransaction.error', error);
-
-    return Boom.badRequest(error);
-
-  }
-
-}
-
-export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
-
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
-
-  let account = await models.Account.findOne({ where: {
-
-    id: invoice.account_id
-  }});
-
-  let currency = req.headers['x-currency'];
-
-  if (!currency) {
-    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
-    currency = 'BCH'
-  }
-
-  let paymentOption = await models.PaymentOption.findOne({
-
-    where: {
-
-      invoice_uid: req.params.uid,
-
-      currency
-
-    }
-  });
-
-  if (!paymentOption) {
-    return Boom.notFound();
-  }
-
-  const paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'JSONV2' }));
-
-  let response = h.response(paymentRequest);
-
-  response.type('application/payment-request');
-
-  response.header('Content-Type', 'application/payment-request');
-
-  response.header('Accept', 'application/payment');
-
-  return response;
-}
 
 async function handleBCH(req, h) {
 
@@ -538,11 +449,9 @@ export async function create(req, h) {
 
       let payments = await transformHexToPayments(hex);
 
-      console.log('PAYMENTS', payments);
+      let plugin = await plugins.getPlugin('BSV')
 
-      ///let resp = await rpc.call('sendrawtransaction', [hex]);
-
-      let resp = await bsvPlugin.broadcastTx(hex);
+      let resp = await plugin.broadcastTx(hex);
 
       console.log('resp', resp);
 
