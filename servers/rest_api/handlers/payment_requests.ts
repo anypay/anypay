@@ -128,7 +128,7 @@ export async function submitJsonV2(req, h) {
 
     let invoice_uid = req.params.uid
 
-    let transactions = req.payload.transaction;
+    let transactions = req.payload.transactions;
 
     let response = await submitPayment({
       currency,
