@@ -198,7 +198,6 @@ export async function generateInvoice(
   });
 
   let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
-    console.log("ROW", row);
 
     let fee = await pay.fees.getFee(row[0].currency)
 
@@ -212,7 +211,7 @@ export async function generateInvoice(
       invoice_uid: invoice.uid,
       currency: row[0].currency,
       amount: row[1].value,
-      address: address,
+      address,
       uri: row[3],
       outputs: [
         {

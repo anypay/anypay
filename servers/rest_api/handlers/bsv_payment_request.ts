@@ -6,7 +6,7 @@ import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash
 
 import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
 
-import { handleJsonV2 } from '../payment_requests';
+import { handleJsonV2 } from './payment_requests';
 
 import { BigNumber } from 'bignumber.js';
 import * as moment from 'moment';
@@ -449,7 +449,7 @@ export async function create(req, h) {
 
       let payments = await transformHexToPayments(hex);
 
-      let plugin = await plugins.getPlugin('BSV')
+      let plugin = await plugins.findForCurrency('BSV')
 
       let resp = await plugin.broadcastTx(hex);
 

@@ -1,7 +1,9 @@
 
 import { plugins, models, amqp } from '../../../lib'
 
-import { verifyPayment } from '../../../lib/pay';
+import { verifyPayment, buildPaymentRequest } from '../../../lib/pay';
+
+import * as Hapi from 'hapi';
 
 import * as Boom from 'boom';
 
@@ -14,6 +16,49 @@ interface SubmitPaymentRequest {
 interface SubmitPaymentResponse {
   success: boolean;
   transactions: string[];
+}
+
+export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+
+  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
+
+  let account = await models.Account.findOne({ where: {
+
+    id: invoice.account_id
+  }});
+
+  let currency = req.headers['x-currency'];
+
+  if (!currency) {
+    throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
+  }
+
+  let paymentOption = await models.PaymentOption.findOne({
+
+    where: {
+
+      invoice_uid: req.params.uid,
+
+      currency
+
+    }
+  });
+
+  if (!paymentOption) {
+    return Boom.notFound();
+  }
+
+  const paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'JSONV2' }));
+
+  let response = h.response(paymentRequest);
+
+  response.type('application/payment-request');
+
+  response.header('Content-Type', 'application/payment-request');
+
+  response.header('Accept', 'application/payment');
+
+  return response;
 }
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
