@@ -10,6 +10,9 @@ import * as ZencashAddressService from './zencash/address_service';
 import { BigNumber } from 'bignumber.js';
 import * as moment from 'moment';
 
+import { getFee } from './pay/fees';
+import { PaymentOption } from './pay/types';
+
 import * as _ from 'underscore';
 
 import { createAddressRoute } from './routes';
@@ -195,16 +198,19 @@ export async function generateInvoice(
     return row;
   });
 
-  let paymentOptions = matrix.map(row => {
+  let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
+
+    let fee = await getFee(row[0].currency)
 
     return {
       invoice_uid: invoice.uid,
       currency: row[0].currency,
       amount: row[1].value,
       address: row[2].address,
-      uri: row[3]
+      uri: row[3],
+      fee: fee.amount
     }
-  });
+  }));
 
   let paymentOptionRecords = await writePaymentOptions(paymentOptions);
 
