@@ -40,7 +40,7 @@ export async function getFee(currency:string): Promise<Fee> {
   switch(currency) {
   case 'BCH':
     return {
-      address: 'bitcoincash:qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6',
+      address: 'qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6',
       amount: fees[currency]
     }
   case 'DASH':
