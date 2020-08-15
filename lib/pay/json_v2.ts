@@ -4,12 +4,15 @@
 
 */
 
+require('dotenv').config();
+
 import * as moment from 'moment';
 
 import { PaymentOutput, PaymentOption } from './types';
 import { BigNumber } from 'bignumber.js';
 
 import { getFee, Fee } from './fees';
+import { getBaseURL } from './environment';
 
 interface JsonV2Output {
   address: string;
@@ -32,11 +35,16 @@ interface PaymentRequestOptions {
 
 }
 
-const BASE_URL = process.env.NODE_ENV === 'staging' ? 'https://api.staging.anypayinc.com' : 'https://api.anypayinc.com'
+const BASE_URL = getBaseURL();
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions = {}): Promise<JsonV2PaymentRequest> {
+  var outputs;
 
-  let outputs = await buildOutputs(paymentOption)
+  if (paymentOption.outputs) {
+    outputs = paymentOption.outputs
+  } else {
+    outputs = await buildOutputs(paymentOption)
+  }
 
   const paymentRequest = {
     "network": "main",
@@ -46,7 +54,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
     "time": moment(paymentOption.createdAt).toDate(),
     "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
     "memo": `Payment request for Anypay invoice ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/payments/edge/${paymentOption.currency}/${paymentOption.invoice_uid}`,
+    "paymentUrl": `${BASE_URL}/payments/jsonv2/${paymentOption.currency}/${paymentOption.invoice_uid}`,
     "paymentId": paymentOption.invoice_uid
   }
 
@@ -58,6 +66,10 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 
   let fee: Fee = await getFee(paymentOption.currency);
 
+  if (paymentOption.fee) {
+    fee.amount = paymentOption.fee;
+  }
+
   let amount = new BigNumber(paymentOption.amount);
   var address = paymentOption.address;
 
@@ -65,15 +77,21 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
     address = address.split(':')[1];
   }
 
-  let outputs = [{
-    "amount": amount.times(100000000).toNumber(),
-    "address": address
-  }, {
-    "amount": fee.amount,
-    "address": fee.address
-  }]
+  if (paymentOption.outputs) {
 
-  return outputs;
+    return paymentOption.outputs;
+
+  } else {
+
+    return [{
+      "amount": amount.times(100000000).toNumber(),
+      "address": address
+    }, {
+      "amount": fee.amount,
+      "address": fee.address
+    }]
+
+  }
 
 }
 

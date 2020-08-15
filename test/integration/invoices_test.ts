@@ -15,8 +15,6 @@ describe("Creating Invoices via REST", async () => {
     await database.sync();
     server = await Server();
 
-    console.log("server", server);
-
     try {
       account = await models.Account.create({
         email: chance.email(),
@@ -47,7 +45,7 @@ describe("Creating Invoices via REST", async () => {
     });
 
     var amount = {
-      currency: 'VEF',
+      currency: 'VES',
       value: 15000000
     };
 
@@ -101,6 +99,8 @@ describe("Creating Invoices via REST", async () => {
           'Authorization': auth(accessToken.uid, "")
         }
       })
+
+      console.log('response.result', response.result);
 
       assert.strictEqual(response.result.redirect_url, redirectURL);
 

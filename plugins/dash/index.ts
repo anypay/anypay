@@ -15,7 +15,7 @@ import {log, xpub, models} from '../../lib'
 
 import { rpc } from './lib/jsonrpc';
 
-import * as Blockcypher from '../../lib/dash/blockcypher';
+import { publishDASH } from '../../lib/blockcypher'
 
 import { I_Address } from '../../types/interfaces';
 
@@ -24,6 +24,10 @@ import * as http from 'superagent';
 import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
+
+import { transformHexToPayments } from '../../router/plugins/dash/lib';
+
+export { transformHexToPayments }
 
 var WAValidator = require('anypay-wallet-address-validator');
 
@@ -119,6 +123,11 @@ export async function getNewAddress(record: I_Address) {
 
   }
 
+}
+
+export async function broadcastTx(transaction: string): Promise<string> {
+
+  return publishDASH(transaction)
 }
 
 async function checkAddressForPayments(address:string, currency:string){

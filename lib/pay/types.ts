@@ -6,7 +6,9 @@ export interface PaymentOption {
   address: string;
   amount: number;
   protocol?: string;
+  fee?: number;
   createdAt?: Date;
+  outputs?: PaymentOutput[];
 }
 
 export interface VerifyPayment {
@@ -17,7 +19,8 @@ export interface VerifyPayment {
 
 export interface PaymentOutput {
   amount: number;
-  script: string;
+  address: string;
+  script?: string;
 }
 
 

@@ -198,7 +198,6 @@ export async function generateInvoice(
   });
 
   let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
-    console.log("ROW", row);
 
     let fee = await pay.fees.getFee(row[0].currency)
 
@@ -208,18 +207,24 @@ export async function generateInvoice(
       address = address.split(':')[1]
     }
 
+    var address = row[2].address;
+    
+    if (address.match(':')) {
+      address = address.split(':')[1]
+    }
+
     return {
       invoice_uid: invoice.uid,
       currency: row[0].currency,
       amount: row[1].value,
-      address: address,
+      address,
       uri: row[3],
       outputs: [
         {
           address: row[2].address,
           amount: pay.toSatoshis(row[1].value)
         },
-        fee
+        fee 
       ],
       fee: fee.amount
     }
@@ -320,5 +325,17 @@ export function isExpired(invoice) {
   let now = moment()
 
   return now > expiry;
+}
+
+export async function ensureInvoice(uid: string): Promise<any> {
+
+  let invoice = await models.Invoice.findOne({ where: { uid }});
+
+  if (!invoice) {
+    throw  new Error(`invoice ${uid} not found`)
+  }
+
+  return invoice;
+
 }
 

@@ -19,11 +19,31 @@ export async function verifyPayment(v: VerifyPayment) {
 
   let tx = new bitcore.Transaction(v.hex);
 
-  let outputs: PaymentOutput[] = await buildOutputs(v.payment_option);
+  let txOutputs = tx.outputs.map(output => {
+    let address = new bitcore.Address(output.script).toString()
+
+    if (address.match(':')) {
+      address = address.split(':')[1]
+    }
+
+    return {
+      address,
+      amount: output.satoshis
+    }
+
+  })
+
+  console.log("txOutputs", txOutputs);
+
+  let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, v.protocol);
 
   for (let output of outputs) {
 
-    verifyOutput(tx.outputs, output.script, output.amount);
+    if (output.address.match(':')) {
+      output.address = output.address.split(':')[1]
+    }
+
+    verifyOutput(txOutputs, output.address, output.amount);
   }
 
 }
@@ -52,9 +72,9 @@ export async function buildPaymentRequest(paymentOption): Promise<any> {
 
 }
 
-export async function buildOutputs(paymentOption: PaymentOption): Promise<any[]> {
+export async function buildOutputs(paymentOption: PaymentOption, protocol: string): Promise<any[]> {
 
-  switch(paymentOption.protocol) {
+  switch(protocol) {
 
   case 'BIP70':
 
@@ -76,22 +96,18 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<any[]>
 
 }
 
-export function verifyOutput(outputs, script, amount) {
+export function verifyOutput(outputs, targetAddress, targetAmount) {
 
-  var targetScript = script.buffer.toString('hex')
-
-  var targetAmount = amount.toNumber();
+  console.log('VERIFY OUTPUTS', outputs);
 
   let matchingOutput = outputs.filter(output => {
 
-    let { amount, script } = output.toJSON();
-
-    return script === targetScript && amount === targetAmount;
+    return output.address === targetAddress && output.amount === targetAmount;
 
   });
 
   if (matchingOutput.length === 0) {
-    throw new Error(`Missing required output ${targetScript} ${targetAmount}`) 
+    throw new Error(`Missing required output ${targetAddress} ${targetAmount}`) 
   }
 
 }

@@ -8,14 +8,25 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
+import { publishBTC } from '../../lib/blockcypher'
+
 import {models} from '../../lib/models';
 
 import {rpc} from './jsonrpc';
 
+import { transformHexToPayments } from '../../router/plugins/btc/lib';
+
+export { transformHexToPayments }
 
 export async function submitTransaction(rawTx: string) {
 
-  return rpc.call('sendrawtransaction', [rawTx]);
+  return publishBTC(rawTx);
+
+}
+
+export async function broadcastTx(rawTx: string) {
+
+  return publishBTC(rawTx);
 
 }
 
