@@ -210,7 +210,7 @@ export async function generateInvoice(
     var address = row[2].address;
     
     if (address.match(':')) {
-      return address.split(':')[1]
+      address = address.split(':')[1]
     }
 
     return {
