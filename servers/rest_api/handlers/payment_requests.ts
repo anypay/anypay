@@ -102,6 +102,10 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     for (let p of payments) {
 
+      if (p.address.match(':')) {
+        p.address = p.address.split(':')[1]
+      }
+
       console.log('PAYMENT', Object.assign(p, {
         invoice_uid: invoice.uid
       }))
