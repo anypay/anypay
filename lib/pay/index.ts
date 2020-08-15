@@ -39,7 +39,9 @@ export async function verifyPayment(v: VerifyPayment) {
 
   for (let output of outputs) {
 
-    console.log('OUTPUT', output);
+    if (output.address.match(':')) {
+      output.address = output.address.split(':')[1]
+    }
 
     verifyOutput(txOutputs, output.address, output.amount);
   }
