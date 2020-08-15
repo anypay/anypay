@@ -62,7 +62,7 @@ describe("Creating Invoices", () => {
     });
 
     var amount = {
-      currency: 'VEF',
+      currency: 'USD',
       value: 15
     };
 

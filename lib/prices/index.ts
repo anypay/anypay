@@ -47,9 +47,13 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
     currency: outputCurrency
   };
 
+  console.log('PRICE WHERE', where);
+
   let price = await models.Price.findOne({ where });
 
   let targetAmount = inputAmount.value * price.value;
+
+  console.log('TARGET AMOUNT', { where, targetAmount })
 
   return {
     currency: outputCurrency,
