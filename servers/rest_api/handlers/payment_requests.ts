@@ -100,17 +100,16 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     let channel = await amqp.awaitChannel()
 
-    for (let payment of payments) {
-      console.log('PAYMENT', payment);
+    for (let p of payments) {
+
+      console.log('PAYMENT', Object.assign(p, {
+        invoice_uid: invoice.uid
+      }))
 
       channel.publish('anypay.payments', 'payment', Buffer.from(
-        JSON.stringify(Object.assign(payment, {
+        JSON.stringify(Object.assign(p, {
           invoice_uid: invoice.uid
         }))
-      ))
-
-      channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
-        JSON.stringify({ transaction })
       ))
 
     }
