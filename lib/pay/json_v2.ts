@@ -15,7 +15,7 @@ import { getFee, Fee } from './fees';
 import { getBaseURL } from './environment';
 
 interface JsonV2Output {
-  address: string;
+  address?: string;
   amount: number; // integer
 }
 
