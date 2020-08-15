@@ -4,6 +4,10 @@ import { rpc } from './lib/jsonrpc';
 
 import * as http from 'superagent';
 
+let BITBOX = require('bitbox-sdk').BITBOX;
+
+const bitbox = new BITBOX();
+
 import {generateInvoice} from '../../lib/invoice';
 
 import {awaitChannel} from '../../lib/amqp';
@@ -35,6 +39,11 @@ import * as address_subscription from '../../lib/address_subscription';
 export async function submitTransaction(rawTx: string) {
 
   return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+export async function broadcastTx(hex: string) {
+
+  return bitbox.RawTransactions.sendRawTransaction(hex);
 
 }
 

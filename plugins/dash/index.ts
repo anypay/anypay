@@ -15,7 +15,7 @@ import {log, xpub, models} from '../../lib'
 
 import { rpc } from './lib/jsonrpc';
 
-import * as Blockcypher from '../../lib/dash/blockcypher';
+import { publishDASH } from '../../lib/blockcypher'
 
 import { I_Address } from '../../types/interfaces';
 
@@ -127,9 +127,7 @@ export async function getNewAddress(record: I_Address) {
 
 export async function broadcastTx(transaction: string): Promise<string> {
 
-  let resp = await rpc.call('sendrawtransaction', [transaction]);
-
-  return resp.result;
+  return publishDASH(transaction)
 }
 
 async function checkAddressForPayments(address:string, currency:string){
