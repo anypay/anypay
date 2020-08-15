@@ -3396,29 +3396,13 @@ define('energy-city-app/routes/pay', ['exports'], function (exports) {
     }(),
     model: function () {
       var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(params) {
-        var token, resp;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                return _context2.abrupt('return', params);
 
-                console.log('PARAMS', params);
-
-                token = this.get('session')['session']['content']['authenticated']['token'];
-                _context2.next = 4;
-                return Ember.$.ajax({
-                  method: 'GET',
-                  url: '/businesses/' + params.stub,
-                  headers: {
-                    'Authorization': 'Basic ' + btoa(token + ':')
-                  }
-                });
-
-              case 4:
-                resp = _context2.sent;
-                return _context2.abrupt('return', resp);
-
-              case 6:
+              case 1:
               case 'end':
                 return _context2.stop();
             }
@@ -3496,6 +3480,7 @@ define('energy-city-app/routes/pay', ['exports'], function (exports) {
       Ember.$('.pay-bottom-tray').removeClass('pay-bottom-tray--is-shown');
     },
     setupController: function setupController(controller, model) {
+      window.location = 'https://app.anypayinc.com/pay/' + model.stub;
       controller.set('business', model);
       this.get('messageBus').subscribe('accounts_' + model.id + '_invoice_created', this, this.handleInvoiceCreated);
     }
@@ -4283,6 +4268,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+db20242c"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+341c5d71"});
 }
 //# sourceMappingURL=energy-city-app.map

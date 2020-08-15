@@ -23,6 +23,10 @@ export default Ember.Route.extend({
   },
 
   async model(params) {
+    return params;
+
+    //window.location = `https://app.anypayinc.com/pay/${params.stub}`
+  /*
 
     console.log('PARAMS', params);
 
@@ -37,6 +41,7 @@ export default Ember.Route.extend({
     });
 
     return resp;
+    */
 
   },
 
@@ -82,6 +87,7 @@ export default Ember.Route.extend({
   },
 
   setupController(controller, model) {
+    window.location = `https://app.anypayinc.com/pay/${model.stub}`
     controller.set('business', model);
     this.get('messageBus').subscribe(`accounts_${model.id}_invoice_created`, this, this.handleInvoiceCreated);
   }
