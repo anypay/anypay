@@ -63,6 +63,8 @@ export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
+  console.log('SUBMIT PAYMENT', payment);
+
   let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
   if (!invoice) {
@@ -99,10 +101,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
     let channel = await amqp.awaitChannel()
 
     for (let payment of payments) {
+      console.log('PAYMENT', payment);
 
       channel.publish('anypay.payments', 'payment', Buffer.from(
         JSON.stringify(Object.assign(payment, {
-          invoice_uid: payment.invoice_uid
+          invoice_uid: invoice.uid
         }))
       ))
 
