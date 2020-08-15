@@ -19,7 +19,7 @@ export interface VerifyPayment {
 
 export interface PaymentOutput {
   amount: number;
-  address: string;
+  address?: string;
   script?: string;
 }
 
