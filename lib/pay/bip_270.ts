@@ -34,7 +34,6 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<Paymen
 
     return {
       script: script.toHex(),
-      address: output.address,
       amount: output.amount
     }
 
