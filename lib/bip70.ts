@@ -23,7 +23,7 @@ import { buildOutputs } from './pay/bip_70'
 export function createBIP70Request(invoice, account, paymentOption) {
 
   // build outputs
-  let outputs = buildOutputs(paymentOption);
+  let outputs = await buildOutputs(paymentOption);
 
   console.log('outputs', outputs);
 
