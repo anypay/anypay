@@ -30,7 +30,8 @@ export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
   let currency = req.headers['x-currency'];
 
   if (!currency) {
-    throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
+    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
+    currency = 'BCH'
   }
 
   let paymentOption = await models.PaymentOption.findOne({
