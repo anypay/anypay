@@ -1,8 +1,6 @@
 import * as Hapi from 'hapi';
 
-import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
-
-import {generatePaymentRequest as createBCHRequest} from '../../../lib/bip70';
+import { createBIP70Request } from '../../../lib/bip70';
 
 import { verifyPayment, buildPaymentRequest } from '../../../lib/pay';
 
@@ -26,7 +24,7 @@ import * as Boom from 'boom';
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
-async function handleBCH(req, h) {
+async function handleBIP70(currency, name, req, h) {
 
   const params = req.params;
 
@@ -44,7 +42,7 @@ async function handleBCH(req, h) {
 
       invoice_uid: req.params.uid,
 
-      currency: 'BCH'
+      currency
 
     }
   });
@@ -53,16 +51,14 @@ async function handleBCH(req, h) {
     return Boom.notFound();
   }
 
-  console.log('payment option', paymentOption.toJSON());
-
-  let content = await createBCHRequest({
+  let content = await createBIP70Request({
     address: paymentOption.address,
     amount: paymentOption.amount,
-    currency: 'BCH',
+    currency,
     denomination_amount: invoice.denomination_amount,
     denomination_currency: invoice.denomination_currency,
     uid: invoice.uid
-  }, account);
+  }, account, paymentOption);
 
   let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex');
 
@@ -84,125 +80,6 @@ async function handleBCH(req, h) {
   return response;
 
 }
-
-async function handleBTC(req, h) {
-
-  const params = req.params;
-
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
-
-  let account = await models.Account.findOne({ where: {
-
-    id: invoice.account_id
-
-  }});
-
-  let paymentOption = await models.PaymentOption.findOne({
-
-    where: {
-
-      invoice_uid: req.params.uid,
-
-      currency: 'BTC'
-
-    }
-  });
-
-  if (!paymentOption) {
-    return Boom.notFound();
-  }
-
-  console.log('payment option', paymentOption.toJSON());
-
-  let content = await createBCHRequest({
-    address: paymentOption.address,
-    amount: paymentOption.amount,
-    currency: 'BTC',
-    denomination_amount: invoice.denomination_amount,
-    denomination_currency: invoice.denomination_currency,
-    uid: invoice.uid
-  }, account);
-
-  let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex');
-
-  var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
-
-  var signature = Message(digest).sign(privateKey);
-
-  let response = h.response(content.serialize());
-
-  response.type('application/bitcoin-paymentrequest');
-
-  response.header('x-signature-type', 'ecc');
-  response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
-  response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
-  response.header('digest', `SHA-256=${digest}`);
-  response.header('Content-Type', 'application/bitcoin-paymentrequest');
-  response.header('Accept', 'application/bitcoin-payment');
-
-  return response;
-
-}
-
-async function handleDASH(req, h) {
-
-  const params = req.params;
-
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
-
-  let account = await models.Account.findOne({ where: {
-
-    id: invoice.account_id
-
-  }});
-
-  let paymentOption = await models.PaymentOption.findOne({
-
-    where: {
-
-      invoice_uid: req.params.uid,
-
-      currency: 'DASH'
-
-    }
-  });
-
-  if (!paymentOption) {
-    return Boom.notFound();
-  }
-
-  console.log('payment option', paymentOption.toJSON());
-
-  let content = await createBCHRequest({
-    address: paymentOption.address,
-    amount: paymentOption.amount,
-    currency: 'DASH',
-    denomination_amount: invoice.denomination_amount,
-    denomination_currency: invoice.denomination_currency,
-    uid: invoice.uid
-  }, account);
-
-  let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex');
-
-  var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
-
-  var signature = Message(digest).sign(privateKey);
-
-  let response = h.response(content.serialize());
-
-  response.type('application/dash-paymentrequest');
-
-  response.header('x-signature-type', 'ecc');
-  response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
-  response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
-  response.header('digest', `SHA-256=${digest}`);
-  response.header('Content-Type', 'application/dash-paymentrequest');
-  response.header('Accept', 'application/dash-payment');
-
-  return response;
-
-}
-
 
 async function handleBSV(req, h) {
 
@@ -250,7 +127,6 @@ async function handleBSV(req, h) {
 
 export async function show(req, h) {
 
-  console.log(req);
   var resp;
 
   try {
@@ -259,43 +135,37 @@ export async function show(req, h) {
 
       case 'application/payment-request':
 
-        // jsonv2
         resp = await handleJsonV2(req, h)
-
-        return resp;
-
-      case 'application/bitcoin-paymentrequest':
-
-        // bip70
-        resp = await handleBTC(req, h)
 
         return resp;
 
       case 'application/bitcoinsv-paymentrequest':
 
-        // bip270
-        resp = await handleBSV(req, h)
+        resp = await handleBIP70('BSV', 'bitcoinsv', req, h)
+
+        return resp;
+
+      case 'application/bitcoin-paymentrequest':
+
+        resp = await handleBIP70('BTC', 'bitcoin', req, h)
 
         return resp;
 
       case 'application/bitcoincash-paymentrequest':
 
-        // bip70
-        resp = await handleBCH(req, h)
+        resp = await handleBIP70('BCH', 'bitcoincash', req, h)
 
         return resp;
 
       case 'application/simpleledger-paymentrequest':
 
-        // bip70
-        resp = await handleBCH(req, h)
+        resp = await handleBIP70('BCH', 'bitcoincash', req, h)
 
         return resp;
 
       case 'application/dash-paymentrequest':
 
-        // bip70
-        resp = await handleDASH(req, h)
+        resp = await handleBIP70('DASH', 'dash', req, h)
 
         return resp;
 

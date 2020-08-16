@@ -20,27 +20,17 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
   let bitcore = getBitcore(payment_option.currency);
 
-  var outputs = [];
+  return payment_option.outputs.map(o => {
 
-  var output = new PaymentProtocol.Output();
-  const script = bitcore.Script.buildPublicKeyHashOut(payment_option.address)
+    var output = new PaymentProtocol.Output();
+    const script = bitcore.Script.buildPublicKeyHashOut(o.address)
+    
+    output.$set('amount', o.amount);
+    output.$set('script', script.toBuffer());
 
-  output.$set('amount', payment_option.amount * 100000000); // BCH -> satoshis
-  output.$set('script', script.toBuffer());
+    return output
 
-  outputs.push(output)
-
-  let fee: Fee = await getFee(payment_option.currency)
-
-  var output2 = new PaymentProtocol.Output();
-  const script2 = bitcore.Script.buildPublicKeyHashOut(fee.address)
-
-  output2.$set('amount', fee.amount);
-  output2.$set('script', script2.toBuffer());
-
-  outputs.push(output2);
-
-  return outputs;
+  })
 
 }
 

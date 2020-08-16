@@ -18,97 +18,12 @@ import { join } from 'path';
  *
  */
 
-export function buildOutputs(invoice) {
-    var outputs = [];
+import { buildOutputs } from './pay/bip_70'
 
-  switch (invoice.currency) {
-
-    case 'BCH':
-
-      outputs = ((outputs) => {
-
-        var output = new PaymentProtocol.Output();
-        const script = bitcoreBCH.Script.buildPublicKeyHashOut(invoice.address)
-
-        output.$set('amount', invoice.amount * 100000000); // BCH -> satoshis
-        output.$set('script', script.toBuffer());
-
-        outputs.push(output);
-
-        /* Output2 is Anypay: $0.01 per transaction on top*/
-        var output2 = new PaymentProtocol.Output();
-        const script2 =bitcoreBCH.Script.buildPublicKeyHashOut('bitcoincash:qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6')
-
-        output2.$set('amount', 5000);
-        output2.$set('script', script2.toBuffer());
-
-        outputs.push(output2);
-
-        return outputs;
-
-      })([]);
-
-      return outputs;
-
-    case 'BTC':
-
-      outputs = ((outputs) => {
-
-        var output = new PaymentProtocol.Output();
-        const script = bitcoreBTC.Script.buildPublicKeyHashOut(invoice.address)
-
-        output.$set('amount', invoice.amount * 100000000); // BTC -> satoshis
-        output.$set('script', script.toBuffer());
-
-        outputs.push(output);
-
-        /* Output2 is Anypay: $0.01 per transaction on top*/
-        var output2 = new PaymentProtocol.Output();
-        const script2 =bitcoreBTC.Script.buildPublicKeyHashOut('17JiDrmEBftkPKtHojcJXAB8RSiv5nY6gc') // mycelium
-
-        output2.$set('amount', 5000);
-        output2.$set('script', script2.toBuffer());
-
-        outputs.push(output2);
-
-        return outputs;
-
-      })([]);
-
-      return outputs;
-
-    case 'DASH':
-
-      var output = new PaymentProtocol.Output();
-      const script = bitcoreDASH.Script.buildPublicKeyHashOut(invoice.address)
-
-      output.$set('amount', invoice.amount * 100000000); // DASH -> satoshis
-      output.$set('script', script.toBuffer());
-
-      outputs.push(output);
-
-      /* Output2 is Anypay: $0.01 per transaction on top*/
-      var output2 = new PaymentProtocol.Output();
-      const script2 =bitcoreDASH.Script.buildPublicKeyHashOut('Xwh247FF6SWymYLiJsMjM1BfrqVkzya6wh')
-
-      output2.$set('amount', 5000);
-      output2.$set('script', script2.toBuffer());
-
-      outputs.push(output2);
-
-      return outputs;
-
-    default:
-      throw new Error('currency not supported');
-  }
-
-}
-
-
-export function generatePaymentRequest(invoice, account) {
+export function createBIP70Request(invoice, account, paymentOption) {
 
   // build outputs
-  let outputs = buildOutputs(invoice);
+  let outputs = buildOutputs(paymentOption);
 
   console.log('outputs', outputs);
 
@@ -132,7 +47,7 @@ export function generatePaymentRequest(invoice, account) {
 
   }
 
-  switch(invoice.currency) {
+  switch(paymentOption.currency) {
   case 'BCH':
     pd.set('payment_url', `https://api.anypayinc.com/invoices/${invoice.uid}/pay/bip70/bch`);
     break;
@@ -147,12 +62,12 @@ export function generatePaymentRequest(invoice, account) {
     break;
   }
 
-  if (invoice.currency === 'BCH') {
+  if (paymentOption.currency === 'BCH') {
     pd.set('required_fee_rate', 1);
   }
   pd.set('merchant_data', invoice.uid); // identify the request
 
-  var paypro = new PaymentProtocol(invoice.currency);
+  var paypro = new PaymentProtocol(paymentOption.currency);
 
   paypro.makePaymentRequest();
 

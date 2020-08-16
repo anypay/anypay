@@ -221,7 +221,7 @@ export async function generateInvoice(
       uri: row[3],
       outputs: [
         {
-          address: row[2].address,
+          address,
           amount: pay.toSatoshis(row[1].value)
         },
         fee 
