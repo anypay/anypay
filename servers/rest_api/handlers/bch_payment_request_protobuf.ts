@@ -1,4 +1,3 @@
-import {generatePaymentRequest} from '../../../plugins/bch/lib/paymentRequest';
 import {awaitChannel} from '../../../lib/amqp';
 import * as Hapi from 'hapi';
 
