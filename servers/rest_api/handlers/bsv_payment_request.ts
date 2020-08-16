@@ -68,14 +68,14 @@ async function handleBIP70(currency, name, req, h) {
 
   let response = h.response(content.serialize());
 
-  response.type('application/bitcoincash-paymentrequest');
+  response.type(`application/${name}-paymentrequest`);
 
   response.header('x-signature-type', 'ecc');
   response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
   response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
   response.header('digest', `SHA-256=${digest}`);
-  response.header('Content-Type', 'application/bitcoincash-paymentrequest');
-  response.header('Accept', 'application/bitcoincash-payment');
+  response.header('Content-Type', `application/${name}-paymentrequest`);
+  response.header('Accept', `application/${name}-payment`);
 
   return response;
 
