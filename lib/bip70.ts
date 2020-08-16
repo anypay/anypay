@@ -20,7 +20,7 @@ import { join } from 'path';
 
 import { buildOutputs } from './pay/bip_70'
 
-export function createBIP70Request(invoice, account, paymentOption) {
+export async function createBIP70Request(invoice, account, paymentOption) {
 
   // build outputs
   let outputs = await buildOutputs(paymentOption);
