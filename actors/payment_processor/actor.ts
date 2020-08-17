@@ -59,7 +59,7 @@ async function start() {
 
       invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
 
-      if (account.email !== 'diagnostic@anypay.global') {
+      if (account.email !== 'diagnostic@anypayinc.com') {
 
         notify(
           `invoice.${invoice.status} ${account.email} ${invoice.currency} https://anypayapp.com/invoices/${invoice.uid}`

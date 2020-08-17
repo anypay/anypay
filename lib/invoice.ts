@@ -314,7 +314,7 @@ export async function republishTxid( currency: string, txid: string){
 
   currency = currency.toLowerCase()
 
-  await  channel.publish( `${currency}.anypay.global`, 'walletnotify', Buffer.from(txid))
+  await  channel.publish( `${currency}.anypayinc.com`, 'walletnotify', Buffer.from(txid))
 
   return txid;
 

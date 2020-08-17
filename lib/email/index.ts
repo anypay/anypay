@@ -15,7 +15,7 @@ import { email as rabbiEmail } from 'rabbi';
 AWS.config.update({ region: "us-east-1" });
 //require('./createtemplate')
 
-const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
+const FROM_EMAIL = 'Derrick from Anypay <derrick@anypayinc.com>';
 
 const templates = requireAll(`${__dirname}/templates`);
 
@@ -46,7 +46,8 @@ export async function sendEmail(recipient, subject, body) {
             },
       Source: FROM_EMAIL, /* required */
       ReplyToAddresses: [
-              'support@anypay.global',
+              'derrick@anypayinc.com',
+              'support@anypayinc.com',
             /* more items */
           ],
   };  

@@ -97,7 +97,7 @@ async function createAddressForward(record: I_Address) {
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/smart/address_forward_callbacks'
+    callback_url: 'https://api.anypayinc.com/smart/address_forward_callbacks'
 
   });
 

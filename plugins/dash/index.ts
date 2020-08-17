@@ -77,9 +77,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://dash.anypay.global/v1/dash/forwards";
+  let url = "https://dash.anypayinc.com/v1/dash/forwards";
 
-  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+  let callbackBase = process.env.API_BASE || 'https://api.anypayinc.com';
 
   let resp = await http.post(url).send({
 

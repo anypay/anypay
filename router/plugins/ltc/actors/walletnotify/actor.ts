@@ -13,7 +13,7 @@ async function start () {
 
   Actor.create({
 
-    exchange: 'ltc.anypay.global',
+    exchange: 'ltc.anypayinc.com',
 
     routingkey: 'walletnotify',
 

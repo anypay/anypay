@@ -6,7 +6,7 @@
   "test": {
     "username": "postgres",
     "password": null,
-    "database": "test_ltc_anypay_global",
+    "database": "test_ltc_anypayinc.com",
     "host": "127.0.0.1",
     "dialect": "postgresql"
   },

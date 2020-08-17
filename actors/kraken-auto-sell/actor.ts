@@ -8,7 +8,7 @@ import * as cron from 'node-cron';
 
 import * as http from 'superagent';
 
-const SLACK_URL = 'https://chat.anypay.global/hooks/pupH8EqX6Hz3WCAeh/RopsnAYceWJkyoq5irtEEtZgmCCdcBiwezNNQg4sA8jCyxNF'
+const SLACK_URL = 'https://chat.anypayinc.com/hooks/pupH8EqX6Hz3WCAeh/RopsnAYceWJkyoq5irtEEtZgmCCdcBiwezNNQg4sA8jCyxNF'
 
 const RISK = 0.001;
 

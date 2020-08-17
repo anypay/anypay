@@ -154,9 +154,9 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://bch.anypay.global/v1/bch/forwards";
+  let url = "https://bch.anypayinc.com/v1/bch/forwards";
 
-  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypay.global/v1/bch/forwards";
+  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypayinc.com/v1/bch/forwards";
 
   let resp = await http.post(url).send({
 

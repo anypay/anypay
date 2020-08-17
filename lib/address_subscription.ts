@@ -5,7 +5,7 @@ import * as http from 'superagent';
 
 export async function createSubscription(currency, address){
 
-  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+  let callbackBase = process.env.API_BASE || 'https://api.anypayinc.com';
 
   let url = `${process.env.MONITOR_BASE}/v1/subscriptions`;
 

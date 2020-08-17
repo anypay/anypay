@@ -4,15 +4,15 @@ module.exports = {
     "email": "corporate@anypayinc.com"
   }, {
     "name": "Steven Zeiler",
-    "email": "steven@anypay.global"
+    "email": "steven@anypayinc.com"
   },{
     "name": "Derrick Horton",
-    "email": "derrick@anypay.global"
+    "email": "derrick@anypayinc.com"
   }, {
     "name": "Ian Freeman",
     "email": "ian@freetalklive.com"
   }, {
     "name": "Brandon Bryant",
-    "email": "brandon@anypay.global"
+    "email": "brandon@anypayinc.com"
   }]
 }

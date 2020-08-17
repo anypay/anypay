@@ -1,5 +1,5 @@
 {
-  "name": "router.anypay.global",
+  "name": "router.anypayinc.com",
   "version": "0.1.0",
   "description": "Address Forwarding Service",
   "main": "actors/server/actor.ts",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anypay/bch.anypay.global.git"
+    "url": "git+https://github.com/anypay/bch.anypayinc.com.git"
   },
   "keywords": [
     "bitcoin",
@@ -22,9 +22,9 @@
   "author": "Steven Zeiler",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/anypay/bch.anypay.global/issues"
+    "url": "https://github.com/anypay/bch.anypayinc.com/issues"
   },
-  "homepage": "https://github.com/anypay/bch.anypay.global#readme",
+  "homepage": "https://github.com/anypay/bch.anypayinc.com#readme",
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.17.9",
     "@types/amqplib": "^0.5.9",

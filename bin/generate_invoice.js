@@ -2,7 +2,7 @@
 const qrCode = require("qrcode-terminal");
 const DashInvoice = require("../lib/dash_invoice");
 const socket = require("socket.io-client")(
-  "http://blockcypher.anypay.global:3000"
+  "http://blockcypher.anypayinc.com:3000"
 );
 const uuid = require("uuid");
 const clear = require("clear");
