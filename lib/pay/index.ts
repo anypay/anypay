@@ -1,9 +1,13 @@
 
 import { VerifyPayment, PaymentOutput, PaymentOption } from './types';
 
+import { log } from '../logger'
+
 import { getBitcore } from '../bitcore';
 
 import { BigNumber } from 'bignumber.js';
+
+import { broadcast } from './broadcast'
 
 import * as bip70 from './bip_70';
 import * as bip270 from './bip_270';
@@ -98,8 +102,6 @@ export async function buildOutputs(paymentOption: PaymentOption, protocol: strin
 
 export function verifyOutput(outputs, targetAddress, targetAmount) {
 
-  console.log('VERIFY OUTPUTS', outputs);
-
   let matchingOutput = outputs.filter(output => {
 
     return output.address === targetAddress && output.amount === targetAmount;
@@ -110,6 +112,11 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
     throw new Error(`Missing required output ${targetAddress} ${targetAmount}`) 
   }
 
+  log.info('output.verified', {
+    address: targetAddress,
+    amount: targetAmount
+  })
+
 }
 
 const SATOSHIS = 100000000
@@ -119,6 +126,8 @@ export function toSatoshis(decimal: number): number {
   return (new BigNumber(decimal)).times(SATOSHIS).toNumber()
 
 }
+
+export { broadcast }
 
 export function fromSatoshis(integer: number): number {
 

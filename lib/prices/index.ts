@@ -53,8 +53,6 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
 
   let targetAmount = inputAmount.value * price.value;
 
-  console.log('TARGET AMOUNT', { where, targetAmount })
-
   return {
     currency: outputCurrency,
     value: parseFloat(targetAmount.toFixed(precision || MAX_DECIMALS))
@@ -111,15 +109,11 @@ export async function updateCryptoUSDPrice(currency) {
     }
   });
 
-  console.log('CRYPRO_USD_PRICE', BCH_USD_PRICE);
-
   let prices = await models.Price.findAll({
     where: {
       currency: 'USD'
     }
   });
-
-  console.log('prices', prices);
 
   return Promise.all(prices.map(async (price) => {
 

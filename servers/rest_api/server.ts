@@ -199,6 +199,8 @@ async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
+    log.info('server.ext', { headers: request.headers })
+
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/payment';

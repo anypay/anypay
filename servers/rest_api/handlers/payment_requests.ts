@@ -1,5 +1,5 @@
 
-import { plugins, models, amqp } from '../../../lib'
+import { plugins, models, amqp, log } from '../../../lib'
 
 import { verifyPayment, buildPaymentRequest } from '../../../lib/pay';
 
@@ -7,13 +7,13 @@ import * as Hapi from 'hapi';
 
 import * as Boom from 'boom';
 
-interface SubmitPaymentRequest {
+export interface SubmitPaymentRequest {
   currency: string;
   invoice_uid: string;
   transactions: string[];
 }
 
-interface SubmitPaymentResponse {
+export interface SubmitPaymentResponse {
   success: boolean;
   transactions: string[];
 }
@@ -64,7 +64,7 @@ export async function handleJsonV2(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
-  console.log('SUBMIT PAYMENT', payment);
+  log.info('payment.submit', payment);
 
   let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
@@ -107,7 +107,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
         p.address = p.address.split(':')[1]
       }
 
-      console.log('PAYMENT', Object.assign(p, {
+      log.info('payment', Object.assign(p, {
         invoice_uid: invoice.uid
       }))
 
