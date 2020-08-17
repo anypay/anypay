@@ -82,7 +82,7 @@ export async function forwardPayment(txid: string, destination?: string): Promis
       try {
 
         let resp = await http
-          .get(`https://api.anypay.global/address_routes/BSV/${address}`)
+          .get(`https://api.anypayinc.com/address_routes/BSV/${address}`)
           .auth(process.env.BSV_ORACLE_ACCESS_TOKEN, '')
 
         forward = {

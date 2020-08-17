@@ -2,7 +2,7 @@ const JsonRpc = require('../lib/jsonrpc');
 import * as Hapi from 'hapi';
 
 import * as amqp from 'amqplib';
-let AMQP_URL = 'amqp://blockcypher.anypay.global';
+let AMQP_URL = 'amqp://blockcypher.anypayinc.com';
 let AMQP_QUEUE = 'anypay:payment:received';
 
 const SEND_BITCOIN_CASH_QUEUE = 'bitcoincash:payment:send';

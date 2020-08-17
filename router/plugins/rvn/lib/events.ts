@@ -9,7 +9,7 @@ var channel: Channel;
 var connection: Connection;
 var channelIsConnected = false;
 
-const exchange = 'bch.anypay.global';
+const exchange = 'bch.anypayinc.com';
 
 function wait(ms) {
 

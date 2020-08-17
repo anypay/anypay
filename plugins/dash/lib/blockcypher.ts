@@ -2,7 +2,7 @@
 /*
  * allow for staging url
  */
-const webhookBase = process.env.BLOCKCYPHER_WEBHOOK_BASE || 'https://api.anypay.global';
+const webhookBase = process.env.BLOCKCYPHER_WEBHOOK_BASE || 'https://api.anypayinc.com';
 
 const TOKEN = process.env.BLOCKCYPHER_TOKEN;
 

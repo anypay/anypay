@@ -80,6 +80,6 @@ Anypay Hot Wallet is made up of 3 components
 
 ## Use Cases 
 
-`curl -X POST -d '{"id":0,"method":"sendtoaddress","params":[bitcoincash:qpppe9kujfssu7gaqc4w0yrcxvr0hm47sg72mdld2l, .000002]}' http://api.anypay.global/api/hot-wallet/bch`
+`curl -X POST -d '{"id":0,"method":"sendtoaddress","params":[bitcoincash:qpppe9kujfssu7gaqc4w0yrcxvr0hm47sg72mdld2l, .000002]}' http://api.anypayinc.com/api/hot-wallet/bch`
 
  - returns txid 

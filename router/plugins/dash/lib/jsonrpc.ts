@@ -30,7 +30,7 @@ async function rpcOne(method: string, params=[]) {
   try {
 
     let resp = await http
-      .post('https://nodes.anypay.global/dash/rpc/one')
+      .post('https://nodes.anypayinc.com/dash/rpc/one')
       .auth('anypay', process.env.SUDO_ADMIN_KEY)
       .send({
         method,

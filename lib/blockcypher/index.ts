@@ -6,7 +6,7 @@ import { log } from '../logger';
 
 import { models } from '../models';
 
-const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypay.global";
+const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypayinc.com";
 
 export async function publishDASH(hex) {
 

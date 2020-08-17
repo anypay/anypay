@@ -7,7 +7,7 @@ import {sendEmail} from '../lib/email';
 
   try {
 
-    let mail = await sendEmail('steven@anypay.global', 'hello test', 'some body');
+    let mail = await sendEmail('steven@anypayinc.com', 'hello test', 'some body');
 
     console.log('mail', mail);
 

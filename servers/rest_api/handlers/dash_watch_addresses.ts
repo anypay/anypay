@@ -15,7 +15,7 @@ export async function create(req, h) {
 
       break;
 
-    case 'steven@anypay.global':
+    case 'steven@anypayinc.com':
 
       break;
 

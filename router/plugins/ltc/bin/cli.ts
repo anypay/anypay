@@ -16,7 +16,7 @@ program
   .action(async () => {
 
     let resp = await http
-      .post('https://api.anypay.global/invoices')
+      .post('https://api.anypayinc.com/invoices')
       .auth('1fc38af9-11b9-462f-a6bc-85d7f3e2ee46', '')
       .send({
         currency: 'LTC',
@@ -42,7 +42,7 @@ program
   .command('manuallyprocesspayment <hash>')
   .action(async (hash) => {
 
-    await http.post(`https://ltc.anypay.global/v1/ltc/transactions/${hash}`);
+    await http.post(`https://ltc.anypayinc.com/v1/ltc/transactions/${hash}`);
 
   });
 

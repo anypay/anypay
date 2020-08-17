@@ -16,7 +16,7 @@ jobs:
                 - staging
       - run:
           name: Build docker image
-          command: docker build -t router.anypay.global .
+          command: docker build -t router.anypayinc.com .
 
       - add_ssh_keys
 

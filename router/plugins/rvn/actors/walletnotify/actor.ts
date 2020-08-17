@@ -13,7 +13,7 @@ async function start () {
 
   Actor.create({
 
-    exchange: 'rvn.anypay.global',
+    exchange: 'rvn.anypayinc.com',
 
     routingkey: 'walletnotify',
 

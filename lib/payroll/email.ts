@@ -4,7 +4,7 @@ import * as AWS from 'aws-sdk';
 
 AWS.config.update({ region: "us-east-1" });
 
-const FROM_EMAIL = 'payroll@anypay.global'
+const FROM_EMAIL = 'payroll@anypayinc.com'
 
 import { models, log } from '../';
 
@@ -62,7 +62,7 @@ function sendEmail(recipient, subject, body) {
                   ],
 
             BccAddresses: [
-              'steven@anypay.global' 
+              'steven@anypayinc.com' 
             ]
           },
       Message: { /* required */
@@ -83,7 +83,7 @@ function sendEmail(recipient, subject, body) {
             },
       Source: FROM_EMAIL, /* required */
       ReplyToAddresses: [
-              'steven@anypay.global',
+              'steven@anypayinc.com',
             /* more items */
           ],
   };  
