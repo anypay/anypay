@@ -13,11 +13,13 @@ import * as PaymentProtocol from '../../../vendor/bitcore-payment-protocol';
 
 import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
 
-import { models, amqp, plugins } from '../../../lib';
+import { models, amqp, plugins, log } from '../../../lib';
 
 import { rpc } from '../../../plugins/bsv/lib/jsonrpc'
 import * as bsvPlugin from '../../../plugins/bsv'
 import { rpc  as dashRPC } from '../../../plugins/dash/lib/jsonrpc'
+
+import { submitPayment, SubmitPaymentRequest, SubmitPaymentResponse } from './payment_requests';
 
 import * as Boom from 'boom';
 
@@ -99,8 +101,6 @@ async function handleBSV(req, h) {
 
   });
 
-  console.log('payment option', paymentOption.toJSON());
-
   let content = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'BIP270'}));
 
   let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(content))).toString('hex'); 
@@ -180,7 +180,7 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    console.log(error);
+    log.error('paymentrequest.error', { error });
 
     return Boom.badRequest(error.message);
 
@@ -190,195 +190,48 @@ export async function show(req, h) {
 
 export async function create(req, h) {
 
-  console.log('HEADERS');
-  console.log(req.headers);
+  log.info('bsv.bip270.broadcast', {
+    headers: req.headers,
+    payload: req.payload
+  })
 
-  console.log('PAYLOAD');
-  console.log(req.payload);
+  try {
 
-  if (req.headers.accept === 'application/verify-payment') {
+    let response: SubmitPaymentResponse = await submitPayment({
+      transactions: [req.payload.transaction],
+      currency: 'BSV',
+      invoice_uid: req.params.uid
+    })
+
+    log.info('bsv.bip270.broadcast.success', {
+      headers: req.headers,
+      payload: req.payload,
+      response
+    })
 
     return {
 
       payment: req.payload,
 
-      memo: "This looks good for now, we will see what the miners say."
+      memo: "Payment Broadcast Successfully By Anypay®",
+
+      error: 0
 
     }
 
-  } else if (req.headers['x-content-type'] === 'application/bitcoinsv-payment') {
+  } catch(error) {
 
-    let hex = req.payload.transaction;
+    log.error('bsv.bip270.broadcast.failed', error)
 
-    console.log("BROADCAST", hex);
+    return h.response({
 
-    try {
+      payment: req.payload,
+      
+      memo: error.message,
 
-      let resp = await rpc.call('sendrawtransaction', [hex]);
+      error: 1
 
-      console.log('resp', resp);
-
-    } catch(error) {
-
-      console.log('could not broadcast transaction', hex);
-
-      var code;
-
-      if (error.message === 'Internal Server Error') {
-        code = 400;
-      } else {
-        code = 500;
-      }
-
-      return h.response({
-
-        payment: {
-
-          transaction: req.payload.transaction,
-
-        },
-
-        error: `transaction rejected with error: ${error.message}`
-
-      }).code(code);
-
-    }
-
-    return {
-
-      success: true,
-
-      payment: {
-
-        transaction: req.payload.transaction
-
-      },
-
-      memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
-
-    }
-
-  } else if (req.headers['x-accept'] === 'application/dash-paymentack') {
-
-    var protocol = new PaymentProtocol('DASH');
-
-    protocol.makePayment();
-
-    console.log('string', req.payload.toString());
-    console.log('hex', req.payload.toString('hex'));
-
-    let payment = protocol.deserialize(req.payload, 'Payment');
-
-    console.log("payment deserialized", payment);
-
-    payment.message.transactions.forEach(async (hex) => {
-
-      console.log("BROADCAST", hex);
-
-      try {
-
-        let resp = await dashRPC.call('sendrawtransaction', [hex]);
-
-        console.log('resp', resp);
-
-      } catch(error) {
-
-        console.log('could not broadcast transaction', hex);
-
-      }
-
-    });
-
-    let paymentAck = new PaymentProtocol('DASH');
-
-    paymentAck.makePaymentACK();
-
-    paymentAck.set('payment', payment.message);
-    let memo = "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
-    paymentAck.set('memo', memo);
-
-    let response = h.response(paymentAck.serialize());
-
-    response.type('application/dash-paymentack');
-
-    response.header('Content-Type', 'application/dash-paymentack');
-    response.header('Accept', 'application/dash-paymentack');
-
-    return response;
-
-  } else {
-
-    let hex = req.payload.transaction;
-
-    console.log("BROADCAST", hex);
-
-    /* BSV transaction using p2p
-       Need to parse the payments from the raw transaction
-    */
-    try {
-
-      let payments = await transformHexToPayments(hex);
-
-      let plugin = await plugins.findForCurrency('BSV')
-
-      let resp = await plugin.broadcastTx(hex);
-
-      console.log('resp', resp);
-
-      let channel = await amqp.awaitChannel();
-
-      payments.forEach(payment => {
-
-        channel.publish('anypay.payments', 'payment', Buffer.from(
-          JSON.stringify(Object.assign(payment, {
-            invoice_uid: req.params.uid 
-          }))
-        ));
-
-        channel.publish('anypay.router', 'transaction.bsv', Buffer.from(
-          JSON.stringify({ hex })
-        ));
-
-      });
-
-    } catch(error) {
-      console.log(error);
-
-      console.log('could not broadcast transaction', hex);
-
-      var code;
-
-      if (error.message === 'Internal Server Error') {
-        code = 400;
-      } else {
-        code = 500;
-      }
-
-      return h.response({
-
-        payment: {
-
-          transaction: req.payload.transaction,
-
-        },
-
-        error: `transaction rejected with error: ${error.message}`
-
-      }).code(code);
-
-    }
-
-    return {
-
-      payment: {
-
-        transaction: req.payload.transaction
-
-      },
-
-      memo: "Transaction received by Anypay. Invoice will be marked as paid if the transaction is confirmed."
-
-    }
+    }).code(500)
 
   }
 
