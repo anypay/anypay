@@ -25,8 +25,8 @@ export function publishReceipt(id: number) {
 
     let data=  [ENERGY_CITY_BITCOM, 'invoice.paid', invoice.uid, invoice.hash];
 
-    console.log("DATA", data);
-    console.log("KEY", ENERGY_CITY_BITCOM_PRIVKEY);
+    log.info("DATA", data);
+    log.info("KEY", ENERGY_CITY_BITCOM_PRIVKEY);
 
     filepay.build({
 
@@ -38,7 +38,7 @@ export function publishReceipt(id: number) {
 
       try {
 
-        console.log('tx', tx); 
+        log.info('tx', tx); 
 
         receipt.hex = tx.toString();
 
@@ -46,14 +46,14 @@ export function publishReceipt(id: number) {
 
         let resp = await rpc.call('sendrawtransaction', [tx.toString()]);
 
-        console.log('resp', resp);
+        log.info('resp', resp);
 
         receipt.txid = resp.result;
         receipt.published_at = new Date();
 
         await receipt.save();
 
-        console.log('published', resp);
+        log.info('published', resp);
 
         resolve(receipt);
 

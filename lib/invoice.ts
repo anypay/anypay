@@ -7,6 +7,8 @@ import * as DogecoinAddressService from './dogecoin/address_service';
 import * as ZcashAddressService from './zcash/address_service';
 import * as ZencashAddressService from './zencash/address_service';
 
+import { getAmbassadorAccount } from './ambassadors';
+
 import { BigNumber } from 'bignumber.js';
 import * as moment from 'moment';
 
@@ -109,6 +111,7 @@ export async function generateInvoice(
   uid = !!uid ? uid : shortid.generate();
 
   var account = await models.Account.findOne({ where: { id: accountId }});
+  log.info({ account })
 
   let addresses = await models.Address.findAll({ where: {
     account_id: account.id
@@ -197,9 +200,24 @@ export async function generateInvoice(
     return row;
   });
 
+  /*
+
+    Ambassador Output:
+
+    If an ambassador is available for the account, include them as a separate output according to the ambassadorship
+    amount (default 0.01 USD)
+
+  */
+
+  let ambassador = await getAmbassadorAccount(account.ambassador_id)
+
+  log.info({ event: 'ambassador.found', ambassador})
+
   let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
 
-    let fee = await pay.fees.getFee(row[0].currency)
+    let currency = row[0].currency
+
+    let fee = await pay.fees.getFee(currency)
 
     var address = row[2].address;
 
@@ -213,19 +231,48 @@ export async function generateInvoice(
       address = address.split(':')[1]
     }
 
+    var amount = pay.toSatoshis(row[1].value);
+
+    let outputs = []
+
+    if (ambassador && account.ambassador_percent > 0) {
+
+      let record = await models.Address.findOne({ where: {
+        account_id: ambassador.id,
+        currency
+      }})
+
+      if (record) {
+
+        let scalar = new BigNumber(100 - account.ambassador_percent).dividedBy(100)
+
+        let ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
+
+        amount = new BigNumber(amount).minus(ambassadorAmount).toNumber()
+
+        outputs.push({
+          address: record.value,
+          amount: ambassadorAmount
+        })
+        
+      }
+
+    }
+
+    outputs.push({
+      address,
+      amount
+    })
+
+    outputs.push(fee)
+
     return {
       invoice_uid: invoice.uid,
-      currency: row[0].currency,
-      amount: row[1].value,
+      currency,
+      amount: pay.fromSatoshis(amount),
       address,
+      outputs,
       uri: row[3],
-      outputs: [
-        {
-          address,
-          amount: pay.toSatoshis(row[1].value)
-        },
-        fee 
-      ],
       fee: fee.amount
     }
   }));
@@ -292,7 +339,7 @@ export async function replaceInvoice(uid: string, currency: string) {
     throw new Error(`currency ${currency} is not a payment option for invoice ${uid}`);
   }
 
-  console.log('replace with payment option', option.toJSON());
+  log.info('replace with payment option', option.toJSON());
 
   invoice.currency = option.currency;
   invoice.invoice_currency = option.currency;
