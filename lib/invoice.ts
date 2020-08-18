@@ -235,7 +235,7 @@ export async function generateInvoice(
 
     let outputs = []
 
-    if (ambassador && account.ambassador_percent > 0) {
+    if (ambassador) {
 
       let record = await models.Address.findOne({ where: {
         account_id: ambassador.id,
@@ -244,9 +244,23 @@ export async function generateInvoice(
 
       if (record) {
 
-        let scalar = new BigNumber(100 - account.ambassador_percent).dividedBy(100)
+        // ambassador has corresponding address set
 
-        let ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
+        var ambassadorAmount;
+
+        if (account.ambassador_percent > 0) {
+
+          let scalar = new BigNumber(100 - account.ambassador_percent).dividedBy(100)
+
+          ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
+
+        } else {
+
+          let conversion = await convert({ value: 0.01, currency: 'USD' }, currency)
+
+          ambassadorAmount = pay.toSatoshis(conversion.value)
+
+        }
 
         amount = new BigNumber(amount).minus(ambassadorAmount).toNumber()
 
