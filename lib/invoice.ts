@@ -191,6 +191,8 @@ export async function generateInvoice(
 
   */
 
+  log.info('ambassador_id', account.ambassador_id)
+
   let ambassador = await getAmbassadorAccount(account.ambassador_id)
 
   log.info({ event: 'ambassador.found', ambassador})
@@ -217,7 +219,7 @@ export async function generateInvoice(
 
     let outputs = []
 
-    if (ambassador) {
+    if (ambassador && currency != 'BTC') {
 
       let record = await models.Address.findOne({ where: {
         account_id: ambassador.id,
