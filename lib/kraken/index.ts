@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import * as KrakenClient from 'kraken-api';
 
-import { database, models } from '../';
+import { database, models, log } from '../';
 
 const kraken = new KrakenClient(process.env.KRAKEN_KEY, process.env.KRAKEN_SECRET);
 
@@ -226,7 +226,7 @@ export async function syncAllNewTrades() {
 
     newTrades = await syncNewTrades();
 
-    console.log(`${newTrades.length} new trades recorded`);
+    log.info('kraken.trades', {message: `${newTrades.length} new trades recorded`});
 
   }
 

@@ -87,7 +87,6 @@ export async function send_all_roi_email(){
     
     let email = await roi_updateEmail(ids[i].id)
 
-    console.log(email)
   }
 
 }

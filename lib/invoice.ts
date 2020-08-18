@@ -1,11 +1,4 @@
 import {plugins} from './plugins';
-import * as LitecoinAddressService from './litecoin/address_service';
-import * as BitcoinCashAddressService from './bitcoin_cash/address_service';
-import * as RippleAddressService from './ripple/address_service';
-import * as BitcoinAddressService from './bitcoin/address_service';
-import * as DogecoinAddressService from './dogecoin/address_service';
-import * as ZcashAddressService from './zcash/address_service';
-import * as ZencashAddressService from './zencash/address_service';
 
 import { getAmbassadorAccount } from './ambassadors';
 
@@ -66,18 +59,7 @@ interface Address {
 async function getNewInvoiceAddress(accountId: number, currency: string): Promise<Address> {
   var address;
 
-  switch(currency) {
-
-    case 'XRP':
-
-      address = await RippleAddressService.getNewAddress(accountId);
-
-      break;
-
-    default:
-
-      address = await plugins.getNewAddress(currency, accountId);
-  }
+  address = await plugins.getNewAddress(currency, accountId);
 
   if (!address) {
     throw new Error(`unable to generate address for ${currency}`);

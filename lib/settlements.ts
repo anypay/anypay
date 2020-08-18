@@ -19,7 +19,7 @@ export async function settleInvoice(invoice) {
 
   let strategy = findByName(account.settlement_strategy);
 
-  console.log("strategy", strategy);
+  log.info("settlement.strategy", {strategy});
 
   await strategy.apply(invoice);
 
