@@ -234,7 +234,7 @@ export async function generateInvoice(
 
         if (account.ambassador_percent > 0) {
 
-          let scalar = new BigNumber(100 - account.ambassador_percent).dividedBy(100)
+          let scalar = new BigNumber(account.ambassador_percent).dividedBy(100)
 
           ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
 
