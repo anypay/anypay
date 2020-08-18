@@ -9,7 +9,7 @@ var channel: Channel;
 var connection: Connection;
 var channelIsConnected = false;
 
-const exchange = 'ltc.anypay.global';
+const exchange = 'ltc.anypayinc.com';
 
 function wait(ms) {
 

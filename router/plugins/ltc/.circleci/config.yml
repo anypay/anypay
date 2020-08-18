@@ -16,12 +16,12 @@ jobs:
                 - staging
       - run:
           name: Build docker image
-          command: docker build -t ltc.anypay.global .
+          command: docker build -t ltc.anypayinc.com .
 
       - add_ssh_keys
 
       - deploy:
           command: |
             ./push_to_docker.sh
-            ssh chef@ltc.anypay.global "sudo /opt/ltc.anypay.global/deploy.sh"
+            ssh chef@ltc.anypayinc.com "sudo /opt/ltc.anypayinc.com/deploy.sh"
 

@@ -74,11 +74,11 @@ program
 
     console.log(report);
 
-    await sendEmail('steven@anypay.global', `wire report for ${day}`, JSON.stringify(report));
+    await sendEmail('steven@anypayinc.com', `wire report for ${day}`, JSON.stringify(report));
 
     console.log('email sent');
 
-    await sendEmail('derrick@anypay.global', `wire report for ${day}`, JSON.stringify(report));
+    await sendEmail('derrick@anypayinc.com', `wire report for ${day}`, JSON.stringify(report));
 
     console.log('email sent');
 
@@ -108,11 +108,11 @@ program
 
     console.log(report);
 
-    await sendEmail('steven@anypay.global', `wire report for ${day}`, JSON.stringify(report));
+    await sendEmail('steven@anypayinc.com', `wire report for ${day}`, JSON.stringify(report));
 
     console.log('email sent');
 
-    await sendEmail('derrick@anypay.global', `wire report for ${day}`, JSON.stringify(report));
+    await sendEmail('derrick@anypayinc.com', `wire report for ${day}`, JSON.stringify(report));
 
     console.log('email sent');
 

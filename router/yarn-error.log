@@ -28,7 +28,7 @@ Trace:
 
 npm manifest: 
   {
-    "name": "router.anypay.global",
+    "name": "router.anypayinc.com",
     "version": "0.1.0",
     "description": "Address Forwarding Service",
     "main": "actors/server/actor.ts",
@@ -39,7 +39,7 @@ npm manifest:
     },
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/anypay/bch.anypay.global.git"
+      "url": "git+https://github.com/anypay/bch.anypayinc.com.git"
     },
     "keywords": [
       "bitcoin",
@@ -50,9 +50,9 @@ npm manifest:
     "author": "Steven Zeiler",
     "license": "ISC",
     "bugs": {
-      "url": "https://github.com/anypay/bch.anypay.global/issues"
+      "url": "https://github.com/anypay/bch.anypayinc.com/issues"
     },
-    "homepage": "https://github.com/anypay/bch.anypay.global#readme",
+    "homepage": "https://github.com/anypay/bch.anypayinc.com#readme",
     "dependencies": {
       "@types/amqplib": "^0.5.9",
       "@types/hapi": "^18.0.0",

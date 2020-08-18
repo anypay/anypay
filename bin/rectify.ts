@@ -50,7 +50,7 @@ program
     let result = await database.query(`select * from invoices where status != 'unpaid'
     and output_hash is null and currency = '${currency}' order by "createdAt" desc limit 100;`);
 
-    let exchange = `${currency.toLowerCase()}.anypay.global`;
+    let exchange = `${currency.toLowerCase()}.anypayinc.com`;
 
     let channel = await awaitChannel();
 

@@ -2,7 +2,7 @@ import { log } from './logger';
 
 const http = require("superagent");
 
-const base = 'https://chat.anypay.global/hooks';
+const base = 'https://chat.anypayinc.com/hooks';
 
 const channels = {
   'ambassadors': 'EZq3CAaXRwaj9NFun/MipnMqrSBu3aH9EydjazKqC3uqnjZd59xggKmy2itdsBtx94',

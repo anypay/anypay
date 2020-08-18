@@ -70,7 +70,7 @@ async function sendEmail(payment: PayrollPayment) {
 
   let email = new AWS.SES().sendEmail({
     Destination: {
-      ToAddresses: [payment.email, 'steven@anypay.global']
+      ToAddresses: [payment.email, 'steven@anypayinc.com']
     },
     Message: {
       Body: {
@@ -84,8 +84,8 @@ async function sendEmail(payment: PayrollPayment) {
         Data: `Anypay Payroll for ${payment.date}`
       }
     },
-    Source: 'payroll@anypay.global',
-    ReplyToAddresses: ['steven@anypay.global']
+    Source: 'payroll@anypayinc.com',
+    ReplyToAddresses: ['steven@anypayinc.com']
   });
 
   let sent = await email.promise();

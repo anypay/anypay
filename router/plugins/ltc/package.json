@@ -1,5 +1,5 @@
 {
-  "name": "ltc.anypay.global",
+  "name": "ltc.anypayinc.com",
   "version": "0.1.0",
   "description": "Bitcoin Cash Address Forwarding Service",
   "main": "actors/server/actor.ts",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anypay/ltc.anypay.global.git"
+    "url": "git+https://github.com/anypay/ltc.anypayinc.com.git"
   },
   "keywords": [
     "bitcoin",
@@ -21,9 +21,9 @@
   "author": "Steven Zeiler",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/anypay/ltc.anypay.global/issues"
+    "url": "https://github.com/anypay/ltc.anypayinc.com/issues"
   },
-  "homepage": "https://github.com/anypay/ltc.anypay.global#readme",
+  "homepage": "https://github.com/anypay/ltc.anypayinc.com#readme",
   "dependencies": {
     "@types/amqplib": "^0.5.9",
     "@types/hapi": "^18.0.0",

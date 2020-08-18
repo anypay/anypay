@@ -41,7 +41,7 @@ export async function start() {
 
     }
 
-    if (json.account_email === 'steven@anypay.global') {
+    if (json.account_email === 'steven@anypayinc.com') {
 
       queue = 'stevenzeiler.payments.notify';
 
@@ -136,7 +136,7 @@ export async function start() {
 
     let account = await models.Account.findOne({ where: {
 
-      email: 'steven@anypay.global'
+      email: 'steven@anypayinc.com'
 
     }});
 

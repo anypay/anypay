@@ -11,7 +11,7 @@ async function start() {
 		models.Account.findOne({ where: { id: invoice.account_id } })
 		  .then(account => {
 
-		    const message = `|${account.email}|${invoice.denomination_amount} ${invoice.denomination_currency}|${invoice.amount} ${invoice.currency}|https://pos.anypay.global/invoices/${invoice.uid}`;
+		    const message = `|${account.email}|${invoice.denomination_amount} ${invoice.denomination_currency}|${invoice.amount} ${invoice.currency}|https://pos.anypayinc.com/invoices/${invoice.uid}`;
 
 	            SlackNotifier.notify(`invoice:created ${message}`);
 		  })

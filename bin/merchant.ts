@@ -66,7 +66,7 @@ program
 
 program
   .command('creategroup <name> [account_email]')
-  .action(async (name, email = 'steven@anypay.global') => {
+  .action(async (name, email = 'steven@anypayinc.com') => {
 
     let account = await models.Account.findOne({ where: { email }});    
 
@@ -97,7 +97,7 @@ program
 
 program
   .command('addtogroup <merchant_email> <group_name> [account_email]')
-  .action(async (merchantEmail, groupName, email = 'steven@anypay.global') => {
+  .action(async (merchantEmail, groupName, email = 'steven@anypayinc.com') => {
 
     let account = await models.Account.findOne({ where: { email }});    
 

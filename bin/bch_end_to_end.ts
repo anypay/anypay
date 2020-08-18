@@ -28,13 +28,13 @@ import * as http from 'superagent';
 
   let invoice = await generateInvoice(token);
 
-  let url = `https://pos.anypay.global/invoices/${invoice.uid}`;
+  let url = `https://pos.anypayinc.com/invoices/${invoice.uid}`;
 
   console.log('generated invoice', url);
 
   exec(`open -a "Google Chrome" ${url}`);
 
-  const socket = io('https://ws.dash.anypay.global');
+  const socket = io('https://ws.dash.anypayinc.com');
 
   socket.on('invoice:paid', function(data) {
 
@@ -68,7 +68,7 @@ import * as http from 'superagent';
 async function getAccessToken(email, password): Promise<any> {
 
     let response = await http
-      .post('https://api.anypay.global/access_tokens')
+      .post('https://api.anypayinc.com/access_tokens')
       .auth(email, password);
 
     return response.body.uid;
@@ -78,7 +78,7 @@ async function getAccessToken(email, password): Promise<any> {
 async function generateInvoice(token: string): Promise<any> {
 
     let response = await http
-      .post('https://api.anypay.global/bch/invoices')
+      .post('https://api.anypayinc.com/bch/invoices')
       .auth(token, '')
       .send({
         currency: "BCH",

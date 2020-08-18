@@ -325,7 +325,7 @@ program
 
     let account2 = await models.Account.findOne({ where: {
 
-      email: 'steven@anypay.global'
+      email: 'steven@anypayinc.com'
 
     }});
 

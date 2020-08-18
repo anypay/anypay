@@ -195,7 +195,7 @@ export async function getCSVFromS3(): Promise<any> {
  return new Promise((resolve, reject) => {
 
    var params = {
-     Bucket: "anypay.global", 
+     Bucket: "anypayinc.com", 
      Key: "generalbytes/batm_org@57_transactions_w_identity.csv"
    };
 

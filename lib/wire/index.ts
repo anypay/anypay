@@ -155,7 +155,7 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
   let end_date = moment(lastInvoice.completed_at).format('MM-DD-YYYY');
 
   let content = mustache.render(templateSource.toString('utf8'), {
-    reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
+    reportCSVURL: `https://api.sudo.anypayinc.com/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
     invoices: invoices.map(invoice => {
 
       return Object.assign(invoice, {
@@ -196,7 +196,7 @@ export async function buildWireEmailReport(invoiceUID: string) {
   let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY');
 
   let content = template({
-    reportCSVURL: `https://api.sudo.anypay.global/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
+    reportCSVURL: `https://api.sudo.anypayinc.com/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
     invoices,
     total,
     start_date,

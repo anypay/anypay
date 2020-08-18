@@ -41,7 +41,7 @@ class JsonRpc {
 
     return new Promise((resolve, reject) => {
       http
-        .post('https://nodes.anypay.global/bch/rpc/all')
+        .post('https://nodes.anypayinc.com/bch/rpc/all')
         .auth('anypay', process.env.SUDO_ADMIN_KEY)
         .timeout({
           response: 15000,  // Wait 5 seconds for the server to start sending,
