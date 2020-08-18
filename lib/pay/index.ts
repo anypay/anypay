@@ -24,18 +24,28 @@ export async function verifyPayment(v: VerifyPayment) {
   let tx = new bitcore.Transaction(v.hex);
 
   let txOutputs = tx.outputs.map(output => {
-    let address = new bitcore.Address(output.script).toString()
 
-    if (address.match(':')) {
-      address = address.split(':')[1]
-    }
+    try {
 
-    return {
-      address,
-      amount: output.satoshis
+      let address = new bitcore.Address(output.script).toString()
+
+      if (address.match(':')) {
+        address = address.split(':')[1]
+      }
+
+      return {
+        address,
+        amount: output.satoshis
+      }
+
+    } catch(error) {
+
+      return null
+
     }
 
   })
+  .filter(n => n != null)
 
   console.log("txOutputs", txOutputs);
 
