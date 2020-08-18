@@ -2,11 +2,9 @@
 
 export function getBaseURL() {
 
-  console.log('BASE', process.env.PAY_PROTOCOL_BASE_URL);
+  if (process.env.API_BASE) {
 
-  if (process.env.PAY_PROTOCOL_BASE_URL) {
-
-    return process.env.PAY_PROTOCOL_BASE_URL
+    return process.env.API_BASE
 
   } else {
 
