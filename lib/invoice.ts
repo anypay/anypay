@@ -236,6 +236,19 @@ export async function generateInvoice(
 
           let scalar = new BigNumber(account.ambassador_percent).dividedBy(100)
 
+          if (account.customer_pays_ambassador) {
+
+            ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
+
+          } else {
+
+            // merchant pays ambassador
+
+            ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
+            amount = new BigNumber(amount).minus(ambassadorAmount).toNumber()
+
+          }
+
           ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
 
         } else {
@@ -245,8 +258,6 @@ export async function generateInvoice(
           ambassadorAmount = pay.toSatoshis(conversion.value)
 
         }
-
-        amount = new BigNumber(amount).minus(ambassadorAmount).toNumber()
 
         outputs.push({
           address: record.value,
