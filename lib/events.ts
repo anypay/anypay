@@ -59,7 +59,7 @@ let events = [
 
       await channel.publish(exchange, event, new Buffer(message));
 
-      log.info(`published to amqp ${exchange}.${event}`, message)
+      log.info(`amqp.published`, { exchange, event, message })
 
     });
 

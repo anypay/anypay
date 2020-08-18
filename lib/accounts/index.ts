@@ -212,6 +212,8 @@ export async function setPhysicalAddress(email: string, address: string): Promis
 
 export async function setAddressScalar(account_id: number, currency: string, price_scalar: number) {
 
+  log.info('address.scalar.set', { account_id, currency, price_scalar })
+
   let result = await models.Address.update({
     price_scalar 
   }, {
