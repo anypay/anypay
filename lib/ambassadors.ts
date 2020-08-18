@@ -10,6 +10,16 @@ export async function listAll() {
 
 }
 
+export async function getAmbassadorAccount(ambassadorId) {
+
+  let ambassador = await models.Ambassador.findOne({ where: { id: ambassadorId }})
+
+  if (!ambassador) { return null }
+
+  return models.Account.findOne({ where: { id: ambassador.account_id }})
+
+}
+
 export async function register(accountId: string, name?: string) {
 
   log.info('ambassadors.register', { accountId, name });

@@ -18,8 +18,9 @@ var templatePromise = new AWS.SES({apiVersion: '2010-12-01'}).createTemplate(par
 // Handle promise's fulfilled/rejected states
 templatePromise.then(
   function(data) {
-    console.log(data);
+
   }).catch(
+
     function(err) {
-    console.error(err, err.stack);
+
   });

@@ -201,8 +201,8 @@ export async function getCSVFromS3(): Promise<any> {
 
    s3.getObject(params, function(err, data) {
      if (err) { return reject(err) }
-     console.log(data.Body.toString());
-     resolve(data.Body.toString());
+     log.info('s3.getobject', { parmas, body: data.Body.toString() })
+     resolve(data.Body.toString())
    });
 
  });

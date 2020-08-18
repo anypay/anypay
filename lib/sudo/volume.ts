@@ -47,7 +47,7 @@ export async function getVolume(id){
    
    }catch(error){
    
-     console.log(error)
+     log.error(error.message, error)
    
   }
 
