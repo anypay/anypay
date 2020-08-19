@@ -158,12 +158,26 @@ export async function show (request, reply) {
       tipjars
 
   if (account.ambassador_id) {
-    ambassador = await models.Account.findOne({
-      where: {
-        id: account.ambassador_id
-      },
-      attributes: ['id', 'email'] 
-    });
+    log.info(`find ambassador ${account.ambassador_id}`)
+    var record = await models.Ambassador.findOne({ where: { id: account.ambassador_id }})
+    log.info('ambassador', record.toJSON())
+    if (record) {
+      let ambassador_account = await models.Account.findOne({
+        where: {
+          id: record.account_id
+        },
+        attributes: ['id', 'email'] 
+      });
+      if (ambassador_account) {
+        log.info('ambassador.account', ambassador)
+
+        ambassador = Object.assign({
+          id: record.id,
+          account_id: ambassador_account.id,
+          email: ambassador_account.email
+        })
+      }
+    }
   }
 
   addresses = await models.Address.findAll({ where: {
