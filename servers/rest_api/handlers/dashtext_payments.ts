@@ -19,8 +19,6 @@ export async function create(req, h) {
   if (account.dash_text_enabled) {
 
     let code = await dashtext.generateCode(
-      invoice.address,
-      invoice.invoice_amount,
       invoice.uid
     );
 

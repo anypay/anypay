@@ -5,12 +5,12 @@ import * as program from 'commander';
 import { generateCode } from '../lib/dash/dashtext';
 
 program
-  .command('generatecode')
-  .action(async () => {
+  .command('generatecode <uid>')
+  .action(async (uid) => {
 
     try {
 
-      let code = await generateCode('XsceVTMC4oYmGyJbx8fitopPGHxakK6JGe', 1000) ;
+      let code = await generateCode(uid) ;
 
       console.log(code);
 
