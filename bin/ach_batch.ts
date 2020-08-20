@@ -545,4 +545,48 @@ program
   })
 
 program
+  .command('set_payments_date')
+  .action(async () => {
+
+    try {
+
+      let batches = await models.AchBatch.findAll({
+        where: {
+          payments_date: null
+        }
+      })
+      
+      for (let batch of batches) {
+
+        if (batch.batch_description.match(/2020$/)) {
+          console.log('matching batch', batch.batch_description)
+
+          if (!batch.payments_date) {
+            let parts = batch.batch_description.split(' ')
+
+            let datePart = parts[parts.length - 1]
+
+            let date = moment(datePart).format()
+
+            batch.payments_date = date
+
+            await batch.save()
+          }
+
+        }
+
+      }
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+    process.exit(0);
+  
+  })
+
+
+
+program
   .parse(process.argv);
