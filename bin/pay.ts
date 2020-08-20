@@ -6,9 +6,31 @@ import * as program from 'commander';
 
 import { models } from '../lib/models';
 
-import { buildOutputs, buildPaymentRequest, fees } from '../lib/pay';
+import { buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
 
 import { submitPayment } from '../servers/rest_api/handlers/payment_requests';
+
+program
+  .command('completepayment <invoice_uid> <currency> <txhex>')
+  .action(async (invoice_uid, currency, hex) => {
+
+    try {
+
+      let paymentOption = await models.PaymentOption.findOne({ where: { invoice_uid, currency }})
+
+      let payment = await completePayment(paymentOption, hex)
+
+      console.log('payment', payment);
+
+    } catch(error) {
+
+      console.error(error);
+
+    }
+
+    process.exit(0)
+
+  })
 
 program
   .command('getfee <currency>')

@@ -8,7 +8,8 @@ require('dotenv').config();
 
 import * as moment from 'moment';
 
-import { PaymentOutput, PaymentOption } from './types';
+import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
+import { nameFromCode } from './currencies';
 import { BigNumber } from 'bignumber.js';
 
 import { getFee, Fee } from './fees';
@@ -17,6 +18,22 @@ import { getBaseURL } from './environment';
 interface JsonV2Output {
   address?: string;
   amount: number; // integer
+}
+
+export function getCurrency(params: GetCurrency): Currency {
+
+  let code = params.headers['x-currency']
+
+  if (!code) {
+    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
+    code = 'BCH'
+  }
+
+  return {
+    code,
+    name: nameFromCode(code)
+  }
+
 }
 
 export interface JsonV2PaymentRequest {
@@ -31,13 +48,9 @@ export interface JsonV2PaymentRequest {
   paymentId: string;
 }
 
-interface PaymentRequestOptions {
-
-}
-
 const BASE_URL = getBaseURL();
 
-export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions = {}): Promise<JsonV2PaymentRequest> {
+export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<JsonV2PaymentRequest> {
   var outputs;
 
   if (paymentOption.outputs) {
@@ -53,8 +66,8 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
     "outputs": outputs,
     "time": moment(paymentOption.createdAt).toDate(),
     "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
-    "memo": `Payment request for Anypay invoice ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/payments/jsonv2/${paymentOption.currency}/${paymentOption.invoice_uid}`,
+    "memo": `Anypay Payment Request ${paymentOption.invoice_uid}`,
+    "paymentUrl": `${BASE_URL}/r/${paymentOption.invoice_uid}/${paymentOption.currency}/jsonv2`,
     "paymentId": paymentOption.invoice_uid
   }
 

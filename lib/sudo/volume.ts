@@ -1,6 +1,8 @@
 const moment = require('moment'); 
 
 import * as database from '../database'
+import { log } from '../logger'
+
 
 import { log } from '../logger'
 

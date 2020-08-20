@@ -52,7 +52,6 @@ export {
   ambassadors,
   amqp,
   auth,
-  bip70,
   blockcypher,
   cashback,
   clicksend,
