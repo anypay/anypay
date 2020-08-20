@@ -139,30 +139,15 @@ export async function importInvoiceRangeForAchBatch(accountAchId: number): Promi
 
 }
 
-export async function generateLatestBatch(endDate, note) {
+export async function generateLatestBatch(endDate: Date, note: string, paymentsDate: Date) {
 
-  let latestBatch = await models.AchBatch.findOne({
-
-    where: {
-
-      effective_date: {
-
-        [Op.ne]: null
-
-      }
-
-    },
-
-    order: [['id', 'DESC']]
-
-  })
-
-  if (!latestBatch.batch_id) {
-
-    throw new Error('An outstanding ACH Batch still needs to be sent and updated with Batch ID')
+  if (moment().toDate() <= endDate) {
+    throw new Error('Date Has Not Yet Completed')
   }
 
-  let invoices = await wire.getInvoices(latestBatch.last_invoice_uid);
+  let account = await models.Account.findOne({ where: { email: 'dashsupport@egifter.com' }})
+
+  let invoices = await wire.getInvoicesByDates(account.id, paymentsDate, endDate);
 
   // filter invoices on or after the end date
 
@@ -171,16 +156,6 @@ export async function generateLatestBatch(endDate, note) {
     return invoice.completed_at < endDate;
 
   });
-
-  if (invoices.length === 0) {
-
-    console.log(`no invoices paid on ${moment(endDate).format('DD/MM/YYYY')}`);
-
-    endDate = moment(endDate).add(1, 'days').toDate();
-
-    return generateLatestBatch(endDate, note)
-
-  }
 
   let sum = invoices.reduce((sum, invoice) => {
 
@@ -193,11 +168,37 @@ export async function generateLatestBatch(endDate, note) {
 
   console.log(`${invoices.length} payments for next batch totaling $${sum}`);
 
+  var first_invoice_uid, last_invoice_uid, status;
+
+  if (invoices[invoices.length - 1]) {
+
+    first_invoice_uid = invoices[invoices.length - 1].uid
+
+  }
+
+  if (invoices[0]) {
+
+    last_invoice_uid = invoices[0].uid
+    
+  }
+
+  if (sum > 0) {
+
+    status = 'pending'
+
+  } else {
+
+    status = 'n/a'
+
+  }
+
+  console.log('PAYMENTS DATE 2', paymentsDate)
+
   let ach_batch = await models.AchBatch.create({
 
-    first_invoice_uid: invoices[invoices.length - 1].uid,
+    first_invoice_uid,
 
-    last_invoice_uid: invoices[0].uid,
+    last_invoice_uid,
 
     type: 'ACH',
 
@@ -205,7 +206,11 @@ export async function generateLatestBatch(endDate, note) {
 
     originating_account: 'Mercury Bank ACH',
 
+    status,
+
     currency: 'USD',
+
+    payments_date: paymentsDate,
 
     amount: sum
 
@@ -287,9 +292,22 @@ export async function generateBatchForDate(MMDDYY) {
 
   let note = `ACH batch from command line using invoices for ${MMDDYY}` 
 
+  let paymentsDate = moment(MMDDYY)
+
+  console.log('PAYMENTS DATE', { MMDDYY, date: paymentsDate.toDate() }) 
+
   let end_date = moment(MMDDYY).add(1, 'day').toDate();
 
-  let {ach_batch, invoices}= await generateLatestBatch(end_date, note);
+  let existingBatch = await models.AchBatch.findOne({ where: {
+    payments_date: paymentsDate.toDate()
+  }})
+
+  if (existingBatch) {
+    console.log('existing batch', existingBatch.toJSON())
+    throw new Error(`Batch Already Exists For Payments On ${paymentsDate}`)
+  }
+
+  let {ach_batch, invoices}= await generateLatestBatch(end_date, note, paymentsDate.toDate());
 
   invoices.forEach(invoice => {
     assert(invoice.ach_batch_id = ach_batch.id);

@@ -2,6 +2,8 @@ const moment = require('moment');
 
 import * as database from '../database'
 
+import { log } from '../logger'
+
 const movingAverage = (data, numberOfPricePoints) => {
   return data.map((row, index, total) => {
     const start = Math.max(0, index - numberOfPricePoints);

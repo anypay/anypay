@@ -1,17 +1,31 @@
 
 import { models } from '../../../lib';
 
+import { Op } from 'sequelize'
+
 import * as Boom from 'boom';
 
 export async function index(req, h) {
+  console.log('sudo ach batch')
 
   try {
 
     let resp = await  models.AchBatch.findAll({
 
-      order: [['createdAt', 'DESC']]
+      where: {
+        payments_date: {
+          [Op.ne]: null 
+        }
+      },
+
+      order: [['payments_date', 'DESC']]
 
     });
+
+    for (let batch of resp) {
+      console.log('batch', batch.toJSON());
+      console.log('payments date', batch.payments_date);
+    }
 
     return resp;
 

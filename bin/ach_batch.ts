@@ -379,6 +379,27 @@ program
   });
 
 program
+  .command('create_batch_for_date <date>')
+  .action(async (date) => {
+
+    try {
+
+      let {ach_batch, invoices} = await ach.generateBatchForDate(date);
+
+      console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
+      console.log(ach_batch.toJSON());
+
+    } catch(error) {
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
   .command('send_ach_report_email <batch_id> <email>')
   .action(async (batch_id, email) => {
 
