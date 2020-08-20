@@ -379,6 +379,27 @@ program
   });
 
 program
+  .command('create_batch_for_date <date>')
+  .action(async (date) => {
+
+    try {
+
+      let {ach_batch, invoices} = await ach.generateBatchForDate(date);
+
+      console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
+      console.log(ach_batch.toJSON());
+
+    } catch(error) {
+
+      console.log(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
   .command('send_ach_report_email <batch_id> <email>')
   .action(async (batch_id, email) => {
 
@@ -543,6 +564,50 @@ program
     process.exit(0);
   
   })
+
+program
+  .command('set_payments_date')
+  .action(async () => {
+
+    try {
+
+      let batches = await models.AchBatch.findAll({
+        where: {
+          payments_date: null
+        }
+      })
+      
+      for (let batch of batches) {
+
+        if (batch.batch_description.match(/2020$/)) {
+          console.log('matching batch', batch.batch_description)
+
+          if (!batch.payments_date) {
+            let parts = batch.batch_description.split(' ')
+
+            let datePart = parts[parts.length - 1]
+
+            let date = moment(datePart).format()
+
+            batch.payments_date = date
+
+            await batch.save()
+          }
+
+        }
+
+      }
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+    process.exit(0);
+  
+  })
+
+
 
 program
   .parse(process.argv);
