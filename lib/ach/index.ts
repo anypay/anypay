@@ -12,6 +12,7 @@ import { email as rabbiEmail } from 'rabbi';
 import { Op } from 'sequelize';
 
 import { models } from '../models';
+import { log } from '../logger';
 
 export async function createNextACH() {
 
@@ -290,11 +291,11 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
 
 export async function generateBatchForDate(MMDDYY) {
 
+  log.info(`generate batch for date ${MMDDYY}`)
+
   let note = `ACH batch from command line using invoices for ${MMDDYY}` 
 
   let paymentsDate = moment(MMDDYY)
-
-  console.log('PAYMENTS DATE', { MMDDYY, date: paymentsDate.toDate() }) 
 
   let end_date = moment(MMDDYY).add(1, 'day').toDate();
 

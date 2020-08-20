@@ -1,12 +1,54 @@
 
-import { models } from '../../../lib';
+import { models, log } from '../../../lib';
 
 import { Op } from 'sequelize'
 
 import * as Boom from 'boom';
 
+import * as moment from 'moment'
+
+import { generateBatchForDate } from '../../../lib/ach'
+
+async function createNewBatches() {
+
+  let now = moment()
+
+  let lastBatch = await models.AchBatch.findOne({
+    where: {
+      payments_date: {
+        [Op.ne]: null 
+      }
+    },
+    order: [['payments_date', 'DESC']]
+  })
+
+  try {
+
+    // while the cursor is still one day or more greater than the latest batch
+    while(moment(lastBatch.payments_date).toDate() < now.toDate()) {
+
+      let nextDay = moment(lastBatch.payments_date).add(1, 'day')
+
+      let { ach_batch } = await generateBatchForDate(nextDay.toDate())
+
+      lastBatch = ach_batch
+
+      log.info('ach.batch.create', lastBatch.toJSON())
+
+    }
+
+  } catch(error) {
+ 
+    log.error(error.message)
+
+  }
+
+}
+
 export async function index(req, h) {
   console.log('sudo ach batch')
+
+  await createNewBatches()
 
   try {
 
@@ -21,11 +63,6 @@ export async function index(req, h) {
       order: [['payments_date', 'DESC']]
 
     });
-
-    for (let batch of resp) {
-      console.log('batch', batch.toJSON());
-      console.log('payments date', batch.payments_date);
-    }
 
     return resp;
 
