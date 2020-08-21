@@ -1,5 +1,6 @@
 
 import { models } from './models';
+import { log } from './logger';
 
 interface PaymentOption {
   invoice_uid: string;
@@ -10,7 +11,7 @@ interface PaymentOption {
 
 export function writePaymentOptions(options: PaymentOption[]) {
 
-  console.log('write options', options);
+  log.info('writepaymentoptions', {options});
 
   return Promise.all(options.map(option => {
 

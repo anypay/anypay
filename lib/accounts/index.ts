@@ -33,6 +33,8 @@ export async function updateAccount(account, payload) {
 
   let updateAttrs: any = Object.assign(payload, {});
 
+  log.info('account.update', updateAttrs)
+
   if (updateAttrs.physical_address) {
 
     try {
@@ -75,6 +77,7 @@ export async function updateAccount(account, payload) {
     })
 
     if (ambassador) {
+      log.info('ambassador.found', { ambassador })
 
       updateAttrs['ambassador_id'] = ambassador.id;
 
@@ -91,6 +94,11 @@ export async function updateAccount(account, payload) {
   }
 
   delete updateAttrs['ambassador_email'];
+
+  if (updateAttrs.remove_ambassador) {
+    updateAttrs['ambassador_id'] = null
+    delete updateAttrs['remove_ambassador']
+  }
 
   await models.Account.update(updateAttrs, {
 
@@ -211,6 +219,8 @@ export async function setPhysicalAddress(email: string, address: string): Promis
 }
 
 export async function setAddressScalar(account_id: number, currency: string, price_scalar: number) {
+
+  log.info('address.scalar.set', { account_id, currency, price_scalar })
 
   let result = await models.Address.update({
     price_scalar 

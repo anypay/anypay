@@ -4,6 +4,8 @@ require("dotenv").config();
 
 import { getLegacyAddressFromCashAddress } from '../plugins/bch/lib/bitbox'
 
+import { log } from './logger'
+
 import { statsd } from './stats/statsd'
 
 const supportedCurrencies = {
@@ -35,7 +37,7 @@ export async function createCoinTextInvoice(address:string, amount:number, curre
 
   }
 
-  console.log("COINTEXT PARAMS:", address, amount, currency, process.env.COIN_TEXT_API_KEY)
+  log.info("cointext.params", {address, amount, currency })
 
   return new Promise((resolve,reject)=>{
     http
@@ -51,7 +53,7 @@ export async function createCoinTextInvoice(address:string, amount:number, curre
       if (error) {
 
         statsd.timing('GenerateCoinTextInvoice', new Date().getTime()-start)
-        console.log(error)
+        log.error(error.message)
 	return reject(error) 
 	}
        statsd.timing('BCH_generateInvoiceAddress', new Date().getTime()-start)

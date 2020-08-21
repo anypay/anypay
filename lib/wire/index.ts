@@ -13,7 +13,7 @@ import * as Handlebars from 'handlebars';
 
 import { join } from 'path';
 
-async function getInvoicesByDates(accountId, start, end) {
+export async function getInvoicesByDates(accountId, start, end) {
 
   let invoices = await models.Invoice.findAll({
 

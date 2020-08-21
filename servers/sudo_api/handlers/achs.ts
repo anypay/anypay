@@ -97,6 +97,8 @@ export async function update(req: Request, h: ResponseToolkit) {
 
       effective_date: moment(req.payload.effective_date).toDate(),
 
+      status: 'sent'
+
     }, {
 
       where: {

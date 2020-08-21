@@ -1,5 +1,6 @@
 require('dotenv');
 import { models } from '../models';
+import { log } from '../logger';
 const filepay = require('filepay')
 
 const ENERGY_CITY_BITCOM = '1DRHWrL1jPjH8V7V4E3TxpS63E6a24ysnN';
@@ -25,8 +26,8 @@ export function publishReceipt(id: number) {
 
     let data=  [ENERGY_CITY_BITCOM, 'invoice.paid', invoice.uid, invoice.hash];
 
-    console.log("DATA", data);
-    console.log("KEY", ENERGY_CITY_BITCOM_PRIVKEY);
+    log.info("DATA", data);
+    log.info("KEY", ENERGY_CITY_BITCOM_PRIVKEY);
 
     filepay.build({
 
@@ -38,7 +39,7 @@ export function publishReceipt(id: number) {
 
       try {
 
-        console.log('tx', tx); 
+        log.info('tx', tx); 
 
         receipt.hex = tx.toString();
 
@@ -46,14 +47,14 @@ export function publishReceipt(id: number) {
 
         let resp = await rpc.call('sendrawtransaction', [tx.toString()]);
 
-        console.log('resp', resp);
+        log.info('resp', resp);
 
         receipt.txid = resp.result;
         receipt.published_at = new Date();
 
         await receipt.save();
 
-        console.log('published', resp);
+        log.info('published', resp);
 
         resolve(receipt);
 
