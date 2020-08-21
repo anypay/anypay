@@ -21,8 +21,6 @@ interface Bip70PaymentRequest {
 
 export function getCurrency(params: GetCurrency): Currency {
 
-  console.log('GET CURRENCY', params)
-
   let headers = params.headers
 
   var name;
@@ -45,9 +43,6 @@ export function getCurrency(params: GetCurrency): Currency {
 
     name = parts.split('-')[0]
   }
-
-  console.log('NAME', name)
-  console.log('CODE', codeFromName(name))
 
   if (!codeFromName(name)) {
     throw new Error(`currency not supported`)

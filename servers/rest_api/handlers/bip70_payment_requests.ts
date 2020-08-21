@@ -48,6 +48,8 @@ export async function show(req, h) {
 
   } catch(error) {
 
+    log.error(error)
+
     return Boom.badRequest(error.message)
 
   }
