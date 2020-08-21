@@ -78,12 +78,16 @@ export async function verifyPayment(v: VerifyPayment) {
 
 export async function buildPaymentRequestForInvoice(params: PaymentRequestForInvoice): Promise<PaymentRequest> {
 
+  log.info('paymentrequest.build', params)
+
   let paymentOption = await models.PaymentOption.findOne({
     where: {
       invoice_uid: params.uid,
       currency: params.currency
     }
   });
+
+  log.info('paymentrequest.paymentoption', paymentOption.toJSON())
 
   return buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
 

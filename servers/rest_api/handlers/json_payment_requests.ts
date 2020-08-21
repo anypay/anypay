@@ -1,7 +1,7 @@
 
 import { plugins, models, amqp, log } from '../../../lib'
 
-import { verifyPayment, buildPaymentRequest, completePayment, getCurrency } from '../../../lib/pay';
+import { verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
 
 import * as Hapi from 'hapi';
 
@@ -20,50 +20,40 @@ export interface SubmitPaymentResponse {
 
 export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }});
+  try {
 
-  let account = await models.Account.findOne({ where: {
+    let currency = getCurrency({
+      headers: req.headers,
+      protocol: 'JSONV2'
+    })
 
-    id: invoice.account_id
-  }});
+    log.info(`paymentrequest.jsonv2`, {
+      currency: currency.code,
+      invoice_uid: req.params.uid
+    })
 
-  let currency = getCurrency({
-    headers: req.headers,
-    protocol: 'JSONV2'
-  })
+    const paymentRequest = await buildPaymentRequestForInvoice({
+      uid: req.params.uid,
+      currency: currency.code,
+      protocol: 'JSONV2'
+    })
 
-  log.info(`paymentrequest.jsonv2`, {
-    currency: currency.code,
-    invoice_uid: invoice.uid
-  })
+    let response = h.response(paymentRequest.content);
 
+    response.type('application/payment-request');
 
-  let paymentOption = await models.PaymentOption.findOne({
+    response.header('Content-Type', 'application/payment-request');
 
-    where: {
+    response.header('Accept', 'application/payment');
 
-      invoice_uid: req.params.uid,
+    return response;
 
-      currency
+  } catch(error) {
 
-    }
-  });
+    log.error(error)
 
-  if (!paymentOption) {
-    return Boom.notFound();
+    return Boom.badRequest(error.message)
   }
-
-  const paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol: 'JSONV2' }));
-
-  let response = h.response(paymentRequest);
-
-  response.type('application/payment-request');
-
-  response.header('Content-Type', 'application/payment-request');
-
-  response.header('Accept', 'application/payment');
-
-  return response;
 }
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
