@@ -141,7 +141,7 @@ export async function show(req, h) {
 
       case 'application/bitcoinsv-paymentrequest':
 
-        resp = await handleBIP70('BSV', 'bitcoinsv', req, h)
+        resp = await handleBSV(req, h)
 
         return resp;
 
