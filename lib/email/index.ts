@@ -66,14 +66,11 @@ export async function newAccountCreatedEmail(account) {
 
 export async function firstInvoiceCreatedEmail(invoiceId) {
 
-  let template = templates['first_invoice_created'];
+  let invoice = await models.Invoice.findOne({ where: { uid: invoiceId }})
 
-  let invoice = await models.Invoice.findOne({where:{id:invoiceId}})
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
+  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
-  return sendEmail(account.email, template.subject, template.body);
+  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay Inc<derrick@anypayinc.com>', { email: account.email });
 
 };
 

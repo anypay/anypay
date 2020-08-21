@@ -48,6 +48,30 @@ program
   });
 
 program
+  .command('first_invoice_created <email_address>')
+  .action(async (email) => {
+
+    try {
+
+      let resp = await rabbiEmail.sendEmail('first_invoice_created', email, 'derrick@anypayinc.com', {
+        email 
+      })
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+
+    process.exit(0);
+
+  });
+
+
+
+program
   .command('egifter_settlement <ach_batch_id> <email>')
   .action(async (ach_batch_id, email) => {
 
