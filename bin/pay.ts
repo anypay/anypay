@@ -11,8 +11,8 @@ import * as http from 'superagent'
 import { buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
 
 program
-  .command('tests [base_url]')
-  .action( async (base_url=process.env.API_BASE) => {
+  .command('tests <base_url>')
+  .action( async (base_url) => {
 
     try {
 
@@ -34,7 +34,7 @@ program
           'x-currency': 'DASH'
         })
 
-      console.log(resp)
+      console.log(resp.body)
 
       resp = await http
         .get(`${base_url}/r/${uid}`) 
@@ -43,16 +43,12 @@ program
           'x-currency': 'BTC'
         })
 
-      console.log(resp)
+      console.log(resp.body)
 
       resp = await http
         .get(`${base_url}/r/${uid}`) 
-        .set({
-          'Accept': 'application/payment-request',
-          'x-currency': 'BSV'
-        })
 
-      console.log(resp)
+      console.log(resp.body)
 
     } catch(error) {
 

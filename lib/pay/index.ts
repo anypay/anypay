@@ -89,7 +89,11 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
 
   log.info('paymentrequest.paymentoption', paymentOption.toJSON())
 
-  return buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
+  let paymentRequest = await  buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
+
+  log.info('paymentrequest', paymentRequest)
+
+  return paymentRequest
 
 }
 
