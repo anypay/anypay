@@ -1,14 +1,29 @@
 #!/usr/bin/env ts-node
 
-require('dotenv').config();
+require('dotenv').config()
 
-import * as program from 'commander';
+import * as program from 'commander'
 
-import { models } from '../lib/models';
+import { models } from '../lib/models'
+
+import { join } from 'path'
+import * as fs from 'fs'
 
 import * as http from 'superagent'
 
-import { buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
+import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
+
+program
+  .command('decode_bip70_request <path>')
+  .action(async (path) => {
+
+    let file = fs.readFileSync(join(process.cwd(), path))
+
+    let request = BIP70Protocol.PaymentRequest.decode(file)
+
+    console.log(request)
+
+  })
 
 program
   .command('tests <base_url>')
