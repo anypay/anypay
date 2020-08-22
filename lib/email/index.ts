@@ -66,7 +66,7 @@ export async function newAccountCreatedEmail(account) {
 
 export async function firstInvoiceCreatedEmail(invoiceId) {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: invoiceId }})
+  let invoice = await models.Invoice.findOne({ where: { id: invoiceId }})
 
   let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
