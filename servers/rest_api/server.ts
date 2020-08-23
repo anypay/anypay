@@ -1080,6 +1080,12 @@ async function Server() {
     handler: handlers.Leaderboard.index
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/support/{token}',
+    handler: handlers.SupportProxy.show
+  }); 
+
   accountCSVReports(server);
 
   server.route({
