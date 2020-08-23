@@ -60,6 +60,7 @@
     "filepay": "^1.0.25",
     "firebase-admin": "^8.9.1",
     "flipit": "^2.0.3",
+    "geoip-lite": "^1.4.2",
     "got": "^9.6.0",
     "grant-hapi": "^4.6.5",
     "handlebars": "^4.1.0",

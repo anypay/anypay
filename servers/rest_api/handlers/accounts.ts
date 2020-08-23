@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const Boom = require('boom');
+var geoip = require('geoip-lite');
 
 import {emitter} from '../../../lib/events'
 
-import { models, accounts, slack, log } from '../../../lib';
+import { models, accounts, slack, log, utils } from '../../../lib';
 
 import { getROI } from '../../../lib/roi';
 
@@ -25,7 +26,7 @@ export async function update(req, h) {
 
     let account = await accounts.updateAccount(req.account, req.payload);
 
-    slack.notify(`${account.email} updated their profile ${JSON.stringify(req.payload)}`)
+    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
 
     return {
 
@@ -107,7 +108,20 @@ export async function create (request, reply) {
       password_hash: passwordHash
     });
 
-    slack.notify(`account:created | ${account.email}`);
+    let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+
+    if (geoLocation) {
+
+      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+
+      slack.notify(`${account.email} registerd from ${userLocation}`);
+
+    } else {
+
+      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+
+    }
+
     
     emitter.emit('account.created', account)
 

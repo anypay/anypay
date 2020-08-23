@@ -1120,7 +1120,7 @@ async function start () {
   // Start the server
   await server.start();
 
-  log.info("Server running at:", server.info.uri);
+  log.info(`Server running at: ${server.info.uri}`);
 
 }
 

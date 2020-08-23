@@ -34,6 +34,7 @@ import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
+import * as utils from './utils';
 
 var initialized = false;
 
@@ -78,6 +79,7 @@ export {
   slack,
   square,
   tipjar,
+  utils,
   xpub
 }
 
