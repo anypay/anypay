@@ -30,7 +30,6 @@ import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
 import * as slack from './slack/notifier';
-import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
@@ -52,7 +51,6 @@ export {
   ambassadors,
   amqp,
   auth,
-  bip70,
   blockcypher,
   cashback,
   clicksend,

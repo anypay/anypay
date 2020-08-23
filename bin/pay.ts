@@ -1,14 +1,102 @@
 #!/usr/bin/env ts-node
 
-require('dotenv').config();
+require('dotenv').config()
 
-import * as program from 'commander';
+import * as program from 'commander'
 
-import { models } from '../lib/models';
+import { models } from '../lib/models'
 
-import { buildOutputs, buildPaymentRequest, fees } from '../lib/pay';
+import { join } from 'path'
+import * as fs from 'fs'
 
-import { submitPayment } from '../servers/rest_api/handlers/payment_requests';
+import * as http from 'superagent'
+
+import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
+
+program
+  .command('decode_bip70_request <path>')
+  .action(async (path) => {
+
+    let file = fs.readFileSync(join(process.cwd(), path))
+
+    let request = BIP70Protocol.PaymentRequest.decode(file)
+
+    console.log(request)
+
+  })
+
+program
+  .command('tests <base_url>')
+  .action( async (base_url) => {
+
+    try {
+
+      let uid = 'f6eF_inmN'
+
+      let resp = await http
+        .get(`${base_url}/r/${uid}`) 
+        .set({
+          'Accept': 'application/payment-request',
+          'x-currency': 'BCH'
+        })
+
+      console.log(resp)
+
+      resp = await http
+        .get(`${base_url}/r/${uid}`) 
+        .set({
+          'Accept': 'application/payment-request',
+          'x-currency': 'DASH'
+        })
+
+      console.log(resp.body)
+
+      resp = await http
+        .get(`${base_url}/r/${uid}`) 
+        .set({
+          'Accept': 'application/payment-request',
+          'x-currency': 'BTC'
+        })
+
+      console.log(resp.body)
+
+      resp = await http
+        .get(`${base_url}/r/${uid}`) 
+
+      console.log(resp.body)
+
+    } catch(error) {
+
+      console.error(error.message)
+      
+
+    }
+
+    process.exit(0)
+
+  });
+
+program
+  .command('completepayment <invoice_uid> <currency> <txhex>')
+  .action(async (invoice_uid, currency, hex) => {
+
+    try {
+
+      let paymentOption = await models.PaymentOption.findOne({ where: { invoice_uid, currency }})
+
+      let payment = await completePayment(paymentOption, hex)
+
+      console.log('payment', payment);
+
+    } catch(error) {
+
+      console.error(error);
+
+    }
+
+    process.exit(0)
+
+  })
 
 program
   .command('getfee <currency>')
@@ -26,6 +114,7 @@ program
   .command('submitexample <currency> [isvalid]')
   .action(async (currency, isValid=true) => {
 
+    /*
     let payment = getPayment(currency, isValid)
 
     try {
@@ -41,6 +130,7 @@ program
     }
 
     process.exit(0);
+    */
 
   })
 
@@ -49,6 +139,7 @@ program
   .command('submitpayment <invoice_uid> <currency> <hex>')
   .action(async (invoice_uid, currency, transaction) => {
 
+/*
     try {
 
       let response = await submitPayment({
@@ -64,6 +155,7 @@ program
     }
 
     process.exit(0)
+    */
 
   });
 

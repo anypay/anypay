@@ -1,4 +1,8 @@
 
+export interface Currency {
+  name: string;
+  code: string;
+}
 
 export interface PaymentOption {
   invoice_uid: string;
@@ -23,4 +27,14 @@ export interface PaymentOutput {
   script?: string;
 }
 
+export interface PaymentRequest {
+  uid: string;
+  protocol: string;
+  content: any
+}
+
+export interface GetCurrency {
+  protocol: string;
+  headers: any;
+}
 
