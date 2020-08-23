@@ -1,14 +1,11 @@
 const bcrypt = require('bcrypt');
-const log = require('winston');
-const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
 
 import {emitter} from '../../../lib/events'
 
-import { models, accounts } from '../../../lib';
+import { models, accounts, slack, log } from '../../../lib';
 
 import { getROI } from '../../../lib/roi';
-import { awaitChannel } from '../../../lib/amqp';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
@@ -22,9 +19,13 @@ function hash(password) {
 
 export async function update(req, h) {
 
+  
+
   try {
 
     let account = await accounts.updateAccount(req.account, req.payload);
+
+    slack.notify(`${account.email} updated their profile ${JSON.stringify(req.payload)}`)
 
     return {
 
@@ -77,7 +78,7 @@ export async function registerAnonymous(request, reply) {
 
     request.account.save();
 
-    Slack.notify(`account:registered | ${request.account.email}`);
+    slack.notify(`account:registered | ${request.account.email}`);
     
     emitter.emit('account.created', request.account)
 
@@ -106,7 +107,7 @@ export async function create (request, reply) {
       password_hash: passwordHash
     });
 
-    Slack.notify(`account:created | ${account.email}`);
+    slack.notify(`account:created | ${account.email}`);
     
     emitter.emit('account.created', account)
 

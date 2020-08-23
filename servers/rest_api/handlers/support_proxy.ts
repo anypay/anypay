@@ -7,8 +7,6 @@ export async function show(req, h) {
 
   try {
 
-    log.info(`support.proxy.pay`)
-
     let accessToken = await models.AccessToken.findOne({ where: { uid: req.params.token }})
 
     let account = await models.Account.findOne({ where: { id: accessToken.account_id }})
