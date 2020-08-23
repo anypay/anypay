@@ -29,10 +29,12 @@ import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
+import * as slack from './slack/notifier';
 import * as bip70 from './bip70';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
+import * as utils from './utils';
 
 var initialized = false;
 
@@ -74,8 +76,10 @@ export {
   routes,
   settings,
   settlements,
+  slack,
   square,
   tipjar,
+  utils,
   xpub
 }
 

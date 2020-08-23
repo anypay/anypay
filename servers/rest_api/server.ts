@@ -1080,6 +1080,12 @@ async function Server() {
     handler: handlers.Leaderboard.index
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/support/{token}',
+    handler: handlers.SupportProxy.show
+  }); 
+
   accountCSVReports(server);
 
   server.route({
@@ -1114,7 +1120,7 @@ async function start () {
   // Start the server
   await server.start();
 
-  log.info("Server running at:", server.info.uri);
+  log.info(`Server running at: ${server.info.uri}`);
 
 }
 
