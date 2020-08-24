@@ -28,7 +28,6 @@ export async function show(req, h) {
     })
 
     log.info(`bip70.${currency.code.toLowerCase()}.paymentrequest.content`)
-    log.info(`bip70.${currency.code.toLowerCase()}.paymentrequest.content`, paymentRequest.content.toJSON())
 
     let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(paymentRequest.content))).toString('hex');
     var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
