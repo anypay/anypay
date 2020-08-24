@@ -100,7 +100,7 @@ export async function create(req, h) {
 
       await pay.verifyPayment({
         payment_option,
-        hex: transaction,
+        hex: transaction.toString('hex'),
         protocol: 'BIP70'
       })
 
