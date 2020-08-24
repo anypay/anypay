@@ -60,7 +60,10 @@ export async function create(req, h) {
 
     let channel = await awaitChannel();
 
-    let currency: pay.Currency = pay.getCurrency(req.headers)
+    let currency: pay.Currency = pay.getCurrency({
+      protocol: 'BIP70',
+      headers: req.headers
+    })
 
     log.info(`bip70.currency.parsed`, currency)
 
@@ -114,6 +117,9 @@ export async function create(req, h) {
     return response;
 
   } catch(error) {
+
+    log.info('bip70error', error)
+    log.info('bip70error', error.message)
 
     let response = h.response({ success: false, error: error.message }).code(500);
 
