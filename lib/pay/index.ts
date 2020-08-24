@@ -33,6 +33,8 @@ interface PaymentRequestForInvoice {
 
 export async function verifyPayment(v: VerifyPayment) {
 
+  log.info(`verifypayment`, v)
+
   let bitcore = getBitcore(v.payment_option.currency)
 
   let tx = new bitcore.Transaction(v.hex);
@@ -54,6 +56,8 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
+      log.error(`verifypayment.error`, error.message)
+
       return null
 
     }
@@ -61,7 +65,7 @@ export async function verifyPayment(v: VerifyPayment) {
   })
   .filter(n => n != null)
 
-  console.log("txOutputs", txOutputs);
+  log.info("verifypayment.txoutputs", txOutputs);
 
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, v.protocol);
 
@@ -181,6 +185,12 @@ export async function buildOutputs(paymentOption: PaymentOption, protocol: strin
 }
 
 export function verifyOutput(outputs, targetAddress, targetAmount) {
+
+  log.info('verifyoutput', {
+    outputs,
+    targetAddress,
+    targetAmount
+  })
 
   let matchingOutput = outputs.filter(output => {
 
