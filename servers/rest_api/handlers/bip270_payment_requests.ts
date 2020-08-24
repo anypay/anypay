@@ -10,7 +10,7 @@ import * as Boom from 'boom';
 
 export async function show(req, h) {
 
-  let content = await buildPaymentRequestForInvoice({
+  let { content } = await buildPaymentRequestForInvoice({
     uid: req.params.uid,
     currency: 'BSV', 
     protocol: 'BIP270'
