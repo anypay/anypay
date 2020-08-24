@@ -4,6 +4,8 @@ import * as PaymentProtocol from '../../vendor/bitcore-payment-protocol'
 import { getBitcore } from '../bitcore'
 import { log } from '../logger'
 
+import { getBaseURL } from './environment';
+
 import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
 import { codeFromName } from './currencies'
 import { getFee, Fee } from './fees'
@@ -74,6 +76,8 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
 }
 
+const BASE_URL = getBaseURL();
+
 export async function buildPaymentRequest(paymentOption) {
 
   // build outputs
@@ -93,7 +97,7 @@ export async function buildPaymentRequest(paymentOption) {
 
   pd.set('memo', `Anypay® Payment Request ${paymentOption.invoice_uid}`);
 
-  pd.set('payment_url', `https://api.anypayinc.com/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
+  pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
   if (paymentOption.currency === 'BCH') {
     pd.set('required_fee_rate', 1);
