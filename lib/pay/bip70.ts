@@ -46,6 +46,13 @@ export function getCurrency(params: GetCurrency): Currency {
     let parts = headers['accept'].split('/')[1]
 
     name = parts.split('-')[0]
+
+  } else if (headers['x-accept'] && headers['x-accept'].match(/paymentack$/)) {
+
+    let parts = headers['x-accept'].split('/')[1]
+
+    name = parts.split('-')[0]
+
   }
 
   console.log('CURRENCY NAME', name)
