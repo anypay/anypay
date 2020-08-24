@@ -69,17 +69,31 @@ export async function verifyPayment(v: VerifyPayment) {
 
   log.info("verifypayment.txoutputs", txOutputs);
 
-  let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, v.protocol);
+  let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, 'JSONV2');
+
+  console.log('EXPECTED OUTPUTS', outputs)
 
   for (let output of outputs) {
 
     log.info('output', output)
 
-    if (output.address.match(':')) {
-      output.address = output.address.split(':')[1]
+    var address;
+
+    if (output.script) {
+
+      address = new bitcore.Address(output.script).toString()
+
+    } else {
+
+      address = output.address
+
     }
 
-    verifyOutput(txOutputs, output.address, output.amount);
+    if (address.match(':')) {
+      address = output.address.split(':')[1]
+    }
+
+    verifyOutput(txOutputs, address, output.amount);
   }
 
 }
