@@ -212,11 +212,15 @@ program
 
       let payment_option = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
 
-      console.log('PAYMENT OPTION', payment_option.toJSON());
+      let verify = {
+        protocol: 'BIP70',
+        hex,
+        payment_option
+      }
 
-      let outputs = await buildOutputs(payment_option);
+      let result = await verifyPayment(verify)
 
-      console.log(outputs);
+      console.log(result);
 
     } catch(error) {
 
@@ -227,7 +231,6 @@ program
     process.exit(0);
 
   });
-*/
 
 program.parse(process.argv);
 

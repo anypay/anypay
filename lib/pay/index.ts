@@ -41,8 +41,6 @@ export async function verifyPayment(v: VerifyPayment) {
 
   let txOutputs = tx.outputs.map(output => {
 
-    log.info(`txoutput.received`, output)
-
     try {
 
       let address = new bitcore.Address(output.script).toString()
