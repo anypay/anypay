@@ -92,7 +92,9 @@ export async function create(req, h) {
 
     for (const transaction of payment.transactions) {
 
-      log.info(`bip70.${payment_option.currency}.transaction`, transaction.toString('hex'));
+      console.log('TRANSACTION', transaction)
+
+      log.info(`bip70.${payment_option.currency}.transaction`, { hex: transaction.toString('hex') });
 
       let resp = await plugin.broadcastTx(transaction.toString('hex'));
 
