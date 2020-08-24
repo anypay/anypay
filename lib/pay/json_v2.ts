@@ -67,7 +67,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     "time": moment(paymentOption.createdAt).toDate(),
     "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
     "memo": `Anypay Payment Request ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/r/${paymentOption.invoice_uid}/${paymentOption.currency}/jsonv2`,
+    "paymentUrl": `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/jsonv2`,
     "paymentId": paymentOption.invoice_uid
   }
 

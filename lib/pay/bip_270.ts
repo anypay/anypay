@@ -68,7 +68,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     creationTimestamp: moment(invoice.createdAt).unix(),
     expirationTimestamp: moment(invoice.expiry).unix(),
     memo: "Bitcoin SV Payment Request by Anypay Inc",
-    paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/bip270/bsv`,
+    paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/BSV/bip270`,
     merchantData: JSON.stringify({
       invoiceUid: invoice.uid,
       merchantName,
