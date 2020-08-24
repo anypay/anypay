@@ -1,5 +1,5 @@
 
-import { PaymentOutput, PaymentOption } from './types';
+import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
 
 import { getBitcore, toSatoshis } from '../bitcore';
 import { getFee, Fee } from './fees';
@@ -8,14 +8,12 @@ import * as moment from 'moment';
 
 import { models } from '../models'
 
-/*
+export function getCurrency(params: GetCurrency): Currency {
 
-  BIP270 Protocol In The Context Of the Anypay Pay Protocol
-
-*/
-
-interface Bip270PaymentRequest {
-
+  return {
+    name: 'bitcoinsv',
+    code: 'BSV'
+  }
 }
 
 export async function buildOutputs(paymentOption: PaymentOption): Promise<PaymentOutput[]> {
@@ -43,6 +41,16 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<Paymen
 
 }
 
+interface Bip270PaymentRequest {
+  network: string;
+  outputs: any[],
+  creationTimestamp: number;
+  expirationTimestamp: number;
+  memo: string
+  paymentUrl: string;
+  merchantData: string;
+}
+
 export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
 
   let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }});
@@ -60,7 +68,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     creationTimestamp: moment(invoice.createdAt).unix(),
     expirationTimestamp: moment(invoice.expiry).unix(),
     memo: "Bitcoin SV Payment Request by Anypay Inc",
-    paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay/bip270/bsv`,
+    paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/BSV/bip270`,
     merchantData: JSON.stringify({
       invoiceUid: invoice.uid,
       merchantName,

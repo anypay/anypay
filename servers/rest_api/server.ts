@@ -32,8 +32,6 @@ const sequelize = require("../../lib/database");
 
 const Joi = require('joi');
 
-import { httpAuthCoinOracle } from './auth/auth_coin_oracle';
-
 import { models } from '../../lib'
 
 import {events} from '../../lib/core';
@@ -119,8 +117,6 @@ const validatePassword = async function(request, username, password, h) {
     }
   });
 
-  console.log(`access token created: ${isNew}`, accessToken.toJSON());
-
   return {
     isValid: true,
     credentials: { accessToken, account }
@@ -199,7 +195,7 @@ async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
-    log.info('server.ext', { headers: request.headers })
+    log.info('server.request', { id: request.info.id, headers: request.headers })
 
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
@@ -285,7 +281,6 @@ async function Server() {
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
-  server.auth.strategy("authoracle", "basic", { validate: httpAuthCoinOracle});
 
   attachMerchantMapRoutes(server);
 
@@ -758,84 +753,47 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: "POST",
-    path: "/{input_currency}/payments",
-    handler: handlers.CoinOraclePayments.create,
-    options: {
-      tags: ['api'],
-      validate: {
+  /* PAYMENT PROTOCOLS */
+
+    server.route({
+      method: "POST",
+      path: "/r",
+      handler: handlers.PaymentRequests.create 
+    })
+
+    /* PAYMENT REQUESTS */
+    server.route({
+      method: "GET",
+      path: "/r/{uid}",
+      handler: handlers.PaymentRequests.show 
+    })
+
+    /* PAYMENT SUBMISSION */
+    server.route({
+      method: "POST",
+      path: "/r/{uid}/pay/{currency}/jsonv2",
+      handler: handlers.JsonPaymentRequests.create
+    })
+
+    server.route({
+      method: "POST",
+      path: "/r/{uid}/pay/{currency}/bip270",
+      handler: handlers.Bip270PaymentRequests.create 
+    })
+
+    server.route({
+      method: "POST",
+      path: "/r/{uid}/pay/{currency}/bip70",
+      handler: handlers.Bip70PaymentRequests.create,
+      config: {
         payload: {
-          amount: Joi.required(),
-          currency: Joi.string().required(),
-          address: Joi.string().required(),
-          hash: Joi.string().required(),
-          output_hash: Joi.string().optional(),
-          output_amount: Joi.optional(),
-          output_address: Joi.string().optional(),
-          output_currency: Joi.string().optional()
-        },
-      },
-      auth: 'authoracle'
-    }
-  });
-
-  /*
-  DEPRECATED
-  server.route({
-    method: "GET",
-    path: "/invoices/{uid}/bip70",
-    handler: handlers.PaymentRequest.show 
-  })
-  */
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/pay/bip70/bch",
-    handler: handlers.BchPaymentRequestProtobuf.create,
-    config: {
-      payload: {
-        output: 'data',
-        parse: false
+          output: 'data',
+          parse: false
+        }
       }
-    }
-  })
+    })
 
-  server.route({
-    method: "POST",
-    path: "/payments/jsonv2/{currency}/{uid}",
-    handler: handlers.PaymentRequests.submitJsonV2
-  })
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/pay/bip70/dash",
-    handler: handlers.DashPaymentRequestProtobuf.create,
-    config: {
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/pay/bip70/btc",
-    handler: handlers.BtcPaymentRequestProtobuf.create,
-    config: {
-      payload: {
-        output: 'data',
-        parse: false
-      }
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/r/{uid}",
-    handler: handlers.BsvPaymentRequest.show 
-  })
+  /* END PAYMENT PROTOCOLS */
 
   server.route({
     method: "GET",
@@ -848,12 +806,6 @@ async function Server() {
         }
       }
     }
-  })
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/pay/bip270/bsv",
-    handler: handlers.BsvPaymentRequest.create 
   })
 
   server.route({
@@ -902,16 +854,6 @@ async function Server() {
     method: 'GET',
     path: '/active-merchant-coins',
     handler: handlers.Merchants.listMerchantCoins
-  });
-
-  // DEPRECATED
-  server.route({
-    method: 'GET',
-    path: '/address_routes/{input_currency}/{input_address}',
-    options: {
-      auth: "authoracle"
-    },
-    handler: handlers.AddressRoutes.show
   });
 
   server.route({

@@ -43,7 +43,6 @@ module.exports.list = async function(request, reply) {
 }
 
 function sortBCHFirst(data) {
-  console.log('sort bch', data);
 
   data.sort(function(x,y){ return x.code == 'BCH' ? -1 : y.code == 'BCH' ? 1 : 0; });
 

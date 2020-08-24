@@ -3,6 +3,7 @@
 require('dotenv').config();
 
 import { models, log, accounts } from '../lib';
+import { emitter } from '../lib/events';
 import { getSupportedCoins } from '../lib/accounts';
 import { registerAccount } from '../lib/accounts';
 import { setAddress } from '../lib/core';
@@ -20,6 +21,19 @@ program
     console.log(coins);
 
   });
+
+program
+  .command('afterregistered <email>')
+  .action(async (email) => {
+
+    let account = await models.Account.findOne({ where: { email }});
+
+    log.info('account', account.toJSON())
+
+    emitter.emit('account.create', account)
+
+  });
+
 
 program
   .command('update <email> <attribute> <value>')
