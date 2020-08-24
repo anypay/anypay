@@ -20,7 +20,11 @@ export async function _sendToAddress(address: string, amount: number): Promise<s
 
   let _address = privkey.toAddress();
 
+  console.log(_address.toString())
+
   let response = await callRpc('listunspent', [0, 9999999, [_address.toString()]])
+
+  console.log('UNSPENT', response)
  
   let utxos = response.result.sort((a, b) => a.amount >= b.amount)
 

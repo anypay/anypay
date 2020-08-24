@@ -30,7 +30,7 @@ import * as http from 'superagent';
 const coins: any = {
 
   'DASH': {
-    address: 'XjCsG5H4ijNU9iwr3MvGz6AkMMhHtYUoeB',
+    address: 'XnEw2KjfLVAy1hSXMFWLCcod5X7rLM581p',
     balance: null
   },
 
