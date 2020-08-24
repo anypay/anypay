@@ -41,6 +41,8 @@ export async function verifyPayment(v: VerifyPayment) {
 
   let txOutputs = tx.outputs.map(output => {
 
+    log.info(`txoutput.received`, output)
+
     try {
 
       let address = new bitcore.Address(output.script).toString()
@@ -70,6 +72,8 @@ export async function verifyPayment(v: VerifyPayment) {
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, v.protocol);
 
   for (let output of outputs) {
+
+    log.info('output', output)
 
     if (output.address.match(':')) {
       output.address = output.address.split(':')[1]
@@ -225,7 +229,7 @@ export async function completePayment(paymentOption, hex: string) {
     invoice_uid: paymentOption.invoice_uid
   }
 
-  console.log('PAYMENT', payment)
+  log.info('payment', payment)
 
   let paymentRecord = await models.Payment.create(payment)
 
