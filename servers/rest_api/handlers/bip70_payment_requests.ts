@@ -90,21 +90,27 @@ export async function create(req, h) {
       throw new Error(`${currency.code} payment option for invoice ${req.params.uid} not found`)
     }
 
-    for (const transaction of payment.transactions) {
+    for (const tx of payment.transactions) {
+
+      let transaction = tx.toString('hex') 
 
       console.log('TRANSACTION', transaction)
 
-      log.info(`bip70.${payment_option.currency}.transaction`, { hex: transaction.toString('hex') });
-
-      let resp = await plugin.broadcastTx(transaction.toString('hex'));
-
-      log.info(`bip70.${payment_option.currency}.broadcast.result`, resp)
-
       await pay.verifyPayment({
         payment_option,
-        hex: transaction.toString('hex'),
+        hex: transaction,
         protocol: 'BIP70'
       })
+
+      log.info(`bip70.${payment_option.currency}.transaction`, { hex: transaction });
+
+      let resp = await plugin.broadcastTx(transaction);
+
+      log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp })
+
+      let paymentRecord = await pay.completePayment(payment_option, transaction)
+
+      log.info(`bip70.${payment_option.currency}.payment.completed`, paymentRecord);
 
     }
 
