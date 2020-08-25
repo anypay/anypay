@@ -3,6 +3,8 @@ require('dotenv').config();
 
 import {createWebhook} from './lib/blockcypher';
 
+import { any } from 'bluebird'
+
 import {generateInvoice} from '../../lib/invoice';
 
 import * as chainSoAPI from '../../lib/chainSoAPI';
@@ -125,9 +127,17 @@ export async function getNewAddress(record: I_Address) {
 
 }
 
+async function publishToNode(transaction: string): Promise<string> {
+  return rpc.call('sendrawtransaction', [transaction])
+}
+
 export async function broadcastTx(transaction: string): Promise<string> {
 
-  return publishDASH(transaction)
+  return any([
+    //publishDASH(transaction),
+    publishToNode(transaction)
+  ])
+
 }
 
 async function checkAddressForPayments(address:string, currency:string){
