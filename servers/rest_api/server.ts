@@ -1028,6 +1028,15 @@ async function Server() {
     handler: handlers.SupportProxy.show
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/api_keys',
+    handler: handlers.ApiKeys.index,
+    options: {
+      auth: "token"
+    }
+  }); 
+
   accountCSVReports(server);
 
   server.route({
