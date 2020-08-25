@@ -6,9 +6,22 @@ const dash = require("@dashevo/dashcore-lib")
 
 import { BigNumber } from 'bignumber.js';
 
-export async function getCashBackBalance() {
+export async function getCashBackBalance(address) {
+  try {
 
-  return (await callRpc('getbalance', [])).result;
+    let unspent = await callRpc('listunspent', [0, 9999999, [address]])
+
+    console.log(unspent);
+
+    return unspent.result.reduce((sum, output) => {
+      return sum + output.amount 
+    }, 0)
+
+  } catch(error) {
+
+    console.log(error);
+  }
+
 
 }
 

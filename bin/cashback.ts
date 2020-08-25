@@ -6,7 +6,8 @@ let program = require('commander');
 
 import { log, cashback } from '../lib';
 
-import { buildSendToAddress, getAddressBalance, getCashBackBalance } from '../plugins/bch/lib/cashback';
+import { buildSendToAddress, getAddressBalance } from '../plugins/bch/lib/cashback';
+import { getCashBackBalance } from '../servers/sudo/handlers/cashback';
 import { _sendToAddress } from '../plugins/dash/lib/cashback';
 import { sendToAddress } from '../cashback/lib';
 
