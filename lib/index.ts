@@ -1,7 +1,8 @@
 require('dotenv').config();
 
-import * as amqp from './amqp';
 import * as accounts from './accounts';
+import * as amqp from './amqp';
+import * as apikeys from './apikeys';
 import * as login from './account_login';
 import * as invoices from './invoice';
 import * as forwards from './forwards';
@@ -50,6 +51,7 @@ export {
   addresses,
   ambassadors,
   amqp,
+  apikeys,
   auth,
   blockcypher,
   cashback,
