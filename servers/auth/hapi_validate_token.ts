@@ -89,5 +89,51 @@ async function validateToken (request, username, password, h) {
   }
 };
 
+export async function validateAppToken (request, username, password, h) {
+  log.info('validate app token')
+
+  log.info('auth.app', { username, password }) 
+
+  if (!username) {
+    return {
+      isValid: false
+    };
+  }
+
+  var accessToken = await models.AccessToken.findOne({
+    where: {
+      uid: username
+    }
+  });
+
+  if (!accessToken) {
+
+    log.info('auth.app.error', { message: 'access token not found' }) 
+
+    return {
+      isValid: false
+    }
+
+  }
+
+  if (accessToken.app_id) {
+
+    request.app_id = accessToken.app_id
+
+    return {
+      isValid: true,
+      credentials: { accessToken: accessToken }
+    }
+
+  } else {
+
+    return {
+      isValid: false
+    }
+
+  }
+
+};
+
 export { validateToken }
 
