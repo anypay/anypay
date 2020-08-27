@@ -498,6 +498,8 @@ export async function show(request, reply) {
 	    }
 	  });
 
+    /*
+
     if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
       var oldInvoiceId = invoice.id;
@@ -516,6 +518,8 @@ export async function show(request, reply) {
     } else {
       log.info('invoice not yet expired');
     }
+  
+    */
 
 	  if (invoice) {
 
