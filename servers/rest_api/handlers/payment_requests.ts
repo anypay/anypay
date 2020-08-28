@@ -1,5 +1,5 @@
 
-import { log, models } from '../../../lib';
+import { log, models, invoices } from '../../../lib';
 
 import * as Boom from 'boom';
 
@@ -31,9 +31,20 @@ export async function create(req, h) {
 
         app_id: req.app_id,
 
-        template: req.payload.template
+        template: req.payload.template,
+
+        status: 'unpaid'
 
       })
+
+      let invoice = await invoices.createEmptyInvoice(req.app_id)
+
+      record.invoice_uid = invoice.uid
+      record.uri = invoice.uri
+      record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
+      record.status = 'unpaid'
+
+      await record.save()
 
       log.info('pay.request.created', record.toJSON())
 

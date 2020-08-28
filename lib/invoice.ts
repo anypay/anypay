@@ -81,6 +81,23 @@ function applyScalar(invoiceAmount, scalar) {
   });
 }
 
+export async function createEmptyInvoice(app_id: number, uid?: string) {
+
+  uid = !!uid ? uid : shortid.generate();
+
+  let uri = computeInvoiceURI({
+    currency: 'ANYPAY',
+    uid
+  })
+
+  return models.Invoice.create({
+    app_id,
+    uid,
+    uri
+  })
+
+}
+
 export async function generateInvoice(
 
   accountId: number,
