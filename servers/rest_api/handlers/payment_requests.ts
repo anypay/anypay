@@ -7,6 +7,8 @@ import { show as handleBIP70 } from './bip70_payment_requests'
 import { show as handleJsonV2 } from './json_payment_requests'
 import { show as handleBIP270 } from './bip270_payment_requests'
 
+import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
+
 import { schema } from 'anypay'
 
 export async function create(req, h) {
@@ -39,12 +41,18 @@ export async function create(req, h) {
 
       let invoice = await invoices.createEmptyInvoice(req.app_id)
 
+      invoice.currency = req.payload.template[0].currency;
+
+      await invoice.save()
+
       record.invoice_uid = invoice.uid
       record.uri = invoice.uri
       record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
       record.status = 'unpaid'
 
       await record.save()
+
+      await paymentRequestToPaymentOptions(record)
 
       log.info('pay.request.created', record.toJSON())
 
