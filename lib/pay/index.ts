@@ -11,6 +11,7 @@ import { models } from '../models'
 import {emitter} from '../events';
 
 import { getBitcore } from '../bitcore';
+import { sendWebhookForInvoice } from '../webhooks';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -273,6 +274,8 @@ export async function completePayment(paymentOption, hex: string) {
 
   emitter.emit('invoice.paid', invoice)
   emitter.emit('invoice.payment', invoice.uid)
+
+  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
 
 }
 
