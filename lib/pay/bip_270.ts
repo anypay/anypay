@@ -51,29 +51,44 @@ interface Bip270PaymentRequest {
   merchantData: string;
 }
 
-export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
+export async function getMerchantData(invoiceUid: string, account_id?: number): Promise<string> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }});
+  if (!account_id) {
+    return JSON.stringify({ invoiceUid })
+  }
 
-  let account = await models.Account.findOne({ where: { id: invoice.account_id }});
+
+  let account = await models.Account.findOne({ where: { id: account_id }});
 
   var merchantName = account.business_name;
   var avatarUrl = account.image_url;
 
+  return JSON.stringify({
+    invoiceUid,
+    merchantName,
+    avatarUrl
+  })
+
+}
+
+export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
+
+  let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }});
+
+  let merchantData = await getMerchantData(invoice.uid, invoice.account_id)
+
   let outputs = await buildOutputs(paymentOption)
+
+  let memo = "Bitcoin SV Payment Request by Anypay Inc"
 
   let request = {
     network:"bitcoin-sv",
     outputs,
     creationTimestamp: moment(invoice.createdAt).unix(),
     expirationTimestamp: moment(invoice.expiry).unix(),
-    memo: "Bitcoin SV Payment Request by Anypay Inc",
+    memo,
     paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/BSV/bip270`,
-    merchantData: JSON.stringify({
-      invoiceUid: invoice.uid,
-      merchantName,
-      avatarUrl
-    })
+    merchantData
   }
 
   return request

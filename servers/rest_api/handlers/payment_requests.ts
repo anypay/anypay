@@ -79,13 +79,20 @@ export async function show(req, h) {
   try {
 
     let isBIP70 = /paymentrequest$/
+    let isBIP270 = /bitcoinsv-paymentrequest$/
     let isJsonV2 = /application\/payment-request$/
 
-    if (req.headers['accept'].match(isBIP70)) {
+    let accept = req.headers['accept']
+
+    if (accept && accept.match(isBIP270)) {
+
+      return handleBIP270(req, h)
+
+    } if (accept && accept.match(isBIP70)) {
 
       return handleBIP70(req, h)
 
-    } else if (req.headers['accept'].match(isJsonV2)) {
+    } else if (accept && accept.match(isJsonV2)) {
 
       return handleJsonV2(req, h)
 
@@ -97,7 +104,7 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    log.error('pay.request.error', { error });
+    log.error('pay.request.error', { error: error.message });
 
     return Boom.badRequest(error.message);
 
