@@ -77,24 +77,24 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
 
 export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2Output[]> {
 
-  let fee: Fee = await getFee(paymentOption.currency);
-
-  if (paymentOption.fee) {
-    fee.amount = paymentOption.fee;
-  }
-
-  let amount = new BigNumber(paymentOption.amount);
-  var address = paymentOption.address;
-
-  if (address.match(/\:/)) {
-    address = address.split(':')[1];
-  }
-
   if (paymentOption.outputs) {
 
     return paymentOption.outputs;
 
   } else {
+
+    let fee: Fee = await getFee(paymentOption.currency);
+
+    if (paymentOption.fee) {
+      fee.amount = paymentOption.fee;
+    }
+
+    let amount = new BigNumber(paymentOption.amount);
+    var address = paymentOption.address;
+
+    if (address.match(/\:/)) {
+      address = address.split(':')[1];
+    }
 
     return [{
       "amount": amount.times(100000000).toNumber(),

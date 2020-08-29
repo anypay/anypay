@@ -1,5 +1,5 @@
 {
-  "name": "anypay",
+  "name": "anypay-platform",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -21,6 +21,7 @@
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.20",
     "amqplib": "^0.5.2",
+    "anypay": "0.0.7",
     "anypay-wallet-address-validator": "^0.2.6",
     "ascii-art": "^1.5.0",
     "asciichart": "^1.5.7",

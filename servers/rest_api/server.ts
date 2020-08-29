@@ -10,7 +10,7 @@ import { log } from '../../lib';
 
 import { attachMerchantMapRoutes } from '../map/server';
 
-import { validateToken, validateAdminToken } from '../auth/hapi_validate_token';
+import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 
@@ -279,6 +279,7 @@ async function Server() {
 
   server.auth.strategy("getaccount", "basic", { validate: getAccount });
   server.auth.strategy("token", "basic", { validate: validateToken });
+  server.auth.strategy("app", "basic", { validate: validateAppToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
 
@@ -758,7 +759,10 @@ async function Server() {
     server.route({
       method: "POST",
       path: "/r",
-      handler: handlers.PaymentRequests.create 
+      handler: handlers.PaymentRequests.create,
+      options: {
+        auth: "app"
+      }
     })
 
     /* PAYMENT REQUESTS */

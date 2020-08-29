@@ -3,7 +3,7 @@ import { Request, ResponseToolkit } from 'hapi';
 
 import * as Boom from 'boom';
 
-import { models } from '../../../lib';
+import { models, log } from '../../../lib';
 import * as wire from '../../../lib/wire';
 import { sendEmail } from '../../../lib/email';
 
@@ -81,6 +81,8 @@ export async function show(req: Request, h: ResponseToolkit) {
 
 export async function update(req: Request, h: ResponseToolkit) {
 
+  log.info('ach.update', req.payload) 
+
   try {
 
     if (!req.payload.batch_id) {
@@ -91,7 +93,7 @@ export async function update(req: Request, h: ResponseToolkit) {
       throw new Error('effective_date required');
     }
 
-    let updatedRecord = await models.AchBatch.update({
+    let update = {
 
       batch_id: req.payload.batch_id,
 
@@ -99,19 +101,29 @@ export async function update(req: Request, h: ResponseToolkit) {
 
       status: 'sent'
 
-    }, {
+    }
 
-      where: {
+    let where = {
 
-        id: req.params.id,
+      id: req.params.id,
 
-        batch_id: { [Op.eq]: null }
+      status: 'pending'
 
-      },
+    }
+
+    log.info('ach.update', {
+      update, where
+    })
+
+    let updatedRecord = await models.AchBatch.update(update, {
+
+      where,
 
       returning: true
 
     });
+
+    console.log('record', updatedRecord)
 
     sendAchReport(req.params.id);
 

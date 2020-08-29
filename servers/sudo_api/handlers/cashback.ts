@@ -8,25 +8,6 @@ import { log, models, database, amqp } from '../../../lib';
 import * as cashbackDash from '../../../plugins/dash/lib/cashback';
 import * as cashbackBch from '../../../plugins/bch/lib/cashback';
 
-
-async function getCashBackBalance(coin: string): Promise<number> {
-
-  switch(coin.toUpperCase()) {
-
-    case 'DASH':
-
-      return cashbackDash.getCashBackBalance()
-
-    case 'BCH':
-
-      return cashbackBch.getCashBackBalance()
-  }
-
-}
-
-import * as Boom from 'boom';
-import * as http from 'superagent';
-
 const coins: any = {
 
   'DASH': {
@@ -40,6 +21,24 @@ const coins: any = {
   }
 
 };
+
+export async function getCashBackBalance(coin: string): Promise<number> {
+
+  switch(coin.toUpperCase()) {
+
+    case 'DASH':
+
+      return cashbackDash.getCashBackBalance(coins['DASH'].address)
+
+    case 'BCH':
+
+      return cashbackBch.getCashBackBalance()
+  }
+
+}
+
+import * as Boom from 'boom';
+import * as http from 'superagent';
 
 export async function index(req, h) {
 
