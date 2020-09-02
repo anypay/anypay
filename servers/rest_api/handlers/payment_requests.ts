@@ -41,7 +41,16 @@ export async function create(req, h) {
 
       let invoice = await invoices.createEmptyInvoice(req.app_id)
 
-      invoice.currency = req.payload.template[0].currency;
+      invoice.currency = req.payload.template[0].currency
+
+      if (req.payload.options) {
+
+        invoice.webhook_url = req.payload.options.webhook
+        invoice.redirect_url = req.payload.options.redirect
+        invoice.secret = req.payload.options.secret
+        invoice.metadata = req.payload.options.metadata
+
+      }
 
       await invoice.save()
 
@@ -58,7 +67,9 @@ export async function create(req, h) {
 
       return {
 
-        payment_request: record.toJSON()
+        payment_request: record.toJSON(),
+
+        options: req.payload.options
 
       } 
 
