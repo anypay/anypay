@@ -14,10 +14,11 @@ export async function broadcastTx(hex) {
   let miners = [
     new Minercraft({
       url: "https://merchantapi.matterpool.io"
-    }),
+    })/*,
     new Minercraft({
       url: "https://merchantapi.taal.com"
     })
+    */
   ]
 
   return Promise.race(miners.map(miner => {
