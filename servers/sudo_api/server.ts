@@ -775,6 +775,34 @@ async function Server() {
 
   server.route({
 
+    method: 'GET',
+
+    path: '/api/payments',
+
+    config: {
+
+      handler: handlers.Payments.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payments/stats',
+
+    config: {
+
+      handler: handlers.Payments.stats
+
+    }
+
+  });
+
+  server.route({
+
     method: "POST",
 
     path: "/api/invoices/{invoice_uid}/cashback_payments",
