@@ -120,6 +120,24 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/api/histograms/daily-invoices-paid",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Histograms.dailyPaidInvoices
+
+    }
+
+  });
+
+
+
+  server.route({
+
     method: "POST",
 
     path: "/api/cash_deposits",
