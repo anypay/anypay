@@ -364,6 +364,38 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/batm_sales",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales/stats",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.stats
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/vending_machines/{id}",
 
     config: {
