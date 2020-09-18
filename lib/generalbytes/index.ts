@@ -9,6 +9,8 @@ import { readFileSync } from 'fs';
 
 import * as csvParse from 'csv-parse';
 
+const parse = require('csv-parse')
+
 import { models } from '../models';
 import { log } from '../logger';
 
@@ -43,6 +45,135 @@ interface GeneralbytesSale {
     identity_phone_number?: string;
 }
 
+export function csvParseStream(csv: string): Promise<GeneralbytesSale[]> {
+
+  let lines = csv.split("\n")
+
+  lines.shift()
+
+  csv = lines.join("\n")
+
+  return new Promise((resolve, reject) => {
+    let output = []
+    
+    const parser = parse({
+      delimiter: ';',
+      skip_lines_with_error: true
+    })
+
+    // Use the readable stream api
+    parser.on('readable', function(){
+      let record
+      while (record = parser.read()) {
+
+        let sale: GeneralbytesSale = parseCSVRow(record)
+        console.log('sale', sale)
+
+        output.push(sale)
+      }
+    })
+    // Catch any error
+    parser.on('error', function(err){
+      console.log('parser error', err)
+      //reject(err)
+    })
+
+    parser.on('end', function(err) {
+      console.log('PARSEREND')
+      resolve(output)
+    })
+
+    parser.write(csv)
+
+    parser.end()
+  })
+
+}
+
+function parseCSVRow(row: any[]): GeneralbytesSale {
+
+  var crypto_amount = row[8];
+  if (crypto_amount) {
+    crypto_amount = parseFloat(row[8]);
+  } else {
+    crypto_amount = 0;
+  }
+
+  var actual_discount = row[11];
+  if (actual_discount) {
+    actual_discount = parseFloat(row[11]);
+  } else {
+    actual_discount = 0;
+  }
+
+  var rate_including_fee = row[19];
+  if (rate_including_fee) {
+    rate_including_fee = parseFloat(row[19]);
+  } else {
+    rate_including_fee = 0;
+  }
+
+  var rate_without_fee = row[20];
+  if (rate_without_fee) {
+    rate_without_fee = parseFloat(row[20]);
+  } else {
+    rate_without_fee = 0;
+  }
+
+  var fixed_transaction_fee = row[21];
+  if (fixed_transaction_fee) {
+    fixed_transaction_fee = parseFloat(row[21]);
+  } else {
+    fixed_transaction_fee = 0;
+  }
+
+  var expected_profit_percent_setting = row[22];
+  if (expected_profit_percent_setting) {
+    expected_profit_percent_setting = parseFloat(row[22]);
+  } else {
+    expected_profit_percent_setting = 0;
+  }
+
+  var expected_profit_value = row[23];
+  if (expected_profit_value) {
+    expected_profit_value = parseFloat(row[23]);
+  } else {
+    expected_profit_value = 0;
+  }
+
+  return {
+    terminal_sn: row[0],
+    server_time: new Date(row[1]),
+    terminal_time: new Date(row[2]),
+    local_transaction_id: row[3],
+    remote_transaction_id: row[4],
+    type: row[5],
+    cash_amount: parseInt(row[6]),
+    cash_currency: row[7],
+    crypto_amount,
+    crypto_currency: row[9],
+    used_discount: row[10],
+    actual_discount,
+    destination_address: row[12],
+    related_remote_transaction_id: row[13],
+    identity: row[14],
+    status: row[15],
+    phone_number: row[16],
+    transaction_detail: row[17],
+    transaction_note: row[18],
+    rate_including_fee,
+    rate_without_fee,
+    fixed_transaction_fee,
+    expected_profit_percent_setting,
+    expected_profit_value,
+    crypto_setting_name: row[24],
+    identity_first_name: row[25],
+    identity_id_card_number: row[26],
+    identity_phone_number: row[27]
+  }
+
+}
+
 export function csvToGBSales(csv: string): Promise<GeneralbytesSale[]> {
 
   return new Promise((resolve, reject) => {
@@ -55,6 +186,8 @@ export function csvToGBSales(csv: string): Promise<GeneralbytesSale[]> {
       output.shift();
 
       resolve(output.map(row => {
+
+        console.log('row', row)
 
         var crypto_amount = row[8];
         if (crypto_amount) {
@@ -158,12 +291,13 @@ export async function getCSVFromPath(path): Promise<any> {
 
 export async function importCSV(csv: string): Promise<any> {
 
-  let sales: GeneralbytesSale[] = await csvToGBSales(csv);
+  let sales: GeneralbytesSale[] = await csvParseStream(csv);
+
+  console.log('SALES')
 
   var newRecords = [];
 
-  for (let i=0; i < sales.length; i++) {
-
+  for (let i=0; i < sales.length; i++) { 
     let sale = sales[i];
 
     var [record, isNew] = await models.GeneralbytesSale.findOrCreate({
@@ -176,6 +310,8 @@ export async function importCSV(csv: string): Promise<any> {
       defaults: sale
 
     });
+
+    console.log('record', record)
 
     if (isNew) {
 
@@ -201,7 +337,7 @@ export async function getCSVFromS3(): Promise<any> {
 
    s3.getObject(params, function(err, data) {
      if (err) { return reject(err) }
-     log.info('s3.getobject', { parmas, body: data.Body.toString() })
+     log.info('s3.getobject', { params, body: data.Body.toString() })
      resolve(data.Body.toString())
    });
 
