@@ -20,7 +20,7 @@ export async function index(req, h) {
 
   try {
 
-    let sales = await  models.VendingTransaction.findAll({
+    let sales = await  models.GeneralbytesSale.findAll({
       where: {
         server_time: {
           [Op.ne]: null
