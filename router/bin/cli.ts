@@ -20,7 +20,7 @@ program
   .action(async () => {
 
     let resp = await http
-      .post('https://api.anypay.global/invoices')
+      .post('https://api.anypayinc.com/invoices')
       .auth('1fc38af9-11b9-462f-a6bc-85d7f3e2ee46', '')
       .send({
         currency: 'BCH',
@@ -46,7 +46,7 @@ program
   .command('manuallyprocesspayment <hash>')
   .action(async (hash) => {
 
-    await http.post(`https://bch.anypay.global/v1/bch/transactions/${hash}`);
+    await http.post(`https://bch.anypayinc.com/v1/bch/transactions/${hash}`);
 
   });
 

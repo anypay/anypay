@@ -1,8 +1,10 @@
-import * as bch from 'bitcore-lib-cash';
+const bch = require('bitcore-lib-cash');
 import { lookupOutputFromInput } from '../../../lib/router_client'
 let Transaction = bch.Transaction
 let Script = bch.Script
 import {rpcCall} from './jsonrpc';
+
+import { fromSatoshis, toSatoshis } from '../../../../lib/pay'
 
 interface Payment{
   amount: number;
@@ -66,7 +68,7 @@ export async function getAddressRouteFromTx(tx):Promise<Route>{
 
 }
 
-export async function broadcastSignedTx(tx: bch.Transaction): Promise<string>{
+export async function broadcastSignedTx(tx): Promise<string>{
  
   return await rpcCall('sendrawtransaction', [tx.toString()])
 
@@ -82,14 +84,14 @@ export function transformHexToPayments(hex: string): Payment[]{
           return {
             currency: 'BCH',
             hash: tx.hash.toString(),
-            amount: satoshisToBCH(output.satoshis),
+            amount: fromSatoshis(output.satoshis),
             address: output.script.toAddress().toString()
           }
   })
 
 }
 
-export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Transaction{
+export function createOutputTxFromInputTx(inputTx, route,fee = 0.00002 ): any { // bch.Transaction
 
   let utxos = inputTx.outputs.reduce((result, output, index)  => {
 
@@ -105,13 +107,11 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Tra
  
   let index = utxos[0].index
 
-  fee = bchToSatoshis(fee)
+  fee = toSatoshis(fee)
 
   if (input.satoshis < fee) {
 
      throw(new RangeError(`Fee: ${fee} satoshis is greater than the unspent output: ${input.satoshis} satoshis`));
-
-     return;
   }
 
   let utxo = {
@@ -132,15 +132,8 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): bch.Tra
 
 }
 
-export function signTransaction(tx: bch.Transaction, pk: bch.PrivateKey):bch.Transaction{
+export function signTransaction(tx, pk):any{
   return tx.sign(pk)            
-}
-
-function satoshisToBCH(sats: number): number{
-  return sats/100000000
-}
-function bchToSatoshis(bch): number{
-  return bch*100000000 | 0;
 }
 
 export async function getSmartFee(numberOfConf){
@@ -151,6 +144,6 @@ export async function getSmartFee(numberOfConf){
 
 }
 
-export function derivePrivateKey(pk: bch.HDPrivateKey ,nonce): bch.PrivateKey{
+export function derivePrivateKey(pk,nonce): any{
   return  pk.deriveChild(nonce).privateKey.toString() 
 }

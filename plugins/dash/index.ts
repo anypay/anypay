@@ -3,6 +3,8 @@ require('dotenv').config();
 
 import {createWebhook} from './lib/blockcypher';
 
+import { any } from 'bluebird'
+
 import {generateInvoice} from '../../lib/invoice';
 
 import * as chainSoAPI from '../../lib/chainSoAPI';
@@ -15,7 +17,7 @@ import {log, xpub, models} from '../../lib'
 
 import { rpc } from './lib/jsonrpc';
 
-import * as Blockcypher from '../../lib/dash/blockcypher';
+import { publishDASH } from '../../lib/blockcypher'
 
 import { I_Address } from '../../types/interfaces';
 
@@ -25,13 +27,29 @@ import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
 
+import { transformHexToPayments } from '../../router/plugins/dash/lib';
+
+export { transformHexToPayments }
+
 var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'DASH')
 
-  return valid;
+  return valid
+
+}
+
+export function transformAddress(address: string){
+
+  if (address.match(':')) {
+
+    address = address.split(':')[1]
+
+  }
+
+  return address;
 
 }
 
@@ -61,9 +79,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://dash.anypay.global/v1/dash/forwards";
+  let url = "https://dash.anypayinc.com/v1/dash/forwards";
 
-  let callbackBase = process.env.API_BASE || 'https://api.anypay.global';
+  let callbackBase = process.env.API_BASE || 'https://api.anypayinc.com';
 
   let resp = await http.post(url).send({
 
@@ -81,30 +99,9 @@ export async function getNewAddress(record: I_Address) {
 
   var address;
 
-  /* 
-   * Example extended public key:
-   *
-   * xpub6CwejPWLBbxgg9hhVUA8kT2RL83ARa1kAk3v564a72kPEyu3sX9GtVNn2UgYDu5aX94Xy3V8ZtwrcJ9QiM7ekJHdq5VpLLyMn4Bog9H5aBS
-   *
-   * (stevenzeiler dash android wallet)
-   *
-   */
-
   if (record.value.match(/^xpub/)) {
 
-    address = record.value;
-
-    //address contains metadata 
-    /*
-    * example xpub key given by DASH official wallet 
-    *xpub6CfwhFo3F2UmpqM19kE1P7W3JTZ5ieUBYNcYt8fxpYcvUU1hgMvzuBsZeS2Ujq7zV1XH1m1mDudS43nMBC1oBmM1rvqZ4H3KvGWz7KxaP4f?c=1514577265&h=bip32
-    *
-    */
-    if(address.length == 132){
-	address = address.substring(0,111)
-    }
-
-    address = xpub.generateAddress('DASH', address, record.nonce);
+    address = xpub.generateAddress('DASH', record.value, record.nonce);
 
     await models.Address.update({
 
@@ -120,50 +117,28 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    let subscription = await address_subscription.createSubscription('DASH', address)
+    return address;
 
   } else {
 
-    //Create a new HDKeyAddress 
-      let record = await models.Hdkeyaddresses.create({
-
-      currency:'DASH',
-
-      xpub_key:process.env.DASH_HD_PUBLIC_KEY
-
-     })
-
-     record.address = deriveAddress(process.env.DASH_HD_PUBLIC_KEY, record.id)
-
-     await record.save()
-
-     try{
-
-       rpc.call('importaddress', [record.address, "", false, false])
-
-     }catch(error){
-
-        console.log(error)
-     }
-     return record.address;
+    return record.value;
 
   }
 
-  return address;
-
 }
 
-
-function deriveAddress(xkey, nonce){
-
-  let address = new dash.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
-
+async function publishToNode(transaction: string): Promise<string> {
+  return rpc.call('sendrawtransaction', [transaction])
 }
 
+export async function broadcastTx(transaction: string): Promise<string> {
 
+  return any([
+    //publishDASH(transaction),
+    publishToNode(transaction)
+  ])
 
+}
 
 async function checkAddressForPayments(address:string, currency:string){
 

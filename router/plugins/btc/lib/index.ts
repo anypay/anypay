@@ -5,6 +5,8 @@ let Script = btc.Script
 import {rpcCall} from './jsonrpc';
 import * as rocketchat from '../../../lib/rocketchat';
 
+import { fromSatoshis, toSatoshis } from '../../../../lib/pay'
+
 interface Payment{
   amount: number;
   hash: string;
@@ -97,7 +99,7 @@ export function transformHexToPayments(hex: string): Payment[]{
     return {
       currency: 'BTC',
       hash: tx.hash.toString(),
-      amount: satoshisToBTC(output.satoshis),
+      amount: fromSatoshis(output.satoshis),
       address: output.script.toAddress().toString(),
       replace_by_fee
     }
@@ -121,7 +123,7 @@ export function createOutputTxFromInputTx(inputTx, route,fee = .00002 ): btc.Tra
  
   let index = utxos[0].index
 
-  fee = btcToSatoshis(fee)
+  fee = toSatoshis(fee)
 
   if (input.satoshis < fee) {
 
@@ -150,14 +152,7 @@ export function signTransaction(tx: btc.Transaction, pk: btc.PrivateKey):btc.Tra
   return tx.sign(pk)            
 }
 
-function satoshisToBTC(sats: number): number{
-  return sats/100000000
-}
-function btcToSatoshis(btc): number{
-  return btc*100000000 | 0;
-}
-
-export async function getSmartFee(numberOfConf){
+export async function getSmartFee(numberOfConf) {
 
   let resp = await rpcCall('estimatesmartfee', [numberOfConf])
 

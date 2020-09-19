@@ -6,9 +6,34 @@ import * as http from 'superagent';
 import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
+
+import { transformHexToPayments } from '../router/plugins/bch/lib';
+import { awaitChannel } from '../lib/amqp';
 const axios = require('axios');
 
 import { Bip70DashPayer } from '../lib/bip70/dash';
+
+program
+  .command('publishbch <uid> <hex>')
+  .action(async (uid, hex) => {
+    let payments = transformHexToPayments(hex)  
+
+    console.log('payments', payments);
+
+    let channel = await awaitChannel();
+
+    payments.forEach(payment => {
+
+      channel.publish('anypay.payments', 'payment', Buffer.from(
+
+        JSON.stringify(Object.assign(payment, {invoice_uid: uid })) 
+
+
+      ))
+
+    });
+
+  })
 
 program
   .command('paydashinvoice <invoice_uid>')
@@ -80,6 +105,8 @@ program
 
   });
 
+program.option('-D, --dev', 'use local development API server');
+
 program
   .command('getpaymentrequest <invoice_uid> <currency>')
   .action(async (invoiceUID, currency) => {
@@ -127,8 +154,10 @@ program
     case 'BCH':
       accept = 'application/bitcoincash-paymentrequest'
 
-      response = await axios.get(`https://api.anypayinc.com/r/${invoiceUID}`, {
-      //response = await axios.get(`http://localhost:8000/r/${invoiceUID}`, {
+      var host = !!program.dev ? 'http://localhost:8000' : 'https://api.anypayinc.com';
+      console.log(`USING API ${host}`);
+
+      response = await axios.get(`${host}/r/${invoiceUID}`, {
         responseType: 'arraybuffer',
         headers: {
           'accept': accept

@@ -15,7 +15,7 @@ import { email as rabbiEmail } from 'rabbi';
 AWS.config.update({ region: "us-east-1" });
 //require('./createtemplate')
 
-const FROM_EMAIL = 'Derrick from Anypay <support@anypay.global>';
+const FROM_EMAIL = 'Derrick from Anypay <derrick@anypayinc.com>';
 
 const templates = requireAll(`${__dirname}/templates`);
 
@@ -46,7 +46,8 @@ export async function sendEmail(recipient, subject, body) {
             },
       Source: FROM_EMAIL, /* required */
       ReplyToAddresses: [
-              'support@anypay.global',
+              'derrick@anypayinc.com',
+              'support@anypayinc.com',
             /* more items */
           ],
   };  
@@ -65,14 +66,11 @@ export async function newAccountCreatedEmail(account) {
 
 export async function firstInvoiceCreatedEmail(invoiceId) {
 
-  let template = templates['first_invoice_created'];
+  let invoice = await models.Invoice.findOne({ where: { id: invoiceId }})
 
-  let invoice = await models.Invoice.findOne({where:{id:invoiceId}})
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
+  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
-  return sendEmail(account.email, template.subject, template.body);
+  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay Inc<derrick@anypayinc.com>', { email: account.email });
 
 };
 
@@ -141,8 +139,6 @@ export async function ambassadorRewardEmail(invoice_uid){
 
   let denomination_amount = (reward.amount * price).toFixed(4);
 
-  console.log(account.toJSON());
-
   let rewardExplorerUrl = getBlockExplorerTxidUrl(reward);
 
   let variables = {
@@ -163,9 +159,6 @@ export async function ambassadorRewardEmail(invoice_uid){
     businessZip: business.business_zip
   };
 
-  console.log(variables);
-  console.log('destination', account.email);
-
   let resp = await rabbiEmail.sendEmail(
     'ambassador_reward',
     account.email,
@@ -179,13 +172,9 @@ export async function ambassadorRewardEmail(invoice_uid){
 
 export async function invoicePaidEmail(invoice){  
 
-  console.log(invoice);
-
   let account = await models.Account.findOne({ where: {
     id: invoice.account_id
   }});
-
-  console.log(account.toJSON());
 
   let variables = {
     invoice_paid_date_time: invoice.completed_at,
@@ -200,8 +189,6 @@ export async function invoicePaidEmail(invoice){
     businessState: account.business_state,
     businessZip: account.business_zip
   };
-
-  console.log(variables);
 
   let resp = await rabbiEmail.sendEmail(
     'invoice_paid_receipt',

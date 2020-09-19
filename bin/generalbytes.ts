@@ -12,6 +12,10 @@ program
 
     let csv = await generalbytes.getCSVFromPath(path) 
 
+    let results = await generalbytes.csvParseStream(csv)
+
+    console.log('results', results)
+
     let newRecords = await generalbytes.importCSV(csv);
 
     console.log(newRecords.map(r => r.toJSON()));

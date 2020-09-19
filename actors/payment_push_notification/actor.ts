@@ -36,7 +36,9 @@ export async function start() {
 
     try {
 
-      let resp = await sendMessage(account.email, `Payment Received ${invoice.denomination_amount_paid} ${invoice.denomination_currency}`, invoice.currency);
+      let resp = await sendMessage(account.email, `Payment Received ${invoice.denomination_amount_paid} ${invoice.denomination_currency}`, invoice.currency, {
+        path: `/payments/${invoiceUid}`,
+      });
 
       console.log('firebase.notification.sent', resp);
 

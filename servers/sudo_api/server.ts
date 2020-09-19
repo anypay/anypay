@@ -120,6 +120,24 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/api/histograms/daily-invoices-paid",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Histograms.dailyPaidInvoices
+
+    }
+
+  });
+
+
+
+  server.route({
+
     method: "POST",
 
     path: "/api/cash_deposits",
@@ -337,6 +355,38 @@ async function Server() {
       auth: "sudopassword",
 
       handler: vendingMachines.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales/stats",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.stats
 
     }
 
@@ -768,6 +818,34 @@ async function Server() {
     config: {
 
       handler: cashback.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payments',
+
+    config: {
+
+      handler: handlers.Payments.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payments/stats',
+
+    config: {
+
+      handler: handlers.Payments.stats
 
     }
 

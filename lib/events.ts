@@ -3,6 +3,7 @@ require('dotenv').config();
 import { EventEmitter2 } from 'eventemitter2';
 import {connect} from 'amqplib';
 import {log} from './logger';
+import {models} from './models';
 
 import {publishEventToSlack} from './slack/events';
 
@@ -58,7 +59,7 @@ let events = [
 
       await channel.publish(exchange, event, new Buffer(message));
 
-      log.info(`published to amqp ${exchange}.${event}`, message)
+      log.info(`amqp.published`, { exchange, event, message })
 
     });
 
@@ -96,6 +97,18 @@ let events = [
   log.debug('bound to all events to slack');
 
 })()
+
+interface EventData {
+  event: string;
+  payload: any;
+  account_id?: number;
+}
+
+export async function record(data: EventData) {
+
+  return models.Event.create(data);
+
+}
 
 export { emitter }
 

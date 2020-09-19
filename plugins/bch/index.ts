@@ -4,6 +4,10 @@ import { rpc } from './lib/jsonrpc';
 
 import * as http from 'superagent';
 
+let BITBOX = require('bitbox-sdk').BITBOX;
+
+const bitbox = new BITBOX();
+
 import {generateInvoice} from '../../lib/invoice';
 
 import {awaitChannel} from '../../lib/amqp';
@@ -22,6 +26,10 @@ import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
 
+import { transformHexToPayments } from '../../router/plugins/bch/lib';
+
+export { transformHexToPayments }
+
 const bch: any = require('bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');
@@ -31,6 +39,11 @@ import * as address_subscription from '../../lib/address_subscription';
 export async function submitTransaction(rawTx: string) {
 
   return rpc.call('sendrawtransaction', [rawTx]);
+
+}
+export async function broadcastTx(hex: string) {
+
+  return bitbox.RawTransactions.sendRawTransaction(hex);
 
 }
 
@@ -141,9 +154,9 @@ async function generateCoinTextInvoice( address:string, amount:number, currency:
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://bch.anypay.global/v1/bch/forwards";
+  let url = "https://bch.anypayinc.com/v1/bch/forwards";
 
-  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypay.global/v1/bch/forwards";
+  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypayinc.com/v1/bch/forwards";
 
   let resp = await http.post(url).send({
 
@@ -185,46 +198,13 @@ export async function getNewAddress(record: I_Address) {
     
     });
 
-    let subscription = await address_subscription.createSubscription('BCH', address)
+    return address;
 
   } else {
 
-           //Create a new HDKeyAddress
-     let record = await models.Hdkeyaddresses.create({
-
-        currency:'BCH',
-
-        xpub_key:process.env.BCH_HD_PUBLIC_KEY
-
-      })
-
-      record.address = deriveAddress(process.env.BCH_HD_PUBLIC_KEY, record.id)
-
-      console.log('Importing address', record.address)
-
-      await record.save()
-
-      rpc.call('importaddress', [record.address, "", false, false])
-
-
-      return record.address;
+    return record.value;
 
   }
-
-  rpc.call('importaddress', [address, 'false', false])
-
-    .then(result => {
-
-      console.log('rpcresult', result); 
-
-    })
-    .catch(error => {
-
-      console.log('rpcerror', error); 
-
-    });
-
-  return address;
 
 }
 

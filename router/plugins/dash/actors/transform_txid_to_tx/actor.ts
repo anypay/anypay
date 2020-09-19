@@ -10,7 +10,7 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'dash.anypay.global',
+    exchange: 'dash.anypayinc.com',
 
     routingkey: 'walletnotify',
 

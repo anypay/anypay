@@ -5,15 +5,20 @@ import * as  bchaddr from 'bchaddrjs';
 import * as Minercraft from 'minercraft';
 
 
+import { transformHexToPayments } from '../../router/plugins/bsv/lib';
+
+export { transformHexToPayments }
+
 export async function broadcastTx(hex) {
 
   let miners = [
     new Minercraft({
       url: "https://merchantapi.matterpool.io"
-    }),
+    })/*,
     new Minercraft({
       url: "https://merchantapi.taal.com"
     })
+    */
   ]
 
   return Promise.race(miners.map(miner => {
@@ -59,7 +64,7 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-export async function getPaymail(alias) {
+export async function getPaymail(alias: string) {
 
   try {
 
@@ -82,20 +87,36 @@ export async function getPaymail(alias) {
 }
 
 
-export async function transformAddress(alias){
+export async function transformAddress(alias: string){
 
-  try{
-          
-    if( isCashAddress(alias) ){
-    
-      return toLegacyAddress(alias)
+  try {
+
+    try{
+            
+      if( isCashAddress(alias) ){
+      
+        return toLegacyAddress(alias)
+
+      }
+
+
+    }catch(err){
 
     }
 
-  }catch(err){
+    if (alias.match(':')) {
 
+      alias = alias.split(':')[1];
+
+    }
+
+    console.log('ALIAS', alias);
+
+    return (await polynym.resolveAddress(alias)).address;
+
+  } catch(error) {
+    throw new Error('invalid BSV address');
   }
-  return (await polynym.resolveAddress(alias)).address;
 
 }
 

@@ -26,7 +26,7 @@ export async function getROI(accountID){
   let cryptoPrice = {}
 
   for( let i=0; i<invoices.length; i++){
-    cryptoPrice[invoices[i].currency] = (await http.get(`api.anypay.global/convert/1-${invoices[i].currency}/to-${account.denomination}`)).body.conversion.output.value
+    cryptoPrice[invoices[i].currency] = (await http.get(`api.anypayinc.com/convert/1-${invoices[i].currency}/to-${account.denomination}`)).body.conversion.output.value
                 
   }
 
@@ -87,7 +87,6 @@ export async function send_all_roi_email(){
     
     let email = await roi_updateEmail(ids[i].id)
 
-    console.log(email)
   }
 
 }

@@ -8,14 +8,37 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
+import { publishBTC } from '../../lib/blockcypher'
+
 import {models} from '../../lib/models';
 
 import {rpc} from './jsonrpc';
 
+import { transformHexToPayments } from '../../router/plugins/btc/lib';
+
+export { transformHexToPayments }
 
 export async function submitTransaction(rawTx: string) {
 
-  return rpc.call('sendrawtransaction', [rawTx]);
+  return publishBTC(rawTx);
+
+}
+
+export async function broadcastTx(rawTx: string) {
+
+  return publishBTC(rawTx);
+
+}
+
+export function transformAddress(address: string) {
+
+  if (address.match(':')) {
+
+    address = address.split(':')[1]
+
+  }
+
+  return address;
 
 }
 
@@ -25,28 +48,16 @@ export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'BTC')
 
+  console.log(address, valid);
+
   return valid;
 
 }
 
 export async function getNewAddress(deprecatedParam){
+  console.log('deprecated', deprecatedParam);
 
-  //Create a new HDKeyAddress 
-  let record = await models.Hdkeyaddresses.create({
-
-    currency:'BTC',
-
-    xpub_key:process.env.BTC_HD_PUBLIC_KEY
-
-  })
-
-  record.address = deriveAddress(process.env.BTC_HD_PUBLIC_KEY, record.id)
-
-  await record.save()
-
-  rpc.call('importaddress', [record.address, "", false, false])
-
-  return record.address;
+  return deprecatedParam.value;
 
 }
 

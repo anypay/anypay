@@ -1,112 +1,32 @@
 const bcrypt = require('bcrypt');
-const log = require('winston');
-const Slack = require('../../../lib/slack/notifier');
 const Boom = require('boom');
-
-import { geocode } from '../../../lib/googlemaps';
+var geoip = require('geoip-lite');
 
 import {emitter} from '../../../lib/events'
 
-import { models } from '../../../lib';
+import { models, accounts, slack, log, utils } from '../../../lib';
 
 import { getROI } from '../../../lib/roi';
-import { awaitChannel } from '../../../lib/amqp';
 
 function hash(password) {
   return new Promise((resolve, reject) => {
 
-    bcrypt.hash(password, 10, (error, hash) => {
-      if (error) { return reject(error) }
-      resolve(hash);
+      bcrypt.hash(password, 10, (error, hash) => {
+        if (error) { return reject(error) }
+        resolve(hash);
     })
   });
 }
 
 export async function update(req, h) {
 
+  
+
   try {
 
-    let account = await models.Account.findOne({ where: {
+    let account = await accounts.updateAccount(req.account, req.payload);
 
-      id: req.account.id
-
-    }});
-
-    if (!account) {
-
-      return {
-
-        success: false,
-
-        error: 'account not found'
-
-      }
-
-    }
-
-    let updateAttrs: any = Object.assign(req.payload, {});
-
-    if (updateAttrs.physical_address) {
-
-      try {
-
-        let geolocation = await geocode(updateAttrs.physical_address);
-
-        updateAttrs.latitude = geolocation.lat;
-        updateAttrs.longitude = geolocation.lng;
-
-      } catch (error) {
-
-        log.error('error geocoding address', error.message);
-
-      }
-
-    }
-
-    if (updateAttrs.ambassador_email) {
-      let ambassadorAccount = await models.Account.findOne({
-        where: {
-          email: updateAttrs.ambassador_email
-        }
-      });
-
-      if (!ambassadorAccount) {
-        throw new Error('ambassador email does not exist');
-      }
-
-      let ambassador = await models.Ambassador.findOne({
-        where: { account_id: ambassadorAccount.id }
-      })
-
-      if (ambassador) {
-
-        updateAttrs['ambassador_id'] = ambassador.id;
-
-        let channel = await awaitChannel();
-
-        await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
-          account_id: req.account.id,
-          ambassador_id: ambassador.id,
-          ambassador_email: updateAttrs.ambassador_email
-        })));
-
-      }
-
-    }
-
-    delete updateAttrs['ambassador_email'];
-
-    await models.Account.update(updateAttrs, {
-
-      where: { id: req.account.id }
-
-    });
-
-    account = await models.Account.findOne({ where: {
-
-      id: req.account.id
-
-    }});
+    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
 
     return {
 
@@ -159,7 +79,7 @@ export async function registerAnonymous(request, reply) {
 
     request.account.save();
 
-    Slack.notify(`account:registered | ${request.account.email}`);
+    slack.notify(`account:registered | ${request.account.email}`);
     
     emitter.emit('account.created', request.account)
 
@@ -188,7 +108,20 @@ export async function create (request, reply) {
       password_hash: passwordHash
     });
 
-    Slack.notify(`account:created | ${account.email}`);
+    let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+
+    if (geoLocation) {
+
+      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+
+      slack.notify(`${account.email} registerd from ${userLocation}`);
+
+    } else {
+
+      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+
+    }
+
     
     emitter.emit('account.created', account)
 
@@ -240,12 +173,26 @@ export async function show (request, reply) {
       tipjars
 
   if (account.ambassador_id) {
-    ambassador = await models.Account.findOne({
-      where: {
-        id: account.ambassador_id
-      },
-      attributes: ['id', 'email'] 
-    });
+    log.info(`find ambassador ${account.ambassador_id}`)
+    var record = await models.Ambassador.findOne({ where: { id: account.ambassador_id }})
+    log.info('ambassador', record.toJSON())
+    if (record) {
+      let ambassador_account = await models.Account.findOne({
+        where: {
+          id: record.account_id
+        },
+        attributes: ['id', 'email'] 
+      });
+      if (ambassador_account) {
+        log.info('ambassador.account', ambassador)
+
+        ambassador = Object.assign({
+          id: record.id,
+          account_id: ambassador_account.id,
+          email: ambassador_account.email
+        })
+      }
+    }
   }
 
   addresses = await models.Address.findAll({ where: {

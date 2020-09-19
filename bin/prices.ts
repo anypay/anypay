@@ -7,14 +7,13 @@ const program = require('commander')
 import { getPriceOfOneDollarInVES } from '../lib/prices/ves';
 import { log } from '../lib';
 import { getVESPrice } from '../lib/localbitcoins';
-import { createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
+import { createConversion, updateCryptoUSDPrice, updateUSDPrices, updateDashPrices } from '../lib/prices';
 
 import { updateCryptoUSDPrices } from '../lib/prices/crypto';
 
 program
   .command('seed_prices')
-  .action(async () => {
-
+  .action(async () => { 
     try {
 
       log.info('updating USD prices');
@@ -40,6 +39,7 @@ program
   .action(async () => {
 
     try {
+      await updateDashPrices();
 
       log.info('updating crypto prices');
 

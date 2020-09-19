@@ -1,5 +1,6 @@
 require('dotenv').config();
 import {models} from '../models';
+import {log} from '../logger';
 
 export async function importVendingCsv(path){
 
@@ -49,10 +50,10 @@ export async function importVendingCsv(path){
 
       })
 
-      console.log(tx)
+     }catch(error){
 
-     }catch(err){
-      console.log(err)
+      log.error(error.message, error)
+
      }
 
       callback();

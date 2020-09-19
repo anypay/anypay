@@ -71,13 +71,13 @@ async function checkAddressForPayments(address:string, currency:string) {
 
 async function createAddressForward(record: I_Address) {
 
-  let url = "https://zen.anypay.global/v1/zen/forwards";
+  let url = "https://zen.anypayinc.com/v1/zen/forwards";
 
   let resp = await http.post(url).send({
 
     destination: record.value,
 
-    callback_url: 'https://api.anypay.global/zen/address_forward_callbacks'
+    callback_url: 'https://api.anypayinc.com/zen/address_forward_callbacks'
 
   });
 

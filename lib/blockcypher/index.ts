@@ -6,7 +6,51 @@ import { log } from '../logger';
 
 import { models } from '../models';
 
-const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypay.global";
+const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypayinc.com";
+
+export async function publishDASH(hex) {
+
+  try {
+
+    let resp = await http.post(`https://api.blockcypher.com/v1/dash/main/txs/push?token=${token}`).send({
+      tx: hex
+    });
+
+    console.log('RESP', resp);
+
+    return resp.body.hash;
+
+  } catch(error) {
+
+    console.log(error);
+
+    throw error;
+
+  }
+
+}
+
+export async function publishBTC(hex) {
+
+  try {
+
+    let resp = await http.post(`https://api.blockcypher.com/v1/btc/main/txs/push?token=${token}`).send({
+      tx: hex
+    });
+
+    console.log('RESP', resp);
+
+    return resp.body.hash;
+
+  } catch(error) {
+
+    console.log(error);
+
+    throw error;
+
+  }
+
+}
 
 function createWebhook(address) {
   return new Promise((resolve, reject) => {

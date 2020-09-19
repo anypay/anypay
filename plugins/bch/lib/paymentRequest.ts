@@ -1,6 +1,10 @@
 const bitcore = require('bitcore-lib-cash');
 import {models} from '../../../lib';
 
+import { BigNumber } from 'bignumber.js';
+
+import { toSatoshis } from '../../../lib/pay';
+
 interface Output{
   address: string;
   amount: number;
@@ -27,7 +31,7 @@ export async function generatePaymentRequest(invoiceUid: string):Promise<Payment
     network:"main",
     currency:"BCH",
     requiredFeeRate:1,
-    outputs :[ {address: invoice.address, amount: bchToSatoshis(invoice.amount) }],
+    outputs :[ {address: invoice.address, amount: toSatoshis(invoice.amount) }],
     time: Date.now() / 1000 | 0,
     expires: invoice.expiry,
     memo: "Anypay Invoice",
@@ -41,6 +45,3 @@ export async function generatePaymentRequest(invoiceUid: string):Promise<Payment
 
 }
 
-function bchToSatoshis(bch): number{
-  return bch*100000000 | 0;
-}

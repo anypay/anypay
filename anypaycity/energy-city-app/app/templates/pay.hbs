@@ -1,0 +1,76 @@
+{{outlet}}
+
+<h1>{{business.business_name}}</h1>
+
+<section>
+    <div class="container page-layout page-layout--background-primary
+  calculator-pad-top noselect">
+    <div class='invoice-amount'>
+      {{!-- <img id="recent-invoices-button" src="{{rootURL}}list-button.png" onclick={{action 'showRecent'}}/> --}}
+      <h1 class='invoice-amount' id='invoice-amount'><span>${{amount}}</span> </h1>
+    </div>
+    <div class='page-layout__content calculator-pad-top noselect' style='display: block;'>
+      <div class="row calculator-pad noselect" id="calculator-pad">
+        <div class="row">
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-1'>1</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-2'>2</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-3'>3</div>
+        </div>
+        <div class="row">
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-4'>4</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-5'>5</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-6'>6</div>
+        </div>
+        <div class="row">
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-7'>7</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-8'>8</div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-9'>9</div>
+        </div>
+
+        <div class="row">
+          <div class="calculator-button col-sm-4 noselect invisible" id='calculator-delete'></div>
+          <div class="calculator-button col-sm-4 noselect" onclick={{action 'calculatorPress'}} id='calculator-0'>0</div>
+        </div>
+        {{#if isShowNextButton}}
+          <div class="calculator-button col-sm-4" onclick={{action 'pressBackspace'}} id='calculator-backspace'>
+            <img class='left-chevron-back' src="{{rootURL}}left-chevron.png"/>
+          </div>
+        {{else}}
+          <div class="col-sm-4 invisible" >
+          </div>
+        {{/if}}
+      </div>
+
+      <div class='invoice-page__controls'>
+
+        {{#if isShowNextButton}}
+        <img {{action "generateInvoice"}} class="new-invoice-next-button" src="{{rootURL}}img/Green_Anypay_Next_Arrow.svg"/>
+        {{/if}}
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<div class='pay-bottom-tray pay-bottom-tray--is-hidden'>
+
+  <p>Swipe to pay ${{bsvAmount}}</p>
+  {{money-button}}
+  <div id="my-money-button"></div>
+
+</div>
+
+<div class="cd-panel cd-panel--from-right js-cd-panel-main">
+   <header class="cd-panel__header">
+      <h1>Title Goes Here</h1>
+      <a href="#0" class="cd-panel__close js-cd-close">Close</a>
+   </header>
+
+   <div class="cd-panel__container">
+      <div class="cd-panel__content">
+         <!-- your side panel content here -->
+      </div> <!-- cd-panel__content -->
+   </div> <!-- cd-panel__container -->
+</div> <!-- cd-panel -->
+

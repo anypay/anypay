@@ -7,7 +7,7 @@ import {unpaidInvoiceEmail} from '../lib/email';
 
   try {
 
-    //let accountId = 1176; // steven@anypay.global
+    //let accountId = 1176; // steven@anypayinc.com
     let accountId = 177; // derrickjfreeman@gmail.com
     let invoiceId = 606;
 

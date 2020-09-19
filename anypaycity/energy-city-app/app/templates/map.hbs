@@ -1,0 +1,11 @@
+{{outlet}}
+
+<div class="container">
+  <div class='map'>
+    {{#g-map lat="13.7563" lng="100.5018" styles=mapStyles zoom=12 as |g|}}
+      {{#each merchants as |l|}}
+        {{g.marker lat=l.latitude lng=l.longitude }}
+      {{/each}}
+    {{/g-map}}
+  </div>
+</div>

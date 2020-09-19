@@ -1,6 +1,6 @@
 const http = require("superagent");
 
-const SLACK_URL = 'https://chat.anypay.global/hooks/2i7vS3RH3TZKgZvGN/B4Z64ZN24JMDftCfQDsijwsB22wJPWkx54obELv8HEHcGfRe'
+const SLACK_URL = 'https://chat.anypayinc.com/hooks/2i7vS3RH3TZKgZvGN/B4Z64ZN24JMDftCfQDsijwsB22wJPWkx54obELv8HEHcGfRe'
 
 export function notify(message: string) {
 

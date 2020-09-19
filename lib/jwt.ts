@@ -15,9 +15,9 @@ const publicKey = fs.readFileSync(
   'utf8'
 );
 
-const issuer  = 'anypay.global';          // Issuer 
-const subject  = 'admin@anypay.global';        // Subject 
-const audience  = 'https://anypay.global'; // Audience/ PRIVATE and PUBLIC key
+const issuer  = 'anypayinc.com';          // Issuer 
+const subject  = 'admin@anypayinc.com';        // Subject 
+const audience  = 'https://anypayinc.com'; // Audience/ PRIVATE and PUBLIC key
 
 export async function generateAdminToken() {
 

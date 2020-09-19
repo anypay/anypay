@@ -1,5 +1,6 @@
 import * as assert from 'assert';
-import { bip70, database, invoices, accounts } from '../../lib';
+import { database, invoices, accounts } from '../../lib';
+import { BIP70Protocol } from '../../lib/pay'
 import { setAddress } from '../../lib/core';
 import { Server } from '../../servers/rest_api/server';
 import * as dash from '@dashevo/dashcore-lib';
@@ -64,14 +65,14 @@ describe('Dash Payment Requests Using BIP70', () => {
 
       let buffer = response.body;
 
-      let request = new bip70.PaymentProtocol('DASH')
+      let request = new BIP70Protocol('DASH')
         .deserialize(buffer, 'PaymentRequest');
 
       assert(request.currency === 'DASH');
 
       assert(request.message.serialized_payment_details);
 
-      let details = new bip70.PaymentProtocol('DASH')
+      let details = new BIP70Protocol('DASH')
         .deserialize(request.message.serialized_payment_details, 'PaymentDetails');
 
       assert(details.message.outputs.length > 1);

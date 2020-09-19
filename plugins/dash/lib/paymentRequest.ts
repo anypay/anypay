@@ -4,6 +4,8 @@ import BigNumber from 'bignumber.js';
 
 import {models} from '../../../lib';
 
+import { toSatoshis } from '../../../lib/pay';
+
 interface Output{
   script: string;
   amount: number;
@@ -33,7 +35,7 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     outputs: [{
       address: address.toString(),
       script: script.toHex(),
-      amount: dashToSatoshis(paymentOption.amount)
+      amount: toSatoshis(paymentOption.amount)
     }, {
       script: anypayScript.toHex(),
       address: anypayAddress.toString(),
@@ -50,12 +52,5 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
 
   return request
 
-}
-
-function dashToSatoshis(dash): number{
-  let amt = new BigNumber(dash); 
-  let scalar = new BigNumber(100000000);
-
-  return amt.times(scalar).toNumber();
 }
 

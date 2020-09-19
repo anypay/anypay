@@ -1,7 +1,8 @@
 require('dotenv').config();
 
-import * as amqp from './amqp';
 import * as accounts from './accounts';
+import * as amqp from './amqp';
+import * as apikeys from './apikeys';
 import * as login from './account_login';
 import * as invoices from './invoice';
 import * as forwards from './forwards';
@@ -29,9 +30,11 @@ import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as settlements from './settlements';
-import * as bip70 from './bip70';
+import * as slack from './slack/notifier';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
+import * as events from './events';
+import * as utils from './utils';
 
 var initialized = false;
 
@@ -48,8 +51,8 @@ export {
   addresses,
   ambassadors,
   amqp,
+  apikeys,
   auth,
-  bip70,
   blockcypher,
   cashback,
   clicksend,
@@ -57,6 +60,7 @@ export {
   dashwatch,
   database,
   email,
+  events,
   forwards,
   invoices,
   kraken,
@@ -72,8 +76,10 @@ export {
   routes,
   settings,
   settlements,
+  slack,
   square,
   tipjar,
+  utils,
   xpub
 }
 

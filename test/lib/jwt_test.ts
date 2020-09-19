@@ -11,9 +11,9 @@ describe("JWT Authentication", () => {
     let legit = await verifyToken(token);
 
     assert.strictEqual(legit.admin, true);
-    assert.strictEqual(legit.aud, 'https://anypay.global');
-    assert.strictEqual(legit.iss, 'anypay.global');
-    assert.strictEqual(legit.sub, 'admin@anypay.global');
+    assert.strictEqual(legit.aud, 'https://anypayinc.com');
+    assert.strictEqual(legit.iss, 'anypayinc.com');
+    assert.strictEqual(legit.sub, 'admin@anypayinc.com');
     assert(legit.iat);
     assert(legit.exp);
   });
