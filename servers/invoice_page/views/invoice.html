@@ -1,0 +1,158 @@
+
+<html>
+
+  <head>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        margin: 0 auto;
+        max-width: 500px;
+        width: 100vw;
+        height: 100vh;
+        text-align:center;
+        align-items:center;
+        justify-content: center;
+      }
+      .paid-invoice {
+        display: none;
+        flex-direction: column;
+      }
+      .unpaid-invoice {
+        display: flex;
+        flex-direction: column;
+        width: 300px;
+      }
+
+      .unpaid-invoice img {
+        width: 100%;
+        margin-bottom: 2em;
+      }
+    </style>
+
+  </head>
+
+  <body data-invoice-uid="{{invoice.uid}}">
+    <div class='container'>
+      <div class='paid-invoice'>
+        <h1>PAID!</h1>
+        <h2>${{invoice.amount}}</h2>
+        <h3>{{invoice.business_name}}</h3>
+      </div>
+
+      <div class='unpaid-invoice'>
+        <img class='anypay-logo' src='https://app.anypayinc.com/img/cropped-anypay_400-wide.jpg'/>
+        <div id='qrcode' class='qrcode'></div>
+      </div>
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" integrity="sha512-v8ng/uGxkge3d1IJuEo6dJP8JViyvms0cly9pnbfRxT6/31c3dRWxIiwGnMSWwZjHKOuY3EVmijs7k1jz/9bLA==" crossorigin="anonymous"></script>
+     <script src="https://app.anypayinc.com/js/qrcode.min-af5bfe5e351e7fb1f37669bf604fdaae.js"></script>
+     <script src="https://app.anypayinc.com/js/confetti.min-4b09fc9425c505d04fbd4ad4bca87d0c.js"></script>
+
+    <script>
+      let socketioUrl = 'wss://ws.anypayinc.com/'
+
+      var socket = io(socketioUrl)
+
+      console.log('socket', socket)
+
+      let invoiceUid = document.querySelector('body').dataset['invoiceUid']
+
+      console.log('invoice Uid', invoiceUid)
+
+      socket.on('subscribe', message => {
+        console.log(`client subscribed to ${message}`)
+      })
+
+      socket.emit('subscribe', {
+        uid: invoiceUid
+      })
+
+      var invoicePaid = false;
+
+      checkInvoiceStatus(invoiceUid).then(() => {
+        if (invoicePaid) {
+
+          showPaidInvoice()
+
+        } else {
+
+          showUnpaidInvoice()
+        }
+      })
+
+      function checkInvoiceStatus(invoiceUid) {
+
+        return fetch(`https://api.anypayinc.com/invoices/${invoiceUid}`).then(resp => {
+          return resp.json()
+        })
+        .then(data => {
+          console.log('invoice status', data.invoice.status)
+
+          if (data.invoice.status === 'paid') {
+            invoicePaid = true
+            showPaidInvoice()
+
+          }
+        })
+
+      }
+
+      function pollInvoiceStatus(invoiceUid) {
+        console.log('poll invoice status')
+
+        if (!invoicePaid) {
+
+          checkInvoiceStatus(invoiceUid).then(() => {
+
+            setTimeout(() => {
+
+              pollInvoiceStatus(invoiceUid)
+
+            }, 2000)
+
+          })
+        } else {
+
+          return;
+
+        }
+
+      }
+
+      function showPaidInvoice() {
+        console.log('show paid invoice')
+        playConfetti(1000)
+        document.getElementsByClassName('paid-invoice')[0].style.display = 'flex'
+        document.getElementsByClassName('unpaid-invoice')[0].style.display = 'none'
+      }
+
+      function showUnpaidInvoice() {
+        var qrcode = new QRCode(document.getElementById("qrcode"), {
+          text: `pay:?r=https://api.anypayinc.com/r/${invoiceUid}`,
+          width: 260,
+          height: 260,
+          colorDark : "#000000",
+          colorLight : "#ffffff",
+          correctLevel : QRCode.CorrectLevel.H
+        });
+
+        console.log('show unpaid invoice')
+        pollInvoiceStatus(invoiceUid)
+      }
+
+      function playConfetti(duration=2000) {
+        window.confetti.start();
+        setTimeout(() => {
+          window.confetti.stop();
+        }, duration);
+      }
+
+
+    </script>
+
+  </body>
+
+</html>

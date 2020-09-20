@@ -1041,6 +1041,12 @@ async function Server() {
     }
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/search/accounts',
+    handler: handlers.Search.accounts
+  }); 
+
   accountCSVReports(server);
 
   server.route({
