@@ -173,7 +173,7 @@ import * as http from 'superagent'
     "zcounter": 6
   }
 
-  let result = await http.post('localhost:8200/korona_pos/orders?token=c0cbd41c-70c8-4454-9a5c-7309b6285a9d').send(data)
+  let result = await http.post('https://api.anypayinc.com/korona_pos/orders?token=c0cbd41c-70c8-4454-9a5c-7309b6285a9d').send(data)
 
   console.log(result.text)
 
