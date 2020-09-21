@@ -9,6 +9,7 @@ import { join } from 'path'
 
 import { models, log } from '../../lib'
 
+
 import * as korona from '../../lib/korona_pos'
 
 /*
@@ -42,7 +43,6 @@ async function Server() {
   });
 
   server.route({
-
     method: 'POST',
     path: '/korona_pos/orders',
     handler: async (req, h) => {
@@ -82,7 +82,6 @@ async function Server() {
 
 
   server.route({
-
     method: 'GET',
     path: '/s/invoices/{uid}',
     handler: (req, h) => {
