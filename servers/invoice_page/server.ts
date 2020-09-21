@@ -57,7 +57,7 @@ async function Server() {
 
         let account = await models.Account.findOne({ where: { id: accessToken.account_id }})
 
-        let invoice = await korona.handleOrder(accessToken.account_id, JSON.parse(req.payload))
+        let invoice = await korona.handleOrder(accessToken.account_id, JSON.parse(req.payload.request))
 
         console.log('INVOICE', invoice.toJSON())
 
