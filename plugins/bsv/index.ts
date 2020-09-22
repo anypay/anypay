@@ -31,7 +31,16 @@ export async function broadcastTx(hex) {
       hex
     })
 
-    return result
+    if (result.returnResult === 'success') {
+
+      return result
+
+    } else {
+
+      throw new Error(result.resultDescription)
+
+    }
+
   }))
 
 }
