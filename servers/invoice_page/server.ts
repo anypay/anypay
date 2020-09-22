@@ -9,6 +9,8 @@ import { join } from 'path'
 
 import { models, log } from '../../lib'
 
+import * as korona from '../../lib/korona_pos'
+
 /*
  *
  * Single URL to fetch Invoice
@@ -40,7 +42,45 @@ async function Server() {
   });
 
   server.route({
+    method: 'POST',
+    path: '/korona_pos/orders',
+    handler: async (req, h) => {
 
+      try {
+
+        let accessToken = await models.AccessToken.findOne({
+          where: {
+            uid: req.query.token
+          }
+        })
+
+        let account = await models.Account.findOne({ where: { id: accessToken.account_id }})
+
+        let invoice = await korona.handleOrder(accessToken.account_id, JSON.parse(req.payload.request))
+
+        console.log('INVOICE', invoice.toJSON())
+
+        log.info('korona.order', req.payload)
+
+        return h.view('invoice', {
+          invoice: {
+            uid: invoice.uid,
+            amount: invoice.denomination_amount,
+            business_name: account.business_name
+          },
+          account: account.toJSON()
+        });
+
+      } catch(error) {
+
+        return Boom.badRequest(error.message)
+
+      }
+    }
+
+  })
+
+  server.route({
     method: 'GET',
     path: '/s/invoices/{uid}',
     handler: (req, h) => {

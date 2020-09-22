@@ -827,9 +827,43 @@ async function Server() {
 
     method: 'GET',
 
+    path: '/api/gift_card_sales',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.GiftCards.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/gift_card_sales/stats',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.GiftCards.stats
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
     path: '/api/payments',
 
     config: {
+
+      auth: 'sudopassword',
 
       handler: handlers.Payments.index
 
