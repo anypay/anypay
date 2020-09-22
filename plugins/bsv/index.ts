@@ -4,6 +4,7 @@ import * as  bchaddr from 'bchaddrjs';
 
 import * as Minercraft from 'minercraft';
 
+import { log } from '../../lib/logger'
 
 import { transformHexToPayments } from '../../router/plugins/bsv/lib';
 
@@ -21,8 +22,16 @@ export async function broadcastTx(hex) {
     */
   ]
 
-  return Promise.race(miners.map(miner => {
-    return miner.tx.push(hex); 
+  return Promise.race(miners.map(async miner => {
+
+    let result = await  miner.tx.push(hex); 
+
+    log.info(`miner.tx.push.result`, {
+      result,
+      hex
+    })
+
+    return result
   }))
 
 }
