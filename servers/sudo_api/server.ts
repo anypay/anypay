@@ -1165,6 +1165,35 @@ async function Server() {
   });
 
   server.route({
+    method: 'GET',
+
+    path: '/api/search',
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Search.show
+
+    }
+  })
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/search',
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Search.show
+
+    }
+  })
+
+  server.route({
 
     method: "GET",
 
