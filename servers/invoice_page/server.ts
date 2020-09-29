@@ -9,7 +9,6 @@ import { join } from 'path'
 
 import { models, log } from '../../lib'
 
-
 import * as korona from '../../lib/korona_pos'
 
 /*
@@ -80,8 +79,6 @@ async function Server() {
     }
 
   })
-
-
 
   server.route({
     method: 'GET',
