@@ -15,6 +15,7 @@ import { validateToken, validateAdminToken, validateAppToken } from '../auth/hap
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 
 import { hash, bcryptCompare } from '../../lib/password';
+import { updateCryptoUSDPrices } from '../../lib/prices/crypto';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
@@ -51,32 +52,35 @@ events.on('address:set', async (changeset) => {
 
 const validatePassword = async function(request, username, password, h) {
 
-  /* 1) check for account by email (username)
-     2) check for account password by hash compare
-     3) check for sudo password by hash compare
-     4) generate access token with expiration
-  */
-
-  if (!username || !password) {
-    return {
-      isValid: false
-    };
-  }
-
-  var account = await models.Account.findOne({
-    where: {
-      email: username.toLowerCase()
-    }
-  });
-
-  if (!account) {
-
-    return {
-      isValid: false
-    }
-  }
-
   try {
+
+
+    /* 1) check for account by email (username)
+       2) check for account password by hash compare
+       3) check for sudo password by hash compare
+       4) generate access token with expiration
+    */
+
+    if (!username || !password) {
+
+      return {
+        isValid: false
+      };
+    }
+
+    var account = await models.Account.findOne({
+      where: {
+        email: username.toLowerCase()
+      }
+    });
+
+    if (!account) {
+
+      return {
+        isValid: false
+      }
+    }
+
 
     var accessToken = await AccountLogin.withEmailPassword(username, password);
 
@@ -87,8 +91,12 @@ const validatePassword = async function(request, username, password, h) {
         credentials: { accessToken, account }
       };
 
+    } else {
+
+
     }
   } catch(error) {
+
 
     log.error(error.message);
 
@@ -1073,6 +1081,24 @@ if (require.main === module) {
 async function start () {
 
   ActivateDeactivateCoinActor.start();
+
+
+  if (process.env.NODE_ENV === 'production') {
+
+    log.info('updating crypto prices from coinmarketcap')
+    await updateCryptoUSDPrices()
+    log.info('updated crypto prices from coinmarketcap')
+
+    setInterval(async () => {
+
+      log.info('updating crypto prices from coinmarketcap')
+      await updateCryptoUSDPrices()
+      log.info('updated crypto prices from coinmarketcap')
+
+    }, 1000 * 60 * 5) // once per five minutes
+  }
+
+
 
   await sequelize.sync()
 
