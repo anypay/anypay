@@ -15,7 +15,7 @@ const chance = new Chance();
 
 describe('Addresses Library', () => {
 
-  it("should set a valid bsv address with handcash handle", async () => {
+  it.skip("should set a valid bsv address with handcash handle", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());
 
