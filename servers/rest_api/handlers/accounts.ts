@@ -116,12 +116,17 @@ export async function create (request, reply) {
 
       slack.notify(`${account.email} registerd from ${userLocation}`);
 
+      account.registration_geolocation = geoLocation
+
     } else {
 
       slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
 
     }
 
+    account.registration_ip_address = request.info.remoteAddress
+
+    account.save()
     
     emitter.emit('account.created', account)
 
