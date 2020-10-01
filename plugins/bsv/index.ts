@@ -35,6 +35,10 @@ export async function broadcastTx(hex) {
 
       return result
 
+    } else if (result.resultDescription.match('Transaction already in the mempool')) {
+
+      return result
+
     } else {
 
       throw new Error(result.resultDescription)
