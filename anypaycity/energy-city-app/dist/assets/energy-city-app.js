@@ -4148,7 +4148,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             var currentlyOpenInfowindow;
 
             activeMerchants.merchants.forEach(function (merchant) {
-                console.log('merchant', merchant);
 
                 var markerOpts = {
 
@@ -4164,6 +4163,11 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
                 };
 
+                if (inactiveMerchants[merchant.id]) {
+
+                    markerOpts.icon = frequencyIcons['inactive'];
+                }
+
                 if (threeMonthsMerchants[merchant.id]) {
 
                     markerOpts.icon = frequencyIcons['three-months'];
@@ -4175,11 +4179,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 }
 
                 if (oneWeekMerchants[merchant.id]) {
-
-                    markerOpts.icon = frequencyIcons['one-week'];
-                }
-
-                if (inactiveMerchants[merchant.id]) {
 
                     markerOpts.icon = frequencyIcons['one-week'];
                 }
@@ -5259,6 +5258,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+e48f1eea"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+77d1461d"});
 }
 //# sourceMappingURL=energy-city-app.map

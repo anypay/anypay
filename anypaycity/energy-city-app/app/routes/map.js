@@ -435,7 +435,6 @@ function loadMerchants(map) {
     var currentlyOpenInfowindow;
 
     activeMerchants.merchants.forEach(merchant => {
-      console.log('merchant', merchant)
 
       let markerOpts = {
 
@@ -451,6 +450,12 @@ function loadMerchants(map) {
 
       };
 
+      if (inactiveMerchants[merchant.id]) {
+
+        markerOpts.icon = frequencyIcons['inactive'];
+
+      }
+
       if (threeMonthsMerchants[merchant.id]) {
 
         markerOpts.icon = frequencyIcons['three-months'];
@@ -464,12 +469,6 @@ function loadMerchants(map) {
       }
 
       if (oneWeekMerchants[merchant.id]) {
-
-        markerOpts.icon = frequencyIcons['one-week'];
-
-      }
-
-      if (inactiveMerchants[merchant.id]) {
 
         markerOpts.icon = frequencyIcons['one-week'];
 
