@@ -1,11 +1,12 @@
 {{outlet}}
 
+<script id="merchant-popup-template" type="text/x-handlebars-template">
+</script>
+
 <div class="container">
-  <div class='map'>
-    {{#g-map lat="13.7563" lng="100.5018" styles=mapStyles zoom=12 as |g|}}
-      {{#each merchants as |l|}}
-        {{g.marker lat=l.latitude lng=l.longitude }}
-      {{/each}}
-    {{/g-map}}
+  <div class='map-location-chosen'>
+    <h1>{{location}}</h1>
+  </div>
+  <div id='map' class='map'>
   </div>
 </div>

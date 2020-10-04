@@ -310,13 +310,20 @@ export default Ember.Route.extend({
     console.log('SETUP CONTROLLER');
     setTimeout(() => {
 
-      Ember.$('.ember-google-map').css('position', 'fixed');
+      Ember.$('.map').css('position', 'fixed');
     }, 1000);
 
     Ember.run.scheduleOnce('afterRender', this, function() {                                                                  
       console.log('AFTER RENDER');
 
-      Ember.$('.ember-google-map').css({
+      let map = new window.google.maps.Map(document.getElementById("map"), {
+        center: { lat: 13.7563, lng:  100.5018},
+        zoom: 10,
+      });
+
+      loadMerchants(map)
+
+      Ember.$('.map').css({
         position: 'fixed',
         top: '50px',
         bottom: '0px',
@@ -326,3 +333,196 @@ export default Ember.Route.extend({
     });      
   }
 });
+
+function loadMerchants(map) {
+
+  let frequencyIcons = {
+
+    'one-week': '/google-map-marker-512-green.png',
+
+    'one-month': '/google-map-marker-yellow.png',
+
+    'three-months': '/google-map-marker-512.png',
+
+    'inactive': '/google-map-marker-512-grey.png',
+
+    'bitcoincom': '/bitcoincomlogo.png'
+
+  };
+
+  var activeMerchants;
+
+  $.ajax({
+
+    method: 'GET',
+
+    url: 'https://api.anypay.global/active-merchants'
+
+  })
+  .then(function(resp) {
+    console.log("ACTIVE MERCHANTS", resp)
+
+    activeMerchants = resp;
+
+    return $.ajax({
+
+      method: 'GET',
+
+      url: 'https://api.anypay.global/active-merchant-coins'
+
+    })
+
+  })
+  .then(function(resp) {
+
+    console.log("RESP", resp);
+
+    var coinsByMerchant = resp.reduce((merchantCoins, merchantCoin) => {
+
+      if (!merchantCoins[merchantCoin.id]) {
+
+        merchantCoins[merchantCoin.id] = [];
+
+      }
+
+      merchantCoins[merchantCoin.id].push(merchantCoin.currency);
+
+      return merchantCoins;
+
+    });
+
+    console.log("COINS", resp);
+
+    let oneWeekMerchants = activeMerchants.oneWeek.reduce((sum, i) => {
+
+      sum[i.id] = true;
+
+      return sum;
+
+    }, {});
+
+    console.log('one week', oneWeekMerchants)
+
+    let oneMonthMerchants = activeMerchants.oneMonth.reduce((map, i) => {
+
+      map[i.id] = true;
+
+      return map;
+
+    }, {});
+
+    let threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
+
+      map[i.id] = true;
+
+      return map;
+
+    }, {});
+
+    let inactiveMerchants = activeMerchants.merchants.reduce((map, i) => {
+
+      map[i.id] = true;
+
+      return map;
+
+    }, {});
+
+    var source   = document.getElementById("merchant-popup-template").innerHTML;
+    var template = Handlebars.compile(source);
+
+    console.log('template', template)
+
+    var currentlyOpenInfowindow;
+
+    activeMerchants.merchants.forEach(merchant => {
+      console.log('merchant', merchant)
+
+      let markerOpts = {
+
+        position: {
+
+          lat: parseFloat(merchant.latitude),
+
+          lng: parseFloat(merchant.longitude)
+
+        },
+
+        map,
+
+      };
+
+      if (threeMonthsMerchants[merchant.id]) {
+
+        markerOpts.icon = frequencyIcons['three-months'];
+
+      }
+
+      if (oneMonthMerchants[merchant.id]) {
+
+        markerOpts.icon = frequencyIcons['one-month'];
+
+      }
+
+      if (oneWeekMerchants[merchant.id]) {
+
+        markerOpts.icon = frequencyIcons['one-week'];
+
+      }
+
+      if (inactiveMerchants[merchant.id]) {
+
+        markerOpts.icon = frequencyIcons['one-week'];
+
+      }
+
+      if (!markerOpts.icon) {
+
+        return
+
+
+      }
+
+      var marker = new google.maps.Marker(markerOpts);
+
+      let content = template({
+        business_name: merchant.business_name,
+        physical_address: merchant.physical_address,
+        coins_accepted: ['BCH', 'BTC', 'DASH'].join(', ')
+      });
+
+      merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
+
+      if (!merchant.image_url) {
+        merchant.image_url = 'https://anypayinc.com/wp-content/uploads/2020/03/anypayPortrait_2048dark.png'
+      }
+
+      var infowindow = new google.maps.InfoWindow({
+        maxWidth: 500,
+        height: 300,
+        content: `
+          <h1>${merchant.business_name}</h1>
+          <h2>${merchant.physical_address}</h2>
+          <div style='position:relative'>
+            <img src='${merchant.image_url}' style='width: 100%; height: 100%'>
+            <h3>Coins accepted: ${merchant.coins_accepted}</h3>
+          </div>
+        `
+      });
+
+      marker.addListener('click', function() {
+
+        if (currentlyOpenInfowindow) {
+          currentlyOpenInfowindow.close();
+        }
+
+        infowindow.open(map, marker);
+
+        currentlyOpenInfowindow = infowindow;
+      });
+
+    });
+
+  });
+
+
+}
