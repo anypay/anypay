@@ -340,3 +340,66 @@ iframe {
 .container {
   max-width: 400px;
 }
+
+.map-container {
+  display: flex;
+  flex-direction: row;
+  position: fixed;
+  top:55px;
+  left:0px;
+  right:0px;
+  bottom:0px;
+  width:100%;
+}
+
+.map {
+  height: 100%;
+  width: 67vw;
+}
+
+.map-location-chosen {
+  width: 33vw; 
+  height: 100vh;
+  border-left:2px solid #fff2af;
+  overflow-y: scroll;
+}
+
+.map-merchant-list {
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-merchant-details {
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+}
+
+.merchant-name {
+  width: 67%;
+}
+
+.merchant-name h2 {
+  text-align: left;
+  font-weight: bold;
+  font-size: 150%;
+  border: 0px;
+}
+
+.merchant-name p {
+  text-align: left;
+  font-size: 100%;
+}
+
+.merchant-image {
+  width: 33%;
+}
+
+.map-merchant-details img {
+  max-width: 100%;
+  border: 1px solid #aaa;
+  height: 180px;
+
+}
+

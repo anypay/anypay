@@ -52,7 +52,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/map.js should pass ESLint\n\n8:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'controllers/map.js should pass ESLint\n\n9:7 - Unexpected console statement. (no-console)\n11:7 - Unexpected console statement. (no-console)\n22:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('controllers/moneybutton-auth-redirect.js', function (assert) {
@@ -127,7 +127,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n41:5 - Unexpected console statement. (no-console)\n310:5 - Unexpected console statement. (no-console)\n317:7 - Unexpected console statement. (no-console)\n355:3 - \'$\' is not defined. (no-undef)\n363:5 - Unexpected console statement. (no-console)\n367:12 - \'$\' is not defined. (no-undef)\n378:5 - Unexpected console statement. (no-console)\n394:5 - Unexpected console statement. (no-console)\n404:5 - Unexpected console statement. (no-console)\n431:20 - \'Handlebars\' is not defined. (no-undef)\n433:5 - Unexpected console statement. (no-console)\n484:24 - \'google\' is not defined. (no-undef)\n486:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n498:28 - \'google\' is not defined. (no-undef)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n320:5 - Unexpected console statement. (no-console)\n327:7 - Unexpected console statement. (no-console)\n368:3 - \'$\' is not defined. (no-undef)\n376:5 - Unexpected console statement. (no-console)\n380:12 - \'$\' is not defined. (no-undef)\n391:5 - Unexpected console statement. (no-console)\n407:5 - Unexpected console statement. (no-console)\n417:5 - Unexpected console statement. (no-console)\n444:20 - \'Handlebars\' is not defined. (no-undef)\n446:5 - Unexpected console statement. (no-console)\n497:24 - \'google\' is not defined. (no-undef)\n499:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n511:28 - \'google\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {

@@ -3,10 +3,21 @@
 <script id="merchant-popup-template" type="text/x-handlebars-template">
 </script>
 
-<div class="container">
+<div class="map-container">
+  <div id='map' class='map'>
+  </div>
   <div class='map-location-chosen'>
     <h1>{{location}}</h1>
-  </div>
-  <div id='map' class='map'>
+    <ul class='map-merchant-list'>
+    {{#each merchants as |merchant|}}
+      <li {{action 'merchantDetailsClicked' merchant}} class='map-merchant-details'>
+        <div class='merchant-name'>
+          <h2>{{merchant.business_name}}</h2>
+          <p>{{merchant.physical_address}}</p>
+        </div>
+        <img class='merchant-image' src={{merchant.image_url}}>
+      </li>
+    {{/each}}
+    </ul>
   </div>
 </div>

@@ -5,6 +5,7 @@ export default Ember.Route.extend({
     didTransition: function() {
       console.log('DID TRANSITION');
 
+      /*
       Ember.$('.ember-google-map').css({
         position: 'fixed',
         top: '50px',
@@ -12,6 +13,7 @@ export default Ember.Route.extend({
         left: '0px',
         right: '0px'
       });
+      */
     }
   },
 
@@ -306,30 +308,41 @@ export default Ember.Route.extend({
     ]
     )
 
-    controller.set('merchants', model.merchants);
+    controller.set('merchants', model.merchants.map(merchant => {
+
+      if (!merchant.image_url) {
+        merchant.image_url = 'https://lunawood.com/wp-content/uploads/2018/02/placeholder-image.png'
+      }
+
+      return merchant
+       
+    }));
     console.log('SETUP CONTROLLER');
     setTimeout(() => {
 
-      Ember.$('.map').css('position', 'fixed');
+      //Ember.$('.map').css('position', 'fixed');
     }, 1000);
 
     Ember.run.scheduleOnce('afterRender', this, function() {                                                                  
       console.log('AFTER RENDER');
 
       let map = new window.google.maps.Map(document.getElementById("map"), {
-        center: { lat: 13.7563, lng:  100.5018},
-        zoom: 10,
+        center: { lat: 13.737275, lng: 100.560145},
+        zoom: 14,
       });
+
+      controller.set('googlemap', map)
 
       loadMerchants(map)
 
-      Ember.$('.map').css({
+      /*Ember.$('.map').css({
         position: 'fixed',
         top: '50px',
         bottom: '0px',
         left: '0px',
         right: '0px'
       });
+      */
     });      
   }
 });

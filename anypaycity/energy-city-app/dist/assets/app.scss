@@ -360,46 +360,14 @@ iframe {
 .map-location-chosen {
   width: 33vw; 
   height: 100vh;
+  background-color: #f1efe9;
   border-left:2px solid #fff2af;
-  overflow-y: scroll;
-}
-
-.map-merchant-list {
-  overflow-y: scroll;
-  display: flex;
-  flex-direction: column;
 }
 
 .map-merchant-details {
   padding: 1em;
   display: flex;
   flex-direction: row;
+  overflow-y: scroll;
+  width: 100px;
 }
-
-.merchant-name {
-  width: 67%;
-}
-
-.merchant-name h2 {
-  text-align: left;
-  font-weight: bold;
-  font-size: 150%;
-  border: 0px;
-}
-
-.merchant-name p {
-  text-align: left;
-  font-size: 100%;
-}
-
-.merchant-image {
-  width: 33%;
-}
-
-.map-merchant-details img {
-  max-width: 100%;
-  border: 1px solid #aaa;
-  height: 180px;
-
-}
-
