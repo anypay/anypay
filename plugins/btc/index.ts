@@ -8,7 +8,7 @@ import {Invoice} from '../../types/interfaces';
 
 import {statsd} from '../../lib/stats/statsd' 
 
-import { publishBTC } from '../../lib/blockcypher'
+import { publishBTC } from '../../lib/blockchair'
 
 import {models} from '../../lib/models';
 
