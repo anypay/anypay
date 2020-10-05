@@ -6,6 +6,8 @@ import {emitter} from '../../../lib/events'
 
 import { models, accounts, slack, log, utils } from '../../../lib';
 
+import { near } from '../../../lib/accounts'
+
 import { getROI } from '../../../lib/roi';
 
 function hash(password) {
@@ -16,6 +18,22 @@ function hash(password) {
         resolve(hash);
     })
   });
+}
+
+function sanitize(account) {
+  let json = account.toJSON()
+  delete json['authenticator_secret']
+  delete json['password_hash']
+  delete json['is_admin']
+}
+
+export async function nearby(req, h) {
+
+  let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
+
+  return { accounts }
+
+
 }
 
 export async function update(req, h) {
