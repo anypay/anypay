@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 import { models } from '../models';
 import { awaitChannel } from '../amqp';
 import { log } from '../logger';
+import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
@@ -10,6 +11,37 @@ import {emitter} from '../events'
 import {AccountAddress} from '../core/types';
 
 import * as geocoder from '../googlemaps';
+
+export async function near(latitude, longitude, limit=100) {
+let query = `SELECT *,
+	ST_Distance(
+    position,
+    'SRID=4326;POINT(${parseFloat(longitude)} ${parseFloat(latitude)})'::geometry
+    ) AS distance
+    from accounts where position is not null order by distance limit ${limit};`
+
+    console.log(query)
+
+  let result = await database.query(query)
+
+  return result[0]
+}
+
+export async function setPositionFromLatLng(account) {
+
+  let point = {
+    type: 'Point',
+    coordinates: [account.longitude, account.latitude],
+    crs: { type: 'name', properties: { name: 'EPSG:4326'} }
+  }
+
+  account.position = point
+
+  await account.save()
+
+  return models.Account.findOne({ where: { id: account.id }})
+
+}
 
 export async function findByEmail(email) {
 
