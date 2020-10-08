@@ -81,7 +81,7 @@ export async function show(req: Request, h: ResponseToolkit) {
 
 export async function update(req: Request, h: ResponseToolkit) {
 
-  log.info('ach.update', req.payload) 
+  log.info(Object.assign({ action: 'ach.update' }, req.payload)) 
 
   try {
 
@@ -127,7 +127,9 @@ export async function update(req: Request, h: ResponseToolkit) {
 
     sendAchReport(req.params.id);
 
-    return { ach: updatedRecord };
+    let ach_batch = await models.AchBatch.findOne({ where: { id: req.params.id }})
+
+    return { ach_batch };
 
   } catch(error) {
 
