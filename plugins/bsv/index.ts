@@ -132,7 +132,7 @@ export async function transformAddress(alias: string){
 
     }
 
-    console.log('ALIAS', alias);
+    alias = alias.split('?')[0];
 
     return (await polynym.resolveAddress(alias)).address;
 
