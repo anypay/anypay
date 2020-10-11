@@ -141,8 +141,44 @@ export async function buildPaymentRequest(paymentOption) {
   paypro.set('pki_data', certificates.serialize());
 
   paypro.sign(file_with_x509_private_key);
+  */
 
   return paypro;
+
+}
+
+export function paymentRequestToJSON(hex, currency) {
+
+  let bitcore = getBitcore(currency)
+
+  let paymentRequest = PaymentProtocol.PaymentRequest.decodeHex(hex);
+
+  console.log(paymentRequest)
+
+  let details = PaymentProtocol.PaymentDetails.decode(paymentRequest.get('serialized_payment_details'))
+
+  console.log(details)
+
+  for (let output of details.outputs) {
+    console.log('script hex', output.script.toString('hex'))
+
+    console.log('output', )
+
+  }
+
+  let decoded = {
+    PaymentRequest: paymentRequest,
+    PaymentDetails: details,
+    outputs: details.outputs.map(output => {
+      return {
+        address: new bitcore.Address(new bitcore.Script(output.script.toString('hex'))).toString(),
+        amount: parseInt(output.amount)
+      }
+    }),
+    merchant_data: details.merchant_data.buffer.toString()
+  }
+
+  return decoded
 
 }
 

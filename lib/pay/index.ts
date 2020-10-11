@@ -23,7 +23,7 @@ import * as jsonV2 from './json_v2';
 
 import * as fees from './fees';
 
-export { fees }
+export { fees, bip70, bip270, jsonV2 }
 
 
 interface PaymentRequestForInvoice {
