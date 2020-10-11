@@ -29,6 +29,32 @@ export async function show(req, h) {
 
     log.info(`bip70.${currency.code.toLowerCase()}.paymentrequest.content`)
 
+    let hex = paymentRequest.content.serialize().toString('hex')
+
+    models.Bip70PaymentRequest.findOrCreate({
+      where: {
+        invoice_uid: req.params.uid,
+        currency: currency.code
+      },
+      defaults: {
+        invoice_uid: req.params.uid,
+        currency: currency.code,
+        hex
+      }
+    })
+    .then(([record, isNew]) => {
+
+      if (isNew) {
+        log.info({
+          event: 'paymentrequest.recorded',
+          payload: record.toJSON()
+        })
+      }
+    })
+    .catch(error => {
+      log.info('error recording paymentrequest', error.message)
+    })
+
     let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(paymentRequest.content))).toString('hex');
     var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
     var signature = Message(digest).sign(privateKey);

@@ -651,6 +651,22 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/invoices/{uid}/bip70/{currency}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PaymentRequests.show
+
+    }
+
+  });
+
 
   server.route({
 

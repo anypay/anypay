@@ -35,6 +35,7 @@ import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
+import * as pay from './pay';
 
 var initialized = false;
 
@@ -70,6 +71,7 @@ export {
   models,
   mysql_lib,
   password,
+  pay,
   plugins,
   prices,
   receipts,
