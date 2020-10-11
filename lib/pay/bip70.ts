@@ -141,6 +141,7 @@ export async function buildPaymentRequest(paymentOption) {
   paypro.set('pki_data', certificates.serialize());
 
   paypro.sign(file_with_x509_private_key);
+  */
 
   return paypro;
 
