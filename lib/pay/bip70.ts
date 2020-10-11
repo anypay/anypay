@@ -76,8 +76,33 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
   return payment_option.outputs.map(o => {
 
     var output = new PaymentProtocol.Output();
-    const script = bitcore.Script.buildPublicKeyHashOut(o.address)
-    
+    var script
+    console.log('ADDRESS', o.address)
+
+    if (o.address.match(/^1/)) {
+
+      script = bitcore.Script.buildPublicKeyHashOut(o.address)
+
+    } else if (o.address.match(/^3/)){
+      try {
+
+        script = bitcore.Script.buildScriptHashOut(new bitcore.Address(o.address))
+
+        console.log(script.toBuffer().toString('hex'))
+
+      } catch(error) {
+
+        console.log('error', error)
+      }
+
+    } else {
+
+      console.log('segwit-style addresses not yet supported')
+
+      throw new Error('segwit-style addresses not yet supported')
+
+    }
+
     output.$set('amount', o.amount);
     output.$set('script', script.toBuffer());
 
@@ -121,26 +146,38 @@ export async function buildPaymentRequest(paymentOption) {
 
   paypro.set('serialized_payment_details', pd.toBuffer());
 
-  let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
-  let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
-  let keyPath = process.env.X509_PRIVATE_KEY_PATH;
+  console.log('node env', process.env.NODE_ENV)
 
-  const file_with_x509_private_key = fs.readFileSync(keyPath);
+  if (process.env.NODE_ENV !== 'development') {
 
-  const certificates = new PaymentProtocol().makeX509Certificates();
+    console.log('NOT DEVELOPMENT')
 
-  certificates.set('certificate', [
-    fs.readFileSync(domainDerPath),
-    fs.readFileSync(rootDerPath)
-  ]);
+    let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
+    let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
+    let keyPath = process.env.X509_PRIVATE_KEY_PATH;
 
-  paypro.set('payment_details_version', 1);
+    const file_with_x509_private_key = fs.readFileSync(keyPath);
 
-  paypro.set('pki_type', 'x509+sha256');
+    const certificates = new PaymentProtocol().makeX509Certificates();
 
-  paypro.set('pki_data', certificates.serialize());
+    certificates.set('certificate', [
+      fs.readFileSync(domainDerPath),
+      fs.readFileSync(rootDerPath)
+    ]);
 
-  paypro.sign(file_with_x509_private_key);
+    paypro.set('payment_details_version', 1);
+
+    paypro.set('pki_type', 'x509+sha256');
+
+    paypro.set('pki_data', certificates.serialize());
+
+    paypro.sign(file_with_x509_private_key);
+
+  } else {
+    console.log('YES DEVELOPMENT')
+  }
+
+  console.log("PAYPRO", paypro)
 
   return paypro;
 
