@@ -127,7 +127,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n320:5 - Unexpected console statement. (no-console)\n327:7 - Unexpected console statement. (no-console)\n368:3 - \'$\' is not defined. (no-undef)\n376:5 - Unexpected console statement. (no-console)\n380:12 - \'$\' is not defined. (no-undef)\n391:5 - Unexpected console statement. (no-console)\n407:5 - Unexpected console statement. (no-console)\n417:5 - Unexpected console statement. (no-console)\n444:20 - \'Handlebars\' is not defined. (no-undef)\n446:5 - Unexpected console statement. (no-console)\n497:24 - \'google\' is not defined. (no-undef)\n499:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n511:28 - \'google\' is not defined. (no-undef)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n19:7 - Unexpected console statement. (no-console)\n47:5 - Unexpected console statement. (no-console)\n65:5 - Unexpected console statement. (no-console)\n342:5 - Unexpected console statement. (no-console)\n349:7 - Unexpected console statement. (no-console)\n357:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n359:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n376:13 - Unexpected console statement. (no-console)\n377:13 - Unexpected console statement. (no-console)\n381:13 - Unexpected console statement. (no-console)\n433:5 - Unexpected console statement. (no-console)\n448:5 - Unexpected console statement. (no-console)\n464:5 - Unexpected console statement. (no-console)\n474:5 - Unexpected console statement. (no-console)\n501:20 - \'Handlebars\' is not defined. (no-undef)\n503:5 - Unexpected console statement. (no-console)\n505:9 - \'currentlyOpenInfowindow\' is defined but never used. (no-unused-vars)\n554:24 - \'google\' is not defined. (no-undef)\n556:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n568:11 - \'infowindow\' is assigned a value but never used. (no-unused-vars)\n568:28 - \'google\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
@@ -148,6 +148,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('services/cities.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'services/cities.js should pass ESLint\n\n66:5 - Unexpected console statement. (no-console)');
+  });
+
+  QUnit.test('services/city-service.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'services/city-service.js should pass ESLint\n\n');
   });
 
   QUnit.test('services/geolocation.js', function (assert) {
@@ -427,6 +432,11 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/services/cities-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/services/city-service-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/services/city-service-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/services/geolocation-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/services/geolocation-test.js should pass ESLint\n\n');
@@ -661,6 +671,20 @@ define('energy-city-app/tests/unit/services/cities-test', ['ember-qunit'], funct
   'use strict';
 
   (0, _emberQunit.moduleFor)('service:cities', 'Unit | Service | cities', {
+    // Specify the other units that are required for this test.
+    // needs: ['service:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var service = this.subject();
+    assert.ok(service);
+  });
+});
+define('energy-city-app/tests/unit/services/city-service-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('service:city-service', 'Unit | Service | city service', {
     // Specify the other units that are required for this test.
     // needs: ['service:foo']
   });

@@ -1,4 +1,17 @@
 import Ember from 'ember';
+import $ from 'jquery'
+
+async function getNearbyAccounts(lat, lng) {
+  $('#loader-wrapper').show()
+
+  let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
+  $('#loader-wrapper').hide()
+
+  return accounts
+
+}
+
+var controller
 
 export default Ember.Route.extend({
   actions: {
@@ -23,7 +36,16 @@ export default Ember.Route.extend({
 
   },
 
-  setupController(controller, model) {
+  async setupController(ctrl, model) {
+
+    controller = ctrl
+
+    let lat = 13.737275, lng =100.560145
+
+    let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
+
+    console.log('search result', accounts)
+
     let frequencyIcons = {
 
       'one-week': '/google-map-marker-512-green.png',
@@ -308,7 +330,7 @@ export default Ember.Route.extend({
     ]
     )
 
-    controller.set('merchants', model.merchants.map(merchant => {
+    controller.set('merchants', accounts.map(merchant => {
 
       if (!merchant.image_url) {
         merchant.image_url = 'https://lunawood.com/wp-content/uploads/2018/02/placeholder-image.png'
@@ -327,9 +349,44 @@ export default Ember.Route.extend({
       console.log('AFTER RENDER');
 
       let map = new window.google.maps.Map(document.getElementById("map"), {
-        center: { lat: 13.737275, lng: 100.560145},
+        center: { lat: 13.737275, lng: 100.560145}, // bangkok
+        //center: { lat: 37.7749, lng: -122.4194}, // san francisco
         zoom: 14,
       });
+
+      var centerChanged = (() => {
+
+        var lastChangedAt;
+        
+        return function() {
+
+        }
+
+      })()
+
+      map.addListener('center_changed', () => {
+
+        var center = map.getCenter()
+
+        setTimeout(async () => {
+
+          let newCenter = map.getCenter()
+
+          if (center.lat() === newCenter.lat() && center.lng() === newCenter.lng()) {
+            console.log('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() })
+            console.log('latlng', newCenter.toJSON())
+
+            let accounts = await getNearbyAccounts(newCenter.lat(), newCenter.lng())
+
+            console.log('accounts', accounts)
+
+            controller.set('merchants', accounts)
+  
+          }
+
+        }, 100)
+
+      })
 
       controller.set('googlemap', map)
 
@@ -523,6 +580,9 @@ function loadMerchants(map) {
 
       marker.addListener('click', function() {
 
+        controller.send('merchantDetailsClicked', merchant)
+
+        /*
         if (currentlyOpenInfowindow) {
           currentlyOpenInfowindow.close();
         }
@@ -530,6 +590,7 @@ function loadMerchants(map) {
         infowindow.open(map, marker);
 
         currentlyOpenInfowindow = infowindow;
+        */
       });
 
     });
