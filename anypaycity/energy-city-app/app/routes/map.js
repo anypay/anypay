@@ -30,17 +30,27 @@ export default Ember.Route.extend({
     }
   },
 
-  model() {
+  model(params) {
+    var model = {}
 
-    return Ember.$.getJSON('https://api.anypayinc.com/active-merchants')
+    model['lat'] = parseFloat(params['lat'])
+    model['lng'] = parseFloat(params['lng'])
+
+    console.log("PARSE", parseFloat(params['lng']))
+
+    return model
 
   },
 
   async setupController(ctrl, model) {
 
+    model['lat'] = parseFloat(model['lat'])
+    model['lng'] = parseFloat(model['lng'])
+
     controller = ctrl
 
-    let lat = 13.737275, lng =100.560145
+    var lat = model.lat || 13.737275
+    var lng = model.lng || 100.560145
 
     let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
 
@@ -61,8 +71,6 @@ export default Ember.Route.extend({
     };
 
     controller.set('icons', frequencyIcons)
-
-    console.log('model', model);
 
     controller.set('mapStyles', [
         {
@@ -333,7 +341,7 @@ export default Ember.Route.extend({
     controller.set('merchants', accounts.map(merchant => {
 
       if (!merchant.image_url) {
-        merchant.image_url = 'https://lunawood.com/wp-content/uploads/2018/02/placeholder-image.png'
+        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
       }
 
       return merchant
@@ -349,9 +357,11 @@ export default Ember.Route.extend({
       console.log('AFTER RENDER');
 
       let map = new window.google.maps.Map(document.getElementById("map"), {
-        center: { lat: 13.737275, lng: 100.560145}, // bangkok
-        //center: { lat: 37.7749, lng: -122.4194}, // san francisco
-        zoom: 14,
+        center: { lat: model.lat, lng: model.lng },
+        fullscreenControl: false,
+        mapTypeControl: false,
+        streetViewControl: false,
+        zoom: 12,
       });
 
       var centerChanged = (() => {
@@ -380,7 +390,15 @@ export default Ember.Route.extend({
 
             console.log('accounts', accounts)
 
-            controller.set('merchants', accounts)
+            controller.set('merchants', accounts.map(merchant => {
+
+              if (!merchant.image_url) {
+                merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
+              }
+
+              return merchant
+            
+            }))
   
           }
 
@@ -562,7 +580,7 @@ function loadMerchants(map) {
       merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
 
       if (!merchant.image_url) {
-        merchant.image_url = 'https://anypayinc.com/wp-content/uploads/2020/03/anypayPortrait_2048dark.png'
+        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
       }
 
       var infowindow = new google.maps.InfoWindow({

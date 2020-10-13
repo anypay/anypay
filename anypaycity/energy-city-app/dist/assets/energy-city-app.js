@@ -3215,7 +3215,7 @@ define('energy-city-app/router', ['exports', 'energy-city-app/config/environment
     this.route('index');
     this.route('leaderboard');
     this.route('invoice', { path: '/invoice/:uid' });
-    this.route('map');
+    this.route('map', { path: '/map/:lat/:lng' });
   });
 
   exports.default = Router;
@@ -3253,6 +3253,11 @@ define('energy-city-app/routes/application', ['exports', 'ember-simple-auth/mixi
 
     setupController: function setupController(controller) {
       var _this = this;
+
+      controller.set('defaultCoordinates', {
+        lat: 13.737275,
+        lng: 100.560145
+      });
 
       var socket = this.get("socketIOService").socketFor('wss://anypay.city');
 
@@ -3906,9 +3911,15 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             }
         },
 
-        model: function model() {
+        model: function model(params) {
+            var model = {};
 
-            return Ember.$.getJSON('https://api.anypayinc.com/active-merchants');
+            model['lat'] = parseFloat(params['lat']);
+            model['lng'] = parseFloat(params['lng']);
+
+            console.log("PARSE", parseFloat(params['lng']));
+
+            return model;
         },
         setupController: function () {
             var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(ctrl, model) {
@@ -3919,13 +3930,17 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
 
+                                model['lat'] = parseFloat(model['lat']);
+                                model['lng'] = parseFloat(model['lng']);
+
                                 controller = ctrl;
 
-                                lat = 13.737275, lng = 100.560145;
-                                _context3.next = 4;
+                                lat = model.lat || 13.737275;
+                                lng = model.lng || 100.560145;
+                                _context3.next = 7;
                                 return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
 
-                            case 4:
+                            case 7:
                                 _ref4 = _context3.sent;
                                 accounts = _ref4.accounts;
 
@@ -3948,8 +3963,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
 
                                 controller.set('icons', frequencyIcons);
-
-                                console.log('model', model);
 
                                 controller.set('mapStyles', [{
                                     "featureType": "all",
@@ -4131,7 +4144,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 controller.set('merchants', accounts.map(function (merchant) {
 
                                     if (!merchant.image_url) {
-                                        merchant.image_url = 'https://lunawood.com/wp-content/uploads/2018/02/placeholder-image.png';
+                                        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
                                     }
 
                                     return merchant;
@@ -4148,9 +4161,11 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     console.log('AFTER RENDER');
 
                                     var map = new window.google.maps.Map(document.getElementById("map"), {
-                                        center: { lat: 13.737275, lng: 100.560145 }, // bangkok
-                                        //center: { lat: 37.7749, lng: -122.4194}, // san francisco
-                                        zoom: 14
+                                        center: { lat: model.lat, lng: model.lng },
+                                        fullscreenControl: false,
+                                        mapTypeControl: false,
+                                        streetViewControl: false,
+                                        zoom: 12
                                     });
 
                                     var centerChanged = function () {
@@ -4190,7 +4205,14 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
                                                             console.log('accounts', _accounts);
 
-                                                            controller.set('merchants', _accounts);
+                                                            controller.set('merchants', _accounts.map(function (merchant) {
+
+                                                                if (!merchant.image_url) {
+                                                                    merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
+                                                                }
+
+                                                                return merchant;
+                                                            }));
 
                                                         case 9:
                                                         case 'end':
@@ -4215,7 +4237,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     */
                                 });
 
-                            case 15:
+                            case 17:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -4375,7 +4397,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
 
                 if (!merchant.image_url) {
-                    merchant.image_url = 'https://anypayinc.com/wp-content/uploads/2020/03/anypayPortrait_2048dark.png';
+                    merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
                 }
 
                 var infowindow = new google.maps.InfoWindow({
@@ -5237,7 +5259,7 @@ define("energy-city-app/templates/application", ["exports"], function (exports) 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "/zBkaCh+", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: black;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"payments\"],null,{\"statements\":[[0,\"          \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/anypay_circle.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/anypay_circle.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"Anypay City\"]],\"parameters\":[]},null],[8],[0,\"\\n\\n\"],[0,\"\\n    \"],[8],[0,\"\\n\"],[4,\"link-to\",[\"map\"],null,{\"statements\":[[0,\"      \"],[6,\"img\"],[9,\"class\",\"float-right map-icon\"],[9,\"src\",\"/map_icon.svg\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"id\",\"loader-wrapper\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loader\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "UteV0YWY", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: black;\"],[7],[0,\"\\n\\n  \"],[6,\"div\"],[9,\"class\",\"container\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"class\",\"float-left\"],[7],[0,\"\\n\"],[4,\"if\",[[19,0,[\"session\",\"isAuthenticated\"]]],null,{\"statements\":[[4,\"link-to\",[\"payments\"],null,{\"statements\":[[0,\"          \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/anypay_circle.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null]],\"parameters\":[]},{\"statements\":[[0,\"        \"],[6,\"img\"],[9,\"class\",\"float-left logo\"],[9,\"src\",\"/anypay_circle.png\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]}],[0,\"      \"],[6,\"h1\"],[9,\"class\",\"float-left\"],[7],[4,\"link-to\",[\"cities\"],null,{\"statements\":[[0,\"Anypay City\"]],\"parameters\":[]},null],[8],[0,\"\\n\\n\"],[0,\"\\n    \"],[8],[0,\"\\n\"],[4,\"link-to\",[\"map\",[19,0,[\"defaultCoordinates\"]]],null,{\"statements\":[[0,\"      \"],[6,\"img\"],[9,\"class\",\"float-right map-icon\"],[9,\"src\",\"/map_icon.svg\"],[7],[8],[0,\"\\n\"]],\"parameters\":[]},null],[0,\"  \"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"id\",\"loader-wrapper\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loader\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
 });
 define("energy-city-app/templates/business", ["exports"], function (exports) {
   "use strict";
@@ -5444,6 +5466,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+6b8c42d5"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+629584ee"});
 }
 //# sourceMappingURL=energy-city-app.map

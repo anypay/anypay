@@ -341,33 +341,63 @@ iframe {
   max-width: 400px;
 }
 
-.map-container {
-  display: flex;
-  flex-direction: row;
-  position: fixed;
-  top:55px;
-  left:0px;
-  right:0px;
-  bottom:0px;
-  width:100%;
-}
+/* Portrait */
+@media only screen
+  and (max-device-width: 480px)
+  and (orientation: portrait) {
 
-.map {
-  height: 100%;
-  width: 67vw;
-}
+  .map-container {
+    display: flex;
+    flex-direction: column;
+    top:55px;
+  }
 
-.map-location-chosen {
-  width: 33vw; 
-  height: 100vh;
-  background-color: #f1efe9;
-  border-left:2px solid #fff2af;
-}
+  .map {
+    width: 100vw;
+    display: hidden;
+  }
 
+  .map-location-chosen {
+    width: 100vw; 
+    background-color: #f1efe9;
+    border-left:2px solid #fff2af;
+  }
+
+}
 .map-merchant-details {
   padding: 1em;
   display: flex;
   flex-direction: row;
   overflow-y: scroll;
   width: 100px;
+}
+
+@media only screen
+  and (min-device-width: 480px)
+  and (orientation: portrait) {
+
+
+  .map-container {
+    display: flex;
+    flex-direction: row;
+    position: fixed;
+    top:55px;
+    left:0px;
+    right:0px;
+    bottom:0px;
+    width:100%;
+  }
+
+  .map {
+    height: 100%;
+    width: 67vw;
+  }
+
+  .map-location-chosen {
+    width: 33vw; 
+    height: 100vh;
+    background-color: #f1efe9;
+    border-left:2px solid #fff2af;
+  }
+
 }
