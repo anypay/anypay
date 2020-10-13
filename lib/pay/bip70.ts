@@ -97,9 +97,7 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
     } else {
 
-      console.log('segwit-style addresses not yet supported')
-
-      throw new Error('segwit-style addresses not yet supported')
+      script = bitcore.Script.buildPublicKeyHashOut(o.address)
 
     }
 
