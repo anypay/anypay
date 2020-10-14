@@ -18,7 +18,7 @@ Router.map(function() {
   this.route('index');
   this.route('leaderboard');
   this.route('invoice', { path: '/invoice/:uid' });
-  this.route('map');
+  this.route('map', { path: '/map/:lat/:lng' });
 });
 
 export default Router;

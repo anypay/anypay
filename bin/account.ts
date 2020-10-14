@@ -3,12 +3,60 @@
 require('dotenv').config();
 
 import { models, log, accounts } from '../lib';
+import { Op } from 'sequelize'
 import { emitter } from '../lib/events';
-import { getSupportedCoins } from '../lib/accounts';
-import { registerAccount } from '../lib/accounts';
+import { getSupportedCoins, near } from '../lib/accounts';
+import { registerAccount, setPositionFromLatLng } from '../lib/accounts';
 import { setAddress } from '../lib/core';
 
 var program = require("commander");
+
+program
+  .command('near [limit]')
+  .action(async (limit=25) => {
+
+    let latitude = 43.0718 
+    let longitude = -70.7626
+
+    try {
+
+      let accounts = await near(latitude, longitude, limit)
+
+      for (let account of accounts) {
+        console.log(account.email, account.business_name)
+      }
+    } catch(error) {
+
+      console.log(error) 
+    }
+
+
+    process.exit(0)
+  
+  })
+
+
+program
+  .command('setpositions')
+  .action(async () => {
+
+    let accounts = await models.Account.findAll({ where: {
+      latitude: {
+        [Op.ne]: null
+      }
+    }})
+
+    for (let account of accounts) {
+
+      let result = await setPositionFromLatLng(account)
+
+      console.log(result)
+
+    }
+
+    process.exit(0)
+
+  })
 
 program
   .command('listcoins <email>')

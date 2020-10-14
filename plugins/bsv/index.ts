@@ -35,6 +35,10 @@ export async function broadcastTx(hex) {
 
       return result
 
+    } else if (result.resultDescription.match('Transaction already in the mempool')) {
+
+      return result
+
     } else {
 
       throw new Error(result.resultDescription)
@@ -128,7 +132,7 @@ export async function transformAddress(alias: string){
 
     }
 
-    console.log('ALIAS', alias);
+    alias = alias.split('?')[0];
 
     return (await polynym.resolveAddress(alias)).address;
 

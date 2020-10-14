@@ -50,6 +50,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
     assert.ok(true, 'controllers/leaderboard.js should pass ESLint\n\n');
   });
 
+  QUnit.test('controllers/map.js', function (assert) {
+    assert.expect(1);
+    assert.ok(false, 'controllers/map.js should pass ESLint\n\n9:7 - Unexpected console statement. (no-console)\n11:7 - Unexpected console statement. (no-console)\n22:7 - Unexpected console statement. (no-console)');
+  });
+
   QUnit.test('controllers/moneybutton-auth-redirect.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'controllers/moneybutton-auth-redirect.js should pass ESLint\n\n');
@@ -77,7 +82,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/application.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n23:7 - Unexpected console statement. (no-console)\n28:7 - Unexpected console statement. (no-console)\n47:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/application.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n23:7 - Unexpected console statement. (no-console)\n28:7 - Unexpected console statement. (no-console)\n52:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/business.js', function (assert) {
@@ -122,7 +127,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n6:7 - Unexpected console statement. (no-console)\n41:5 - Unexpected console statement. (no-console)\n310:5 - Unexpected console statement. (no-console)\n317:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n19:7 - Unexpected console statement. (no-console)\n39:5 - Unexpected console statement. (no-console)\n57:5 - Unexpected console statement. (no-console)\n350:5 - Unexpected console statement. (no-console)\n357:7 - Unexpected console statement. (no-console)\n367:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n369:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n386:13 - Unexpected console statement. (no-console)\n387:13 - Unexpected console statement. (no-console)\n391:13 - Unexpected console statement. (no-console)\n451:5 - Unexpected console statement. (no-console)\n466:5 - Unexpected console statement. (no-console)\n482:5 - Unexpected console statement. (no-console)\n492:5 - Unexpected console statement. (no-console)\n519:20 - \'Handlebars\' is not defined. (no-undef)\n521:5 - Unexpected console statement. (no-console)\n523:9 - \'currentlyOpenInfowindow\' is defined but never used. (no-unused-vars)\n572:24 - \'google\' is not defined. (no-undef)\n574:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n586:11 - \'infowindow\' is assigned a value but never used. (no-unused-vars)\n586:28 - \'google\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
@@ -143,6 +148,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('services/cities.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'services/cities.js should pass ESLint\n\n66:5 - Unexpected console statement. (no-console)');
+  });
+
+  QUnit.test('services/city-service.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'services/city-service.js should pass ESLint\n\n');
   });
 
   QUnit.test('services/geolocation.js', function (assert) {
@@ -347,6 +357,11 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/controllers/business-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/controllers/map-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/controllers/map-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/controllers/moneybutton-auth-redirect-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/controllers/moneybutton-auth-redirect-test.js should pass ESLint\n\n');
@@ -417,6 +432,11 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
     assert.ok(true, 'unit/services/cities-test.js should pass ESLint\n\n');
   });
 
+  QUnit.test('unit/services/city-service-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/services/city-service-test.js should pass ESLint\n\n');
+  });
+
   QUnit.test('unit/services/geolocation-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/services/geolocation-test.js should pass ESLint\n\n');
@@ -440,6 +460,20 @@ define('energy-city-app/tests/unit/controllers/business-test', ['ember-qunit'], 
   'use strict';
 
   (0, _emberQunit.moduleFor)('controller:business', 'Unit | Controller | business', {
+    // Specify the other units that are required for this test.
+    // needs: ['controller:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var controller = this.subject();
+    assert.ok(controller);
+  });
+});
+define('energy-city-app/tests/unit/controllers/map-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('controller:map', 'Unit | Controller | map', {
     // Specify the other units that are required for this test.
     // needs: ['controller:foo']
   });
@@ -637,6 +671,20 @@ define('energy-city-app/tests/unit/services/cities-test', ['ember-qunit'], funct
   'use strict';
 
   (0, _emberQunit.moduleFor)('service:cities', 'Unit | Service | cities', {
+    // Specify the other units that are required for this test.
+    // needs: ['service:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var service = this.subject();
+    assert.ok(service);
+  });
+});
+define('energy-city-app/tests/unit/services/city-service-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('service:city-service', 'Unit | Service | city service', {
     // Specify the other units that are required for this test.
     // needs: ['service:foo']
   });

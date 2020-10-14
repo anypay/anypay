@@ -22,7 +22,7 @@
       --}}
 
     </div>
-    {{#link-to "map"}}
+    {{#link-to "map" defaultCoordinates}}
       <img class='float-right map-icon' src="/map_icon.svg"/>
     {{/link-to}}
   </div>
@@ -30,6 +30,10 @@
 </nav>
 
 <div class='container bodycontainer'>
+
+<div id="loader-wrapper">
+    <div id="loader"></div>
+</div>
 
 <div style='display:none' class="loading"></div>
   {{outlet}}

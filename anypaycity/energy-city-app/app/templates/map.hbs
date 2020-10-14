@@ -1,11 +1,23 @@
 {{outlet}}
 
-<div class="container">
-  <div class='map'>
-    {{#g-map lat="13.7563" lng="100.5018" styles=mapStyles zoom=12 as |g|}}
-      {{#each merchants as |l|}}
-        {{g.marker lat=l.latitude lng=l.longitude }}
-      {{/each}}
-    {{/g-map}}
+<script id="merchant-popup-template" type="text/x-handlebars-template">
+</script>
+
+<div class="map-container">
+  <div id='map' class='map'>
+  </div>
+  <div class='map-location-chosen'>
+    <h1>{{location}}</h1>
+    <ul class='map-merchant-list'>
+    {{#each merchants as |merchant|}}
+      <li {{action 'merchantDetailsClicked' merchant}} class='map-merchant-details'>
+        <div class='merchant-name'>
+          <h2>{{merchant.business_name}}</h2>
+          <p>{{merchant.physical_address}}</p>
+        </div>
+        <img class='merchant-image' src={{merchant.image_url}}>
+      </li>
+    {{/each}}
+    </ul>
   </div>
 </div>

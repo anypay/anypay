@@ -1055,6 +1055,12 @@ async function Server() {
     handler: handlers.Search.accounts
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/search/accounts/near/{latitude}/{longitude}',
+    handler: handlers.Accounts.nearby
+  }); 
+
   accountCSVReports(server);
 
   server.route({
