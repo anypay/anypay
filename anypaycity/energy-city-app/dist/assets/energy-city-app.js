@@ -1457,9 +1457,76 @@ define('energy-city-app/controllers/map', ['exports'], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
   exports.default = Ember.Controller.extend({
+    addressSearch: Ember.inject.service('address-search'),
+    search: null,
 
     actions: {
+      searchLocation: function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(query) {
+          var results;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  _context.next = 2;
+                  return this.get('addressSearch').getCoordinates(this.get('search'));
+
+                case 2:
+                  results = _context.sent;
+
+
+                  console.log('addressSearchResults', results);
+
+                  this.get('googlemap').setCenter({
+                    lat: parseFloat(results.lat),
+                    lng: parseFloat(results.lng)
+                  });
+
+                case 5:
+                case 'end':
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function searchLocation(_x) {
+          return _ref.apply(this, arguments);
+        }
+
+        return searchLocation;
+      }(),
       merchantDetailsClicked: function merchantDetailsClicked(details) {
 
         console.log('merchant details clicked', details);
@@ -3895,6 +3962,9 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
     var controller;
 
     exports.default = Ember.Route.extend({
+
+        addressSearch: Ember.inject.service('address-search'),
+
         actions: {
             didTransition: function didTransition() {
                 console.log('DID TRANSITION');
@@ -3923,24 +3993,35 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
         },
         setupController: function () {
             var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(ctrl, model) {
-                var lat, lng, _ref4, accounts, frequencyIcons;
+                var addressSearchResults, lat, lng, _ref4, accounts, frequencyIcons;
 
                 return regeneratorRuntime.wrap(function _callee3$(_context3) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
+                                _context3.next = 2;
+                                return this.get('addressSearch').getCoordinates('keene, new hampshire');
+
+                            case 2:
+                                addressSearchResults = _context3.sent;
+
+
+                                console.log('address search results', addressSearchResults);
 
                                 model['lat'] = parseFloat(model['lat']);
                                 model['lng'] = parseFloat(model['lng']);
+
+                                model.lat = addressSearchResults.lat;
+                                model.lng = addressSearchResults.lng;
 
                                 controller = ctrl;
 
                                 lat = model.lat || 13.737275;
                                 lng = model.lng || 100.560145;
-                                _context3.next = 7;
+                                _context3.next = 13;
                                 return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
 
-                            case 7:
+                            case 13:
                                 _ref4 = _context3.sent;
                                 accounts = _ref4.accounts;
 
@@ -4237,7 +4318,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     */
                                 });
 
-                            case 17:
+                            case 23:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -4755,6 +4836,41 @@ define('energy-city-app/routes/payments', ['exports', 'ember-simple-auth/mixins/
       console.log(model);
 
       controller.set('payments', model);
+    }
+  });
+});
+define('energy-city-app/services/address-search', ['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.default = Ember.Service.extend({
+    getCoordinates: function getCoordinates(query) {
+
+      var apiKey = 'AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA';
+
+      var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + query.replaceAll(' ', '+') + '&key=' + apiKey;
+
+      console.log('search url', url);
+
+      return $.ajax({
+        url: url
+      }).then(function (resp) {
+        console.log(resp);
+
+        if (resp.results.length > 0) {
+
+          var location = resp.results[0].geometry.location;
+
+          console.log('getcoordinates', location);
+
+          return location;
+        } else {
+
+          throw new Error('location not found');
+        }
+      });
     }
   });
 });
@@ -5391,7 +5507,7 @@ define("energy-city-app/templates/map", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "NnIBm2BZ", "block": "{\"symbols\":[\"merchant\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"script\"],[9,\"id\",\"merchant-popup-template\"],[9,\"type\",\"text/x-handlebars-template\"],[7],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"map-container\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"map\"],[9,\"class\",\"map\"],[7],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"map-location-chosen\"],[7],[0,\"\\n    \"],[6,\"h1\"],[7],[1,[18,\"location\"],false],[8],[0,\"\\n    \"],[6,\"ul\"],[9,\"class\",\"map-merchant-list\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"merchants\"]]],null,{\"statements\":[[0,\"      \"],[6,\"li\"],[9,\"class\",\"map-merchant-details\"],[3,\"action\",[[19,0,[]],\"merchantDetailsClicked\",[19,1,[]]]],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"merchant-name\"],[7],[0,\"\\n          \"],[6,\"h2\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"p\"],[7],[1,[19,1,[\"physical_address\"]],false],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"img\"],[9,\"class\",\"merchant-image\"],[10,\"src\",[19,1,[\"image_url\"]],null],[7],[8],[0,\"\\n      \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/map.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "y/0rZ1sn", "block": "{\"symbols\":[\"merchant\"],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"script\"],[9,\"id\",\"merchant-popup-template\"],[9,\"type\",\"text/x-handlebars-template\"],[7],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"map-container\"],[7],[0,\"\\n  \"],[6,\"div\"],[9,\"id\",\"map\"],[9,\"class\",\"map\"],[7],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"form\"],[3,\"action\",[[19,0,[]],\"searchLocation\"],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n    \"],[1,[25,\"input\",null,[[\"class\",\"type\",\"value\",\"placeholder\"],[\"search-city\",\"search\",[19,0,[\"search\"]],\"search city or address\"]]],false],[0,\"\\n  \"],[8],[0,\"\\n  \"],[6,\"div\"],[9,\"class\",\"map-location-chosen\"],[7],[0,\"\\n    \"],[6,\"ul\"],[9,\"class\",\"map-merchant-list\"],[7],[0,\"\\n\"],[4,\"each\",[[19,0,[\"merchants\"]]],null,{\"statements\":[[0,\"      \"],[6,\"li\"],[9,\"class\",\"map-merchant-details\"],[3,\"action\",[[19,0,[]],\"merchantDetailsClicked\",[19,1,[]]]],[7],[0,\"\\n        \"],[6,\"div\"],[9,\"class\",\"merchant-name\"],[7],[0,\"\\n          \"],[6,\"h2\"],[7],[1,[19,1,[\"business_name\"]],false],[8],[0,\"\\n          \"],[6,\"p\"],[7],[1,[19,1,[\"physical_address\"]],false],[8],[0,\"\\n        \"],[8],[0,\"\\n        \"],[6,\"img\"],[9,\"class\",\"merchant-image\"],[10,\"src\",[19,1,[\"image_url\"]],null],[7],[8],[0,\"\\n      \"],[8],[0,\"\\n\"]],\"parameters\":[1]},null],[0,\"    \"],[8],[0,\"\\n  \"],[8],[0,\"\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/map.hbs" } });
 });
 define("energy-city-app/templates/moneybutton-auth-redirect", ["exports"], function (exports) {
   "use strict";
@@ -5466,6 +5582,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+629584ee"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+d2241671"});
 }
 //# sourceMappingURL=energy-city-app.map

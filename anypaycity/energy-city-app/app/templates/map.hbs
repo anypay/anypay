@@ -6,8 +6,10 @@
 <div class="map-container">
   <div id='map' class='map'>
   </div>
+  <form {{action "searchLocation" on="submit"}}>
+    {{input class='search-city' type="search" value=this.search placeholder="search city or address"}}
+  </form>
   <div class='map-location-chosen'>
-    <h1>{{location}}</h1>
     <ul class='map-merchant-list'>
     {{#each merchants as |merchant|}}
       <li {{action 'merchantDetailsClicked' merchant}} class='map-merchant-details'>
