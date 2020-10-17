@@ -1002,6 +1002,14 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/clover/webhooks",
+    options: {
+      handler: handlers.CloverWebhooks.create
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/firebase_token",
     options: {
