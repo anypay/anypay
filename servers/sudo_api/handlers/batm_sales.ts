@@ -6,6 +6,8 @@ import * as Boom from 'boom'
 import { models, database } from '../../../lib'
 import * as moment from 'moment'
 
+import * as mysql from '../../../lib/vending/db'
+
 export async function index(req, h) {
 
   /* 
@@ -92,4 +94,37 @@ async function sumProfit(start, end) {
   return result[0][0]
 
 }
+
+export async function profits(req, h) {
+  let week = await profitsByWeek(req, h)
+  let month = await profitsByMonth(req, h)
+
+  return {
+    week, month
+  }
+}
+
+export async function profitsByMonth(req, h) {
+    let statement = `select  EXTRACT(YEAR_MONTH from terminaltime) as month, sum(expectedprofitvalue) as sum,
+    sum(cashamount) as revenue,
+    count(*) as count from transactionrecord
+    group by month order by month desc;`
+
+  let result = await mysql.query(statement)
+
+  return { result }
+
+}
+
+export async function profitsByWeek(req, h) {
+    let statement = `select  YEARWEEK(terminaltime) as week, sum(expectedprofitvalue) as sum,
+    sum(cashamount) as revenue,
+    count(*) as count  from transactionrecord group by week order by week desc;`
+
+  let result = await mysql.query(statement)
+
+  return { result }
+
+}
+
 
