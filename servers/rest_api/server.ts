@@ -1010,6 +1010,24 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/clover/auth",
+    options: {
+      auth: "token",
+      handler: handlers.CloverAuth.show
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/clover/auth",
+    options: {
+      auth: "token",
+      handler: handlers.CloverAuth.create
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/firebase_token",
     options: {
