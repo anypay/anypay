@@ -380,6 +380,22 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/batm_sales/profits",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.profits
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/batm_sales/stats",
 
     config: {
