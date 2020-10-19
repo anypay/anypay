@@ -1,5 +1,6 @@
 import Ember from 'ember';
 import $ from 'jquery'
+import { inject as service } from '@ember/service'
 
 async function getNearbyAccounts(lat, lng) {
   $('#loader-wrapper').show()
@@ -14,6 +15,9 @@ async function getNearbyAccounts(lat, lng) {
 var controller
 
 export default Ember.Route.extend({
+
+  addressSearch: service('address-search'),
+
   actions: {
     didTransition: function() {
       console.log('DID TRANSITION');
@@ -44,8 +48,15 @@ export default Ember.Route.extend({
 
   async setupController(ctrl, model) {
 
+    let addressSearchResults = await this.get('addressSearch').getCoordinates('keene, new hampshire')
+
+    console.log('address search results', addressSearchResults)
+
     model['lat'] = parseFloat(model['lat'])
     model['lng'] = parseFloat(model['lng'])
+
+    model.lat = addressSearchResults.lat
+    model.lng = addressSearchResults.lng
 
     controller = ctrl
 
