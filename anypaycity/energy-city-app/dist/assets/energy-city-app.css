@@ -508,6 +508,7 @@ iframe {
     width: 100vw; 
     background-color: #f1efe9;
     border-left:2px solid #fff2af;
+    position: relative:
   }
 
   .map-merchant-details {
@@ -517,6 +518,13 @@ iframe {
     overflow-y: scroll;
     width: 100%;
     background-color: white;
+  }
+
+  .search-city {
+    padding: 1em;
+    width: 100%;
+    position: absolute;
+    top: 0px;
   }
 
   img.merchant-image {
@@ -529,6 +537,12 @@ iframe {
 
 @media only screen
   and (min-device-width: 480px) {
+
+  .search-city {
+    padding: 1em;
+    width: 100%;
+    position: absolute;
+    top: 0px;
 
   .map-merchant-details {
     background-color:white;
@@ -562,14 +576,9 @@ iframe {
   }
 
   img.merchant-image {
-    max-width: 100%;
     border: 1px solid #aaa;
     height: 180px;
-
+    max-width: 200px;
   }
 
-}
-.search-city {
-  padding: 1em;
-  width: 100%;
 }
