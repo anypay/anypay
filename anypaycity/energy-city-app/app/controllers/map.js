@@ -25,7 +25,11 @@ export default Ember.Controller.extend({
       console.log('merchant details clicked', details)
 
       console.log(this.get('googlemap'))
-      
+
+      if (details.stub) {
+        window.location = `https://app.anypayinc.com/pay/${details.stub}`
+      }
+
       this.get('googlemap').setCenter({
         lat: parseFloat(details.latitude),
         lng: parseFloat(details.longitude)

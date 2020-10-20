@@ -52,7 +52,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/map.js should pass ESLint\n\n10:26 - \'query\' is defined but never used. (no-unused-vars)\n14:7 - Unexpected console statement. (no-console)\n25:7 - Unexpected console statement. (no-console)\n27:7 - Unexpected console statement. (no-console)\n38:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'controllers/map.js should pass ESLint\n\n10:26 - \'query\' is defined but never used. (no-unused-vars)\n14:7 - Unexpected console statement. (no-console)\n25:7 - Unexpected console statement. (no-console)\n27:7 - Unexpected console statement. (no-console)\n42:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('controllers/moneybutton-auth-redirect.js', function (assert) {
@@ -97,7 +97,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/city.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/city.js should pass ESLint\n\n68:5 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/city.js should pass ESLint\n\n74:5 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/geolocate.js', function (assert) {
@@ -127,7 +127,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n23:7 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n53:5 - Unexpected console statement. (no-console)\n68:5 - Unexpected console statement. (no-console)\n361:5 - Unexpected console statement. (no-console)\n368:7 - Unexpected console statement. (no-console)\n378:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n380:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n397:13 - Unexpected console statement. (no-console)\n398:13 - Unexpected console statement. (no-console)\n402:13 - Unexpected console statement. (no-console)\n462:5 - Unexpected console statement. (no-console)\n477:5 - Unexpected console statement. (no-console)\n493:5 - Unexpected console statement. (no-console)\n503:5 - Unexpected console statement. (no-console)\n530:20 - \'Handlebars\' is not defined. (no-undef)\n532:5 - Unexpected console statement. (no-console)\n534:9 - \'currentlyOpenInfowindow\' is defined but never used. (no-unused-vars)\n583:24 - \'google\' is not defined. (no-undef)\n585:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n597:11 - \'infowindow\' is assigned a value but never used. (no-unused-vars)\n597:28 - \'google\' is not defined. (no-undef)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n23:7 - Unexpected console statement. (no-console)\n43:5 - Unexpected console statement. (no-console)\n51:5 - Unexpected console statement. (no-console)\n55:5 - Unexpected console statement. (no-console)\n71:5 - Unexpected console statement. (no-console)\n364:5 - Unexpected console statement. (no-console)\n371:7 - Unexpected console statement. (no-console)\n381:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n383:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n400:13 - Unexpected console statement. (no-console)\n401:13 - Unexpected console statement. (no-console)\n405:13 - Unexpected console statement. (no-console)\n465:5 - Unexpected console statement. (no-console)\n480:5 - Unexpected console statement. (no-console)\n496:5 - Unexpected console statement. (no-console)\n506:5 - Unexpected console statement. (no-console)\n533:20 - \'Handlebars\' is not defined. (no-undef)\n535:5 - Unexpected console statement. (no-console)\n537:9 - \'currentlyOpenInfowindow\' is defined but never used. (no-unused-vars)\n586:24 - \'google\' is not defined. (no-undef)\n588:11 - \'content\' is assigned a value but never used. (no-unused-vars)\n600:11 - \'infowindow\' is assigned a value but never used. (no-unused-vars)\n600:28 - \'google\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {

@@ -48,6 +48,8 @@ export default Ember.Route.extend({
 
   async setupController(ctrl, model) {
 
+    console.log('MODEL', model)
+
     let addressSearchResults = await this.get('addressSearch').getCoordinates('keene, new hampshire')
 
     console.log('address search results', addressSearchResults)
@@ -55,8 +57,9 @@ export default Ember.Route.extend({
     model['lat'] = parseFloat(model['lat'])
     model['lng'] = parseFloat(model['lng'])
 
-    model.lat = addressSearchResults.lat
+    /*model.lat = addressSearchResults.lat
     model.lng = addressSearchResults.lng
+    */
 
     controller = ctrl
 
@@ -372,7 +375,7 @@ export default Ember.Route.extend({
         fullscreenControl: false,
         mapTypeControl: false,
         streetViewControl: false,
-        zoom: 12,
+        zoom: 15,
       });
 
       var centerChanged = (() => {

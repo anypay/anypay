@@ -1379,9 +1379,15 @@ define('energy-city-app/controllers/cities', ['exports'], function (exports) {
     actions: {
       cityClicked: function cityClicked(city) {
 
-        console.log('city clicked', city.city_tag);
+        console.log('city clicked', city);
 
-        this.transitionToRoute('city', city.city_tag);
+        if (city.city.latitude && city.city.longitude) {
+
+          this.transitionToRoute('map', city.city.latitude, city.city.longitude);
+        } else {
+
+          this.transitionToRoute('city', city.city_tag);
+        }
       }
     }
 
@@ -1532,6 +1538,10 @@ define('energy-city-app/controllers/map', ['exports'], function (exports) {
         console.log('merchant details clicked', details);
 
         console.log(this.get('googlemap'));
+
+        if (details.stub) {
+          window.location = 'https://app.anypayinc.com/pay/' + details.stub;
+        }
 
         this.get('googlemap').setCenter({
           lat: parseFloat(details.latitude),
@@ -3632,6 +3642,16 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
 
                 Ember.Logger.info('city', { city: model });
 
+                if (!(model.city.latitude && model.city.longitude)) {
+                  _context.next = 4;
+                  break;
+                }
+
+                this.transitionTo('map', model.city.latitude, model.city.longitude);
+
+                return _context.abrupt('return');
+
+              case 4:
                 locations = model.accounts.map(function (account) {
 
                   var assign = {};
@@ -3687,7 +3707,7 @@ define('energy-city-app/routes/city', ['exports'], function (exports) {
                   Ember.Logger.info('socket.error', error.message);
                 });
 
-              case 10:
+              case 13:
               case 'end':
                 return _context.stop();
             }
@@ -3999,10 +4019,13 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                     while (1) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
-                                _context3.next = 2;
+
+                                console.log('MODEL', model);
+
+                                _context3.next = 3;
                                 return this.get('addressSearch').getCoordinates('keene, new hampshire');
 
-                            case 2:
+                            case 3:
                                 addressSearchResults = _context3.sent;
 
 
@@ -4011,17 +4034,18 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 model['lat'] = parseFloat(model['lat']);
                                 model['lng'] = parseFloat(model['lng']);
 
-                                model.lat = addressSearchResults.lat;
-                                model.lng = addressSearchResults.lng;
+                                /*model.lat = addressSearchResults.lat
+                                model.lng = addressSearchResults.lng
+                                */
 
                                 controller = ctrl;
 
                                 lat = model.lat || 13.737275;
                                 lng = model.lng || 100.560145;
-                                _context3.next = 13;
+                                _context3.next = 12;
                                 return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
 
-                            case 13:
+                            case 12:
                                 _ref4 = _context3.sent;
                                 accounts = _ref4.accounts;
 
@@ -4246,7 +4270,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                         fullscreenControl: false,
                                         mapTypeControl: false,
                                         streetViewControl: false,
-                                        zoom: 12
+                                        zoom: 15
                                     });
 
                                     var centerChanged = function () {
@@ -4318,7 +4342,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     */
                                 });
 
-                            case 23:
+                            case 22:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -5582,6 +5606,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+d2241671"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+4fc4adb5"});
 }
 //# sourceMappingURL=energy-city-app.map
