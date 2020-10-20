@@ -6,18 +6,18 @@
 <div class="map-container">
   <div id='map' class='map'>
   </div>
-  <form {{action "searchLocation" on="submit"}}>
-    {{input class='search-city' type="search" value=this.search placeholder="search city or address"}}
-  </form>
   <div class='map-location-chosen'>
     <ul class='map-merchant-list'>
+    <form {{action "searchLocation" on="submit"}}>
+      {{input class='search-city' type="search" value=this.search placeholder="search city or address"}}
+    </form>
     {{#each merchants as |merchant|}}
       <li {{action 'merchantDetailsClicked' merchant}} class='map-merchant-details'>
         <div class='merchant-name'>
           <h2>{{merchant.business_name}}</h2>
           <p>{{merchant.physical_address}}</p>
         </div>
-        <img class='merchant-image' src={{merchant.image_url}}>
+        <img class='merchant-image' src={{merchant.image_url}} style='max-width:200px;'>
       </li>
     {{/each}}
     </ul>
