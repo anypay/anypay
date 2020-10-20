@@ -9,9 +9,17 @@ export default Ember.Controller.extend({
   actions: {
     cityClicked(city) {
 
-      console.log('city clicked', city.city_tag);
+      console.log('city clicked', city);
 
-      this.transitionToRoute('city', city.city_tag);
+      if (city.city.latitude && city.city.longitude) {
+
+        this.transitionToRoute('map', city.city.latitude, city.city.longitude);
+
+      } else {
+
+        this.transitionToRoute('city', city.city_tag);
+
+      }
 
     }
   }
