@@ -5606,6 +5606,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+4fc4adb5"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+bbf52c3d"});
 }
 //# sourceMappingURL=energy-city-app.map
