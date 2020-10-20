@@ -43,6 +43,9 @@ export async function start() {
     });
 
 
+    let message = Buffer.from(invoice.uid);
+
+    await channel.sendToQueue('cryptozone:cashback:customers', message);
 
     await channel.ack(msg);
 
