@@ -992,6 +992,36 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/apps",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.index
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/apps/{id}",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.show
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/apps",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.create
+    }
+  });
+
+  server.route({
     method: "POST",
     path: "/firebase_token",
     options: {
