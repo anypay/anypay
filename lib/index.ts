@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+import * as apps from './apps';
 import * as accounts from './accounts';
 import * as amqp from './amqp';
 import * as apikeys from './apikeys';
@@ -53,6 +54,7 @@ export {
   ambassadors,
   amqp,
   apikeys,
+  apps,
   auth,
   blockcypher,
   cashback,
