@@ -4024,8 +4024,86 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
   exports.default = Ember.Route.extend({
-    setupController: function setupController() {}
+    setupController: function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var _this = this;
+
+        var permission;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return window.navigator.permissions.query({ name: 'geolocation' });
+
+              case 2:
+                permission = _context.sent;
+
+
+                if (permission.state === 'granted') {
+
+                  $('#loader-wrapper').show();
+                  window.navigator.geolocation.getCurrentPosition(function (position) {
+
+                    $('#loader-wrapper').hide();
+                    console.log('geolocation.currentposition', position);
+
+                    _this.transitionTo('map', position.coords.latitude, position.coords.longitude);
+                  }, function (error) {
+                    $('#loader-wrapper').hide();
+                    console.log('geolocation.error', error);
+
+                    _this.transitionToRoute('search-city');
+                  }, {
+                    enableHighAccuracy: false
+                  });
+                }
+
+              case 4:
+              case 'end':
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function setupController() {
+        return _ref.apply(this, arguments);
+      }
+
+      return setupController;
+    }()
   });
 });
 define('energy-city-app/routes/index', ['exports'], function (exports) {
