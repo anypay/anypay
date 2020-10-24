@@ -582,3 +582,18 @@ iframe {
   }
 
 }
+
+.nearby-button {
+  width: 100%;
+  border: 0px;
+  padding: 1em;
+  font-family: ubuntu;
+}
+
+.home p {
+  text-align:center;
+}
+
+.search-city-page {
+  width: 100%;
+}
