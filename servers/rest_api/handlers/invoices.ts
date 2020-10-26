@@ -379,7 +379,7 @@ export async function createPublic (request, reply) {
   try {
 
     let response = await createPublicInvoice(
-      request.account.id, request.payload);
+      request.params.account_id, request.payload);
 
     return response;
 

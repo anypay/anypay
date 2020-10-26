@@ -584,7 +584,6 @@ async function Server() {
     path: "/accounts/{account_id}/invoices",
     handler: handlers.Invoices.createPublic,
     options: {
-      auth: "getaccount",
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
