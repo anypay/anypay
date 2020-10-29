@@ -216,7 +216,9 @@ export async function generateInvoice(
 
   let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
 
-    let currency = row[0].currency
+    let currency = row[0].currency;
+
+    let paymentCoin = getCoin(currency);
 
     let fee = await pay.fees.getFee(currency)
 
@@ -293,6 +295,8 @@ export async function generateInvoice(
     outputs.push(fee)
 
     return {
+      currency_logo_url: paymentCoin.logo_url,
+      currency_name: paymentCoin.name,
       invoice_uid: invoice.uid,
       currency,
       amount: pay.fromSatoshis(amount),
