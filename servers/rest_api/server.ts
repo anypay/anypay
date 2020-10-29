@@ -356,6 +356,17 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/clover/accounts/{merchant_id}/invoices",
+    handler: handlers.CloverInvoices.create,
+    options: {
+      tags: ['api']
+    }
+  });
+
+
+
+  server.route({
 
     method: "GET",
     path: "/tipjars/{currency}",
