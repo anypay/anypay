@@ -6,6 +6,7 @@ import { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest, 
 export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
 import { log } from '../logger'
+import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
 import {emitter} from '../events';
@@ -274,6 +275,10 @@ export async function completePayment(paymentOption, hex: string) {
 
   emitter.emit('invoice.paid', invoice)
   emitter.emit('invoice.payment', invoice.uid)
+
+  let channel = await awaitChannel()
+
+  channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
 
   sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
 
