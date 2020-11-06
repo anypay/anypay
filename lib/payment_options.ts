@@ -5,6 +5,7 @@ import { log } from './logger';
 import { convert } from './prices'
 import { toSatoshis } from './pay'
 import { computeInvoiceURI } from './uri'
+import {getCoin} from './coins';
 
 interface PaymentOption {
   invoice_uid: string;
@@ -49,10 +50,14 @@ export async function paymentRequestToPaymentOptions(paymentRequest) {
       uid: paymentRequest.invoice_uid
     })
 
+    let coin = getCoin(option.currency)
+
     return {
       invoice_uid: paymentRequest.invoice_uid,
       currency: option.currency,
       outputs,
+      currency_name: coin.name,
+      currency_logo_url: coin.logo_url,
       uri
     }
 
