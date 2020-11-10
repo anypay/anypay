@@ -783,6 +783,12 @@ async function Server() {
       }
     })
 
+    server.route({
+      method: "POST",
+      path: "/r/beta",
+      handler: handlers.PaymentRequests.createBeta
+    })
+
     /* PAYMENT REQUESTS */
     server.route({
       method: "GET",
