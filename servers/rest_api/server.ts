@@ -310,6 +310,16 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/woocommerce",
+    handler: handlers.Woocommerce.index,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/invoices/{invoice_uid}/payment_options",
     handler: handlers.InvoicePaymentOptions.show,
     options: {
