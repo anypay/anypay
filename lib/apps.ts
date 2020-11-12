@@ -31,3 +31,15 @@ export async function createApp(params: NewApp) {
   return app
 
 }
+
+export async function createAppToken(id) {
+
+  let app = await models.App.findOne({ where: { id }})
+
+  let token = await models.AccessToken.create({
+    account_id: app.account_id,
+    app_id: app.id
+  })
+
+  return token
+}
