@@ -65,9 +65,6 @@ export function getCashBackAddresses() {
 
   // create payment request
 
-  console.log('dash address', dashAddress.value)
-  console.log('dash cashback', cashbackAddresses['DASH'])
-
   let amount = 1
   let cashbackAmount = 0.10
 
@@ -89,6 +86,7 @@ export function getCashBackAddresses() {
       amount: amount,
       currency: 'USD' 
     }, {
+
       address: cashbackAddresses['BCH'].address,
       amount: amount - cashbackAmount,
       currency: 'USD'
@@ -97,8 +95,29 @@ export function getCashBackAddresses() {
 
   console.log(params)
 
-  anypay.request(params)
-  .then(console.log).catch(error => {
+  anypay.request(params, {
+    redirect: 'https://anypayinc.com' 
+    webhook: 'https://anypayinc.com' 
+  })
+  .then(request => {
+
+    request.on('paid', (currency, txid, txhex) => {
+
+    })
+
+    request.on('cancelled', (reason) => {
+
+    })
+
+    request.on('expired', () => {
+
+    })
+
+    request.on('rejected', (error) => {
+
+    })
+  
+  }).catch(error => {
     console.error(error.request) 
   })
 })()

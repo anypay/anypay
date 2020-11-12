@@ -6,8 +6,8 @@ import * as uuid from 'uuid'
 
 import { models, log } from '../../lib'
 
+//import { Actor } from '/Users/zyler/github/rabbijs/rabbi'
 import { Actor } from 'rabbi'
-
 
 Actor.create({
 
