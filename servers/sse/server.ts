@@ -151,6 +151,7 @@ app.get('/sse/r/:uid', async (req, res) => {
   sseStream.uid = uuid.v4()
 
   if (invoice.status === 'paid') {
+    console.log('write to event stream')
 
     sseStream.write({
       event: 'paid',
