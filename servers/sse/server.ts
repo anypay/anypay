@@ -118,6 +118,7 @@ class InvoiceSubscriptions {
 let subscriptions = new InvoiceSubscriptions();  
 
 const app = express()
+app.use(require('cors')())
 app.use(serveStatic(__dirname))
 app.get('/sse', (req, res) => {
   console.log('new connection')
@@ -151,6 +152,7 @@ app.get('/sse/r/:uid', async (req, res) => {
   sseStream.uid = uuid.v4()
 
   if (invoice.status === 'paid') {
+
     console.log('write to event stream')
 
     sseStream.write({
