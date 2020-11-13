@@ -158,7 +158,11 @@ app.get('/sse/r/:uid', async (req, res) => {
       data: invoice.toJSON()
     })
 
-    sseStream.unpipe(res)
+    setTimeout(() => {
+
+      sseStream.unpipe(res)
+
+    }, 5000)
 
   } else {
 
