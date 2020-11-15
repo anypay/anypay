@@ -20,6 +20,12 @@ export async function submitTransaction(rawTx: string) {
 
 }
 
+export async function broadcastTx(rawTx: string) {
+
+  return blockchair.publish('litecoin', rawTx)
+
+}
+
 export {
 
   currency
