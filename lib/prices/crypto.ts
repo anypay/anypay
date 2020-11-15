@@ -25,7 +25,10 @@ export async function updateCryptoUSDPrices() {
   const coins = [
     'BSV',
     'BCH',
-    'BTC'
+    'BTC',
+    'LTC',
+    'DOGE',
+    'ZEC'
   ];
 
   let prices = await getCryptoPrices('USD');

@@ -18,6 +18,18 @@ const feesFiat = {
     currency: 'USD',
     value: 0.01
   },
+  'LTC': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'DOGE': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'ZEC': {
+    currency: 'USD',
+    value: 0.01
+  },
   'BTC': {
     currency: 'USD',
     value: 0.25
@@ -51,6 +63,16 @@ export async function getFee(currency:string): Promise<Fee> {
   case 'BTC':
     return {
       address: '17JiDrmEBftkPKtHojcJXAB8RSiv5nY6gc',
+      amount: fees[currency]
+    }
+  case 'LTC':
+    return {
+      address: 'MLEV4eQfHvtkUGFXvQJE9gCtFwW7zNq1NJ',
+      amount: fees[currency]
+    }
+  case 'DOGE':
+    return {
+      address: 'DRe5AjffdiLjtq9QSXW9RHGTMnm2hCQrRp',
       amount: fees[currency]
     }
   case 'BSV':

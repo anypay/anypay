@@ -20,6 +20,10 @@ export function validateAddress(address: string){
 
 }
 
+export async function getNewAddress(record) {
+  return record.value;
+}
+
 async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
 
   let start = new Date().getTime()
@@ -103,6 +107,12 @@ export async function getNewAddress(record: I_Address) {
   let address = await createAddressForward(record);
 
   return address;
+
+}
+
+export async function submitTransaction(rawTx: string) {
+
+  return blockchair.publish('dogecoin', rawTx)
 
 }
 
