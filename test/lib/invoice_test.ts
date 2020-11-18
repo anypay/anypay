@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+console.log(process.env)
+
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
 import { settleInvoice } from '../../lib/invoice';
