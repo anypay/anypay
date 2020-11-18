@@ -5,6 +5,9 @@ import { replaceInvoice } from '../../lib/invoice';
 import { settleInvoice } from '../../lib/invoice';
 import { registerAccount, setAddressScalar } from '../../lib/accounts';
 import { setAddress, setDenomination } from '../../lib/core';
+
+import { updateCryptoUSDPrices } from '../../lib/prices/crypto';
+
 import * as assert from 'assert';
 
 import * as Chance from 'chance';
@@ -13,6 +16,12 @@ import * as moment from 'moment';
 const chance = new Chance();
 
 describe("Creating Invoices", () => {
+
+  before(async () => {
+    
+    await updateCryptoUSDPrices()
+
+  })
 
   it("#generateInvoice should create a new DASH invoice", async () => {
 
