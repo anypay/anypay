@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+console.log('CONFIG ENV')
 console.log(process.env)
 
 import { generateInvoice } from '../../lib/invoice';
