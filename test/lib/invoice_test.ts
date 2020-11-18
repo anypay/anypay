@@ -2,6 +2,7 @@ require('dotenv').config();
 
 console.log('CONFIG ENV')
 console.log(process.env)
+Object.keys(process.env).map(k => console.log(k))
 
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
