@@ -11,16 +11,17 @@ jobs:
           command: docker build -t anypay . 
       - run:
           name: Migrate Database
-          command: docker run -i -t -e DATABASE_URL=$DATABASE_URL anypay npm run db:migrate
+          command: docker run -i -t -e DATABASE_URL=$DATABASE_URL COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY anypay npm run db:migrate
       - run:
           name: Seed Test Database
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay npm run db:seed:prices
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run db:seed:prices
       - run:
           name: Seed Test Database
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -i -t anypay ./bin/prices.ts update_crypto_prices
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay ./bin/prices.ts update_crypto_prices
       - run:
           name: Running tests
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -i -t anypay mocha --require=ts-node/register --timeout=20000 test/types/*_test.ts test/models/*_test.ts test/lib/*_test.ts test/plugins/*_test.ts test/integration/*.ts  --exit 
+          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e
+          DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay mocha --require=ts-node/register --timeout=20000 test/types/*_test.ts test/models/*_test.ts test/lib/*_test.ts test/plugins/*_test.ts test/integration/*.ts  --exit 
       - run:
           name: Push to Docker Hub
           command: |
