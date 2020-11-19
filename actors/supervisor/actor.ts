@@ -12,7 +12,8 @@ export async function start() {
     'prices',
     'payment_push_notification',
     'grab_and_go_push_notification',
-    'truereviews'
+    'truereviews',
+    'invoice_created_to_slack'
   ])
 
   // containers2
