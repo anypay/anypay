@@ -23,11 +23,11 @@ describe("Invoices V2", () => {
 
     it("#should create an invoice for an existing account with no payment options", async () => {
 
+      await account.addresses.unsetAll()
 
-      let invoice = await account.invoices.v2.create({
+      let invoice = await account.invoices.create({
         currency: 'USD',
-        amount: 10,
-        account_id: 1177
+        amount: 10
       })
 
       assert.strictEqual(invoice.currency, 'USD')
@@ -41,11 +41,12 @@ describe("Invoices V2", () => {
 
     it("#should create an invoice for an existing account with one payment options", async () => {
 
-      await account.addresses.set('BCH', 'bitcoincash:qp2tqtmhm6ukrz0hnmxarqmdt2l4p38gdcwuxj40mr')
+      await account.addresses.unsetAll()
+      await account.addresses.update('BCH', 'bitcoincash:qp2tqtmhm6ukrz0hnmxarqmdt2l4p38gdcwuxj40mr')
 
       let invoice = await account.invoices.create({
         currency: 'USD',
-        amount: 10,
+        amount: 10
       })
 
       assert.strictEqual(invoice.currency, 'USD')

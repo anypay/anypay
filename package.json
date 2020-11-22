@@ -72,6 +72,7 @@
     "handlebars": "^4.1.0",
     "hapi": "^18.1.0",
     "hapi-auth-basic": "^5.0.0",
+    "hapi-error": "^2.3.0",
     "hapi-swagger": "^9.1.1",
     "inert": "^5.1.0",
     "jayson": "^2.0.5",
