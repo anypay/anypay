@@ -7,27 +7,22 @@ import { models } from '../models'
 import { toSatoshis } from '../pay'
 import { writePaymentOptions } from '../payment_options'
 import { createAddressRoute } from '../routes'
+import { PaymentOption } from './payment_options'
 
 interface CreateInvoice {
   currency: string;
   amount: number;
   uid?: string;
 }
-
-interface PaymentOption {
-  invoice_uid: string;
-  currency: string,
-  uri: string;
-  outputs: any[];
-}
-
 export class Invoice {
   model: any;
-  payment_options: PaymentOption[]
+  payment_options: PaymentOption[];
+  uri: string;
 
   constructor(model) {
     this.model = model
     this.payment_options = []
+    this.uri = `pay:?r=https://api.anypayinc.com/r/${model.uid}`
   }
 
   toJSON() {
@@ -42,10 +37,6 @@ export class Invoice {
 
   get uid() {
     return this.model.uid
-  }
-
-  get uri() {
-    return `pay:?r=https://api.anypayinc.com/r/${this.model.uid}`
   }
 
   get web_url() {
@@ -72,24 +63,20 @@ export class Invoice {
       return !coin.unavailable
     })
 
-    this.payment_options = addresses.map(address => {
 
-      let outputs = []
+    for (let address of addresses) {
 
-      outputs.push({
-        address: address.value,
-        amount: toSatoshis(this.amount)
-      })
+      let option = new PaymentOption(this.model, address)
 
-      return {
-        currency: address.currency,
-        invoice_uid: this.model.uid,
-        uri: this.uri,
-        outputs
-      }
-    })
+      await option.setMerchantOutput()
+      await option.setAffiliateOutput()
+      await option.setPlatformFeeOutput()
 
-    await writePaymentOptions(this.payment_options);
+      this.payment_options.push(option)
+
+    }
+
+    await writePaymentOptions(this.payment_options.map(option => option.toJSON()))
 
   }
 
