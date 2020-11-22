@@ -53,6 +53,8 @@ describe("Invoices V2", () => {
       assert.strictEqual(invoice.amount, 10)
 
       assert(invoice.payment_options.length === 1)
+      assert(invoice.payment_options[0].outputs.length > 0) // it has at least a single output to the destination address
+      assert(invoice.payment_options[0].outputs[0].address, 'bitcoincash:qp2tqtmhm6ukrz0hnmxarqmdt2l4p38gdcwuxj40mr')
       assert(invoice.uid)
       assert(invoice.uri)
       assert(invoice.web_url)

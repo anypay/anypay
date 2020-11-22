@@ -4,14 +4,21 @@ import { getCoin } from '../coins'
 
 import { models } from '../models'
 
+import { toSatoshis } from '../pay'
+import { writePaymentOptions } from '../payment_options'
+import { createAddressRoute } from '../routes'
+
 interface CreateInvoice {
   currency: string;
   amount: number;
   uid?: string;
 }
 
-export class PaymentOption {
-
+interface PaymentOption {
+  invoice_uid: string;
+  currency: string,
+  uri: string;
+  outputs: any[];
 }
 
 export class Invoice {
@@ -65,12 +72,25 @@ export class Invoice {
       return !coin.unavailable
     })
 
-    this.payment_options = addresses.map(coin => {
+    this.payment_options = addresses.map(address => {
+
+      let outputs = []
+
+      outputs.push({
+        address: address.value,
+        amount: toSatoshis(this.amount)
+      })
 
       return {
-        currency: coin.code
+        currency: address.currency,
+        invoice_uid: this.model.uid,
+        uri: this.uri,
+        outputs
       }
     })
+
+    await writePaymentOptions(this.payment_options);
+
   }
 
 }
