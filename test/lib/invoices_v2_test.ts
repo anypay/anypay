@@ -49,14 +49,10 @@ describe("Invoices V2", () => {
         amount: 10
       })
 
-      assert.strictEqual(invoice.amount, 10)
-
       assert(invoice.payment_options.length === 1)
       assert(invoice.payment_options[0].outputs.length > 0) // it has at least a single output to the destination address
       assert.strictEqual(invoice.payment_options[0].outputs[0].address, 'qp2tqtmhm6ukrz0hnmxarqmdt2l4p38gdcwuxj40mr')
       assert.strictEqual(invoice.payment_options[0].currency_name, 'Bitcoin Cash')
-
-      console.log(invoice.payment_options[0].toJSON())
 
       assert(invoice.payment_options[0].currency_logo_url)
       assert(invoice.uid)
