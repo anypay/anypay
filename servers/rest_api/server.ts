@@ -381,6 +381,15 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/v2/invoices/{uid}",
+    handler: handlers.InvoicesV2.show,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "POST",
     path: "/clover/accounts/{merchant_id}/invoices",
     handler: handlers.CloverInvoices.create,

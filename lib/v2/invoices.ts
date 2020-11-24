@@ -14,15 +14,24 @@ interface CreateInvoice {
   amount: number;
   uid?: string;
 }
+
 export class Invoice {
   model: any;
   payment_options: PaymentOption[];
   uri: string;
+  currency: string;
+  amount: number;
+  webhook_url: string;
+  redirect_url: string;
 
   constructor(model) {
     this.model = model
     this.payment_options = []
     this.uri = `pay:?r=https://api.anypayinc.com/r/${model.uid}`
+    this.currency = model.currency
+    this.amount = model.amount
+    this.webhook_url = model.webhook_url
+    this.redirect_url = model.redirect_url
   }
 
   toJSON() {
@@ -31,7 +40,8 @@ export class Invoice {
       amount: this.amount,
       uid: this.uid,
       uri: this.uri,
-      web_url: this.web_url
+      web_url: this.web_url,
+      payment_options: this.payment_options.map(option => option.toJSON())
     }
   }
 
@@ -41,14 +51,6 @@ export class Invoice {
 
   get web_url() {
     return `https://app.anypayinc.com/web/#/invoices/${this.model.uid}`
-  }
-
-  get currency() {
-    return this.model.currency
-  }
-
-  get amount() {
-    return this.model.amount
   }
 
   async setPaymentOptions() {
@@ -76,8 +78,25 @@ export class Invoice {
 
     }
 
-    await writePaymentOptions(this.payment_options.map(option => option.toJSON()))
+    await writePaymentOptions(this.payment_options.map(option => {
+      return Object.assign(option.toJSON(), { invoice_uid: option.invoice_uid })
+    }))
 
+  }
+
+  async loadPaymentOptions() {
+
+    let records = await models.PaymentOption.findAll({ where: { invoice_uid: this.uid }})
+
+    let options = []
+
+    for (let record of records) {
+      console.log('records', records)
+      let option = await PaymentOption.fromRecord(this.model, record)
+      options.push(option)
+    }
+
+    this.payment_options = options
   }
 
 }
@@ -88,6 +107,7 @@ export class Invoices {
   constructor(options) {
     this.account_id = options.account_id
   }
+
 
   async create(opts: CreateInvoice): Promise<Invoice> {
     if (!opts.amount) {
@@ -100,7 +120,9 @@ export class Invoices {
 
     let record = await models.Invoice.create(Object.assign({
       uid: shortid.generate(),
-      account_id: this.account_id
+      account_id: this.account_id,
+      denomination_amount: opts.amount,
+      denomination_currency: opts.currency
     }, opts))
 
     let invoice = new Invoice(record) 
@@ -109,5 +131,19 @@ export class Invoices {
 
     return invoice
   }
+}
+
+export async function find(uid: string): Promise<Invoice> {
+
+  let record = await models.Invoice.findOne({ where: { uid }})
+
+  if (!record) { throw new Error(`invoice ${uid} not found`) }
+
+  let invoice = new Invoice(record)
+
+  await invoice.loadPaymentOptions()
+
+  return invoice
+
 }
 
