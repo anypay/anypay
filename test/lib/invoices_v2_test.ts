@@ -39,7 +39,7 @@ describe("Invoices V2", () => {
       assert(invoice.web_url)
     })
 
-    it("#should create an invoice for an existing account with one payment options", async () => {
+    it.skip("#should create an invoice for an existing account with one payment options", async () => {
 
       await account.addresses.unsetAll()
       await account.addresses.update('BCH', 'bitcoincash:qp2tqtmhm6ukrz0hnmxarqmdt2l4p38gdcwuxj40mr')
