@@ -368,8 +368,6 @@ export default Ember.Route.extend({
     }, 1000);
 
     Ember.run.scheduleOnce('afterRender', this, function() {                                                                  
-      Ember.Logger.info('AFTER RENDER');
-
       let map = new window.google.maps.Map(document.getElementById("map"), {
         center: { lat: model.lat, lng: model.lng },
         fullscreenControl: false,
@@ -467,7 +465,6 @@ function loadMerchants(map) {
 
   })
   .then(function(resp) {
-    Ember.Logger.info("ACTIVE MERCHANTS", resp)
 
     activeMerchants = resp;
 
@@ -481,8 +478,6 @@ function loadMerchants(map) {
 
   })
   .then(function(resp) {
-
-    Ember.Logger.info("RESP", resp);
 
     var coinsByMerchant = resp.reduce((merchantCoins, merchantCoin) => {
 
@@ -498,7 +493,6 @@ function loadMerchants(map) {
 
     });
 
-    Ember.Logger.info("COINS", resp);
 
     let oneWeekMerchants = activeMerchants.oneWeek.reduce((sum, i) => {
 
@@ -508,7 +502,6 @@ function loadMerchants(map) {
 
     }, {});
 
-    Ember.Logger.info('one week', oneWeekMerchants)
 
     let oneMonthMerchants = activeMerchants.oneMonth.reduce((map, i) => {
 
@@ -518,7 +511,6 @@ function loadMerchants(map) {
 
     }, {});
 
-    Ember.Logger.info('one month', oneMonthMerchants)
 
     let threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
 
@@ -538,7 +530,6 @@ function loadMerchants(map) {
 
 
     activeMerchants.merchants.forEach(merchant => {
-      Ember.Logger.info('merchant', merchant)
 
       let markerOpts = {
 

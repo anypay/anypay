@@ -4636,8 +4636,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 Ember.run.scheduleOnce('afterRender', this, function () {
                                     var _this = this;
 
-                                    Ember.Logger.info('AFTER RENDER');
-
                                     var map = new window.google.maps.Map(document.getElementById("map"), {
                                         center: { lat: model.lat, lng: model.lng },
                                         fullscreenControl: false,
@@ -4762,7 +4760,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             url: 'https://api.anypay.global/active-merchants'
 
         }).then(function (resp) {
-            Ember.Logger.info("ACTIVE MERCHANTS", resp);
 
             activeMerchants = resp;
 
@@ -4774,8 +4771,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
             });
         }).then(function (resp) {
-
-            Ember.Logger.info("RESP", resp);
 
             var coinsByMerchant = resp.reduce(function (merchantCoins, merchantCoin) {
 
@@ -4789,8 +4784,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return merchantCoins;
             });
 
-            Ember.Logger.info("COINS", resp);
-
             var oneWeekMerchants = activeMerchants.oneWeek.reduce(function (sum, i) {
 
                 sum[i.id] = true;
@@ -4798,16 +4791,12 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return sum;
             }, {});
 
-            Ember.Logger.info('one week', oneWeekMerchants);
-
             var oneMonthMerchants = activeMerchants.oneMonth.reduce(function (map, i) {
 
                 map[i.id] = true;
 
                 return map;
             }, {});
-
-            Ember.Logger.info('one month', oneMonthMerchants);
 
             var threeMonthsMerchants = activeMerchants.threeMonths.reduce(function (map, i) {
 
@@ -4824,7 +4813,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             }, {});
 
             activeMerchants.merchants.forEach(function (merchant) {
-                Ember.Logger.info('merchant', merchant);
 
                 var markerOpts = {
 

@@ -142,7 +142,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n381:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n383:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n487:9 - \'coinsByMerchant\' is assigned a value but never used. (no-unused-vars)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n379:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n381:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n482:9 - \'coinsByMerchant\' is assigned a value but never used. (no-unused-vars)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
