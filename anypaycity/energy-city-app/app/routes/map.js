@@ -421,6 +421,9 @@ export default Ember.Route.extend({
       })
 
       controller.set('googlemap', map)
+      let appCtrl = this.controllerFor('application')
+      appCtrl.set('googlemap', map)
+      console.log('set google map')
 
       loadMerchants(map)
 

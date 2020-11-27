@@ -15,6 +15,13 @@ a {
   width: 100%;
   top: 0px;
 }
+.navbar form {
+  margin-left: -1em;
+}
+.navbar form input {
+  color: white;
+  background-color: black;
+}
 
 .float-left {
   float: left;
@@ -375,7 +382,7 @@ iframe {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  padding-top: 4em;
+  padding-top: 0.5em;
 }
 .map-merchant-list li {
   margin: 5px 0 5px 0;

@@ -14,6 +14,14 @@ a {
   left: 0px;
   width: 100%;
   top: 0px;
+
+  form {
+    margin-left: -1em;
+    input {
+      color: white;
+      background-color: black;
+    }
+  }
 }
 
 .float-left {
@@ -368,7 +376,7 @@ iframe {
   overflow-y: scroll;
   display: flex;
   flex-direction: column;
-  padding-top: 4em;
+  padding-top: 0.5em;
 
   li {
     margin: 5px 0 5px 0;
