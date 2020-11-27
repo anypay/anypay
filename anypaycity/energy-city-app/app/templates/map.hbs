@@ -13,14 +13,15 @@
     {{#if selectedMerchant.stub}}
       <button {{action 'payNow'}} class='btn btn-large pay-now-button'>Pay Now</button>
     {{/if}}
+    {{#if selectedMerchantDetails.payments.latest}}
     <p><i>Active {{moment-from-now selectedMerchantDetails.payments.latest.time}}</i></p>
+    {{else}}
+    <p><i>No Payments Yet</i></p>
+    {{/if}}
 
   </div>
 
 </div>
-
-<script id="merchant-popup-template" type="text/x-handlebars-template">
-</script>
 
 <div class="map-container">
   <div id='map' class='map'>
