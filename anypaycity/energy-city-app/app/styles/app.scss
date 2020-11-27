@@ -661,3 +661,20 @@ iframe {
   top: 100%;
 }
 
+#splash-loader {
+  display: flex;
+  position: fixed;
+  width: 100%;
+  background-color: black;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    max-width: 300px;
+  }
+}
+

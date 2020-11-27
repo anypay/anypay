@@ -3654,6 +3654,8 @@ define('energy-city-app/routes/application', ['exports', 'ember-simple-auth/mixi
       socket.on('error', function (error) {
         Ember.Logger.info('socket.error', error.message);
       });
+
+      $('#splash-loader').hide();
     }
   });
 });

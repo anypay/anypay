@@ -67,6 +67,7 @@ export default Ember.Route.extend(ApplicationRouteMixin, {
       Ember.Logger.info('socket.error', error.message); 
     });
 
+    $('#splash-loader').hide()
   }
 
 });
