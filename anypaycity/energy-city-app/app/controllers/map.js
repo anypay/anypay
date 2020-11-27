@@ -33,8 +33,7 @@ export default Ember.Controller.extend({
 
       $('.business-modal').removeClass('close')
 
-      let resp = await $.getJSON(`http://localhost:8000/accounts/${details.id}`)
-      console.log(resp)
+      let resp = await $.getJSON(`https://api.anypayinc.com/accounts/${details.id}`)
 
       this.set('selectedMerchantDetails', resp)
       this.set('selectedMerchantCoins', resp.coins.join(', '))

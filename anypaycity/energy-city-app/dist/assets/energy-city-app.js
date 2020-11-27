@@ -1654,12 +1654,11 @@ define('energy-city-app/controllers/map', ['exports'], function (exports) {
                   Ember.$('.business-modal').removeClass('close');
 
                   _context2.next = 4;
-                  return Ember.$.getJSON('http://localhost:8000/accounts/' + details.id);
+                  return Ember.$.getJSON('https://api.anypayinc.com/accounts/' + details.id);
 
                 case 4:
                   resp = _context2.sent;
 
-                  console.log(resp);
 
                   this.set('selectedMerchantDetails', resp);
                   this.set('selectedMerchantCoins', resp.coins.join(', '));
@@ -1675,7 +1674,7 @@ define('energy-city-app/controllers/map', ['exports'], function (exports) {
                   })
                   */
 
-                case 8:
+                case 7:
                 case 'end':
                   return _context2.stop();
               }

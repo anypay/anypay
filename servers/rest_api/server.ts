@@ -425,7 +425,7 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/accounts/{email}",
+    path: "/accounts/{id}", // id or email
     handler: handlers.Accounts.showPublic,
     options: {
       tags: ['api'],
