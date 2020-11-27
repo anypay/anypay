@@ -57,7 +57,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/map.js should pass ESLint\n\n18:26 - \'query\' is defined but never used. (no-unused-vars)\n22:7 - Unexpected console statement. (no-console)\n57:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'controllers/map.js should pass ESLint\n\n18:26 - \'query\' is defined but never used. (no-unused-vars)\n22:7 - Unexpected console statement. (no-console)\n65:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('controllers/moneybutton-auth-redirect.js', function (assert) {

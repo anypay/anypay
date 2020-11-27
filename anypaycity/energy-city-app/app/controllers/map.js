@@ -28,6 +28,14 @@ export default Ember.Controller.extend({
 
     },
 
+    payNow() {
+
+      if (this.get('selectedMerchant').stub) {
+        window.open(`https://app.anypayinc.com/pay/${this.get('selectedMerchant').stub}`)
+      }
+
+    },
+
     async merchantDetailsClicked(details)  {
       this.set('selectedMerchant', details)
 

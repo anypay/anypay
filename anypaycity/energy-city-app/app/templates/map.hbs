@@ -10,7 +10,9 @@
   <div class='selected-merchant-details'>
 
     <p class='selected-merchant-coins'><b>{{selectedMerchantCoins}}</b></p>
-    <button class='btn btn-large pay-now-button'>Pay Now</button>
+    {{#if selectedMerchant.stub}}
+      <button {{action 'payNow'}} class='btn btn-large pay-now-button'>Pay Now</button>
+    {{/if}}
     <p><i>Active {{moment-from-now selectedMerchantDetails.payments.latest.time}}</i></p>
 
   </div>
