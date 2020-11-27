@@ -47,7 +47,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/home.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/home.js should pass ESLint\n\n8:7 - Unexpected console statement. (no-console)\n12:43 - Empty block statement. (no-empty)\n19:43 - Empty block statement. (no-empty)\n21:14 - Empty block statement. (no-empty)\n25:7 - \'$\' is not defined. (no-undef)\n28:9 - \'$\' is not defined. (no-undef)\n29:9 - Unexpected console statement. (no-console)\n34:9 - \'$\' is not defined. (no-undef)\n35:9 - Unexpected console statement. (no-console)\n47:10 - \'revokePermission\' is defined but never used. (no-unused-vars)');
+    assert.ok(false, 'controllers/home.js should pass ESLint\n\n12:7 - Unexpected console statement. (no-console)\n16:43 - Empty block statement. (no-empty)\n23:43 - Empty block statement. (no-empty)\n25:14 - Empty block statement. (no-empty)\n29:7 - \'$\' is not defined. (no-undef)\n32:9 - \'$\' is not defined. (no-undef)\n33:9 - Unexpected console statement. (no-console)\n38:9 - \'$\' is not defined. (no-undef)\n39:9 - Unexpected console statement. (no-console)\n51:10 - \'revokePermission\' is defined but never used. (no-unused-vars)');
   });
 
   QUnit.test('controllers/leaderboard.js', function (assert) {

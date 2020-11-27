@@ -3,6 +3,10 @@ import Ember from 'ember';
 export default Ember.Controller.extend({
 
   actions: {
+    searchCity() {
+
+      document.getElementById("searchInput").focus();
+    },
 
     async findNearby() {
       console.log("find nearby")

@@ -624,6 +624,13 @@ iframe {
   text-align: center;
 }
 
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
 .search-city-page {
   width: 100%;
 }
@@ -687,6 +694,26 @@ iframe {
 }
 #splash-loader img {
   max-width: 300px;
+}
+
+.home-background {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: -1000;
+}
+
+.home-logo {
+  max-width: 200px;
+  margin-bottom: 2em;
+}
+
+@media only screen and (min-device-width: 480px) {
+  .home-background {
+    width: 100%;
+  }
 }
 
 /*# sourceMappingURL=energy-city-app.css.map */

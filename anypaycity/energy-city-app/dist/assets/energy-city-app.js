@@ -1515,8 +1515,8 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
 
   });
 });
-define('energy-city-app/controllers/home', ['exports'], function (exports) {
-  'use strict';
+define("energy-city-app/controllers/home", ["exports"], function (exports) {
+  "use strict";
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -1554,6 +1554,10 @@ define('energy-city-app/controllers/home', ['exports'], function (exports) {
   exports.default = Ember.Controller.extend({
 
     actions: {
+      searchCity: function searchCity() {
+
+        document.getElementById("searchInput").focus();
+      },
       findNearby: function () {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
           var _this = this;
@@ -1596,7 +1600,7 @@ define('energy-city-app/controllers/home', ['exports'], function (exports) {
                   });
 
                 case 8:
-                case 'end':
+                case "end":
                   return _context.stop();
               }
             }
@@ -4191,7 +4195,7 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
                     $('#loader-wrapper').hide();
                     console.log('geolocation.currentposition', position);
 
-                    _this.transitionTo('map', position.coords.latitude, position.coords.longitude);
+                    //this.transitionTo('map', position.coords.latitude, position.coords.longitude)
                   }, function (error) {
                     $('#loader-wrapper').hide();
                     console.log('geolocation.error', error);
@@ -5789,7 +5793,7 @@ define("energy-city-app/templates/application", ["exports"], function (exports) 
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "2QbHTxpV", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: black;\"],[7],[0,\"\\n\\n\\n  \"],[6,\"form\"],[9,\"class\",\"search-form\"],[3,\"action\",[[19,0,[]],\"searchLocation\"],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n    \"],[1,[25,\"input\",null,[[\"class\",\"type\",\"value\",\"placeholder\"],[\"search-city\",\"search\",[19,0,[\"search\"]],\"search city or address\"]]],false],[0,\"\\n  \"],[8],[0,\"\\n\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"id\",\"loader-wrapper\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loader\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "LDW6qOzg", "block": "{\"symbols\":[],\"statements\":[[0,\"\\n\"],[2,\"<nav class=\\\"navbar navbar-light\\\" style=\\\"background-color: #039454;\\\">\"],[0,\"\\n\"],[6,\"nav\"],[9,\"class\",\"navbar navbar-dark \"],[9,\"style\",\"background-color: black;\"],[7],[0,\"\\n\\n\\n  \"],[6,\"form\"],[9,\"class\",\"search-form\"],[3,\"action\",[[19,0,[]],\"searchLocation\"],[[\"on\"],[\"submit\"]]],[7],[0,\"\\n    \"],[1,[25,\"input\",null,[[\"id\",\"class\",\"type\",\"value\",\"placeholder\"],[\"searchInput\",\"search-city\",\"search\",[19,0,[\"search\"]],\"search city or address\"]]],false],[0,\"\\n  \"],[8],[0,\"\\n\\n\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"container bodycontainer\"],[7],[0,\"\\n\\n\"],[6,\"div\"],[9,\"id\",\"loader-wrapper\"],[7],[0,\"\\n    \"],[6,\"div\"],[9,\"id\",\"loader\"],[7],[8],[0,\"\\n\"],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"style\",\"display:none\"],[9,\"class\",\"loading\"],[7],[8],[0,\"\\n  \"],[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/application.hbs" } });
 });
 define("energy-city-app/templates/business", ["exports"], function (exports) {
   "use strict";
@@ -5897,7 +5901,7 @@ define("energy-city-app/templates/home", ["exports"], function (exports) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.default = Ember.HTMLBars.template({ "id": "uI8uTeeV", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"home\"],[7],[0,\"\\n\\n  \"],[6,\"button\"],[9,\"style\",\"width: 100%; padding: 2em; border: 0px\"],[9,\"class\",\"nearby-button\"],[3,\"action\",[[19,0,[]],\"findNearby\"]],[7],[0,\"Find\\n  Nearby\"],[8],[0,\"\\n\\n  \"],[6,\"p\"],[7],[0,\"or\"],[8],[0,\"\\n\\n  \"],[6,\"button\"],[9,\"style\",\"width: 100%; padding: 2em; border: 0px\"],[7],[4,\"link-to\",[\"search-city\"],null,{\"statements\":[[0,\"Search City\"]],\"parameters\":[]},null],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/home.hbs" } });
+  exports.default = Ember.HTMLBars.template({ "id": "DJV2M3N1", "block": "{\"symbols\":[],\"statements\":[[1,[18,\"outlet\"],false],[0,\"\\n\\n\"],[6,\"img\"],[9,\"class\",\"home-background\"],[10,\"src\",[26,[[18,\"rootUrl\"],\"/bangkok_2.jpg\"]]],[7],[8],[0,\"\\n\\n\"],[6,\"div\"],[9,\"class\",\"home\"],[7],[0,\"\\n  \"],[6,\"img\"],[9,\"class\",\"home-logo\"],[10,\"src\",[26,[[18,\"rootUrl\"],\"anypay_wide.png\"]]],[7],[8],[0,\"\\n\\n  \"],[6,\"button\"],[9,\"style\",\"width: 100%; padding: 2em; border: 0px\"],[9,\"class\",\"nearby-button\"],[3,\"action\",[[19,0,[]],\"findNearby\"]],[7],[0,\"Find\\n  Nearby\"],[8],[0,\"\\n\\n  \"],[6,\"p\"],[7],[0,\"or\"],[8],[0,\"\\n\\n  \"],[6,\"button\"],[9,\"style\",\"width: 100%; padding: 2em; border: 0px\"],[3,\"action\",[[19,0,[]],\"searchCity\"]],[7],[0,\"Search City\"],[8],[0,\"\\n\\n\"],[8],[0,\"\\n\"]],\"hasEval\":false}", "meta": { "moduleName": "energy-city-app/templates/home.hbs" } });
 });
 define("energy-city-app/templates/index", ["exports"], function (exports) {
   "use strict";

@@ -14,7 +14,7 @@ export default Ember.Route.extend({
         $('#loader-wrapper').hide()
         console.log('geolocation.currentposition', position)
 
-        this.transitionTo('map', position.coords.latitude, position.coords.longitude)
+        //this.transitionTo('map', position.coords.latitude, position.coords.longitude)
       
       }, (error) => {
         $('#loader-wrapper').hide()
