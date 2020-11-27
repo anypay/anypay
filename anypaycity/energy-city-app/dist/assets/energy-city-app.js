@@ -4390,8 +4390,6 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             model['lat'] = parseFloat(params['lat']);
             model['lng'] = parseFloat(params['lng']);
 
-            console.log("PARSE", parseFloat(params['lng']));
-
             return model;
         },
         setupController: function () {
@@ -4637,7 +4635,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
                                     return merchant;
                                 }));
-                                console.log('SETUP CONTROLLER');
+
                                 setTimeout(function () {
 
                                     //Ember.$('.map').css('position', 'fixed');
@@ -4728,7 +4726,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     */
                                 });
 
-                            case 22:
+                            case 21:
                             case 'end':
                                 return _context3.stop();
                         }
@@ -4746,6 +4744,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
 
     function loadMerchants(map) {
+
+        console.log('LOAD MERCHANTS');
 
         var frequencyIcons = {
 
@@ -4815,6 +4815,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return map;
             }, {});
 
+            console.log('one month', oneMonthMerchants);
+
             var threeMonthsMerchants = activeMerchants.threeMonths.reduce(function (map, i) {
 
                 map[i.id] = true;
@@ -4829,14 +4831,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return map;
             }, {});
 
-            var source = document.getElementById("merchant-popup-template").innerHTML;
-            var template = Handlebars.compile(source);
-
-            console.log('template', template);
-
-            var currentlyOpenInfowindow;
-
             activeMerchants.merchants.forEach(function (merchant) {
+                console.log('merchant', merchant);
 
                 var markerOpts = {
 
@@ -4879,35 +4875,9 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
                 var marker = new google.maps.Marker(markerOpts);
 
-                var content = template({
-                    business_name: merchant.business_name,
-                    physical_address: merchant.physical_address,
-                    coins_accepted: ['BCH', 'BTC', 'DASH'].join(', ')
-                });
-
-                merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
-
-                if (!merchant.image_url) {
-                    merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
-                }
-
-                var infowindow = new google.maps.InfoWindow({
-                    maxWidth: 500,
-                    height: 300,
-                    content: '\n          <h1>' + merchant.business_name + '</h1>\n          <h2>' + merchant.physical_address + '</h2>\n          <div style=\'position:relative\'>\n            <img src=\'' + merchant.image_url + '\' style=\'width: 100%; height: 100%\'>\n            <h3>Coins accepted: ' + merchant.coins_accepted + '</h3>\n          </div>\n        '
-                });
-
                 marker.addListener('click', function () {
 
                     controller.send('merchantDetailsClicked', merchant);
-
-                    /*
-                    if (currentlyOpenInfowindow) {
-                      currentlyOpenInfowindow.close();
-                    }
-                     infowindow.open(map, marker);
-                     currentlyOpenInfowindow = infowindow;
-                    */
                 });
             });
         });

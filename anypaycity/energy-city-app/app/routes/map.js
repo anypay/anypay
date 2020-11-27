@@ -40,8 +40,6 @@ export default Ember.Route.extend({
     model['lat'] = parseFloat(params['lat'])
     model['lng'] = parseFloat(params['lng'])
 
-    console.log("PARSE", parseFloat(params['lng']))
-
     return model
 
   },
@@ -361,7 +359,7 @@ export default Ember.Route.extend({
       return merchant
        
     }));
-    console.log('SETUP CONTROLLER');
+
     setTimeout(() => {
 
       //Ember.$('.map').css('position', 'fixed');
@@ -441,6 +439,8 @@ export default Ember.Route.extend({
 
 function loadMerchants(map) {
 
+  console.log('LOAD MERCHANTS')
+
   let frequencyIcons = {
 
     'one-week': '/google-map-marker-512-green.png',
@@ -516,6 +516,8 @@ function loadMerchants(map) {
 
     }, {});
 
+    console.log('one month', oneMonthMerchants)
+
     let threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
 
       map[i.id] = true;
@@ -532,14 +534,9 @@ function loadMerchants(map) {
 
     }, {});
 
-    var source   = document.getElementById("merchant-popup-template").innerHTML;
-    var template = Handlebars.compile(source);
-
-    console.log('template', template)
-
-    var currentlyOpenInfowindow;
 
     activeMerchants.merchants.forEach(merchant => {
+      console.log('merchant', merchant)
 
       let markerOpts = {
 
@@ -588,44 +585,9 @@ function loadMerchants(map) {
 
       var marker = new google.maps.Marker(markerOpts);
 
-      let content = template({
-        business_name: merchant.business_name,
-        physical_address: merchant.physical_address,
-        coins_accepted: ['BCH', 'BTC', 'DASH'].join(', ')
-      });
-
-      merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
-
-      if (!merchant.image_url) {
-        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
-      }
-
-      var infowindow = new google.maps.InfoWindow({
-        maxWidth: 500,
-        height: 300,
-        content: `
-          <h1>${merchant.business_name}</h1>
-          <h2>${merchant.physical_address}</h2>
-          <div style='position:relative'>
-            <img src='${merchant.image_url}' style='width: 100%; height: 100%'>
-            <h3>Coins accepted: ${merchant.coins_accepted}</h3>
-          </div>
-        `
-      });
-
       marker.addListener('click', function() {
 
         controller.send('merchantDetailsClicked', merchant)
-
-        /*
-        if (currentlyOpenInfowindow) {
-          currentlyOpenInfowindow.close();
-        }
-
-        infowindow.open(map, marker);
-
-        currentlyOpenInfowindow = infowindow;
-        */
       });
 
     });
