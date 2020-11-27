@@ -1515,8 +1515,8 @@ define('energy-city-app/controllers/city', ['exports'], function (exports) {
 
   });
 });
-define("energy-city-app/controllers/home", ["exports"], function (exports) {
-  "use strict";
+define('energy-city-app/controllers/home', ['exports'], function (exports) {
+  'use strict';
 
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -1562,26 +1562,11 @@ define("energy-city-app/controllers/home", ["exports"], function (exports) {
         var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
           var _this = this;
 
-          var permission;
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  console.log("find nearby");
-
-                  _context.next = 3;
-                  return window.navigator.permissions.query({ name: 'geolocation' });
-
-                case 3:
-                  permission = _context.sent;
-
-
-                  if (permission.state === 'granted') {} else {
-
-                    //alert(permission.state)
-                  }
-
-                  if (permission.state === 'granted') {} else {}
+                  console.log('FIND NEARBY');
 
                   $('#loader-wrapper').show();
                   window.navigator.geolocation.getCurrentPosition(function (position) {
@@ -1599,8 +1584,8 @@ define("energy-city-app/controllers/home", ["exports"], function (exports) {
                     enableHighAccuracy: false
                   });
 
-                case 8:
-                case "end":
+                case 3:
+                case 'end':
                   return _context.stop();
               }
             }
@@ -4180,10 +4165,15 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
+                if (!window.navigator.permissions) {
+                  _context.next = 5;
+                  break;
+                }
+
+                _context.next = 3;
                 return window.navigator.permissions.query({ name: 'geolocation' });
 
-              case 2:
+              case 3:
                 permission = _context.sent;
 
 
@@ -4206,7 +4196,7 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
                   });
                 }
 
-              case 4:
+              case 5:
               case 'end':
                 return _context.stop();
             }
@@ -4370,7 +4360,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
         actions: {
             didTransition: function didTransition() {
-                console.log('DID TRANSITION');
+                Ember.Logger.info('DID TRANSITION');
 
                 /*
                 Ember.$('.ember-google-map').css({
@@ -4385,6 +4375,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
         },
 
         model: function model(params) {
+            Ember.Logger.info('MODEL', params);
+
             var model = {};
 
             model['lat'] = parseFloat(params['lat']);
@@ -4401,7 +4393,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                         switch (_context3.prev = _context3.next) {
                             case 0:
 
-                                console.log('MODEL', model);
+                                Ember.Logger.info('MODEL', model);
 
                                 _context3.next = 3;
                                 return this.get('addressSearch').getCoordinates('keene, new hampshire');
@@ -4410,7 +4402,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 addressSearchResults = _context3.sent;
 
 
-                                console.log('address search results', addressSearchResults);
+                                Ember.Logger.info('address search results', addressSearchResults);
 
                                 model['lat'] = parseFloat(model['lat']);
                                 model['lng'] = parseFloat(model['lng']);
@@ -4431,7 +4423,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 accounts = _ref4.accounts;
 
 
-                                console.log('search result', accounts);
+                                Ember.Logger.info('search result', accounts);
 
                                 frequencyIcons = {
 
@@ -4644,7 +4636,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                 Ember.run.scheduleOnce('afterRender', this, function () {
                                     var _this = this;
 
-                                    console.log('AFTER RENDER');
+                                    Ember.Logger.info('AFTER RENDER');
 
                                     var map = new window.google.maps.Map(document.getElementById("map"), {
                                         center: { lat: model.lat, lng: model.lng },
@@ -4679,8 +4671,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                                                 break;
                                                             }
 
-                                                            console.log('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() });
-                                                            console.log('latlng', newCenter.toJSON());
+                                                            Ember.Logger.info('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() });
+                                                            Ember.Logger.info('latlng', newCenter.toJSON());
 
                                                             _context2.next = 6;
                                                             return getNearbyAccounts(newCenter.lat(), newCenter.lng());
@@ -4689,7 +4681,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                                             _accounts = _context2.sent;
 
 
-                                                            console.log('accounts', _accounts);
+                                                            Ember.Logger.info('accounts', _accounts);
 
                                                             controller.set('merchants', _accounts.map(function (merchant) {
 
@@ -4712,7 +4704,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                                     controller.set('googlemap', map);
                                     var appCtrl = this.controllerFor('application');
                                     appCtrl.set('googlemap', map);
-                                    console.log('set google map');
+                                    Ember.Logger.info('set google map');
 
                                     loadMerchants(map);
 
@@ -4745,7 +4737,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
     function loadMerchants(map) {
 
-        console.log('LOAD MERCHANTS');
+        Ember.Logger.info('LOAD MERCHANTS');
 
         var frequencyIcons = {
 
@@ -4770,7 +4762,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             url: 'https://api.anypay.global/active-merchants'
 
         }).then(function (resp) {
-            console.log("ACTIVE MERCHANTS", resp);
+            Ember.Logger.info("ACTIVE MERCHANTS", resp);
 
             activeMerchants = resp;
 
@@ -4783,7 +4775,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             });
         }).then(function (resp) {
 
-            console.log("RESP", resp);
+            Ember.Logger.info("RESP", resp);
 
             var coinsByMerchant = resp.reduce(function (merchantCoins, merchantCoin) {
 
@@ -4797,7 +4789,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return merchantCoins;
             });
 
-            console.log("COINS", resp);
+            Ember.Logger.info("COINS", resp);
 
             var oneWeekMerchants = activeMerchants.oneWeek.reduce(function (sum, i) {
 
@@ -4806,7 +4798,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return sum;
             }, {});
 
-            console.log('one week', oneWeekMerchants);
+            Ember.Logger.info('one week', oneWeekMerchants);
 
             var oneMonthMerchants = activeMerchants.oneMonth.reduce(function (map, i) {
 
@@ -4815,7 +4807,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                 return map;
             }, {});
 
-            console.log('one month', oneMonthMerchants);
+            Ember.Logger.info('one month', oneMonthMerchants);
 
             var threeMonthsMerchants = activeMerchants.threeMonths.reduce(function (map, i) {
 
@@ -4832,7 +4824,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
             }, {});
 
             activeMerchants.merchants.forEach(function (merchant) {
-                console.log('merchant', merchant);
+                Ember.Logger.info('merchant', merchant);
 
                 var markerOpts = {
 
@@ -4873,7 +4865,7 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
                     return;
                 }
 
-                var marker = new google.maps.Marker(markerOpts);
+                var marker = new window.google.maps.Marker(markerOpts);
 
                 marker.addListener('click', function () {
 
@@ -5238,11 +5230,11 @@ define('energy-city-app/services/address-search', ['exports'], function (exports
 
       var apiKey = 'AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA';
 
-      var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + query.replaceAll(' ', '+') + '&key=' + apiKey;
+      var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + query.replace(' /g', '+') + '&key=' + apiKey;
 
       console.log('search url', url);
 
-      return $.ajax({
+      return Ember.$.ajax({
         url: url
       }).then(function (resp) {
         console.log(resp);

@@ -9,22 +9,7 @@ export default Ember.Controller.extend({
     },
 
     async findNearby() {
-      console.log("find nearby")
-
-      let permission = await window.navigator.permissions.query({name:'geolocation'})
-
-      if (permission.state === 'granted') {
-
-      } else {
-
-        //alert(permission.state)
-      }
-
-      if (permission.state === 'granted') {
-
-      } else {
-
-      }
+      console.log('FIND NEARBY')
 
       $('#loader-wrapper').show()
       window.navigator.geolocation.getCurrentPosition((position) => {
