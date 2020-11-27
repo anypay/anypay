@@ -4195,7 +4195,7 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
                     $('#loader-wrapper').hide();
                     console.log('geolocation.currentposition', position);
 
-                    //this.transitionTo('map', position.coords.latitude, position.coords.longitude)
+                    _this.transitionTo('map', position.coords.latitude, position.coords.longitude);
                   }, function (error) {
                     $('#loader-wrapper').hide();
                     console.log('geolocation.error', error);
