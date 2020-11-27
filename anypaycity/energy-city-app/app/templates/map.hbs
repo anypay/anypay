@@ -1,5 +1,22 @@
 {{outlet}}
 
+<div class='business-modal close'>
+  <a {{action 'closeModal'}} class='close-link'>X</a>
+
+  <h1>{{selectedMerchant.business_name}}</h1>
+  <img class='logo' src={{selectedMerchant.image_url}}/>
+  <p class='business-address'>{{selectedMerchant.physical_address}}</p>
+
+  <div class='selected-merchant-details'>
+
+    <p class='selected-merchant-coins'><b>{{selectedMerchantCoins}}</b></p>
+    <button class='btn btn-large pay-now-button'>Pay Now</button>
+    <p><i>Active {{moment-from-now selectedMerchantDetails.payments.latest.time}}</i></p>
+
+  </div>
+
+</div>
+
 <script id="merchant-popup-template" type="text/x-handlebars-template">
 </script>
 
