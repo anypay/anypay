@@ -208,7 +208,25 @@ export async function getToken(code: string) {
 
 }
 
+export async function getOrder(account_id: number, order_id: string) {
 
+  let squareClient = await getClient(account_id);
+  
+  let order = await squareClient.getOrder(order_id);
+
+  return order
+
+}
+
+export async function listOrders(account_id: number, location_id: string) {
+
+  let squareClient = await getClient(account_id)
+
+  let orders = await squareClient.listOrders(location_id)
+
+  return orders
+
+}
 
 export async function getClient(accountId) {
 
