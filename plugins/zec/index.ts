@@ -12,6 +12,10 @@ import * as address_subscription from '../../lib/address_subscription';
 
 import { rpc } from './lib/jsonrpc';
 
+export async function getNewAddress(record) {
+  return record.value;
+}
+
 export async function validateAddress(address: string){
 
   let value = await rpc.call('validateaddress', [address])
@@ -28,6 +32,12 @@ export async function validateAddress(address: string){
 
   }
 
+
+}
+
+export async function submitTransaction(rawTx: string) {
+
+  return blockchair.publish('zcash', rawTx)
 
 }
 

@@ -4,6 +4,7 @@ import * as  bchaddr from 'bchaddrjs';
 
 import * as Minercraft from 'minercraft';
 
+import { log } from '../../lib/logger'
 
 import { transformHexToPayments } from '../../router/plugins/bsv/lib';
 
@@ -21,8 +22,29 @@ export async function broadcastTx(hex) {
     */
   ]
 
-  return Promise.race(miners.map(miner => {
-    return miner.tx.push(hex); 
+  return Promise.race(miners.map(async miner => {
+
+    let result = await  miner.tx.push(hex); 
+
+    log.info(`miner.tx.push.result`, {
+      result,
+      hex
+    })
+
+    if (result.returnResult === 'success') {
+
+      return result
+
+    } else if (result.resultDescription.match('Transaction already in the mempool')) {
+
+      return result
+
+    } else {
+
+      throw new Error(result.resultDescription)
+
+    }
+
   }))
 
 }
@@ -110,7 +132,7 @@ export async function transformAddress(alias: string){
 
     }
 
-    console.log('ALIAS', alias);
+    alias = alias.split('?')[0];
 
     return (await polynym.resolveAddress(alias)).address;
 
@@ -121,9 +143,19 @@ export async function transformAddress(alias: string){
 }
 
 
-export async function getNewAddress(deprecatedParam){
+export async function getNewAddress(params){
 
-  return deprecatedParam.value;
+  if (params.paymail && params.paymail.match('handcash.io')) {
+
+    let resolved = await polynym.resolveAddress(params.paymail)
+
+    return resolved.address
+
+  } else {
+
+    return params.value;
+
+  }
 
   /*
   //Create a new HDKeyAddress 

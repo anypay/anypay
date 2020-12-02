@@ -15,6 +15,7 @@ import { validateToken, validateAdminToken, validateAppToken } from '../auth/hap
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 
 import { hash, bcryptCompare } from '../../lib/password';
+import { updateCryptoUSDPrices } from '../../lib/prices/crypto';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
@@ -51,32 +52,35 @@ events.on('address:set', async (changeset) => {
 
 const validatePassword = async function(request, username, password, h) {
 
-  /* 1) check for account by email (username)
-     2) check for account password by hash compare
-     3) check for sudo password by hash compare
-     4) generate access token with expiration
-  */
-
-  if (!username || !password) {
-    return {
-      isValid: false
-    };
-  }
-
-  var account = await models.Account.findOne({
-    where: {
-      email: username.toLowerCase()
-    }
-  });
-
-  if (!account) {
-
-    return {
-      isValid: false
-    }
-  }
-
   try {
+
+
+    /* 1) check for account by email (username)
+       2) check for account password by hash compare
+       3) check for sudo password by hash compare
+       4) generate access token with expiration
+    */
+
+    if (!username || !password) {
+
+      return {
+        isValid: false
+      };
+    }
+
+    var account = await models.Account.findOne({
+      where: {
+        email: username.toLowerCase()
+      }
+    });
+
+    if (!account) {
+
+      return {
+        isValid: false
+      }
+    }
+
 
     var accessToken = await AccountLogin.withEmailPassword(username, password);
 
@@ -87,8 +91,12 @@ const validatePassword = async function(request, username, password, h) {
         credentials: { accessToken, account }
       };
 
+    } else {
+
+
     }
   } catch(error) {
+
 
     log.error(error.message);
 
@@ -302,6 +310,15 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/woocommerce/{account_id}",
+    handler: handlers.Woocommerce.index,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/invoices/{invoice_uid}/payment_options",
     handler: handlers.InvoicePaymentOptions.show,
     options: {
@@ -343,9 +360,44 @@ async function Server() {
     handler: handlers.Invoices.replace,
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api']
     }
   });
+
+  server.route({
+    method: "POST",
+    path: "/v2/invoices",
+    handler: handlers.InvoicesV2.create,
+    options: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v2/invoices/{uid}",
+    handler: handlers.InvoicesV2.show,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/clover/accounts/{merchant_id}/invoices",
+    handler: handlers.CloverInvoices.create,
+    options: {
+      tags: ['api']
+    }
+  });
+
+
 
   server.route({
 
@@ -372,7 +424,7 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/accounts/{email}",
+    path: "/accounts/{id}", // id or email
     handler: handlers.Accounts.showPublic,
     options: {
       tags: ['api'],
@@ -481,6 +533,16 @@ async function Server() {
   });
 
   server.route({
+    method: "DELETE",
+    path: "/addresses/{currency}",
+    handler: handlers.Addresses.destroy,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/account",
     handler: handlers.Accounts.show,
@@ -576,7 +638,6 @@ async function Server() {
     path: "/accounts/{account_id}/invoices",
     handler: handlers.Invoices.createPublic,
     options: {
-      auth: "getaccount",
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
@@ -763,6 +824,12 @@ async function Server() {
       options: {
         auth: "app"
       }
+    })
+
+    server.route({
+      method: "POST",
+      path: "/r/beta",
+      handler: handlers.PaymentRequests.createBeta
     })
 
     /* PAYMENT REQUESTS */
@@ -984,12 +1051,68 @@ async function Server() {
   });
 
   server.route({
+    method: "GET",
+    path: "/apps",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.index
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/apps/{id}",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.show
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/apps",
+    options: {
+      auth: "token",
+      tags: ['api'],
+      handler: handlers.Apps.create
+    }
+  });
+
+  server.route({
     method: "POST",
     path: "/firebase_token",
     options: {
       auth: "token",
       tags: ['api'],
       handler: handlers.FirebaseTokens.create
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/clover/webhooks",
+    options: {
+      handler: handlers.CloverWebhooks.create
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/clover/auth",
+    options: {
+      auth: "token",
+      handler: handlers.CloverAuth.show
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/clover/auth",
+    options: {
+      auth: "token",
+      handler: handlers.CloverAuth.create
     }
   });
 
@@ -1041,6 +1164,18 @@ async function Server() {
     }
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/search/accounts',
+    handler: handlers.Search.accounts
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/search/accounts/near/{latitude}/{longitude}',
+    handler: handlers.Accounts.nearby
+  }); 
+
   accountCSVReports(server);
 
   server.route({
@@ -1067,6 +1202,24 @@ if (require.main === module) {
 async function start () {
 
   ActivateDeactivateCoinActor.start();
+
+
+  if (process.env.NODE_ENV === 'production') {
+
+    log.info('updating crypto prices from coinmarketcap')
+    await updateCryptoUSDPrices()
+    log.info('updated crypto prices from coinmarketcap')
+
+    setInterval(async () => {
+
+      log.info('updating crypto prices from coinmarketcap')
+      await updateCryptoUSDPrices()
+      log.info('updated crypto prices from coinmarketcap')
+
+    }, 1000 * 60 * 5) // once per five minutes
+  }
+
+
 
   await sequelize.sync()
 

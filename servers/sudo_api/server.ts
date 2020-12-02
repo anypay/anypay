@@ -120,6 +120,24 @@ async function Server() {
 
   server.route({
 
+    method: "GET",
+
+    path: "/api/histograms/daily-invoices-paid",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Histograms.dailyPaidInvoices
+
+    }
+
+  });
+
+
+
+  server.route({
+
     method: "POST",
 
     path: "/api/cash_deposits",
@@ -337,6 +355,54 @@ async function Server() {
       auth: "sudopassword",
 
       handler: vendingMachines.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales/profits",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.profits
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/api/batm_sales/stats",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.BatmSales.stats
 
     }
 
@@ -601,6 +667,22 @@ async function Server() {
 
   });
 
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/invoices/{uid}/bip70/{currency}',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.PaymentRequests.show
+
+    }
+
+  });
+
 
   server.route({
 
@@ -768,6 +850,68 @@ async function Server() {
     config: {
 
       handler: cashback.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/gift_card_sales',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.GiftCards.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/gift_card_sales/stats',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.GiftCards.stats
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payments',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Payments.index
+
+    }
+
+  });
+
+  server.route({
+
+    method: 'GET',
+
+    path: '/api/payments/stats',
+
+    config: {
+
+      handler: handlers.Payments.stats
 
     }
 
@@ -1051,6 +1195,35 @@ async function Server() {
     }
 
   });
+
+  server.route({
+    method: 'GET',
+
+    path: '/api/search',
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Search.show
+
+    }
+  })
+
+  server.route({
+
+    method: 'POST',
+
+    path: '/api/search',
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.Search.show
+
+    }
+  })
 
   server.route({
 

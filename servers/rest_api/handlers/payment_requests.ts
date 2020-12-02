@@ -11,6 +11,59 @@ import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
 import { schema } from 'anypay'
 
+function upcase(str) {
+
+  if (!str) {
+    return null
+  }
+
+  return str.toUpperCase()
+
+}
+
+export async function createBeta(req, h) {
+
+  /* 
+
+    Create payment request. Does not require access token. Will accept either a single Payment struct or an Array of
+    Payment structs.
+
+    [{
+      coin: 'BSV',
+      currency: 'CAD',
+      amount: 15.99,
+      address: '1Dn4dU42sjV5UXQPfHwxY187DoQAwRkyga'
+    }]
+
+  */
+
+  if (req.payload.template) {
+    return create(req, h)
+  }
+
+  var template;
+
+  if (Array.isArray(req.payload)) {
+
+    template = {
+      currency: upcase(req.params.currency) || 'BSV',
+
+      to: req.payload
+    }
+
+
+  } else {
+
+    template = {
+      currency: upcase(req.params.currency) || 'BSV',
+
+      to: [req.payload]
+    }
+
+  }
+
+}
+
 export async function create(req, h) {
 
   try {
@@ -67,9 +120,15 @@ export async function create(req, h) {
 
       return {
 
-        payment_request: record.toJSON(),
+        uid: record.uid,
 
-        options: req.payload.options
+        uri: record.uri,
+
+        url: record.webpage_url,
+
+        payment_request: record.toJSON()
+
+        //options: req.payload.options
 
       } 
 

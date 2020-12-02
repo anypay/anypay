@@ -23,3 +23,27 @@ export async function publishBTC(hex) {
 
 }
 
+export async function publish(coin, hex) {
+
+  /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum */
+
+  try {
+
+    let resp = await http.post(`https://api.blockchair.com/${coin}/push/transaction`).send({
+      data: hex
+    });
+
+    log.info(`blockchair.push.transcation.${coin}`, resp);
+
+    return resp.body.data.transaction_hash;
+
+  } catch(error) {
+
+    log.error('blockchair.push.transaction.btc.error', error);
+
+    throw error;
+
+  }
+
+}
+

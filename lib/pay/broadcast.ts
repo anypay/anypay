@@ -20,12 +20,29 @@ async function broadcastBlockchair(currency: string, hex: string): Promise<Broad
 }
 
 export async function broadcast(currency:string, hex:string): Promise<BroadcastResult> {
+  var result;
 
   switch (currency) {
   case 'BTC':
 
-    let result = await broadcastBlockchair('bitcoin', hex) 
+    result = await broadcastBlockchair('bitcoin', hex) 
+
+    return result
+  case 'LTC':
+
+    result = await broadcastBlockchair('litecoin', hex) 
+
+    return result
+  case 'DOGE':
+
+    result = await broadcastBlockchair('dogecoin', hex) 
+
+    return result
+  case 'ZEC':
+
+    result = await broadcastBlockchair('zcash', hex) 
 
     return result
   }
+
 }

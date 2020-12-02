@@ -33,6 +33,12 @@ export default Ember.Route.extend({
 
     Ember.Logger.info('city', { city: model });
 
+    if (model.city.latitude && model.city.longitude) {
+      this.transitionTo('map', model.city.latitude, model.city.longitude)
+
+      return
+    }
+
     let locations = model.accounts.map(account => {
 
       let assign = {}

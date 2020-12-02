@@ -11,14 +11,16 @@ Router.map(function() {
   this.route('city', { path: '/cities/:city' });
   this.route('business', { path: '/businesses/:stub' });
   this.route('pay', { path: '/businesses/:stub/pay' });
-  this.route('cities', { path: '/' });
+  this.route('home', { path: '/' });
   this.route('moneybutton-auth-redirect', { path: '/auth/moneybutton/redirect' });
   this.route('payments');
   this.route('logout');
   this.route('index');
   this.route('leaderboard');
   this.route('invoice', { path: '/invoice/:uid' });
-  this.route('map');
+  this.route('map', { path: '/map/:lat/:lng' });
+  this.route('cities');
+  this.route('search-city');
 });
 
 export default Router;
