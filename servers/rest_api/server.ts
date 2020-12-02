@@ -889,15 +889,6 @@ async function Server() {
   });
 
   server.route({
-    method: "POST",
-    path: "/invoices/{uid}/cointext_payments",
-    handler: handlers.Cointext.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
     handler: handlers.MoneybuttonWebhooks.create
@@ -1123,14 +1114,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       handler: handlers.FirebaseTokens.update
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/currency-map",
-    options: {
-      handler: handlers.CurrencyMap.index
     }
   });
 

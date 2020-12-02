@@ -29,7 +29,7 @@ import * as Joi from 'joi';
  *       }]
  *     }
  */
-module.exports.list = async function(request, reply) {
+export async function list(request, h) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
@@ -38,15 +38,8 @@ module.exports.list = async function(request, reply) {
   let coins = Object.values(accountCoins);
 
   return {
-    'coins': sortBCHFirst(coins)
+    'coins': coins
   };
-}
-
-function sortBCHFirst(data) {
-
-  data.sort(function(x,y){ return x.code == 'BCH' ? -1 : y.code == 'BCH' ? 1 : 0; });
-
-  return data
 }
 
 const Coin = Joi.object({
@@ -56,6 +49,9 @@ const Coin = Joi.object({
   supported: Joi.boolean().required(),
 }).label('Coin')
 
-module.exports.CoinsIndexResponse = Joi.object({
+const CoinsIndexResponse = Joi.object({
   coins: Joi.array().items(Coin).label('Coins')
 }).label('CoinsIndexResponse');
+
+export { CoinsIndexResponse }
+
