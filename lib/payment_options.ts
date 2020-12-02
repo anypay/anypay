@@ -5,12 +5,25 @@ import { log } from './logger';
 import { convert } from './prices'
 import { toSatoshis } from './pay'
 import { computeInvoiceURI } from './uri'
+import {getCoin} from './coins';
 
-interface PaymentOption {
+export interface PaymentOption {
   invoice_uid: string;
   currency: string;
-  address: string;
-  amount: number;
+  address?: string;
+  amount?: number;
+}
+
+export function writePaymentOption(option: PaymentOption) {
+
+  return models.PaymentOption.create(option);
+
+}
+
+export function writePaymentOption(option: PaymentOption) {
+
+  return models.PaymentOption.create(option);
+
 }
 
 export function writePaymentOptions(options: PaymentOption[]) {
@@ -49,10 +62,14 @@ export async function paymentRequestToPaymentOptions(paymentRequest) {
       uid: paymentRequest.invoice_uid
     })
 
+    let coin = getCoin(option.currency)
+
     return {
       invoice_uid: paymentRequest.invoice_uid,
       currency: option.currency,
       outputs,
+      currency_name: coin.name,
+      currency_logo_url: coin.logo_url,
       uri
     }
 

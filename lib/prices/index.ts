@@ -86,6 +86,13 @@ export async function setPrice(currency:string, value:number, source:string,  ba
     }
   });
 
+  await models.PriceRecord.create({
+    currency,
+    value,
+    base_currency,
+    source
+  })
+
   if (!isNew) {
 
     price.value = value;

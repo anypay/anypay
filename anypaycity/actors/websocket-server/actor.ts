@@ -15,6 +15,8 @@ import * as http from 'superagent';
 
 import * as jwt from 'jsonwebtoken';
 
+import * as moment from 'moment'
+
 require('dotenv').config();
 
 const subscriptions = {};
@@ -88,6 +90,33 @@ export async function start() {
     handler: (request, h) => {
 
       return wsSubscriptions.subscriptions;
+
+    }
+
+  })
+
+  hapiServer.route({
+
+    method: 'GET',
+
+    path: '/api/accounts/{account_id}/current_invoice',
+
+    handler: async (request, h) => {
+      console.log('get current invoice for account', request.params.account_id)
+
+      let invoice = await models.Invoice.findOne({
+        where: {
+          status: 'unpaid',
+          account_id: request.params.account_id,
+          createdAt: {
+            [Op.gte]: moment().subtract(1, 'minute').toDate()
+          }
+        },
+
+        order: [['createdAt', 'desc']]
+      })
+
+      return { invoice }
 
     }
 

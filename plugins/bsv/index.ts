@@ -143,9 +143,19 @@ export async function transformAddress(alias: string){
 }
 
 
-export async function getNewAddress(deprecatedParam){
+export async function getNewAddress(params){
 
-  return deprecatedParam.value;
+  if (params.paymail && params.paymail.match('handcash.io')) {
+
+    let resolved = await polynym.resolveAddress(params.paymail)
+
+    return resolved.address
+
+  } else {
+
+    return params.value;
+
+  }
 
   /*
   //Create a new HDKeyAddress 

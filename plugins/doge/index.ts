@@ -8,6 +8,8 @@ import {statsd} from '../../lib/stats/statsd'
 
 import * as forwards from './lib/forwards';
 
+import * as blockchair from './lib/blockchair';
+
 import { I_Address } from '../../types/interfaces';
 
 var WAValidator = require('anypay-wallet-address-validator');
@@ -18,6 +20,10 @@ export function validateAddress(address: string){
 
   return valid;
 
+}
+
+export async function getNewAddress(record) {
+  return record.value;
 }
 
 async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
@@ -98,11 +104,14 @@ async function createAddressForward(record: I_Address) {
 
 }
 
-export async function getNewAddress(record: I_Address) {
+export async function submitTransaction(rawTx: string) {
 
-  let address = await createAddressForward(record);
+  return blockchair.publish('dogecoin', rawTx)
 
-  return address;
+}
+export async function broadcastTx(rawTx: string) {
+
+  return blockchair.publish('dogecoin', rawTx)
 
 }
 

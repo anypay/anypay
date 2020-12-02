@@ -39,6 +39,10 @@ import { writePaymentOptions } from './payment_options';
 
 import {channel} from './amqp';
 
+import { app } from 'anypay'
+
+const anypay = app(process.env.ANYPAY_API_SECRET)
+
 interface Amount {
   currency: string;
   value: number
@@ -85,6 +89,12 @@ export async function createEmptyInvoice(app_id: number, uid?: string) {
 
   uid = !!uid ? uid : shortid.generate();
 
+  let app = await models.App.findOne({ where: { id: app_id }})
+
+  if (!app) {
+    throw new Error('app not found')
+  }
+
   let uri = computeInvoiceURI({
     currency: 'ANYPAY',
     uid
@@ -92,6 +102,7 @@ export async function createEmptyInvoice(app_id: number, uid?: string) {
 
   return models.Invoice.create({
     app_id,
+    account_id: app.account_id,
     uid,
     uri
   })
@@ -129,6 +140,65 @@ export async function create(params: CreateInvoice): Promise<any> {
   
 }
 
+class ClassicInvoice {
+
+  template: any
+
+  addresses: any[]
+
+  params: any
+
+  constructor(params) {
+    this.params = params
+  }
+
+  async applyScalar() {
+
+  }
+
+  async applyCashback() {
+
+  }
+
+  async applyAffiliate() {
+
+  }
+
+  async getTemplate() {
+
+    return this.template;
+
+  }
+}
+
+export async function createPlatformInvoice(account_id, amount, currency, cashback) {
+
+  // invoice amount 
+
+  // times scalar
+
+  // minus cash back
+
+  let platformInvoice = new ClassicInvoice({ account_id, currency, amount, cashback })
+
+  await platformInvoice.applyScalar()
+
+  await platformInvoice.applyCashback()
+
+  await platformInvoice.applyAffiliate()
+
+  let template = await platformInvoice.getTemplate()
+
+  let request = await anypay.request(template)
+
+  let invoice = await models.Invoice.findOne({ where: {
+
+    uid: request.uid
+
+  }})
+
+}
+  
 export async function generateInvoice(
 
   accountId: number,
@@ -247,7 +317,9 @@ export async function generateInvoice(
 
   let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
 
-    let currency = row[0].currency
+    let currency = row[0].currency;
+
+    let paymentCoin = getCoin(currency);
 
     let fee = await pay.fees.getFee(currency)
 
@@ -324,6 +396,8 @@ export async function generateInvoice(
     outputs.push(fee)
 
     return {
+      currency_logo_url: paymentCoin.logo_url,
+      currency_name: paymentCoin.name,
       invoice_uid: invoice.uid,
       currency,
       amount: pay.fromSatoshis(amount),

@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+import * as apps from './apps';
 import * as accounts from './accounts';
 import * as amqp from './amqp';
 import * as apikeys from './apikeys';
@@ -36,6 +37,7 @@ import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
+import * as woocommerce from './woocommerce';
 
 var initialized = false;
 
@@ -53,6 +55,7 @@ export {
   ambassadors,
   amqp,
   apikeys,
+  apps,
   auth,
   blockcypher,
   cashback,
@@ -82,6 +85,7 @@ export {
   square,
   tipjar,
   utils,
+  woocommerce,
   xpub
 }
 
