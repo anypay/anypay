@@ -20,7 +20,7 @@ export default Ember.Route.extend({
 
   actions: {
     didTransition: function() {
-      console.log('DID TRANSITION');
+      Ember.Logger.info('DID TRANSITION');
 
       /*
       Ember.$('.ember-google-map').css({
@@ -35,12 +35,12 @@ export default Ember.Route.extend({
   },
 
   model(params) {
+    Ember.Logger.info('MODEL', params)
+    
     var model = {}
 
     model['lat'] = parseFloat(params['lat'])
     model['lng'] = parseFloat(params['lng'])
-
-    console.log("PARSE", parseFloat(params['lng']))
 
     return model
 
@@ -48,11 +48,11 @@ export default Ember.Route.extend({
 
   async setupController(ctrl, model) {
 
-    console.log('MODEL', model)
+    Ember.Logger.info('MODEL', model)
 
     let addressSearchResults = await this.get('addressSearch').getCoordinates('keene, new hampshire')
 
-    console.log('address search results', addressSearchResults)
+    Ember.Logger.info('address search results', addressSearchResults)
 
     model['lat'] = parseFloat(model['lat'])
     model['lng'] = parseFloat(model['lng'])
@@ -68,7 +68,7 @@ export default Ember.Route.extend({
 
     let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
 
-    console.log('search result', accounts)
+    Ember.Logger.info('search result', accounts)
 
     let frequencyIcons = {
 
@@ -361,15 +361,13 @@ export default Ember.Route.extend({
       return merchant
        
     }));
-    console.log('SETUP CONTROLLER');
+
     setTimeout(() => {
 
       //Ember.$('.map').css('position', 'fixed');
     }, 1000);
 
     Ember.run.scheduleOnce('afterRender', this, function() {                                                                  
-      console.log('AFTER RENDER');
-
       let map = new window.google.maps.Map(document.getElementById("map"), {
         center: { lat: model.lat, lng: model.lng },
         fullscreenControl: false,
@@ -397,12 +395,12 @@ export default Ember.Route.extend({
           let newCenter = map.getCenter()
 
           if (center.lat() === newCenter.lat() && center.lng() === newCenter.lng()) {
-            console.log('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() })
-            console.log('latlng', newCenter.toJSON())
+            Ember.Logger.info('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() })
+            Ember.Logger.info('latlng', newCenter.toJSON())
 
             let accounts = await getNearbyAccounts(newCenter.lat(), newCenter.lng())
 
-            console.log('accounts', accounts)
+            Ember.Logger.info('accounts', accounts)
 
             controller.set('merchants', accounts.map(merchant => {
 
@@ -421,6 +419,9 @@ export default Ember.Route.extend({
       })
 
       controller.set('googlemap', map)
+      let appCtrl = this.controllerFor('application')
+      appCtrl.set('googlemap', map)
+      Ember.Logger.info('set google map')
 
       loadMerchants(map)
 
@@ -437,6 +438,8 @@ export default Ember.Route.extend({
 });
 
 function loadMerchants(map) {
+
+  Ember.Logger.info('LOAD MERCHANTS')
 
   let frequencyIcons = {
 
@@ -462,7 +465,6 @@ function loadMerchants(map) {
 
   })
   .then(function(resp) {
-    console.log("ACTIVE MERCHANTS", resp)
 
     activeMerchants = resp;
 
@@ -476,8 +478,6 @@ function loadMerchants(map) {
 
   })
   .then(function(resp) {
-
-    console.log("RESP", resp);
 
     var coinsByMerchant = resp.reduce((merchantCoins, merchantCoin) => {
 
@@ -493,7 +493,6 @@ function loadMerchants(map) {
 
     });
 
-    console.log("COINS", resp);
 
     let oneWeekMerchants = activeMerchants.oneWeek.reduce((sum, i) => {
 
@@ -503,7 +502,6 @@ function loadMerchants(map) {
 
     }, {});
 
-    console.log('one week', oneWeekMerchants)
 
     let oneMonthMerchants = activeMerchants.oneMonth.reduce((map, i) => {
 
@@ -512,6 +510,7 @@ function loadMerchants(map) {
       return map;
 
     }, {});
+
 
     let threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
 
@@ -529,12 +528,6 @@ function loadMerchants(map) {
 
     }, {});
 
-    var source   = document.getElementById("merchant-popup-template").innerHTML;
-    var template = Handlebars.compile(source);
-
-    console.log('template', template)
-
-    var currentlyOpenInfowindow;
 
     activeMerchants.merchants.forEach(merchant => {
 
@@ -583,46 +576,11 @@ function loadMerchants(map) {
 
       }
 
-      var marker = new google.maps.Marker(markerOpts);
-
-      let content = template({
-        business_name: merchant.business_name,
-        physical_address: merchant.physical_address,
-        coins_accepted: ['BCH', 'BTC', 'DASH'].join(', ')
-      });
-
-      merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
-
-      if (!merchant.image_url) {
-        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
-      }
-
-      var infowindow = new google.maps.InfoWindow({
-        maxWidth: 500,
-        height: 300,
-        content: `
-          <h1>${merchant.business_name}</h1>
-          <h2>${merchant.physical_address}</h2>
-          <div style='position:relative'>
-            <img src='${merchant.image_url}' style='width: 100%; height: 100%'>
-            <h3>Coins accepted: ${merchant.coins_accepted}</h3>
-          </div>
-        `
-      });
+      var marker = new window.google.maps.Marker(markerOpts);
 
       marker.addListener('click', function() {
 
         controller.send('merchantDetailsClicked', merchant)
-
-        /*
-        if (currentlyOpenInfowindow) {
-          currentlyOpenInfowindow.close();
-        }
-
-        infowindow.open(map, marker);
-
-        currentlyOpenInfowindow = infowindow;
-        */
       });
 
     });

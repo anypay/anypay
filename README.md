@@ -55,25 +55,6 @@ CI will deploy your new code to `https://api.staging.anypay.global`.
 
 Configuration of the application is done via environment variables
 
-- BLOCKCYPHER_API_KEY
-- BLOCKCYPHER_API_SECRET
-- BLOCKCYPHER_BITCOIN_FEE
-- BLOCKCYPHER_DASH_FEE
-- DATABASE_URL
-- AMQP_URL
-- FORWARDING_SERVICE_URL
-- JSONWEBTOKEN_PUBKEY_PATH
-- JSONWEBTOKEN_PRIVATE_KEY_PATH
-- SUDO_PASSWORD_HASH
-
-- DASHTEXT_TOKEN
-
-### Optional Environmente Variables
-
-- BLOCKCYPHER_CALLBACKS_BASE (used for staging/testing of blockcypher)
-
-
-
 ## Enabling Features
 
 - set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
