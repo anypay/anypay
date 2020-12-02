@@ -37,6 +37,7 @@ import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
+import * as woocommerce from './woocommerce';
 
 var initialized = false;
 
@@ -84,6 +85,7 @@ export {
   square,
   tipjar,
   utils,
+  woocommerce,
   xpub
 }
 
