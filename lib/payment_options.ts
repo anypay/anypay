@@ -20,12 +20,6 @@ export function writePaymentOption(option: PaymentOption) {
 
 }
 
-export function writePaymentOption(option: PaymentOption) {
-
-  return models.PaymentOption.create(option);
-
-}
-
 export function writePaymentOptions(options: PaymentOption[]) {
 
   log.info('writepaymentoptions', {options});

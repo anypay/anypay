@@ -93,6 +93,7 @@
     "node-statsd": "^0.1.1",
     "parent-module": "^2.0.0",
     "pg": "^7.9.0",
+    "pg-native": "^3.0.0",
     "polynym": "^1.0.7",
     "postgresql": "0.0.1",
     "prettyjson": "^1.2.1",
