@@ -310,10 +310,9 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/woocommerce",
+    path: "/woocommerce/{account_id}",
     handler: handlers.Woocommerce.index,
     options: {
-      auth: "token",
       tags: ['api']
     }
   });
