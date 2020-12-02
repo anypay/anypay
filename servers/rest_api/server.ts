@@ -310,10 +310,9 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/woocommerce",
+    path: "/woocommerce/{account_id}",
     handler: handlers.Woocommerce.index,
     options: {
-      auth: "token",
       tags: ['api']
     }
   });
@@ -530,6 +529,16 @@ async function Server() {
         payload: handlers.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
+    }
+  });
+
+  server.route({
+    method: "DELETE",
+    path: "/addresses/{currency}",
+    handler: handlers.Addresses.destroy,
+    options: {
+      auth: "token",
+      tags: ['api']
     }
   });
 
