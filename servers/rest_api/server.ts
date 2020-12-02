@@ -510,6 +510,16 @@ async function Server() {
   });
 
   server.route({
+    method: "DELETE",
+    path: "/addresses/{currency}",
+    handler: handlers.Addresses.destroy,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/account",
     handler: handlers.Accounts.show,
