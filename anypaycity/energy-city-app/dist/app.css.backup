@@ -597,3 +597,13 @@ iframe {
 .search-city-page {
   width: 100%;
 }
+
+.business-modal {
+  position: fixed;
+  background-color: black;
+  z-index: 1000;
+  width: 90vw;
+  height: 90vh;
+  max-width: 500px;
+  max-height: 800px;;
+}
