@@ -310,10 +310,9 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/woocommerce",
+    path: "/woocommerce/{account_id}",
     handler: handlers.Woocommerce.index,
     options: {
-      auth: "token",
       tags: ['api']
     }
   });
@@ -361,7 +360,31 @@ async function Server() {
     handler: handlers.Invoices.replace,
     options: {
       auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/v2/invoices",
+    handler: handlers.InvoicesV2.create,
+    options: {
+      auth: "token",
       tags: ['api'],
+      validate: {
+        payload: {
+          amount: Joi.number().required()
+        }
+      },
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v2/invoices/{uid}",
+    handler: handlers.InvoicesV2.show,
+    options: {
+      tags: ['api']
     }
   });
 
@@ -401,7 +424,7 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/accounts/{email}",
+    path: "/accounts/{id}", // id or email
     handler: handlers.Accounts.showPublic,
     options: {
       tags: ['api'],
@@ -506,6 +529,16 @@ async function Server() {
         payload: handlers.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
+    }
+  });
+
+  server.route({
+    method: "DELETE",
+    path: "/addresses/{currency}",
+    handler: handlers.Addresses.destroy,
+    options: {
+      auth: "token",
+      tags: ['api']
     }
   });
 

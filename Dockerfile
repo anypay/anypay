@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:12
 
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
@@ -6,10 +6,10 @@ WORKDIR /usr/src/app
 # Install app dependencies
 COPY package.json /usr/src/app/
 
-RUN yarn 
-RUN yarn global add typescript
-RUN yarn global add ts-node
-RUN yarn global add mocha 
+RUN npm install 
+RUN npm install -g typescript
+RUN npm install -g ts-node
+RUN npm install -g mocha 
 
 # Bundle app source
 COPY . /usr/src/app

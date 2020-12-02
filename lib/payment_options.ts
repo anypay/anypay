@@ -10,8 +10,14 @@ import {getCoin} from './coins';
 export interface PaymentOption {
   invoice_uid: string;
   currency: string;
-  address: string;
-  amount: number;
+  address?: string;
+  amount?: number;
+}
+
+export function writePaymentOption(option: PaymentOption) {
+
+  return models.PaymentOption.create(option);
+
 }
 
 export function writePaymentOption(option: PaymentOption) {

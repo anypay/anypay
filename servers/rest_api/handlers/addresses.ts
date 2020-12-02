@@ -3,10 +3,41 @@ const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
-import { log } from '../../../lib';
+import { log, amqp, events } from '../../../lib';
+import { notify } from '../../../lib/slack/notifier';
 import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
 
 import { models } from '../../../lib';
+
+export async function destroy(req, h) {
+
+  try {
+
+    let where = {
+
+      account_id: req.account.id,
+
+      currency: req.params.currency 
+
+    }
+
+    await models.Address.destroy({ where })
+
+    amqp.publish('address.deleted', where)
+
+    events.emitter.emit('address.deleted', where)
+
+    return { success: true }
+
+  } catch(error) {
+
+    log.error(error.message)
+
+    return Boom.badRequest(error)  
+
+  }
+
+}
 
 module.exports.list = async function(request, reply) {
 
