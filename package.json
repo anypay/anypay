@@ -20,6 +20,7 @@
     "@rodrigogs/mysql-events": "^0.6.0",
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.20",
+    "@types/es6-promise": "^3.3.0",
     "amqplib": "^0.5.2",
     "anypay": "^0.1.0",
     "anypay-wallet-address-validator": "^0.2.6",
@@ -137,7 +138,7 @@
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
     "@types/mocha": "^5.2.0",
-    "@types/node": "^10.1.2",
+    "@types/node": "^10.17.46",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "ts-node": "^6.2.0",

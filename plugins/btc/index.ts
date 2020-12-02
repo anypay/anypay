@@ -46,11 +46,17 @@ var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 
-  let valid = WAValidator.validate( address, 'BTC')
+  try {
 
-  console.log(address, valid);
+    new btc.Address(address)
+  
+    return true
 
-  return valid;
+  } catch(error) {
+
+    throw new Error('Invalid BTC address. SegWit addresses not supported. Use 1 or 3-style addresses.')
+
+  }
 
 }
 

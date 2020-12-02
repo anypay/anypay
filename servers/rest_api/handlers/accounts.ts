@@ -4,7 +4,11 @@ var geoip = require('geoip-lite');
 
 import {emitter} from '../../../lib/events'
 
-import { models, accounts, slack, log, utils } from '../../../lib';
+import {Op} from 'sequelize'
+
+import * as moment from 'moment'
+
+import { coins, models, accounts, slack, log, utils } from '../../../lib';
 
 import { near } from '../../../lib/accounts'
 
@@ -161,31 +165,95 @@ export async function create (request, reply) {
 }
 
 export async function showPublic (req, h) {
+  try {
 
-  let account = await models.Account.findOne({
-    where: {
-      email: req.params.email
+    let account = await models.Account.findOne({
+      where: {
+        email: req.params.id
+      }
+    });
+
+    if (!account) {
+
+      account = await models.Account.findOne({
+        where: {
+          id: req.params.id
+        }
+      });
     }
-  });
 
-  if (!account) {
-    return Boom.notFound();
-  }
+    if (!account) {
 
-  let addresses = await models.Address.findAll({
-
-    where: {
-      account_id: account.id
+      return Boom.notFound();
     }
 
-  });
+    let addresses = await models.Address.findAll({
 
-  return {
-    id: account.id,
-    email: account.email,
-    coins: addresses.map(a => a.currency)
+      where: {
+        account_id: account.id
+      }
+
+    });
+
+    let payments = await models.Invoice.findAll({
+
+      where: {
+        account_id: account.id,
+        status: 'paid',
+        createdAt: {
+          [Op.gte]: moment().subtract(1, 'month')
+        }
+      },
+
+      order: [["createdAt", "desc"]]
+    
+    })
+
+    let latest = await models.Invoice.findOne({
+
+      where: {
+        account_id: account.id,
+        status: 'paid'
+      },
+
+      order: [["createdAt", "desc"]]
+    
+    })
+
+    if (latest) {
+      latest = {
+        time: latest.paidAt,
+        denomination_amount: latest.denomination_amount,
+        denomination_currency: latest.denomination_currency,
+        currency: latest.currency
+      }
+    }
+
+    return {
+      id: account.id,
+      name: account.business_name,
+      physical_address: account.physical_address,
+      coordinates: {
+        latitude: account.latitude,
+        longitude: account.longitude
+      },
+      coins: addresses.filter(a => {
+        let coin = coins.getCoin(a.currency)
+        return !!coin && !coin.unavailable
+      }).map(a => a.currency),
+      payments: {
+        last_30_days: payments.length,
+        latest: latest
+      }
+    }
+
+  } catch(error) {
+
+    console.log(error)
+
+    return Boom.badRequest(error)
+
   }
-
 }
 
 export async function show (request, reply) {
