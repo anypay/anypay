@@ -142,7 +142,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n379:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n381:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n389:7 - Unexpected console statement. (no-console)\n485:9 - \'coinsByMerchant\' is assigned a value but never used. (no-unused-vars)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n217:7 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {
@@ -188,6 +188,11 @@ define('energy-city-app/tests/app.lint-test', [], function () {
   QUnit.test('services/leaderboard.js', function (assert) {
     assert.expect(1);
     assert.ok(false, 'services/leaderboard.js should pass ESLint\n\n3:20 - \'service\' is defined but never used. (no-unused-vars)');
+  });
+
+  QUnit.test('services/merchant-map.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'services/merchant-map.js should pass ESLint\n\n');
   });
 });
 define('energy-city-app/tests/helpers/destroy-app', ['exports'], function (exports) {
@@ -490,6 +495,11 @@ define('energy-city-app/tests/tests.lint-test', [], function () {
   QUnit.test('unit/services/geolocation-test.js', function (assert) {
     assert.expect(1);
     assert.ok(true, 'unit/services/geolocation-test.js should pass ESLint\n\n');
+  });
+
+  QUnit.test('unit/services/merchant-map-test.js', function (assert) {
+    assert.expect(1);
+    assert.ok(true, 'unit/services/merchant-map-test.js should pass ESLint\n\n');
   });
 });
 define('energy-city-app/tests/unit/controllers/application-test', ['ember-qunit'], function (_emberQunit) {
@@ -817,6 +827,20 @@ define('energy-city-app/tests/unit/services/geolocation-test', ['ember-qunit'], 
   'use strict';
 
   (0, _emberQunit.moduleFor)('service:geolocation', 'Unit | Service | geolocation', {
+    // Specify the other units that are required for this test.
+    // needs: ['service:foo']
+  });
+
+  // Replace this with your real tests.
+  (0, _emberQunit.test)('it exists', function (assert) {
+    var service = this.subject();
+    assert.ok(service);
+  });
+});
+define('energy-city-app/tests/unit/services/merchant-map-test', ['ember-qunit'], function (_emberQunit) {
+  'use strict';
+
+  (0, _emberQunit.moduleFor)('service:merchant-map', 'Unit | Service | merchant map', {
     // Specify the other units that are required for this test.
     // needs: ['service:foo']
   });

@@ -4269,587 +4269,476 @@ define('energy-city-app/routes/logout', ['exports'], function (exports) {
   });
 });
 define('energy-city-app/routes/map', ['exports'], function (exports) {
-    'use strict';
+  'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
 
-    function _asyncToGenerator(fn) {
-        return function () {
-            var gen = fn.apply(this, arguments);
-            return new Promise(function (resolve, reject) {
-                function step(key, arg) {
-                    try {
-                        var info = gen[key](arg);
-                        var value = info.value;
-                    } catch (error) {
-                        reject(error);
-                        return;
-                    }
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
 
-                    if (info.done) {
-                        resolve(value);
-                    } else {
-                        return Promise.resolve(value).then(function (value) {
-                            step("next", value);
-                        }, function (err) {
-                            step("throw", err);
-                        });
-                    }
-                }
-
-                return step("next");
-            });
-        };
+  var _createClass = function () {
+    function defineProperties(target, props) {
+      for (var i = 0; i < props.length; i++) {
+        var descriptor = props[i];
+        descriptor.enumerable = descriptor.enumerable || false;
+        descriptor.configurable = true;
+        if ("value" in descriptor) descriptor.writable = true;
+        Object.defineProperty(target, descriptor.key, descriptor);
+      }
     }
 
-    var getNearbyAccounts = function () {
-        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(lat, lng) {
-            var _ref2, accounts;
+    return function (Constructor, protoProps, staticProps) {
+      if (protoProps) defineProperties(Constructor.prototype, protoProps);
+      if (staticProps) defineProperties(Constructor, staticProps);
+      return Constructor;
+    };
+  }();
 
-            return regeneratorRuntime.wrap(function _callee$(_context) {
-                while (1) {
-                    switch (_context.prev = _context.next) {
+  function _asyncToGenerator(fn) {
+    return function () {
+      var gen = fn.apply(this, arguments);
+      return new Promise(function (resolve, reject) {
+        function step(key, arg) {
+          try {
+            var info = gen[key](arg);
+            var value = info.value;
+          } catch (error) {
+            reject(error);
+            return;
+          }
+
+          if (info.done) {
+            resolve(value);
+          } else {
+            return Promise.resolve(value).then(function (value) {
+              step("next", value);
+            }, function (err) {
+              step("throw", err);
+            });
+          }
+        }
+
+        return step("next");
+      });
+    };
+  }
+
+  var getNearbyAccounts = function () {
+    var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(lat, lng) {
+      var _ref2, accounts;
+
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              Ember.$('#loader-wrapper').show();
+
+              _context.next = 3;
+              return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
+
+            case 3:
+              _ref2 = _context.sent;
+              accounts = _ref2.accounts;
+
+              Ember.$('#loader-wrapper').hide();
+
+              return _context.abrupt('return', accounts);
+
+            case 7:
+            case 'end':
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    return function getNearbyAccounts(_x, _x2) {
+      return _ref.apply(this, arguments);
+    };
+  }();
+
+  var controller;
+
+  exports.default = Ember.Route.extend({
+
+    addressSearch: Ember.inject.service('address-search'),
+    'merchant-map': Ember.inject.service(),
+
+    actions: {
+      didTransition: function didTransition() {
+        Ember.Logger.info('DID TRANSITION');
+      }
+    },
+
+    model: function model(params) {
+      Ember.Logger.info('MODEL', params);
+
+      var model = {};
+
+      model['lat'] = parseFloat(params['lat']);
+      model['lng'] = parseFloat(params['lng']);
+
+      return model;
+    },
+    setupController: function () {
+      var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(ctrl, model) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+
+                Ember.run.scheduleOnce('afterRender', this, _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+                  var _this = this;
+
+                  var addressSearchResults, map, merchantMap, lat, lng, _ref5, accounts, appCtrl;
+
+                  return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
                         case 0:
-                            Ember.$('#loader-wrapper').show();
 
-                            _context.next = 3;
-                            return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
+                          Ember.Logger.info('MODEL', model);
+
+                          _context3.next = 3;
+                          return this.get('addressSearch').getCoordinates('keene, new hampshire');
 
                         case 3:
-                            _ref2 = _context.sent;
-                            accounts = _ref2.accounts;
+                          addressSearchResults = _context3.sent;
 
-                            Ember.$('#loader-wrapper').hide();
 
-                            return _context.abrupt('return', accounts);
+                          Ember.Logger.info('address search results', addressSearchResults);
 
-                        case 7:
+                          model['lat'] = parseFloat(model['lat']);
+                          model['lng'] = parseFloat(model['lng']);
+
+                          map = new window.google.maps.Map(document.getElementById("map"), {
+                            center: { lat: model.lat, lng: model.lng },
+                            fullscreenControl: false,
+                            mapTypeControl: false,
+                            streetViewControl: false,
+                            zoom: 15
+                          });
+                          merchantMap = new MerchantMap(map);
+
+
+                          controller = ctrl;
+
+                          lat = model.lat || 13.737275;
+                          lng = model.lng || 100.560145;
+                          _context3.next = 14;
+                          return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
+
+                        case 14:
+                          _ref5 = _context3.sent;
+                          accounts = _ref5.accounts;
+
+
+                          merchantMap.setNearbyMerchants(accounts);
+
+                          controller.set('icons', merchantMap.frequencyIcons);
+
+                          controller.set('mapStyles', this.get('merchant-map').getStyles());
+
+                          controller.set('merchants', accounts.map(function (merchant) {
+
+                            if (!merchant.image_url) {
+                              merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
+                            }
+
+                            return merchant;
+                          }));
+
+                          merchantMap.map.addListener('center_changed', function () {
+
+                            var center = merchantMap.map.getCenter();
+
+                            setTimeout(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+                              var newCenter, merchants;
+                              return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                                while (1) {
+                                  switch (_context2.prev = _context2.next) {
+                                    case 0:
+                                      newCenter = merchantMap.map.getCenter();
+
+                                      if (!(center.lat() === newCenter.lat() && center.lng() === newCenter.lng())) {
+                                        _context2.next = 10;
+                                        break;
+                                      }
+
+                                      Ember.Logger.info('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() });
+                                      Ember.Logger.info('latlng', newCenter.toJSON());
+
+                                      _context2.next = 6;
+                                      return getNearbyAccounts(newCenter.lat(), newCenter.lng());
+
+                                    case 6:
+                                      merchants = _context2.sent;
+
+
+                                      merchantMap.setNearbyMerchants(merchants);
+
+                                      Ember.Logger.info('merchants', merchants);
+
+                                      controller.set('merchants', merchants.map(function (merchant) {
+
+                                        if (!merchant.image_url) {
+                                          merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
+                                        }
+
+                                        return merchant;
+                                      }));
+
+                                    case 10:
+                                    case 'end':
+                                      return _context2.stop();
+                                  }
+                                }
+                              }, _callee2, _this);
+                            })), 10);
+                          });
+
+                          controller.set('googlemap', merchantMap.map);
+                          appCtrl = this.controllerFor('application');
+
+                          appCtrl.set('googlemap', merchantMap.map);
+                          Ember.Logger.info('set google map');
+
+                          loadMerchants(merchantMap);
+
+                        case 26:
                         case 'end':
-                            return _context.stop();
+                          return _context3.stop();
+                      }
                     }
-                }
-            }, _callee, this);
+                  }, _callee3, this);
+                })));
+
+              case 1:
+              case 'end':
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function setupController(_x3, _x4) {
+        return _ref3.apply(this, arguments);
+      }
+
+      return setupController;
+    }()
+  });
+
+  var MerchantMap = function () {
+    function MerchantMap(map) {
+      _classCallCheck(this, MerchantMap);
+
+      this.map = map;
+
+      this.icons = {};
+
+      this.merchants = {}; // indexed by merchant ID
+
+      this.frequencyIcons = {
+
+        'one-week': '/google-map-marker-512-green.png',
+
+        'one-month': '/google-map-marker-yellow.png',
+
+        'three-months': '/google-map-marker-512.png',
+
+        'inactive': '/google-map-marker-512-grey.png',
+
+        'bitcoincom': '/bitcoincomlogo.png'
+
+      };
+    }
+
+    _createClass(MerchantMap, [{
+      key: 'setNearbyMerchants',
+      value: function setNearbyMerchants(merchants) {
+        var _this2 = this;
+
+        merchants.forEach(function (merchant) {
+          _this2.merchants[merchant.id] = merchant;
+        });
+      }
+    }, {
+      key: 'setMap',
+      value: function setMap(map) {
+        this.map = map;
+      }
+    }, {
+      key: 'setMerchantIcon',
+      value: function setMerchantIcon(merchant) {
+        var _this3 = this;
+
+        var markerOpts = {
+
+          position: {
+
+            lat: parseFloat(merchant.latitude),
+
+            lng: parseFloat(merchant.longitude)
+
+          },
+
+          map: this.map
+
+        };
+
+        if (this.inactiveMerchants[merchant.id]) {
+
+          markerOpts.icon = this.frequencyIcons['inactive'];
+        }
+
+        if (this.threeMonthsMerchants[merchant.id]) {
+
+          markerOpts.icon = this.frequencyIcons['three-months'];
+        }
+
+        if (this.oneMonthMerchants[merchant.id]) {
+
+          markerOpts.icon = this.frequencyIcons['one-month'];
+        }
+
+        if (this.oneWeekMerchants[merchant.id]) {
+
+          markerOpts.icon = this.frequencyIcons['one-week'];
+        }
+
+        if (!markerOpts.icon) {
+
+          return;
+        }
+
+        var marker = new window.google.maps.Marker(markerOpts);
+
+        marker.addListener('click', function () {
+
+          console.log('this.merchants', _this3.merchants);
+
+          controller.send('merchantDetailsClicked', _this3.merchants[merchant.id]);
+        });
+      }
+    }, {
+      key: 'getAllActiveMerchants',
+      value: function () {
+        var _ref7 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+          var _this4 = this;
+
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  _context5.next = 2;
+                  return Ember.$.ajax({
+
+                    method: 'GET',
+
+                    url: 'https://api.anypay.global/active-merchants'
+
+                  });
+
+                case 2:
+                  this.allActiveMerchants = _context5.sent;
+
+
+                  this.allActiveMerchants.merchants.forEach(function (merchant) {
+                    if (!_this4.merchants[merchant.id]) {
+                      _this4.merchants[merchant.id] = merchant;
+                    }
+                  });
+
+                  return _context5.abrupt('return', this.allActiveMerchants);
+
+                case 5:
+                case 'end':
+                  return _context5.stop();
+              }
+            }
+          }, _callee5, this);
         }));
 
-        return function getNearbyAccounts(_x, _x2) {
-            return _ref.apply(this, arguments);
-        };
-    }();
+        function getAllActiveMerchants() {
+          return _ref7.apply(this, arguments);
+        }
 
-    var controller;
+        return getAllActiveMerchants;
+      }()
+    }]);
 
-    exports.default = Ember.Route.extend({
+    return MerchantMap;
+  }();
 
-        addressSearch: Ember.inject.service('address-search'),
+  var loadMerchants = function () {
+    var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(merchantMap) {
+      var activeMerchants;
+      return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
 
-        actions: {
-            didTransition: function didTransition() {
-                Ember.Logger.info('DID TRANSITION');
+              window.merchantMap = merchantMap;
 
-                /*
-                Ember.$('.ember-google-map').css({
-                  position: 'fixed',
-                  top: '50px',
-                  bottom: '0px',
-                  left: '0px',
-                  right: '0px'
-                });
-                */
-            }
-        },
+              Ember.Logger.info('LOAD MERCHANTS');
 
-        model: function model(params) {
-            Ember.Logger.info('MODEL', params);
+              _context6.next = 4;
+              return merchantMap.getAllActiveMerchants();
 
-            var model = {};
+            case 4:
+              activeMerchants = merchantMap.allActiveMerchants;
 
-            model['lat'] = parseFloat(params['lat']);
-            model['lng'] = parseFloat(params['lng']);
 
-            return model;
-        },
-        setupController: function () {
-            var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(ctrl, model) {
-                var addressSearchResults, lat, lng, _ref4, accounts, frequencyIcons;
-
-                return regeneratorRuntime.wrap(function _callee3$(_context3) {
-                    while (1) {
-                        switch (_context3.prev = _context3.next) {
-                            case 0:
-
-                                Ember.Logger.info('MODEL', model);
-
-                                _context3.next = 3;
-                                return this.get('addressSearch').getCoordinates('keene, new hampshire');
-
-                            case 3:
-                                addressSearchResults = _context3.sent;
-
-
-                                Ember.Logger.info('address search results', addressSearchResults);
-
-                                model['lat'] = parseFloat(model['lat']);
-                                model['lng'] = parseFloat(model['lng']);
-
-                                /*model.lat = addressSearchResults.lat
-                                model.lng = addressSearchResults.lng
-                                */
-
-                                controller = ctrl;
-
-                                lat = model.lat || 13.737275;
-                                lng = model.lng || 100.560145;
-                                _context3.next = 12;
-                                return Ember.$.getJSON('https://api.anypayinc.com/search/accounts/near/' + lat + '/' + lng + '?limit=100');
-
-                            case 12:
-                                _ref4 = _context3.sent;
-                                accounts = _ref4.accounts;
-
-
-                                Ember.Logger.info('search result', accounts);
-
-                                frequencyIcons = {
-
-                                    'one-week': '/google-map-marker-512-green.png',
-
-                                    'one-month': '/google-map-marker-yellow.png',
-
-                                    'three-months': '/google-map-marker-512.png',
-
-                                    'inactive': '/google-map-marker-512-grey.png',
-
-                                    'bitcoincom': '/bitcoincomlogo.png'
-
-                                };
-
-
-                                controller.set('icons', frequencyIcons);
-
-                                controller.set('mapStyles', [{
-                                    "featureType": "all",
-                                    "elementType": "labels",
-                                    "stylers": [{
-                                        "visibility": "on"
-                                    }]
-                                }, {
-                                    "featureType": "all",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "saturation": 36
-                                    }, {
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 40
-                                    }]
-                                }, {
-                                    "featureType": "all",
-                                    "elementType": "labels.text.stroke",
-                                    "stylers": [{
-                                        "visibility": "on"
-                                    }, {
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 16
-                                    }]
-                                }, {
-                                    "featureType": "all",
-                                    "elementType": "labels.icon",
-                                    "stylers": [{
-                                        "visibility": "off"
-                                    }]
-                                }, {
-                                    "featureType": "administrative",
-                                    "elementType": "geometry.fill",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 20
-                                    }]
-                                }, {
-                                    "featureType": "administrative",
-                                    "elementType": "geometry.stroke",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 17
-                                    }, {
-                                        "weight": 1.2
-                                    }]
-                                }, {
-                                    "featureType": "administrative.country",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#e5c163"
-                                    }]
-                                }, {
-                                    "featureType": "administrative.locality",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#c4c4c4"
-                                    }]
-                                }, {
-                                    "featureType": "administrative.neighborhood",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#e5c163"
-                                    }]
-                                }, {
-                                    "featureType": "landscape",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 20
-                                    }]
-                                }, {
-                                    "featureType": "poi",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 21
-                                    }, {
-                                        "visibility": "on"
-                                    }]
-                                }, {
-                                    "featureType": "poi.business",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "visibility": "on"
-                                    }]
-                                }, {
-                                    "featureType": "road.highway",
-                                    "elementType": "geometry.fill",
-                                    "stylers": [{
-                                        "color": "#e5c163"
-                                    }, {
-                                        "lightness": "0"
-                                    }]
-                                }, {
-                                    "featureType": "road.highway",
-                                    "elementType": "geometry.stroke",
-                                    "stylers": [{
-                                        "visibility": "off"
-                                    }]
-                                }, {
-                                    "featureType": "road.highway",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#ffffff"
-                                    }]
-                                }, {
-                                    "featureType": "road.highway",
-                                    "elementType": "labels.text.stroke",
-                                    "stylers": [{
-                                        "color": "#e5c163"
-                                    }]
-                                }, {
-                                    "featureType": "road.arterial",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 18
-                                    }]
-                                }, {
-                                    "featureType": "road.arterial",
-                                    "elementType": "geometry.fill",
-                                    "stylers": [{
-                                        "color": "#575757"
-                                    }]
-                                }, {
-                                    "featureType": "road.arterial",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#ffffff"
-                                    }]
-                                }, {
-                                    "featureType": "road.arterial",
-                                    "elementType": "labels.text.stroke",
-                                    "stylers": [{
-                                        "color": "#2c2c2c"
-                                    }]
-                                }, {
-                                    "featureType": "road.local",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 16
-                                    }]
-                                }, {
-                                    "featureType": "road.local",
-                                    "elementType": "labels.text.fill",
-                                    "stylers": [{
-                                        "color": "#999999"
-                                    }]
-                                }, {
-                                    "featureType": "transit",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#000000"
-                                    }, {
-                                        "lightness": 19
-                                    }]
-                                }, {
-                                    "featureType": "water",
-                                    "elementType": "geometry",
-                                    "stylers": [{
-                                        "color": "#0077C0"
-                                    }, {
-                                        "lightness": 60
-
-                                    }]
-                                }]);
-
-                                controller.set('merchants', accounts.map(function (merchant) {
-
-                                    if (!merchant.image_url) {
-                                        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
-                                    }
-
-                                    return merchant;
-                                }));
-
-                                setTimeout(function () {
-
-                                    //Ember.$('.map').css('position', 'fixed');
-                                }, 1000);
-
-                                Ember.run.scheduleOnce('afterRender', this, function () {
-                                    var _this = this;
-
-                                    var map = new window.google.maps.Map(document.getElementById("map"), {
-                                        center: { lat: model.lat, lng: model.lng },
-                                        fullscreenControl: false,
-                                        mapTypeControl: false,
-                                        streetViewControl: false,
-                                        zoom: 15
-                                    });
-
-                                    var centerChanged = function () {
-
-                                        var lastChangedAt;
-
-                                        return function () {};
-                                    }();
-
-                                    console.log('MAP', map);
-
-                                    map.addListener('center_changed', function () {
-
-                                        var center = map.getCenter();
-
-                                        setTimeout(_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-                                            var newCenter, _accounts;
-
-                                            return regeneratorRuntime.wrap(function _callee2$(_context2) {
-                                                while (1) {
-                                                    switch (_context2.prev = _context2.next) {
-                                                        case 0:
-                                                            newCenter = map.getCenter();
-
-                                                            if (!(center.lat() === newCenter.lat() && center.lng() === newCenter.lng())) {
-                                                                _context2.next = 9;
-                                                                break;
-                                                            }
-
-                                                            Ember.Logger.info('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() });
-                                                            Ember.Logger.info('latlng', newCenter.toJSON());
-
-                                                            _context2.next = 6;
-                                                            return getNearbyAccounts(newCenter.lat(), newCenter.lng());
-
-                                                        case 6:
-                                                            _accounts = _context2.sent;
-
-
-                                                            Ember.Logger.info('accounts', _accounts);
-
-                                                            controller.set('merchants', _accounts.map(function (merchant) {
-
-                                                                if (!merchant.image_url) {
-                                                                    merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb';
-                                                                }
-
-                                                                return merchant;
-                                                            }));
-
-                                                        case 9:
-                                                        case 'end':
-                                                            return _context2.stop();
-                                                    }
-                                                }
-                                            }, _callee2, _this);
-                                        })), 100);
-                                    });
-
-                                    controller.set('googlemap', map);
-                                    var appCtrl = this.controllerFor('application');
-                                    appCtrl.set('googlemap', map);
-                                    Ember.Logger.info('set google map');
-
-                                    loadMerchants(map);
-
-                                    /*Ember.$('.map').css({
-                                      position: 'fixed',
-                                      top: '50px',
-                                      bottom: '0px',
-                                      left: '0px',
-                                      right: '0px'
-                                    });
-                                    */
-                                });
-
-                            case 21:
-                            case 'end':
-                                return _context3.stop();
-                        }
-                    }
-                }, _callee3, this);
-            }));
-
-            function setupController(_x3, _x4) {
-                return _ref3.apply(this, arguments);
-            }
-
-            return setupController;
-        }()
-    });
-
-
-    function loadMerchants(map) {
-
-        Ember.Logger.info('LOAD MERCHANTS');
-
-        var frequencyIcons = {
-
-            'one-week': '/google-map-marker-512-green.png',
-
-            'one-month': '/google-map-marker-yellow.png',
-
-            'three-months': '/google-map-marker-512.png',
-
-            'inactive': '/google-map-marker-512-grey.png',
-
-            'bitcoincom': '/bitcoincomlogo.png'
-
-        };
-
-        var activeMerchants;
-
-        Ember.$.ajax({
-
-            method: 'GET',
-
-            url: 'https://api.anypay.global/active-merchants'
-
-        }).then(function (resp) {
-
-            activeMerchants = resp;
-
-            return Ember.$.ajax({
-
-                method: 'GET',
-
-                url: 'https://api.anypay.global/active-merchant-coins'
-
-            });
-        }).then(function (resp) {
-
-            var coinsByMerchant = resp.reduce(function (merchantCoins, merchantCoin) {
-
-                if (!merchantCoins[merchantCoin.id]) {
-
-                    merchantCoins[merchantCoin.id] = [];
-                }
-
-                merchantCoins[merchantCoin.id].push(merchantCoin.currency);
-
-                return merchantCoins;
-            });
-
-            var oneWeekMerchants = activeMerchants.oneWeek.reduce(function (sum, i) {
+              merchantMap.oneWeekMerchants = activeMerchants.oneWeek.reduce(function (sum, i) {
 
                 sum[i.id] = true;
 
                 return sum;
-            }, {});
+              }, {});
 
-            var oneMonthMerchants = activeMerchants.oneMonth.reduce(function (map, i) {
-
-                map[i.id] = true;
-
-                return map;
-            }, {});
-
-            var threeMonthsMerchants = activeMerchants.threeMonths.reduce(function (map, i) {
+              merchantMap.oneMonthMerchants = activeMerchants.oneMonth.reduce(function (map, i) {
 
                 map[i.id] = true;
 
                 return map;
-            }, {});
+              }, {});
 
-            var inactiveMerchants = activeMerchants.merchants.reduce(function (map, i) {
+              merchantMap.threeMonthsMerchants = activeMerchants.threeMonths.reduce(function (map, i) {
 
                 map[i.id] = true;
 
                 return map;
-            }, {});
+              }, {});
 
-            activeMerchants.merchants.forEach(function (merchant) {
+              merchantMap.inactiveMerchants = activeMerchants.merchants.reduce(function (map, i) {
 
-                var markerOpts = {
+                map[i.id] = true;
 
-                    position: {
+                return map;
+              }, {});
 
-                        lat: parseFloat(merchant.latitude),
+              activeMerchants.merchants.forEach(function (merchant) {
+                return merchantMap.setMerchantIcon(merchant);
+              });
 
-                        lng: parseFloat(merchant.longitude)
+            case 10:
+            case 'end':
+              return _context6.stop();
+          }
+        }
+      }, _callee6, this);
+    }));
 
-                    },
-
-                    map: map
-
-                };
-
-                if (inactiveMerchants[merchant.id]) {
-
-                    markerOpts.icon = frequencyIcons['inactive'];
-                }
-
-                if (threeMonthsMerchants[merchant.id]) {
-
-                    markerOpts.icon = frequencyIcons['three-months'];
-                }
-
-                if (oneMonthMerchants[merchant.id]) {
-
-                    markerOpts.icon = frequencyIcons['one-month'];
-                }
-
-                if (oneWeekMerchants[merchant.id]) {
-
-                    markerOpts.icon = frequencyIcons['one-week'];
-                }
-
-                if (!markerOpts.icon) {
-
-                    return;
-                }
-
-                var marker = new window.google.maps.Marker(markerOpts);
-
-                marker.addListener('click', function () {
-
-                    controller.send('merchantDetailsClicked', merchant);
-                });
-            });
-        });
-    }
+    return function loadMerchants(_x5) {
+      return _ref8.apply(this, arguments);
+    };
+  }();
 });
 define('energy-city-app/routes/moneybutton-auth-redirect', ['exports', 'ember-simple-auth/mixins/unauthenticated-route-mixin'], function (exports, _unauthenticatedRouteMixin) {
   'use strict';
@@ -5658,6 +5547,193 @@ define('energy-city-app/services/leaderboard', ['exports', 'ember-get-config'], 
       return getLeaderboard;
     }()
   });
+});
+define("energy-city-app/services/merchant-map", ["exports"], function (exports) {
+    "use strict";
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+    exports.default = Ember.Service.extend({
+        getStyles: function getStyles() {
+            return [{
+                "featureType": "all",
+                "elementType": "labels",
+                "stylers": [{
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "saturation": 36
+                }, {
+                    "color": "#000000"
+                }, {
+                    "lightness": 40
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "visibility": "on"
+                }, {
+                    "color": "#000000"
+                }, {
+                    "lightness": 16
+                }]
+            }, {
+                "featureType": "all",
+                "elementType": "labels.icon",
+                "stylers": [{
+                    "visibility": "off"
+                }]
+            }, {
+                "featureType": "administrative",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 20
+                }]
+            }, {
+                "featureType": "administrative",
+                "elementType": "geometry.stroke",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 17
+                }, {
+                    "weight": 1.2
+                }]
+            }, {
+                "featureType": "administrative.country",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "administrative.locality",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#c4c4c4"
+                }]
+            }, {
+                "featureType": "administrative.neighborhood",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "landscape",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 20
+                }]
+            }, {
+                "featureType": "poi",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 21
+                }, {
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "poi.business",
+                "elementType": "geometry",
+                "stylers": [{
+                    "visibility": "on"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#e5c163"
+                }, {
+                    "lightness": "0"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "geometry.stroke",
+                "stylers": [{
+                    "visibility": "off"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#ffffff"
+                }]
+            }, {
+                "featureType": "road.highway",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "color": "#e5c163"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 18
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "geometry.fill",
+                "stylers": [{
+                    "color": "#575757"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#ffffff"
+                }]
+            }, {
+                "featureType": "road.arterial",
+                "elementType": "labels.text.stroke",
+                "stylers": [{
+                    "color": "#2c2c2c"
+                }]
+            }, {
+                "featureType": "road.local",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 16
+                }]
+            }, {
+                "featureType": "road.local",
+                "elementType": "labels.text.fill",
+                "stylers": [{
+                    "color": "#999999"
+                }]
+            }, {
+                "featureType": "transit",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#000000"
+                }, {
+                    "lightness": 19
+                }]
+            }, {
+                "featureType": "water",
+                "elementType": "geometry",
+                "stylers": [{
+                    "color": "#0077C0"
+                }, {
+                    "lightness": 60
+
+                }]
+            }];
+        }
+    });
 });
 define('energy-city-app/services/message-bus', ['exports', 'ember-message-bus/services/message-bus'], function (exports, _messageBus) {
   'use strict';
