@@ -386,6 +386,9 @@ export default Ember.Route.extend({
 
       })()
 
+      console.log('MAP', map)
+
+
       map.addListener('center_changed', () => {
 
         var center = map.getCenter()

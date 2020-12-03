@@ -24,10 +24,7 @@ export default Ember.Controller.extend({
 
       console.log('addressSearchResults' , results)
 
-      this.get('googlemap').setCenter({
-        lat: parseFloat(results.lat),
-        lng: parseFloat(results.lng)
-      })
+      this.transitionToRoute("map", {lat: results.lat, lng: results.lng})
 
     },
 

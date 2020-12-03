@@ -117,7 +117,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/home.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/home.js should pass ESLint\n\n13:9 - \'$\' is not defined. (no-undef)\n16:11 - \'$\' is not defined. (no-undef)\n17:11 - Unexpected console statement. (no-console)\n22:11 - \'$\' is not defined. (no-undef)\n23:11 - Unexpected console statement. (no-console)');
+    assert.ok(true, 'routes/home.js should pass ESLint\n\n');
   });
 
   QUnit.test('routes/index.js', function (assert) {
@@ -142,7 +142,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/map.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/map.js should pass ESLint\n\n379:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n381:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n482:9 - \'coinsByMerchant\' is assigned a value but never used. (no-unused-vars)');
+    assert.ok(false, 'routes/map.js should pass ESLint\n\n379:11 - \'centerChanged\' is assigned a value but never used. (no-unused-vars)\n381:13 - \'lastChangedAt\' is defined but never used. (no-unused-vars)\n389:7 - Unexpected console statement. (no-console)\n485:9 - \'coinsByMerchant\' is assigned a value but never used. (no-unused-vars)');
   });
 
   QUnit.test('routes/moneybutton-auth-redirect.js', function (assert) {

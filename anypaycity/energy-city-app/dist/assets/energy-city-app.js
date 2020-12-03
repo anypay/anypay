@@ -1242,10 +1242,7 @@ define('energy-city-app/controllers/application', ['exports'], function (exports
 
                 console.log('addressSearchResults', results);
 
-                this.get('googlemap').setCenter({
-                  lat: parseFloat(results.lat),
-                  lng: parseFloat(results.lng)
-                });
+                this.transitionToRoute("map", { lat: results.lat, lng: results.lng });
 
               case 5:
               case 'end':
@@ -4158,45 +4155,10 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
   exports.default = Ember.Route.extend({
     setupController: function () {
       var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var _this = this;
-
-        var permission;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (!window.navigator.permissions) {
-                  _context.next = 5;
-                  break;
-                }
-
-                _context.next = 3;
-                return window.navigator.permissions.query({ name: 'geolocation' });
-
-              case 3:
-                permission = _context.sent;
-
-
-                if (permission.state === 'granted') {
-
-                  $('#loader-wrapper').show();
-                  window.navigator.geolocation.getCurrentPosition(function (position) {
-
-                    $('#loader-wrapper').hide();
-                    console.log('geolocation.currentposition', position);
-
-                    _this.transitionTo('map', position.coords.latitude, position.coords.longitude);
-                  }, function (error) {
-                    $('#loader-wrapper').hide();
-                    console.log('geolocation.error', error);
-
-                    _this.transitionToRoute('search-city');
-                  }, {
-                    enableHighAccuracy: false
-                  });
-                }
-
-              case 5:
               case 'end':
                 return _context.stop();
             }
@@ -4210,7 +4172,31 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
 
       return setupController;
     }()
-  });
+  }
+
+  /*
+  if (window.navigator.permissions) {
+     let permission = await window.navigator.permissions.query({name:'geolocation'})
+     if (permission.state === 'granted') {
+       $('#loader-wrapper').show()
+      window.navigator.geolocation.getCurrentPosition((position) => {
+         $('#loader-wrapper').hide()
+        console.log('geolocation.currentposition', position)
+         this.transitionTo('map', position.coords.latitude, position.coords.longitude)
+      
+      }, (error) => {
+        $('#loader-wrapper').hide()
+        console.log('geolocation.error', error)
+         this.transitionToRoute('search-city')
+       
+      }, {
+        enableHighAccuracy: false 
+      });
+     }
+   }
+  */
+
+  );
 });
 define('energy-city-app/routes/index', ['exports'], function (exports) {
   'use strict';
@@ -4650,6 +4636,8 @@ define('energy-city-app/routes/map', ['exports'], function (exports) {
 
                                         return function () {};
                                     }();
+
+                                    console.log('MAP', map);
 
                                     map.addListener('center_changed', function () {
 
@@ -5966,6 +5954,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+b580b46d"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+0a6ab4c2"});
 }
 //# sourceMappingURL=energy-city-app.map

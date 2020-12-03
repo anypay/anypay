@@ -4,6 +4,7 @@ export default Ember.Route.extend({
 
   async setupController() {
 
+    /*
     if (window.navigator.permissions) {
 
       let permission = await window.navigator.permissions.query({name:'geolocation'})
@@ -32,6 +33,7 @@ export default Ember.Route.extend({
       }
 
     }
+    */
 
   }
 });
