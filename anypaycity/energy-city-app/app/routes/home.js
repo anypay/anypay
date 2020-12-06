@@ -4,31 +4,36 @@ export default Ember.Route.extend({
 
   async setupController() {
 
-    let permission = await window.navigator.permissions.query({name:'geolocation'})
+    /*
+    if (window.navigator.permissions) {
 
-    if (permission.state === 'granted') {
+      let permission = await window.navigator.permissions.query({name:'geolocation'})
 
-      $('#loader-wrapper').show()
-      window.navigator.geolocation.getCurrentPosition((position) => {
+      if (permission.state === 'granted') {
 
-        $('#loader-wrapper').hide()
-        console.log('geolocation.currentposition', position)
+        $('#loader-wrapper').show()
+        window.navigator.geolocation.getCurrentPosition((position) => {
 
-        this.transitionTo('map', position.coords.latitude, position.coords.longitude)
-      
-      }, (error) => {
-        $('#loader-wrapper').hide()
-        console.log('geolocation.error', error)
+          $('#loader-wrapper').hide()
+          console.log('geolocation.currentposition', position)
 
-        this.transitionToRoute('search-city')
+          this.transitionTo('map', position.coords.latitude, position.coords.longitude)
+        
+        }, (error) => {
+          $('#loader-wrapper').hide()
+          console.log('geolocation.error', error)
 
-      
-      }, {
-        enableHighAccuracy: false 
-      });
+          this.transitionToRoute('search-city')
 
+        
+        }, {
+          enableHighAccuracy: false 
+        });
+
+      }
 
     }
+    */
 
   }
 });

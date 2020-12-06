@@ -1,0 +1,39 @@
+/* implements rabbi actor protocol */
+
+require('dotenv').config();
+
+import { Actor, Joi, log } from 'rabbi';
+
+import { accounts, models, slack } from '../../lib';
+
+export async function start() {
+
+  Actor.create({
+
+    exchange: 'anypay.events',
+
+    routingkey: 'models.Invoice.afterCreate',
+
+    queue: 'invoice_created_slack'
+
+  })
+  .start(async (channel, msg, json) => {
+
+    console.log(json);
+
+    let account = await models.Account.findOne({ where: { id: json.account_id }})
+
+    slack.notify(`Invoice created by ${account.email} for ${json.denomination_amount} ${json.denomination_currency}`);
+
+    await channel.ack(msg);
+
+  });
+
+}
+
+if (require.main === module) {
+
+  start();
+
+}
+

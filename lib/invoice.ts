@@ -109,6 +109,37 @@ export async function createEmptyInvoice(app_id: number, uid?: string) {
 
 }
 
+interface CreateInvoice {
+  account_id: number;
+  amount: number;
+  external_id?: string;
+}
+
+
+export async function create(params: CreateInvoice): Promise<any> {
+
+  let addresses = await models.Address.findAll({ where: {
+    account_id: params.account_id
+  }});
+
+  addresses = _.reject(addresses, (address) => {
+    let coin = getCoin(address.currency);
+    if (!coin) { return true }
+    return coin.unavailable;
+  });
+
+
+  let invoice = await generateInvoice(params.account_id, params.amount, addresses[0].currency)
+
+  if (params.external_id) {
+    invoice.external_id = params.external_id
+    await invoice.save()
+  }
+
+  return invoice
+  
+}
+
 class ClassicInvoice {
 
   template: any

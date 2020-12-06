@@ -17,30 +17,21 @@ var controller
 export default Ember.Route.extend({
 
   addressSearch: service('address-search'),
+  'merchant-map': service(),
 
   actions: {
     didTransition: function() {
-      console.log('DID TRANSITION');
-
-      /*
-      Ember.$('.ember-google-map').css({
-        position: 'fixed',
-        top: '50px',
-        bottom: '0px',
-        left: '0px',
-        right: '0px'
-      });
-      */
+      Ember.Logger.info('DID TRANSITION');
     }
   },
 
   model(params) {
+    Ember.Logger.info('MODEL', params)
+    
     var model = {}
 
     model['lat'] = parseFloat(params['lat'])
     model['lng'] = parseFloat(params['lng'])
-
-    console.log("PARSE", parseFloat(params['lng']))
 
     return model
 
@@ -48,327 +39,16 @@ export default Ember.Route.extend({
 
   async setupController(ctrl, model) {
 
-    console.log('MODEL', model)
+    Ember.run.scheduleOnce('afterRender', this, async function() {
 
-    let addressSearchResults = await this.get('addressSearch').getCoordinates('keene, new hampshire')
+      Ember.Logger.info('MODEL', model)
 
-    console.log('address search results', addressSearchResults)
+      let addressSearchResults = await this.get('addressSearch').getCoordinates('keene, new hampshire')
 
-    model['lat'] = parseFloat(model['lat'])
-    model['lng'] = parseFloat(model['lng'])
+      Ember.Logger.info('address search results', addressSearchResults)
 
-    /*model.lat = addressSearchResults.lat
-    model.lng = addressSearchResults.lng
-    */
-
-    controller = ctrl
-
-    var lat = model.lat || 13.737275
-    var lng = model.lng || 100.560145
-
-    let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
-
-    console.log('search result', accounts)
-
-    let frequencyIcons = {
-
-      'one-week': '/google-map-marker-512-green.png',
-
-      'one-month': '/google-map-marker-yellow.png',
-
-      'three-months': '/google-map-marker-512.png',
-
-      'inactive': '/google-map-marker-512-grey.png',
-
-      'bitcoincom': '/bitcoincomlogo.png'
-
-    };
-
-    controller.set('icons', frequencyIcons)
-
-    controller.set('mapStyles', [
-        {
-            "featureType": "all",
-            "elementType": "labels",
-            "stylers": [
-                {
-                    "visibility": "on"
-                }
-            ]
-        },
-        {
-            "featureType": "all",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "saturation": 36
-                },
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 40
-                }
-            ]
-        },
-        {
-            "featureType": "all",
-            "elementType": "labels.text.stroke",
-            "stylers": [
-                {
-                    "visibility": "on"
-                },
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 16
-                }
-            ]
-        },
-        {
-            "featureType": "all",
-            "elementType": "labels.icon",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative",
-            "elementType": "geometry.fill",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 20
-                }
-            ]
-        },
-        {
-            "featureType": "administrative",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 17
-                },
-                {
-                    "weight": 1.2
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.country",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#e5c163"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.locality",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#c4c4c4"
-                }
-            ]
-        },
-        {
-            "featureType": "administrative.neighborhood",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#e5c163"
-                }
-            ]
-        },
-        {
-            "featureType": "landscape",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 20
-                }
-            ]
-        },
-        {
-            "featureType": "poi",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 21
-                },
-                {
-                    "visibility": "on"
-                }
-            ]
-        },
-        {
-            "featureType": "poi.business",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "visibility": "on"
-                }
-            ]
-        },
-        {
-            "featureType": "road.highway",
-            "elementType": "geometry.fill",
-            "stylers": [
-                {
-                    "color": "#e5c163"
-                },
-                {
-                    "lightness": "0"
-                }
-            ]
-        },
-        {
-            "featureType": "road.highway",
-            "elementType": "geometry.stroke",
-            "stylers": [
-                {
-                    "visibility": "off"
-                }
-            ]
-        },
-        {
-            "featureType": "road.highway",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#ffffff"
-                }
-            ]
-        },
-        {
-            "featureType": "road.highway",
-            "elementType": "labels.text.stroke",
-            "stylers": [
-                {
-                    "color": "#e5c163"
-                }
-            ]
-        },
-        {
-            "featureType": "road.arterial",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 18
-                }
-            ]
-        },
-        {
-            "featureType": "road.arterial",
-            "elementType": "geometry.fill",
-            "stylers": [
-                {
-                    "color": "#575757"
-                }
-            ]
-        },
-        {
-            "featureType": "road.arterial",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#ffffff"
-                }
-            ]
-        },
-        {
-            "featureType": "road.arterial",
-            "elementType": "labels.text.stroke",
-            "stylers": [
-                {
-                    "color": "#2c2c2c"
-                }
-            ]
-        },
-        {
-            "featureType": "road.local",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 16
-                }
-            ]
-        },
-        {
-            "featureType": "road.local",
-            "elementType": "labels.text.fill",
-            "stylers": [
-                {
-                    "color": "#999999"
-                }
-            ]
-        },
-        {
-            "featureType": "transit",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#000000"
-                },
-                {
-                    "lightness": 19
-                }
-            ]
-        },
-        {
-            "featureType": "water",
-            "elementType": "geometry",
-            "stylers": [
-                {
-                    "color": "#0077C0"
-                },
-                {
-                    "lightness": 60
-
-                }
-            ]
-        }
-    ]
-    )
-
-    controller.set('merchants', accounts.map(merchant => {
-
-      if (!merchant.image_url) {
-        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
-      }
-
-      return merchant
-       
-    }));
-    console.log('SETUP CONTROLLER');
-    setTimeout(() => {
-
-      //Ember.$('.map').css('position', 'fixed');
-    }, 1000);
-
-    Ember.run.scheduleOnce('afterRender', this, function() {                                                                  
-      console.log('AFTER RENDER');
+      model['lat'] = parseFloat(model['lat'])
+      model['lng'] = parseFloat(model['lng'])
 
       let map = new window.google.maps.Map(document.getElementById("map"), {
         center: { lat: model.lat, lng: model.lng },
@@ -378,33 +58,50 @@ export default Ember.Route.extend({
         zoom: 15,
       });
 
-      var centerChanged = (() => {
+      let merchantMap = new MerchantMap(map)
 
-        var lastChangedAt;
-        
-        return function() {
+      controller = ctrl
 
+      var lat = model.lat || 13.737275
+      var lng = model.lng || 100.560145
+
+      let { accounts } = await Ember.$.getJSON(`https://api.anypayinc.com/search/accounts/near/${lat}/${lng}?limit=100`)
+
+      merchantMap.setNearbyMerchants(accounts)
+
+      controller.set('icons', merchantMap.frequencyIcons)
+
+      controller.set('mapStyles', this.get('merchant-map').getStyles())
+
+      controller.set('merchants', accounts.map(merchant => {
+
+        if (!merchant.image_url) {
+          merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
         }
 
-      })()
+        return merchant
+         
+      }));
 
-      map.addListener('center_changed', () => {
+      merchantMap.map.addListener('center_changed', () => {
 
-        var center = map.getCenter()
+        var center = merchantMap.map.getCenter()
 
         setTimeout(async () => {
 
-          let newCenter = map.getCenter()
+          let newCenter = merchantMap.map.getCenter()
 
           if (center.lat() === newCenter.lat() && center.lng() === newCenter.lng()) {
-            console.log('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() })
-            console.log('latlng', newCenter.toJSON())
+            Ember.Logger.info('definitive center change', { lat: newCenter.lat(), lng: newCenter.lng() })
+            Ember.Logger.info('latlng', newCenter.toJSON())
 
-            let accounts = await getNearbyAccounts(newCenter.lat(), newCenter.lng())
+            let merchants = await getNearbyAccounts(newCenter.lat(), newCenter.lng())
 
-            console.log('accounts', accounts)
+            merchantMap.setNearbyMerchants(merchants)
 
-            controller.set('merchants', accounts.map(merchant => {
+            Ember.Logger.info('merchants', merchants)
+
+            controller.set('merchants', merchants.map(merchant => {
 
               if (!merchant.image_url) {
                 merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
@@ -416,218 +113,181 @@ export default Ember.Route.extend({
   
           }
 
-        }, 100)
+        }, 10)
 
       })
 
-      controller.set('googlemap', map)
+      controller.set('googlemap', merchantMap.map)
+      let appCtrl = this.controllerFor('application')
+      appCtrl.set('googlemap', merchantMap.map)
+      Ember.Logger.info('set google map')
 
-      loadMerchants(map)
 
-      /*Ember.$('.map').css({
-        position: 'fixed',
-        top: '50px',
-        bottom: '0px',
-        left: '0px',
-        right: '0px'
-      });
-      */
+      loadMerchants(merchantMap)
+
     });      
   }
 });
 
-function loadMerchants(map) {
+class MerchantMap {
 
-  let frequencyIcons = {
+  constructor(map) {
 
-    'one-week': '/google-map-marker-512-green.png',
+    this.map = map
 
-    'one-month': '/google-map-marker-yellow.png',
+    this.icons = {}
 
-    'three-months': '/google-map-marker-512.png',
+    this.merchants = {} // indexed by merchant ID
 
-    'inactive': '/google-map-marker-512-grey.png',
+    this.frequencyIcons = {
 
-    'bitcoincom': '/bitcoincomlogo.png'
+      'one-week': '/google-map-marker-512-green.png',
 
-  };
+      'one-month': '/google-map-marker-yellow.png',
 
-  var activeMerchants;
+      'three-months': '/google-map-marker-512.png',
 
-  $.ajax({
+      'inactive': '/google-map-marker-512-grey.png',
 
-    method: 'GET',
+      'bitcoincom': '/bitcoincomlogo.png'
 
-    url: 'https://api.anypay.global/active-merchants'
+    }
+  }
 
-  })
-  .then(function(resp) {
-    console.log("ACTIVE MERCHANTS", resp)
+  setNearbyMerchants(merchants) {
+    merchants.forEach(merchant => {
+      this.merchants[merchant.id] = merchant
+    })
+  }
 
-    activeMerchants = resp;
+  setMap(map) {
+    this.map = map
+  }
 
-    return $.ajax({
+  setMerchantIcon(merchant) {
+
+    let markerOpts = {
+
+      position: {
+
+        lat: parseFloat(merchant.latitude),
+
+        lng: parseFloat(merchant.longitude)
+
+      },
+
+      map: this.map,
+
+    };
+
+    if (this.inactiveMerchants[merchant.id]) {
+
+      markerOpts.icon = this.frequencyIcons['inactive'];
+
+    }
+
+    if (this.threeMonthsMerchants[merchant.id]) {
+
+      markerOpts.icon = this.frequencyIcons['three-months'];
+
+    }
+
+    if (this.oneMonthMerchants[merchant.id]) {
+
+      markerOpts.icon = this.frequencyIcons['one-month'];
+
+    }
+
+    if (this.oneWeekMerchants[merchant.id]) {
+
+      markerOpts.icon = this.frequencyIcons['one-week'];
+
+    }
+
+    if (!markerOpts.icon) {
+
+      return
+
+    }
+
+    var marker = new window.google.maps.Marker(markerOpts);
+
+    marker.addListener('click', () => {
+
+      console.log('this.merchants', this.merchants)
+
+      controller.send('merchantDetailsClicked', this.merchants[merchant.id])
+
+    });
+
+  }
+
+  async getAllActiveMerchants() {
+
+    this.allActiveMerchants = await $.ajax({
 
       method: 'GET',
 
-      url: 'https://api.anypay.global/active-merchant-coins'
+      url: 'https://api.anypay.global/active-merchants'
 
     })
 
-  })
-  .then(function(resp) {
-
-    console.log("RESP", resp);
-
-    var coinsByMerchant = resp.reduce((merchantCoins, merchantCoin) => {
-
-      if (!merchantCoins[merchantCoin.id]) {
-
-        merchantCoins[merchantCoin.id] = [];
-
+    this.allActiveMerchants.merchants.forEach(merchant => {
+      if (!this.merchants[merchant.id]) {
+        this.merchants[merchant.id] = merchant
       }
+    })
 
-      merchantCoins[merchantCoin.id].push(merchantCoin.currency);
+    return this.allActiveMerchants
 
-      return merchantCoins;
+  }
+}
 
-    });
+async function loadMerchants(merchantMap) {
 
-    console.log("COINS", resp);
+  window.merchantMap = merchantMap
 
-    let oneWeekMerchants = activeMerchants.oneWeek.reduce((sum, i) => {
+  Ember.Logger.info('LOAD MERCHANTS')
 
-      sum[i.id] = true;
+  await merchantMap.getAllActiveMerchants()
 
-      return sum;
+  let activeMerchants = merchantMap.allActiveMerchants
 
-    }, {});
+  merchantMap.oneWeekMerchants = activeMerchants.oneWeek.reduce((sum, i) => {
 
-    console.log('one week', oneWeekMerchants)
+    sum[i.id] = true;
 
-    let oneMonthMerchants = activeMerchants.oneMonth.reduce((map, i) => {
+    return sum;
 
-      map[i.id] = true;
-
-      return map;
-
-    }, {});
-
-    let threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
-
-      map[i.id] = true;
-
-      return map;
-
-    }, {});
-
-    let inactiveMerchants = activeMerchants.merchants.reduce((map, i) => {
-
-      map[i.id] = true;
-
-      return map;
-
-    }, {});
-
-    var source   = document.getElementById("merchant-popup-template").innerHTML;
-    var template = Handlebars.compile(source);
-
-    console.log('template', template)
-
-    var currentlyOpenInfowindow;
-
-    activeMerchants.merchants.forEach(merchant => {
-
-      let markerOpts = {
-
-        position: {
-
-          lat: parseFloat(merchant.latitude),
-
-          lng: parseFloat(merchant.longitude)
-
-        },
-
-        map,
-
-      };
-
-      if (inactiveMerchants[merchant.id]) {
-
-        markerOpts.icon = frequencyIcons['inactive'];
-
-      }
-
-      if (threeMonthsMerchants[merchant.id]) {
-
-        markerOpts.icon = frequencyIcons['three-months'];
-
-      }
-
-      if (oneMonthMerchants[merchant.id]) {
-
-        markerOpts.icon = frequencyIcons['one-month'];
-
-      }
-
-      if (oneWeekMerchants[merchant.id]) {
-
-        markerOpts.icon = frequencyIcons['one-week'];
-
-      }
-
-      if (!markerOpts.icon) {
-
-        return
+  }, {});
 
 
-      }
+  merchantMap.oneMonthMerchants = activeMerchants.oneMonth.reduce((map, i) => {
 
-      var marker = new google.maps.Marker(markerOpts);
+    map[i.id] = true;
 
-      let content = template({
-        business_name: merchant.business_name,
-        physical_address: merchant.physical_address,
-        coins_accepted: ['BCH', 'BTC', 'DASH'].join(', ')
-      });
+    return map;
 
-      merchant.coins_accepted = coinsByMerchant[merchant.id] || [];
+  }, {});
 
-      if (!merchant.image_url) {
-        merchant.image_url = 'https://media.bitcoinfiles.org/87225dad1311748ab90cd37cf4c2b2dbd1ef3576bbf9f42cb97292a9155e3afb'
-      }
 
-      var infowindow = new google.maps.InfoWindow({
-        maxWidth: 500,
-        height: 300,
-        content: `
-          <h1>${merchant.business_name}</h1>
-          <h2>${merchant.physical_address}</h2>
-          <div style='position:relative'>
-            <img src='${merchant.image_url}' style='width: 100%; height: 100%'>
-            <h3>Coins accepted: ${merchant.coins_accepted}</h3>
-          </div>
-        `
-      });
+  merchantMap.threeMonthsMerchants = activeMerchants.threeMonths.reduce((map, i) => {
 
-      marker.addListener('click', function() {
+    map[i.id] = true;
 
-        controller.send('merchantDetailsClicked', merchant)
+    return map;
 
-        /*
-        if (currentlyOpenInfowindow) {
-          currentlyOpenInfowindow.close();
-        }
+  }, {});
 
-        infowindow.open(map, marker);
+  merchantMap.inactiveMerchants = activeMerchants.merchants.reduce((map, i) => {
 
-        currentlyOpenInfowindow = infowindow;
-        */
-      });
+    map[i.id] = true;
 
-    });
+    return map;
 
-  });
+  }, {});
 
+
+  activeMerchants.merchants.forEach(merchant => merchantMap.setMerchantIcon(merchant))
 
 }
