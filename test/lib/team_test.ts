@@ -23,5 +23,11 @@ describe("Affiliate - Typescript Library", () => {
 
   })
 
+  describe("Sudo Managing Teams", () => {
+  
+    it("#listTeams should return a list of all teams with")
+  
+  })
+
 })
 
