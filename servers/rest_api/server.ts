@@ -318,6 +318,88 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/teams",
+    handler: handlers.Teams.create,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/teams",
+    handler: handlers.Teams.list,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/teams/{uid}/members",
+    handler: handlers.Teams.addMember,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/teams/{uid}/members",
+    handler: handlers.Teams.listMembers,
+    options: {
+      tags: ['api']
+    }
+  });
+
+
+  server.route({
+    method: "DELETE",
+    path: "/teams/{uid}/members/{member_id}",
+    handler: handlers.Teams.removeMember,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/teams/{uid}",
+    handler: handlers.Teams.updateTeam,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/teams/{uid}/merchants",
+    handler: handlers.Teams.listTeamMerchants,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/teams/{uid}/members/{member_id}/rewards",
+    handler: handlers.Teams.listTeamMemberRewards,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/teams/{uid}/rewards",
+    handler: handlers.Teams.listTeamRewards,
+    options: {
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/invoices/{invoice_uid}/payment_options",
     handler: handlers.InvoicePaymentOptions.show,
