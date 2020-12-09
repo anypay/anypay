@@ -322,6 +322,7 @@ async function Server() {
     path: "/teams",
     handler: handlers.Teams.create,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -331,6 +332,7 @@ async function Server() {
     path: "/teams",
     handler: handlers.Teams.list,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -340,6 +342,7 @@ async function Server() {
     path: "/teams/{uid}/members",
     handler: handlers.Teams.addMember,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -349,6 +352,7 @@ async function Server() {
     path: "/teams/{uid}/members",
     handler: handlers.Teams.listMembers,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -359,6 +363,7 @@ async function Server() {
     path: "/teams/{uid}/members/{member_id}",
     handler: handlers.Teams.removeMember,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -368,6 +373,7 @@ async function Server() {
     path: "/teams/{uid}",
     handler: handlers.Teams.updateTeam,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -377,6 +383,7 @@ async function Server() {
     path: "/teams/{uid}/merchants",
     handler: handlers.Teams.listTeamMerchants,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -386,6 +393,7 @@ async function Server() {
     path: "/teams/{uid}/members/{member_id}/rewards",
     handler: handlers.Teams.listTeamMemberRewards,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });
@@ -395,6 +403,7 @@ async function Server() {
     path: "/teams/{uid}/rewards",
     handler: handlers.Teams.listTeamRewards,
     options: {
+      auth: "token",
       tags: ['api']
     }
   });

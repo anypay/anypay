@@ -5,18 +5,27 @@ import { log } from '../../../lib'
 import * as teams from '../../../lib/teams'
 
 export async function create(req, h) {
+  log.info('createteam', req.payload)
 
   try {
 
-    let team = await teams.create(req.payload)
+    let team = await teams.create(req.account.id, req.payload.data.attributes)
 
-    return { team }
+    return {
+      data: {
+        type: "teams",
+        id: team.id,
+        attributes: team.toJSON()
+      }
+    }
 
   } catch(error) {
 
     log.error(error.message)
 
-    return Boom.badRequest(error.message)
+    return {
+      errors: [error.message]
+    }
 
   }
 
@@ -26,9 +35,17 @@ export async function list(req, h) {
 
   try {
 
-    let _teams = await teams.list()
+    let _teams = await teams.list(req.account.id)
 
-    return { teams: _teams }
+    return {
+      data: _teams.map(team => {
+        return {
+          type: "teams",
+          id: team.id,
+          attributes: team.toJSON()
+        }
+      })
+    }
 
   } catch(error) {
 
