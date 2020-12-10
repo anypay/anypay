@@ -1,9 +1,9 @@
 
 export interface Payment {
   currency: string;
-  address: string;
-  amount: number;
   hash: string;
+  amount?: number;
+  address?: string;
   invoice_uid?: string;
   output_hash?: string;
   confirmations?: number;
