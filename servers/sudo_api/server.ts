@@ -905,6 +905,22 @@ async function Server() {
 
   server.route({
 
+    method: 'POST',
+
+    path: '/api/invoices/{uid}/payments',
+
+    config: {
+
+      auth: 'sudopassword',
+
+      handler: handlers.Payments.create
+
+    }
+
+  });
+
+  server.route({
+
     method: 'GET',
 
     path: '/api/payments/stats',
@@ -1837,20 +1853,24 @@ async function Server() {
 
 async function start() {
 
- try{
-  await database.sync()
+ try {
 
-  var server = await Server();
+    await database.sync()
 
-  // Start the server
-  await server.start();
+    var server = await Server();
 
-  log.info("Server running at:", server.info.uri);
- }catch(err){
+    // Start the server
+    await server.start();
 
-   console.log(err)
+    console.log('server info', server.info)
 
- }
+    log.info(`Server running at ${server.info.uri}`);
+
+  } catch(err) {
+
+    console.log(err)
+
+  }
 
 }
 

@@ -1,5 +1,5 @@
 
-import { database } from '../../../lib';
+import { database, models } from '../../../lib';
 
 import * as moment from 'moment'
 import * as Boom from 'boom'
@@ -21,6 +21,28 @@ export async function index(request) {
   return {
     payments: result[0]
   }
+
+}
+
+import { handlePaid } from '../../../lib/payment_processor'
+
+export async function create(req, h) {
+  console.log('create payment', req.payload)
+
+  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
+
+  if (!invoice) {
+    throw new Error('invoice not found')
+  }
+
+  let payment = Object.assign(req.payload, {
+    amount: invoice.amount,
+    denomination_amount_paid: invoice.denomination_amount
+  })
+
+  invoice = await handlePaid(invoice, payment)
+
+  return { invoice }
 
 }
 
