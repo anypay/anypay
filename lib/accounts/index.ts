@@ -18,7 +18,7 @@ let query = `SELECT *,
     position,
     'SRID=4326;POINT(${parseFloat(longitude)} ${parseFloat(latitude)})'::geometry
     ) AS distance
-    from accounts where position is not null order by distance limit ${limit};`
+    from accounts where position is not null and business_name is not null order by distance limit ${limit};`
 
     console.log(query)
 
