@@ -132,17 +132,7 @@ export async function updateAccount(account, payload) {
     delete updateAttrs['remove_ambassador']
   }
 
-  await models.Account.update(updateAttrs, {
-
-    where: { id: account.id }
-
-  });
-
-  account = await models.Account.findOne({ where: {
-
-    id: account.id
-
-  }});
+  await account.update(updateAttrs)
 
   return account
 
