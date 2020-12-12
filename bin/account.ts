@@ -43,6 +43,9 @@ program
     let accounts = await models.Account.findAll({ where: {
       latitude: {
         [Op.ne]: null
+      },
+      position: {
+        [Op.eq]: null
       }
     }})
 
