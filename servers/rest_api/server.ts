@@ -6,7 +6,7 @@ import('bitcore-lib')
 import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
-import { log } from '../../lib';
+import { log, logError, logInfo } from '../../lib/logger';
 
 import { attachMerchantMapRoutes } from '../map/server';
 
@@ -97,8 +97,7 @@ const validatePassword = async function(request, username, password, h) {
     }
   } catch(error) {
 
-
-    log.error(error.message);
+    logError('password.validate.error', error);
 
   }
 
@@ -203,7 +202,7 @@ async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
-    log.info('server.request', { id: request.info.id, headers: request.headers })
+    logInfo('server.request', { id: request.info.id, headers: request.headers })
 
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
@@ -880,15 +879,6 @@ async function Server() {
   });
 
   server.route({
-    method: "POST",
-    path: "/invoices/{uid}/cointext_payments",
-    handler: handlers.Cointext.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
     handler: handlers.MoneybuttonWebhooks.create
@@ -1197,15 +1187,15 @@ async function start () {
 
   if (process.env.NODE_ENV === 'production') {
 
-    log.info('updating crypto prices from coinmarketcap')
+    logInfo('updating crypto prices from coinmarketcap')
     await updateCryptoUSDPrices()
-    log.info('updated crypto prices from coinmarketcap')
+    logInfo('updated crypto prices from coinmarketcap')
 
     setInterval(async () => {
 
-      log.info('updating crypto prices from coinmarketcap')
+      logInfo('updating crypto prices from coinmarketcap')
       await updateCryptoUSDPrices()
-      log.info('updated crypto prices from coinmarketcap')
+      logInfo('updated crypto prices from coinmarketcap')
 
     }, 1000 * 60 * 5) // once per five minutes
   }
@@ -1219,7 +1209,7 @@ async function start () {
   // Start the server
   await server.start();
 
-  log.info(`Server running at: ${server.info.uri}`);
+  logInfo('http.server.started', { uri: server.info.uri});
 
 }
 
