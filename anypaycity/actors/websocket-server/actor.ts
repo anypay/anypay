@@ -99,6 +99,24 @@ export async function start() {
 
     method: 'GET',
 
+    path: '/p/{id}',
+
+    handler: async (req, h) => {
+
+      let account = await models.Account.findOne({ where: { id: req.params.id }})
+
+      if (!account) { return Boom.notFound() }
+
+      return h.redirect(`https://app.anypayinc.com/pay/${account.stub}`);
+
+    }
+
+  })
+
+  hapiServer.route({
+
+    method: 'GET',
+
     path: '/api/accounts/{account_id}/current_invoice',
 
     handler: async (request, h) => {
