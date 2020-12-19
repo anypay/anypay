@@ -37,6 +37,8 @@ export async function handleOrder(account_id: number, order) {
 
   let account = await models.Account.findOne({ where: { id: account_id }})
 
+  let amount = order.receipt.total.value
+
   let invoice = await generateInvoice(account_id, amount, 'BCH')
 
   return { order: record, invoice }
