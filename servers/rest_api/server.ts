@@ -357,6 +357,16 @@ async function Server() {
 
   server.route({
     method: "POST",
+    path: "/api/korona/createinvoice",
+    handler: handlers.KoronaPos.post,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "POST",
     path: "/invoices/{uid}/replacements",
     handler: handlers.Invoices.replace,
     options: {

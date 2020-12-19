@@ -1,8 +1,48 @@
 #!/usr/bin/env ts-node
 
+require('dotenv').config()
+
 import * as http from 'superagent'
 
-(async () => {
+import * as program from 'commander'
+
+const koronaAccountId = process.env.KORONA_ACCOUNT_ID
+const apiBase = 'https://167.koronacloud.com/web/api/v3'
+
+program
+  .command('testpost')
+  .action(async () => {
+
+    let data = testData()
+
+    let result = await http.post(`https://api.anypayinc.com/korona_pos/orders?token=${process.env.KORONA_TOKEN}`).send(data)
+
+    console.log(result.text)
+
+  })
+
+program
+  .command('listcustomerorders')
+  .action(async () => {
+
+    try {
+
+      let resp = await http.get(`${apiBase}/accounts/${koronaAccountId}/customerOrders`)
+        .auth(process.env.KORONA_USER, process.env.KORONA_PASSWORD)
+
+      console.log(resp)
+
+    } catch(error) {
+
+      console.error(error) 
+
+    }
+
+    process.exit(0)
+
+  })
+
+function testData() {
 
   let data = {
     "application": {
@@ -173,10 +213,8 @@ import * as http from 'superagent'
     "zcounter": 6
   }
 
-  let result = await http.post('https://api.anypayinc.com/korona_pos/orders?token=c0cbd41c-70c8-4454-9a5c-7309b6285a9d').send(data)
+  return data
+}
 
-  console.log(result.text)
-
-
-})()
+program.parse(process.argv)
 
