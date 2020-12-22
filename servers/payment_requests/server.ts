@@ -9,20 +9,8 @@ import { join } from 'path'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
-async function Server() {
 
-  var server = new Hapi.Server({
-    host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8000,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      },
-    }
-  })
+export function attach(server: Hapi.Server) {
 
   /* Set Alternate Headers To Avoid BIP70 Binary vs JSON Data Type Conflict */
   server.ext('onRequest', function(request, h) {
@@ -127,6 +115,27 @@ async function Server() {
   })
 
   /* END PAYMENT PROTOCOLS */
+
+  return server
+
+}
+
+async function Server() {
+
+  var server = new Hapi.Server({
+    host: process.env.HOST || "localhost",
+    port: process.env.PORT || 8000,
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      },
+    }
+  })
+
+  attach(server)
 
   return server
 

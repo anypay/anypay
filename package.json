@@ -164,7 +164,9 @@
     "build": "tsc",
     "db:migrate": "sequelize db:migrate --url=$DATABASE_URL",
     "db:seed:prices": "ts-node test/seed_prices.ts",
-    "payreq:test": "mocha --require=ts-node/register --timeout=20000 --file servers/payment_requests/tests/setup.ts servers/payment_requests/tests/*_test.ts --exit"
+    "payreq:test": "mocha --require=ts-node/register --timeout=20000 --file servers/payment_requests/tests/setup.ts servers/payment_requests/tests/*_test.ts --exit",
+    "payreq:test:migrate": "NODE_ENV=test ts-node servers/payment_requests/tests/migrate.ts",
+    "payreq:start": "ts-node servers/payment_requests/server.ts"
   },
   "keywords": [],
   "author": "",
