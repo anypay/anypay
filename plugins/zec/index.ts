@@ -8,6 +8,8 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { I_Address } from '../../types/interfaces';
 
+import * as blockchair from '../../lib/blockchair';
+
 import * as address_subscription from '../../lib/address_subscription';
 
 import { rpc } from './lib/jsonrpc';
@@ -102,22 +104,6 @@ async function createAddressForward(record: I_Address) {
   });
 
   return resp.body.input_address;
-
-}
-
-export async function getNewAddress(record: I_Address) {
-
-  console.log('ADDRESS')
-
-  let address = await createAddressForward(record);
-
-  console.log('forward address', address)
-
-  let subscription = await address_subscription.createSubscription('ZEC', address)
-
-  console.log('subscription', subscription)
-
-  return address;
 
 }
 

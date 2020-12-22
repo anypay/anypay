@@ -8,7 +8,7 @@ import {statsd} from '../../lib/stats/statsd'
 
 import * as forwards from './lib/forwards';
 
-import * as blockchair from './lib/blockchair';
+import * as blockchair from '../../lib/blockchair';
 
 import { I_Address } from '../../types/interfaces';
 
@@ -55,8 +55,6 @@ async function checkAddressForPayments(address:string,currency:string){
     let start = new Date().getTime()
 
     let payments: Payment[]=[];
-
-    console.log(`https://chain.so/api/v2/get_tx_received/currency/address`)
 
     let resp = await http.get(`https://chain.so/api/v2/get_tx_received/${currency}/${address}`)
 
