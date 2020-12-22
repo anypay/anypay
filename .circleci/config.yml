@@ -25,7 +25,6 @@ jobs:
           name: Run Payment Request Tests
           command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run payreq:test 
       - run:
-      - run:
           name: Push to Docker Hub
           command: |
             ./push_to_docker.sh
