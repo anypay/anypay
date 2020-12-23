@@ -5,6 +5,12 @@ jobs:
       - image: circleci/node:10
     steps:
       - checkout
+
+  build_docker:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
       - setup_remote_docker
       - run:
           name: Build docker image
@@ -42,11 +48,19 @@ workflows:
   build_and_deploy:
     jobs:
       - build
-      - deploy:
+      - build_docker:
           requires:
             - build
           filters:
             branches:
-              only: master
+              only:
+                - master
+      - deploy:
+          requires:
+            - build_docker
+          filters:
+            branches:
+              only:
+                - master
 
 
