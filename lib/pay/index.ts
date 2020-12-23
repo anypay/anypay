@@ -71,8 +71,6 @@ export async function verifyPayment(v: VerifyPayment) {
 
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, 'JSONV2');
 
-  console.log('EXPECTED OUTPUTS', outputs)
-
   for (let output of outputs) {
 
     log.info('output', output)

@@ -39,6 +39,12 @@ export async function generateAccount() {
     address: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9'
   })
 
+  await setAddress({
+    account_id: account.id,
+    currency: 'LTC',
+    address: 'MJH9DxwdDpYMwdaqdXD3ypUYFcbvYybawW'
+  })
+
   return account
 }
 
