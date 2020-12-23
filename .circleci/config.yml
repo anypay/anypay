@@ -31,11 +31,11 @@ jobs:
           name: Build docker image
           command: docker build -t anypay . 
       - run:
-          name: Run Main Tests
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm test
+          ename: Run Main Tests
+          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm test
       - run:
           name: Run Payment Request Tests
-          command: docker run -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run payreq:test 
+          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run payreq:test 
       - run:
           name: Push to Docker Hub
           command: |
