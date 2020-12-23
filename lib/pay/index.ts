@@ -5,7 +5,7 @@ export { BIP70Protocol }
 import { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest, GetCurrency } from './types';
 export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
-import { log } from '../logger'
+import { log, logError } from '../logger'
 import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
@@ -58,7 +58,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
-      log.error(`verifypayment.error`, error.message)
+      logError(`verifypayment.error`, error)
 
       return null
 

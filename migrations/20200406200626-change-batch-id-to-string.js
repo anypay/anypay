@@ -7,9 +7,6 @@ module.exports = {
     });
   },
 
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.changeColumn('ach_batches', 'batch_id', {
-      type: Sequelize.INTEGER
-    });
+  down: async (queryInterface, Sequelize) => {
   }
 };

@@ -25,8 +25,6 @@ export function getCurrency(params: GetCurrency): Currency {
 
   let headers = params.headers
 
-  console.log('GET CURRENCY HEADERS', headers)
-
   var name;
 
   if (headers['accept'] && headers['accept'].match(/paymentrequest$/)) {
@@ -54,8 +52,6 @@ export function getCurrency(params: GetCurrency): Currency {
     name = parts.split('-')[0]
 
   }
-
-  console.log('CURRENCY NAME', name)
 
   if (!codeFromName(name)) {
     throw new Error(`currency not supported`)
