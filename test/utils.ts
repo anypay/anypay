@@ -11,7 +11,7 @@ import { registerAccount } from '../lib/accounts';
 import { setAddress } from '../lib/core';
 
 export async function generateAccount() {
-  let account = await registerAccount(chance.email(), chance.word());
+  return registerAccount(chance.email(), chance.word());
 }
 
 export {
