@@ -7,10 +7,11 @@ const chance = new Chance();
 
 import * as assert from 'assert';
 
-import { accounts } from '../lib';
+import { registerAccount } from '../lib/accounts';
+import { setAddress } from '../lib/core';
 
 export async function generateAccount() {
-  return accounts.registerAccount(chance.email(), chance.word());
+  return registerAccount(chance.email(), chance.word());
 }
 
 export {

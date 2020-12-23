@@ -21,7 +21,7 @@ module.exports = {
 
   down: async function (queryInterface, Sequelize) {
 
-    await queryInterface.renameColumn('cashback_merchants', 'dash_back_merchants');
+    /*await queryInterface.renameColumn('cashback_merchants', 'dash_back_merchants');
 
     await queryInterface.renameColumn('cashback_customer_payments', 'dash_back_customer_payments');
 
@@ -30,6 +30,7 @@ module.exports = {
     await queryInterface.removeColumn('dash_back_customer_payments', 'currency');
 
     await queryInterface.removeColumn('dash_back_merchant_payments', 'currency');
+    */
 
   }
 };

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 
 import * as PaymentProtocol from '../../vendor/bitcore-payment-protocol'
 import { getBitcore } from '../bitcore'
-import { log } from '../logger'
+import { log, logInfo } from '../logger'
 
 import { getBaseURL } from './environment';
 
@@ -24,8 +24,6 @@ interface Bip70PaymentRequest {
 export function getCurrency(params: GetCurrency): Currency {
 
   let headers = params.headers
-
-  console.log('GET CURRENCY HEADERS', headers)
 
   var name;
 
@@ -55,8 +53,6 @@ export function getCurrency(params: GetCurrency): Currency {
 
   }
 
-  console.log('CURRENCY NAME', name)
-
   if (!codeFromName(name)) {
     throw new Error(`currency not supported`)
   }
@@ -77,7 +73,6 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
     var output = new PaymentProtocol.Output();
     var script
-    console.log('ADDRESS', o.address)
 
     if (o.address.match(/^1/)) {
 
@@ -117,7 +112,7 @@ export async function buildPaymentRequest(paymentOption) {
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
-  log.info(`bip70.${paymentOption.currency}.outputs`, {outputs});
+  logInfo(`bip70.${paymentOption.currency}.outputs`, {outputs});
 
   var pd = new PaymentProtocol.PaymentDetails();
 
@@ -144,11 +139,7 @@ export async function buildPaymentRequest(paymentOption) {
 
   paypro.set('serialized_payment_details', pd.toBuffer());
 
-  console.log('node env', process.env.NODE_ENV)
-
-  if (process.env.NODE_ENV !== 'development') {
-
-    console.log('NOT DEVELOPMENT')
+  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
 
     let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
     let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
@@ -171,11 +162,7 @@ export async function buildPaymentRequest(paymentOption) {
 
     paypro.sign(file_with_x509_private_key);
 
-  } else {
-    console.log('YES DEVELOPMENT')
   }
-
-  console.log("PAYPRO", paypro)
 
   return paypro;
 
@@ -187,18 +174,7 @@ export function paymentRequestToJSON(hex, currency) {
 
   let paymentRequest = PaymentProtocol.PaymentRequest.decodeHex(hex);
 
-  console.log(paymentRequest)
-
   let details = PaymentProtocol.PaymentDetails.decode(paymentRequest.get('serialized_payment_details'))
-
-  console.log(details)
-
-  for (let output of details.outputs) {
-    console.log('script hex', output.script.toString('hex'))
-
-    console.log('output', )
-
-  }
 
   let decoded = {
     PaymentRequest: paymentRequest,

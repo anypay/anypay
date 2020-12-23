@@ -16,6 +16,9 @@ module.exports = {
       uid: {
         type: Sequelize.STRING
       },
+      webhook_url: {
+        type: Sequelize.STRING
+      },
       password_hash: {
         type: Sequelize.STRING
       },

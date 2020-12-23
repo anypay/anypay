@@ -21,6 +21,8 @@ import { accountCSVReports } from './handlers/csv_reports';
 
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 
+import * as payreq from '../payment_requests/server'
+
 /* Import all handlers from './handlers directory */
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 import { join } from 'path';
@@ -292,6 +294,7 @@ async function Server() {
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
 
   attachMerchantMapRoutes(server);
+  payreq.attach(server)
 
   server.route({
     method: "GET",
@@ -814,44 +817,6 @@ async function Server() {
       handler: handlers.PaymentRequests.create,
       options: {
         auth: "app"
-      }
-    })
-
-    server.route({
-      method: "POST",
-      path: "/r/beta",
-      handler: handlers.PaymentRequests.createBeta
-    })
-
-    /* PAYMENT REQUESTS */
-    server.route({
-      method: "GET",
-      path: "/r/{uid}",
-      handler: handlers.PaymentRequests.show 
-    })
-
-    /* PAYMENT SUBMISSION */
-    server.route({
-      method: "POST",
-      path: "/r/{uid}/pay/{currency}/jsonv2",
-      handler: handlers.JsonPaymentRequests.create
-    })
-
-    server.route({
-      method: "POST",
-      path: "/r/{uid}/pay/{currency}/bip270",
-      handler: handlers.Bip270PaymentRequests.create 
-    })
-
-    server.route({
-      method: "POST",
-      path: "/r/{uid}/pay/{currency}/bip70",
-      handler: handlers.Bip70PaymentRequests.create,
-      config: {
-        payload: {
-          output: 'data',
-          parse: false
-        }
       }
     })
 

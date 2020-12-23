@@ -18,6 +18,7 @@
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
     "@rodrigogs/mysql-events": "^0.6.0",
+    "@slack/webhook": "^5.0.3",
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.20",
     "@types/es6-promise": "^3.3.0",
@@ -104,6 +105,7 @@
     "redis": "^2.8.0",
     "request-promise": "^4.2.5",
     "require-all": "^3.0.0",
+    "riverpig": "^1.1.4",
     "rpc-simple-wallet": "^1.1.0",
     "sequelize": "^5.16.0",
     "sequelize-cli": "^4.0.0",
@@ -161,7 +163,10 @@
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "sequelize db:migrate --url=$DATABASE_URL",
-    "db:seed:prices": "ts-node test/seed_prices.ts"
+    "db:seed:prices": "ts-node test/seed_prices.ts",
+    "payreq:test": "mocha --require=ts-node/register --timeout=20000 --file servers/payment_requests/tests/setup.ts servers/payment_requests/tests/*_test.ts --exit",
+    "payreq:test:migrate": "NODE_ENV=test ts-node servers/payment_requests/tests/migrate.ts",
+    "payreq:start": "ts-node servers/payment_requests/server.ts"
   },
   "keywords": [],
   "author": "",

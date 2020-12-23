@@ -48,9 +48,7 @@ module.exports = {
 
     await queryInterface.dropTable('settlements');
 
-    await queryInterface.renameColumn('invoices', 'should_settle', 'convert_to_bank');
-
-    await queryInterface.removeColumn('accounts', 'should_settle');
+    //await queryInterface.renameColumn('invoices', 'should_settle', 'convert_to_bank');
 
   }
 };

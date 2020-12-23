@@ -25,8 +25,8 @@ export function getCurrency(params: GetCurrency): Currency {
   let code = params.headers['x-currency']
 
   if (!code) {
-    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC')
-    code = 'BCH'
+    throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV,BTC,LTC')
+    //code = 'BCH'
   }
 
   return {

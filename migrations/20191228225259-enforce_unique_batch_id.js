@@ -10,7 +10,7 @@ module.exports = {
   down: (queryInterface, Sequelize) => {
 
     return queryInterface.sequelize.query(
-      `ALTER TABLE ach_batches REMOVE CONSTRAINT unique_batch_id;`
+      `ALTER TABLE ach_batches DROP CONSTRAINT unique_batch_id;`
     );
 
   }
