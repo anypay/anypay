@@ -42,6 +42,10 @@ export async function generateAccount() {
   return account
 }
 
+import { generateInvoice } from '../../../lib/invoice';
+
+export { generateInvoice }
+
 export async function initServer() {
 
   server = await Server()

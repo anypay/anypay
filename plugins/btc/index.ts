@@ -61,7 +61,6 @@ export function validateAddress(address: string){
 }
 
 export async function getNewAddress(deprecatedParam){
-  console.log('deprecated', deprecatedParam);
 
   return deprecatedParam.value;
 

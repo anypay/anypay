@@ -1,7 +1,7 @@
 
 import * as assert from 'assert';
 
-import { server, generateAccount } from './utils'
+import { server, generateAccount, generateInvoice } from './utils'
 
 describe("Payment Requests", async () => {
 
@@ -15,13 +15,13 @@ describe("Payment Requests", async () => {
 
   describe("BIP70 Payments", () => {
 
-    it('#GET /r/{uid} with proper header should return DASH BIP70 request', async () => {
+    it('#GET /r/{invoice.uid} with proper header should return DASH BIP70 request', async () => {
 
-      let uid = 1234
+      let invoice = await generateInvoice(account.id, 0.1, 'DASH')
 
       let response = await server.inject({
         method: 'GET',
-        url: `/r/${uid}`,
+        url: `/r/${invoice.uid}`,
         headers: {
           'accept': 'application/dash-paymentrequest'
         }
@@ -31,13 +31,13 @@ describe("Payment Requests", async () => {
 
     })
 
-    it('#GET /r/{uid} with proper header should return BCH BIP70 request', async () => {
+    it('#GET /r/{invoice.uid} with proper header should return BCH BIP70 request', async () => {
 
-      let uid = 1234
+      let invoice = await generateInvoice(account.id, 0.1, 'BCH')
 
       let response = await server.inject({
         method: 'GET',
-        url: `/r/${uid}`,
+        url: `/r/${invoice.uid}`,
         headers: {
           'accept': 'application/bitcoincash-paymentrequest'
         }
@@ -47,13 +47,13 @@ describe("Payment Requests", async () => {
 
     })
 
-    it('#GET /r/{uid} with proper header should return BTC BIP70 request', async () => {
+    it('#GET /r/{invoice.uid} with proper header should return BTC BIP70 request', async () => {
 
-      let uid = 1234
+      let invoice = await generateInvoice(account.id, 0.1, 'BTC')
 
       let response = await server.inject({
         method: 'GET',
-        url: `/r/${uid}`,
+        url: `/r/${invoice.uid}`,
         headers: {
           'accept': 'application/bitcoin-paymentrequest'
         }
@@ -66,12 +66,11 @@ describe("Payment Requests", async () => {
   })
 
   describe("BIP270 Payments", () => {
-
-    it('#GET /r/{uid} with proper header should return BIP270 request', async () => {
+it('#GET /r/{invoice.uid} with proper header should return BIP270 request', async () => {
 
     })
 
-    it('#GET /r/{uid} with no header should return BIP270 request', async () => {
+    it('#GET /r/{invoice.uid} with no header should return BIP270 request', async () => {
 
     })
 
@@ -79,7 +78,7 @@ describe("Payment Requests", async () => {
 
   describe("JSON Payments", () => {
 
-    it('#GET /r/{uid} with proper header should return JSON request', async () => {
+    it('#GET /r/{invoice.uid} with proper header should return JSON request', async () => {
 
     })
 
