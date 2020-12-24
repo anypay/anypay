@@ -30,7 +30,6 @@ import * as square from './square';
 import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
-import * as settlements from './settlements';
 import * as slack from './slack/notifier';
 import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
@@ -79,7 +78,6 @@ export {
   receipts,
   routes,
   settings,
-  settlements,
   slack,
   square,
   tipjar,

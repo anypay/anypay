@@ -29,6 +29,7 @@ module.exports = {
   },
 
   down: async function (queryInterface, Sequelize) {
+    /*
     await queryInterface.removeColumn('dash_back_merchants', 'merchant_percent');
     await queryInterface.removeColumn('dash_back_merchants', 'merchant_amount');
     await queryInterface.removeColumn('dash_back_merchants', 'merchant_strategy');
@@ -36,5 +37,6 @@ module.exports = {
     await queryInterface.removeColumn('dash_back_merchants', 'customer_percent');
     await queryInterface.removeColumn('dash_back_merchants', 'customer_amount');
     await queryInterface.removeColumn('dash_back_merchants', 'customer_strategy');
+    */
   }
 };

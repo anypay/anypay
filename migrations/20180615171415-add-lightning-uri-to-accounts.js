@@ -8,6 +8,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('accounts', 'lightning_uri');
+    //await queryInterface.removeColumn('accounts', 'lightning_uri');
   }
 };

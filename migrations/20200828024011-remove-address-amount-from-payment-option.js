@@ -15,11 +15,11 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.changeColumn('payment_options', 'amount', {
       type: Sequelize.DECIMAL,
-      allowNull: false
+      allowNull: true
     });
     await queryInterface.changeColumn('payment_options', 'address', {
       type: Sequelize.STRING,
-      allowNull: false
+      allowNull: true
     });
   }
 };
