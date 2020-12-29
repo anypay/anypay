@@ -298,6 +298,24 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/vending/batms",
+    handler: handlers.Batms.index,
+    options: {
+      auth: "token"
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/vending/batms/{batm_id}",
+    handler: handlers.Batms.show,
+    options: {
+      auth: "token"
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/invoices/{invoice_id}",
     handler: handlers.Invoices.show,
     options: {
