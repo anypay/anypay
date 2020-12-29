@@ -3,6 +3,8 @@ import { models } from '../models'
 
 import * as log from '../logger'
 
+import { query } from './mysql'
+
 interface Batm {
   account_id: number;
   id: number;
@@ -59,6 +61,10 @@ export async function getAccountBatmWithTransactions(account_id: number, batm_id
 
 export async function getBatmTransactions(batm_id: number): Promise<BatmTransaction[]> {
 
-  return []
+  let batm = await models.VendingMachine.findOne({ where: { id: batm_id }})
+
+  let transactions = await query(`SELECT * FROM terminal left join transactionrecord  on (terminal.id = transactionrecord.terminal_id)  where serialnumber = '${batm.serial_number}' order by transactionrecord.terminaltime desc;`)
+
+  return transactions
 }
 
