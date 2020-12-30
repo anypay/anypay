@@ -27,7 +27,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('controllers/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'controllers/application.js should pass ESLint\n\n11:3 - Duplicate key \'geolocation\'. (no-dupe-keys)\n21:26 - \'query\' is defined but never used. (no-unused-vars)\n25:7 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'controllers/application.js should pass ESLint\n\n23:11 - \'currentRoute\' is assigned a value but never used. (no-unused-vars)');
   });
 
   QUnit.test('controllers/business.js', function (assert) {
@@ -92,7 +92,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/application.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/application.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n23:7 - Unexpected console statement. (no-console)\n28:7 - Unexpected console statement. (no-console)\n52:7 - Unexpected console statement. (no-console)\n70:5 - \'$\' is not defined. (no-undef)');
+    assert.ok(false, 'routes/application.js should pass ESLint\n\n16:5 - Unexpected console statement. (no-console)\n23:7 - Unexpected console statement. (no-console)\n28:7 - Unexpected console statement. (no-console)\n52:7 - Unexpected console statement. (no-console)\n70:5 - Unexpected console statement. (no-console)\n72:5 - \'$\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/business.js', function (assert) {
@@ -117,7 +117,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('routes/home.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'routes/home.js should pass ESLint\n\n13:9 - \'$\' is not defined. (no-undef)\n16:11 - \'$\' is not defined. (no-undef)\n17:11 - Unexpected console statement. (no-console)\n22:11 - \'$\' is not defined. (no-undef)\n23:11 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'routes/home.js should pass ESLint\n\n13:9 - \'$\' is not defined. (no-undef)\n16:11 - \'$\' is not defined. (no-undef)\n17:11 - Unexpected console statement. (no-console)\n22:11 - \'$\' is not defined. (no-undef)\n23:11 - Unexpected console statement. (no-console)\n31:9 - \'$\' is not defined. (no-undef)');
   });
 
   QUnit.test('routes/index.js', function (assert) {

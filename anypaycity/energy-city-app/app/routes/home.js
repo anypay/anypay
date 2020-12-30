@@ -28,6 +28,7 @@ export default Ember.Route.extend({
         }, {
           enableHighAccuracy: false 
         });
+        $('#loader-wrapper').hide()
 
       }
 

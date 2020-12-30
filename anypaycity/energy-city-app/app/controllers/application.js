@@ -2,13 +2,13 @@ import Ember from 'ember';
 import { inject as service } from '@ember/service';
 
 export default Ember.Controller.extend({
+  routing: service('-routing'),
+
   addressSearch: service('address-search'),
 
   geolocation: service(),
 
   currentLocation: null,
-
-  geolocation: null,
 
   socket: null,
 
@@ -18,16 +18,24 @@ export default Ember.Controller.extend({
 
   actions: {
 
-    async searchLocation(query) {
+    async searchLocation() {
+
+      var currentRoute = this.get('routing').get('currentRouteName');
 
       let results = await this.get('addressSearch').getCoordinates(this.get('search'))
 
-      console.log('addressSearchResults' , results)
+      if (this.get('googlemap')) {
 
-      this.get('googlemap').setCenter({
-        lat: parseFloat(results.lat),
-        lng: parseFloat(results.lng)
-      })
+        this.get('googlemap').setCenter({
+          lat: parseFloat(results.lat),
+          lng: parseFloat(results.lng)
+        })
+
+      } else {
+
+        this.transitionToRoute('map', {lat: results.lat, lng: results.lng})
+
+      }
 
     },
 

@@ -1172,23 +1172,6 @@ define('energy-city-app/controllers/application', ['exports'], function (exports
     value: true
   });
 
-  var _Ember$Controller$ext;
-
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
   function _asyncToGenerator(fn) {
     return function () {
       var gen = fn.apply(this, arguments);
@@ -1218,50 +1201,65 @@ define('energy-city-app/controllers/application', ['exports'], function (exports
     };
   }
 
-  exports.default = Ember.Controller.extend((_Ember$Controller$ext = {
+  exports.default = Ember.Controller.extend({
+    routing: Ember.inject.service('-routing'),
+
     addressSearch: Ember.inject.service('address-search'),
 
     geolocation: Ember.inject.service(),
 
-    currentLocation: null
+    currentLocation: null,
 
-  }, _defineProperty(_Ember$Controller$ext, 'geolocation', null), _defineProperty(_Ember$Controller$ext, 'socket', null), _defineProperty(_Ember$Controller$ext, 'connected', false), _defineProperty(_Ember$Controller$ext, 'session', Ember.inject.service()), _defineProperty(_Ember$Controller$ext, 'actions', {
-    searchLocation: function () {
-      var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(query) {
-        var results;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                _context.next = 2;
-                return this.get('addressSearch').getCoordinates(this.get('search'));
+    socket: null,
 
-              case 2:
-                results = _context.sent;
+    connected: false,
+
+    session: Ember.inject.service(),
+
+    actions: {
+      searchLocation: function () {
+        var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+          var currentRoute, results;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  currentRoute = this.get('routing').get('currentRouteName');
+                  _context.next = 3;
+                  return this.get('addressSearch').getCoordinates(this.get('search'));
+
+                case 3:
+                  results = _context.sent;
 
 
-                console.log('addressSearchResults', results);
+                  if (this.get('googlemap')) {
 
-                this.get('googlemap').setCenter({
-                  lat: parseFloat(results.lat),
-                  lng: parseFloat(results.lng)
-                });
+                    this.get('googlemap').setCenter({
+                      lat: parseFloat(results.lat),
+                      lng: parseFloat(results.lng)
+                    });
+                  } else {
 
-              case 5:
-              case 'end':
-                return _context.stop();
+                    this.transitionToRoute('map', { lat: results.lat, lng: results.lng });
+                  }
+
+                case 5:
+                case 'end':
+                  return _context.stop();
+              }
             }
-          }
-        }, _callee, this);
-      }));
+          }, _callee, this);
+        }));
 
-      function searchLocation(_x) {
-        return _ref.apply(this, arguments);
-      }
+        function searchLocation() {
+          return _ref.apply(this, arguments);
+        }
 
-      return searchLocation;
-    }()
-  }), _Ember$Controller$ext));
+        return searchLocation;
+      }()
+    }
+
+  });
 });
 define('energy-city-app/controllers/business', ['exports', 'ember-get-config'], function (exports, _emberGetConfig) {
   'use strict';
@@ -3644,6 +3642,8 @@ define('energy-city-app/routes/application', ['exports', 'ember-simple-auth/mixi
         Ember.Logger.info('socket.error', error.message);
       });
 
+      console.log("CONTROLLER SETUP");
+
       $('#splash-loader').hide();
     }
   });
@@ -4194,6 +4194,7 @@ define('energy-city-app/routes/home', ['exports'], function (exports) {
                   }, {
                     enableHighAccuracy: false
                   });
+                  $('#loader-wrapper').hide();
                 }
 
               case 5:
@@ -5966,6 +5967,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+b580b46d"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+2e7dc1ff"});
 }
 //# sourceMappingURL=energy-city-app.map
