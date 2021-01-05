@@ -1,5 +1,6 @@
 
 import { log, models, invoices } from '../../../lib';
+import { logInfo } from '../../../lib/logger' 
 
 import * as Boom from 'boom';
 
@@ -68,7 +69,7 @@ export async function create(req, h) {
 
   try {
 
-    log.info('pay.request.create', { template: req.payload.template, options: req.payload.options })
+    logInfo('pay.request.create', { template: req.payload.template, options: req.payload.options })
 
     let { error, template } = schema.PaymentRequestTemplate.validate(req.payload.template)
 
@@ -80,7 +81,7 @@ export async function create(req, h) {
 
     } else {
 
-      log.info('pay.request.create.template.valid', template)
+      logInfo('pay.request.create.template.valid', template)
 
       let record = await models.PaymentRequest.create({
 
@@ -116,7 +117,7 @@ export async function create(req, h) {
 
       await paymentRequestToPaymentOptions(record)
 
-      log.info('pay.request.created', record.toJSON())
+      logInfo('pay.request.created', record.toJSON())
 
       return {
 
@@ -144,7 +145,7 @@ export async function create(req, h) {
 
 export async function show(req, h) {
 
-  log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
+  logInfo('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
   try {
 
