@@ -1,7 +1,8 @@
 
 import { plugins, models, amqp, log } from '../../../lib'
+import { logInfo } from '../../../lib/logger'
 
-import { verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
+import { detectWallet, verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
 
 import * as Hapi from 'hapi';
 
@@ -11,6 +12,7 @@ export interface SubmitPaymentRequest {
   currency: string;
   invoice_uid: string;
   transactions: string[];
+  wallet?: string;
 }
 
 export interface SubmitPaymentResponse {
@@ -58,7 +60,7 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
-  log.info('payment.submit', payment);
+  logInfo('payment.submit', payment);
 
   let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
@@ -85,22 +87,26 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       protocol: 'JSONV2'
     })
 
-    console.log(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, transaction)
+    logInfo(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
 
     let resp = await plugin.broadcastTx(transaction)
 
-    console.log(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`)
-
-    console.log('COMPLETE PAYMENT')
+    logInfo(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
 
     let paymentRecord = await completePayment(payment_option, transaction)
 
-    console.log('payment completed', paymentRecord);
-
-    return {
-      success: true,
-      transactions: payment.transactions
+    if (payment.wallet) {
+      paymentRecord.wallet = payment.wallet
+      await paymentRecord.save()
     }
+
+    logInfo('payment.completed', paymentRecord.toJSON());
+
+  }
+
+  return {
+    success: true,
+    transactions: payment.transactions
   }
 
 }
@@ -115,10 +121,13 @@ export async function create(req, h) {
 
     let transactions = req.payload.transactions;
 
+    let wallet = detectWallet(req.headers, req.params.uid)
+
     let response = await submitPayment({
       currency,
       invoice_uid,
-      transactions
+      transactions,
+      wallet
     })
 
     return response
