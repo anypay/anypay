@@ -6,18 +6,14 @@ import { startActors } from 'rabbi';
 
 export async function start() {
 
-  // containers1
   startActors([
     'webhooks',
     'prices',
     'payment_push_notification',
     'grab_and_go_push_notification',
     'truereviews',
-    'invoice_created_to_slack'
-  ])
-
-  // containers2
-  startActors([
+    'invoice_created_to_slack',
+    'invoice_paid_receipt_slack',
     'payment_processor',
     'payment-options-processor',
     'invoice_paid_apply_settlement',
@@ -27,11 +23,7 @@ export async function start() {
     'ambassador-rewards',
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
-    'router_transactions'
-  ])
-
-  // containers3
-  startActors([
+    'router_transactions',
     'cashback_customers',
     'invoice-paid-cashback-record'
   ])
