@@ -6,7 +6,7 @@ import * as Boom from 'boom'
 import { models, database } from '../../../lib'
 import * as moment from 'moment'
 
-import * as mysql from '../../../lib/vending/db'
+import * as mysql from '../../../lib/vending/mysql'
 
 export async function index(req, h) {
 
