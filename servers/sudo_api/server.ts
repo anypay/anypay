@@ -122,6 +122,22 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/paypow/orders",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.PaypowOrders.index,
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/histograms/daily-invoices-paid",
 
     config: {
