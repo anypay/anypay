@@ -4,7 +4,7 @@ import { join } from 'path';
 
 import * as Hapi from 'hapi';
 
-import { log } from '../../lib';
+import { logInfo } from '../../lib/logger';
 
 import { requireHandlersDirectory } from 'rabbi';
 
@@ -136,16 +136,6 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/{item_uid}",
-
-    handler: handlers.PaymentRequests.createByItemUid
-
-  });
-
-  server.route({
-
-    method: "GET",
-
     path: "/gg/{item_uid}",
 
     handler: handlers.PaymentRequests.createByItemUid
@@ -154,22 +144,22 @@ async function Server(): Promise<Hapi.Server> {
 
   server.route({
 
-    method: "POST",
+    method: "GET",
 
-    path: "/payments/edge/{currency}/{uid}",
+    path: "/{item_uid}",
 
-    handler: handlers.PaymentRequests.submitPayment
+    handler: handlers.PaymentRequests.createByItemUid
 
   });
 
 
   server.route({
 
-    method: "GET",
+    method: "POST",
 
-    path: "/gg/dash/{item_uid}",
+    path: "/payments/edge/{currency}/{uid}",
 
-    handler: handlers.DashPaymentRequests.createByItemUid
+    handler: handlers.PaymentRequests.submitPayment
 
   });
 
@@ -186,7 +176,7 @@ async function start() {
   // Start the server
     await server.start();
 
-    log.info("Server running at:", server.info.uri);
+    logInfo("servers.grab-and-go.started", server.info);
 
    } catch(err){
 
