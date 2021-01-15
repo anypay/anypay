@@ -3,12 +3,15 @@ import * as Hapi from 'hapi';
 import { verifyPayment, buildPaymentRequestForInvoice } from '../../../lib/pay';
 
 import { amqp, log } from '../../../lib';
+import { logInfo } from '../../../lib/logger';
 
 import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
 
 import * as Boom from 'boom';
 
 export async function show(req, h) {
+
+  logInfo('servers.rest_api.bip270_pament_requests.show', req.params)
 
   let { content } = await buildPaymentRequestForInvoice({
     uid: req.params.uid,

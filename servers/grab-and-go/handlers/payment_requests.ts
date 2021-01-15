@@ -1,10 +1,12 @@
 import * as Hapi from 'hapi'; import * as Boom from 'boom';
 
-import { generatePaymentRequest } from '../../../lib/bip70';
-
 import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/lib/paymentRequest';
 
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
+
+import { show as showPaymentRequest } from '../../rest_api/handlers/payment_requests'
+
+import { logInfo, logError } from '../../../lib/logger'
 
 import { models, invoices, plugins } from '../../../lib';
 
@@ -81,63 +83,21 @@ export async function create(req: Hapi.Request, h) {
 
   });
 
-  let paymentRequest = await generatePaymentRequest(invoice, account);
+  req.account = account
+  req.account_id = account.id
+  req.invoice_uid = invoice.uid
+  req.uid = invoice.uid
 
-  const response = h.response(paymentRequest.serialize());
+  try {
 
-  response.type('application/bitcoincash-paymentrequest');
-  response.header('Content-Type', 'application/bitcoincash-paymentrequest');
-  response.header('Accept', 'application/bitcoincash-payment');
+    return showPaymentRequest(req, h);
 
-  return response;
+  } catch(error) {
 
-}
+    logError('showpaymentrequest.error', error.message)
+    return Boom.badRequest(error.message)
 
-async function handleEdge(req: Hapi.Request, h: Hapi.ResponseToolkit) {
-
-  console.log('edgewallet.detected'); 
-
-  let currency = req.headers['x-currency'];
-
-  if (!currency) {
-    //throw new Error('x-currency header must be provided with value such as BCH,DASH,BSV')
-    currency = 'BCH'
   }
-
-  let { invoice, item } = await createGrabAndGoInvoice(req.params.item_uid, currency);
-
-  let amount = new BigNumber(invoice.amount);
-
-  if (invoice.address.match(/\:/)) {
-    invoice.address = invoice.address.split(':')[1];
-  }
-
-  const paymentRequest = {
-    "network": "main",
-    "currency": invoice.currency,
-    "requiredFeeRate": 1,
-    "outputs": [
-        {
-            "amount": amount.times(100000000).toNumber(),
-            "address": invoice.address
-        }
-    ],
-    "time": moment().toDate(),
-    "expires": moment().add(15, 'minutes').toDate(),
-    "memo": `Payment request for Anypay invoice ${invoice.uid}`,
-    "paymentUrl": `https://api.anypayinc.com/payments/edge/${invoice.currency}/${invoice.uid}`,
-    "paymentId": invoice.uid
-  }
-
-  let response = h.response(paymentRequest);
-
-  response.type('application/payment-request');
-
-  response.header('Content-Type', 'application/payment-request');
-
-  response.header('Accept', 'application/payment');
-
-  return response;
 
 }
 
@@ -171,6 +131,9 @@ export async function submitPayment(req: Hapi.Request, h: Hapi.ResponseToolkit) 
 }
 
 async function createGrabAndGoInvoice(item_uid: string, currency: string) {
+
+    logInfo('grab-and-go.invoices.create', { item_uid, currency })
+
     // look up the item from the url parameters
     let item = await models.GrabAndGoItem.findOne({
 
@@ -208,22 +171,11 @@ async function createGrabAndGoInvoice(item_uid: string, currency: string) {
 
     return { invoice, item };
 
-
 }
 
 export async function createByItemUid(req: Hapi.Request, h: Hapi.ResponseToolkit) {
-  var isEdge = false;
 
-  /* Detect EDGE Wallet for Bitpay's JSON Protocol Support */
-
-
-  if (req.headers['x-requested-with'] === 'co.edgesecure.app') {
-
-    return handleEdge(req, h);
-
-  }
-
-  console.log("HEADERS", req.headers);
+  logInfo('grab-and-go.payment_requests.createByItemUid', { headers: req.headers, params: req.params })
 
   var currency;
   if (req.headers.accept === 'application/bitcoin-paymentrequest') {
@@ -244,81 +196,12 @@ export async function createByItemUid(req: Hapi.Request, h: Hapi.ResponseToolkit
 
     let account = await models.Account.findOne({ where: { id: item.account_id }});
 
-    var paymentRequest, response;
+    req.account = account
+    req.account_id = account.id
+    req.params.invoice_uid = invoice.uid
+    req.params.uid = invoice.uid
 
-    switch(currency) {
-    case 'BCH':
-
-      paymentRequest = await generatePaymentRequest(invoice, account);
-
-      response = h.response(paymentRequest.serialize());
-
-      response.type('application/bitcoincash-paymentrequest');
-
-      response.header('Content-Type', 'application/bitcoincash-paymentrequest');
-
-      response.header('Accept', 'application/bitcoincash-payment');
-
-      return response;
-
-    case 'DASH':
-
-      paymentRequest = await generatePaymentRequest(invoice, account);
-
-      response = h.response(paymentRequest.serialize());
-
-      response.type('application/dash-paymentrequest');
-
-      response.header('Content-Type', 'application/dash-paymentrequest');
-
-      response.header('Accept', 'application/dash-payment');
-
-      return response;
-
-    case 'BTC':
-
-      paymentRequest = await generatePaymentRequest(invoice, account);
-
-      response = h.response(paymentRequest.serialize());
-
-      response.type('application/bitcoin-paymentrequest');
-
-      response.header('Content-Type', 'application/bitcoin-paymentrequest');
-
-      response.header('Accept', 'application/bitcoin-payment');
-
-      return response;
-
-    case 'BSV':
-
-      let paymentOption = await models.PaymentOption.findOne({
-      
-        where: {
-
-          invoice_uid: invoice.uid,
-
-          currency: 'BSV'
-
-        }
-
-      });
-
-      paymentRequest = await createBSVRequest(invoice, paymentOption, {
-        name: item.name,
-        image_url: item.image_url
-      });
-
-      response = h.response(paymentRequest);
-
-      response.type('application/json'); 
-
-      response.header('Content-Type', 'application/json');
-
-      response.header('Accept', 'application/json');
-
-      return response;
-    }
-
+    return showPaymentRequest(req, h)
 
   } catch(error) {
 
