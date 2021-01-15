@@ -71,6 +71,10 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     "paymentId": paymentOption.invoice_uid
   }
 
+  if (paymentOption.currency === 'BTC') {
+    paymentRequest.requiredFeeRate = 30
+  }
+
   return paymentRequest;
 
 }
