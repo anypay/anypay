@@ -12,40 +12,9 @@ import { validateToken } from '../auth/hapi_validate_token';
 
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
 
-async function Server(): Promise<Hapi.Server> {
-
-  var server = new Hapi.Server({
-    host: "0.0.0.0",
-    port:  process.env.PORT || 5200,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      }
-    }
-  });
-
-  await server.register(require('hapi-auth-basic'));
+function attach(server: Hapi.Server): Hapi.Server {
 
   server.auth.strategy("accountToken", "basic", { validate: validateToken});
-
-  server.ext('onRequest', function(request, h) {
-
-    if ('application/payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment';
-    }
-
-    if ('application/payment-request' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment-request';
-    }
-
-    return h.continue;
-
-  });
 
   server.route({
 
@@ -146,6 +115,16 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
+    path: "/g/{item_uid}",
+
+    handler: handlers.PaymentRequests.createByItemUid
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/{item_uid}",
 
     handler: handlers.PaymentRequests.createByItemUid
@@ -163,15 +142,56 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+  return server
+
+}
+
+async function Server(): Promise<Hapi.Server> {
+
+  var server = new Hapi.Server({
+    host: "0.0.0.0",
+    port:  process.env.PORT || 5200,
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      }
+    }
+  });
+
+  await server.register(require('hapi-auth-basic'));
+
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment-request' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-request';
+    }
+
+    return h.continue;
+
+  });
+
+
   return server;
 
 }
 
 async function start() {
 
+
   try {
 
     let server = await Server();
+
+    attach(server)
 
   // Start the server
     await server.start();
@@ -195,6 +215,8 @@ if (require.main === module) {
 export {
 
   start,
+
+  attach,
 
   Server
 

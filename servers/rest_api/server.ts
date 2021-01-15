@@ -22,6 +22,7 @@ import { accountCSVReports } from './handlers/csv_reports';
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 
 import * as payreq from '../payment_requests/server'
+import { attach as attachGrabAndGoRoutes } from '../grab-and-go/server'
 
 /* Import all handlers from './handlers directory */
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
@@ -1152,17 +1153,15 @@ async function Server() {
 
   accountCSVReports(server);
 
+  attachGrabAndGoRoutes(server);
+
   server.route({
     method: 'GET',
-    path: '/{param*}',
-    handler: {
-      directory: {
-        path: '.',
-        redirectToSlash: true,
-        index: true,
-      }
+    path: '/',
+    handler: (req, h) => {
+      return h.redirect('https://anypay.dev')
     }
-  });
+  }); 
 
   return server;
 
