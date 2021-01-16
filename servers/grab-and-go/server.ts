@@ -4,7 +4,7 @@ import { join } from 'path';
 
 import * as Hapi from 'hapi';
 
-import { log } from '../../lib';
+import { logInfo } from '../../lib/logger';
 
 import { requireHandlersDirectory } from 'rabbi';
 
@@ -12,40 +12,9 @@ import { validateToken } from '../auth/hapi_validate_token';
 
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
 
-async function Server(): Promise<Hapi.Server> {
-
-  var server = new Hapi.Server({
-    host: "0.0.0.0",
-    port:  process.env.PORT || 5200,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      }
-    }
-  });
-
-  await server.register(require('hapi-auth-basic'));
+function attach(server: Hapi.Server): Hapi.Server {
 
   server.auth.strategy("accountToken", "basic", { validate: validateToken});
-
-  server.ext('onRequest', function(request, h) {
-
-    if ('application/payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment';
-    }
-
-    if ('application/payment-request' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment-request';
-    }
-
-    return h.continue;
-
-  });
 
   server.route({
 
@@ -136,7 +105,7 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/{item_uid}",
+    path: "/gg/{item_uid}",
 
     handler: handlers.PaymentRequests.createByItemUid
 
@@ -146,11 +115,22 @@ async function Server(): Promise<Hapi.Server> {
 
     method: "GET",
 
-    path: "/gg/{item_uid}",
+    path: "/g/{item_uid}",
 
     handler: handlers.PaymentRequests.createByItemUid
 
   });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/{item_uid}",
+
+    handler: handlers.PaymentRequests.createByItemUid
+
+  });
+
 
   server.route({
 
@@ -162,16 +142,43 @@ async function Server(): Promise<Hapi.Server> {
 
   });
 
+  return server
 
-  server.route({
+}
 
-    method: "GET",
+async function Server(): Promise<Hapi.Server> {
 
-    path: "/gg/dash/{item_uid}",
+  var server = new Hapi.Server({
+    host: "0.0.0.0",
+    port:  process.env.PORT || 5200,
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      }
+    }
+  });
 
-    handler: handlers.DashPaymentRequests.createByItemUid
+  await server.register(require('hapi-auth-basic'));
+
+  server.ext('onRequest', function(request, h) {
+
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment-request' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-request';
+    }
+
+    return h.continue;
 
   });
+
 
   return server;
 
@@ -179,14 +186,17 @@ async function Server(): Promise<Hapi.Server> {
 
 async function start() {
 
+
   try {
 
     let server = await Server();
 
+    attach(server)
+
   // Start the server
     await server.start();
 
-    log.info("Server running at:", server.info.uri);
+    logInfo("servers.grab-and-go.started", server.info);
 
    } catch(err){
 
@@ -205,6 +215,8 @@ if (require.main === module) {
 export {
 
   start,
+
+  attach,
 
   Server
 

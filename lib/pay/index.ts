@@ -135,7 +135,6 @@ export async function verifyPayment(v: VerifyPayment) {
 export async function buildPaymentRequestForInvoice(params: PaymentRequestForInvoice): Promise<PaymentRequest> {
 
   logInfo('paymentrequest.build', params)
-  logInfo('paymentrequest.build.uid', { uid: params.uid })
 
   let paymentOption = await models.PaymentOption.findOne({
     where: {
