@@ -20,7 +20,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     method: "POST",
 
-    path: "/debits",
+    path: "/x/debits",
 
     options: {
 
@@ -36,7 +36,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     method: "GET",
 
-    path: "/account",
+    path: "/x/account",
 
     options: {
 
@@ -52,7 +52,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     method: "GET",
 
-    path: "/transactions",
+    path: "/x/transactions",
 
     options: {
 
