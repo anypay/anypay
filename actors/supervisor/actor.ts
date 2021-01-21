@@ -16,7 +16,6 @@ export async function start() {
     'invoice_paid_receipt_slack',
     'payment_processor',
     'payment-options-processor',
-    'invoice_paid_apply_settlement',
     'kraken-auto-sell',
     'grab_and_go_payment_amqp',
     'grab_and_go_invoice_order',
@@ -25,7 +24,8 @@ export async function start() {
     'invoice_after_create_to_energycity',
     'router_transactions',
     'cashback_customers',
-    'invoice-paid-cashback-record'
+    'invoice-paid-cashback-record',
+    'anypay_x_credit_invoice_paid'
   ])
 
 }
