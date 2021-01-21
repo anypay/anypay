@@ -1156,6 +1156,8 @@ async function Server() {
 
   attachAnypayXRoutes(server);
 
+  attachGrabAndGoRoutes(server);
+
   server.route({
     method: 'GET',
     path: '/',

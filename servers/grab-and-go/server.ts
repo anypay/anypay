@@ -14,8 +14,6 @@ const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
 
 function attach(server: Hapi.Server): Hapi.Server {
 
-  server.auth.strategy("accountToken", "basic", { validate: validateToken});
-
   server.route({
 
     method: "GET",
@@ -190,6 +188,8 @@ async function start() {
   try {
 
     let server = await Server();
+
+    server.auth.strategy("accountToken", "basic", { validate: validateToken});
 
     attach(server)
 
