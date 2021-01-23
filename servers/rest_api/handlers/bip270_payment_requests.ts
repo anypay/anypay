@@ -2,7 +2,7 @@ import * as Hapi from 'hapi';
 
 import { verifyPayment, buildPaymentRequestForInvoice } from '../../../lib/pay';
 
-import { amqp, log } from '../../../lib';
+import { amqp, log, models } from '../../../lib';
 import { logInfo } from '../../../lib/logger';
 
 import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
@@ -20,6 +20,34 @@ export async function show(req, h) {
   })
 
   log.info(`pay.request.bsv.content`, content)
+
+  let grabAndGoInvoice = await models.GrabAndGoInvoice.findOne({
+    where: {
+      invoice_uid: req.params.uid
+    }
+  })
+
+  if (grabAndGoInvoice) {
+
+    let grabAndGoItem = await models.GrabAndGoItem.findOne({
+      where: {
+        id: grabAndGoInvoice.item_id
+      }
+    })
+
+    let merchantData = JSON.parse(content.merchantData)
+
+    merchantData['merchantName'] = grabAndGoItem.name
+
+    if (grabAndGoItem.image_url) {
+
+      merchantData['avatarUrl'] = grabAndGoItem.image_url
+
+    }
+
+    content['merchantData'] = JSON.stringify(merchantData)
+
+  }
 
   let response = h.response(content);
 
