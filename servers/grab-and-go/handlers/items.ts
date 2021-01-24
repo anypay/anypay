@@ -6,7 +6,7 @@ export async function create(req, h) {
 
   try {
 
-    let grab_and_go_item = await models.findOrCreate({
+    let grab_and_go_item = await models.GrabAndGoItem.findOrCreate({
 
       where: {
 
@@ -20,7 +20,11 @@ export async function create(req, h) {
 
         account_id: req.account.id,
 
-        name: req.payload.name
+        name: req.payload.name,
+
+        image_url: req.payload.image_url,
+
+        price: req.payload.amount
 
       }
 
