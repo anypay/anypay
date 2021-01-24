@@ -24,7 +24,7 @@ export async function create(req, h) {
 
         image_url: req.payload.image_url,
 
-        price: req.payload.amount
+        price: req.payload.price
 
       }
 
