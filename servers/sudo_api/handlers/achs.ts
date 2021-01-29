@@ -45,6 +45,14 @@ export async function index(req: Request, h: ResponseToolkit) {
 
     }
 
+    params['include'] = [{
+      model: models.Account,
+      attributes: ['email']
+    }, {
+      model: models.AchBatch,
+      as: 'batch'
+    }]
+
     let achs = await models.AccountAch.findAll(params);
 
     return { achs };
