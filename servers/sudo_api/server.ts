@@ -224,7 +224,7 @@ async function Server() {
 
     method: "GET",
 
-    path: "/api/settlements/{invoice_uid}",
+    path: "/api/bitpay_settlements/{invoice_uid}",
 
     config: {
 

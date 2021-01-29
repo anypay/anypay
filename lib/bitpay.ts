@@ -12,7 +12,7 @@ export async function create(invoice_uid: string) {
     throw new Error('invoice not found');
   }
 
-  let [settlement, isNew] = await models.Settlement.findOrCreate({
+  let [settlement, isNew] = await models.BitpaySettlement.findOrCreate({
     where: {
       invoice_uid: invoice.uid
     },
@@ -55,7 +55,7 @@ interface SettlementUpdate {
 export async function update(params: SettlementUpdate){
   console.log('bitpay.settlement.update', params);
  
-  let settlement = await models.Settlement.findOne({ where: {
+  let settlement = await models.BitpaySettlement.findOne({ where: {
     invoice_uid: params.invoice_uid
   }});
 
