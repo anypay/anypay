@@ -48,11 +48,11 @@ describe("Setting Firebase Token via REST", async () => {
         headers: headers(accessToken.uid)
       });
 
-      assert.strictEqual(models.FirebaseToken.findAll(
+      assert.strictEqual(models.FirebaseToken.findAll({
         where: {
           account_id: account.id
         }
-      ).length, 2)
+      }).length, 2)
 
     } catch(error) {
 

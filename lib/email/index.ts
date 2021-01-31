@@ -9,58 +9,11 @@ const moment = require('moment');
 
 import { getBlockExplorerTxidUrl } from '../block_explorer';
 
-
 import { email as rabbiEmail } from 'rabbi';
-
-AWS.config.update({ region: "us-east-1" });
-//require('./createtemplate')
-
-const FROM_EMAIL = 'Derrick from Anypay <derrick@anypayinc.com>';
-
-const templates = requireAll(`${__dirname}/templates`);
-
-
-export async function sendEmail(recipient, subject, body) {
-  var params = {
-      Destination: { /* required */
-            ToAddresses: [
-                    recipient,
-                    /* more items */
-                  ]
-          },
-      Message: { /* required */
-            Body: { /* required */
-                    Html: {
-                             Charset: "UTF-8",
-                             Data: body
-                            },
-                    Text: {
-                             Charset: "UTF-8",
-                             Data: body
-                            }
-                   },
-             Subject: {
-                     Charset: 'UTF-8',
-                     Data: subject
-                    }
-            },
-      Source: FROM_EMAIL, /* required */
-      ReplyToAddresses: [
-              'derrick@anypayinc.com',
-              'support@anypayinc.com',
-            /* more items */
-          ],
-  };  
-
-  log.info('email.sent', recipient, subject) 
-
-  return new AWS.SES({apiVersion: '2010-12-01'}).sendEmail(params).promise();
-  
-};
 
 export async function newAccountCreatedEmail(account) {
 
-  return rabbiEmail.sendEmail('welcome', account.email, 'Anypay Inc<noreply@anypayinc.com>', { email: account.email });
+  return rabbiEmail.sendEmail('welcome', account.email, 'Anypay<support@anypayinc.com>', { email: account.email });
 
 };
 
@@ -70,23 +23,7 @@ export async function firstInvoiceCreatedEmail(invoiceId) {
 
   let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
-  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay Inc<derrick@anypayinc.com>', { email: account.email });
-
-};
-
-export async function unpaidInvoiceEmail(invoiceId) {
-
-  let template = templates['unpaid_invoice'];
-
-  let invoice = await models.Invoice.findOne({ where: {
-    id: invoiceId
-  }});
-
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
-
-  return sendEmail(account.email, template.subject, template.body);
+  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay<support@anypayinc.com>', { email: account.email });
 
 };
 
@@ -100,7 +37,7 @@ export async function addressChangedEmail(address_id: number) {
     id: address.account_id
   }});
 
-  return rabbiEmail.sendEmail('address_updated', account.email, 'Anypay Inc<noreply@anypayinc.com>', {
+  return rabbiEmail.sendEmail('address_updated', account.email, 'Anypay<support@anypayinc.com>', {
     currency: address.currency,
     address: address.value,
     updated_at_time: address.updated_at,
@@ -200,19 +137,6 @@ export async function invoicePaidEmail(invoice){
   return resp;
 }
 
-export async function firstInvoicePaidEmail(invoice){
-
-
-  let template = templates["first_paid_invoice"]
-
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
-
-  return sendEmail(account.email, template.subject, template.body);
-
-}
-
 async function checkInvoiceCount(invoice){
 
   const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`
@@ -244,7 +168,7 @@ async function checkInvoicePaidCount(invoice){
 
     if(result[1].rows[0].count==1){
       emitter.emit('invoice.paid.first', invoice)
-      firstInvoicePaidEmail(invoice)
+      //firstInvoicePaidEmail(invoice)
     }
     else{
       invoicePaidEmail(invoice)
@@ -262,8 +186,6 @@ emitter.on('account.created', (account) => {
     
 })   
 
-
-
 emitter.on('invoice.created', (invoice)=>{
  
   checkInvoiceCount(invoice)
@@ -277,8 +199,6 @@ emitter.on('address.set', (changeset)=>{
 })
 
 emitter.on('invoice.paid.first', (invoice)=>{
-
-  firstInvoicePaidEmail(invoice)
-
+  // first invoice paid email
 })
 
