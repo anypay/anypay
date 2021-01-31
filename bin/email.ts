@@ -3,6 +3,7 @@
 import * as program from 'commander';
 import { ambassadorRewardEmail } from '../lib/email';
 import { sendEgifterAchReceipt } from '../lib/ach';
+import { models } from '../lib/models';
 import { email as rabbiEmail } from 'rabbi';
 
 program
@@ -69,6 +70,32 @@ program
 
   });
 
+program
+  .command('invoice_paid_receipt <uid>')
+  .action(async (uid) => {
+
+    let invoice = await models.Invoice.findOne({ where: { uid }})
+    let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+
+    try {
+
+      let resp = await rabbiEmail.sendEmail('invoice_paid_receipt', account.email, 'derrick@anypayinc.com', {
+        invoice,
+        account,
+        email: account.email
+      })
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+
+    process.exit(0);
+
+  })
 
 
 program
