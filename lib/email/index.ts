@@ -11,19 +11,31 @@ import { getBlockExplorerTxidUrl } from '../block_explorer';
 
 import { email as rabbiEmail } from 'rabbi';
 
+export async function firstAddressSetEmail(account) {
+
+  return rabbiEmail.sendEmail('first_address_set', account.email, 'Anypay<support@anypayinc.com>', {
+    account_id: account.id
+  });
+
+};
+
+
 export async function newAccountCreatedEmail(account) {
 
   return rabbiEmail.sendEmail('welcome', account.email, 'Anypay<support@anypayinc.com>', { email: account.email });
 
 };
 
-export async function firstInvoiceCreatedEmail(invoiceId) {
+export async function firstInvoiceCreatedEmail(email) {
 
-  let invoice = await models.Invoice.findOne({ where: { id: invoiceId }})
+  let account = await models.Account.findOne({ where: { email }})
 
-  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+  let invoice = await models.Invoice.findOne({ where: { account_id: account.id }})
 
-  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay<support@anypayinc.com>', { email: account.email });
+  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay<support@anypayinc.com>', {
+    email: account.email,
+    invoice_uid: invoice.uid
+  });
 
 };
 

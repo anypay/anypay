@@ -3,7 +3,7 @@
   <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>RSS to Email</title>
+    <title>Receipt</title>
     <style media="all" type="text/css">
     @media only screen and (max-width: 640px) {
       .span-2,
@@ -168,20 +168,17 @@
         <td class="container" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; margin: 0 auto !important; max-width: 600px; padding: 0; padding-top: 24px; width: 600px;" width="600" valign="top">
           <div class="content" style="box-sizing: border-box; display: block; margin: 0 auto; max-width: 600px; padding: 0;">
 
+            <!-- START CENTERED WHITE CONTAINER -->
+            <span class="preheader" style="color: transparent; display: none;
+            height: 0; max-height: 0; max-width: 0; opacity: 0; overflow:hidden; mso-hide: all; visibility: hidden; width: 0;">You are now ready to accept payments in {{currency}}</span>
+
+
             <!-- START HEADER -->
             <div class="header" style="margin-bottom: 24px; margin-top: 0; width: 100%;">
               <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; min-width: 100%;" width="100%">
                 <tr>
                   <td class="align-center" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; text-align: center;" valign="top" align="center">
-                    <!--<a href="https://anypayinc.com" target="_blank" style="color: #3498db; text-decoration:
-                    underline;"><img
-                    src="https://media.bitcoinfiles.org/daf1ce932811b8af7392cf61aa114c968fe3387aa4d34c04517add4847f604fe"
-                    alt="Logo" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width:
-                    100%;"></a>-->
-                    <a href="https://anypayinc.com" target="_blank" style="color: #3498db; text-decoration:
-                    underline;"><img
-                    src="https://media.bitcoinfiles.org/26faeb80d1d019a8e9827108bee522462a98052cd49ab40c4b794433caf04785.png"
-                    alt="Successful Business Person" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;"></a>
+                    <a href="http://htmlemail.io" target="_blank" style="color: #3498db; text-decoration: underline;"><img src="https://media.bitcoinfiles.org/daf1ce932811b8af7392cf61aa114c968fe3387aa4d34c04517add4847f604fe" alt="Logo" align="center" style="border: none; -ms-interpolation-mode: bicubic; max-width: 100%;"></a>
                   </td>
                 </tr>
               </table>
@@ -196,62 +193,94 @@
                   <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                     <tr>
                       <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top;" valign="top">
+                        <h1 style="color: #222222; font-family: Helvetica,
+                        sans-serif; font-weight: 300; line-height: 1.4; margin:
+                        0; font-size: 36px; margin-bottom: 24px; text-align:
+                        center; text-transform: capitalize;">You Are Ready To Get Paid</h1>
+                        <h2 class="align-center" style="color: #222222;
+                        font-family: Helvetica, sans-serif; font-weight: 400;
+                        line-height: 1.4; margin: 0; font-size: 28px;
+                        margin-bottom: 16px; text-align: center;"></h2>
+                        <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
+                          <tr>
+                            <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
+                            <td class="receipt-container" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; width: 80%;" width="80%" valign="top">
+                              <table class="receipt" border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; margin-bottom: 24px;" width="100%">
+                                <tr class="receipt-subtle" style="color: #aaa;">
+                                  <td colspan="2" class="align-center"
+                                  style="font-family: Helvetica, sans-serif;
+                                  font-size: 14px; vertical-align: top;
+                                  text-align: center; border-bottom: 1px solid
+                                  #eee; margin: 0; padding: 8px;" valign="top"
+                                  align="center">{{updated_at_time}}</td>
+                                </tr>
+                                <tr>
+                                  <td style="font-family: Helvetica, sans-serif;
+                                  font-size: 14px; vertical-align: top;
+                                  border-bottom: 1px solid #eee; margin: 0;
+                                  padding: 8px;"
+                                  valign="top">{{currency}}</td>
+                                  <td class="receipt-figure" style="font-family:
+                                  Helvetica, sans-serif; font-size: 14px;
+                                  vertical-align: top; border-bottom: 1px solid
+                                  #eee; margin: 0; padding: 8px; text-align:
+                                  right;" valign="top"
+                                  align="right">{{address}}</td>
+                                </tr>
+                                {{#if notePresent}}
+                                  <tr class="receipt-bold">
+                                    <td style="font-family: Helvetica, sans-serif;
+                                    vertical-align: top; margin: 0; padding: 8px;
+                                    font-size: 18px; border-bottom: 2px solid
+                                    #333; border-top: 2px solid #333; font-weight:
+                                    600;" valign="top">Note</td>
+                                    <td class="receipt-figure" style="font-family:
+                                    Helvetica, sans-serif; vertical-align: top;
+                                    margin: 0; padding: 8px; font-size: 18px;
+                                    border-bottom: 2px solid #333; text-align:
+                                    right; border-top: 2px solid #333;
+                                    font-weight: 600;" valign="top"
+                                    align="right">{{note}}</td>
+                                  </tr>
+                                {{/if}}
+                              </table>
+                            </td>
+                            <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top;" valign="top">&nbsp;</td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
 
-                        <table border="0" cellpadding="0" cellspacing="0" class="hr" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
-
+              <tr>
+                <td class="wrapper" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; box-sizing: border-box; padding: 24px;" valign="top">
+                  <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
+                    <tr>
+                      <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top;" valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%; box-sizing: border-box; min-width: 100% !important;" width="100%">
                           <tbody>
                             <tr>
-                              <td style="font-family: Helvetica, sans-serif;
-                              font-size: 14px; vertical-align: top; height:
-                              24px; line-height: 24px;" valign="top">
-                            <h1>Complete Your Training In 30 Seconds</h1>
-
-                                      <p style="font-family: Helvetica,
+                              <td align="center" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 16px;" valign="top">
+                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;">
+                                  <tbody>
+                                    <tr>
+                                      <td style="font-family: Helvetica,
                                       sans-serif; font-size: 14px;
                                       vertical-align: top; background-color:
                                       #3498db; border-radius: 4px; text-align:
                                       center;" valign="top" bgcolor="#3498db"
                                       align="center"> <a
-                                      href="https://app.anypayinc.com/invoices/{{invoice_uid}}" target="_blank"
-                                      style="display: inline-block; color: #ffffff; background-color: #3498db; border:
-                                    solid 2px #3498db; border-radius: 4px; box-sizing: border-box; cursor: pointer;
-                                    text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px
-                                  24px; text-transform: capitalize; border-color: #3498db;">Collect Payment Now</a> </p>
-
-                            <p>And as always, if you ever need anything, message us anytime.</p>
-                            <div style='float:right'>
-                              <img style='width:200px' src="https://anypayinc.com/wp-content/uploads/2020/03/anypayPortrait_2048light.jpg"/>
-                            </div>
-
-
-                            <p><a href="https://twetch.app/u/4965">Twetch</a> | 
-                            <a href="https://anypayinc.com/blog/">Blog</a> | 
-                            <a href="https://www.youtube.com/channel/UCowXYkFcTJQGQffFa2UqQkw">YouTube</a> | 
-                            <a href="https://twitter.com/anypayinc">Twitter</a> | 
-                            <a href="https://www.facebook.com/anypayincorporated/">Facebook</a></p>
-  </td>
-                            </tr>
-                            <tr>
-                              <td height="1" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; background-color: #f6f6f6; height: 1px; line-height: 1px; width: 100%;" width="100%" valign="top" bgcolor="#f6f6f6"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; height: 24px; line-height: 24px;" valign="top">&nbsp;</td>
+                                      href="https://app.anypayinc.com/pay/{{account_id}}" target="_blank" style="display: inline-block; color: #ffffff; background-color: #3498db; border: solid 2px #3498db; border-radius: 4px; box-sizing: border-box; cursor: pointer; text-decoration: none; font-size: 14px; font-weight: bold; margin: 0; padding: 12px 24px; text-transform: capitalize; border-color: #3498db;">Try Taking A Payment</a> </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
-                        <table border="0" cellpadding="0" cellspacing="0" class="hr" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
-                          <tbody>
-                            <tr>
-                              <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; height: 24px; line-height: 24px;" valign="top">&nbsp;</td>
-                            </tr>
-                            <tr>
-                              <td height="1" style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; background-color: #f6f6f6; height: 1px; line-height: 1px; width: 100%;" width="100%" valign="top" bgcolor="#f6f6f6"></td>
-                            </tr>
-                            <tr>
-                              <td style="font-family: Helvetica, sans-serif; font-size: 14px; vertical-align: top; height: 24px; line-height: 24px;" valign="top">&nbsp;</td>
-                            </tr>
-                          </tbody>
-                        </table>
+                        <p class="align-center" style="font-family: Helvetica, sans-serif; font-size: 14px; font-weight: normal; margin: 0; margin-bottom: 16px; text-align: center;">Thanks for being a great customer.</p>
                       </td>
                     </tr>
                   </table>
@@ -262,14 +291,15 @@
               </table>
 
             <!-- START FOOTER -->
-
             <div class="footer" style="clear: both; padding-top: 24px; text-align: center; width: 100%;">
               <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: 100%;" width="100%">
                 <tr>
                   <td class="content-block" style="font-family: Helvetica, sans-serif; vertical-align: top; padding-top: 0; padding-bottom: 24px; font-size: 12px; color: #999999; text-align: center;" valign="top" align="center">
                     <span class="apple-link" style="color: #999999; font-size:
-                    12px; text-align: center;">Anypay Inc, 2 Bow St,
+                    12px; text-align: center;">Anypay Inc, 110 State St,
                     Portsmouth NH 03801</span>
+                    <br> Don't like these emails? <a
+                    href="https://anypayinc.com/admin/#/unsubscribe" style="text-decoration: underline; color: #999999; font-size: 12px; text-align: center;">Unsubscribe</a>.
                   </td>
                 </tr>
               </table>
