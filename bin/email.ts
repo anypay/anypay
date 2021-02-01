@@ -17,6 +17,19 @@ program
     process.exit(0)
   
   })
+program
+  .command('one_day_after_signup <email>')
+  .action(async (email) => {
+
+    let account = await models.Account.findOne({ where: { email }})
+
+    await rabbiEmail.sendEmail('one_day_after_signup', email, 'Anypay<support@anypayinc.com>', account)
+
+    process.exit(0)
+  
+  })
+
+
 
 program
   .command('ambassador_reward <invoice_uid>')
