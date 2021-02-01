@@ -111,7 +111,7 @@ export async function ambassadorRewardEmail(invoice_uid){
   let resp = await rabbiEmail.sendEmail(
     'ambassador_reward',
     account.email,
-    'receipts@anypayinc.com',
+    'support@anypayinc.com',
     variables
   )
 
@@ -142,7 +142,7 @@ export async function invoicePaidEmail(invoice){
   let resp = await rabbiEmail.sendEmail(
     'invoice_paid_receipt',
     account.email,
-    'receipts@anypayinc.com',
+    'support@anypayinc.com',
     variables
   )
 
