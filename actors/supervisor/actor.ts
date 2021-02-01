@@ -25,7 +25,8 @@ export async function start() {
     'router_transactions',
     'cashback_customers',
     'invoice-paid-cashback-record',
-    'anypay_x_credit_invoice_paid'
+    'anypay_x_credit_invoice_paid',
+    'email-one-day-after-signup'
   ])
 
 }
