@@ -280,6 +280,8 @@ export async function create (request, reply) {
 
     }
 
+    invoice.email = request.payload.email;
+
     await invoice.save();
 
     let payment_options = await models.PaymentOption.findAll({where: {
