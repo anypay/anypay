@@ -288,6 +288,13 @@ export async function create (request, reply) {
       invoice_uid: invoice.uid
     }});
 
+    if (invoice.email) {
+      let note = await models.InvoiceNote.create({
+        content: `Customer Email: ${invoice.email}`,
+        invoice_uid: invoice.uid,
+      });
+    }
+
     invoice.payment_options = payment_options;
 
     let sanitized = sanitizeInvoice(invoice);
