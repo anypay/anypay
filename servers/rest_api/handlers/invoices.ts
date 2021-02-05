@@ -280,11 +280,20 @@ export async function create (request, reply) {
 
     }
 
+    invoice.email = request.payload.email;
+
     await invoice.save();
 
     let payment_options = await models.PaymentOption.findAll({where: {
       invoice_uid: invoice.uid
     }});
+
+    if (invoice.email) {
+      let note = await models.InvoiceNote.create({
+        content: `Customer Email: ${invoice.email}`,
+        invoice_uid: invoice.uid,
+      });
+    }
 
     invoice.payment_options = payment_options;
 
