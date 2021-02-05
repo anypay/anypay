@@ -60,7 +60,13 @@ export async function index(req, h) {
         }
       },
 
-      order: [['payments_date', 'DESC']]
+      order: [['payments_date', 'DESC']],
+
+      include: [{
+        model: models.Account,
+        as: 'account',
+        attributes: ['email', 'business_name', 'id']
+      }]
 
     });
 

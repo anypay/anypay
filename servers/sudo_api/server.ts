@@ -122,6 +122,22 @@ async function Server() {
 
     method: "GET",
 
+    path: "/api/paypow/orders",
+
+    config: {
+
+      auth: "sudopassword",
+
+      handler: handlers.PaypowOrders.index,
+
+    }
+
+  });
+
+  server.route({
+
+    method: "GET",
+
     path: "/api/histograms/daily-invoices-paid",
 
     config: {
@@ -208,7 +224,7 @@ async function Server() {
 
     method: "GET",
 
-    path: "/api/settlements/{invoice_uid}",
+    path: "/api/bitpay_settlements/{invoice_uid}",
 
     config: {
 
@@ -1430,21 +1446,6 @@ async function Server() {
       auth: "sudopassword",
 
       handler: handlers.Accounts.showKioskRewards
-
-    }
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/accounts/{id}/roi",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Accounts.calculateROI
 
     }
   });

@@ -4,7 +4,8 @@ require('dotenv').config();
 
 import { Actor, Joi } from 'rabbi';
 
-import {email, models, settlements} from '../../lib';
+import {email, models} from '../../lib';
+import {creditInvoice} from '../../lib/anypayx';
 
 export async function start() {
 
@@ -14,7 +15,7 @@ export async function start() {
 
     routingkey: 'invoice:paid',
 
-    queue: 'apply_settlement_strategy_to_invoice',
+    queue: 'anypay_x_credit_invoice_paid',
 
   })
   .start(async (channel, msg) => {
@@ -27,7 +28,12 @@ export async function start() {
 
     });
 
-    await settlements.settleInvoice(invoice);
+    let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+
+    if (account.should_settle) {
+
+      await creditInvoice(uid)
+    }
 
     channel.ack(msg);
 

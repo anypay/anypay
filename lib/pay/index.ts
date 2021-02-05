@@ -33,6 +33,42 @@ interface PaymentRequestForInvoice {
   protocol: string;
 }
 
+enum Wallets {
+  Edge = 'edge',
+  BitcoinCom = 'bitcoin.com',
+  Badger = 'badger',
+  Handcash = 'handcash',
+  SimpyCash = 'simply.cash',
+  Dash = 'dash',
+  ElectrumSV = 'electrum sv',
+  ElectronCash = 'electron cash',
+  Electrum = 'electurm',
+  Mycelium = 'mycelium',
+  Copay = 'copay',
+}
+
+export function detectWallet(headers, invoice_uid): string {
+
+  var wallet; 
+
+  switch(headers['x-requested-with']){ 
+    case 'co.edgesecure.app':
+      wallet = Wallets.Edge
+      break;
+    case 'cash.simply.wallet':
+      wallet = Wallets.SimpyCash
+      break;
+    default:
+  }
+
+  if (wallet) {
+    logInfo('wallet.detected', { wallet, invoice_uid })
+  }
+
+  return wallet
+
+}
+
 export async function verifyPayment(v: VerifyPayment) {
 
   log.info(`verifypayment`, v)
@@ -99,7 +135,6 @@ export async function verifyPayment(v: VerifyPayment) {
 export async function buildPaymentRequestForInvoice(params: PaymentRequestForInvoice): Promise<PaymentRequest> {
 
   logInfo('paymentrequest.build', params)
-  logInfo('paymentrequest.build.uid', { uid: params.uid })
 
   let paymentOption = await models.PaymentOption.findOne({
     where: {
@@ -280,6 +315,8 @@ export async function completePayment(paymentOption, hex: string) {
   channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
 
   sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
+
+  return paymentRecord
 
 }
 

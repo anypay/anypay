@@ -225,5 +225,17 @@ models.Invoice.hasMany(models.InvoiceNote, {
   sourceKey: 'uid'
 });
 
+models.AchBatch.belongsTo(models.Account, {
+  as: 'account',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+})
+
+models.Account.hasMany(models.AchBatch, {
+  as: 'ach_batches',
+  foreignKey: 'account_id',
+  sourceKey: 'id'
+})
+
 export { models };
 

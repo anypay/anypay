@@ -22,6 +22,8 @@ import { accountCSVReports } from './handlers/csv_reports';
 import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 
 import * as payreq from '../payment_requests/server'
+import { attach as attachGrabAndGoRoutes } from '../grab-and-go/server'
+import { attach as attachAnypayXRoutes } from '../anypayx/server'
 
 /* Import all handlers from './handlers directory */
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
@@ -936,16 +938,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/accounts/roi",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.Accounts.calculateROI
-    }
-  });
-
-  server.route({
-    method: "GET",
     path: "/kiosks",
     options: {
       auth: "token",
@@ -1152,17 +1144,17 @@ async function Server() {
 
   accountCSVReports(server);
 
+  attachAnypayXRoutes(server);
+
+  attachGrabAndGoRoutes(server);
+
   server.route({
     method: 'GET',
-    path: '/{param*}',
-    handler: {
-      directory: {
-        path: '.',
-        redirectToSlash: true,
-        index: true,
-      }
+    path: '/',
+    handler: (req, h) => {
+      return h.redirect('https://anypay.dev')
     }
-  });
+  }); 
 
   return server;
 

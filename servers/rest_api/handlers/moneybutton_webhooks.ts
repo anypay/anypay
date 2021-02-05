@@ -7,6 +7,8 @@ import { events } from '../../../lib';
 
 import { notify } from '../../../lib/slack/notifier';
 
+import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
+
 import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
 
 export async function create(req, h) {
@@ -34,23 +36,17 @@ export async function create(req, h) {
       JSON.stringify(payment) 
     ))
 
-    let payments = transformHexToPayments(payment.rawtx);
+    let response: SubmitPaymentResponse = await submitPayment({
+      transactions: [payment.rawtx],
+      currency: 'BSV',
+      invoice_uid: req.payload.payment.buttonId
+    })
 
-    payments.forEach(anypayPayment => {
-
-      anypayPayment.invoice_uid = req.payload.payment.buttonId;
-
-      if (req.payload.payment.buttonId) {
-
-        log.info('anypay.payment', anypayPayment);
-
-        channel.publish('anypay.payments', 'payment', Buffer.from(
-          JSON.stringify(anypayPayment)
-        ));
-
-      }
-
-    });
+    log.info('bsv.bip270.broadcast.success', {
+      headers: req.headers,
+      payload: req.payload,
+      response
+    })
 
     return { success: true }
 

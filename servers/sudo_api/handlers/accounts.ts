@@ -9,8 +9,6 @@ import { geocode } from '../../../lib/googlemaps';
 
 import {emitter} from '../../../lib/events'
 
-import { getROI } from '../../../lib/roi';
-
 import { getVolume } from '../../../lib/sudo/volume';
 
 import { models } from '../../../lib';
@@ -174,24 +172,6 @@ export async function destroy(request, reply) {
 
   return { success: true };
 };
-
-export async function calculateROI(req, reply){
-
-  try{
-
-   let roi = await getROI(req.params.id)
-
-   return roi;
-
-  }catch(error){
-
-    console.log(error)
-
-    return(error)
-
-  }
-
-}
 
 export async function accountVolume(req, reply){
 

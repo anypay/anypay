@@ -27,7 +27,7 @@ export async function show(req, h) {
 
   try {
 
-    let settlement = await models.Settlement.findOne({
+    let settlement = await models.BitpaySettlement.findOne({
       where: {
         invoice_uid: req.params.invoice_uid
       }
@@ -75,7 +75,7 @@ export async function index(req, h) {
 
   try {
 
-    let settlements = await models.Settlement.findAll({
+    let settlements = await models.BitpaySettlement.findAll({
       order, limit, offset 
     });
 

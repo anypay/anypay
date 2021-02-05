@@ -5,7 +5,6 @@ import * as Boom from 'boom';
 
 import { models, log } from '../../../lib';
 import * as wire from '../../../lib/wire';
-import { sendEmail } from '../../../lib/email';
 
 import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
 
@@ -44,6 +43,14 @@ export async function index(req: Request, h: ResponseToolkit) {
       params = { where: { account_id: req.params.account_id }};
 
     }
+
+    params['include'] = [{
+      model: models.Account,
+      attributes: ['email']
+    }, {
+      model: models.AchBatch,
+      as: 'batch'
+    }]
 
     let achs = await models.AccountAch.findAll(params);
 

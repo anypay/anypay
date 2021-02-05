@@ -131,6 +131,10 @@ export async function buildPaymentRequest(paymentOption) {
   if (paymentOption.currency === 'BCH') {
     pd.set('required_fee_rate', 1);
   }
+
+  if (paymentOption.currency === 'BTC') {
+    pd.set('required_fee_rate', 30);
+  }
   pd.set('merchant_data', paymentOption.invoice_uid); // identify the request
 
   var paypro = new PaymentProtocol(paymentOption.currency);

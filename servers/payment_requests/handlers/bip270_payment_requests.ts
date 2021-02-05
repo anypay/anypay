@@ -1,8 +1,9 @@
 import * as Hapi from 'hapi';
 
-import { verifyPayment, buildPaymentRequestForInvoice } from '../../../lib/pay';
+import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
 import { amqp, log } from '../../../lib';
+import { logInfo } from '../../../lib/logger';
 
 import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
 
@@ -16,7 +17,7 @@ export async function show(req, h) {
     protocol: 'BIP270'
   })
 
-  log.info(`pay.request.bsv.content`, content)
+  logInfo(`pay.request.bsv.content`, content)
 
   let response = h.response(content);
 
@@ -28,20 +29,23 @@ export async function show(req, h) {
 
 export async function create(req, h) {
 
-  log.info('bsv.bip270.broadcast', {
+  logInfo('bsv.bip270.broadcast', {
     headers: req.headers,
     payload: req.payload
   })
 
   try {
 
+    let wallet = detectWallet(req.headers, req.params.uid)
+
     let response: SubmitPaymentResponse = await submitPayment({
       transactions: [req.payload.transaction],
       currency: 'BSV',
-      invoice_uid: req.params.uid
+      invoice_uid: req.params.uid,
+      wallet
     })
 
-    log.info('bsv.bip270.broadcast.success', {
+    logInfo('bsv.bip270.broadcast.success', {
       headers: req.headers,
       payload: req.payload,
       response
