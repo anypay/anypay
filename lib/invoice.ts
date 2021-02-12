@@ -324,7 +324,7 @@ export async function createPaymentOptions(account, invoice) {
       address = address.split(':')[1]
     }
 
-    var amount = pay.toSatoshis(row[1].value);
+    var amount = new BigNumber(pay.toSatoshis(row[1].value)).minus(fee.amount).toNumber();
 
     let outputs = []
 
@@ -360,18 +360,12 @@ export async function createPaymentOptions(account, invoice) {
 
           ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
 
-        } else {
-
-          let conversion = await convert({ value: 0.01, currency: 'USD' }, currency)
-
-          ambassadorAmount = pay.toSatoshis(conversion.value)
+          outputs.push({
+            address: record.value,
+            amount: ambassadorAmount
+          })
 
         }
-
-        outputs.push({
-          address: record.value,
-          amount: ambassadorAmount
-        })
         
       }
 
