@@ -938,16 +938,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/accounts/roi",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.Accounts.calculateROI
-    }
-  });
-
-  server.route({
-    method: "GET",
     path: "/kiosks",
     options: {
       auth: "token",

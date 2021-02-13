@@ -1454,21 +1454,6 @@ async function Server() {
 
     method: "GET",
 
-    path: "/accounts/{id}/roi",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Accounts.calculateROI
-
-    }
-  });
-
-  server.route({
-
-    method: "GET",
-
     path: "/accounts/{id}/volume",
 
     config: {

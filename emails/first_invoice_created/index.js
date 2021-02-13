@@ -8,7 +8,7 @@ let template = Handlebars.compile(body.toString());
 
 export default {
 
-  title: "🎉  Congratulations! Your business is ready to earn bitcoin.",
+  title: "Last Step To Bitcoin 🎉",
 
   template,
 

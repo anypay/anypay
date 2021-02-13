@@ -5,7 +5,6 @@ import * as Boom from 'boom';
 
 import { models, log } from '../../../lib';
 import * as wire from '../../../lib/wire';
-import { sendEmail } from '../../../lib/email';
 
 import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
 
