@@ -61,6 +61,17 @@ export async function getInvoicesByDates(accountId, start, end) {
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
     invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
 
+    if (invoice.bitpay_settlement) {
+      invoice.settlement_type = 'Bitpay'
+      invoice.settlement_uid = invoice.bitpay_settlement.url
+    } else if (invoice.ach_batch_id) {
+      invoice.settlement_type = 'ACH'
+      invoice.settlement_uid = invoice.ach_batch.batch_id
+    } else if (invoice.wire_id) {
+      invoice.settlement_type = 'WIRE'
+      invoice.settlement_uid = invoice.wire.uid
+    }
+
     return invoice;
 
   });
@@ -240,7 +251,8 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'currency', title: 'Currency'},
       {id: 'amount', title: 'Amount Paid (Crypto)'},
       {id: 'uid', title: 'Invoice ID'},
-      {id: 'ach_batch', title: 'ACH Batch'}
+      {id: 'settlement_type', title: 'Settlement Type'},
+      {id: 'settlement_uid', title: 'Settlement UID'}
     ]
   });
 
