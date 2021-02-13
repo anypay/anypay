@@ -41,13 +41,17 @@ export async function getInvoicesByDates(accountId, start, end) {
 
       as: 'ach_batch'
 
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
     }]
 
   });
 
   invoices = invoices.map(invoice => {
-
-    console.log('ACH BATCH', invoice.ach_batch)
 
     if (!invoice.cashback_denomination_amount) {
 
@@ -56,6 +60,17 @@ export async function getInvoicesByDates(accountId, start, end) {
 
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
     invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+
+    if (invoice.bitpay_settlement) {
+      invoice.settlement_type = 'Bitpay'
+      invoice.settlement_uid = invoice.bitpay_settlement.url
+    } else if (invoice.ach_batch_id) {
+      invoice.settlement_type = 'ACH'
+      invoice.settlement_uid = invoice.ach_batch.batch_id
+    } else if (invoice.wire_id) {
+      invoice.settlement_type = 'WIRE'
+      invoice.settlement_uid = invoice.wire.uid
+    }
 
     return invoice;
 
@@ -236,7 +251,8 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'currency', title: 'Currency'},
       {id: 'amount', title: 'Amount Paid (Crypto)'},
       {id: 'uid', title: 'Invoice ID'},
-      {id: 'ach_batch', title: 'ACH Batch'}
+      {id: 'settlement_type', title: 'Settlement Type'},
+      {id: 'settlement_uid', title: 'Settlement UID'}
     ]
   });
 
@@ -249,6 +265,8 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
 
     if (invoice.ach_batch) {
       invoice.ach_batch = invoice.ach_batch.batch_id
+    } else if (invoice.bitpay_settlement) {
+      invoice.ach_batch = invoice.bitpay_settlement.url
     } else {
       invoice.ach_batch = null
     }
@@ -280,6 +298,12 @@ export async function buildAllTimeReport(accountId) {
       model: models.AchBatch,
       attributes: ['batch_id'],
       as: 'ach_batch'
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
     }]
   });
 
