@@ -45,6 +45,10 @@ models.AchBatch.hasMany(models.AccountAch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
 });
+models.Invoice.belongsTo(models.AchBatch, {
+  foreignKey: 'ach_batch_id',
+  as: 'ach_batch'
+});
 models.AccountAch.belongsTo(models.AchBatch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
