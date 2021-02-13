@@ -41,13 +41,17 @@ export async function getInvoicesByDates(accountId, start, end) {
 
       as: 'ach_batch'
 
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
     }]
 
   });
 
   invoices = invoices.map(invoice => {
-
-    console.log('ACH BATCH', invoice.ach_batch)
 
     if (!invoice.cashback_denomination_amount) {
 
@@ -249,6 +253,8 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
 
     if (invoice.ach_batch) {
       invoice.ach_batch = invoice.ach_batch.batch_id
+    } else if (invoice.bitpay_settlement) {
+      invoice.ach_batch = invoice.bitpay_settlement.url
     } else {
       invoice.ach_batch = null
     }
@@ -280,6 +286,12 @@ export async function buildAllTimeReport(accountId) {
       model: models.AchBatch,
       attributes: ['batch_id'],
       as: 'ach_batch'
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
     }]
   });
 

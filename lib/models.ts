@@ -65,6 +65,11 @@ models.AccountAch.hasMany(models.AccountAchInvoice, {
   foreignKey: 'account_ach_id',
   as: 'invoices'
 })
+models.Invoice.hasOne(models.BitpaySettlement, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'bitpay_settlement'
+})
 models.AccountAchInvoice.hasOne(models.Invoice, {
   foreignKey: 'uid',
   sourceKey: 'invoice_uid',
