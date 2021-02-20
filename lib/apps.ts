@@ -12,7 +12,7 @@ export async function createApp(params: NewApp) {
 
   let privkey = new bsv.PrivateKey()
 
-  let app = await models.App.findOrCreate({
+  let [app] = await models.App.findOrCreate({
 
     where: {
       name: params.name,
