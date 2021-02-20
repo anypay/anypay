@@ -149,6 +149,21 @@ export async function invoicePaidEmail(invoice){
   return resp;
 }
 
+export async function firstInvoicePaidEmail(invoice){  
+
+  let account = await models.Account.findOne({ where: {
+    id: invoice.account_id
+  }});
+
+  let resp = await rabbiEmail.sendEmail(
+    'first_invoice_paid',
+    account.email,
+    'support@anypayinc.com'
+  )
+
+  return resp;
+}
+
 async function checkInvoiceCount(invoice){
 
   const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`

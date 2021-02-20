@@ -45,6 +45,12 @@ models.AchBatch.hasMany(models.AccountAch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
 });
+
+models.Invoice.hasMany(models.PaymentOption, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'payment_options'
+});
 models.Invoice.belongsTo(models.AchBatch, {
   foreignKey: 'ach_batch_id',
   as: 'ach_batch'
