@@ -8,6 +8,22 @@ import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
 
 import { models } from '../../../lib';
 
+module.exports.delete = async function(req, h) {
+
+  let address = await models.Address.findOne({ where: {
+    account_id: req.account.id,
+    currency: req.params.currency
+  }})
+
+  if (address) {
+    await address.destroy()
+  }
+
+  return { success: true };
+
+};
+
+
 module.exports.list = async function(request, reply) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
