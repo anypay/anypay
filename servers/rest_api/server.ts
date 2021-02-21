@@ -309,6 +309,12 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/api/accounts-by-email/{email}",
+    handler: handlers.Anypaycity.show
+  });
+
+  server.route({
+    method: "GET",
     path: "/vending/batms/{batm_id}",
     handler: handlers.Batms.show,
     options: {
