@@ -45,6 +45,16 @@ models.AchBatch.hasMany(models.AccountAch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
 });
+
+models.Invoice.hasMany(models.PaymentOption, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'payment_options'
+});
+models.Invoice.belongsTo(models.AchBatch, {
+  foreignKey: 'ach_batch_id',
+  as: 'ach_batch'
+});
 models.AccountAch.belongsTo(models.AchBatch, {
   foreignKey: 'ach_batch_id',
   as: 'batch'
@@ -60,6 +70,11 @@ models.AccountAchInvoice.belongsTo(models.AccountAch, {
 models.AccountAch.hasMany(models.AccountAchInvoice, {
   foreignKey: 'account_ach_id',
   as: 'invoices'
+})
+models.Invoice.hasOne(models.BitpaySettlement, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'bitpay_settlement'
 })
 models.AccountAchInvoice.hasOne(models.Invoice, {
   foreignKey: 'uid',

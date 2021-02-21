@@ -12,6 +12,7 @@ export async function accountCSVReports(server) {
     method: 'GET',
     path: '/csv_reports.csv',
     handler: async (req, h) => {
+      console.log("CSV REPORTS")
 
       let token = await models.AccessToken.findOne({ where: {
 
@@ -62,26 +63,34 @@ export async function accountCSVReports(server) {
     path: '/complete_history.csv',
     handler: async (req, h) => {
 
-      let token = await models.AccessToken.findOne({ where: {
+      try {
 
-        uid: req.query.token
+        let token = await models.AccessToken.findOne({ where: {
 
-      }});
+          uid: req.query.token
 
-      if (!token) {
+        }});
 
-        return Boom.unauthorized('invalid access token');
+        if (!token) {
+
+          return Boom.unauthorized('invalid access token');
+        }
+
+        let content = await buildAllTimeReport(token.account_id);
+
+        let filename = `anypay_report_complete.csv`
+
+        let response = h.response(content)
+          .header("Content-Disposition", `attachment;filename="${filename}"`)
+          .header("Content-Type", 'text/csv');
+
+        return response;
+
+      } catch(error) {
+
+        return Boom.badRequest(error.message)
+
       }
-
-      let content = await buildAllTimeReport(token.account_id);
-
-      let filename = `anypay_report_complete.csv`
-
-      let response = h.response(content)
-        .header("Content-Disposition", `attachment;filename="${filename}"`)
-        .header("Content-Type", 'text/csv');
-
-      return response;
 
     },
     options: {

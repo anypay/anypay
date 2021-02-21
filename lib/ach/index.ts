@@ -195,7 +195,15 @@ export async function generateLatestBatch(endDate: Date, note: string, paymentsD
 
   console.log('PAYMENTS DATE 2', paymentsDate)
 
+  let egifter = await models.Account.findOne({
+    where: {
+      email: 'dashsupport@egifter.com' 
+    }
+  })
+
   let ach_batch = await models.AchBatch.create({
+
+    account_id: egifter.id,
 
     first_invoice_uid,
 

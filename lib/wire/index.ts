@@ -31,7 +31,23 @@ export async function getInvoicesByDates(accountId, start, end) {
 
       }
 
-    }
+    },
+
+    order: [['completed_at', 'desc']],
+
+    include: [{
+
+      model: models.AchBatch,
+
+      as: 'ach_batch'
+
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
+    }]
 
   });
 
@@ -43,6 +59,18 @@ export async function getInvoicesByDates(accountId, start, end) {
     }
 
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
+    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+
+    if (invoice.bitpay_settlement) {
+      invoice.settlement_type = 'Bitpay'
+      invoice.settlement_uid = invoice.bitpay_settlement.url
+    } else if (invoice.ach_batch_id) {
+      invoice.settlement_type = 'ACH'
+      invoice.settlement_uid = invoice.ach_batch.batch_id
+    } else if (invoice.wire_id) {
+      invoice.settlement_type = 'WIRE'
+      invoice.settlement_uid = invoice.wire.uid
+    }
 
     return invoice;
 
@@ -102,6 +130,7 @@ export async function getInvoices(invoiceUID: string) {
       invoice.cashback_denomination_amount = 0;
     }
 
+    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
 
     return invoice;
@@ -151,8 +180,8 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
     }
   })
 
-  let start_date = moment(firstInvoice.completed_at).format('MM-DD-YYYY');
-  let end_date = moment(lastInvoice.completed_at).format('MM-DD-YYYY');
+  let start_date = moment(firstInvoice.completed_at).format('MM/DD/YYYY');
+  let end_date = moment(lastInvoice.completed_at).format('MM/DD/YYYY');
 
   let content = mustache.render(templateSource.toString('utf8'), {
     reportCSVURL: `https://api.sudo.anypayinc.com/api/wires/reportsinceinvoice/${previousBatch.last_invoice_uid}/csv`,
@@ -192,8 +221,8 @@ export async function buildWireEmailReport(invoiceUID: string) {
 
   }, 0);
 
-  let start_date = moment(invoices[0].completed_at).format('MM-DD-YYYY');
-  let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM-DD-YYYY');
+  let start_date = moment(invoices[0].completed_at).format('MM/DD/YYYY');
+  let end_date = moment(invoices[invoices.length - 1].completed_at).format('MM/DD/YYYY');
 
   let content = template({
     reportCSVURL: `https://api.sudo.anypayinc.com/api/wires/reportsinceinvoice/${invoiceUID}/csv`,
@@ -213,7 +242,7 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
   const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'paid_at', title: 'Paid at'},
+      {id: 'completed_at', title: 'Paid at'},
       {id: 'denomination_amount', title: 'Amount Invoiced'},
       {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
       {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
@@ -221,7 +250,9 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'external_id', title: 'Reference'},
       {id: 'currency', title: 'Currency'},
       {id: 'amount', title: 'Amount Paid (Crypto)'},
-      {id: 'uid', title: 'Invoice ID'}
+      {id: 'uid', title: 'Invoice ID'},
+      {id: 'settlement_type', title: 'Settlement Type'},
+      {id: 'settlement_uid', title: 'Settlement UID'}
     ]
   });
 
@@ -230,6 +261,15 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
   let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any) => {
 
     invoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+
+    if (invoice.ach_batch) {
+      invoice.ach_batch = invoice.ach_batch.batch_id
+    } else if (invoice.bitpay_settlement) {
+      invoice.ach_batch = invoice.bitpay_settlement.url
+    } else {
+      invoice.ach_batch = null
+    }
 
     return invoice;
     
@@ -252,7 +292,20 @@ export async function buildReportCsvFromDates(accountId, start, end) {
 
 export async function buildAllTimeReport(accountId) {
 
-  let invoices = await models.Invoice.findAll({ where: {account_id: accountId }});
+  let invoices = await models.Invoice.findAll({
+    where: {account_id: accountId },
+    include: [{
+      model: models.AchBatch,
+      attributes: ['batch_id'],
+      as: 'ach_batch'
+    }, {
+
+      model: models.BitpaySettlement,
+
+      as: 'bitpay_settlement'
+    
+    }]
+  });
 
   invoices = invoices.map(invoice => {
     var i = invoice.toJSON();
