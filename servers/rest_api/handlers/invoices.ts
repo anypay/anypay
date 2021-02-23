@@ -12,7 +12,7 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
-import { models, invoices, coins } from '../../../lib';
+import { email, models, invoices, coins } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -571,6 +571,43 @@ export async function show(request, reply) {
 
 	    throw new Error('invoice not found')
 	  }
+  } catch(error) {
+
+    console.log(error);
+
+    return Boom.badRequest(error.message);
+
+  }
+
+
+}
+
+export async function shareEmail(req, h) {
+
+  log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
+
+  try {
+
+	  let invoice = await models.Invoice.findOne({
+	    where: {
+	      uid: req.params.uid
+	    }
+	  });
+
+	  if (!invoice) {
+
+	    log.error('no invoice found', req.params.uid);
+
+	    throw new Error('invoice not found')
+
+	  } else {
+
+      await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
+
+      return { success: true }
+
+	  }
+
   } catch(error) {
 
     console.log(error);
