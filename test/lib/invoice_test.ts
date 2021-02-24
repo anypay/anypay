@@ -1,9 +1,5 @@
 require('dotenv').config();
 
-console.log('CONFIG ENV')
-console.log(process.env)
-Object.keys(process.env).map(k => console.log(k))
-
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
 import { settleInvoice } from '../../lib/invoice';
@@ -48,17 +44,15 @@ describe("Creating Invoices", () => {
     });
 
     let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-    
-    console.log('invoice', invoice.toJSON());
 
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
     assert(invoice.amount > 0);
-    assert.strictEqual(invoice.currency, 'DASH');
+    assert.strictEqual(invoice.currency, 'USD');
 
     assert(invoice.invoice_amount > 0);
-    assert.strictEqual(invoice.invoice_currency, 'DASH');
+    assert.strictEqual(invoice.invoice_currency, 'USD');
 
     assert(moment(invoice.expiry));
 
@@ -85,14 +79,12 @@ describe("Creating Invoices", () => {
     });
 
     let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-    
-    console.log('INVOICE', invoice.toJSON());
 
     assert.strictEqual(invoice.denomination_amount, amount.value);
     assert.strictEqual(invoice.denomination_currency, amount.currency);
 
     assert(invoice.amount > 0);
-    assert.strictEqual(invoice.currency, 'DASH');
+    assert.strictEqual(invoice.currency, 'USD')
 
     assert(invoice.invoice_amount > 0);
     assert.strictEqual(invoice.invoice_currency, 'DASH');
