@@ -35,7 +35,7 @@ import * as shortid from 'shortid'
 
 import { computeInvoiceURI } from './uri';
 
-import { writePaymentOptions } from './payment_options';
+import { writePaymentOptions, PaymentOption } from './payment_options';
 
 import {channel} from './amqp';
 
@@ -167,7 +167,34 @@ export async function createPlatformInvoice(account_id, amount, currency, cashba
   }})
 
 }
-  
+
+export async function refreshInvoice(uid: string): Promise<any> {
+
+  let invoice = await models.Invoice.findOne({ where: { uid }})
+
+  let paymentOptions = await models.PaymentOption.findAll({
+    where: {
+      invoice_uid: uid
+    }
+  })
+
+  // delete all payment options and re-generate invoice
+  await Promise.all(paymentOptions.map(option => option.destroy()))
+
+  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+
+  await createPaymentOptions(account, invoice)
+
+  invoice.expiry = moment().add(15, 'minutes').toDate();
+
+  await invoice.save()
+
+  log.info('invoice.refreshed', invoice.toJSON())
+
+  return invoice
+
+}
+
 export async function generateInvoice(
 
   accountId: number,
@@ -177,79 +204,39 @@ export async function generateInvoice(
 
 ): Promise<any> {
 
+  log.info('invoices.generate', { accountId, denominationAmountValue, invoiceCurrency, uid })
+
   uid = !!uid ? uid : shortid.generate();
 
   var account = await models.Account.findOne({ where: { id: accountId }});
+
   log.info({ account })
 
-  let addresses = await models.Address.findAll({ where: {
-    account_id: account.id
-  }});
-
-  addresses = _.reject(addresses, (address) => {
-    let coin = getCoin(address.currency);
-    if (!coin) { return true }
-    return coin.unavailable;
-  });
-
-  let coin = getCoin(invoiceCurrency);
-
-  let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
-
-    let conversion = await convert({
-      currency: account.denomination,
-      value: denominationAmountValue
-    }, address.currency, coin.precision);
-
-    if (address.price_scalar) {
-      conversion = applyScalar(conversion, address.price_scalar);
-    }
-
-    return conversion;
-
-  }));
-
-  let invoiceAmount: any = invoiceAmounts.find((elem:any)=> elem.currency === invoiceCurrency);
-
-  let newAddresses = await Promise.all(addresses.map(async (address:any) => {
-    let newAddress = await getNewInvoiceAddress(accountId, address.currency);
-    return {
-      currency: address.currency,
-      address: newAddress.value
-    }
-  }));
-
-  let address:any = newAddresses.find((elem:any)=> elem.currency === invoiceCurrency);
-
-  let invoiceChangeset: InvoiceChangeset = {
-    accountId,
-    address: address.address,
-    denominationAmount: {
-      currency: account.denomination,
-      value: denominationAmountValue
-    },
-    invoiceAmount
-  };
 
   var invoiceParams = {
-    address: invoiceChangeset.address,
-    invoice_amount: invoiceChangeset.invoiceAmount.value,
-    invoice_currency: invoiceChangeset.invoiceAmount.currency,
-    denomination_currency: invoiceChangeset.denominationAmount.currency,
-    denomination_amount: invoiceChangeset.denominationAmount.value,
-    account_id: invoiceChangeset.accountId,
+    denomination_currency: account.denomination,
+    denomination_amount: denominationAmountValue,
+    currency: account.denomination,
+    amount: denominationAmountValue,
+    account_id: account.id,
     status: 'unpaid',
     uid,
     uri: computeInvoiceURI({
       currency: 'ANYPAY',
       uid
     }),
-    should_settle: account.should_settle,
-    amount: invoiceChangeset.invoiceAmount.value, // DEPRECATED
-    currency: invoiceChangeset.invoiceAmount.currency, // DEPRECATED
+    should_settle: account.should_settle
   }
 
   var invoice = await models.Invoice.create(invoiceParams);
+
+  await createPaymentOptions(account, invoice)
+
+  return invoice;
+
+}
+
+export function buildPaymentOptionsMatrix(addresses, invoiceAmounts, newAddresses, invoice) {
 
   let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
 
@@ -258,7 +245,7 @@ export async function generateInvoice(
 
     return  computeInvoiceURI({
       currency: address.currency,
-      uid
+      uid: invoice.uid
     });
   });
 
@@ -269,16 +256,49 @@ export async function generateInvoice(
     return row;
   });
 
-  /*
+  return matrix
 
-    Ambassador Output:
+}
 
-    If an ambassador is available for the account, include them as a separate output according to the ambassadorship
-    amount (default 0.01 USD)
+export async function createPaymentOptions(account, invoice) {
 
-  */
+  let addresses = await models.Address.findAll({ where: {
+    account_id: account.id
+  }});
 
-  log.info('ambassador_id', account.ambassador_id)
+  addresses = _.reject(addresses, (address) => {
+    let coin = getCoin(address.currency);
+    if (!coin) { return true }
+    if (!coin) { return true }
+    return coin.unavailable;
+  });
+
+  let newAddresses = await Promise.all(addresses.map(async (address:any) => {
+    let newAddress = await getNewInvoiceAddress(account.id, address.currency);
+    return {
+      currency: address.currency,
+      address: newAddress.value
+    }
+  }));
+
+  let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
+
+    let coin = getCoin(address.currency);
+
+    let conversion = await convert({
+      currency: account.denomination,
+      value: invoice.denomination_amount
+    }, address.currency, coin.precision);
+
+    if (address.price_scalar) {
+      conversion = applyScalar(conversion, address.price_scalar);
+    }
+
+    return conversion;
+
+  }));
+
+  let matrix = buildPaymentOptionsMatrix(addresses, invoiceAmounts, newAddresses, invoice)
 
   let ambassador = await getAmbassadorAccount(account.ambassador_id)
 
@@ -389,8 +409,6 @@ export async function generateInvoice(
       currency: option.currency
     });
   }))
-
-  return invoice;
 
 }
 

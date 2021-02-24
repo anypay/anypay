@@ -516,28 +516,14 @@ export async function show(request, reply) {
 	    }
 	  });
 
-    /*
-
     if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-      var oldInvoiceId = invoice.id;
-
-      log.info('invoice expired');
-
-      invoice = await invoices.generateInvoice(
-        invoice.account_id,
-        invoice.denomination_amount,
-        invoice.currency,
-        invoice.uid
-      )
-
-      await models.Invoice.destroy({ where: { id: oldInvoiceId }});
+      invoice = await invoices.refreshInvoice(invoice.uid)
 
     } else {
+
       log.info('invoice not yet expired');
     }
-  
-    */
 
 	  if (invoice) {
 

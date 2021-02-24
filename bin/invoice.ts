@@ -1,12 +1,11 @@
 #!/usr/bin/env ts-node
 
-require('dotenv').config();
-
+require('dotenv').config(); 
 import * as program from 'commander';
 
 import { generateInvoice } from '../lib/invoice';
 
-import { log, models } from '../lib';
+import { coins, log, models, invoices } from '../lib';
 
 import { invoicePaidEmail } from '../lib/email';
 
@@ -27,6 +26,27 @@ program
     process.exit(0);
 
   });
+
+program
+  .command('refresh <invoice_uid>')
+  .action(async (uid) => {
+
+    try {
+
+      await coins.refreshCoins()
+
+      await invoices.refreshInvoice(uid)
+
+    } catch(error) {
+
+      console.log(error)
+      log.error(error)
+
+    }
+
+    process.exit(0);
+
+  })
 
 program
   .command('sendemailreceipt <invoice_uid>')
