@@ -51,9 +51,6 @@ describe("Creating Invoices", () => {
     assert(invoice.amount > 0);
     assert.strictEqual(invoice.currency, 'USD');
 
-    assert(invoice.invoice_amount > 0);
-    assert.strictEqual(invoice.invoice_currency, 'USD');
-
     assert(moment(invoice.expiry));
 
   });
@@ -85,9 +82,6 @@ describe("Creating Invoices", () => {
 
     assert(invoice.amount > 0);
     assert.strictEqual(invoice.currency, 'USD')
-
-    assert(invoice.invoice_amount > 0);
-    assert.strictEqual(invoice.invoice_currency, 'DASH');
 
   });
 
