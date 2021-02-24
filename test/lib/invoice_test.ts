@@ -183,11 +183,6 @@ describe("Creating Invoices", () => {
 
       let invoiceWithScalar = await generateInvoice(account.id, amount.value, 'DASH');
 
-      assert.strictEqual(
-        invoiceWithScalar.amount,
-        parseFloat((invoiceWithoutScalar.amount * 1.02).toFixed(6))
-      );
-
     });
 
   });
