@@ -22,12 +22,16 @@
     {
       "code": "BCH",
       "name": "Bitcoin Cash",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
 
     {
       "code": "BTC",
       "name": "Bitcoin",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
 
@@ -52,6 +56,8 @@
     {
       "code": "BSV",
       "name": "Bitcoin Satoshi Vision",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
 

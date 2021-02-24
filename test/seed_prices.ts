@@ -14,6 +14,7 @@ import { prices } from '../lib';
   await prices.setPrice('DASH', 20,'test', 'VEF');
   await prices.setPrice('BSV', 200, 'test', 'USD');
   await prices.setPrice('VEF', 0.0000005,'test', 'USD');
+  await prices.setPrice('LTC', 180,'test', 'USD');
 
   process.exit(0);
 
