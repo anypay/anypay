@@ -144,6 +144,17 @@ export async function create(req, h) {
 
 export async function show(req, h) {
 
+  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
+
+  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
+
+    invoice = await invoices.refreshInvoice(invoice.uid)
+
+  } else {
+
+    log.info('invoice not yet expired');
+  }
+
   log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
   try {
