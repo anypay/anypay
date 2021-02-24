@@ -167,7 +167,30 @@ export async function createPlatformInvoice(account_id, amount, currency, cashba
   }})
 
 }
-  
+
+export async function refreshInvoice(uid: string): Promise<any> {
+
+  let invoice = await models.Invoice.findOne({ where: { uid }})
+
+  let paymentOptions = await models.PaymentOption.findAll({
+    where: {
+      invoice_uid: uid
+    }
+  })
+
+  // delete all payment options and re-generate invoice
+  await Promise.all(paymentOptions.map(option => option.destroy()))
+
+  await invoice.destroy()
+
+  invoice = await generateInvoice(invoice.account_id, invoice.denomination_amount, invoice.currency, uid)
+
+  log.info('invoice.refreshed', invoice.toJSON())
+
+  return invoice
+
+}
+
 export async function generateInvoice(
 
   accountId: number,
@@ -176,6 +199,8 @@ export async function generateInvoice(
   uid?: string
 
 ): Promise<any> {
+
+  log.info('invoices.generate', { accountId, denominationAmountValue, invoiceCurrency, uid })
 
   uid = !!uid ? uid : shortid.generate();
 
@@ -187,10 +212,22 @@ export async function generateInvoice(
   }});
 
   addresses = _.reject(addresses, (address) => {
+
+    console.log('CURRENCY', address.currency)
+
     let coin = getCoin(address.currency);
+
+    console.log('COIN', coin)
+
+    if (!coin) { return true }
+
+    console.log("UNAVAILABLE", coin.unavailable)
+
     if (!coin) { return true }
     return coin.unavailable;
   });
+
+  console.log("ADDRESSES", addresses.length)
 
   let coin = getCoin(invoiceCurrency);
 
