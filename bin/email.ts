@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import * as program from 'commander';
-import { ambassadorRewardEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
+import { sendInvoiceToEmail, ambassadorRewardEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
 import { sendEgifterAchReceipt } from '../lib/ach';
 import { models } from '../lib/models';
 import { email as rabbiEmail } from 'rabbi';
@@ -60,6 +60,26 @@ program
       let resp = await rabbiEmail.sendEmail('welcome', email, 'support@anypayinc.com', {
         email 
       })
+
+      console.log(resp);
+
+    } catch(error) {
+
+      console.log(error);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('send_invoice <uid> <email_address>')
+  .action(async (uid, email) => {
+
+    try {
+
+      let resp = await sendInvoiceToEmail(uid, email)
 
       console.log(resp);
 

@@ -11,6 +11,23 @@ import { getBlockExplorerTxidUrl } from '../block_explorer';
 
 import { email as rabbiEmail } from 'rabbi';
 
+export async function sendInvoiceToEmail(uid, email) {
+
+  let invoice = await models.Invoice.findOne({ where: { uid }})
+
+  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+
+  return rabbiEmail.sendEmail('share-invoice', email, 'Anypay<support@anypayinc.com>', {
+    account_id: account.id,
+    business_name: account.business_name,
+    invoice,
+    invoice_uid: invoice.uid,
+    denomination_currency: invoice.denomination_currency,
+    denomination_amount: invoice.denomination_amount
+  });
+
+}
+
 export async function firstAddressSetEmail(account) {
 
   return rabbiEmail.sendEmail('first_address_set', account.email, 'Anypay<support@anypayinc.com>', {

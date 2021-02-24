@@ -357,6 +357,20 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/invoices/{uid}/share/email",
+    handler: handlers.Invoices.shareEmail,
+    options: {
+      tags: ['api'],
+      validate: {
+        payload: {
+          email: Joi.string().email().required()
+        }
+      },
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/grab_and_go_items",
     handler: handlers.GrabAndGoItems.index,
