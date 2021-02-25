@@ -12,7 +12,11 @@ import { publishBTC } from '../../lib/blockchair'
 
 import {models} from '../../lib/models';
 
+import {oneSuccess} from 'promise-one-success'
+
 import {rpc} from './jsonrpc';
+
+import * as blockcypher from '../../lib/blockcypher'
 
 import { transformHexToPayments } from '../../router/plugins/btc/lib';
 
@@ -20,13 +24,19 @@ export { transformHexToPayments }
 
 export async function submitTransaction(rawTx: string) {
 
-  return publishBTC(rawTx);
+  return oneSuccess([
+    publishBTC(rawTx),
+    blockcypher.publishBTC(rawTx)
+  ])
 
 }
 
 export async function broadcastTx(rawTx: string) {
 
-  return publishBTC(rawTx);
+  return oneSuccess([
+    publishBTC(rawTx),
+    blockcypher.publishBTC(rawTx)
+  ])
 
 }
 
