@@ -587,6 +587,24 @@ async function Server() {
   });
 
   server.route({
+    method: "PUT",
+    path: "/discounts/{currency}",
+    handler: handlers.Discounts.update,
+    options: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        params: {
+          currency: Joi.string().required(),
+        },
+        payload: {
+          percent: Joi.number().required()
+        },
+      }
+    }
+  });
+
+  server.route({
     method: "GET",
     path: "/account",
     handler: handlers.Accounts.show,

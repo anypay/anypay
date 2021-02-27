@@ -13,6 +13,7 @@ import { models } from './models';
 import * as cashback from './cashback';
 import * as ambassadors from './ambassadors';
 import * as database from './database';
+import * as discount from './discount';
 import * as dashwatch from './dashwatch';
 import * as addresses from './addresses';
 import * as coins from './coins';
@@ -61,6 +62,7 @@ export {
   coins,
   dashwatch,
   database,
+  discount,
   email,
   events,
   forwards,

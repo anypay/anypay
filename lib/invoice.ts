@@ -19,11 +19,7 @@ import * as http from 'superagent';
 
 import {emitter} from './events'
 
-const log = require("winston");
-
-import * as bch from '../plugins/bch';
-
-import * as xrp from '../plugins/xrp';
+import { log, logInfo } from './logger'
 
 import { models } from './models';
 
@@ -78,6 +74,15 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
 function applyScalar(invoiceAmount, scalar) {
   let nScalar = new BigNumber(scalar);
+  let nAmount = new BigNumber(invoiceAmount.value);
+
+  return Object.assign(invoiceAmount, {
+    value: parseFloat(nScalar.times(nAmount).toNumber().toFixed(6))
+  });
+}
+
+function applyDiscount(invoiceAmount, discountPercent) {
+  let nScalar = new BigNumber(100).minus(new BigNumber(discountPercent));
   let nAmount = new BigNumber(invoiceAmount.value);
 
   return Object.assign(invoiceAmount, {
@@ -292,6 +297,16 @@ export async function createPaymentOptions(account, invoice) {
 
     if (address.price_scalar) {
       conversion = applyScalar(conversion, address.price_scalar);
+    }
+    let discount = await models.Discount.findOne({
+      where: {
+        account_id: account.id,
+        currency: address.currency
+      }
+    })
+    if (discount) {
+      logInfo('discount.apply', Object.assign(conversion, {percent: discount.percent}))
+      conversion = applyDiscount(conversion, discount.percent);
     }
 
     return conversion;
