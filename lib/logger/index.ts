@@ -39,6 +39,7 @@ export function logInfo(event, payload: object = {}) {
   publishAmqp(event, payload)
 
 }
+
 function notifySlackError(event, payload) {
   return slackErrorWebhook.send({
     text: `${event} ${payload}`
