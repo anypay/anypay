@@ -82,7 +82,7 @@ function applyScalar(invoiceAmount, scalar) {
 }
 
 function applyDiscount(invoiceAmount, discountPercent) {
-  let nScalar = new BigNumber(100).minus(new BigNumber(discountPercent));
+  let nScalar = new BigNumber(1).minus((new BigNumber(discountPercent)).dividedBy(100));
   let nAmount = new BigNumber(invoiceAmount.value);
 
   return Object.assign(invoiceAmount, {
