@@ -13,7 +13,7 @@ class JsonRpc {
 
   call(method, params) {
 
-    log.info(`bch.rpc.call.${method}`, params);
+    log.info(`btc.rpc.call.${method}`, params);
 
     return new Promise((resolve, reject) => {
       http
@@ -37,11 +37,11 @@ class JsonRpc {
 
   callAll(method, params) {
 
-    log.info(`bch.rpc.callall.${method}`, params);
+    log.info(`btc.rpc.callall.${method}`, params);
 
     return new Promise((resolve, reject) => {
       http
-        .post('https://nodes.anypayinc.com/bch/rpc/all')
+        .post('https://nodes.anypayinc.com/btc.rpc/all')
         .auth('anypay', process.env.SUDO_ADMIN_KEY)
         .timeout({
           response: 15000,  // Wait 5 seconds for the server to start sending,
