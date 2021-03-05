@@ -2,6 +2,8 @@ require('dotenv').config()
 
 import { rpc } from '../../plugins/btc/jsonrpc'
 
+import * as btc from 'bitcore-lib';
+
 import * as _ from 'lodash'
 
 export class TxNode {
@@ -10,12 +12,15 @@ export class TxNode {
   rawtx: string;
   parents: TxNode[];
   children: TxNode[];
+  replace_by_fee: boolean;
   constructor(txid, tx, rawtx) {
     this.tx = tx
     this.rawtx = rawtx
     this.txid = txid
     this.parents = []
     this.children = []
+    let bitcoreTx = new btc.Transaction(rawtx)
+    this.replace_by_fee = bitcoreTx.isRBF();
   }
 }
 
@@ -50,6 +55,14 @@ export class BTCTraverser {
 
     this.ancestorLevels[this.currentAncenstorLevel] = this.currentAncenstors
     this.currentAncenstorLevel = this.currentAncenstorLevel + 1
+
+  }
+
+  async traverseAncestors(levels: number) {
+
+    for (let i=0; i<levels; i++) {
+      await this.getNextAncesorLevel()
+    }
 
   }
 

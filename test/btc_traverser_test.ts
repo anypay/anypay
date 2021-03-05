@@ -36,6 +36,11 @@ describe("BTC Traverser", () => {
 
   })
 
+  it('should traverse and keep state', () => {
+
+
+  })
+
   it('should get the node for a single transaction', async () => {
 
     let node = await traverser.getNode(txid)

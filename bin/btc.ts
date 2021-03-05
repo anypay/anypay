@@ -4,7 +4,19 @@ require("dotenv").config()
 
 import * as program from 'commander'
 
-import { BTCTraverser } from '../lib/btc_traverser'
+import { BTCTraverser, getNode } from '../lib/btc_traverser'
+
+program
+  .command('isrbf <txid>')
+  .action(async (txid) => {
+
+    let node = await getNode(txid)
+
+    console.log('isRBF', node.replace_by_fee)
+
+    process.exit(0)
+
+  })
 
 program
   .command('traverse <txid> [n]')
@@ -14,7 +26,7 @@ program
 
       let traverser = new BTCTraverser(txid)
 
-      await traverser.getParents(txid)
+      await traverser.traverseAncestors(n)
 
     } catch(error) {
 
