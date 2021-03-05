@@ -38,6 +38,15 @@ describe("BTC Traverser", () => {
 
   it('should traverse and keep state', () => {
 
+    let t = new traverser.BTCTraverser(txid)
+
+    await t.traverseAncestors(2)
+
+    ancestors = t.getCurrentAncenstors()
+
+    assert.strictEqual(ancestors.length, 1)
+
+    assert.strictEqual(ancestors[0].txid, '74b1779bac755e460c208f7958681ebabfecd7352b049673508afb3eb5b9996f')
 
   })
 

@@ -73,15 +73,9 @@ export class BTCTraverser {
 
 export async function getTransaction(txid) {
 
-  let response: any = await rpc.call('getrawtransaction', [txid])
+  let response: any = await rpc.call('getrawtransaction', [txid, true])
 
-  let rawtx = response.result
-
-  response = await rpc.call('decoderawtransaction', [rawtx])
-
-  let tx = response.result
-
-  return [rawtx, tx]
+  return [response.result.hex, response.result]
 
 }
 
