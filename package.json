@@ -83,6 +83,7 @@
     "knex": "^0.20.8",
     "kraken-api": "^1.0.0",
     "litecore-lib": "^0.13.22",
+    "lodash": "^4.17.21",
     "mailchimp-api-v3": "^1.13.0",
     "minercraft": "0.0.8",
     "moment": "^2.22.1",

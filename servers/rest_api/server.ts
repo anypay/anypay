@@ -315,6 +315,12 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/api/replace_by_fee/{txid}",
+    handler: handlers.Rbf.show
+  });
+
+  server.route({
+    method: "GET",
     path: "/vending/batms/{batm_id}",
     handler: handlers.Batms.show,
     options: {
