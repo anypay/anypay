@@ -107,7 +107,16 @@ export async function start() {
 
       if (!account) { return Boom.notFound() }
 
-      return h.redirect(`https://app.anypayinc.com/pay/${account.stub}`);
+      if (account.stub) {
+
+        return h.redirect(`https://app.anypayinc.com/pay/${account.stub}`);
+
+      } else {
+
+        return h.redirect(`https://app.anypayinc.com/pay/${account.id}`);
+
+      }
+
 
     }
 
