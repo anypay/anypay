@@ -315,6 +315,12 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/api/replace_by_fee/{txid}",
+    handler: handlers.Rbf.show
+  });
+
+  server.route({
+    method: "GET",
     path: "/vending/batms/{batm_id}",
     handler: handlers.Batms.show,
     options: {
@@ -583,6 +589,24 @@ async function Server() {
         payload: handlers.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
+    }
+  });
+
+  server.route({
+    method: "PUT",
+    path: "/discounts/{currency}",
+    handler: handlers.Discounts.update,
+    options: {
+      auth: "token",
+      tags: ['api'],
+      validate: {
+        params: {
+          currency: Joi.string().required(),
+        },
+        payload: {
+          percent: Joi.number().required()
+        },
+      }
     }
   });
 

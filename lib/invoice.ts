@@ -19,11 +19,7 @@ import * as http from 'superagent';
 
 import {emitter} from './events'
 
-const log = require("winston");
-
-import * as bch from '../plugins/bch';
-
-import * as xrp from '../plugins/xrp';
+import { log, logInfo } from './logger'
 
 import { models } from './models';
 
@@ -78,6 +74,15 @@ async function getNewInvoiceAddress(accountId: number, currency: string): Promis
 
 function applyScalar(invoiceAmount, scalar) {
   let nScalar = new BigNumber(scalar);
+  let nAmount = new BigNumber(invoiceAmount.value);
+
+  return Object.assign(invoiceAmount, {
+    value: parseFloat(nScalar.times(nAmount).toNumber().toFixed(6))
+  });
+}
+
+function applyDiscount(invoiceAmount, discountPercent) {
+  let nScalar = new BigNumber(1).minus((new BigNumber(discountPercent)).dividedBy(100));
   let nAmount = new BigNumber(invoiceAmount.value);
 
   return Object.assign(invoiceAmount, {
@@ -293,6 +298,16 @@ export async function createPaymentOptions(account, invoice) {
     if (address.price_scalar) {
       conversion = applyScalar(conversion, address.price_scalar);
     }
+    let discount = await models.Discount.findOne({
+      where: {
+        account_id: account.id,
+        currency: address.currency
+      }
+    })
+    if (discount) {
+      logInfo('discount.apply', Object.assign(conversion, {percent: discount.percent}))
+      conversion = applyDiscount(conversion, discount.percent);
+    }
 
     return conversion;
 
@@ -324,7 +339,7 @@ export async function createPaymentOptions(account, invoice) {
       address = address.split(':')[1]
     }
 
-    var amount = pay.toSatoshis(row[1].value);
+    var amount = new BigNumber(pay.toSatoshis(row[1].value)).minus(fee.amount).toNumber();
 
     let outputs = []
 
@@ -360,18 +375,12 @@ export async function createPaymentOptions(account, invoice) {
 
           ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
 
-        } else {
-
-          let conversion = await convert({ value: 0.01, currency: 'USD' }, currency)
-
-          ambassadorAmount = pay.toSatoshis(conversion.value)
+          outputs.push({
+            address: record.value,
+            amount: ambassadorAmount
+          })
 
         }
-
-        outputs.push({
-          address: record.value,
-          amount: ambassadorAmount
-        })
         
       }
 
