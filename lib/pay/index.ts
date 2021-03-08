@@ -288,6 +288,7 @@ export async function completePayment(paymentOption, hex: string) {
   var result = await models.Invoice.update(
     {
       amount_paid: invoice.amount,
+      invoice_amount: paymentOption.amount,
       invoice_amount_paid: paymentOption.amount,
       invoice_currency: paymentOption.currency,
       denomination_amount_paid: invoice.denomination_amount,
