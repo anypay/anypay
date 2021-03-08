@@ -45,8 +45,8 @@ jobs:
       image: ubuntu-1604:202007-01
     steps:
       - run:
-          name: Chef Client Update Live Staging Container
-          command: ssh ubuntu@api.staging.anypayinc.com "sudo chef-client -o recipe[anypay_api::staging]"
+          name: Chef Client Update Live Container
+          command: ssh ubuntu@api.anypayinc.com "sudo chef-client -o recipe[anypay_api]"
 
 
 workflows:
