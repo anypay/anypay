@@ -4,6 +4,8 @@ import {plugins} from '../plugins';
 
 import * as bsv from 'bsv';
 
+import * as events from '../events'
+
 import {
   AddressChangeSet,
   DenominationChangeset
@@ -15,8 +17,6 @@ import {Op} from 'sequelize';
 
 import {models} from "../models";
 
-import * as logger from "winston";
-
 import {checkAddressForPayments} from '../../plugins/dash/lib/check_for_payments';
 
 import {getPaymail as bsvGetPaymail} from '../../plugins/bsv';
@@ -24,18 +24,6 @@ import {getPaymail as bsvGetPaymail} from '../../plugins/bsv';
 import { handlePayment } from '../payment_processor';
 
 import * as Cron from 'cron';
-
-import {emitter} from '../events'
-
-logger.configure({
-    transports: [
-        new logger.transports.Console()
-    ]
-});
-
-import {EventEmitter2} from 'eventemitter2';
-
-const events = new EventEmitter2(); 
 
 async  function getPaymail(currency, address) {
 
@@ -70,8 +58,6 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
   let plugin = await plugins.findForCurrency(changeset.currency);
 
   let paymail = await getPaymail(changeset.currency, changeset.address);
-
-  console.log('paymail', paymail);
 
   changeset.paymail = paymail;
 
@@ -128,8 +114,11 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   changeset.address_id = address.id;
 
-  emitter.emit('address.set', changeset);
-  events.emit('address:set', changeset);
+  events.record({
+    event: 'address.set',
+    payload: changeset,
+    account_id: changeset.account_id
+  })
 
   return address.value;
 
@@ -150,7 +139,11 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
     await address.destroy({ force: true });
 
-  events.emit('address:unset', changeset);
+  events.record({
+    event: 'address:unset',
+    payload: changeset,
+    account_id: changeset.account_id
+  });
 
 };
 
@@ -160,7 +153,11 @@ export async function setDenomination(changeset: DenominationChangeset): Promise
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});
 
-  events.emit('denomination:set', changeset);
+  events.record({
+    event: 'denomination.set',
+    payload: changeset,
+    account_id: changeset.account_id
+  });
 
   return;
 }
@@ -238,5 +235,5 @@ export async function sweepUnpaid() {
 }
 
 
-export { events, logger };
+export { events };
 
