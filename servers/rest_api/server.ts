@@ -39,21 +39,6 @@ const Joi = require('joi');
 
 import { models } from '../../lib'
 
-import {events} from '../../lib/core';
-import {notify} from '../../lib/slack/notifier';
-
-events.on('address:set', async (changeset) => {
-
-  let account = await models.Account.findOne({ where: { id: changeset.account_id }});
-
-  let value = Object.assign({account: account.email, id: changeset.address_id}, changeset);
-
-  delete value.address_id;
-
-  await notify(`address:set:${JSON.stringify(value)}`);
-
-});
-
 const validatePassword = async function(request, username, password, h) {
 
   try {
