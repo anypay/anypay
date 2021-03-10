@@ -3,6 +3,7 @@ require('dotenv').config();
 import { publish } from '../../lib/amqp';
 
 require('../prices_bch/actor').start();
+require('../prices_ltc/actor').start();
 require('../prices_bsv/actor').start();
 require('../prices_dash/actor').start();
 require('../prices_btc/actor').start();
