@@ -57,18 +57,27 @@ export async function getMerchantData(invoiceUid: string, account_id?: number): 
     return JSON.stringify({ invoiceUid })
   }
 
+  let invoice = await models.Invoice.findOne({ where: { uid: invoiceUid }})
 
   let account = await models.Account.findOne({ where: { id: account_id }});
 
-  var merchantName = account.business_name;
-  var avatarUrl = account.image_url;
 
-  return JSON.stringify({
-    invoiceUid,
-    merchantName,
-    avatarUrl
-  })
+  if (invoice.metadata) {
 
+    return JSON.stringify(Object.assign({ invoiceUid }, invoice.metadata))
+
+  } else {
+
+    var merchantName = account.business_name;
+    var avatarUrl = account.image_url;
+
+    return JSON.stringify({
+      invoiceUid,
+      merchantName,
+      avatarUrl
+    })
+
+  }
 }
 
 export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
