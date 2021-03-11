@@ -638,6 +638,16 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/ach_batches",
+    handler: handlers.AchBatches.index,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/achs/{account_ach_id}/invoices",
     handler: handlers.AccountAchInvoices.show,
     options: {
