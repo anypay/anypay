@@ -12,7 +12,7 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
-import { email, models, invoices, coins } from '../../../lib';
+import { prices, email, models, invoices, coins } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -262,13 +262,16 @@ export async function create (request, reply) {
 
     if (request.payload.cashback_amount && request.account.allow_cashback_amount) {
 
+      // ONLY FOR EGIFTER & DASH!!
+
       invoice.cashback_denomination_amount = request.payload.cashback_amount;
 
       let price = invoice.denomination_amount / invoice.amount;
 
-      invoice.cashback_amount = parseFloat(
-        (request.payload.cashback_amount / price).toFixed(5)
-      );
+      invoice.cashback_amount = (await prices.convert({
+        currency: 'USD',
+        value: invoice.cashback_denomination_amount
+      }, 'DASH')).value
 
       console.log('cashback amount', invoice.cashback_amount);
 
