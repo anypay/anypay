@@ -33,14 +33,22 @@ export async function start() {
       where: { id: invoice.account_id }
     })
 
+    var notificationMessage;
+
     if (account.business_name) {
 
-      await notify(`Payment to ${account.business_name} (${account.email}) for ${invoice.denomination_amount} ${invoice.denomination_currency} ${invoice.invoice_currency}`);
+      notificationMessage = `Payment to ${account.business_name} (${account.email}) for ${invoice.denomination_amount} ${invoice.denomination_currency} ${invoice.invoice_currency}`;
 
     } else {
 
-      await notify(`Payment to ${account.email} for ${invoice.denomination_amount} ${invoice.denomination_currency} ${invoice.invoice_currency}`);
+      notificationMessage = `Payment to ${account.email} for ${invoice.denomination_amount} ${invoice.denomination_currency} ${invoice.invoice_currency}`;
     }
+
+    if (invoice.is_public_request) {
+      notificationMessage = `${notificationMessage} on Anypay City`
+    }
+
+    await notify(notificationMessage)
 
     channel.ack(msg);
 
