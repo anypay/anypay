@@ -132,6 +132,13 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
     throw new Error(`cannot credit unpaid invoice with uid ${invoice_uid}`)
   }
 
+  var amount = invoice.denomination_amount_paid
+
+  // Apply Legacy Cashback For eGifter
+  if (invoice.cashback_denomination_amount > 0) {
+    amount = new BigNumber(amount).minus(invoice.cashback_denomination_amount).toNumber()
+  }
+
   let result: [any, boolean] = await models.AnypayxCredit.findOrCreate({
     where: {
       invoice_uid
@@ -140,7 +147,7 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
       account_id: invoice.account_id,
       invoice_uid,
       currency: invoice.denomination_currency,
-      amount: invoice.denomination_amount_paid,
+      amount,
       date: new Date()
     }
   })
