@@ -88,7 +88,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
 
   let outputs = await buildOutputs(paymentOption)
 
-  let memo = "Bitcoin SV Payment Request by Anypay Inc"
+  let memo = invoice.memo || "Bitcoin SV Payment Request by Anypay Inc"
 
   let request = {
     network:"bitcoin-sv",
@@ -98,6 +98,10 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     memo,
     paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/BSV/bip270`,
     merchantData
+  }
+
+  if (invoice.redirect_url) {
+    request['redirectUrl'] = invoice.redirect_url
   }
 
   return request
