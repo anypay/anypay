@@ -3,6 +3,8 @@ import { BigNumber } from 'bignumber.js';
 import { models } from '../models'
 import { logInfo } from '../logger'
 
+import { Op } from 'sequelize'
+
 import * as sequelize from '../database'
 
 /*
@@ -153,6 +155,136 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
   })
 
   return [result[0].toJSON(), result[1]]
+
+}
+
+/*
+ *
+ * For a given ACH batch that was sent debit the account for that amount
+ * If the ACH does not yet have an effective date throw an error. Total
+ * amount should represent the sum of the account's invoices related to the ACH.
+ *
+ */
+
+async function debitACH(id) {
+
+  var debit = await models.AnypayxDebit.findOne({
+    where: {
+      settlement_id: id,
+      settlement_type: 'ach_batch'
+    }
+  })
+
+  if (debit) {
+    throw new Error(`ach_batch ${id} already debited from AnypayX account`)
+  }
+
+  let ach_batch = await models.AchBatch.findOne({ where: { id }})
+
+  debit = await models.AnypayxDebit.create({
+    settlement_id: id,
+    settlement_type: 'ach_batch',
+    amount: ach_batch.id,
+    currency: 'USD',
+    date: new Date(),
+    account_id: ach_batch.account_id,
+    external_id: id
+  })
+
+  return debit
+
+}
+interface DebitSettlement {
+  settlement_type: string;
+  settlement_id: number;
+}
+export async function debitSettlement(params: DebitSettlement) {
+  switch(params.settlement_type) {
+    case 'ach_batch': 
+      return debitACH(params.settlement_id)
+    case 'bitpay': 
+      return debitBitpaySettlement(params.settlement_id)
+    default:
+      throw new Error(`settlement type ${params.settlement_type} not yet supported`)
+  }
+}
+
+export async function debitBitpaySettlement(bitpay_settlement) {
+
+  let debit = await models.AnypayxDebit.findOrCreate({
+    where: {
+      settlement_type: 'bitpay',
+      settlement_id: bitpay_settlement.id
+    },
+    defaults: {
+      settlement_type: 'bitpay',
+      settlement_id: bitpay_settlement.id,
+      amount: bitpay_settlement.id,
+      currency: bitpay_settlement.currency,
+      date: new Date(),
+      account_id: bitpay_settlement.account_id,
+      external_id: bitpay_settlement.url.split('=')[1]
+    }
+  })
+
+  return debit
+
+}
+
+export async function debitAllACH(start_date, end_date) {
+
+  let ach_batches = await models.AchBatch.findAll({
+    where: {
+      effective_date: {
+        [Op.gt]: start_date,
+        [Op.lt]: end_date || new Date()
+      }
+    }
+  })
+
+  for (let batch of ach_batches) {
+
+    try {
+
+      let debit = await debitSettlement({
+        settlement_type: 'ach_batch',
+        settlement_id: batch.id
+      })
+
+      console.log('debit', debit.toJSON())
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+    
+  }
+
+}
+
+export async function creditAllInvoices(account_id) {
+
+  let invoices = await models.Invoice.findAll({
+    where: {
+      account_id,
+      status: 'paid'
+    }
+  })
+
+  for (let invoice of invoices) {
+
+    try {
+
+      await creditInvoice(invoice.uid)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  }
 
 }
 
