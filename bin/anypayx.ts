@@ -6,6 +6,65 @@ import * as program from 'commander'
 
 import * as anypayx from '../lib/anypayx'
 
+import { models } from '../lib/models'
+
+program
+  .command('debitallbitpaysettlements')
+  .action(async () => {
+
+    let settlements = await models.BitpaySettlement.findAll()
+
+    for (let settlement of settlements) {
+
+      await anypayx.debitBitpaySettlement(settlement)
+
+    }
+
+  })
+
+program
+  .command('debitallach <start_date> [end_date]')
+  .action(async (start_date, end_date) => {
+
+    await anypayx.debitAllACH(start_date, end_date)
+
+
+  })
+
+program
+  .command('creditallinvoices <account_email>')
+  .action(async (email) => {
+    
+    let account = await models.Account.findOne({ where: { email }})
+
+    await anypayx.creditAllInvoices(account.id)
+
+  })
+
+
+program
+  .command('debitach <ach_batch_id>')
+  .action(async (ach_batch_id) => {
+
+    try {
+
+      let debit = await anypayx.debitSettlement({
+        settlement_type: 'ach_batch',
+        settlement_id: ach_batch_id
+      })
+
+      console.log('debit', debit.toJSON())
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    process.exit(0)
+
+  })
+
 program
   .command('settleaccount <account_id>')
   .action(async (account_id) => {
