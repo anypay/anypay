@@ -64,8 +64,14 @@ export async function getBalance(account_id: number) {
  */
 export async function listTransactions(account_id: number) {
 
-  let debits: any[] = await models.AnypayxDebit.findAll({ where: { account_id }})
-  let credits: any[] = await models.AnypayxCredit.findAll({ where: { account_id }})
+  let debits: any[] = await models.AnypayxDebit.findAll({
+    where: { account_id },
+    order: ['date', 'desc']
+  })
+  let credits: any[] = await models.AnypayxCredit.findAll({
+    where: { account_id },
+    order: ['date', 'desc']
+  })
 
   debits = debits.map(debit => {
     return {
@@ -150,7 +156,7 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
       invoice_uid,
       currency: invoice.denomination_currency,
       amount,
-      date: new Date()
+      date: invoice.paidAt
     }
   })
 
@@ -181,12 +187,16 @@ async function debitACH(id) {
 
   let ach_batch = await models.AchBatch.findOne({ where: { id }})
 
+  if (!ach_batch.effective_date) {
+    throw new Error(`ach batch ${ach_batch.id} has no effective date`)
+  }
+
   debit = await models.AnypayxDebit.create({
     settlement_id: id,
     settlement_type: 'ach_batch',
-    amount: ach_batch.id,
+    amount: ach_batch.amount,
     currency: 'USD',
-    date: new Date(),
+    date: ach_batch.effective_date,
     account_id: ach_batch.account_id,
     external_id: id
   })
@@ -221,7 +231,7 @@ export async function debitBitpaySettlement(bitpay_settlement) {
       settlement_id: bitpay_settlement.id,
       amount: bitpay_settlement.id,
       currency: bitpay_settlement.currency,
-      date: new Date(),
+      date: bitpay_settlement.createdAt,
       account_id: bitpay_settlement.account_id,
       external_id: bitpay_settlement.url.split('=')[1]
     }
