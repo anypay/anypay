@@ -391,7 +391,9 @@ export async function createPaymentOptions(account, invoice) {
       amount
     })
 
-    outputs.push(fee)
+    if (currency != 'BTC') {
+      outputs.push(fee)
+    }
 
     return {
       currency_logo_url: paymentCoin.logo_url,
