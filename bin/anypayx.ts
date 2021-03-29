@@ -9,6 +9,16 @@ import * as anypayx from '../lib/anypayx'
 import { models } from '../lib/models'
 
 program
+  .command('monthlyreport <email> <month_year>')
+  .action(async () => {
+
+    // dashsupport@egifter.com 01_2021 
+
+  })
+
+
+
+program
   .command('debitallbitpaysettlements')
   .action(async () => {
 

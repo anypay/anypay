@@ -18,6 +18,38 @@ function attach(server: Hapi.Server): Hapi.Server {
 
   server.route({
 
+    method: "GET",
+
+    path: "/x/balance/{month}-{day}-{year}",
+
+    options: {
+
+      auth: "accountToken"
+
+    },
+
+    handler: handlers.Balance.show
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/x/reports/{month}-{year}",
+
+    options: {
+
+      auth: "accountToken"
+
+    },
+
+    handler: handlers.Reports.show
+
+  });
+
+  server.route({
+
     method: "POST",
 
     path: "/x/debits",
