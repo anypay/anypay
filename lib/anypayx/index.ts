@@ -3,9 +3,41 @@ import { BigNumber } from 'bignumber.js';
 import { models } from '../models'
 import { logInfo } from '../logger'
 
+import * as moment from 'moment'
+
 import { Op } from 'sequelize'
 
 import * as sequelize from '../database'
+
+export async function monthlyTransactions({account_id, month, year}: {account_id: number, month: number, year: number}) {
+
+  let date = `${month}/01/${year}`
+
+  let start = moment(date);
+
+  let end = moment(date).add(1, 'month');
+
+  return listTransactions(account_id, start.toDate(), end.toDate())  
+
+}
+
+export async function monthlyBalance({account_id, month, year}: {account_id: number, month: number, year: number}) {
+
+  let date = `${month}/01/${year}`
+
+  let start = moment(date);
+
+  let end = moment(date).add(1, 'month');
+
+  return getBalance(account_id, start.toDate(), end.toDate())  
+
+}
+
+export async function balanceAtDate(account_id: number, date: Date): Promise<number> {
+
+  return getBalance(account_id, null, date)
+
+}
 
 /*
  * Get Balance
@@ -14,14 +46,19 @@ import * as sequelize from '../database'
  * The balance is the sum of credits minus the sum of debits
  *
  */
-export async function getBalance(account_id: number) {
+export async function getBalance(account_id: number, start?: Date, end?: Date) {
 
   logInfo('anypayx.getbalance', { account_id })
+  let where = { account_id, date: {}}
+  if (start) {
+    where['date'][Op.gte] = start
+  }
+  if (end) {
+    where['date'][Op.lt] = end
+  }
 
   let sumCreditsResult = await models.AnypayxCredit.findAll({
-    where: {
-      account_id
-    },
+    where,
     attributes: [
       'account_id',
       [sequelize.fn('sum', sequelize.col('amount')), 'sumCredits']
@@ -33,9 +70,7 @@ export async function getBalance(account_id: number) {
   let sumCredits = sumCreditsResult && sumCreditsResult[0] ? sumCreditsResult[0].dataValues.sumCredits || 0 : 0
 
   let sumDebitsResult = await models.AnypayxDebit.findAll({
-    where: {
-      account_id
-    },
+    where,
     attributes: [
       'account_id',
       [sequelize.fn('sum', sequelize.col('amount')), 'sumDebits']
@@ -62,14 +97,26 @@ export async function getBalance(account_id: number) {
  * sorted by most recent first
  *
  */
-export async function listTransactions(account_id: number) {
+export async function listTransactions(account_id: number, start?: Date, end?: Date) {
+
+  let where = { account_id, date: {} }
+
+  if (start) {
+    where['date'][Op.gte] = start
+  }
+
+  if (end) {
+    where['date'][Op.lt] = end
+  }
+
+  console.log('where', where)
 
   let debits: any[] = await models.AnypayxDebit.findAll({
-    where: { account_id },
+    where,
     order: [['date', 'desc']]
   })
   let credits: any[] = await models.AnypayxCredit.findAll({
-    where: { account_id },
+    where,
     order: [['date', 'desc']]
   })
 
