@@ -66,11 +66,11 @@ export async function listTransactions(account_id: number) {
 
   let debits: any[] = await models.AnypayxDebit.findAll({
     where: { account_id },
-    order: ['date', 'desc']
+    order: [['date', 'desc']]
   })
   let credits: any[] = await models.AnypayxCredit.findAll({
     where: { account_id },
-    order: ['date', 'desc']
+    order: [['date', 'desc']]
   })
 
   debits = debits.map(debit => {
@@ -135,7 +135,7 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
 
   let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
-  if (invoice.status !== 'paid') {
+  if (invoice.status !== 'paid' && invoice.status !== 'underpaid' && invoice.status !== 'overpaid') {
 
     throw new Error(`cannot credit unpaid invoice with uid ${invoice_uid}`)
   }
@@ -273,16 +273,19 @@ export async function debitAllACH(start_date, end_date) {
 
 }
 
-export async function creditAllInvoices(account_id) {
+export async function creditAllInvoices(account_id, status=['paid', 'underpaid', 'overpaid']) {
 
   let invoices = await models.Invoice.findAll({
     where: {
       account_id,
-      status: 'paid'
+      status: {
+        [Op.in]: status
+      }
     }
   })
 
   for (let invoice of invoices) {
+    console.log('invoice.status', invoice.status)
 
     try {
 
