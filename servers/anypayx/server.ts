@@ -44,7 +44,23 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     },
 
-    handler: handlers.Reports.show
+    handler: handlers.Statements.show
+
+  });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/x/statements",
+
+    options: {
+
+      auth: "accountToken"
+
+    },
+
+    handler: handlers.Statements.index
 
   });
 

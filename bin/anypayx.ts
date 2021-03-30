@@ -16,6 +16,29 @@ program
 
   })
 
+program
+  .command('monthlyreports <email>')
+  .action(async (email) => {
+
+    console.log('monthlyreports', email)
+
+    try {
+
+      let account = await models.Account.findOne({ where: { email }})
+
+      let statements = await anypayx.allStatements(account.id)
+
+      console.log(statements)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    process.exit(0)
+
+  })
 
 
 program

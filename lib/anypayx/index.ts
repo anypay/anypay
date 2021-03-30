@@ -9,6 +9,82 @@ import { Op } from 'sequelize'
 
 import * as sequelize from '../database'
 
+export async function getStatement(account_id, month, year) {
+
+  let transactions = await monthlyTransactions({
+    account_id,
+    month,
+    year
+  })
+
+  let balance = await monthlyBalance({
+    account_id,
+    month,
+    year
+  })
+
+  return { transactions, balance }
+
+}
+
+
+export async function allStatements(account_id: number) {
+
+  // get first anypayx transaction
+  let firstDebit = await models.AnypayxDebit.findOne({
+    where: { account_id },
+    order: [["date", "asc"]]
+  })
+
+  let firstCredit = await models.AnypayxCredit.findOne({
+    where: { account_id },
+    order: [["date", "asc"]]
+  })
+
+  var firstDate;
+
+  if (firstDebit.date > firstCredit.date) {
+
+    firstDate = firstCredit.date
+
+  } else {
+
+    firstDate = firstDebit.date
+
+  }
+
+  let firstMonth = moment(firstDate).startOf("month")
+
+  let lastMonth = moment().startOf("month").subtract(1, "month")
+
+  var currentMonth = moment().startOf('month')
+
+  var statements = [] 
+
+  while (firstMonth.toDate() < lastMonth.toDate()) {
+
+    try {
+
+      console.log(firstMonth.toDate())
+
+      firstMonth.add(1, "month")
+
+      let statement = await getStatement(account_id, firstMonth.toDate().getMonth(), firstMonth.toDate().getFullYear())
+
+      statements.push(statement)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  }
+
+  return statements
+
+}
+
 export async function monthlyTransactions({account_id, month, year}: {account_id: number, month: number, year: number}) {
 
   let date = `${month}/01/${year}`
