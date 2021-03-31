@@ -329,7 +329,7 @@ export async function creditInvoice(invoice_uid: string): Promise<[any, boolean]
  *
  */
 
-async function debitACH(id) {
+export async function debitACH(id) {
 
   var debit = await models.AnypayxDebit.findOne({
     where: {
