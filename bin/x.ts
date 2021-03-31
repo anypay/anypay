@@ -42,7 +42,9 @@ program
         path: 'ocns.csv',
         header: [
           {id: 'paidAt', title: 'Paid at'},
-          {id: 'denomination_amount_paid', title: 'Amount USD'},
+          {id: 'denomination_amount_paid', title: 'Amount Paid'},
+          {id: 'cashback_denomination_amount', title: 'Cash Back Paid'},
+          {id: 'settlement_amount', title: 'Amount Credited'},
           {id: 'uid', title: 'UID'},
           {id: 'external_id', title: 'OCN'},
         ]
@@ -51,12 +53,17 @@ program
       let records = await csvStringifier.stringifyRecords(invoices.map(invoice => {
 
         return Object.assign(invoice.toJSON(), {
+          denomination_amount_paid: invoice.denomination_amount_paid.toFixed(2),
+          settlement_amount: invoice.settlement_amount.toFixed(2),
+          cashback_denomination_amount: invoice.cashback_denomination_amount ? invoice.cashback_denomination_amount.toFixed(2) : "0.00",
           paidAt: moment(invoice.paidAt).format('MM/DD/YYYY')
         })
 
       }))
+
+      let header = await csvStringifier.getHeaderString();
       
-      fs.writeFileSync(path.join(__dirname, '../tmp/egifter_ocs.csv'), records)
+      fs.writeFileSync(path.join(__dirname, '../tmp/egifter_ocns.csv'), `${header}\t${records}`)
 
     } catch(error) {
 
