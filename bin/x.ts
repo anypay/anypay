@@ -4,9 +4,71 @@ require('dotenv').config()
 
 import * as program from 'commander'
 
+import * as moment from 'moment'
+
 import * as anypayx from '../lib/anypayx'
 
 import { models } from '../lib/models'
+
+import * as fs from 'fs'
+
+import * as path from 'path'
+
+import { Op } from 'sequelize'
+
+const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
+
+program
+  .command('exportocns')
+  .action(async () => {
+
+    try {
+
+      let email = 'dashsupport@egifter.com'
+
+      let account = await models.Account.findOne({ where: { email }})
+
+      let invoices = await models.Invoice.findAll({
+        where: {
+          status: {
+            [Op.in]: ["paid", "underpaid", "overpaid"]
+          },
+          account_id: account.id
+        },
+        order: [["paidAt", "asc"]]
+      })
+
+      const csvStringifier = createCsvStringifier({
+        path: 'ocns.csv',
+        header: [
+          {id: 'paidAt', title: 'Paid at'},
+          {id: 'denomination_amount_paid', title: 'Amount USD'},
+          {id: 'uid', title: 'UID'},
+          {id: 'external_id', title: 'OCN'},
+        ]
+      });
+
+      let records = await csvStringifier.stringifyRecords(invoices.map(invoice => {
+
+        return Object.assign(invoice.toJSON(), {
+          paidAt: moment(invoice.paidAt).format('MM/DD/YYYY')
+        })
+
+      }))
+      
+      fs.writeFileSync(path.join(__dirname, '../tmp/egifter_ocs.csv'), records)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    process.exit(0)
+
+  })
+
+
 
 program
   .command('monthlyreport <email> <month_year>')
@@ -17,8 +79,8 @@ program
   })
 
 program
-  .command('monthlyreports <email>')
-  .action(async (email) => {
+  .command('allstatements <email> [include_transactions]')
+  .action(async (email, include_transactions=true) => {
 
     console.log('monthlyreports', email)
 
@@ -26,7 +88,10 @@ program
 
       let account = await models.Account.findOne({ where: { email }})
 
-      let statements = await anypayx.allStatements(account.id)
+      let statements = await anypayx.allStatements({
+        account_id: account.id,
+        include_transactions
+      })
 
       console.log(statements)
 
