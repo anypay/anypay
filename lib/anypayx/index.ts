@@ -9,13 +9,12 @@ import { Op } from 'sequelize'
 
 import * as sequelize from '../database'
 
-export async function getStatement(account_id, month, year) {
-
-  let transactions = await monthlyTransactions({
-    account_id,
-    month,
-    year
-  })
+export async function getStatement({account_id, month, year, include_transactions}: {
+  account_id: number,
+  month: number,
+  year: number,
+  include_transactions?: boolean
+}): Promise<any> {
 
   let balance = await monthlyBalance({
     account_id,
@@ -23,12 +22,28 @@ export async function getStatement(account_id, month, year) {
     year
   })
 
-  return { transactions, balance }
+  if (include_transactions) {
+
+    let transactions = await monthlyTransactions({
+      account_id,
+      month,
+      year
+    })
+
+    return { transactions, balance, account_id, month, year }
+
+  } else {
+
+    return { balance, account_id, month, year }
+
+  }
 
 }
 
-
-export async function allStatements(account_id: number) {
+export async function allStatements({account_id, include_transactions}: {
+  account_id: number,
+  include_transactions?: boolean
+}) {
 
   // get first anypayx transaction
   let firstDebit = await models.AnypayxDebit.findOne({
@@ -69,7 +84,11 @@ export async function allStatements(account_id: number) {
 
       firstMonth.add(1, "month")
 
-      let statement = await getStatement(account_id, firstMonth.toDate().getMonth(), firstMonth.toDate().getFullYear())
+      let statement = await getStatement({
+        account_id,
+        month: firstMonth.toDate().getMonth(),
+        year: firstMonth.toDate().getFullYear()
+      })
 
       statements.push(statement)
 
