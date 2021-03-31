@@ -100,6 +100,21 @@ export async function allStatements({account_id, include_transactions}: {
 
   }
 
+  var previousStatementEndingBalance = new BigNumber(0)
+
+  statements = statements.map((statement) => {
+
+    console.log('map statement', statement)
+
+    statement.starting_balance = previousStatementEndingBalance.toNumber().toFixed(2)
+
+    statement.ending_balance = previousStatementEndingBalance.plus(statement.balance).toNumber().toFixed(2)
+
+    previousStatementEndingBalance = new BigNumber(statement.ending_balance)
+
+    return statement
+  })
+
   return statements
 
 }
