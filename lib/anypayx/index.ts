@@ -232,7 +232,11 @@ export async function listTransactions(account_id: number, start?: Date, end?: D
 
   let debits: any[] = await models.AnypayxDebit.findAll({
     where,
-    order: [['date', 'desc']]
+    order: [['date', 'desc']],
+    include: [{
+      model: models.AchBatch,
+      as: 'ach_batch'
+    }]
   })
   let credits: any[] = await models.AnypayxCredit.findAll({
     where,
