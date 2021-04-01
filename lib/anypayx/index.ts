@@ -72,8 +72,6 @@ export async function allStatements({account_id, include_transactions}: {
 
   let firstMonth = moment(firstDate).startOf("month")
 
-  console.log("FIRST MONTH", firstMonth)
-
   let lastMonth = moment().endOf("month")
 
   var currentMonth = moment().startOf('month')
@@ -166,7 +164,6 @@ export async function balanceAtDate(account_id: number, date: Date): Promise<num
  */
 export async function getBalance(account_id: number, start?: Date, end?: Date) {
 
-  logInfo('anypayx.getbalance', { start, end, account_id })
   let where = { account_id, date: {}}
   if (start) {
     where['date'][Op.gte] = start
@@ -174,6 +171,10 @@ export async function getBalance(account_id: number, start?: Date, end?: Date) {
   if (end) {
     where['date'][Op.lt] = end
   }
+  if (!start && !end) {
+    delete where['date']
+  }
+  logInfo('anypayx.getbalance', { start, end, account_id, where })
 
   let sumCreditsResult = await models.AnypayxCredit.findAll({
     where,
@@ -184,7 +185,7 @@ export async function getBalance(account_id: number, start?: Date, end?: Date) {
     group: ['account_id']
   })
 
-  //logInfo('anypayx.sumcredits.result', sumCreditsResult[0].sumCredits)
+  logInfo('anypayx.sumcredits.result', sumCreditsResult[0])
   let sumCredits = sumCreditsResult && sumCreditsResult[0] ? sumCreditsResult[0].dataValues.sumCredits || 0 : 0
 
   let sumDebitsResult = await models.AnypayxDebit.findAll({
