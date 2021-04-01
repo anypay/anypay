@@ -247,5 +247,35 @@ program
   })
 
 program
+  .command('recordachbatch <account_id> <amount> <effective_date> [batch_id]')
+  .action(async (account_id, amount, effective_date, batch_id) => {
+
+    try {
+
+      let [batch] = await models.AchBatch.findOrCreate({
+        defaults: {
+          account_id,
+          batch_id,
+          amount,
+          effective_date
+        },
+        where: {
+          account_id,
+          batch_id
+        }
+      })
+
+      await anypayx.debitACH(batch.id)
+
+    } catch(error) {
+      
+      console.error(error)
+    }
+
+    process.exit(0)
+
+  })
+
+program
   .parse(process.argv)
 

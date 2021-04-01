@@ -16,6 +16,8 @@ export async function getStatement({account_id, month, year, include_transaction
   include_transactions?: boolean
 }): Promise<any> {
 
+  console.log('get statement', { account_id, month, year })
+
   let balance = await monthlyBalance({
     account_id,
     month,
@@ -70,7 +72,9 @@ export async function allStatements({account_id, include_transactions}: {
 
   let firstMonth = moment(firstDate).startOf("month")
 
-  let lastMonth = moment().startOf("month").subtract(1, "month")
+  console.log("FIRST MONTH", firstMonth)
+
+  let lastMonth = moment().endOf("month")
 
   var currentMonth = moment().startOf('month')
 
@@ -80,17 +84,21 @@ export async function allStatements({account_id, include_transactions}: {
 
     try {
 
-      console.log(firstMonth.toDate())
+      console.log('FIRST MONTH', firstMonth.toDate())
 
-      firstMonth.add(1, "month")
+      let month = firstMonth.toDate().getMonth() + 1
+
+      let year = firstMonth.toDate().getFullYear()
 
       let statement = await getStatement({
         account_id,
-        month: firstMonth.toDate().getMonth(),
-        year: firstMonth.toDate().getFullYear()
+        month,
+        year
       })
 
       statements.push(statement)
+
+      firstMonth.add(1, "month")
 
     } catch(error) {
 
@@ -158,7 +166,7 @@ export async function balanceAtDate(account_id: number, date: Date): Promise<num
  */
 export async function getBalance(account_id: number, start?: Date, end?: Date) {
 
-  logInfo('anypayx.getbalance', { account_id })
+  logInfo('anypayx.getbalance', { start, end, account_id })
   let where = { account_id, date: {}}
   if (start) {
     where['date'][Op.gte] = start
