@@ -75,6 +75,60 @@ program
 
   })
 
+program
+  .command('exportdebits')
+  .action(async () => {
+
+    try {
+
+      let email = 'dashsupport@egifter.com'
+
+      let account = await models.Account.findOne({ where: { email }})
+
+      let debits = await models.AnypayxDebit.findAll({
+        where: {
+          account_id: account.id
+        },
+        order: [["date", "asc"]],
+        include: [{
+          model: models.AchBatch,
+          as: 'ach_batch'
+        }]
+      })
+
+      const csvStringifier = createCsvStringifier({
+        path: 'egifter_anypayx_debits.csv',
+        header: [
+          {id: 'date', title: 'Date'},
+          {id: 'amount', title: 'Amount'},
+          {id: 'settlement_type', title: 'Settlement Type'}
+        ]
+      });
+
+      let records = await csvStringifier.stringifyRecords(debits.map(debit => {
+        let date = moment(debit.date).format('MM/DD/YYYY')
+        console.log('date', date)
+        return {
+          date,
+          amount: parseFloat(debit.amount).toFixed(2),
+          settlement_type: debit.settlement_type
+        }
+      }))
+
+      let header = await csvStringifier.getHeaderString();
+      
+      fs.writeFileSync(path.join(__dirname, '../tmp/egifter_anypayx_debits.csv'), `${header}\t${records}`)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    process.exit(0)
+
+  })
+
 
 
 program
@@ -207,6 +261,27 @@ program
     process.exit(0)
 
   })
+
+/*
+program
+  .command('countdebits <account_id>')
+  .action(async (account_id) => {
+
+    try {
+
+      let count = await anypayx.countDebits(account_id)
+
+      console.log({ count })
+
+    } catch(error) {
+      
+      console.error(error)
+    }
+
+    process.exit(0)
+
+  })
+*/
 
 program
   .command('getbalance <account_id>')
