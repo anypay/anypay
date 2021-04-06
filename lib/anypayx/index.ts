@@ -419,7 +419,7 @@ export async function debitBitpaySettlement(bitpay_settlement) {
     defaults: {
       settlement_type: 'bitpay',
       settlement_id: bitpay_settlement.id,
-      amount: bitpay_settlement.id,
+      amount: bitpay_settlement.amount,
       currency: bitpay_settlement.currency,
       date: bitpay_settlement.createdAt,
       account_id: bitpay_settlement.account_id,
