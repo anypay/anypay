@@ -42,6 +42,29 @@ export async function getStatement({account_id, month, year, include_transaction
 
 }
 
+export async function listUnsettled({account_id}: {
+  account_id: number
+}): Promise<any[]> {
+
+  return models.Invoice.findAll({
+    where: {
+      account_id,
+      should_settle: true,
+      status: {
+        [Op.in]: ['paid', 'underpaid', 'overpaid']
+      },
+      ach_batch_id: {
+        [Op.eq]: null
+      },
+      settlement_id: {
+        [Op.eq]: null
+      }
+    }
+  })
+
+}
+
+
 export async function allStatements({account_id, include_transactions}: {
   account_id: number,
   include_transactions?: boolean
@@ -399,7 +422,7 @@ export async function debitBitpaySettlement(bitpay_settlement) {
     defaults: {
       settlement_type: 'bitpay',
       settlement_id: bitpay_settlement.id,
-      amount: bitpay_settlement.id,
+      amount: bitpay_settlement.amount,
       currency: bitpay_settlement.currency,
       date: bitpay_settlement.createdAt,
       account_id: bitpay_settlement.account_id,
