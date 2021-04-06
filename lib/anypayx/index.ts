@@ -55,6 +55,9 @@ export async function listUnsettled({account_id}: {
       },
       ach_batch_id: {
         [Op.eq]: null
+      },
+      settlement_id: {
+        [Op.eq]: null
       }
     }
   })
