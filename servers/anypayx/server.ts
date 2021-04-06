@@ -60,9 +60,25 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     },
 
+
     handler: handlers.Statements.index
 
   });
+
+  server.route({
+
+    method: "GET",
+
+    path: "/x/unsettled",
+
+    options: {
+
+      auth: "accountToken"
+
+    },
+
+    handler: handlers.Unsettled.index
+  })
 
   server.route({
 

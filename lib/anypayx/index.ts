@@ -42,6 +42,26 @@ export async function getStatement({account_id, month, year, include_transaction
 
 }
 
+export async function listUnsettled({account_id}: {
+  account_id: number
+}): Promise<any[]> {
+
+  return models.Invoice.findAll({
+    where: {
+      account_id,
+      should_settle: true,
+      status: {
+        [Op.in]: ['paid', 'underpaid', 'overpaid']
+      },
+      ach_batch_id: {
+        [Op.eq]: null
+      }
+    }
+  })
+
+}
+
+
 export async function allStatements({account_id, include_transactions}: {
   account_id: number,
   include_transactions?: boolean
