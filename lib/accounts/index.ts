@@ -104,8 +104,11 @@ export async function updateAccount(account, payload) {
       throw new Error('ambassador email does not exist');
     }
 
-    let ambassador = await models.Ambassador.findOne({
-      where: { account_id: ambassadorAccount.id }
+    let [ambassador] = await models.Ambassador.findOrCreate({
+      where: { account_id: ambassadorAccount.id },
+      defaults: {
+        account_id: ambassadorAccount.id 
+      }
     })
 
     if (ambassador) {

@@ -40,8 +40,6 @@ export async function nearby(req, h) {
 
 export async function update(req, h) {
 
-  
-
   try {
 
     let account = await accounts.updateAccount(req.account, req.payload);
@@ -265,6 +263,7 @@ export async function show (request, reply) {
     log.info(`find ambassador ${account.ambassador_id}`)
     var record = await models.Ambassador.findOne({ where: { id: account.ambassador_id }})
     log.info('ambassador', record.toJSON())
+
     if (record) {
       let ambassador_account = await models.Account.findOne({
         where: {
@@ -282,6 +281,7 @@ export async function show (request, reply) {
         })
       }
     }
+
   }
 
   addresses = await models.Address.findAll({ where: {
