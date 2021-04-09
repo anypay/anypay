@@ -131,6 +131,12 @@ export async function allStatements({account_id, include_transactions}: {
 
   var previousStatementEndingBalance = new BigNumber(0)
 
+  if (account_id === 2380) {
+
+    previousStatementEndingBalance = new BigNumber(750)
+
+  }
+
   statements = statements.map((statement) => {
 
     console.log('map statement', statement)
