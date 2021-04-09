@@ -18,11 +18,13 @@ export async function getStatement({account_id, month, year, include_transaction
 
   console.log('get statement', { account_id, month, year })
 
-  let balance = await monthlyBalance({
+  let { balance, sumDebits, sumCredits } = await monthlyTotals({
     account_id,
     month,
     year
-  })
+  }) 
+
+  let statement = { balance, account_id, month, year, sumDebits, sumCredits }
 
   if (include_transactions) {
 
@@ -32,13 +34,11 @@ export async function getStatement({account_id, month, year, include_transaction
       year
     })
 
-    return { transactions, balance, account_id, month, year }
-
-  } else {
-
-    return { balance, account_id, month, year }
+    statement['transactions'] = transactions
 
   }
+
+  return statement
 
 }
 
@@ -166,6 +166,19 @@ export async function monthlyTransactions({account_id, month, year}: {account_id
 
 }
 
+export async function monthlyTotals({account_id, month, year}: {account_id: number, month: number, year: number}) {
+
+  let date = `${month}/01/${year}`
+
+  let start = moment(date);
+
+  let end = moment(date).add(1, 'month');
+
+  return getTotals(account_id, start.toDate(), end.toDate())  
+
+}
+
+
 export async function monthlyBalance({account_id, month, year}: {account_id: number, month: number, year: number}) {
 
   let date = `${month}/01/${year}`
@@ -192,6 +205,14 @@ export async function balanceAtDate(account_id: number, date: Date): Promise<num
  *
  */
 export async function getBalance(account_id: number, start?: Date, end?: Date) {
+
+  let { balance } = await getTotals(account_id, start, end)
+
+  return balance
+
+}
+
+export async function getTotals(account_id: number, start?: Date, end?: Date) {
 
   let where = { account_id, date: {}}
   if (start) {
@@ -236,7 +257,7 @@ export async function getBalance(account_id: number, start?: Date, end?: Date) {
     balance
   })
 
-  return balance
+  return { balance, sumCredits, sumDebits }
 
 }
 
