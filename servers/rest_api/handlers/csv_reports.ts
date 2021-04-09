@@ -12,7 +12,6 @@ export async function accountCSVReports(server) {
     method: 'GET',
     path: '/csv_reports.csv',
     handler: async (req, h) => {
-      console.log("CSV REPORTS")
 
       let token = await models.AccessToken.findOne({ where: {
 

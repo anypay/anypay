@@ -64,12 +64,15 @@ export async function getInvoicesByDates(accountId, start, end) {
     if (invoice.bitpay_settlement) {
       invoice.settlement_type = 'Bitpay'
       invoice.settlement_uid = invoice.bitpay_settlement.url
+      invoice.settlement_date = invoice.bitpay_settlement.createdAt
     } else if (invoice.ach_batch_id) {
       invoice.settlement_type = 'ACH'
       invoice.settlement_uid = invoice.ach_batch.batch_id
+      invoice.settlement_date = invoice.ach_batch_id.effective_date
     } else if (invoice.wire_id) {
       invoice.settlement_type = 'WIRE'
       invoice.settlement_uid = invoice.wire.uid
+      invoice.settlement_date = invoice.wire.effective_date
     }
 
     return invoice;
@@ -252,26 +255,47 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'amount', title: 'Amount Paid (Crypto)'},
       {id: 'uid', title: 'Invoice ID'},
       {id: 'settlement_type', title: 'Settlement Type'},
-      {id: 'settlement_uid', title: 'Settlement UID'}
+      {id: 'settlement_uid', title: 'Settlement UID'},
+      {id: 'settlement_date', title: 'Settlement Date'}
     ]
   });
 
   let header = await csvStringifier.getHeaderString();
 
-  let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any) => {
+  let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any = {}) => {
 
-    invoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+    console.log("ACH", invoice.ach_batch_id)
+
+    var newInvoice = invoice.toJSON()
+
+    newInvoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+    newInvoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
+    newInvoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
 
     if (invoice.ach_batch) {
-      invoice.ach_batch = invoice.ach_batch.batch_id
+      newInvoice.ach_batch = invoice.ach_batch.batch_id
     } else if (invoice.bitpay_settlement) {
-      invoice.ach_batch = invoice.bitpay_settlement.url
+      newInvoice.ach_batch = invoice.bitpay_settlement.url
     } else {
-      invoice.ach_batch = null
+      newInvoice.ach_batch = null
     }
 
-    return invoice;
+    if (invoice.bitpay_settlement) {
+      newInvoice.settlement_type = 'Bitpay'
+      newInvoice.settlement_uid = invoice.bitpay_settlement.url
+      newInvoice.settlement_date = moment(invoice.bitpay_settlement.createdAt).format('MM/DD/YYYY')
+    } else if (invoice.ach_batch_id) {
+      console.log('ACH', invoice.ach_batch)
+      newInvoice.settlement_type = 'ACH'
+      newInvoice.settlement_uid = invoice.ach_batch.batch_id
+      newInvoice.settlement_date = moment(invoice.ach_batch.effective_date).format('MM/DD/YYYY')
+    } else if (invoice.wire_id) {
+      newInvoice.settlement_type = 'WIRE'
+      newInvoice.settlement_uid = invoice.wire.uid
+      newInvoice.settlement_date = moment(invoice.wire.effective_date).format('MM/DD/YYYY')
+    }
+
+    return newInvoice
     
   }));
 
