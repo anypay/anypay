@@ -67,8 +67,10 @@ export async function getInvoicesByDates(accountId, start, end) {
       invoice.settlement_date = invoice.bitpay_settlement.createdAt
     } else if (invoice.ach_batch_id) {
       invoice.settlement_type = 'ACH'
-      invoice.settlement_uid = invoice.ach_batch.batch_id
-      invoice.settlement_date = invoice.ach_batch_id.effective_date
+      if (invoice.ach_batch) {
+        invoice.settlement_uid = invoice.ach_batch.batch_id
+        invoice.settlement_date = invoice.ach_batch_id.effective_date
+      }
     } else if (invoice.wire_id) {
       invoice.settlement_type = 'WIRE'
       invoice.settlement_uid = invoice.wire.uid
@@ -287,8 +289,10 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
     } else if (invoice.ach_batch_id) {
       console.log('ACH', invoice.ach_batch)
       newInvoice.settlement_type = 'ACH'
-      newInvoice.settlement_uid = invoice.ach_batch.batch_id
-      newInvoice.settlement_date = moment(invoice.ach_batch.effective_date).format('MM/DD/YYYY')
+      if (invoice.ach_batch) {
+        newInvoice.settlement_uid = invoice.ach_batch.batch_id
+        newInvoice.settlement_date = moment(invoice.ach_batch.effective_date).format('MM/DD/YYYY')
+      }
     } else if (invoice.wire_id) {
       newInvoice.settlement_type = 'WIRE'
       newInvoice.settlement_uid = invoice.wire.uid
