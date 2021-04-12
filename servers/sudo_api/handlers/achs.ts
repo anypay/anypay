@@ -6,6 +6,8 @@ import * as Boom from 'boom';
 import { models, log } from '../../../lib';
 import * as wire from '../../../lib/wire';
 
+import { debitACH } from '../../../lib/anypayx'
+
 import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
 
 import { Op } from 'sequelize';
@@ -133,8 +135,10 @@ export async function update(req: Request, h: ResponseToolkit) {
     console.log('record', updatedRecord)
 
     sendAchReport(req.params.id);
-
+    
     let ach_batch = await models.AchBatch.findOne({ where: { id: req.params.id }})
+
+    debitACH(ach_batch.id)
 
     return { ach_batch };
 

@@ -7,9 +7,17 @@ import { logError } from '../../../lib/logger'
 
 export async function index(req, h) {
 
-  let transactions = await listTransactions(req.account.id)
+  try {
 
-  return { transactions }
+    let transactions = await listTransactions(req.account.id)
+
+    return { transactions }
+
+  } catch(error) {
+
+    return Boom.badRequest(error)
+
+  }
 
 }
 

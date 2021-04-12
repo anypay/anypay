@@ -251,6 +251,11 @@ models.Account.hasMany(models.AchBatch, {
   foreignKey: 'account_id',
   sourceKey: 'id'
 })
+models.AnypayxDebit.hasOne(models.AchBatch, {
+  as: 'ach_batch',
+  foreignKey: 'id',
+  sourceKey: 'settlement_id'
+})
 
 export { models };
 

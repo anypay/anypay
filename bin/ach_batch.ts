@@ -8,7 +8,8 @@ import * as assert from 'assert';
 import { models, log, database } from '../lib';
 import * as ach from '../lib/ach';
 import * as wire from '../lib/wire';
-import { sendEmail } from '../lib/email';
+
+import { email } from 'rabbi';
 
 import * as moment from 'moment';
 
@@ -137,6 +138,30 @@ program
       await findOrRecordAchBatch(batches[i]);
 
     }
+
+  
+  });
+
+program
+  .command('importach <batch_id> <date> <account_id> <amount> <description> [id]')
+  .action(async (batch_id, effective_date, account_id, amount, batch_description, id) => {
+
+    let [batch] = await models.AchBatch.findOrCreate({
+
+      where: {
+        batch_id
+      },
+
+      defaults: {
+        batch_id,
+        effective_date,
+        batch_description,
+        account_id,
+        amount,
+        id
+      }
+
+    })
 
   
   });
@@ -407,7 +432,7 @@ program
 
       let report = await wire.buildAchBatchEmailReport(batch_id);
 
-      let resp = await sendEmail(email, '[ACH EMAIL TO SEND EGIFTER]', report);
+      let resp = await email.sendEmail(email, '[ACH EMAIL TO SEND EGIFTER]', report);
 
       console.log(resp);
 

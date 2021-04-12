@@ -27,13 +27,21 @@ let query = `SELECT *,
   return result[0]
 }
 
-export async function setPositionFromLatLng(account) {
+function pointFromLatLng(lat, lng) {
 
   let point = {
     type: 'Point',
-    coordinates: [account.longitude, account.latitude],
+    coordinates: [lat, lng],
     crs: { type: 'name', properties: { name: 'EPSG:4326'} }
   }
+
+  return point
+
+}
+
+export async function setPositionFromLatLng(account) {
+
+  let point = pointFromLatLng(account.latitude, account.longitude)
 
   account.position = point
 
@@ -81,6 +89,7 @@ export async function updateAccount(account, payload) {
 
       updateAttrs.latitude = geolocation.lat;
       updateAttrs.longitude = geolocation.lng;
+      updateAttrs.position = pointFromLatLng(geolocation.lat, geolocation.lng)
       updateAttrs.city = city.long_name;
       updateAttrs.state = state.short_name;
       updateAttrs.country = country.short_name;
@@ -104,8 +113,11 @@ export async function updateAccount(account, payload) {
       throw new Error('ambassador email does not exist');
     }
 
-    let ambassador = await models.Ambassador.findOne({
-      where: { account_id: ambassadorAccount.id }
+    let [ambassador] = await models.Ambassador.findOrCreate({
+      where: { account_id: ambassadorAccount.id },
+      defaults: {
+        account_id: ambassadorAccount.id 
+      }
     })
 
     if (ambassador) {
