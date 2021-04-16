@@ -16,7 +16,7 @@ export default Ember.Service.extend({
           language: "en",
           google: {
               version: "3",
-              key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8"
+              key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8" // zeiler.steven@gmail.com/anypay
           }
       });
 

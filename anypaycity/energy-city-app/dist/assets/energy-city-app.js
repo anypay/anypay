@@ -5217,11 +5217,10 @@ define('energy-city-app/services/address-search', ['exports'], function (exports
   exports.default = Ember.Service.extend({
     getCoordinates: function getCoordinates(query) {
 
-      var apiKey = 'AIzaSyBzFUoLc2p9xXpizIJV8CJOo3buh8RZKKA';
+      // zeiler.steven@gmail.com/anypay
+      var apiKey = 'AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8';
 
       var url = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + query.replace(' /g', '+') + '&key=' + apiKey;
-
-      console.log('search url', url);
 
       return Ember.$.ajax({
         url: url
@@ -5480,7 +5479,7 @@ define('energy-city-app/services/geolocation', ['exports'], function (exports) {
                     language: "en",
                     google: {
                         version: "3",
-                        key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8"
+                        key: "AIzaSyDHprMrEY-JrNMw4q55ZhoG4HXspKeG8V8" // zeiler.steven@gmail.com/anypay
                     }
                 });
 
@@ -5967,6 +5966,6 @@ catch(err) {
 });
 
 if (!runningTests) {
-  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+2e7dc1ff"});
+  require("energy-city-app/app")["default"].create({"name":"energy-city-app","version":"0.0.0+bb23c005"});
 }
 //# sourceMappingURL=energy-city-app.map

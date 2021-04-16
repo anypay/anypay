@@ -167,7 +167,7 @@ define('energy-city-app/tests/app.lint-test', [], function () {
 
   QUnit.test('services/address-search.js', function (assert) {
     assert.expect(1);
-    assert.ok(false, 'services/address-search.js should pass ESLint\n\n12:5 - Unexpected console statement. (no-console)\n18:7 - Unexpected console statement. (no-console)\n24:9 - Unexpected console statement. (no-console)');
+    assert.ok(false, 'services/address-search.js should pass ESLint\n\n17:7 - Unexpected console statement. (no-console)\n23:9 - Unexpected console statement. (no-console)');
   });
 
   QUnit.test('services/cities.js', function (assert) {
