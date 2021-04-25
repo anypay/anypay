@@ -13,7 +13,7 @@ program
 
       let account = await models.Account.findOne({ where: { email }});
 
-      let campaign = TonicPow.getCampaign(account)
+      let campaign = await TonicPow.getCampaign(account)
 
       console.log(campaign);
 
