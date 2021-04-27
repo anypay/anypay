@@ -18,6 +18,12 @@ import {models} from '../../lib'
 
 var WAValidator = require('anypay-wallet-address-validator');
 
+export async function getNewAddress(params){
+
+  return params.value;
+
+}
+
 export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'XRP')
