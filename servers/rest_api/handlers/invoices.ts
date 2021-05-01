@@ -6,8 +6,6 @@ import { Op } from 'sequelize';
 
 import {replaceInvoice} from '../../../lib/invoice';
 
-import {emitter} from '../../../lib/events';
-
 import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
@@ -532,8 +530,6 @@ export async function show(request, reply) {
 
 	    log.info('invoice.requested', invoice.toJSON());
 
-	    emitter.emit('invoice.requested', invoice.toJSON()); 
-
       let payment_options = await models.PaymentOption.findAll({where: {
         invoice_uid: invoice.uid
       }});
@@ -608,15 +604,3 @@ export async function shareEmail(req, h) {
 
 }
 
-/*
-
-emitter.on('invoice.requested', async (invoice) => {
-
-  statsd.increment('invoice requested')
-
-  log.info("checking.invoice:", invoice.uid, invoice.currency, invoice.amount, invoice.address)
-
-  plugins.checkAddressForPayments(invoice.address, invoice.currency);
-
-});
-*/
