@@ -25,7 +25,7 @@ const slackErrorWebhook = new IncomingWebhook('https://hooks.slack.com/services/
 export function logError(event, error) {
 
   logger.error(event, error.message)
-  notifySlackError(event, error.message)
+  //notifySlackError(event, error.message)
   //logToPostgres(event, error, 'error')
   publishAmqp(event, error)
 
