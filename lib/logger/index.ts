@@ -34,7 +34,7 @@ export function logError(event, error) {
 export function logInfo(event, payload: object = {}) {
 
   logger.info(event, JSON.stringify(payload))
-  notifySlack(event, JSON.stringify(payload))
+  //notifySlack(event, JSON.stringify(payload))
   //logToPostgres(event, payload, 'info')
   publishAmqp(event, payload)
 
