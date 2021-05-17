@@ -53,6 +53,7 @@
     "commander": "^2.13.0",
     "cors": "^2.8.5",
     "cron": "^1.2.1",
+    "cryptojs": "^2.5.3",
     "csv-parse": "^4.6.1",
     "csv-writer": "^1.2.0",
     "datapay": "^0.0.18",
