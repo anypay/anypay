@@ -72,9 +72,11 @@ export async function marketOrder(quantity: number) {
   console.log('headers', headers)
   console.log('payload', payload)
 
-  return http.post(uri)
+  let resp = await http.post(uri)
     .set(headers)
     .send(payload)
+
+  return resp.body
   
 }
 
