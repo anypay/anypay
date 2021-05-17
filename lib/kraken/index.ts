@@ -123,6 +123,87 @@ export async function listTrades(options={}) {
 
 }
 
+export async function listBankAccounts(options={}) {
+
+  options = Object.assign({
+    type: 'all'
+  }, options);
+
+  let info = await kraken.api('WithdrawInfo', options);
+
+  return info;
+
+}
+
+export async function withdrawStatus(options={}) {
+
+  options = Object.assign({
+    asset: 'USD',
+  }, options);
+
+  let info = await kraken.api('WithdrawStatus', options);
+
+  return info;
+
+}
+
+const USD_WITHDRAW_ACCOUNT_NAME = process.env.KRAKEN_WITHDRAW_KEY || '???'
+
+export async function withdrawInfo(options={}) {
+
+  options = Object.assign({
+    amount: 1000,
+    asset: 'USD',
+    key: USD_WITHDRAW_ACCOUNT_NAME
+  }, options);
+
+  let info = await kraken.api('WithdrawInfo', options);
+
+  return info;
+
+}
+
+export async function withdrawAllUSD(options: any={}) {
+
+  let balances = await getAccountBalance()
+
+  let balance = parseFloat(balances.result['ZUSD'])
+
+  if (balance > 1000) {
+
+    console.log(`withdrawing ${balance} USD to bank account`)
+
+    return withdrawUSD({ amount: balance })
+
+  }
+
+}
+ 
+
+export async function withdrawUSD(options: any={}) {
+
+  options = Object.assign({
+    amount: options.amount,
+    asset: 'ZUSD',
+    key: USD_WITHDRAW_ACCOUNT_NAME
+  }, options);
+
+  console.log(options)
+
+  let info = await kraken.api('Withdraw', options);
+
+  return info;
+
+}
+
+export async function getAccountBalance() {
+
+  let balance = await kraken.api('Balance');
+
+  return balance;
+
+}
+
 export async function getTradeBalance() {
 
   let balance = await kraken.api('TradeBalance');

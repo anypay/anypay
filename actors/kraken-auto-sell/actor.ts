@@ -51,6 +51,12 @@ export async function start() {
 
   });
 
+  cron.schedule('0 * * * * *', async () => { // every minute
+
+    await kraken.withdrawAllUSD(actor.channel);
+
+  });
+
 }
 
 async function stopLossAnyNewDASH(channel) {
