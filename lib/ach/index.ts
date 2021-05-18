@@ -14,6 +14,8 @@ import { Op } from 'sequelize';
 import { models } from '../models';
 import { log } from '../logger';
 
+import { debitACH } from '../anypayx'
+
 export async function createNextACH() {
 
   let unsent = await models.AchBatch.findOne({
@@ -296,6 +298,80 @@ export async function sendEgifterAchReceipt(ach_batch_id, email) {
   return resp;
 
 }
+export async function sendAchReportEmail(ach_batch_id, email) {
+
+  console.log('SEND ACH REPORT EMAIL', {ach_batch_id, email})
+
+  let invoices = await models.Invoice.findAll({
+
+    where: {
+
+      ach_batch_id
+
+    },
+
+    order: [["id", "desc"]]
+
+  });
+
+  let batch = await models.AchBatch.findOne({
+    where: { id: ach_batch_id }
+  });
+
+  invoices = invoices.map(invoice => {
+
+    let json = invoice.toJSON();
+
+    json.egifter_receives = (json.denomination_amount_paid - json.cashback_denomination_amount).toFixed(2);
+
+    json.denomination_amount_paid = json.denomination_amount_paid.toFixed(2);
+    json.cashback_denomination_amount = json.cashback_denomination_amount.toFixed(2);
+
+    return json;
+  
+  });
+
+  console.log(`${invoices.length} invoices found`);
+
+  let date = moment(invoices[0].completed_at).format('LL');
+
+  batch = batch.toJSON();
+
+  batch.amount = batch.amount.toFixed(2);
+
+  let emailParams = {
+    templateName: 'egifter-ach-receipt',
+    to: [email],
+    from: 'receipts@anypayx.com',
+    bcc: [
+      'steven@anypayx.com',
+      'derrick@anypayx.com'
+    ],
+    replyTo: [
+      'steven@anypayx.com',
+      'derrick@anypayx.com'
+    ],
+    subject: `ACH Sent From Anypay $${batch.amount} - for ${date}`,
+    vars: {
+      invoices,
+      batch,
+      date
+    }
+  }
+
+  if (email === 'dashsupport@egifter.com') {
+    emailParams['cc'] = ['accounting@egifter.com']
+  }
+
+  console.log('email params', emailParams)
+
+  let resp = await rabbiEmail.send(emailParams)
+
+  return resp;
+
+}
+
+
 
 export async function generateBatchForDate(MMDDYY) {
 
@@ -326,4 +402,55 @@ export async function generateBatchForDate(MMDDYY) {
 
 }
 
+export async function handleCompletedACH(id: number, batch_id: string, effective_date: string) {
+
+  log.info({ action: 'ach.update', batch_id, effective_date })
+
+  let update = {
+
+    batch_id: batch_id,
+
+    effective_date: moment(effective_date).toDate(),
+
+    status: 'sent'
+
+  }
+
+  let where = {
+
+    id,
+
+    status: 'pending'
+
+  }
+
+  log.info('ach.update', {
+    update, where
+  })
+
+  let updatedRecord = await models.AchBatch.update(update, {
+
+    where,
+
+    returning: true
+
+  });
+
+  console.log('record', updatedRecord)
+
+  let ach_batch = await models.AchBatch.findOne({ where: { id }})
+
+  let account = await models.Account.findOne({
+    where: {
+      id: ach_batch.account_id
+    }
+  })
+
+  await sendAchReportEmail(id, account.email);
+
+  await debitACH(ach_batch.id)
+
+  return { ach_batch };
+
+}
 
