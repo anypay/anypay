@@ -27,7 +27,8 @@ export async function start() {
     'invoice-paid-cashback-record',
     'anypay_x_credit_invoice_paid',
     'email-one-day-after-signup',
-    'bittrex_autosell'
+    'bittrex_autosell',
+    'prices_updater'
   ])
 
 }
