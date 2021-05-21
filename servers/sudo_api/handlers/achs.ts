@@ -8,7 +8,7 @@ import * as wire from '../../../lib/wire';
 
 import { debitACH } from '../../../lib/anypayx'
 
-import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
+import { sendEgifterAchReceipt, createNextACH, handleCompletedACH } from '../../../lib/ach';
 
 import { Op } from 'sequelize';
 
