@@ -22,7 +22,7 @@ import { Op } from 'sequelize';
 
 import * as csvParse from 'csv-parse';
 
-import { importInvoiceRangeForAchBatch, createNextACH, sendEgifterAchReceipt } from '../lib/ach';
+import { importInvoiceRangeForAchBatch, createNextACH, sendAchReportEmail } from '../lib/ach';
 
 const _cliProgress = require('cli-progress');
 
@@ -383,12 +383,18 @@ program
   });
 
 program
-  .command('generate_latest_ach <end_date> [note]')
-  .action(async (date) => {
+  .command('generate_latest_ach <email> <end_date> [note]')
+  .action(async (email, date) => {
+
+    let account = await models.Account.findOne({
+      where: {
+        email
+      }
+    })
 
     try {
 
-      let {ach_batch, invoices} = await ach.generateBatchForDate(date);
+      let {ach_batch, invoices} = await ach.generateBatchForDate(account.id, date);
 
       console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
       console.log(ach_batch.toJSON());
@@ -404,12 +410,18 @@ program
   });
 
 program
-  .command('create_batch_for_date <date>')
-  .action(async (date) => {
+  .command('create_batch_for_date <email> <date>')
+  .action(async (email, date) => {
 
     try {
 
-      let {ach_batch, invoices} = await ach.generateBatchForDate(date);
+      let account = await models.Account.findOne({
+        where: {
+          email
+        }
+      })
+
+      let {ach_batch, invoices} = await ach.generateBatchForDate(account.id, date);
 
       console.log(`ach batch ${ach_batch.id} generated with ${invoices.length} invoices`);
       console.log(ach_batch.toJSON());
@@ -556,10 +568,16 @@ program
   });
 
 program
-  .command('create_next_ach')
-  .action(async () => {
+  .command('create_next_ach <email>')
+  .action(async (email) => {
 
-     let {ach_batch, invoices} = await createNextACH();
+    let account = await models.Account.findOne({
+      where: {
+        email
+      }
+    })
+
+    let {ach_batch, invoices} = await createNextACH(account.id);
 
     if (!ach_batch) {
 
@@ -578,8 +596,8 @@ program
   .action(async (ach_batch_id) => {
 
     try {
-
-      await sendEgifterAchReceipt(ach_batch_id, 'accounting@egifter.com')
+    
+      await sendAchReportEmail(ach_batch_id, 'accounting@egifter.com')
 
     } catch(error) {
 
