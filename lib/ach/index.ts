@@ -369,4 +369,55 @@ export async function generateBatchForDate(account_id: number, MMDDYY) {
 
 }
 
+export async function handleCompletedACH(id: number, batch_id: string, effective_date: string) {
+
+  log.info({ action: 'ach.update', batch_id, effective_date })
+
+  let update = {
+
+    batch_id: batch_id,
+
+    effective_date: moment(effective_date).toDate(),
+
+    status: 'sent'
+
+  }
+
+  let where = {
+
+    id,
+
+    status: 'pending'
+
+  }
+
+  log.info('ach.update', {
+    update, where
+  })
+
+  let updatedRecord = await models.AchBatch.update(update, {
+
+    where,
+
+    returning: true
+
+  });
+
+  console.log('record', updatedRecord)
+
+  let ach_batch = await models.AchBatch.findOne({ where: { id }})
+
+  let account = await models.Account.findOne({
+    where: {
+      id: ach_batch.account_id
+    }
+  })
+
+  await sendAchReportEmail(id, account.email);
+
+  await debitACH(ach_batch.id)
+
+  return { ach_batch };
+
+}
 
