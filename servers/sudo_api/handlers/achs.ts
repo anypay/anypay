@@ -8,7 +8,7 @@ import * as wire from '../../../lib/wire';
 
 import { debitACH } from '../../../lib/anypayx'
 
-import { sendEgifterAchReceipt, createNextACH } from '../../../lib/ach';
+import { sendAchReportEmail, createNextACH, handleCompletedACH } from '../../../lib/ach';
 
 import { Op } from 'sequelize';
 
@@ -19,8 +19,14 @@ export async function create(req: Request, h: ResponseToolkit) {
   try {
 
     console.log('sudo.api.createNextAch');
+
+    if (!req.payload.account_id) {
+
+      throw new Error('account_id required in payload')
+
+    }
   
-    let { ach_batch, invoices } = await createNextACH();
+    let { ach_batch, invoices } = await createNextACH(req.payload.account_id);
 
     return { ach_batch, invoices };
 
@@ -134,9 +140,15 @@ export async function update(req: Request, h: ResponseToolkit) {
 
     console.log('record', updatedRecord)
 
-    sendAchReport(req.params.id);
-    
     let ach_batch = await models.AchBatch.findOne({ where: { id: req.params.id }})
+
+    let account = await models.Account.findOne({
+      where: {
+        id: ach_batch.account_id
+      }
+    })
+
+    await sendAchReportEmail(ach_batch.id, account.email);
 
     debitACH(ach_batch.id)
 
@@ -147,12 +159,6 @@ export async function update(req: Request, h: ResponseToolkit) {
     return Boom.badRequest(error.message)
 
   }
-
-}
-
-async function sendAchReport(batch_id) {
-
-  await sendEgifterAchReceipt(batch_id, 'accounting@egifter.com');
 
 }
 
