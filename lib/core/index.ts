@@ -11,19 +11,9 @@ import {
   DenominationChangeset
 } from './types/address_change_set';
 
-import * as moment from 'moment';
-
-import {Op} from 'sequelize';
-
 import {models} from "../models";
 
-import {checkAddressForPayments} from '../../plugins/dash/lib/check_for_payments';
-
 import {getPaymail as bsvGetPaymail} from '../../plugins/bsv';
-
-import { handlePayment } from '../payment_processor';
-
-import * as Cron from 'cron';
 
 async  function getPaymail(currency, address) {
 
@@ -161,79 +151,6 @@ export async function setDenomination(changeset: DenominationChangeset): Promise
 
   return;
 }
-
-export async function getRecentlyUnpaidInvoices(sinceDate?: Date, currency?: string) {
-
-  if (!sinceDate) {
-
-    // default to one day ago
-    sinceDate = moment().subtract(1, 'days').toDate();
-
-  }
-
-  let query = {
-
-    where: {
-
-      createdAt: {
-
-        [Op.gt]: sinceDate
-
-      },
-
-      status: 'unpaid'
-
-    }
-
-  };
-
-  if (currency) {
-
-    query['currency'] = currency;
-
-  }
-
-  let recentlyUnpaidInvoices = await models.Invoice.findAll(query);
-
-  return recentlyUnpaidInvoices;
-
-}
-
-export async function sweepUnpaid() {
-
-  // Lookup all unpaid DASH invoices, check for payment
-
-  let invoices = await getRecentlyUnpaidInvoices(); 
-
-  for (const invoice of invoices) {
-
-    if (invoice.currency === 'DASH') {
-    
-      let balance = await checkAddressForPayments(invoice.address);
-
-      if (balance.total_received > 0) {
-
-        let amountPaid = balance.total_received / 100000000.00000;
-
-        let payment = {
-          currency: 'DASH',
-          address: balance.address,
-          amount: invoice.amount,
-          hash: balance.txrefs[0].tx_hash
-        };
-
-        await handlePayment(invoice, payment);
-        
-        console.log(payment);
-
-      }
-
-    }
-    
-  };
-
-}
-
 
 export { events };
 

@@ -19,13 +19,7 @@ const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
 
 import { sudoLogin } from './handlers/sudo_login';
 
-import * as SudoPaymentForwards from "./handlers/payment_forwards";
-
-import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
-
 import * as sudoAddresses from './handlers/sudo_addresses';
-
-import * as vendingMachines from './handlers/vending_machines';
 
 import * as sudoTipjars from './handlers/tipjars';
 
@@ -176,136 +170,6 @@ async function Server() {
 
   server.route({
 
-    method: "POST",
-
-    path: "/api/clicksend/postcards",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.ClicksendPostcards.create,
-
-      validate: {
-        
-        payload : {
-
-          google_place_id: Joi.string().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/bitpay_settlements/not_settled",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.notSettled
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/bitpay_settlements/{invoice_uid}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/bitpay_settlements",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.create,
-
-      validate: {
-        
-        payload : {
-
-          invoice_uid: Joi.string().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/bitpay_settlements",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "PUT",
-
-    path: "/api/bitpay_settlements/{invoice_uid}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.update,
-
-      validate: {
-        
-        payload : {
-
-          txid: Joi.string().required(),
-
-          currency: Joi.string().required(),
-
-          amount: Joi.number().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
     method: "GET",
 
     path: "/api/merchant_groups",
@@ -323,120 +187,6 @@ async function Server() {
     }
 
   });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/ach_batches",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.SudoAchBatches.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/ach_batches",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/vending_machines",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: vendingMachines.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales/profits",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.profits
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales/stats",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.stats
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/vending_machines/{id}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: vendingMachines.show
-
-    }
-
-  });
-
-
 
   server.route({
 
@@ -550,119 +300,6 @@ async function Server() {
 
   });
  
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/payment_forwards',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: SudoPaymentForwards.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/payment_forwards/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: SudoPaymentForwards.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/shareholders',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Shareholders.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/payroll_accounts',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.PayrollAccounts.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/payroll_batches',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.PayrollBatches.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/shareholders/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Shareholders.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'PUT',
-
-    path: '/api/shareholders/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Shareholders.update
-
-    }
-
-  });
-
   server.route({
 
     method: 'GET',
@@ -719,23 +356,6 @@ async function Server() {
         }
 
       }
-
-    }
-
-  });
-
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/invoices/unrouted',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Invoices.sudoIndexUnrouted
 
     }
 
@@ -857,38 +477,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/gift_card_sales',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.GiftCards.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/gift_card_sales/stats',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.GiftCards.stats
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
     path: '/api/payments',
 
     config: {
@@ -927,66 +515,6 @@ async function Server() {
 
       handler: handlers.Payments.stats
 
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/accounts/{account_id}/achs",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.index
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/achs",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.index
-    }
-
-  });
-
-
-  server.route({
-    method: "GET",
-
-    path: "/api/ach_batches/{ach_batch_id}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.show
-    }
-
-  });
-
-  server.route({
-
-    method: "PUT",
-
-    path: "/api/ach_batches/{id}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.update
     }
 
   });
@@ -1035,71 +563,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/bank_accounts',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/api/bank_accounts',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/bank_accounts/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'DELETE',
-
-    path: '/api/bank_accounts/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.del
-
-    }
-
-  });
-
-
-  server.route({
-
-    method: 'GET',
-
     path: '/api/auth',
 
     config: {
@@ -1107,22 +570,6 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: sudoLogin
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/simple_wallets",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: simplewallets.index
 
     }
 
@@ -1322,21 +769,6 @@ async function Server() {
 
   server.route({
 
-    method: 'GET',
-
-    path: "/api/accounts/{account_id}/kiosk-rewards",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Accounts.showKioskRewards
-
-    }
-  });
-
-  server.route({
-
     method: "GET",
 
     path: "/accounts/{id}/volume",
@@ -1384,23 +816,6 @@ async function Server() {
       auth: "sudopassword",
       handler: sudoTipjars.show
     }
-  });
-
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/wires/reportsinceinvoice/{invoice_uid}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.WireReports.show
-
-    }
-
   });
 
   server.route({
@@ -1454,22 +869,6 @@ async function Server() {
     config: {
 
       handler: handlers.YelpBusinesses.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/wires/reportsinceinvoice/{invoice_uid}/csv',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.WireReports.showCSV
 
     }
 
@@ -1605,22 +1004,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/kraken_invoice_sell_orders',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.KrakenInvoiceSellOrders.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
     path: `/api/emails`,
 
     config: {
@@ -1632,87 +1015,6 @@ async function Server() {
     }
 
   });
-
-  /**
-  ** SEQUELIZE AUTO_GENERATED HANDLERS EXPERIMENT
-  function sequelizeHandler(handlerType, model) {
- 
-  };
-
-
-  Object.keys(models).forEach(modelName => {
-
-    let model = models[modelName];
-
-    let resource_path_base = camelToSnake(modelName);
-
-    server.route({
-
-      method: 'GET',
-
-      path: `/api/sequelze/${resource_path_base}`,
-
-      config: {
-
-        auth: 'sudopassword',
-
-        handler: sequelizeHandler('index', model)
-
-      }
-
-    });
-
-    server.route({
-
-      method: 'GET',
-
-      path: `/api/sequelze/${resource_path_base}/{id}`,
-
-      config: {
-
-        auth: 'sudopassword',
-
-        handler: sequelizeHandler('show', model)
-
-      }
-
-    });
-
-    server.route({
-
-      method: 'POST',
-
-      path: `/api/sequelze/${resource_path_base}`,
-
-      config: {
-
-        auth: 'sudopassword',
-
-        handler: sequelizeHandler('create', model)
-
-      }
-
-    });
-
-    server.route({
-
-      method: 'DELETE',
-
-      path: `/api/sequelze/${resource_path_base}/{id}`,
-
-      config: {
-
-        auth: 'sudopassword',
-
-        handler: sequelizeHandler('delete', model)
-
-      }
-
-    });
-
-  });
-  **  END SEQUELIZE AUTO GENERATED HANDLERS EXPERIMENT
-  ****/
 
   return server;
 

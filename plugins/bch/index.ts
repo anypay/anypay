@@ -16,25 +16,15 @@ import {log, models, xpub} from '../../lib';
 
 import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
-import * as forwards from './lib/forwards';
-
-import { createCoinTextInvoice } from '../../lib/cointext'
-
 import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
 import {statsd} from '../../lib/stats/statsd'
 
 import { I_Address } from '../../types/interfaces';
 
-import { transformHexToPayments } from '../../router/plugins/bch/lib';
-
-export { transformHexToPayments }
-
 const bch: any = require('bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');
-
-import * as address_subscription from '../../lib/address_subscription';
 
 export async function submitTransaction(rawTx: string) {
 
@@ -44,42 +34,6 @@ export async function submitTransaction(rawTx: string) {
 export async function broadcastTx(hex: string) {
 
   return bitbox.RawTransactions.sendRawTransaction(hex);
-
-}
-
-export async function generateInvoiceAddress(settlementAddress: string): Promise<string> {
-  var inputAddress;
-
-  let start = new Date().getTime()
-
-  statsd.increment('BCH_generateInvoiceAddress')
-
-  if (settlementAddress.match(/^xpub/)) {
-
-    // generate address from extended public key
-
-  } else {
-
-    // set up payment forward if enabled
-
-    if (process.env.BCH_SUPPORT_FORWARDS) {
-
-      let paymentForward = await forwards.setupPaymentForward(settlementAddress);
-
-      log.info('bch.paymentforward.created', paymentForward.toJSON());
-
-      statsd.timing('BCH_generateInvoiceAddress', new Date().getTime()-start);
-
-      inputAddress = paymentForward.input_address;
-
-    } else {
-
-      throw new Error('BCH Forwards Not Supported');
-
-    }
-  }
-
-  return inputAddress;
 
 }
 
@@ -143,39 +97,6 @@ async function checkAddressForPayments(address:string,currency:string){
   return(txs)
 }
 
-async function generateCoinTextInvoice( address:string, amount:number, currency:string ){
-
-  let legacy = getLegacyAddressFromCashAddress(address)
-  
-  let invoice =  await createCoinTextInvoice(legacy, amount, currency)
-
-  return invoice
-}
-
-async function createAddressForward(record: I_Address) {
-
-  let url = "https://bch.anypayinc.com/v1/bch/forwards";
-
-  let callback_url = process.env.BCH_FORWARD_CALLBACK_URL || "https://bch.anypayinc.com/v1/bch/forwards";
-
-  let resp = await http.post(url).send({
-
-    destination: record.value,
-
-    callback_url: callback_url
-
-  });
-
-  let address = resp.body.input_address;
-
-  let channel = await awaitChannel();
-
-  await channel.publish('anypay.bch', 'addaddress', new Buffer(address))
-
-  return address;
-
-}
-
 export async function getNewAddress(record: I_Address) {
 
   var address;
@@ -230,10 +151,6 @@ export {
   checkAddressForPayments,
 
   validateAddress,
-
-  generateCoinTextInvoice,
-
-  forwards,
 
   rpc,
 

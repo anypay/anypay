@@ -6,10 +6,6 @@ import * as Minercraft from 'minercraft';
 
 import { log } from '../../lib/logger'
 
-import { transformHexToPayments } from '../../router/plugins/bsv/lib';
-
-export { transformHexToPayments }
-
 export async function broadcastTx(hex) {
 
   let miners = [

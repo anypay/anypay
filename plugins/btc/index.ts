@@ -2,6 +2,8 @@ require('dotenv').config()
 const btc = require('bitcore-lib')
 import {generateInvoice} from '../../lib/invoice';
 
+import * as http from 'superagent'
+
 import * as chainSoAPI from '../../lib/chainSoAPI';
 
 import {Invoice} from '../../types/interfaces';
@@ -16,17 +18,11 @@ import {oneSuccess} from 'promise-one-success'
 
 import {rpc} from './jsonrpc';
 
-import * as blockcypher from '../../lib/blockcypher'
-
-import { transformHexToPayments } from '../../router/plugins/btc/lib';
-
-export { transformHexToPayments }
-
 export async function submitTransaction(rawTx: string) {
 
   return oneSuccess([
     publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
+    publishBlockcypherBTC(rawTx)
   ])
 
 }
@@ -35,8 +31,30 @@ export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
     publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
+    publishBlockcypherBTC(rawTx)
   ])
+
+}
+
+export async function publishBlockcypherBTC(hex) {
+
+  let token = process.env.BLOCKCYPHER_TOKEN;
+
+  try {
+
+    let resp = await http.post(`https://api.blockcypher.com/v1/btc/main/txs/push?token=${token}`).send({
+      tx: hex
+    });
+
+    return resp.body.hash;
+
+  } catch(error) {
+
+    console.log(error);
+
+    throw error;
+
+  }
 
 }
 
