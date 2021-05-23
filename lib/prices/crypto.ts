@@ -21,14 +21,12 @@ export async function getCryptoPrices(base_currency: string) {
 
 export async function updateCryptoUSDPrices() {
  
-  // DASH excluded because we use dashretail2 for DASH/USD price
   const coins = [
     'BSV',
     'BCH',
     'BTC',
     'LTC',
-    'DOGE',
-    'ZEC'
+    'DASH'
   ];
 
   let prices = await getCryptoPrices('USD');
