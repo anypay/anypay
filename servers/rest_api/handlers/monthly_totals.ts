@@ -73,32 +73,6 @@ export async function btc() {
 
 }
 
-export async function dash() {
-
-  const query = `select extract(month from "createdAt") as mon,
-    extract(year from "createdAt") as yyyy,
-    sum("amount") as "dash",
-    sum(1) as "payments"
-    from invoices
-    where status = 'paid'
-    and currency = 'DASH'
-    group by 1,2;`;
-
-  try {
-
-    var result = await database.query(query);
-
-    return result[0];
-
-  } catch(error){ 
-
-    logger.error(error.message);
-
-    throw error;
-  }
-
-}
-
 export async function bch() {
 
   const query = `select extract(month from "createdAt") as mon,
@@ -144,15 +118,6 @@ export async function total() {
 
     throw error;
   }
-}
-
-export async function count() {
-
-  let dashCountsByMonth = await globalTotalsForCurrency('DASH');
-
-  return {
-    'DASH': dashCountsByMonth
-  };
 }
 
 export async function totalTransactionsByCoin(req, h) {

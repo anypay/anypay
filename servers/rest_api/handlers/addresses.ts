@@ -104,12 +104,3 @@ module.exports.update = async function(request, reply) {
 
 }
 
-module.exports.PayoutAddresses = Joi.object({
-  BTC: Joi.string(),
-  DASH: Joi.string(),
-  BCH: Joi.string(),
-}).label('PayoutAddresses');
-
-module.exports.PayoutAddressUpdate = Joi.object({
-  address: Joi.string().required(),
-}).label('PayoutAddressUpdate');

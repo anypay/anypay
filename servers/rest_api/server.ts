@@ -19,9 +19,8 @@ import { updateCryptoUSDPrices } from '../../lib/prices/crypto';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
-import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-
 import * as payreq from '../payment_requests/server'
+
 import { attach as attachGrabAndGoRoutes } from '../grab-and-go/server'
 import { attach as attachAnypayXRoutes } from '../anypayx/server'
 
@@ -845,18 +844,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/dashback/totals/alltime",
-    handler: handlers.DashbackController.dashbackTotalsAlltime
-  });
-
-  server.route({
-    method: "GET",
-    path: "/dashback/totals/monthly",
-    handler: handlers.DashbackController.dashbackTotalsByMonth
-  });
-
-  server.route({
-    method: "GET",
     path: "/totals/merchants",
     handler: handlers.Totals.merchants
   });
@@ -915,33 +902,9 @@ async function Server() {
   })
 
   server.route({
-    method: "POST",
-    path: "/invoices/{uid}/dashtext_payments",
-    handler: handlers.DashtextPayments.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/cointext_payments",
-    handler: handlers.Cointext.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
     handler: handlers.MoneybuttonWebhooks.create
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/dashwatch/reports/{month}',
-    handler: handlers.DashwatchReports.reportForMonth
   });
 
   server.route({
@@ -1158,15 +1121,6 @@ async function Server() {
       handler: handlers.CurrencyMap.index
     }
   });
-
-  server.route({
-    method: 'POST',
-    path: '/dash/watch_addresses',
-    options: {
-      auth: "token"
-    },
-    handler: handlers.DashWatchAddresses.create
-  }); 
 
   server.route({
     method: 'GET',

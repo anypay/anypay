@@ -22,8 +22,8 @@ import * as Joi from 'joi';
  *         "enabled": false,
  *         "supported": true
  *       },{
- *        "code": "DASH",
- *        "name": "dash",
+ *        "code": "BCH",
+ *        "name": "bch",
  *        "enabled": true,
  *         "supported": false
  *       }]

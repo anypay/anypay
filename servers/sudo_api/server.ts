@@ -8,8 +8,6 @@ import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import * as Boom from 'boom';
 
-import * as cashbackMerchants from './handlers/cashback_merchants';
-import * as cashback from './handlers/cashback';
 import * as simplewallets from './handlers/simple_wallets';
 import * as accountInvoices from './handlers/account_invoices';
 
@@ -20,8 +18,6 @@ import { join } from 'path';
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
 
 import { sudoLogin } from './handlers/sudo_login';
-
-import * as CashbackMerchants from './handlers/cashback_merchants';
 
 import * as SudoPaymentForwards from "./handlers/payment_forwards";
 
@@ -861,20 +857,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/cashback/payments',
-
-    config: {
-
-      handler: cashback.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
     path: '/api/gift_card_sales',
 
     config: {
@@ -951,21 +933,6 @@ async function Server() {
 
   server.route({
 
-    method: "POST",
-
-    path: "/api/invoices/{invoice_uid}/cashback_payments",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: cashback.retry
-    }
-
-  });
-
-  server.route({
-
     method: "GET",
 
     path: "/api/accounts/{account_id}/achs",
@@ -1023,73 +990,6 @@ async function Server() {
     }
 
   });
-
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/cashback/merchants',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoList
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/cashback/merchants/{email}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoShow
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/api/cashback/merchants/{email}/activate',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoActivate
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/api/cashback/merchants/{email}/deactivate',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: CashbackMerchants.sudoDeactivate
-
-    }
-
-  });
-
-
 
   server.route({
 
@@ -1379,21 +1279,6 @@ async function Server() {
 
     method: 'GET',
 
-    path: "/api/cashback/dashboard",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: cashback.dashboard
-
-    }
-  });
-
-  server.route({
-
-    method: 'GET',
-
     path: "/api/accounts/{id}/invoices",
 
     config: {
@@ -1573,23 +1458,6 @@ async function Server() {
     }
 
   });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/cashback/failures',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.CashbackFailures.index
-
-    }
-
-  });
-
 
   server.route({
 
@@ -1889,9 +1757,9 @@ export {
 
 }
 
-
 function camelToSnake(string) {
  return string.replace(/[\w]([A-Z])/g, function(m) {
    return m[0] + "_" + m[1];
  }).toLowerCase();
 }
+
