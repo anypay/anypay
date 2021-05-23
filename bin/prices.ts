@@ -4,10 +4,9 @@ require('dotenv').config();
 
 const program = require('commander')
 
-import { getPriceOfOneDollarInVES } from '../lib/prices/ves';
 import { log } from '../lib';
-import { getVESPrice } from '../lib/localbitcoins';
-import { createConversion, updateCryptoUSDPrice, updateUSDPrices, updateDashPrices } from '../lib/prices';
+
+import { createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 
 import { updateCryptoUSDPrices } from '../lib/prices/crypto';
 
@@ -39,7 +38,6 @@ program
   .action(async () => {
 
     try {
-      await updateDashPrices();
 
       log.info('updating crypto prices');
 
@@ -120,26 +118,6 @@ program
       console.error(error.message);
 
     }
-
-  });
-
-program
-  .command('getvesprice')
-  .action(async () => {
-
-    let usdPrice = await getPriceOfOneDollarInVES();
-
-    console.log(`one USD equals ${usdPrice} VES`);
-
-  });
-
-program
-  .command('getvespricelocalbitcoins')
-  .action(async () => {
-
-    let price = await getVESPrice();
-
-    console.log(`one BTC equals ${price} VES on localbitcoins.com`);
 
   });
 

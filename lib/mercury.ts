@@ -57,7 +57,7 @@ export async function sendACHForBatch(batchId: number) {
 
   let transaction = await sendACH(recipientId, amount, externalMemo)
 
-  let { ach_batch } = await handleCompletedACH(batch.id, transaction.id, transaction.estimatedDeliveryDate)
+  let { ach_batch } = await handleCompletedACH(batch.id, transaction.id, transaction.createdAt)
 
   return { ach_batch, transaction }
 

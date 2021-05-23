@@ -16,12 +16,50 @@ import { log } from '../logger';
 
 import { debitACH } from '../anypayx'
 
-export async function createNextACH() {
+export async function createNewBatches(account_id: number) {
+
+  let now = moment()
+
+  let lastBatch = await models.AchBatch.findOne({
+    where: {
+      payments_date: {
+        [Op.ne]: null 
+      },
+      account_id
+    },
+    order: [['payments_date', 'DESC']]
+  })
+
+  try {
+
+    // while the cursor is still one day or more greater than the latest batch
+    while(moment(lastBatch.payments_date).toDate() < now.toDate()) {
+
+      let nextDay = moment(lastBatch.payments_date).add(1, 'day')
+
+      let { ach_batch } = await generateBatchForDate(account_id, nextDay.toDate())
+
+      lastBatch = ach_batch
+
+      log.info('ach.batch.create', lastBatch.toJSON())
+
+    }
+
+  } catch(error) {
+ 
+    log.error(error.message)
+
+  }
+
+}
+
+export async function createNextACH(account_id: number) {
 
   let unsent = await models.AchBatch.findOne({
 
     where : {
-      batch_id: { [Op.is]: null }
+      batch_id: { [Op.is]: null },
+      account_id
     }, 
 
     order: [['id', 'desc']],
@@ -45,7 +83,8 @@ export async function createNextACH() {
   let latest = await models.AchBatch.findOne({
 
     where : {
-      batch_id: { [Op.not]: null }
+      batch_id: { [Op.not]: null },
+      account_id
     }, 
 
     order: [['id', 'desc']],
@@ -68,7 +107,7 @@ export async function createNextACH() {
 
   console.log('next batch date', nextBatchDate);
 
-  let {ach_batch, invoices} = await  generateBatchForDate(nextBatchDate);
+  let {ach_batch, invoices} = await  generateBatchForDate(account_id, nextBatchDate);
 
   return {ach_batch, invoices}
 
@@ -142,13 +181,13 @@ export async function importInvoiceRangeForAchBatch(accountAchId: number): Promi
 
 }
 
-export async function generateLatestBatch(endDate: Date, note: string, paymentsDate: Date) {
+export async function generateLatestBatch(account_id: number, endDate: Date, note: string, paymentsDate: Date) {
 
   if (moment().toDate() <= endDate) {
     throw new Error('Date Has Not Yet Completed')
   }
 
-  let account = await models.Account.findOne({ where: { email: 'dashsupport@egifter.com' }})
+  let account = await models.Account.findOne({ where: { id: account_id }})
 
   let invoices = await wire.getInvoicesByDates(account.id, paymentsDate, endDate);
 
@@ -195,17 +234,9 @@ export async function generateLatestBatch(endDate: Date, note: string, paymentsD
 
   }
 
-  console.log('PAYMENTS DATE 2', paymentsDate)
-
-  let egifter = await models.Account.findOne({
-    where: {
-      email: 'dashsupport@egifter.com' 
-    }
-  })
-
   let ach_batch = await models.AchBatch.create({
 
-    account_id: egifter.id,
+    account_id: account.id,
 
     first_invoice_uid,
 
@@ -235,69 +266,6 @@ export async function generateLatestBatch(endDate: Date, note: string, paymentsD
   return { ach_batch, invoices };
 }
 
-export async function sendEgifterAchReceipt(ach_batch_id, email) {
-
-  let invoices = await models.Invoice.findAll({
-
-    where: {
-
-      ach_batch_id
-
-    },
-
-    order: [["id", "desc"]]
-
-  });
-
-  let batch = await models.AchBatch.findOne({
-    where: { id: ach_batch_id }
-  });
-
-  invoices = invoices.map(invoice => {
-
-    let json = invoice.toJSON();
-
-    json.egifter_receives = (json.denomination_amount_paid - json.cashback_denomination_amount).toFixed(2);
-
-    json.denomination_amount_paid = json.denomination_amount_paid.toFixed(2);
-    json.cashback_denomination_amount = json.cashback_denomination_amount.toFixed(2);
-
-    return json;
-  
-  });
-
-  console.log(`${invoices.length} invoices found`);
-
-  let date = moment(invoices[0].completed_at).format('LL');
-
-  batch = batch.toJSON();
-
-  batch.amount = batch.amount.toFixed(2);
-
-  let resp = await rabbiEmail.send({
-    templateName: 'egifter-ach-receipt',
-    to: [email],
-    from: 'receipts@anypayinc.com',
-    cc: ['judy@egifter.com'],
-    bcc: [
-      'steven@anypayinc.com',
-      'derrick@anypayinc.com'
-    ],
-    replyTo: [
-      'steven@anypayinc.com',
-      'derrick@anypayinc.com'
-    ],
-    subject: `ACH Sent From Anypay $${batch.amount} - for ${date}`,
-    vars: {
-      invoices,
-      batch,
-      date
-    }
-  })
-
-  return resp;
-
-}
 export async function sendAchReportEmail(ach_batch_id, email) {
 
   console.log('SEND ACH REPORT EMAIL', {ach_batch_id, email})
@@ -371,9 +339,7 @@ export async function sendAchReportEmail(ach_batch_id, email) {
 
 }
 
-
-
-export async function generateBatchForDate(MMDDYY) {
+export async function generateBatchForDate(account_id: number, MMDDYY) {
 
   log.info(`generate batch for date ${MMDDYY}`)
 
@@ -384,7 +350,8 @@ export async function generateBatchForDate(MMDDYY) {
   let end_date = moment(MMDDYY).add(1, 'day').toDate();
 
   let existingBatch = await models.AchBatch.findOne({ where: {
-    payments_date: paymentsDate.toDate()
+    payments_date: paymentsDate.toDate(),
+    account_id
   }})
 
   if (existingBatch) {
@@ -392,7 +359,7 @@ export async function generateBatchForDate(MMDDYY) {
     throw new Error(`Batch Already Exists For Payments On ${paymentsDate}`)
   }
 
-  let {ach_batch, invoices}= await generateLatestBatch(end_date, note, paymentsDate.toDate());
+  let {ach_batch, invoices}= await generateLatestBatch(account_id, end_date, note, paymentsDate.toDate());
 
   invoices.forEach(invoice => {
     assert(invoice.ach_batch_id = ach_batch.id);
