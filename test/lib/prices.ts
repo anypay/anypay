@@ -12,24 +12,6 @@ describe('Prices', () => {
 
   });
 
-  it("#createConversion should convert from VEF to DASH", async () => {
-
-    await prices.setPrice('DASH', 0.01, 'BTC');
-    await prices.setPrice('VEF', 0.0001, 'DASH');
-
-    let input = {
-      currency: 'VEF',
-      value: 50000000
-    }
-
-    let conversion = await prices.createConversion(input, 'DASH');
-
-    console.log('conversion of 50000000 VEF to DASH', conversion);
-
-    assert(conversion.output.value > 0);
-
-  });
-
   it("#convert should convert from BTC to BCH", async () => {
 
     await prices.setPrice('BCH', 10, 'BTC');
@@ -82,3 +64,4 @@ describe('Prices', () => {
   });
 
 });
+
