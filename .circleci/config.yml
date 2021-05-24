@@ -1,26 +1,5 @@
 version: 2.1
 jobs:
-  build:
-    docker:
-      - image: circleci/node:10
-    steps:
-      - checkout
-      - run:
-          name: Install Dependencies
-          command: npm install && sudo npm install -g typescript ts-node mocha
-      - run:
-          name: Migrate Database
-          command: npm run db:migrate
-      - run:
-          name: Seed Test Database
-          command: npm run db:seed:prices && ./bin/prices.ts update_crypto_prices
-      - run:
-          name: Run Main Tests
-          command: npm test
-      - run:
-          name: Run Payment Request Tests
-          command: npm run payreq:test 
-
   build_docker:
     docker:
       - image: circleci/node:10
@@ -30,6 +9,9 @@ jobs:
       - run:
           name: Build docker image
           command: docker build -t anypay . 
+      - run:
+          name: Migrate & Seed Test Database
+          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run db:migrate && npm run db:seed:prices && ./bin/prices.ts update_crypto_prices
       - run:
           ename: Run Main Tests
           command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm test
