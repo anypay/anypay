@@ -6,9 +6,7 @@ const program = require('commander')
 
 import { log } from '../lib';
 
-import { createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
-
-import { updateCryptoUSDPrices } from '../lib/prices/crypto';
+import { updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 
 program
   .command('seed_prices')

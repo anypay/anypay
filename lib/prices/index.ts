@@ -164,47 +164,57 @@ export async function updateUSDPrices() {
 
 }
 
-export async function updateDashPrices() {
+const http = require('superagent');
 
-  let resp = await http.get('https://rates2.dashretail.org/rates?source=dashretail');
+export async function getCryptoPrices(base_currency: string) {
 
-  let currencies = resp.body
-
-  for (let i=0; i<currencies.length; i++) {
-
-    let currency = currencies[i];
-
-    if (currency.baseCurrency === 'DASH') {
-
-      console.log({
-        base_currency: currency.baseCurrency,
-        currency: currency.quoteCurrency,
-        amount: parseFloat(currency.price),
-        source: 'rates2.dashretail.org/rates?source=dashretail'
+  let resp = await http
+     .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
+     .query({
+        start: 1,
+        limit: 75,
+        convert: base_currency
       })
+      .set( 'X-CMC_PRO_API_KEY', process.env.COINMARKETCAP_API_KEY);
 
-      setPrice(
-        currency.quoteCurrency,
-        parseFloat(currency.price),
-        'https://rates2.dashretail.org/rates?source=dashretail',
-        currency.baseCurrency
-      );
+  return resp.body.data;
 
-      let price=  {
-        base_currency: currency.quoteCurrency,
-        currency: currency.baseCurrency,
-        value: 1 / parseFloat(currency.price),
-        source: 'rates2.dashretail.org/rates?source=dashretail'
-      }
+}
 
-      setPrice(
-        price.currency,
-        price.value,
-        price.source,
-        price.base_currency
-      );
+export async function updateCryptoUSDPrices() {
+ 
+  const coins = [
+    'BSV',
+    'BCH',
+    'BTC',
+    'LTC',
+    'DASH'
+  ];
 
+  let prices = await getCryptoPrices('USD');
+
+  await Promise.all(prices.filter(price => {
+
+    return coins.includes(price.symbol);
+  })
+  .map(price => {
+    return {
+      currency: price.symbol,
+      base_currency: 'USD',
+      value: 1 / price['quote']['USD']['price'],
+      source: 'coinmarketcap.com'
     }
+  })
+  .map(async price => {
+
+    await setPrice(price.currency, price.value, price.source, price.base_currency)
+    await setPrice(price.base_currency, 1 / price.value, price.source, price.currency);
+
+  }))
+
+  for (let coin of coins) {
+
+    await updateCryptoUSDPrice(coin)
 
   }
 

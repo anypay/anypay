@@ -46,7 +46,7 @@ jobs:
     steps:
       - run:
           name: Chef Client Update Live Container
-          command: ssh ubuntu@api.anypayinc.com "sudo chef-client -o recipe[anypay_api]"
+          command: echo "no deploy" #ssh ubuntu@api.anypayinc.com "sudo chef-client -o recipe[anypay_api]"
 
 
 workflows:
