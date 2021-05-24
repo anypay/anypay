@@ -8,27 +8,19 @@ export async function start() {
 
   startActors([
     'webhooks',
-    'prices',
     'payment_push_notification',
     'grab_and_go_push_notification',
     'truereviews',
     'invoice_created_to_slack',
     'invoice_paid_receipt_slack',
-    'payment_processor',
     'payment-options-processor',
-    'kraken-auto-sell',
     'grab_and_go_payment_amqp',
     'grab_and_go_invoice_order',
-    'ambassador-rewards',
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
-    'router_transactions',
-    'cashback_customers',
     'invoice-paid-cashback-record',
     'anypay_x_credit_invoice_paid',
-    'email-one-day-after-signup',
-    'bittrex_autosell',
-    'prices_updater'
+    'email-one-day-after-signup'
   ])
 
 }

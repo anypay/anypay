@@ -15,7 +15,6 @@ import { validateToken, validateAdminToken, validateAppToken } from '../auth/hap
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
 
 import { hash, bcryptCompare } from '../../lib/password';
-import { updateCryptoUSDPrices } from '../../lib/prices/crypto';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
@@ -1227,24 +1226,6 @@ if (require.main === module) {
 async function start () {
 
   ActivateDeactivateCoinActor.start();
-
-
-  if (process.env.NODE_ENV === 'production') {
-
-    log.info('updating crypto prices from coinmarketcap')
-    await updateCryptoUSDPrices()
-    log.info('updated crypto prices from coinmarketcap')
-
-    setInterval(async () => {
-
-      log.info('updating crypto prices from coinmarketcap')
-      await updateCryptoUSDPrices()
-      log.info('updated crypto prices from coinmarketcap')
-
-    }, 1000 * 60 * 5) // once per five minutes
-  }
-
-
 
   await sequelize.sync()
 

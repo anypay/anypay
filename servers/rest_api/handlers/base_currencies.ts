@@ -2,7 +2,6 @@
 import { badRequest } from 'boom'
 
 const Fixer = require('../../../lib/fixer');
-import { getPriceOfOneDollarInVES } from '../../../lib/prices/ves';
 
 export async function index(req, h) {
 
@@ -11,10 +10,6 @@ export async function index(req, h) {
     var currencies = await Fixer.getCurrencies();
 
     var rates = currencies.rates;
-
-    let vesPrice = ((await getPriceOfOneDollarInVES()) * currencies.rates['USD']);
-
-    rates['VES'] = vesPrice;
 
     let sortedCurrencies = Object.keys(rates).sort();
 
