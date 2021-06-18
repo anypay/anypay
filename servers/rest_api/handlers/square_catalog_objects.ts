@@ -73,7 +73,7 @@ export async function show (req, h) {
 
 }
 
-async function createGrabAndGoItemsForCatalog(catalog, account_id) {
+async function createProductsForCatalog(catalog, account_id) {
 
   let catalogObjects = catalog.objects.filter(obj => {
 
