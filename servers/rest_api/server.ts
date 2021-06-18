@@ -360,10 +360,11 @@ async function Server() {
     }
   });
 
+  /* TODO: Update clients to use /products not /grab_and_go_items */
   server.route({
     method: "GET",
     path: "/grab_and_go_items",
-    handler: handlers.GrabAndGoItems.index,
+    handler: handlers.Products.index,
     options: {
       auth: "token",
       tags: ['api']

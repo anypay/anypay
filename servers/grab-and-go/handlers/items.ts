@@ -6,7 +6,7 @@ export async function create(req, h) {
 
   try {
 
-    let grab_and_go_item = await models.GrabAndGoItem.findOrCreate({
+    let grab_and_go_item = await models.Product.findOrCreate({
 
       where: {
 
@@ -44,7 +44,7 @@ export async function index(req, h) {
 
   try {
 
-    let grab_and_go_items = await models.GrabAndGoItem.findAll({
+    let grab_and_go_items = await models.Product.findAll({
 
       where: {
 

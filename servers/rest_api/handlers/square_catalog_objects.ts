@@ -32,9 +32,9 @@ export async function index (req, h) {
 
     let catalog = await squareClient.fullCatalog();
 
-    createGrabAndGoItemsForCatalog(catalog, req.account.id);
+    createProductsForCatalog(catalog, req.account.id);
 
-    let grab_and_go_items = await models.GrabAndGoItem.findAll({ where: {
+    let grab_and_go_items = await models.Product.findAll({ where: {
 
       account_id: req.account.id
 
@@ -103,7 +103,7 @@ async function createGrabAndGoItemsForCatalog(catalog, account_id) {
 
     try {
 
-      [record, isNew] = await models.GrabAndGoItem.findOrCreate({
+      [record, isNew] = await models.Product.findOrCreate({
 
         where: {
 

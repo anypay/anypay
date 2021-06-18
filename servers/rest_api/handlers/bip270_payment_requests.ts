@@ -29,7 +29,7 @@ export async function show(req, h) {
 
   if (grabAndGoInvoice) {
 
-    let grabAndGoItem = await models.GrabAndGoItem.findOne({
+    let grabAndGoItem = await models.Product.findOne({
       where: {
         id: grabAndGoInvoice.item_id
       }
