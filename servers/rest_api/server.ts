@@ -8,8 +8,6 @@ const HapiSwagger = require("hapi-swagger");
 
 import { log } from '../../lib';
 
-import { attachMerchantMapRoutes } from '../map/server';
-
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
 import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
@@ -279,7 +277,6 @@ async function Server() {
   server.auth.strategy("password", "basic", { validate: validatePassword });
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
 
-  attachMerchantMapRoutes(server);
   payreq.attach(server)
 
   server.route({
