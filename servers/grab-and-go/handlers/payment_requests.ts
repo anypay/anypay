@@ -42,7 +42,7 @@ export async function create(req: Hapi.Request, h) {
   console.log('account', account.toJSON());
 
   // look up the item from the url parameters
-  var item = await models.GrabAndGoItem.findOne({
+  var item = await models.Product.findOne({
 
     where: {
       stub: req.params.item_stub,
@@ -51,28 +51,18 @@ export async function create(req: Hapi.Request, h) {
 
   });
 
-  console.log('ITEM', item.toJSON());
-
   if (!item) {
     throw new Error(`item ${req.params.item_stub} for account not found`);
   }
 
   let invoice = await invoices.generateInvoice(account.id, item.price, currency);
 
-  console.log('INVOICE CREATED', invoice.toJSON());
-
   if (item.square_catalog_object_id) {
-
-    console.log('SQUARE OBJECT ID', item.square_catalog_object_id);
 
     invoice.external_id = item.square_catalog_object_id;
 
     await invoice.save();
 
-  } else {
-
-    console.log('item no object id', item.toJSON());
-  
   }
 
   await models.GrabAndGoInvoice.create({
@@ -135,7 +125,7 @@ async function createGrabAndGoInvoice(item_uid: string, currency: string) {
     logInfo('grab-and-go.invoices.create', { item_uid, currency })
 
     // look up the item from the url parameters
-    let item = await models.GrabAndGoItem.findOne({
+    let item = await models.Product.findOne({
 
       where: {
         uid: item_uid

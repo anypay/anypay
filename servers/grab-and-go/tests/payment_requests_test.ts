@@ -44,7 +44,7 @@ describe("Create Grab and Go Payment Request", async () => {
 
     let stub = name.replace(/\ /g, '-').toLowerCase();
 
-    let item = await models.GrabAndGoItem.create({
+    let item = await models.Product.create({
 
       price: 12,
 
