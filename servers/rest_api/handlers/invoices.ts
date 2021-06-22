@@ -1,4 +1,3 @@
-const log = require('winston');
 const Boom = require('boom');
 const uuid = require('uuid')
 
@@ -10,7 +9,9 @@ import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
 
-import { prices, email, models, invoices, coins } from '../../../lib';
+import { log, prices, email, models, invoices, coins } from '../../../lib';
+
+import { logInfo } from '../../../lib/logger'
 
 import * as moment from 'moment';
 
@@ -192,6 +193,10 @@ export async function create (request, reply) {
 
   log.info(`controller:invoices,action:create`);
 
+  logInfo('invoices.create', Object.assign({
+    account_id: request.account.id
+  }, request.payload))
+
 	if (request.payload.currency) {
 
     log.info('currency parameter provided')
@@ -246,6 +251,14 @@ export async function create (request, reply) {
 
     }
 
+    if (request.payload.wordpress_site_url) {
+
+      invoice.wordpress_site_url = request.payload.wordpress_site_url;
+
+      invoice.tags = ['wordpress']
+
+    }
+
     if (request.payload.webhook_url) {
 
       invoice.webhook_url = request.payload.webhook_url;
@@ -258,28 +271,13 @@ export async function create (request, reply) {
 
     }
 
-    if (request.payload.cashback_amount && request.account.allow_cashback_amount) {
-
-      // ONLY FOR EGIFTER & DASH!!
-
-      invoice.cashback_denomination_amount = request.payload.cashback_amount;
-
-      let price = invoice.denomination_amount / invoice.amount;
-
-      invoice.cashback_amount = (await prices.convert({
-        currency: 'USD',
-        value: invoice.cashback_denomination_amount
-      }, 'DASH')).value
-
-      console.log('cashback amount', invoice.cashback_amount);
-
-    }
-
     if (request.is_public_request) {
 
       invoice.is_public_request = true;
 
     }
+
+    invoice.headers = request.headers
 
     invoice.email = request.payload.email;
 
