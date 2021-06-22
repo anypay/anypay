@@ -6,6 +6,8 @@ import('bitcore-lib')
 import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
+import { attachMerchantMapRoutes } from '../map/server';
+
 import { log } from '../../lib';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
@@ -278,6 +280,7 @@ async function Server() {
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
 
   payreq.attach(server)
+  attachMerchantMapRoutes(server);
 
   server.route({
     method: "GET",
