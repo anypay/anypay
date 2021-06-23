@@ -4,12 +4,11 @@ import * as Boom from 'boom';
 import { awaitChannel } from '../../../lib/amqp';
 import { log } from '../../../lib/logger';
 import { events } from '../../../lib';
+import * as bsv from 'bsv';
 
 import { notify } from '../../../lib/slack/notifier';
 
-import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
-
-import { transformHexToPayments } from '../../../router/plugins/bsv/lib';
+import { submitPayment, SubmitPaymentResponse } from '../../payment_requests/handlers/json_payment_requests';
 
 export async function create(req, h) {
 

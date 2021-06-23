@@ -4,7 +4,7 @@ import {generatePaymentRequest as createBSVRequest} from '../../../plugins/bsv/l
 
 import {generatePaymentRequest as createDASHRequest} from '../../../plugins/dash/lib/paymentRequest';
 
-import { show as showPaymentRequest } from '../../rest_api/handlers/payment_requests'
+import { show as showPaymentRequest } from '../../payment_requests/handlers/payment_requests'
 
 import { logInfo, logError } from '../../../lib/logger'
 

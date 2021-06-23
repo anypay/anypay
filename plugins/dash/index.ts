@@ -3,6 +3,8 @@ require('dotenv').config();
 
 import {createWebhook} from './lib/blockcypher';
 
+import { fromSatoshis, Payment } from '../../lib/pay'
+
 import { any } from 'bluebird'
 
 import {generateInvoice} from '../../lib/invoice';
@@ -27,11 +29,23 @@ import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
 
-import { transformHexToPayments } from '../../router/plugins/dash/lib';
-
-export { transformHexToPayments }
-
 var WAValidator = require('anypay-wallet-address-validator');
+
+export function transformHexToPayments(hex: string): Payment[]{
+
+  let tx = new dash.Transaction(hex)
+
+  return tx.outputs.map((output)=>{
+
+          return {
+            currency: 'DASH',
+            hash: tx.hash.toString(),
+            amount: fromSatoshis(output.satoshis),
+            address: output.script.toAddress().toString()
+          }
+  })
+
+}
 
 export function validateAddress(address: string){
 

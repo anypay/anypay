@@ -18,10 +18,6 @@ describe('AmbassadorClaim Model', () => {
 
       let merchantAccount = await utils.generateAccount();
 
-      let merchant = await models.CashbackMerchant.create({
-        account_id: merchantAccount.id
-      });
-
       let claim = await ambassadors.createClaim(ambassadorAccount.email, merchantAccount.email);
 
       utils.assert(claim.id > 0);
@@ -90,10 +86,6 @@ describe('AmbassadorClaim Model', () => {
     });
 
     let merchantAccount = await utils.generateAccount();
-
-    let merchant = await models.CashbackMerchant.create({
-      account_id: merchantAccount.id
-    });
 
     let claim = await ambassadors.createClaim(ambassadorAccount.email, merchantAccount.email);
 

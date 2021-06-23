@@ -143,29 +143,6 @@ describe("Creating Invoices via REST", async () => {
 
   })
 
-  describe("Optionally Allowing Cash Back Amount", () => {
-
-    it.skip('should optionally allow cash back', async () => {
-      let cashback_amount = 1;
-
-      let response = await server.inject({
-        method: 'POST',
-        url: `/invoices`,
-        payload: {
-          currency: 'DASH',
-          amount: '10',
-          cashback_amount
-        },
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
-      });
-
-      assert.strictEqual(response.result.cashback_amount, cashback_amount);
-    });
-
-  });
-
 });
 
 function auth(username, password) {

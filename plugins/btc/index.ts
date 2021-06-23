@@ -2,6 +2,8 @@ require('dotenv').config()
 const btc = require('bitcore-lib')
 import {generateInvoice} from '../../lib/invoice';
 
+import { fromSatoshis, Payment } from '../../lib/pay'
+
 import * as chainSoAPI from '../../lib/chainSoAPI';
 
 import {Invoice} from '../../types/interfaces';
@@ -17,10 +19,6 @@ import {oneSuccess} from 'promise-one-success'
 import {rpc} from './jsonrpc';
 
 import * as blockcypher from '../../lib/blockcypher'
-
-import { transformHexToPayments } from '../../router/plugins/btc/lib';
-
-export { transformHexToPayments }
 
 export async function submitTransaction(rawTx: string) {
 

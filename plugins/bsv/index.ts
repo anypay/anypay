@@ -6,9 +6,58 @@ import * as Minercraft from 'minercraft';
 
 import { log } from '../../lib/logger'
 
-import { transformHexToPayments } from '../../router/plugins/bsv/lib';
+import { fromSatoshis } from '../../lib/pay'
 
-export { transformHexToPayments }
+interface Payment{
+  amount: number;
+  hash: string;
+  currency: string;
+  address: string;
+  invoice_uid?: string;
+}
+
+export function transformHexToPayments(hex: string): Payment[]{
+
+  let tx = new bsv.Transaction(hex)
+
+  let payments = [];
+
+  for( let i = 0; i < tx.outputs.length; i++){
+
+    let address = tx.outputs[i].script.toAddress().toString();
+
+    let paymentIndex = payments.findIndex((elem) =>{ return elem.address === address})
+
+    if( paymentIndex > -1 ){
+
+      payments[paymentIndex] = {
+
+        currency: 'BSV',
+        hash: tx.hash.toString(),
+        amount: fromSatoshis(tx.outputs[i].satoshis) + payments[paymentIndex].amount,
+        address: tx.outputs[i].script.toAddress().toString()
+
+      }
+      
+    }else{
+
+      payments.push({
+
+        currency: 'BSV',
+        hash: tx.hash.toString(),
+        amount: fromSatoshis(tx.outputs[i].satoshis),
+        address: tx.outputs[i].script.toAddress().toString()
+
+      })
+      
+    }
+
+  }
+
+  return payments
+
+}
+
 
 export async function broadcastTx(hex) {
 

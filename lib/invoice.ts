@@ -145,15 +145,13 @@ class ClassicInvoice {
   }
 }
 
-export async function createPlatformInvoice(account_id, amount, currency, cashback) {
+export async function createPlatformInvoice(account_id, amount, currency) {
 
   // invoice amount 
 
   // times scalar
 
-  // minus cash back
-
-  let platformInvoice = new ClassicInvoice({ account_id, currency, amount, cashback })
+  let platformInvoice = new ClassicInvoice({ account_id, currency, amount })
 
   await platformInvoice.applyScalar()
 

@@ -3,10 +3,6 @@ import { log, models, invoices } from '../../../lib';
 
 import * as Boom from 'boom';
 
-import { show as handleBIP70 } from './bip70_payment_requests'
-import { show as handleJsonV2 } from './json_payment_requests'
-import { show as handleBIP270 } from './bip270_payment_requests'
-
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
 import { schema } from 'anypay'
@@ -135,57 +131,6 @@ export async function create(req, h) {
     }
 
   } catch(error) {
-
-    return Boom.badRequest(error.message);
-
-  }
-
-}
-
-export async function show(req, h) {
-
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
-
-  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
-
-    invoice = await invoices.refreshInvoice(invoice.uid)
-
-  } else {
-
-    log.info('invoice not yet expired');
-  }
-
-  log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
-
-  try {
-
-    let isBIP70 = /paymentrequest$/
-    let isBIP270 = /bitcoinsv-paymentrequest$/
-    let isJsonV2 = /application\/payment-request$/
-
-    let accept = req.headers['accept']
-
-    if (accept && accept.match(isBIP270)) {
-
-      return handleBIP270(req, h)
-
-    } if (accept && accept.match(isBIP70)) {
-
-      return handleBIP70(req, h)
-
-    } else if (accept && accept.match(isJsonV2)) {
-
-      return handleJsonV2(req, h)
-
-    } else {
-
-      return handleBIP270(req, h)
-
-    }
-
-  } catch(error) {
-
-    log.error('pay.request.error', { error: error.message });
 
     return Boom.badRequest(error.message);
 

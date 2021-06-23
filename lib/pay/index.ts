@@ -26,6 +26,12 @@ import * as fees from './fees';
 
 export { fees, bip70, bip270, jsonV2 }
 
+export interface Payment{
+  amount: number;
+  hash: string;
+  currency: string;
+  address: string;
+}
 
 interface PaymentRequestForInvoice {
   uid: string;

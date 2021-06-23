@@ -53,10 +53,6 @@ export async function getInvoicesByDates(accountId, start, end) {
 
   invoices = invoices.map(invoice => {
 
-    if (!invoice.cashback_denomination_amount) {
-
-      invoice.cashback_denomination_amount = 0;
-    }
 
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
     invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
@@ -124,17 +120,6 @@ export async function getInvoices(invoiceUID: string) {
 
   invoices = invoices.map(invoice => {
 
-    if (invoice.status !== 'paid') {
-
-      invoice.cashback_denomination_amount = 0;
-
-    }
-
-    if (!invoice.cashback_denomination_amount) {
-
-      invoice.cashback_denomination_amount = 0;
-    }
-
     invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
     invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
 
@@ -194,7 +179,6 @@ export async function buildAchBatchEmailReport(ach_batch_id: number) {
 
       return Object.assign(invoice, {
         denomination_amount_paid: invoice.denomination_amount_paid.toFixed(2),
-        cashback_denomination_amount: invoice.cashback_denomination_amount.toFixed(2),
         settlement_amount: invoice.settlement_amount.toFixed(2) 
       });
 
@@ -250,7 +234,6 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       {id: 'completed_at', title: 'Paid at'},
       {id: 'denomination_amount', title: 'Amount Invoiced'},
       {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
-      {id: 'cashback_denomination_amount', title: 'Minus Dash Back (USD)'},
       {id: 'settlement_amount', title: 'Account Gets (USD)'},
       {id: 'external_id', title: 'Reference'},
       {id: 'currency', title: 'Currency'},

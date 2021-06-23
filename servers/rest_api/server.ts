@@ -1,8 +1,6 @@
 "use strict";
 require('dotenv').config();
 
-import('bitcore-lib')
-
 import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
@@ -22,7 +20,6 @@ import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockc
 
 import * as payreq from '../payment_requests/server'
 import { attach as attachGrabAndGoRoutes } from '../grab-and-go/server'
-import { attach as attachAnypayXRoutes } from '../anypayx/server'
 
 /* Import all handlers from './handlers directory */
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
@@ -1089,8 +1086,6 @@ async function Server() {
   }); 
 
   accountCSVReports(server);
-
-  attachAnypayXRoutes(server);
 
   attachGrabAndGoRoutes(server);
 
