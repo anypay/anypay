@@ -10,11 +10,9 @@ import * as forwards from './forwards';
 import * as settings from './settings';
 import * as prices from './prices';
 import { models } from './models';
-import * as cashback from './cashback';
 import * as ambassadors from './ambassadors';
 import * as database from './database';
 import * as discount from './discount';
-import * as dashwatch from './dashwatch';
 import * as addresses from './addresses';
 import * as coins from './coins';
 import * as xpub from './xpub';
@@ -57,10 +55,8 @@ export {
   apps,
   auth,
   blockcypher,
-  cashback,
   clicksend,
   coins,
-  dashwatch,
   database,
   discount,
   email,

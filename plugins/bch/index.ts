@@ -18,8 +18,6 @@ import {bitbox_checkAddressForPayments} from './lib/bitbox'
 
 import * as forwards from './lib/forwards';
 
-import { createCoinTextInvoice } from '../../lib/cointext'
-
 import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
 import {statsd} from '../../lib/stats/statsd'
@@ -143,15 +141,6 @@ async function checkAddressForPayments(address:string,currency:string){
   return(txs)
 }
 
-async function generateCoinTextInvoice( address:string, amount:number, currency:string ){
-
-  let legacy = getLegacyAddressFromCashAddress(address)
-  
-  let invoice =  await createCoinTextInvoice(legacy, amount, currency)
-
-  return invoice
-}
-
 async function createAddressForward(record: I_Address) {
 
   let url = "https://bch.anypayinc.com/v1/bch/forwards";
@@ -230,8 +219,6 @@ export {
   checkAddressForPayments,
 
   validateAddress,
-
-  generateCoinTextInvoice,
 
   forwards,
 

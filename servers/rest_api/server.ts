@@ -627,46 +627,6 @@ async function Server() {
   });
 
   server.route({
-    method: "GET",
-    path: "/achs",
-    handler: handlers.Achs.index,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/ach_batches",
-    handler: handlers.AchBatches.index,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/ach_batches/{id}",
-    handler: handlers.AchBatches.show,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/achs/{account_ach_id}/invoices",
-    handler: handlers.AccountAchInvoices.show,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
     method: "POST",
     path: "/invoices/{invoice_uid}/notes",
     handler: handlers.InvoiceNotes.create,
@@ -845,18 +805,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/dashback/totals/alltime",
-    handler: handlers.DashbackController.dashbackTotalsAlltime
-  });
-
-  server.route({
-    method: "GET",
-    path: "/dashback/totals/monthly",
-    handler: handlers.DashbackController.dashbackTotalsByMonth
-  });
-
-  server.route({
-    method: "GET",
     path: "/totals/merchants",
     handler: handlers.Totals.merchants
   });
@@ -915,33 +863,9 @@ async function Server() {
   })
 
   server.route({
-    method: "POST",
-    path: "/invoices/{uid}/dashtext_payments",
-    handler: handlers.DashtextPayments.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/cointext_payments",
-    handler: handlers.Cointext.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
     handler: handlers.MoneybuttonWebhooks.create
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/dashwatch/reports/{month}',
-    handler: handlers.DashwatchReports.reportForMonth
   });
 
   server.route({
@@ -1150,23 +1074,6 @@ async function Server() {
       handler: handlers.FirebaseTokens.update
     }
   });
-
-  server.route({
-    method: "GET",
-    path: "/currency-map",
-    options: {
-      handler: handlers.CurrencyMap.index
-    }
-  });
-
-  server.route({
-    method: 'POST',
-    path: '/dash/watch_addresses',
-    options: {
-      auth: "token"
-    },
-    handler: handlers.DashWatchAddresses.create
-  }); 
 
   server.route({
     method: 'GET',

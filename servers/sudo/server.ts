@@ -5,27 +5,17 @@ import * as Hapi from 'hapi';
 
 import { log, database, models, password } from '../../lib';
 
+import { logError } from '../../lib/logger'
+
 import { validateSudoPassword } from './auth/sudo_admin_password';
 
 import * as Boom from 'boom';
-
-import * as accountInvoices from './handlers/account_invoices';
 
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 
 import { join } from 'path';
 
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'))
-
-import { sudoLogin } from './handlers/sudo_login';
-
-import * as sudoBankAccounts from './handlers/sudo_bank_accounts';
-
-import * as sudoAddresses from './handlers/sudo_addresses';
-
-import * as sudoTipjars from './handlers/tipjars';
-
-import * as passwords from './handlers/passwords';
 
 import * as Joi from 'joi';
 
@@ -49,8 +39,6 @@ async function Server() {
   });
 
   const io = require("socket.io")(server.listener);
-
-  console.log('server.route')
 
   let wsSubscriptions = new Subscriptions();
 
@@ -101,22 +89,6 @@ async function Server() {
 
     method: "GET",
 
-    path: "/api/cash_deposits",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.CashDeposits.index,
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
     path: "/api/paypow/orders",
 
     config: {
@@ -140,34 +112,6 @@ async function Server() {
       auth: "sudopassword",
 
       handler: handlers.Histograms.dailyPaidInvoices
-
-    }
-
-  });
-
-
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/cash_deposits",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.CashDeposits.create,
-
-      validate: {
-        
-        payload : {
-
-          amount: Joi.number().required()
-
-        }
-
-      }
 
     }
 
@@ -318,86 +262,6 @@ async function Server() {
         return models.MerchantGroup.findAll()
 
       }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/ach_batches",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.SudoAchBatches.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/ach_batches",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales/profits",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.profits
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/batm_sales/stats",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BatmSales.stats
 
     }
 
@@ -667,7 +531,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoAddresses.index
+      handler: handlers.SudoAddresses.index
 
     }
 
@@ -683,7 +547,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoAddresses.lockAddress
+      handler: handlers.SudoAddresses.lockAddress
 
     }
 
@@ -699,7 +563,7 @@ async function Server() {
 
       auth: 'sudopassword',
 
-      handler: sudoAddresses.unlockAddress
+      handler: handlers.SudoAddresses.unlockAddress
 
     }
 
@@ -785,66 +649,6 @@ async function Server() {
 
   server.route({
 
-    method: "GET",
-
-    path: "/api/accounts/{account_id}/achs",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.index
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/achs",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.index
-    }
-
-  });
-
-
-  server.route({
-    method: "GET",
-
-    path: "/api/ach_batches/{ach_batch_id}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.show
-    }
-
-  });
-
-  server.route({
-
-    method: "PUT",
-
-    path: "/api/ach_batches/{id}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Achs.update
-    }
-
-  });
-
-  server.route({
-
     method: 'PUT',
 
     path: '/api/accounts/{id}',
@@ -887,78 +691,13 @@ async function Server() {
 
     method: 'GET',
 
-    path: '/api/bank_accounts',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'POST',
-
-    path: '/api/bank_accounts',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.create
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/bank_accounts/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'DELETE',
-
-    path: '/api/bank_accounts/{id}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: sudoBankAccounts.del
-
-    }
-
-  });
-
-
-  server.route({
-
-    method: 'GET',
-
     path: '/api/auth',
 
     config: {
 
       auth: 'sudopassword',
 
-      handler: sudoLogin
+      handler: handlers.SudoLogin.sudoLogin
 
     }
 
@@ -1121,7 +860,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: accountInvoices.show
+      handler: handlers.AccountInvoices.show
 
     }
   });
@@ -1195,7 +934,7 @@ async function Server() {
 
       auth: "sudopassword",
 
-      handler: passwords.update,
+      handler: handlers.Passwords.update,
 
       validate: {
 
@@ -1218,7 +957,7 @@ async function Server() {
     path: "/api/accounts/{account_id}/tipjars/{currency}",
     config: {
       auth: "sudopassword",
-      handler: sudoTipjars.show
+      handler: handlers.Tipjars.show
     }
   });
 
@@ -1472,13 +1211,11 @@ async function start() {
     // Start the server
     await server.start();
 
-    console.log('server info', server.info)
-
     log.info(`Server running at ${server.info.uri}`);
 
   } catch(err) {
 
-    console.error('server.error', err)
+    logError('server.error', err)
 
   }
 
