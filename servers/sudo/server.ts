@@ -147,110 +147,6 @@ async function Server() {
 
     method: "GET",
 
-    path: "/api/bitpay_settlements/not_settled",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.notSettled
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/bitpay_settlements/{invoice_uid}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.show
-
-    }
-
-  });
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/bitpay_settlements",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.create,
-
-      validate: {
-        
-        payload : {
-
-          invoice_uid: Joi.string().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/bitpay_settlements",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: "PUT",
-
-    path: "/api/bitpay_settlements/{invoice_uid}",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.BitpaySettlements.update,
-
-      validate: {
-        
-        payload : {
-
-          txid: Joi.string().required(),
-
-          currency: Joi.string().required(),
-
-          amount: Joi.number().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
     path: "/api/merchant_groups",
 
     config: {
@@ -394,23 +290,6 @@ async function Server() {
     }
 
   });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/invoices/{uid}/bip70/{currency}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.PaymentRequests.show
-
-    }
-
-  });
-
 
   server.route({
 
@@ -897,21 +776,6 @@ async function Server() {
 
   server.route({
 
-    method: 'GET',
-
-    path: "/api/accounts/{account_id}/kiosk-rewards",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Accounts.showKioskRewards
-
-    }
-  });
-
-  server.route({
-
     method: "GET",
 
     path: "/accounts/{id}/volume",
@@ -953,33 +817,6 @@ async function Server() {
 
   server.route({
 
-    method: "GET",
-    path: "/api/accounts/{account_id}/tipjars/{currency}",
-    config: {
-      auth: "sudopassword",
-      handler: handlers.Tipjars.show
-    }
-  });
-
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/wires/reportsinceinvoice/{invoice_uid}',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.WireReports.show
-
-    }
-
-  });
-
-  server.route({
-
     method: 'GET',
 
     path: '/cities',
@@ -1015,22 +852,6 @@ async function Server() {
     config: {
 
       handler: handlers.Cities.update
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/wires/reportsinceinvoice/{invoice_uid}/csv',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.WireReports.showCSV
 
     }
 

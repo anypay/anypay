@@ -281,15 +281,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/vending/batms",
-    handler: handlers.Batms.index,
-    options: {
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: "GET",
     path: "/api/accounts-by-email/{email}",
     handler: handlers.Anypaycity.show
   });
@@ -298,15 +289,6 @@ async function Server() {
     method: "GET",
     path: "/api/replace_by_fee/{txid}",
     handler: handlers.Rbf.show
-  });
-
-  server.route({
-    method: "GET",
-    path: "/vending/batms/{batm_id}",
-    handler: handlers.Batms.show,
-    options: {
-      auth: "token"
-    }
   });
 
   server.route({
@@ -429,18 +411,6 @@ async function Server() {
     }
   });
 
-
-
-  server.route({
-
-    method: "GET",
-    path: "/tipjars/{currency}",
-    handler: handlers.Tipjars.show,
-    options: {
-      auth: "token"
-    }
-  });
-
   server.route({
     method: "POST",
     path: "/accounts",
@@ -483,16 +453,6 @@ async function Server() {
     path: "/anonymous-accounts",
     handler: handlers.Accounts.createAnonymous,
     options: {
-      tags: ['api']
-    },
-  });
-
-  server.route({
-    method: "GET",
-    path: "/shares",
-    handler: handlers.Shareholders.show,
-    options: {
-      auth: "token",
       tags: ['api']
     },
   });

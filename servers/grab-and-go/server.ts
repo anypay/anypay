@@ -22,7 +22,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     options: {
 
-      auth: "accountToken"
+      auth: "token"
 
     },
 
@@ -40,7 +40,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     options: {
 
-      auth: "accountToken"
+      auth: "token"
 
     }
 
@@ -54,7 +54,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     options: {
 
-      auth: "accountToken"
+      auth: "token"
 
     },
 
@@ -83,7 +83,7 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     options: {
 
-      auth: "accountToken"
+      auth: "token"
 
     }
 
@@ -189,7 +189,7 @@ async function start() {
 
     let server = await Server();
 
-    server.auth.strategy("accountToken", "basic", { validate: validateToken});
+    server.auth.strategy("token", "basic", { validate: validateToken});
 
     attach(server)
 
