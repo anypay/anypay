@@ -50,22 +50,6 @@ function attach(server: Hapi.Server): Hapi.Server {
 
     method: "GET",
 
-    path: "/grab-and-go/payments",
-
-    options: {
-
-      auth: "token"
-
-    },
-
-    handler: handlers.Payments.index
-
-  });
-
-  server.route({
-
-    method: "GET",
-
     path: "/grab-and-go/{account_stub}/{item_stub}",
 
     handler: handlers.PaymentRequests.create
