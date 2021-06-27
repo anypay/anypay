@@ -10,7 +10,6 @@ export async function start() {
     'webhooks',
     'payment_push_notification',
     'grab_and_go_push_notification',
-    'truereviews',
     'invoice_created_to_slack',
     'invoice_paid_receipt_slack',
     'payment-options-processor',
@@ -18,8 +17,6 @@ export async function start() {
     'grab_and_go_invoice_order',
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
-    'invoice-paid-cashback-record',
-    'anypay_x_credit_invoice_paid',
     'email-one-day-after-signup'
   ])
 
