@@ -4,8 +4,6 @@ const CryptoJS = require('crypto-js')
 
 const API_BASE = 'https://api.bittrex.com/v3'
 
-import SHA512 from 'crypto-js/sha512'
-
 import * as http from 'superagent'
 
 import { models } from '../models'
