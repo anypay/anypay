@@ -17,7 +17,8 @@ export async function start() {
     'grab_and_go_invoice_order',
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
-    'email-one-day-after-signup'
+    'email-one-day-after-signup',
+    'bittrex_autosell'
   ])
 
 }

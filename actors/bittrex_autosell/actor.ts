@@ -4,17 +4,33 @@ require('dotenv').config();
 
 import { Actor, Joi, log } from 'rabbi';
 
+import { models } from '../../lib';
+
+import { logError } from '../../lib/logger'
+
 import * as cron from 'node-cron';
 
-import { marketOrder } from '../../lib/bittrex'
+import * as bittrex from '../../lib/bittrex'
 
 export async function start() {
 
   cron.schedule('0 * * * * *', async () => { // every minute
 
-    let order = await marketOrder(1) // sell 1 BSV if available
+    let bittrexAccounts = await models.BittrexAccount.findAll()
 
-    console.log('bittrex.sell.market.bsv', order)
+    for (let {account_id} of bittrexAccounts) {
+
+      try {
+
+        bittrex.sellAll(account_id)
+
+      } catch(error) {
+
+        logError('bittrex.sellall.error', error.message)
+
+      }
+
+    }
 
   });
 
