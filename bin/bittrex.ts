@@ -4,16 +4,7 @@ require("dotenv").config()
 
 import * as program from 'commander'
 
-const { BittrexClient } = require('bittrex-node')
-
 import { models } from '../lib/models'
-
-let client = new BittrexClient({
-  apiKey: process.env.MCD_BITTREX_API_KEY,
-  apiSecret: process.env.MCD_BITTREX_API_SECRET
-})
-
-import { marketOrder, listOrders, listAddresses, createAddress } from '../lib/bittrex'
 
 import * as bittrex from '../lib/bittrex'
 
@@ -25,7 +16,7 @@ program
 
       let account = await models.Account.findOne({ where: { email }})
 
-      let addresses = await listAddresses(account.id)
+      let addresses = await bittrex.listAddresses(account.id)
 
       console.log(addresses)
 
@@ -45,7 +36,7 @@ program
 
       let account = await models.Account.findOne({ where: { email }})
 
-      let address = await createAddress(account.id, currency)
+      let address = await bittrex.createAddress(account.id, currency)
 
       console.log(address)
 
@@ -113,26 +104,6 @@ program
     
   })
 
-
-
-program
-  .command('listordersv1')
-  .action(async () => {
-
-    try {
-
-      let resp = await client.openOrders('BSVUSD') 
-
-      console.log(resp)
-
-    } catch(error) {
-
-      console.log(error)
-
-    }
-
-  })
-
 program
   .command('listorders <email>')
   .action(async (email) => {
@@ -141,7 +112,7 @@ program
 
       let account = await models.Account.findOne({ where: { email }})
 
-      let response = await listOrders(account.id)
+      let response = await bittrex.listOrders(account.id)
 
       console.log(response)
 
