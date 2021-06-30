@@ -93,18 +93,34 @@ export async function apiCall(params: BittrexApiCall) {
 
   if (method === 'POST') {
 
-    let resp = await http.post(uri)
-      .set(headers)
-      .send(params.payload)
+    try {
 
-    return resp.body
+      let resp = await http.post(uri)
+        .set(headers)
+        .send(params.payload)
+
+      return resp.body
+
+    } catch(error) {
+
+      throw new Error(error.response.body.code)
+
+    }
 
   } else if (method === 'GET') {
 
-    let resp = await http.get(uri)
-      .set(headers)
+    try {
 
-    return resp.body
+      let resp = await http.get(uri)
+        .set(headers)
+
+      return resp.body
+
+    } catch(error) {
+
+      throw new Error(error.response.body.code)
+
+    }
 
   }
 
@@ -145,20 +161,40 @@ export async function listOrders(account_id): Promise<Order[]> {
 
 export async function listBalances(account_id): Promise<Balance[]> {
 
-  return accountApiCall({
+  let balances = await accountApiCall({
     account_id,
     method: 'GET',
     url: 'https://api.bittrex.com/v3/balances'
   })
 
+  return balances.map(balance => {
+
+    balance.available = parseFloat(balance.available)
+    balance.total = parseFloat(balance.total)
+    return balance
+
+  })
+
 }
 
-export async function marketOrder(account_id: number, quantity: number): Promise<Order> {
+export async function getBalance(account_id: number, currency: string): Promise<number> {
+
+  let balance = await accountApiCall({
+    account_id,
+    method: 'GET',
+    url: `https://api.bittrex.com/v3/balances/${currency}`
+  })
+
+  return parseFloat(balance.available)
+
+}
+
+export async function marketOrder(account_id: number, currency: string, quantity: number): Promise<Order> {
 
   return accountApiCall({
     account_id,
     payload: {
-      "marketSymbol": "BSV-USD",
+      "marketSymbol": `${currency}-USD`,
       "direction": "sell",
       "type": "market",
       "quantity": quantity,
@@ -187,6 +223,24 @@ export async function getDepositsByTxid(account_id: number, txid: string): Promi
     url: `https://api.bittrex.com/v3/deposits/ByTxId/${txid}`,
     method: 'GET'
   })
+
+}
+
+export async function sellAllOfCurrency(account_id, currency): Promise<any> {
+
+  let balance = await getBalance(account_id, currency)
+
+  console.log('bittrex.balance', {account_id, balance, currency})
+
+  if (balance > 0) {
+
+    let order = await marketOrder(account_id, currency, balance)
+
+    console.log('bittrex.order', {account_id, order})
+
+    return order
+
+  }
 
 }
 
