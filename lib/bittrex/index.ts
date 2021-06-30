@@ -10,6 +10,8 @@ import * as http from 'superagent'
 
 import { models } from '../models'
 
+import { logInfo, logError } from '../logger'
+
 import { Balance, Order, Address, Deposit } from './types'
 
 export async function setAccountAddresses(account_id: number) {
@@ -30,7 +32,7 @@ export async function setAccountAddresses(account_id: number) {
       }
     })
 
-    console.log(record.toJSON())
+    logInfo('bittrex.address.set', record.toJSON())
   }
 
 }
@@ -230,17 +232,43 @@ export async function sellAllOfCurrency(account_id, currency): Promise<any> {
 
   let balance = await getBalance(account_id, currency)
 
-  console.log('bittrex.balance', {account_id, balance, currency})
+  logInfo('bittrex.balance', {account_id, balance, currency})
 
   if (balance > 0) {
 
     let order = await marketOrder(account_id, currency, balance)
 
-    console.log('bittrex.order', {account_id, order})
+    logInfo('bittrex.order', {account_id, order})
 
     return order
 
   }
 
 }
+
+
+export async function sellAll(account_id) {
+
+  let balances = await listBalances(account_id)
+
+  for (let balance of balances) {
+
+    logInfo('bittrex.balance', Object.assign(balance, {account_id}))
+
+    if (balance.available > 0 && balance.currencySymbol !== 'BTXCRD' && balance.currencySymbol !== 'USD') {
+
+      let order = await sellAllOfCurrency(account_id, balance.currencySymbol)
+
+      if (order) {
+
+        logInfo(`bittrex.order`, order)
+
+      }
+
+    }
+
+  }
+
+}
+
 
