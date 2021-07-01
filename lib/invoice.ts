@@ -338,6 +338,9 @@ export async function createPaymentOptions(account, invoice) {
     }
 
     var amount = new BigNumber(pay.toSatoshis(row[1].value)).minus(fee.amount).toNumber();
+    if (currency === 'BTC') {
+      amount = new BigNumber(pay.toSatoshis(row[1].value)).toNumber();
+    }
 
     let outputs = []
 
