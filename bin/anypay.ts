@@ -2,6 +2,8 @@
 
 require('dotenv').config();
 
+require('../lib/apm')
+
 const yargs = require('yargs');
 
 import { log } from '../lib/logger';

@@ -5,48 +5,15 @@ const Hapi = require('hapi');
 
 import * as Boom from 'boom';
 
-import { log, models, tipjar } from '../../lib';
+import { log, models } from '../../lib';
 
 export async function attachMerchantMapRoutes(server) {
-
-  server.route({
-
-    method: 'GET',
-    path: '/merchants-list',
-
-    handler: async (req, h) => {
-
-      return [{
-
-        email: 'murphys@anypay.global',
-
-        account_id: 499
-
-      }, {
-      
-        email: 'info@mnpastry.com',
-
-        account_id: 455
-
-      }, {
-      
-        email: 'freshpress@anypay.global',
-
-        account_id: 176
-
-      }]
-
-    }
-
-  });
 
   interface MerchantInfo {
     business_address: string;
     business_name: string;
-    tipjar_address: string;
     latitude: number;
     longitude: number;
-    cash_back_enabled: boolean;
     image_url: boolean;
     account_id: number;
     denomination: string;
@@ -75,8 +42,6 @@ export async function attachMerchantMapRoutes(server) {
 
   async function getMerchantInfo(accountId: any): Promise<MerchantInfo> {
 
-    console.log("get merchant info", accountId); 
-
     let account = await models.Account.findOne({where: {
       stub: accountId
     }})
@@ -91,27 +56,14 @@ export async function attachMerchantMapRoutes(server) {
     }
 
     if (!account) {
-      throw new Error('no account found');
+      throw new Error(`no account found for id ${accountId}`);
     }
-
-    let cashbackMerchant = await models.CashbackMerchant.findOne({ where: {
-
-      account_id: account.id
-
-    }});
-
-    let cashback = false;
-    if (cashbackMerchant) { cashback = cashbackMerchant.enabled };
-
-    let jar = await tipjar.getTipJar(account.id, 'BCH');
 
     return {
       business_name: account.business_name,
       business_address: account.business_address,
       latitude: parseFloat(account.latitude),
       longitude: parseFloat(account.longitude),
-      cash_back_enabled: cashback,
-      tipjar_address: jar.address,
       image_url: account.image_url,
       account_id: account.id,
       denomination: account.denomination

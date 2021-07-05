@@ -60,6 +60,7 @@
     "datapay": "^0.0.18",
     "docsify": "^4.10.2",
     "dotenv": "^8.1.0",
+    "elastic-apm-node": "^3.16.0",
     "elasticsearch": "^16.7.1",
     "email-validator": "^2.0.4",
     "eventemitter2": "^5.0.1",
