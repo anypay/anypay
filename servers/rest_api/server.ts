@@ -1036,6 +1036,34 @@ async function Server() {
   }); 
 
   server.route({
+    method: 'POST',
+    path: '/bittrex_api_keys',
+    handler: handlers.BittrexApiKeys.create,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/bittrex_api_keys',
+    handler: handlers.BittrexApiKeys.show,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+  server.route({
+    method: 'DELETE',
+    path: '/bittrex_api_keys',
+    handler: handlers.BittrexApiKeys.destroy,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+
+  server.route({
     method: 'GET',
     path: '/search/accounts',
     handler: handlers.Search.accounts
