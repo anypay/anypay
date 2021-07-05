@@ -73,6 +73,18 @@ export async function destroy(req, h) {
 
   try {
 
+    let bittrexAccount = await models.BittrexAccount.findOne({
+      where: {
+        account_id: req.account.id
+      },
+    })
+
+    if (bittrexAccount) {
+      await bittrexAccount.destroy()
+    }
+
+    return { success: true }
+
   } catch(error) {
 
     return badRequest(error)
