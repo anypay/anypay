@@ -1,6 +1,6 @@
 
 import { plugins, models, amqp, log } from '../../../lib'
-import { logInfo } from '../../../lib/logger'
+import { logInfo, logError } from '../../../lib/logger'
 
 import { detectWallet, verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
 
@@ -63,6 +63,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
   logInfo('payment.submit', payment);
 
   let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+
+  if (invoice.cancelled) {
+    logError('payment.error.invoicecancelled', { payment })
+    return Boom.badRequest('invoice cancelled')
+  }
 
   if (!invoice) {
     throw new Error(`invoice ${payment.invoice_uid} not found`)

@@ -11,9 +11,59 @@ import { statsd } from '../../../lib/stats/statsd';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
-import { logInfo } from '../../../lib/logger'
+import { logInfo, logError } from '../../../lib/logger'
 
 import * as moment from 'moment';
+
+export async function cancel(req, h) {
+
+  try {
+
+    let where = {
+      uid: req.params.uid,
+      account_id: req.account.id
+    }
+
+    let invoice = await models.Invoice.findOne({
+      where
+    })
+
+    if (!invoice) {
+
+      logError('invoice.notfound', where)
+
+      return Boom.notFound()
+
+    }
+
+    if (invoice && !invoice.cancelled) {
+
+      invoice.cancelled = true;
+      invoice.status = 'cancelled';
+
+      await invoice.save()
+
+      logInfo('invoice.cancelled', where)
+
+      where['status'] = 'cancelled'
+
+      return where
+
+    } else {
+
+      logError('invoice.cancel.error.alreadycancelled', where)
+
+      throw new Error('invoice already cancelled')
+
+    } 
+
+  } catch(error) {
+
+    return Boom.badRequest(error.message)
+
+  }
+
+}
 
 export async function index (request, reply) {
 

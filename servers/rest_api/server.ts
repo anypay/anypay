@@ -626,6 +626,16 @@ async function Server() {
   });
 
   server.route({
+    method: "DELETE",
+    path: "/invoices/{uid}",
+    handler: handlers.Invoices.cancel,
+    options: {
+      auth: "token",
+      tags: ['api']
+    }
+  });
+
+  server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
     handler: handlers.Invoices.createPublic,

@@ -149,6 +149,10 @@ export async function show(req, h) {
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
+  if (invoice.cancelled) {
+    return Boom.badRequest('invoice cancelled')
+  }
+
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
