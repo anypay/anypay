@@ -3,6 +3,7 @@ import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 
 import { log, models, plugins } from '../../../lib'
+import { logError } from '../../../lib/logger'
 
 import * as pay from '../../../lib/pay'
 
@@ -111,6 +112,17 @@ export async function create(req, h) {
 
       }
     });
+
+    let invoice = await models.Invoice.findOne({
+      where: {
+        uid: req.params.uid
+      }
+    })
+
+    if (invoice.cancelled) {
+      logError('payment.error.invoicecancelled', { uid: req.params.uid, payment })
+      return Boom.badRequest('invoice cancelled')
+    }
 
     if (!payment_option) {
       throw new Error(`${currency.code} payment option for invoice ${req.params.uid} not found`)

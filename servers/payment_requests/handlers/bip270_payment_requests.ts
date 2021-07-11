@@ -2,8 +2,8 @@ import * as Hapi from 'hapi';
 
 import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
-import { amqp, log } from '../../../lib';
-import { logInfo } from '../../../lib/logger';
+import { amqp, log, models } from '../../../lib';
+import { logInfo, logError } from '../../../lib/logger';
 
 import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
 
@@ -34,16 +34,27 @@ export async function create(req, h) {
     payload: req.payload
   })
 
+  let invoice = await models.Invoice.findOne({
+    where: { uid: req.params.uid }
+  })
+
   try {
 
     let wallet = detectWallet(req.headers, req.params.uid)
 
-    let response: SubmitPaymentResponse = await submitPayment({
+    let submission = {
       transactions: [req.payload.transaction],
       currency: 'BSV',
       invoice_uid: req.params.uid,
       wallet
-    })
+    }
+
+    if (invoice.cancelled) {
+      logError('payment.error.invoicecancelled', submission)
+      return Boom.badRequest('invoice cancelled')
+    }
+
+    let response: SubmitPaymentResponse = await submitPayment(submission)
 
     logInfo('bsv.bip270.broadcast.success', {
       headers: req.headers,
