@@ -75,6 +75,10 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
     paymentRequest.requiredFeeRate = 30
   }
 
+  if (paymentOption.currency === 'DOGE') {
+    paymentRequest.requiredFeeRate = 1000000
+  }
+
   return paymentRequest;
 
 }
