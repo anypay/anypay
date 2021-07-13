@@ -25,7 +25,7 @@ export async function publishBTC(hex) {
 
 export async function publish(coin, hex) {
 
-  /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum */
+  /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
 
   try {
 
