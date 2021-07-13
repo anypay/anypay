@@ -188,7 +188,10 @@ export async function updateCryptoUSDPrices() {
     'BCH',
     'BTC',
     'LTC',
-    'DASH'
+    'DASH',
+    'DOGE',
+    'ZEC',
+    'XMR'
   ];
 
   let prices = await getCryptoPrices('USD');
