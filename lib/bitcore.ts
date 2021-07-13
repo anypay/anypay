@@ -1,6 +1,7 @@
 const btc = require('bitcore-lib');
 const bch = require('bitcore-lib-cash');
 const ltc = require('litecore-lib');
+const doge = require('bitcore-doge-lib');
 const dash = require('@dashevo/dashcore-lib');
 const bsv = require('bsv');
 
@@ -19,6 +20,8 @@ export function getBitcore(currency) {
     return dash;
   case 'BSV':
     return bsv;
+  case 'DOGE':
+    return doge;
   }
 
 }
