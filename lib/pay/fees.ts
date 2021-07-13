@@ -20,19 +20,19 @@ const feesFiat = {
   },
   'LTC': {
     currency: 'USD',
-    value: 0.01
+    value: 0.05
   },
   'DOGE': {
     currency: 'USD',
-    value: 0.01
+    value: 0.50
   },
   'ZEC': {
     currency: 'USD',
-    value: 0.01
+    value: 0.05
   },
   'BTC': {
     currency: 'USD',
-    value: 0.25
+    value: 1.00
   }
 }
 
