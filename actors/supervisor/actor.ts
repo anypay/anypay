@@ -18,7 +18,11 @@ export async function start() {
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
     'email-one-day-after-signup',
-    'bittrex_autosell'
+    'bittrex_autosell',
+    'account_created_email',
+    'ambassador_reward_email',
+    'first_address_set_email',
+    'invoice_paid_receipt_email'
   ])
 
 }
