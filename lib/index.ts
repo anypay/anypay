@@ -20,7 +20,6 @@ import * as invoice from './invoice';
 import { log } from './logger';
 import { plugins } from './plugins';
 import * as blockcypher from './blockcypher';
-import * as tipjar from './tipjar';
 import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
@@ -30,7 +29,6 @@ import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as slack from './slack/notifier';
-import * as clicksend from './clicksend';
 import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
@@ -55,7 +53,6 @@ export {
   apps,
   auth,
   blockcypher,
-  clicksend,
   coins,
   database,
   discount,
@@ -78,7 +75,6 @@ export {
   settings,
   slack,
   square,
-  tipjar,
   utils,
   xpub
 }
