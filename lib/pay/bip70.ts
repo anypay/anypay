@@ -128,13 +128,12 @@ export async function buildPaymentRequest(paymentOption) {
 
   pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
-  if (paymentOption.currency === 'BCH') {
+  if (process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]) {
+    pd.set('required_fee_rate', parseInt(process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]));
+  } else {
     pd.set('required_fee_rate', 1);
   }
 
-  if (paymentOption.currency === 'BTC') {
-    pd.set('required_fee_rate', 30);
-  }
   pd.set('merchant_data', paymentOption.invoice_uid); // identify the request
 
   var paypro = new PaymentProtocol(paymentOption.currency);
