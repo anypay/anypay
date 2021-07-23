@@ -1,6 +1,8 @@
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import * as _ from 'lodash'
+
 import { Op } from 'sequelize';
 
 import {replaceInvoice} from '../../../lib/invoice';
@@ -333,10 +335,6 @@ export async function create (request, reply) {
 
     await invoice.save();
 
-    let payment_options = await models.PaymentOption.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
-
     if (invoice.email) {
       let note = await models.InvoiceNote.create({
         content: `Customer Email: ${invoice.email}`,
@@ -344,13 +342,13 @@ export async function create (request, reply) {
       });
     }
 
-    invoice.payment_options = payment_options;
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
 
     let sanitized = sanitizeInvoice(invoice);
 
     return Object.assign({
       invoice: sanitized,
-      payment_options
+      payment_options: invoice.payment_options
     }, sanitized);
 
   } catch(error) {
@@ -426,18 +424,29 @@ export async function createPublicInvoice(account_id, payload) {
     });
   }
 
-  let payment_options = await models.PaymentOption.findAll({where: {
-    invoice_uid: invoice.uid
-  }});
-
-  invoice.payment_options = payment_options;
+  invoice.payment_options = await getPaymentOptions(invoice.uid)
 
   let sanitized = sanitizeInvoice(invoice);
 
   return Object.assign({
     invoice: sanitized,
-    payment_options
+    payment_options: invoice.payment_options
   }, sanitized);
+
+}
+
+async function getPaymentOptions(invoice_uid) { 
+
+  let payment_options = await models.PaymentOption.findAll({where: {
+    invoice_uid
+  }});
+
+  return payment_options.map(option => _.pick(option,
+    'uri',
+    'currency',
+    'currency_name',
+    'currency_logo_url'
+  ))
 
 }
 
@@ -457,86 +466,6 @@ export async function createPublic (request, reply) {
     return Boom.badRequest(error.message);
 
   }
-
-  /*
-    Dynamicallly look up coin and corresponding plugin given the currency
-    provided.
-  var currency;
-
-	if (!(request.payload.amount > 0)) {
-		throw Boom.badRequest('amount must be greater than zero')	
-	}
-
-  let addresses = await models.Address.findAll({ where: {
-
-    account_id: request.account.id
-
-  }})
-  
-  let addressesMap = addresses.reduce((set, record) => {
-
-    set[record.currency] = record.value;
-    return set;
-  }, {});
-
-  if (addressesMap['BCH']) {
-    currency = 'BCH';
-  } else if (addressesMap['DASH']) {
-    currency = 'DASH';
-  } else if (addressesMap['BSV']) {
-    currency = 'BSV';
-  } else {
-    currency = addresses[0].currency;
-  }
-
-  try {
-
-    let plugin = await plugins.findForCurrency(currency);
-
-    log.info('plugin.createInvoice');
-
-    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
-
-    if(invoice){
-   
-      log.info('invoice.created', invoice.toJSON());
-
-    }
-
-    invoice.redirect_url = request.payload.redirect_url;
-
-    invoice.webhook_url = request.payload.webhook_url;
-
-    invoice.external_id = request.payload.external_id;
-
-    invoice.is_public_request = true;
-
-    await invoice.save();
-
-    let payment_options = await models.PaymentOption.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
-
-    invoice.payment_options = payment_options;
-
-    let sanitized = sanitizeInvoice(invoice);
-
-    return Object.assign({
-      invoice: sanitized,
-      payment_options
-    }, sanitized);
-
-  } catch(error) {
-
-    console.log(error);
-
-    log.error(error.message);
-
-    throw Boom.badRequest(error.message);
-
-  }
-
-  */
 
 };
 
@@ -578,11 +507,7 @@ export async function show(request, reply) {
 
 	    log.info('invoice.requested', invoice.toJSON());
 
-      let payment_options = await models.PaymentOption.findAll({where: {
-        invoice_uid: invoice.uid
-      }});
-
-      invoice.payment_options = payment_options;
+      invoice.payment_options = await getPaymentOptions(invoice.uid)
 
       let notes = await models.InvoiceNote.findAll({where: {
         invoice_uid: invoice.uid
@@ -592,7 +517,7 @@ export async function show(request, reply) {
 
       let resp = Object.assign({
         invoice: sanitized,
-        payment_options,
+        payment_options: invoice.payment_options,
         notes
       }, sanitized)
 
