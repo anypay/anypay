@@ -7,6 +7,8 @@ import * as fixer from '../../lib/fixer';
 
 import * as http from 'superagent';
 
+import { toSatoshis } from '../pay'
+
 export interface Price {
   base_currency: string;
   currency: string;
@@ -52,6 +54,10 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   let price = await models.Price.findOne({ where });
 
   let targetAmount = inputAmount.value * price.value;
+
+  if (outputCurrency === 'BTCLN') {
+    targetAmount = toSatoshis(targetAmount)
+  }
 
   return {
     currency: outputCurrency,
