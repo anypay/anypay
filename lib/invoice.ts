@@ -336,6 +336,7 @@ export async function createPaymentOptions(account, invoice) {
         currency,
         amount,
         address,
+        outputs: [],
         uri: `lightning:${address}`,
         fee: 0
       }
