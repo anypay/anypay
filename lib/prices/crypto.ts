@@ -44,6 +44,12 @@ export async function updateCryptoUSDPrices() {
   })
   .map(async price => {
 
+    if (price.currency === 'BTC') {
+      // set BTCLN price to the same as BTC
+      await setPrice('BTCLN', price.value, price.source, price.base_currency)
+      await setPrice(price.base_currency, 1 / price.value, price.source, 'BTCLN');
+    }
+
     await setPrice(price.currency, price.value, price.source, price.base_currency)
     await setPrice(price.base_currency, 1 / price.value, price.source, price.currency);
 
