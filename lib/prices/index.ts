@@ -56,7 +56,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision?: 
   let targetAmount = inputAmount.value * price.value;
 
   if (outputCurrency === 'BTCLN') {
-    targetAmount = toSatoshis(targetAmount)
+    targetAmount = parseInt(toSatoshis(targetAmount).toFixed(0))
   }
 
   return {
