@@ -332,6 +332,9 @@ export async function create (request, reply) {
     invoice.headers = request.headers
 
     invoice.email = request.payload.email;
+    invoice.business_id = request.payload.business_id;
+    invoice.location_id = request.payload.location_id;
+    invoice.register_id = request.payload.register_id;
 
     await invoice.save();
 

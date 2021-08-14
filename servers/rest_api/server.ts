@@ -1112,6 +1112,8 @@ async function start () {
 
   await sequelize.sync()
 
+  log.info('database.syncronized')
+
   var server = await Server();
 
   // Start the server

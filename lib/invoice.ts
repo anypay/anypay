@@ -56,10 +56,10 @@ interface Address {
   value: string
 }
 
-async function getNewInvoiceAddress(accountId: number, currency: string): Promise<Address> {
+async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<Address> {
   var address;
 
-  address = await plugins.getNewAddress(currency, accountId);
+  address = await plugins.getNewAddress(currency, accountId, amount);
 
   if (!address) {
     throw new Error(`unable to generate address for ${currency}`);
@@ -276,14 +276,6 @@ export async function createPaymentOptions(account, invoice) {
     return coin.unavailable;
   });
 
-  let newAddresses = await Promise.all(addresses.map(async (address:any) => {
-    let newAddress = await getNewInvoiceAddress(account.id, address.currency);
-    return {
-      currency: address.currency,
-      address: newAddress.value
-    }
-  }));
-
   let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
 
     let coin = getCoin(address.currency);
@@ -311,6 +303,14 @@ export async function createPaymentOptions(account, invoice) {
 
   }));
 
+  let newAddresses = await Promise.all(addresses.map(async (address:any, index:number) => {
+    let newAddress = await getNewInvoiceAddress(account.id, address.currency, invoiceAmounts[index]);
+    return {
+      currency: address.currency,
+      address: newAddress.value
+    }
+  }));
+
   let matrix = buildPaymentOptionsMatrix(addresses, invoiceAmounts, newAddresses, invoice)
 
   let ambassador = await getAmbassadorAccount(account.ambassador_id)
@@ -326,6 +326,20 @@ export async function createPaymentOptions(account, invoice) {
     let fee = await pay.fees.getFee(currency)
 
     var address = row[2].address;
+
+    if (currency === 'BTCLN') {
+
+      return {
+        currency_logo_url: paymentCoin.logo_url,
+        currency_name: paymentCoin.name,
+        invoice_uid: invoice.uid,
+        currency,
+        amount,
+        address,
+        uri: `lightning:${address}`,
+        fee: 0
+      }
+    }
 
     if (address.match(':')) {
       address = address.split(':')[1]
