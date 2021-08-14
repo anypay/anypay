@@ -15,13 +15,25 @@ program
   .command('generate <email> <denomination_amount> <currency>')
   .action(async (email, denominationAmount, currency) => {
 
-    var amount = parseFloat(denominationAmount);
+    try {
 
-    let account = await models.Account.findOne({ where: { email }});
+      var amount = parseFloat(denominationAmount);
 
-    let invoice = await generateInvoice(account.id, amount, currency);
+      console.log('generate invoice', {email, denominationAmount, currency })
 
-    log.info('invoice.generated', invoice.toJSON());
+      let account = await models.Account.findOne({ where: { email }});
+
+      console.log('account', account.toJSON())
+
+      let invoice = await generateInvoice(account.id, amount, currency);
+
+      log.info('invoice.generated', invoice.toJSON());
+
+    } catch(error) {
+
+      log.error(error);
+
+    }
 
     process.exit(0);
 

@@ -36,6 +36,14 @@
     },
 
     {
+      "code": "BTCLN",
+      "name": "BTC Lightning",
+      "enabled": true,
+      "supported": true,
+      "icon_url": "https://bico.media/0dd8d3d0d507df99a3a94b03aad30a94abf8db8cf1912de0ee2bd873ded31bfd"
+    },
+
+    {
       "code": "DOGE",
       "name": "Dogecoin",
       "icon_url": ""
