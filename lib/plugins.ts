@@ -52,7 +52,7 @@ class Plugins {
 
   }
 
-  async getNewAddress(currency: string, accountId: number) {
+  async getNewAddress(currency: string, accountId: number, amount) {
 
     let address = await models.Address.findOne({ where: {
 
@@ -72,7 +72,7 @@ class Plugins {
       throw new Error('plugin does not implement getNewAddress')
     }
 
-    let input = await this.plugins[currency].getNewAddress(address);
+    let input = await this.plugins[currency].getNewAddress(address, amount);
 
     return input;
 
