@@ -32,7 +32,7 @@ export async function getNewAddress(account, amount) {
   let response = await http
     .post('https://lnd.anypayx.com/invoices')
     .send({
-      amount
+      amount: amount.value
     })
 
   logInfo('btcln.getnewaddress.result', response.body.payment_request)
