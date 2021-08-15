@@ -328,6 +328,61 @@ export async function completePayment(paymentOption, hex: string) {
 
 }
 
+export async function completeLNPayment(paymentOption, r_hash: string) {
+  log.info('paymentoption', paymentOption.toJSON())
+
+  let payment = {
+    txid: r_hash,
+    currency: paymentOption.currency,
+    payment_option_id: paymentOption.id,
+    invoice_uid: paymentOption.invoice_uid
+  }
+
+  log.info('payment', payment)
+
+  let paymentRecord = await models.Payment.create(payment)
+
+  let invoice = await models.Invoice.findOne({ where: {
+    uid: paymentOption.invoice_uid
+  }})
+
+  var result = await models.Invoice.update(
+    {
+      amount_paid: invoice.amount,
+      invoice_amount: paymentOption.amount,
+      invoice_amount_paid: paymentOption.amount,
+      invoice_currency: paymentOption.currency,
+      denomination_amount_paid: invoice.denomination_amount,
+      currency: paymentOption.currency,
+      address: paymentOption.address,
+      hash: r_hash,
+      status: 'paid',
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
+    },
+    {
+      where: { uid: paymentOption.invoice_uid }
+    }
+  );
+
+  invoice = await models.Invoice.findOne({ where: {
+    id: invoice.id
+  }})
+
+  emitter.emit('invoice.paid', invoice)
+  emitter.emit('invoice.payment', invoice.uid)
+
+  let channel = await awaitChannel()
+
+  channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
+
+  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
+
+  return paymentRecord
+
+}
+
 const SATOSHIS = 100000000
 
 export function toSatoshis(decimal: number): number {
