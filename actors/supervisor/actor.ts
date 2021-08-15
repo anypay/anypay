@@ -22,7 +22,8 @@ export async function start() {
     'account_created_email',
     'ambassador_reward_email',
     'first_address_set_email',
-    'invoice_paid_receipt_email'
+    'invoice_paid_receipt_email',
+    'lnd_invoice_paid'
   ])
 
 }
