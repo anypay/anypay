@@ -521,6 +521,8 @@ export function isExpired(invoice) {
 
 export async function checkLightning(invoice_uid) {
 
+  logInfo('lnd.invoice.check', {invoice_uid})
+
   let paymentOption = await models.PaymentOption.findOne({
     where: {
       invoice_uid,
@@ -528,7 +530,10 @@ export async function checkLightning(invoice_uid) {
     }
   })
 
+  logInfo('lnd.invoice.check.paymentoption', paymentOption.toJSON())
+
   if (paymentOption) {
+
     let lightningInvoice = await models.LightningInvoice.findOne({
       where: {
         payment_request: paymentOption.address
@@ -536,8 +541,18 @@ export async function checkLightning(invoice_uid) {
     })
 
     if (lightningInvoice) {
-      http.get(`https://lnd.anypayinc.com/invoices/${lightningInvoice.r_hash}`)
+
+      logInfo('lnd.invoice.check.record', lightningInvoice.toJSON())
+
+      return http.get(`https://lnd.anypayinc.com/invoices/${lightningInvoice.r_hash}`)
+    } else {
+
+      logInfo('lnd.invoice.check.noinvoice')
     }
+  } else {
+
+      logInfo('lnd.invoice.check.nopaymentoption')
+
   }
 
 }
