@@ -5,6 +5,8 @@ import { fromSatoshis } from '../../lib/pay'
 
 import {generateInvoice} from '../../lib/invoice';
 
+import { models } from '../../lib/models';
+
 import * as http from 'superagent'
 
 interface Payment{
@@ -34,6 +36,8 @@ export async function getNewAddress(account, amount) {
     .send({
       amount: amount.value
     })
+
+  await models.LightningInvoice.create(response.body)
 
   logInfo('btcln.getnewaddress.result', response.body.payment_request)
 
