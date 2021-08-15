@@ -519,6 +519,29 @@ export function isExpired(invoice) {
   return now > expiry;
 }
 
+export async function checkLightning(invoice_uid) {
+
+  let paymentOption = await models.PaymentOption.findOne({
+    where: {
+      invoice_uid,
+      currency: 'BTCLN'
+    }
+  })
+
+  if (paymentOption) {
+    let lightningInvoice = await models.LightningInvoice.findOne({
+      where: {
+        payment_request: paymentOption.address
+      }
+    })
+
+    if (lightningInvoice) {
+      http.get(`https://lnd.anypayinc.com/invoices/${lightningInvoice.r_hash}`)
+    }
+  }
+
+}
+
 export async function ensureInvoice(uid: string): Promise<any> {
 
   let invoice = await models.Invoice.findOne({ where: { uid }});
