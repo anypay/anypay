@@ -544,7 +544,7 @@ export async function checkLightning(invoice_uid) {
 
       logInfo('lnd.invoice.check.record', lightningInvoice.toJSON())
 
-      return http.get(`https://lnd.anypayinc.com/invoices/${lightningInvoice.r_hash}`)
+      return http.get(`https://lnd.anypayx.com/invoices/${lightningInvoice.r_hash}`)
     } else {
 
       logInfo('lnd.invoice.check.noinvoice')
