@@ -448,7 +448,8 @@ async function getPaymentOptions(invoice_uid) {
     'uri',
     'currency',
     'currency_name',
-    'currency_logo_url'
+    'currency_logo_url',
+    'amount'
   ))
 
 }
