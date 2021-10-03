@@ -88,7 +88,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption): Promise
 
   let outputs = await buildOutputs(paymentOption)
 
-  let memo = invoice.memo || "Bitcoin SV Payment Request by Anypay Inc"
+  let memo = invoice.memo || "Anypay™"
 
   let request = {
     network:"bitcoin-sv",
