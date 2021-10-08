@@ -19,7 +19,8 @@ import {log, xpub, models} from '../../lib'
 
 import { rpc } from './lib/jsonrpc';
 
-import { publishDASH } from '../../lib/blockcypher'
+import * as blockcypher from '../../lib/blockcypher'
+import * as blockchair from '../../lib/blockchair'
 
 import { I_Address } from '../../types/interfaces';
 
@@ -29,7 +30,27 @@ import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
 
+import {oneSuccess} from 'promise-one-success'
+
 var WAValidator = require('anypay-wallet-address-validator');
+
+export async function submitTransaction(rawTx: string) {
+
+  return oneSuccess([
+    blockchair.publish(rawTx, 'dash'),
+    blockcypher.publishDASH(rawTx)
+  ])
+
+}
+
+export async function broadcastTx(rawTx: string) {
+
+  return oneSuccess([
+    blockchair.publish(rawTx, 'dash'),
+    blockcypher.publishDASH(rawTx)
+  ])
+
+}
 
 export function transformHexToPayments(hex: string): Payment[]{
 
@@ -67,11 +88,6 @@ export function transformAddress(address: string){
 
 }
 
-export async function submitTransaction(rawTx: string) {
-
-  return rpc.call('sendrawtransaction', [rawTx]);
-
-}
 
 export async function createInvoice(accountId: number, amount: number) {
 
@@ -141,18 +157,6 @@ export async function getNewAddress(record: I_Address) {
 
 }
 
-async function publishToNode(transaction: string): Promise<string> {
-  return rpc.call('sendrawtransaction', [transaction])
-}
-
-export async function broadcastTx(transaction: string): Promise<string> {
-
-  return any([
-    //publishDASH(transaction),
-    publishToNode(transaction)
-  ])
-
-}
 
 async function checkAddressForPayments(address:string, currency:string){
 
