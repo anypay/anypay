@@ -8,12 +8,6 @@
     },
 
     {
-      "code": "USDH",
-      "name": "Honest Coin USD",
-      "icon_url": ""
-    },
-
-    {
       "code": "LTC",
       "name": "Litecoin",
       "icon_url": "https://app.anypayinc.com/ltc.png"
@@ -36,28 +30,8 @@
     },
 
     {
-      "code": "BTCLN",
-      "name": "BTC Lightning",
-      "enabled": true,
-      "supported": true,
-      "icon_url": ""
-    },
-
-    {
       "code": "DOGE",
       "name": "Dogecoin",
-      "icon_url": ""
-    },
-
-    {
-      "code": "XRP",
-      "name": "XRP",
-      "icon_url": ""
-    },
-
-    {
-      "code": "ZEN",
-      "name": "Horizen",
       "icon_url": ""
     },
 
@@ -67,20 +41,6 @@
       "enabled": true,
       "supported": true,
       "icon_url": ""
-    },
-
-    {
-      "code": "ZEC",
-      "name": "Zcash",
-      "icon_url": "",
-      "unavailable": true
-    },
-
-    {
-      "code": "SMART",
-      "name": "Smart Cash",
-      "icon_url": "",
-      "unavailable": true
     }
 
   ]

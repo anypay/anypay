@@ -26,10 +26,6 @@ const feesFiat = {
     currency: 'USD',
     value: 0.50
   },
-  'ZEC': {
-    currency: 'USD',
-    value: 0.05
-  },
   'BTC': {
     currency: 'USD',
     value: 1.00
