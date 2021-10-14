@@ -7,16 +7,14 @@ import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 
-import { transformHexToPayments } from '../router/plugins/bch/lib';
+import { rawTxToPayment } from '../plugins/bch/lib/rawtx_to_payment';
 import { awaitChannel } from '../lib/amqp';
 const axios = require('axios');
-
-import { Bip70DashPayer } from '../lib/bip70/dash';
 
 program
   .command('publishbch <uid> <hex>')
   .action(async (uid, hex) => {
-    let payments = transformHexToPayments(hex)  
+    let payments = rawTxToPayment(hex)  
 
     console.log('payments', payments);
 
@@ -34,36 +32,6 @@ program
     });
 
   })
-
-program
-  .command('paydashinvoice <invoice_uid>')
-  .action(async (invoiceUID) => {
-
-    try {
-
-      let payer = new Bip70DashPayer(invoiceUID); 
-
-      let payment_request = await payer.fetchPaymentRequest();
-
-      console.log(payment_request);
-
-      let unspent_coins = await payer.fetchUnspentCoins();
-
-      console.log(unspent_coins);
-
-      let transaction = await payer.buildTransaction();
-
-      console.log(transaction);
-
-    } catch(error) { 
-
-      console.log(error.message);
-
-    }
-
-    process.exit(0);
-  
-  });
 
 program
   .command('payinvoice <invoice_uid>')

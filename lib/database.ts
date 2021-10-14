@@ -37,4 +37,8 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+export async function query(statement) {
+  return database.query(statement)
+}
+
 export default database

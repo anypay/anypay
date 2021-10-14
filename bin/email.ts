@@ -2,7 +2,6 @@
 
 import * as program from 'commander';
 import { sendInvoiceToEmail, ambassadorRewardEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
-import { sendEgifterAchReceipt } from '../lib/ach';
 import { models } from '../lib/models';
 import { email as rabbiEmail } from 'rabbi';
 
@@ -139,25 +138,6 @@ program
     process.exit(0);
 
   })
-
-
-program
-  .command('egifter_settlement <ach_batch_id> <email>')
-  .action(async (ach_batch_id, email) => {
-
-    try {
-
-      let resp = await sendEgifterAchReceipt(ach_batch_id, email);
-
-    } catch(error) {
-
-      console.log(error);
-
-    }
-
-    process.exit(0);
-
-  });
 
 program.parse(process.argv);
 

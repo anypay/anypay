@@ -99,8 +99,6 @@ describe("Setting a BSV Address", () => {
 
   before(async () => {
 
-    await database.sync();
-
     try {
       var account = await models.Account.create({
         email: chance.email()

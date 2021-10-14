@@ -20,7 +20,7 @@ export async function bcryptCompare(password, hash) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, hash, (error, res) => {
       if (res) {
-        resolve();
+        resolve(null);
       } else {
         reject(new Error("invalid password"));
       }

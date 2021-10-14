@@ -23,7 +23,7 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
 
   if (firebaseTokens.length == 0) { throw new Error('no firebase token found') }
 
-  var promises = firebaseTokens.map(firebaseToken => {
+  var promises: any[] = firebaseTokens.map(firebaseToken => {
     return new Promise(async (resolve, reject) => {
 
       console.log('token', firebaseToken.toJSON());
@@ -47,7 +47,7 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
           if (err) {
             console.error(err);
             //return reject(err);
-            resolve();
+            resolve(null);
           } else {
             resolve(response);
           }
