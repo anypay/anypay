@@ -15,46 +15,6 @@ const chance = new Chance();
 
 describe('Addresses Library', () => {
 
-  it.skip("should set a valid bsv address with handcash handle", async () => {
-
-    let account = await registerAccount(chance.email(), chance.word());
-
-    let currency = 'BSV'
-
-   let changeset = {
-      account_id: account.id,
-      address: '$brandonbryant',
-      currency: 'BSV'
-    };
-
-    await addresses.setAddress(changeset);
-
-    let address = await models.Address.findOne({ where: { account_id: account.id , currency: 'BSV' }});
-
-    assert(validateAddress(address.value));
-
-  });
-
-  it.skip("should set a valid bsv address with paymail", async () => {
-
-    let account = await registerAccount(chance.email(), chance.word());
-
-    let currency = 'BSV'
-
-   let changeset = {
-      account_id: account.id,
-      address: 'brandonbryant@moneybutton.com',
-      currency: 'BSV'
-    };
-
-    await addresses.setAddress(changeset);
-
-    let address = await models.Address.findOne({ where: { account_id: account.id, currency: 'BSV' }});
-
-    assert(validateAddress(address.value));
-
-  });
-
   it("should set a valid bsv address with valid bsv address", async () => {
 
     let account = await registerAccount(chance.email(), chance.word());

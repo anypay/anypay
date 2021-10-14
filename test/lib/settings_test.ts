@@ -39,20 +39,6 @@ describe("Settings", () => {
       assert.strictEqual(denomination, "GBP");
     });
 
-    it.skip("setDenomination should reject an unsupported denomination", async () => {
-
-      try {
-
-        await settings.setDenomination(account.id, "XXX");
-        
-        assert(false, 'invalid denomination should not be set');
-
-      } catch(error) {
-    
-        assert.strictEqual(error.message, 'invalid denomination');
-      }
-    });
-
   });
 
 });

@@ -8,13 +8,13 @@ describe('Prices', () => {
 
   it('#setPrice should set a price in the database', async () => {
 
-    await prices.setPrice('USD', 0.0001, 'BTC');
+    await prices.setPrice('USD', 0.0001, 'testsource', 'BTC');
 
   });
 
   it("#convert should convert from BTC to BCH", async () => {
 
-    await prices.setPrice('BCH', 10, 'BTC');
+    await prices.setPrice('BCH', 10, 'testsource', 'BTC');
 
     let input = {
       currency: 'BTC',
@@ -31,7 +31,7 @@ describe('Prices', () => {
 
   it("#convert should convert from USD to XRP", async () => {
 
-    await prices.setPrice('XRP', 0.3, 'BTC');
+    await prices.setPrice('XRP', 0.3, 'testsource', 'BTC');
 
     let input = {
       currency: 'USD',
@@ -46,22 +46,5 @@ describe('Prices', () => {
 
   });
   
-  it.skip("#convert should convert from USD to ZEN", async () => {
-
-    await prices.setPrice('ZEN', 0.01, 'BTC');
-
-    let input = {
-      currency: 'USD',
-      value: 12
-    }
-
-    let output = await prices.convert(input, 'ZEN');
-
-    console.log('output of 12 USD to ZEN', output);
-
-    assert(output.value > 0);
-
-  });
-
 });
 

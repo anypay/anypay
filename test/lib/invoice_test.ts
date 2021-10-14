@@ -85,43 +85,6 @@ describe("Creating Invoices", () => {
 
   });
 
-  describe("Replacing an Invoice", () => {
-
-    it.skip("#replaceInvoice should change the currency of an invoice", async () => {
-
-      let account = await registerAccount(chance.email(), chance.word());
-
-      await setAddress({
-        account_id: account.id,
-        currency: "DASH",
-        address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
-      });
-
-      await setAddress({
-        account_id: account.id,
-        currency: "BCH",
-        address: "bitcoincash:pp8skudq3x5hzw8ew7vzsw8tn4k8wxsqsv0lt0mf3g"
-      });
-
-      var amount = {
-        currency: 'USD',
-        value: 15000000
-      };
-
-      await setDenomination({
-        account_id: account.id,
-        currency: amount.currency
-      });
-
-      let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-
-      invoice = await replaceInvoice(invoice.uid, 'BCH');
-
-      assert.strictEqual(invoice.currency, 'BCH')
-
-    });
-
-  });
 
   describe("Settling an Invoice", () => {
 

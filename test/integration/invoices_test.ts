@@ -30,49 +30,6 @@ describe("Creating Invoices via REST", async () => {
     }
   });
 
-  it.skip("POST /invoices/:uid/replacements should replace the invoice", async () => {
-
-    await setAddress({
-      account_id: account.id,
-      currency: "DASH",
-      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
-    });
-
-    await setAddress({
-      account_id: account.id,
-      currency: "BTC",
-      address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
-    });
-
-    var amount = {
-      currency: 'VES',
-      value: 15000000
-    };
-
-    await setDenomination({
-      account_id: account.id,
-      currency: amount.currency
-    });
-
-    let invoice = await invoices.generateInvoice(account.id, amount.value, 'DASH');
-
-    let response = await server.inject({
-      method: 'POST',
-      url: `/invoices/${invoice.uid}/replacements`,
-      payload: {
-        currency: 'BTC'
-      },
-      headers: {
-        'Authorization': auth(accessToken.uid, "")
-      }
-    })
-
-    console.log('replacements response', response);
-
-    assert.strictEqual(response.result.currency, 'BTC');
-
-  })
-
   describe("Including Redirect URL", () => {
 
     it("should allow for a redirect_url POST parameter", async () => {
@@ -116,32 +73,6 @@ describe("Creating Invoices via REST", async () => {
 
   });
 
-  it.skip("POST /invoices should accept webhook_url as a parameter", async () => {
-
-    await setAddress({
-      account_id: account.id,
-      currency: "DASH",
-      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
-    });
-
-    let webhook_url = 'https://webhooks.zeiler.io/123454';
-
-    let response = await server.inject({
-      method: 'POST',
-      url: `/invoices`,
-      payload: {
-        currency: 'DASH',
-        amount: '10',
-        webhook_url
-      },
-      headers: {
-        'Authorization': auth(accessToken.uid, "")
-      }
-    });
-
-    assert.strictEqual(response.result.webhook_url, webhook_url);
-
-  })
 
 });
 
