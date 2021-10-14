@@ -406,15 +406,6 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/clover/accounts/{merchant_id}/invoices",
-    handler: handlers.CloverInvoices.create,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
     path: "/accounts",
     handler: handlers.Accounts.create,
     options: {
@@ -925,32 +916,6 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       handler: handlers.FirebaseTokens.create
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/clover/webhooks",
-    options: {
-      handler: handlers.CloverWebhooks.create
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/clover/auth",
-    options: {
-      auth: "token",
-      handler: handlers.CloverAuth.show
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/clover/auth",
-    options: {
-      auth: "token",
-      handler: handlers.CloverAuth.create
     }
   });
 
