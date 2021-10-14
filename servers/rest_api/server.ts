@@ -890,66 +890,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/square/locations",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareLocations.index
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/square/locations/{location_id}",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareLocations.show
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/square/locations/{location_id}/orders",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareOrders.index
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/square/orders/{order_id}",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareOrders.show
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/square/catalog",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareCatalogObjects.index
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/square/catalog/{object_id}",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: handlers.SquareCatalogObjects.show
-    }
-  });
-
-  server.route({
-    method: "GET",
     path: "/apps",
     options: {
       auth: "token",

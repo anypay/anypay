@@ -56,33 +56,6 @@ function attach(server: Hapi.Server): Hapi.Server {
 
   });
 
-
-  server.route({
-
-    method: "POST",
-
-    path: "/grab-and-go/square/oauth/codes",
-
-    handler: handlers.SquareOauthCodes.create,
-
-    options: {
-
-      auth: "token"
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/grab-and-go/auth/square",
-
-    handler: handlers.SquareOauth.authorize
-
-  });
-
   server.route({
 
     method: "GET",

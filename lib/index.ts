@@ -24,8 +24,6 @@ import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
 import * as auth from './auth';
-import * as square from './square';
-import * as mysql_lib from './mysql';
 import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as slack from './slack/notifier';
@@ -65,7 +63,6 @@ export {
   log,
   login,
   models,
-  mysql_lib,
   password,
   pay,
   plugins,
@@ -74,7 +71,6 @@ export {
   routes,
   settings,
   slack,
-  square,
   utils,
   xpub
 }

@@ -28,7 +28,6 @@
     "bcrypt": "^3.0.6",
     "bcrypt-nodejs": "0.0.3",
     "bignumber.js": "^8.0.2",
-    "bitbox-sdk": "^8.11.2",
     "bitcoind-rpc-dash": "^1.0.1",
     "bitcore-doge-lib": "^8.25.8",
     "bitcore-lib": "^0.16.0",
@@ -109,7 +108,13 @@
     "ws": "^3.3.3",
     "yargs": "^12.0.5",
     "yayson": "^2.0.8",
-    "zeromq": "^4.6.0"
+    "zeromq": "^4.6.0",
+    "asn1.js": "=4.9.1",
+    "asn1.js-rfc3280": "=4.0.0",
+    "asn1.js-rfc5280": "=2.0.0",
+    "bs58": "^4.0.1",
+    "jsrsasign": "^8.0.4",
+    "protobufjs": "^5.0.3"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
