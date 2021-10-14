@@ -36,13 +36,13 @@ describe("BTC Traverser", () => {
 
   })
 
-  it('should traverse and keep state', () => {
+  it('should traverse and keep state', async () => {
 
     let t = new traverser.BTCTraverser(txid)
 
     await t.traverseAncestors(2)
 
-    ancestors = t.getCurrentAncenstors()
+    var ancestors = t.getCurrentAncenstors()
 
     assert.strictEqual(ancestors.length, 1)
 

@@ -361,24 +361,6 @@ async function Server() {
       tags: ['api']
     }
   });
-  server.route({
-    method: "GET",
-    path: "/dashboard",
-    handler: handlers.Dashboard.index,
-    options: {
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/replacements",
-    handler: handlers.Invoices.replace,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
 
   server.route({
     method: "POST",
@@ -744,39 +726,6 @@ async function Server() {
   });
 
   server.route({
-    method: 'GET',
-    path: '/sms_numbers',
-    options: {
-      auth: "token"
-    },
-    handler: handlers.SmsNumbers.index
-  });
-
-  server.route({
-    method: 'DELETE',
-    path: '/sms_numbers/{id}',
-    handler: handlers.SmsNumbers.destroy,
-    options: {
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: 'POST',
-    path: '/sms_numbers',
-    handler: handlers.SmsNumbers.create,
-    options: {
-      auth: "token",
-      validate: {
-        payload: Joi.object().keys({
-          phone_number: Joi.string().required(),
-          name: Joi.string()
-        })
-      }
-    }
-  });
-
-  server.route({
     method: "GET",
     path: "/apps",
     options: {
@@ -911,10 +860,6 @@ if (require.main === module) {
 async function start () {
 
   ActivateDeactivateCoinActor.start();
-
-  await sequelize.sync()
-
-  log.info('database.syncronized')
 
   var server = await Server();
 

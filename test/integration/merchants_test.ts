@@ -11,7 +11,6 @@ describe("Merchants REST API", async () => {
   
   before(async () => {
 
-    await database.sync();
     server = await Server();
 
   });

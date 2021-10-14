@@ -84,85 +84,6 @@ async function Server() {
   await server.register(require('hapi-auth-basic'));
   server.auth.strategy("sudopassword", "basic", { validate: validateSudoPassword});
 
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/paypow/orders",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.PaypowOrders.index,
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/histograms/daily-invoices-paid",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Histograms.dailyPaidInvoices
-
-    }
-
-  });
-
-  server.route({
-
-    method: "POST",
-
-    path: "/api/clicksend/postcards",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.ClicksendPostcards.create,
-
-      validate: {
-        
-        payload : {
-
-          google_place_id: Joi.string().required()
-
-        }
-
-      }
-
-    }
-
-  });
-
-  server.route({
-
-    method: "GET",
-
-    path: "/api/merchant_groups",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: async (req, h) => {
-
-        return models.MerchantGroup.findAll()
-
-      }
-
-    }
-
-  });
-
   server.route({
 
     method: 'DELETE',
@@ -443,38 +364,6 @@ async function Server() {
       auth: 'sudopassword',
 
       handler: handlers.SudoAddresses.unlockAddress
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/gift_card_sales',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.GiftCards.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/gift_card_sales/stats',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.GiftCards.stats
 
     }
 
@@ -776,20 +665,6 @@ async function Server() {
 
   server.route({
 
-    method: "GET",
-
-    path: "/accounts/{id}/volume",
-
-    config: {
-
-      auth: "sudopassword",
-
-      handler: handlers.Accounts.accountVolume
-
-    }
-  });
-  server.route({
-
     method: 'PUT',
 
     path: "/api/accounts/{account_id}/passwords",
@@ -983,38 +858,6 @@ async function Server() {
 
   });
 
-  server.route({
-
-    method: 'GET',
-
-    path: '/api/kraken_invoice_sell_orders',
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.KrakenInvoiceSellOrders.index
-
-    }
-
-  });
-
-  server.route({
-
-    method: 'GET',
-
-    path: `/api/emails`,
-
-    config: {
-
-      auth: 'sudopassword',
-
-      handler: handlers.Emails.index
-
-    }
-
-  });
-
   return server;
 
 }
@@ -1024,8 +867,6 @@ async function Server() {
 async function start() {
 
  try {
-
-    await database.sync()
 
     var server = await Server();
 

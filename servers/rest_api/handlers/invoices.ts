@@ -5,8 +5,6 @@ import * as _ from 'lodash'
 
 import { Op } from 'sequelize';
 
-import {replaceInvoice} from '../../../lib/invoice';
-
 import {plugins} from '../../../lib/plugins';
 
 import { statsd } from '../../../lib/stats/statsd';
@@ -172,37 +170,9 @@ export async function index (request, reply) {
   }
 };
 
-export async function replace (request, reply) {
-
-  let invoiceId = request.params.uid;
-
-  log.info(`controller:invoices,action:replace,invoice_id:${invoiceId}`);
-
-  let invoice = await models.Invoice.findOne({
-    where: {
-      uid: invoiceId
-    }
-  });
-
-  if (invoice) {
-
-    invoice = await replaceInvoice(invoice.uid, request.payload.currency);
-
-    return invoice;
-
-  } else {
-
-    log.error('no invoice found', invoiceId);
-
-    throw new Error('invoice not found')
-  }
-
-}
-
 function selectCurrency(addresses) {
 
   let currency = addresses.reduce((c, address) => {
-    console.log('C', c)
 
     if (c) {
 
@@ -217,8 +187,6 @@ function selectCurrency(addresses) {
       }
 
     }
-
-    console.log('c', c);
 
     return c;
 

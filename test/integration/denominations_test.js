@@ -11,7 +11,7 @@ describe("Setting Denomination Via REST", async () => {
   var accessToken, account, server;
   
   before(async () => {
-    await database.sync();
+
     server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());

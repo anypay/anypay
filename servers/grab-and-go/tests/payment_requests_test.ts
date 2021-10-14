@@ -14,7 +14,7 @@ describe("Create Grab and Go Payment Request", async () => {
  var account, server;
   
   before(async () => {
-    await database.sync();
+
     server = await Server();
 
     await prices.setPrice('BCH', 0.05, 'static', 'USD');

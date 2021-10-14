@@ -23,7 +23,6 @@ import * as email from './email';
 import * as routes from './routes';
 import * as password from './password';
 import * as auth from './auth';
-import * as kraken from './kraken';
 import * as receipts from './receipts';
 import * as slack from './slack/notifier';
 import * as leaderboard from './leaderboard';
@@ -56,7 +55,6 @@ export {
   email,
   events,
   invoices,
-  kraken,
   leaderboard,
   log,
   login,

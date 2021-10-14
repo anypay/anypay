@@ -1,4 +1,5 @@
-import { logger, events, setAddress, unsetAddress } from '../../lib/core';
+
+import { events, setAddress, unsetAddress } from '../../lib/core';
 import { AddressChangeSet } from '../../lib/core/types/address_change_set';
 
 import { lockAddress, unlockAddress  } from '../../lib/addresses';
@@ -24,23 +25,6 @@ describe("Anypay Core", () => {
   });
 
   describe("Updating Account.models Address", () => {
-
-    it("#setAddress should emit an event", (done) => {
-
-      events.once('address:set', async (changeset) => {
-
-        logger.info('address:set', changeset);
-        done();
-
-      });
-
-      setAddress({
-        account_id: account.id,
-        currency: 'DASH',
-        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      }); 
-
-    });
 
     it("#setAddress should fail if locked", async () => {
 
@@ -102,25 +86,6 @@ describe("Anypay Core", () => {
       }});
 
       assert.strictEqual(address.value, addressChangeset.address);
-
-    });
-
-    it("#unsetAddress should emit an event", (done) => {
-
-      events.once('address:unset', changeset => {
-
-        logger.info('address:unset', changeset);
-        done();
-
-      });
-
-      let addressChangeset = {
-        account_id: account.id,
-        currency: 'DASH',
-        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      };
-
-      unsetAddress(addressChangeset);
 
     });
 

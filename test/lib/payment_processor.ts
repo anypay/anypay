@@ -14,7 +14,7 @@ describe("Payment Handler", () => {
 
   before(async () => {
 
-    await prices.setPrice('DASH', 100, 'USD');
+    await prices.setPrice('DASH', 100, 'testsource', 'USD');
 
   });
 

@@ -12,7 +12,7 @@ describe("Creating Invoices via REST", async () => {
   var account, accessToken, server;
   
   before(async () => {
-    await database.sync();
+
     server = await Server();
 
     try {

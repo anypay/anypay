@@ -14,7 +14,7 @@ describe("Account Coins over HTTP", async () => {
   var accessToken, account, server;
   
   before(async () => {
-    await Database.sync();
+
     server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());

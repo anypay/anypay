@@ -13,7 +13,6 @@ describe("Setting Firebase Token via REST", async () => {
   var accessToken, account, server;
   
   before(async () => {
-    await database.sync();
     server = await Server();
 
     account = await generateAccount();

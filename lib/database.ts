@@ -14,9 +14,11 @@ if (!process.env.DATABASE_URL) {
   process.env.DATABASE_URL = 'postgres://postgres:@127.0.0.1:5432/';
 }
 
+var database: any
+
 if (process.env.NODE_ENV === 'production') {
 
-  module.exports = new Sequelize(process.env.DATABASE_URL, {
+  database = new Sequelize(process.env.DATABASE_URL, {
     logging: false,
     dialect: "postgres",
     dialectOptions: {
@@ -29,9 +31,10 @@ if (process.env.NODE_ENV === 'production') {
 
 } else {
 
-  module.exports = new Sequelize(process.env.DATABASE_URL, {
+  database = new Sequelize(process.env.DATABASE_URL, {
     logging: false,
     dialect: "postgres"
   });
 }
 
+export default database

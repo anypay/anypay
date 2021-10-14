@@ -11,7 +11,7 @@ describe("Setting Addresses Via REST", async () => {
   var accessToken, server;
   
   before(async () => {
-    await database.sync();
+
     server = await Server();
 
     try {
