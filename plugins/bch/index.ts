@@ -2,15 +2,11 @@ require('dotenv').config();
 
 import * as http from 'superagent';
 
-let BITBOX = require('bitbox-sdk').BITBOX;
-
-const bitbox = new BITBOX();
+import * as blockchair from '../../lib/blockchair'
 
 import {generateInvoice} from '../../lib/invoice';
 
 import {log, models, xpub} from '../../lib';
-
-import { getLegacyAddressFromCashAddress } from './lib/bitbox'
 
 import { I_Address } from '../../types/interfaces';
 
@@ -23,9 +19,10 @@ export async function submitTransaction(rawTx: string) {
   return broadcastTx(rawTx)
 
 }
+
 export async function broadcastTx(hex: string) {
 
-  return bitbox.RawTransactions.sendRawTransaction(hex);
+  return blockchair.publish(hex, 'bch')
 
 }
 

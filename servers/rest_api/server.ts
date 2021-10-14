@@ -557,16 +557,6 @@ async function Server() {
   });
 
   server.route({
-    method: "GET",
-    path: "/account/rewards",
-    handler: handlers.Accounts.getRewards,
-    options: {
-      auth: "token",
-      tags: ['api'],
-    }
-  });
-
-  server.route({
     method: "PUT",
     path: "/account",
     handler: handlers.Accounts.update,
@@ -694,99 +684,6 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/usd",
-    handler: handlers.MonthlyTotals.usd
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/btc",
-    handler: handlers.MonthlyTotals.btc
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/dash",
-    handler: handlers.MonthlyTotals.dash
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/transactions/{coin}",
-    handler: handlers.MonthlyTotals.totalTransactionsByCoin
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/bch",
-    handler: handlers.MonthlyTotals.bch
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/total",
-    handler: handlers.MonthlyTotals.total
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/accounts",
-    handler: handlers.MonthlyTotals.accounts
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/denomination/{denomination}",
-    handler: handlers.MonthlyTotals.denomination
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/denominations",
-    handler: handlers.MonthlyTotals.denominations
-  });
-
-  server.route({
-    method: "GET",
-    path: "/account/totals/monthly/{currency}",
-    handler: handlers.AccountMonthlyTotals.byCurrency,
-    options: {
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/monthly/count",
-    handler: handlers.MonthlyTotals.count
-  });
-
-  server.route({
-    method: "GET",
-    path: "/totals/merchants",
-    handler: handlers.Totals.merchants
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/ambassador_claims',
-    handler: handlers.Ambassadors.list_account_claims,
-    options: {
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: 'POST',
-    path: '/ambassador_claims',
-    handler: handlers.Ambassadors.claim_merchant,
-    options: {
-      auth: "token"
-    }
-  });
-  
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
