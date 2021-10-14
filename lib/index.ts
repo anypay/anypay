@@ -6,7 +6,6 @@ import * as amqp from './amqp';
 import * as apikeys from './apikeys';
 import * as login from './account_login';
 import * as invoices from './invoice';
-import * as forwards from './forwards';
 import * as settings from './settings';
 import * as prices from './prices';
 import { models } from './models';
@@ -56,7 +55,6 @@ export {
   discount,
   email,
   events,
-  forwards,
   invoices,
   kraken,
   leaderboard,
