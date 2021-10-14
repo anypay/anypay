@@ -37,8 +37,13 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+module.exports = database
+
 export async function query(statement) {
   return database.query(statement)
 }
 
-export default database
+const sequelize = database
+
+export { sequelize }
+
