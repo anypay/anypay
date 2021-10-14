@@ -132,7 +132,7 @@
     "start": "ts-node main.ts",
     "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
     "ws:server": "ts-node servers/websocket/server.ts",
-    "test": "NODE_ENV=test nyc mocha --require=ts-node/register --timeout=20000 test/integration/*.ts test/types/*_test.ts test/models/*_test.ts test/lib/*_test.ts test/plugins/*_test.ts --exit",
+    "test": "NODE_ENV=test nyc mocha --require=ts-node/register --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts test/plugins/*_test.ts --exit",
     "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
     "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
