@@ -6,6 +6,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
           name: Migrate & Seed Test Database
           command: npm run db:migrate
       - run:
