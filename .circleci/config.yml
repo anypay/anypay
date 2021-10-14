@@ -1,8 +1,23 @@
 version: 2.1
 jobs:
+  test:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - run:
+          name: Migrate & Seed Test Database
+          command: npm run db:migrate
+      - run:
+          name: Run Main Tests
+          command: npm test
+      - run:
+          name: Run Payment Request Tests
+          command: npm run payreq:test 
+
   build_docker:
     docker:
-      - image: circleci/node:10
+      - image: circleci/node:12
     steps:
       - checkout
       - setup_remote_docker
@@ -10,32 +25,33 @@ jobs:
           name: Build docker image
           command: docker build -t anypay . 
       - run:
-          name: Migrate & Seed Test Database
-          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -i -t anypay npm run db:migrate
-      - run:
-          ename: Run Main Tests
-          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -e ELASTIC_APM_SERVER_URL=$ELASTIC_APM_SERVER_URL -e ELASTIC_APM_SECRET_TOKEN=$ELASTIC_APM_SECRET_TOKEN -i -t anypay npm test
-      - run:
-          name: Run Payment Request Tests
-          command: docker run -e NODE_ENV=test -e AMQP_URL=$AMQP_URL -e DATABASE_URL=$DATABASE_URL -e DASH_HD_PUBLIC_KEY=$DASH_HD_PUBLIC_KEY -e BSV_HD_PUBLIC_KEY=$BSV_HD_PUBLIC_KEY -e COINMARKETCAP_API_KEY=$COINMARKETCAP_API_KEY -e JSON_PROTOCOL_IDENTITY_WIF=$JSON_PROTOCOL_IDENTITY_WIF -e ELASTIC_APM_SERVER_URL=$ELASTIC_APM_SERVER_URL -e ELASTIC_APM_SECRET_TOKEN=$ELASTIC_APM_SECRET_TOKEN -i -t anypay npm run payreq:test 
-      - run:
           name: Push to Docker Hub
           command: |
-            ./push_to_docker.sh
+            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD 
+            docker tag anypay anypay/anypay:$CIRCLE_BRANCH
+            docker push anypay/anypay:$CIRCLE_BRANCH
+
   deploy:
     machine:
       image: ubuntu-1604:202007-01
     steps:
       - run:
-          name: Chef Client Update Live Container
-          command: echo "no deploy" #ssh ubuntu@api.anypayinc.com "sudo chef-client -o recipe[anypay_api]"
+          name: Deploy to Web Servers
+          command: echo "no deploy"
 
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
-      - build_docker
+      - test
+      - build_docker:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
       - deploy:
           requires:
             - build_docker
