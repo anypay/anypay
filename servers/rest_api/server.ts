@@ -361,30 +361,6 @@ async function Server() {
 
   server.route({
     method: "POST",
-    path: "/v2/invoices",
-    handler: handlers.InvoicesV2.create,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        payload: {
-          amount: Joi.number().required()
-        }
-      },
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/v2/invoices/{uid}",
-    handler: handlers.InvoicesV2.show,
-    options: {
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
     path: "/accounts",
     handler: handlers.Accounts.create,
     options: {
