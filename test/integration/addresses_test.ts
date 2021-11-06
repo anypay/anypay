@@ -79,59 +79,6 @@ describe("Setting Addresses Via REST", async () => {
     }
   })
 
-  it("PUT /addresses/xrp should set the XRP address", async () => {
-    try {
-
-      var address = 'raBmhBNmYFGe5hJ5Gez2MbpNspewctCAGv';
-
-      let response = await server.inject({
-        method: 'PUT',
-        url: '/addresses/xrp',
-        payload: {
-          address: address
-        },
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
-      })
-
-      assert.strictEqual(response.result.value, address);
-
-    } catch(error) {
-
-      console.error('ERROR', error.message);
-      throw error;
-    }
-  });
-
-  it("PUT /addresses/zen should set the ZEN address", async () => {
-
-    try {
-
-      var address = 'znjqSXSH2SbkdLUwrkem7pGSAJUbjzzPWg6';
-
-      let response = await server.inject({
-        method: 'PUT',
-        url: '/addresses/zen',
-        payload: {
-          address: address
-        },
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
-      })
-
-      assert.strictEqual(response.result.currency, 'ZEN');
-      assert.strictEqual(response.result.value, address);
-
-    } catch(error) {
-
-      console.error('ERROR', error.message);
-      throw error;
-    }
-
-  });
-
 })
 
 function auth(username, password) {
