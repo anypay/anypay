@@ -12,8 +12,6 @@ import { log } from '../../lib';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
-import * as ActivateDeactivateCoinActor from '../../actors/activate_deactivate_coin/actor';
-
 import { hash, bcryptCompare } from '../../lib/password';
 
 import { accountCSVReports } from './handlers/csv_reports';
@@ -855,8 +853,6 @@ if (require.main === module) {
 }
 
 async function start () {
-
-  ActivateDeactivateCoinActor.start();
 
   var server = await Server();
 
