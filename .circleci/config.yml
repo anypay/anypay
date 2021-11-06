@@ -22,9 +22,6 @@ jobs:
       - run:
           name: Run Main Tests
           command: npm test
-      - run:
-          name: Run Payment Request Tests
-          command: npm run payreq:test 
 
   build_docker:
     docker:
