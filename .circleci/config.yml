@@ -7,7 +7,7 @@ jobs:
         environment:
           POSTGRES_USER: anypay_test
           POSTGRES_DB: anypay_test
-          POSTGRES_PASSWORD: ""
+          POSTGRES_PASSWORD: "letmein"
     steps:
       - checkout
       - run:
