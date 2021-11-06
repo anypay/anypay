@@ -9,8 +9,6 @@ import * as pay from './pay';
 
 import * as _ from 'underscore';
 
-import { createAddressRoute } from './routes';
-
 import * as database from './database';
 
 import { Payment } from '../types/interfaces';
@@ -428,15 +426,6 @@ export async function createPaymentOptions(account, invoice) {
 
   emitter.emit('invoice.created', invoice.uid);
 
-  await Promise.all(paymentOptions.map(option => {
-
-    return createAddressRoute({
-      account_id: account.id,
-      address: option.address,
-      currency: option.currency
-    });
-  }))
-
 }
 
 /*
@@ -449,21 +438,6 @@ export async function createPaymentOptions(account, invoice) {
   Emits an event `invoice.settled`
 
 */
-
-export async function settleInvoice(invoice, settlementPayment: Payment) {
-
-  invoice.output_hash = settlementPayment.hash;
-  invoice.output_amount = settlementPayment.amount;
-  invoice.output_address = settlementPayment.address;
-  invoice.output_currency = settlementPayment.currency;
-
-  await invoice.save();
-
-  emitter.emit('invoice.settled', invoice.toJSON());
-
-  return invoice;
-
-}
 
 export async function replaceInvoice(uid: string, currency: string) {
 

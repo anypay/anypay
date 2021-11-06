@@ -20,7 +20,6 @@ import { log } from './logger';
 import { plugins } from './plugins';
 import * as blockcypher from './blockcypher';
 import * as email from './email';
-import * as routes from './routes';
 import * as password from './password';
 import * as auth from './auth';
 import * as receipts from './receipts';
@@ -64,7 +63,6 @@ export {
   plugins,
   prices,
   receipts,
-  routes,
   settings,
   slack,
   utils,
