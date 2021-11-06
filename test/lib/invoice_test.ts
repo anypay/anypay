@@ -2,7 +2,6 @@ require('dotenv').config();
 
 import { generateInvoice } from '../../lib/invoice';
 import { replaceInvoice } from '../../lib/invoice';
-import { settleInvoice } from '../../lib/invoice';
 import { registerAccount, setAddressScalar } from '../../lib/accounts';
 import { setAddress, setDenomination } from '../../lib/core';
 
@@ -82,44 +81,6 @@ describe("Creating Invoices", () => {
 
     assert(invoice.amount > 0);
     assert.strictEqual(invoice.currency, 'USD')
-
-  });
-
-
-  describe("Settling an Invoice", () => {
-
-    it('#settleInvoice should update with output payment information', async () => {
-
-      let account = await registerAccount(chance.email(), chance.word());
-
-      await setAddress({
-        account_id: account.id,
-        currency: "DASH",
-        address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
-      });
-
-      var amount = {
-        currency: 'USD',
-        value: 100
-      };
-
-      let invoice = await generateInvoice(account.id, amount.value, 'DASH');
-
-      let payment = {
-        hash: '123412342342342',
-        amount: amount.value * 0.999,
-        currency: 'DASH',
-        address: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9'
-      }
-
-      invoice = await settleInvoice(invoice, payment);
-
-      assert.strictEqual(invoice.output_hash, payment.hash);
-      assert.strictEqual(invoice.output_amount, payment.amount);
-      assert.strictEqual(invoice.output_currency, payment.currency);
-      assert.strictEqual(invoice.output_address, payment.address);
-
-    });
 
   });
 
