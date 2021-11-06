@@ -17,6 +17,9 @@ jobs:
           name: Migrate & Seed Test Database
           command: npm run db:migrate
       - run:
+          name: Seed Prices
+          command: npm run db:seed:prices
+      - run:
           name: Run Main Tests
           command: npm test
       - run:
