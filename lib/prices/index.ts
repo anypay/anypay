@@ -178,10 +178,16 @@ export async function getCryptoPrices(base_currency: string) {
      .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
      .query({
         start: 1,
-        limit: 75,
+        limit: 5000,
         convert: base_currency
       })
       .set( 'X-CMC_PRO_API_KEY', process.env.COINMARKETCAP_API_KEY);
+
+  await models.CoinMarketCapPrice.bulkCreate(resp.body.data.map(price => {
+    price.cmd_id = price.id 
+    delete price['id']
+    return price
+  }))
 
   return resp.body.data;
 
@@ -197,7 +203,8 @@ export async function updateCryptoUSDPrices() {
     'DASH',
     'DOGE',
     'ZEC',
-    'XMR'
+    'XMR',
+    'SOL'
   ];
 
   let prices = await getCryptoPrices('USD');
