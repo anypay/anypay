@@ -26,7 +26,8 @@ export async function updateCryptoUSDPrices() {
     'BCH',
     'BTC',
     'LTC',
-    'DASH'
+    'DASH',
+    'SOL'
   ];
 
   let prices = await getCryptoPrices('USD');

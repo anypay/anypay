@@ -5,8 +5,9 @@ require('dotenv').config();
 const program = require('commander')
 
 import { log } from '../lib';
+import { logInfo } from '../lib/logger';
 
-import { updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
+import { getCryptoPrices, updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 
 program
   .command('seed_prices')
@@ -74,6 +75,27 @@ program
     process.exit(0);
 
   });
+
+program
+  .command('getcmcprices')
+  .action(async () => {
+
+    try {
+
+      let prices = await getCryptoPrices('USD');
+
+      console.log(prices);
+
+    } catch(error) {
+
+      console.error(error.message);
+
+    }
+
+    process.exit(0);
+
+  });
+
 
 program
   .command('update_crypto_usd <currency>')
