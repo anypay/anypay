@@ -109,8 +109,6 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {models} from '../../lib/models';
 
-import {statsd} from '../../lib/stats/statsd'
-
 const polynym = require('polynym');
 
 var WAValidator = require('anypay-wallet-address-validator');
@@ -123,13 +121,7 @@ export async function submitTransaction(rawTx: string) {
 
 async function createInvoice(accountId: number, amount: number) {
 
-  let start = new Date().getTime()
-
   let invoice = await generateInvoice(accountId, amount, 'BSV');
-
-  statsd.timing('BSV_createInvoice', new Date().getTime()-start)
-
-  statsd.increment('BSV_createInvoice')
 
   return invoice;
 

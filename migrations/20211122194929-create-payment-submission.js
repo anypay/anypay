@@ -23,6 +23,9 @@ module.exports = {
       wallet: {
         type: Sequelize.STRING
       },
+      protocol: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

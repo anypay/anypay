@@ -4,7 +4,7 @@ import { rpc } from '../../plugins/btc/jsonrpc'
 
 import * as btc from 'bitcore-lib';
 
-import * as _ from 'lodash'
+const _ = require('lodash')
 
 export class TxNode {
   tx: any;

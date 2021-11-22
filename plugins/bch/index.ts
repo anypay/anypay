@@ -22,13 +22,11 @@ export async function submitTransaction(rawTx: string) {
 
 export async function broadcastTx(hex: string) {
 
-  return blockchair.publish(hex, 'bch')
+  return blockchair.publish('bch', hex)
 
 }
 
 async function createInvoice(accountId: number, amount: number) {
-
-  let start = new Date().getTime()
 
   let invoice = await generateInvoice(accountId, amount, 'BCH');
 
@@ -110,16 +108,12 @@ function deriveAddress(xkey, nonce){
 
 const currency = 'BCH';
 
-const poll = true;
-
 export {
 
   currency,
 
   createInvoice,
 
-  validateAddress,
-
-  poll
+  validateAddress
 
 };

@@ -128,6 +128,20 @@ export async function create(req, h) {
       throw new Error(`${currency.code} payment option for invoice ${req.params.uid} not found`)
     }
 
+    for (let transaction of payment.transactions) {
+
+      models.PaymentSubmission.create({
+        invoice_uid: invoice.uid,
+        txhex: transaction,
+        headers: req.headers,
+        wallet: null,
+        protocol: 'bip70',
+        currency: payment_option.currency
+      })
+    }
+
+
+
     for (const tx of payment.transactions) {
 
       let transaction = tx.toString('hex') 

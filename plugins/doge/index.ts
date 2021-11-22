@@ -4,8 +4,6 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {Payment,Invoice} from '../../types/interfaces';
 
-import {statsd} from '../../lib/stats/statsd'
-
 import * as blockchair from '../../lib/blockchair';
 
 var WAValidator = require('anypay-wallet-address-validator');
@@ -24,13 +22,7 @@ export async function getNewAddress(record) {
 
 export async function createInvoice(accountId: number, amount: number) {
 
-  let start = new Date().getTime()
-
   let invoice = await generateInvoice(accountId, amount, 'DOGE');
-
-  statsd.timing('DOGE_createInvoice', new Date().getTime()-start)
-  
-  statsd.increment('DOGE_createInvoice')
 
   return invoice;
 

@@ -1,13 +1,11 @@
 const Boom = require('boom');
 const uuid = require('uuid')
 
-import * as _ from 'lodash'
+const _ = require('lodash')
 
 import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
-
-import { statsd } from '../../../lib/stats/statsd';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
