@@ -477,8 +477,6 @@ export async function show(request, reply) {
 
 	  if (invoice) {
 
-      invoices.checkLightning(invoice.uid)
-
 	    log.info('invoice.requested', invoice.toJSON());
 
       invoice.payment_options = await getPaymentOptions(invoice.uid)
