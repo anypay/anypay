@@ -128,6 +128,17 @@ export async function create(req, h) {
 
     let wallet = detectWallet(req.headers, req.params.uid)
 
+    for (let transaction of transactions) {
+
+      models.PaymentSubmission.create({
+        invoice_uid,
+        txhex: transaction,
+        headers: req.headers,
+        wallet,
+        currency
+      })
+    }
+
     let response = await submitPayment({
       currency,
       invoice_uid,
