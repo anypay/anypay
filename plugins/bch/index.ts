@@ -22,7 +22,7 @@ export async function submitTransaction(rawTx: string) {
 
 export async function broadcastTx(hex: string) {
 
-  return blockchair.publish('bch', hex)
+  return blockchair.publish('bitcoin-cash', hex)
 
 }
 
