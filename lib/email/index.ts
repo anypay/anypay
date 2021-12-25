@@ -2,7 +2,7 @@ require('dotenv').config()
 import * as requireAll from  'require-all';
 import * as AWS from 'aws-sdk';
 import {models} from '../models';
-import {emitter} from '../events'
+import {events} from '../events'
 import * as database from '../database';
 const log = require("winston");
 const moment = require('moment');
@@ -192,7 +192,7 @@ async function checkInvoiceCount(invoice){
     if(result[1].rows[0].count==1){
 
       firstInvoiceCreatedEmail(invoice.id)
-      emitter.emit('invoice.created.first')
+      events.emit('invoice.created.first')
 
     }
   }catch(error){
@@ -211,7 +211,7 @@ async function checkInvoicePaidCount(invoice){
     var result = await database.query(query);
 
     if(result[1].rows[0].count==1){
-      emitter.emit('invoice.paid.first', invoice)
+      events.emit('invoice.paid.first', invoice)
       //firstInvoicePaidEmail(invoice)
     }
     else{
@@ -224,25 +224,21 @@ async function checkInvoicePaidCount(invoice){
 
 }
 
-emitter.on('account.created', (account) => {
+events.on('account.created', (account) => {
    
   newAccountCreatedEmail(account)
     
 })   
 
-emitter.on('invoice.created', (invoice)=>{
+events.on('invoice.created', (invoice)=>{
  
   checkInvoiceCount(invoice)
  
 })
 
-emitter.on('address.set', (changeset)=>{
+events.on('address.set', (changeset)=>{
 
   addressChangedEmail(changeset.address_id) 
 
-})
-
-emitter.on('invoice.paid.first', (invoice)=>{
-  // first invoice paid email
 })
 

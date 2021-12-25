@@ -1,7 +1,7 @@
 
 import { models } from '../lib/models';
 
-import { emitter } from '../lib/events';
+import { events } from '../lib/events';
 
 var coins = [];
 
@@ -9,7 +9,7 @@ export async function refreshCoins() {
 
   coins = await models.Coin.findAll();
 
-  emitter.emit('coins.refreshed');
+  events.emit('coins.refreshed');
 
 }
 
@@ -31,13 +31,13 @@ export async function initFromConfig(coinsConfig) {
 
   await refreshCoins();
 
-  emitter.emit('coins.initialized');
+  events.emit('coins.initialized');
 
 }
 
 export async function getCoins() {
 
-  emitter.emit('coins.requested');
+  events.emit('coins.requested');
 
   return coins;
 
@@ -53,7 +53,7 @@ export async function deactivateCoin(code) {
 
   await refreshCoins();
 
-  emitter.emit('coins.deactivated', { code });
+  events.emit('coins.deactivated', { code });
 
 }
 
@@ -67,7 +67,7 @@ export async function activateCoin(code) {
 
   await refreshCoins();
 
-  emitter.emit('coins.activated', { code });
+  events.emit('coins.activated', { code });
 
 }
 

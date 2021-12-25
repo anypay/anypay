@@ -15,7 +15,7 @@ import { Payment } from '../types/interfaces';
 
 import * as http from 'superagent';
 
-import {emitter} from './events'
+import {events} from './events'
 
 import { log, logInfo } from './logger'
 
@@ -424,7 +424,7 @@ export async function createPaymentOptions(account, invoice) {
 
   let paymentOptionRecords = await writePaymentOptions(paymentOptions);
 
-  emitter.emit('invoice.created', invoice.uid);
+  events.emit('invoice.created', { uid: invoice.uid });
 
 }
 

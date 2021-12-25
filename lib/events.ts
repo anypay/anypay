@@ -1,33 +1,14 @@
 require('dotenv').config();
 
-import { EventEmitter2 } from 'eventemitter2';
 import {connect} from 'amqplib';
 import {log, logInfo} from './logger';
 import {models} from './models';
 
+import { events } from 'rabbi'
+
 import {publishEventToSlack} from './slack/events';
 
-let emitter = new EventEmitter2({
-
-  wildcard: true
-
-});
-
 const exchange = 'anypay.events';
-
-let events = [
-
-  'account.created',
-
-  'invoice.created',
-
-  'invoice.requested',
-
-  'invoice.payment',
-
-  'invoice.complete'
-
-];
 
 (async function(){ 
 
@@ -41,31 +22,7 @@ let events = [
 
   // publish event when emitted
 
-  events.forEach(event => {
-
-    emitter.on(event, async (data) => {
-
-      var message;
-
-      if (typeof data === 'string') {
-
-        message = data;
-
-      } else {
-
-        message = JSON.stringify(data);
-
-      }
-
-      await channel.publish(exchange, event, new Buffer(message));
-
-      logInfo(`amqp.published`, { exchange, event, message })
-
-    });
-
-  });
-
-  emitter.on('*', async function (data) {
+  events.on('*', async function (data) {
 
     log.info('event.emitted', this.event);
 
@@ -79,7 +36,7 @@ let events = [
 
   log.debug('bound all events to amqp');
 
-  emitter.on('*', async function (data) {
+  events.on('*', async function (data) {
 
     try {
 
@@ -108,5 +65,6 @@ export async function record(data: EventData) {
 
 }
 
-export { emitter }
+export { events as emitter }
+export { events }
 

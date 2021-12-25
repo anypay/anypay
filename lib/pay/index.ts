@@ -9,7 +9,7 @@ import { log, logError, logInfo } from '../logger'
 import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
-import {emitter} from '../events';
+import {events} from '../events';
 
 import { getBitcore } from '../bitcore';
 import { sendWebhookForInvoice } from '../webhooks';
@@ -315,8 +315,8 @@ export async function completePayment(paymentOption, hex: string) {
     id: invoice.id
   }})
 
-  emitter.emit('invoice.paid', invoice)
-  emitter.emit('invoice.payment', invoice.uid)
+  events.emit('invoice.paid', invoice)
+  events.emit('invoice.payment', invoice.uid)
 
   let channel = await awaitChannel()
 
@@ -370,8 +370,8 @@ export async function completeLNPayment(paymentOption, r_hash: string) {
     id: invoice.id
   }})
 
-  emitter.emit('invoice.paid', invoice)
-  emitter.emit('invoice.payment', invoice.uid)
+  events.emit('invoice.paid', invoice)
+  events.emit('invoice.payment', invoice.uid)
 
   let channel = await awaitChannel()
 

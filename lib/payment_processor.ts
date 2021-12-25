@@ -2,7 +2,7 @@ require('dotenv').config();
 
 import { Payment, Invoice } from "../types/interfaces";
 
-import {emitter} from './events';
+import {events} from './events';
 
 import {log} from './logger';
 
@@ -93,7 +93,7 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
 
     log.info('invoice.payment.expired', invoice, payment);
 
-    emitter.emit('invoice.payment.expired', {
+    events.emit('invoice.payment.expired', {
       invoice,
       payment
     });
@@ -111,14 +111,6 @@ export async function handlePayment(invoice: Invoice, payment: Payment) {
 
     await handlePaid(invoice, payment);
 
-  } else if (payment.amount < invoice.amount) {
-
-    await handleUnderpaid(invoice, payment);
-
-  } else if (payment.amount > invoice.amount) {
-
-    await handleOverpaid(invoice, payment);
-
   } else {
 
     throw new Error("invoice neither paid, overpaid, or underpaid");
@@ -134,46 +126,6 @@ function getInvoicePrice(invoice) {
   let invoiceAmount = new BigNumber(invoice.invoice_amount);
 
   return denominationAmount.dividedBy(invoiceAmount);
-}
-
-export async function handleUnderpaid(invoice: Invoice, payment: Payment) {
-  if (payment.amount >= invoice.amount) {
-    throw new Error("underpaid handler called with sufficient payment");
-  }
-
-  let paymentAmount = new BigNumber(payment.amount);
-
-  let price = getInvoicePrice(invoice);
-
-  var result = await models.Invoice.update(
-    {
-      amount_paid: paymentAmount.toNumber(),
-      invoice_amount_paid: paymentAmount.toNumber(),
-      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
-      hash: payment.hash,
-      locked: payment.locked,
-      replace_by_fee: payment.replace_by_fee,
-      status: 'underpaid',
-      paidAt: new Date(),
-      complete: true,
-      output_hash: payment.output_hash,
-      output_currency: payment.output_currency,
-      output_amount: payment.output_amount,
-      output_address: payment.output_address,
-      completed_at: new Date()
-    },
-    {
-      where: { id: invoice.id }
-    }
-  );
-
-  if (result[0] === 1) {
-    emitter.emit('invoice.underpaid', invoice)
-    emitter.emit('invoice.payment', invoice.uid)
-    return invoice;
-  } else {
-    throw new Error("error updating invoice");
-  }
 }
 
 export async function handlePaid(invoice: Invoice, payment: Payment) {
@@ -207,55 +159,11 @@ export async function handlePaid(invoice: Invoice, payment: Payment) {
   
   if (result[0] === 1) {
 
-    emitter.emit('invoice.paid', invoice)
-    emitter.emit('invoice.payment', invoice.uid)
+    events.emit('invoice.paid', invoice)
+    events.emit('invoice.payment', invoice.uid)
     return invoice;
   } else {
     throw new Error("error updating invoice");
   }
 }
 
-export async function handleOverpaid(invoice: Invoice, payment: Payment) {
-  if (payment.amount <= invoice.amount) {
-    throw new Error("overpaid handler called with insufficient payment");
-  }
-  if (payment.amount === invoice.amount) {
-    throw new Error("overpaid handler called with exactly sufficient payment");
-  }
-
-  console.log("handleOverpaid", payment)
-
-  let paymentAmount = new BigNumber(payment.amount);
-
-  let price = getInvoicePrice(invoice);
-
-  var result = await models.Invoice.update(
-    {
-      amount_paid: paymentAmount.toNumber(),
-      invoice_amount_paid: paymentAmount.toNumber(),
-      denomination_amount_paid: paymentAmount.times(price).toFixed(2),
-      hash: payment.hash,
-      locked: payment.locked,
-      replace_by_fee: payment.replace_by_fee,
-      status: 'overpaid',
-      paidAt: new Date(),
-      complete: true,
-      output_hash: payment.output_hash,
-      output_currency: payment.output_currency,
-      output_amount: payment.output_amount,
-      output_address: payment.output_address,
-      completed_at: new Date()
-    },
-    {
-      where: { id: invoice.id }
-    }
-  );
-
-  if (result[0] === 1) {
-    emitter.emit('invoice.overpaid', invoice)
-    emitter.emit('invoice.payment', invoice.uid)
-    return invoice;
-  } else {
-    throw new Error("error updating invoice");
-  }
-}

@@ -7,7 +7,7 @@ import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
-import {emitter} from '../events'
+import {events} from '../events'
 import {AccountAddress} from '../core/types';
 
 import * as geocoder from '../googlemaps';
@@ -193,7 +193,7 @@ export async function registerAccount(email: string, password: string): Promise<
 
   if( account ){
 
-    emitter.emit('account.created', account)
+    events.emit('account.created', account)
 
   }
 
