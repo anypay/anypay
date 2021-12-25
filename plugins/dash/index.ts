@@ -9,8 +9,6 @@ import { any } from 'bluebird'
 
 import {generateInvoice} from '../../lib/invoice';
 
-import * as chainSoAPI from '../../lib/chainSoAPI';
-
 import {Invoice} from '../../types/interfaces';
 
 import {log, xpub, models} from '../../lib'
@@ -23,8 +21,6 @@ import * as blockchair from '../../lib/blockchair'
 import { I_Address } from '../../types/interfaces';
 
 import * as http from 'superagent';
-
-import * as address_subscription from '../../lib/address_subscription';
 
 import * as dash from '@dashevo/dashcore-lib';
 

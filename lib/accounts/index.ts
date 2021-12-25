@@ -1,5 +1,22 @@
 const bcrypt = require('bcrypt');
 
+interface Map<T> {
+    [key: string]: T;
+}
+
+type AccountAddresses = Map<AccountAddress>;
+
+interface AccountAddress {
+  account_id: number;
+  currency: string;
+  address: string;
+  xpubkey: boolean;
+  nonce: number;
+  enabled: boolean;
+  name?: string;
+  code?: string;
+}
+
 import { models } from '../models';
 import { awaitChannel } from '../amqp';
 import { log } from '../logger';
@@ -8,7 +25,6 @@ import * as database from '../database';
 import {getAddress, getSupportedCoins} from './supported_coins';
 
 import {events} from '../events'
-import {AccountAddress} from '../core/types';
 
 import * as geocoder from '../googlemaps';
 

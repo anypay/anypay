@@ -309,17 +309,6 @@ export async function getRewards(request, reply) {
    where: {
      id: accountId 
    },include:[{
-      model: models.VendingMachine,
-      as: 'vending_machines'
-    },
-    {
-      model: models.VendingTransaction,
-      as: 'vending_transactions'
-    },{
-      model: models.VendingTransactionOutput,
-      as: 'vending_transaction_outputs'
-    },
-    {
       model: models.Ambassador,
       as: 'ambassador'
     },{

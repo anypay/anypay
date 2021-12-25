@@ -1,10 +1,6 @@
 import {models} from '../models';
 
 import { getCoins } from '../coins';
-import {
-  AccountAddress,
-  AccountAddresses
-} from '../core/types';
 
 export async function getSupportedCoins(accountId: number): Promise<any> {
 

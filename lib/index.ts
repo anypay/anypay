@@ -24,7 +24,6 @@ import * as password from './password';
 import * as auth from './auth';
 import * as receipts from './receipts';
 import * as slack from './slack/notifier';
-import * as leaderboard from './leaderboard';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
@@ -54,7 +53,6 @@ export {
   email,
   events,
   invoices,
-  leaderboard,
   log,
   login,
   models,

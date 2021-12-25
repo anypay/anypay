@@ -1,10 +1,8 @@
-const BitcoinInvoice = require("../../../lib/bitcoin/invoice");
 
 const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
 import { log } from '../../../lib';
-import { AddressChangeSet } from '../../../lib/core/types/address_change_set';
 
 import { models } from '../../../lib';
 

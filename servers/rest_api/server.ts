@@ -286,12 +286,6 @@ async function Server() {
 
   server.route({
     method: "GET",
-    path: "/api/replace_by_fee/{txid}",
-    handler: handlers.Rbf.show
-  });
-
-  server.route({
-    method: "GET",
     path: "/invoices/{invoice_id}",
     handler: handlers.Invoices.show,
     options: {
@@ -662,19 +656,6 @@ async function Server() {
   /* END PAYMENT PROTOCOLS */
 
   server.route({
-    method: "GET",
-    path: "/csv/r",
-    options: {
-      handler: handlers.CsvPaymentRequest.show,
-      validate: {
-        query: {
-          csv_url:  Joi.string().required()
-        }
-      }
-    }
-  })
-
-  server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
     handler: handlers.MoneybuttonWebhooks.create
@@ -750,12 +731,6 @@ async function Server() {
 
   server.route({
     method: 'GET',
-    path: '/leaderboard',
-    handler: handlers.Leaderboard.index
-  }); 
-
-  server.route({
-    method: 'GET',
     path: '/support/{token}',
     handler: handlers.SupportProxy.show
   }); 
@@ -794,13 +769,6 @@ async function Server() {
     options: {
       auth: "token"
     }
-  }); 
-
-
-  server.route({
-    method: 'GET',
-    path: '/search/accounts',
-    handler: handlers.Search.accounts
   }); 
 
   server.route({
