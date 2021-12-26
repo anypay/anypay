@@ -7494,10 +7494,10 @@
   "resolved" "https://registry.npmjs.org/quick-lru/-/quick-lru-5.1.1.tgz"
   "version" "5.1.1"
 
-"rabbi@^1.17.0":
-  "integrity" "sha512-aDMhc2wb/FquSNbWHLK5Evkg1b1CPkUKR0g1qKWvjMe861OGn9c7Ge3pt3tVHxl4W2nt+ZBFSJVDPfe5bR39bg=="
-  "resolved" "https://registry.npmjs.org/rabbi/-/rabbi-1.17.0.tgz"
-  "version" "1.17.0"
+"rabbi@^1.17.1":
+  "integrity" "sha512-/tOjJMtqvJYdsvl/pydeelZA2Sa+PrwwBUvPtTaGgdXW9pi7YFg8pRauPBc7AYDSbaHSwtf87Fo48UGssKwmuQ=="
+  "resolved" "https://registry.npmjs.org/rabbi/-/rabbi-1.17.1.tgz"
+  "version" "1.17.1"
   dependencies:
     "@types/amqplib" "^0.8.2"
     "@types/bluebird" "^3.5.26"

@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Boom = require('boom');
 var geoip = require('geoip-lite');
 

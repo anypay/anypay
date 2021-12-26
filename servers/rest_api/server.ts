@@ -1,8 +1,6 @@
 "use strict";
 require('dotenv').config();
 
-//require('../../lib/apm')
-
 import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 

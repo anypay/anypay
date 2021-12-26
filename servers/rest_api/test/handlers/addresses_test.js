@@ -5,7 +5,7 @@ const AccessToken = require("../../../../lib/models/access_token");
 const Chance = require('chance'), chance = new Chance();
 
 const { server, Server } = require('../../server');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 import * as assert from 'assert';
 
