@@ -96,7 +96,6 @@
     "sequelize-cli": "^4.0.0",
     "serve-static": "^1.14.1",
     "shortid": "^2.2.15",
-    "slpjs": "^0.21.3",
     "socket.io": "^2.0.3",
     "socket.io-client": "^2.0.3",
     "square-connect": "^2.20191217.0",
