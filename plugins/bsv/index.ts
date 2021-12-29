@@ -8,6 +8,8 @@ import { log } from '../../lib/logger'
 
 import { fromSatoshis } from '../../lib/pay'
 
+import * as Bluebird from 'bluebird'
+
 interface Payment{
   amount: number;
   hash: string;
@@ -70,7 +72,7 @@ export async function broadcastTx(hex) {
     })
   ]
 
-  return Promise.race(miners.map(async miner => {
+  return Bluebird.any(miners.map(async miner => {
 
     let result = await  miner.tx.push(hex); 
 
