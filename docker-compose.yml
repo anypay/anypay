@@ -1,47 +1,28 @@
-version: '2'
-
+version: "3.9"
 services:
-  blockcypher-callbacks:
-    build:
-      context: .
-      dockerfile: ./servers/blockcypher/Dockerfile
+  rabbi:
+    build: .
+    environment:
+      AMQP_URL: amqp://anypay:letmein@rabbitmq/anypay
+      DATABASE_URL: postgres://anypay:letmein@postgres/anypay
+      NODE_ENV: development
+    command: rabbi start
+  api:
+    build: .
     ports:
-      - 8000:8000
-    expose:
-      - "8000"
-  websockets:
-    build:
-      context: .
-      dockerfile: ./servers/websocket/Dockerfile
-    ports:
-      - 3000:3000
-    expose:
-      - "3000"
-  rest-api:
-    build:
-      context: .
-      dockerfile: ./servers/rest_api/Dockerfile
-    ports:
-      - 3000:3000
-    expose:
-      - "3000"
-  blockcypher-processor:
-    build:
-      context: .
-      dockerfile: ./servers/processor/blockcypher/Dockerfile
-  payment-processor:
-    build:
-      context: .
-      dockerfile: ./servers/processor/payments/Dockerfile
-  payouts-cron:
-    build:
-      context: .
-      dockerfile: ./servers/dash_payouts/Dockerfile
-  instantsend-monitor:
-    build:
-      context: .
-      dockerfile: ./processes/dash_monitor/Dockerfile
-  bitcoincash-monitor:
-    build:
-      context: .
-      dockerfile: ./processes/bitcoincash-monitor/Dockerfile
+      - "8000:8000"
+    environment:
+      AMQP_URL: amqp://anypay:letmein@rabbitmq/anypay
+  postgres:
+    image: "postgres"
+    environment:
+      POSTGRES_USER: anypay
+      POSTGRES_DB: anypay
+      POSTGRES_PASSWORD: letmein
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    environment:
+      DEFAULT_USER: anypay
+      DEFAULT_PASS: letmein
+      DEFAULT_VHOST: anypay
+
