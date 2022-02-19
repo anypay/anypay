@@ -27,6 +27,7 @@ import * as slack from './slack/notifier';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
+import * as features from './features';
 
 var initialized = false;
 
@@ -52,6 +53,7 @@ export {
   discount,
   email,
   events,
+  features,
   invoices,
   log,
   login,
