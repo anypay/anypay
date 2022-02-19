@@ -21,13 +21,13 @@ function formatFeatures(json: any): FeatureMap {
 
 function loadFeatures(json: any): FeatureMap {
 
-  let configPath = join(__dirname, '../config/features', `${process.env.NODE_ENV}.json`)
+  let configPath = join(__dirname, '../config/features.json')
 
   if (existsSync(configPath)) {
 
     let file = readFileSync(configPath)
 
-    let config = JSON.parse(file.toString())
+    let config = JSON.parse(file.toString())[process.env.NODE_ENV]
 
     return Object.assign(defaults, config)
 

@@ -9,9 +9,10 @@ COPY package.json /usr/src/app/
 RUN npm install -g typescript
 RUN npm install -g ts-node
 RUN npm install -g mocha 
+RUN npm install -g rabbi 
 RUN npm install 
 
 # Bundle app source
 COPY . /usr/src/app
 
-CMD ./bin/anypay.ts --api --actors slack
+CMD npm run rabbi

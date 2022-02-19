@@ -6,6 +6,7 @@ services:
       AMQP_URL: amqp://anypay:letmein@rabbitmq/anypay
       DATABASE_URL: postgres://anypay:letmein@postgres/anypay
       NODE_ENV: development
+      FEATURES_PROTOCOLS_BIP70: "false"
     command: rabbi start
   api:
     build: .
