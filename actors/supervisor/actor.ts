@@ -14,7 +14,6 @@ export async function start() {
     'invoice_paid_receipt_slack',
     'payment-options-processor',
     'grab_and_go_payment_amqp',
-    'grab_and_go_invoice_order',
     'republish-invoice-paid-to-account-id',
     'invoice_after_create_to_energycity',
     'email-one-day-after-signup',
@@ -22,8 +21,7 @@ export async function start() {
     'account_created_email',
     'ambassador_reward_email',
     'first_address_set_email',
-    'invoice_paid_receipt_email',
-    'lnd_invoice_paid'
+    'invoice_paid_receipt_email'
   ])
 
 }
