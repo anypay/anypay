@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import * as http from 'superagent';
 
+import { BigNumber } from 'bignumber.js'
+
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
 export interface Price {
@@ -26,7 +28,7 @@ export async function fetchCurrencies(base_currency): Promise<Price[]> {
      return {
        base_currency: base_currency.toUpperCase(),
        currency: currency,
-       value: rates[currency],
+       value: new BigNumber(1).dividedBy(rates[currency]).toNumber(),
        source: 'data.fixer.io/api/latest'
      }
   })

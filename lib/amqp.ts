@@ -42,9 +42,19 @@ export async function publishJson(channel, exchange, routingkey, json) {
 
 (async function() {
 
-  connection = await connect(process.env.AMQP_URL);
+  if (process.env.NODE_ENV === 'test') {
+
+    connection = await connect(process.env.TEST_AMQP_URL);
+
+  } else {
+
+    connection = await connect(process.env.AMQP_URL);
+  }
  
   channel = await connection.createChannel();  
+
+  await channel.assertExchange('anypay.events', 'direct')
+  await channel.assertExchange('rabbi.events', 'direct')
 
   channelIsConnected = true;
   

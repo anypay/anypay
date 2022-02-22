@@ -114,15 +114,19 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.7",
+    "@types/chai": "^4.3.0",
+    "@types/chai-as-promised": "^7.1.5",
     "@types/mocha": "^5.2.0",
     "@types/node": "^10.17.46",
+    "chai": "^4.3.6",
+    "chai-as-promised": "^7.1.1",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "nyc": "^15.1.0",
     "ts-node": "^6.2.0"
   },
   "scripts": {
-    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST_PATH --exit",
+    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=5000 --exit",
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",

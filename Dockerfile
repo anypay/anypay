@@ -14,4 +14,4 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 
-CMD ./bin/anypay.ts --api --actors slack
+CMD ts-node main.ts

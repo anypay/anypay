@@ -3,11 +3,19 @@ import { log } from '../logger';
 
 import { models } from '../models';
 
-import * as fixer from '../../lib/fixer';
+import * as fixer from './fixer';
+
+export { fixer }
+
+import { BigNumber } from 'bignumber.js'
 
 import * as http from 'superagent';
 
 import { toSatoshis } from '../pay'
+
+import * as bittrex from './bittrex'
+
+export { bittrex }
 
 export interface Price {
   base_currency: string;
@@ -41,71 +49,98 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
   };
 };
 
+export class PriceNotFoundError implements Error {
+
+  name = "PriceNotFoundError"
+  message = "price not found for pair"
+
+  constructor(input, output) {
+    this.message = `price not found to convert ${input} to ${output}`
+  }
+}
+
 async function convert(inputAmount: Amount, outputCurrency: string, precision?: number): Promise<Amount> {
+
+  // Normalize input to USD if neither input or output is USD 
+  if (inputAmount.currency !== 'USD' && outputCurrency !== 'USD') {
+
+    inputAmount = await convert(inputAmount, 'USD')
+
+  }
 
   // input currency is the account's denomination 
   // output currency is the payment option currency
 
   let where = {
-    base_currency: inputAmount.currency,
-    currency: outputCurrency
+    base_currency: outputCurrency,
+    currency: inputAmount.currency
   };
 
   let price = await models.Price.findOne({ where });
 
-  let targetAmount = inputAmount.value * price.value;
+  if (price) {
 
-  if (outputCurrency === 'BTCLN') {
-    targetAmount = parseInt(toSatoshis(targetAmount).toFixed(0))
+    let targetAmount = new BigNumber(inputAmount.value).times(price.value).dp(MAX_DECIMALS).toNumber();
+
+    return {
+      currency: outputCurrency,
+      value: targetAmount
+    };
+
+  } else {
+
+    let inverse = await models.Price.findOne({ where: {
+      base_currency: inputAmount.currency,
+      currency: outputCurrency
+    }});
+
+    if (!inverse) {
+
+      throw new PriceNotFoundError(inputAmount.currency, outputCurrency)
+
+    }
+
+    let price = new BigNumber(1).dividedBy(inverse.value)
+
+    let targetAmount = price.times(inputAmount.value).dp(MAX_DECIMALS).toNumber()
+
+    return {
+      currency: outputCurrency,
+      value: targetAmount
+    };
+
   }
-
-  return {
-    currency: outputCurrency,
-    value: parseFloat(targetAmount.toFixed(precision || MAX_DECIMALS))
-  };
 };
 
-export async function setPrice(currency:string, value:number, source:string,  base_currency:string) {
+export async function setPrice(price: Price): Promise<Price> {
 
-  log.info("set price", currency, value, base_currency);
+  price.value = new BigNumber(price.value).dp(MAX_DECIMALS).toNumber()
 
-  let [price, isNew] = await models.Price.findOrCreate({
+  log.info("set price", price);
+
+  var [record, isNew] = await models.Price.findOrCreate({
 
     where: {
 
-      currency,
+      currency: price.currency,
 
-      base_currency
+      base_currency: price.base_currency
 
     },
 
-    defaults: {
+    defaults: price
 
-      currency,
-
-      value,
-
-      base_currency,
-    
-      source
-
-    }
   });
 
-  await models.PriceRecord.create({
-    currency,
-    value,
-    base_currency,
-    source
-  })
+  await models.PriceRecord.create(price)
 
   if (!isNew) {
 
-    price.value = value;
+    record.value = price.value;
 
-    price.source = source;
+    record.source = price.source;
 
-    await price.save();
+    await record.save();
 
   }
 
@@ -136,8 +171,19 @@ export async function updateCryptoUSDPrice(currency) {
 
     let value = price.value * BCH_USD_PRICE.value
 
-    await setPrice(currency, value, 'fixer•coinmarketcap', price.base_currency);
-    await setPrice(price.base_currency, 1 / value, 'fixer•coinmarketcap', currency);
+    await setPrice({
+      currency,
+      value, 
+      base_currency: price.base_currency,
+      source: 'fixer•coinmarketcap'
+    });
+
+    await setPrice({
+      base_currency: price.base_currency,
+      value: 1 / value,
+      source: 'fixer•coinmarketcap',
+      currency
+    });
 
   }))
 
@@ -145,11 +191,11 @@ export async function updateCryptoUSDPrice(currency) {
 
 export async function updateUSDPrices() {
 
-  let prices = await fixer.fetchCurrencies('USD');
+  let prices: Price[] = await fixer.fetchCurrencies('USD');
 
-  await Promise.all(prices.map(async (price) => {
+  await Promise.all(prices.map(async (price: Price) => {
 
-    let record = await setPrice(price.currency, price.value, price.source, price.base_currency);
+    let record = await setPrice(price)
 
   }))
 
@@ -162,9 +208,9 @@ export async function updateUSDPrices() {
       source: price.source
     }
   })
-  .map((price) => {
+  .map((price: Price) => {
 
-    return setPrice(price.currency, price.value, price.source, price.base_currency);
+    return setPrice(price)
 
   }));
 
@@ -193,7 +239,7 @@ export async function getCryptoPrices(base_currency: string) {
 
 }
 
-export async function updateCryptoUSDPrices() {
+export async function setAllCryptoPrices() {
  
   const coins = [
     'BSV',
@@ -203,36 +249,27 @@ export async function updateCryptoUSDPrices() {
     'DASH',
     'DOGE',
     'ZEC',
-    'XMR',
-    'SOL'
+    //'XMR',
+    //'SOL'
   ];
 
-  let prices = await getCryptoPrices('USD');
+  let prices: Price[] = await Promise.all(coins.map(bittrex.getPrice))
 
-  await Promise.all(prices.filter(price => {
+  return Promise.all(prices.map(setPrice))
 
-    return coins.includes(price.symbol);
-  })
-  .map(price => {
-    return {
-      currency: price.symbol,
-      base_currency: 'USD',
-      value: 1 / price['quote']['USD']['price'],
-      source: 'coinmarketcap.com'
-    }
-  })
-  .map(async price => {
+}
 
-    await setPrice(price.currency, price.value, price.source, price.base_currency)
-    await setPrice(price.base_currency, 1 / price.value, price.source, price.currency);
+export async function setAllFiatPrices(): Promise<Price[]> {
 
-  }))
+  let prices: Price[] = await fixer.fetchCurrencies('USD')
 
-  for (let coin of coins) {
+  for (let price of prices) {
 
-    await updateCryptoUSDPrice(coin)
+    await setPrice(price)
 
   }
+
+  return prices
 
 }
 
