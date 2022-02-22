@@ -9,10 +9,6 @@ jobs:
           POSTGRES_DB: anypay_test
           POSTGRES_PASSWORD: "letmein"
       - image: rabbitmq:3
-        environment:
-          DEFAULT_USER: anypay_test
-          DEFAULT_PASS: "letmein"
-          RABBITMQ_DEFAULT_VHOST: anypay
     steps:
       - checkout
       - run:
