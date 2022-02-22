@@ -13,10 +13,18 @@ import { setAddress } from '../lib/core';
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
 }
+import * as chai from 'chai'
+
+const chaiAsPromised = require('chai-as-promised')
+
+chai.use(chaiAsPromised)
+
+const expect = chai.expect
 
 export {
   chance,
   assert,
-  uuid
+  uuid,
+  expect
 }
 
