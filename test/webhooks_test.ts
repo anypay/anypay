@@ -26,9 +26,9 @@ import {
 
 } from '../lib/webhooks'
 
-import { models } from '../lib/models'
-
 import { createClient, loadClientForAccount } from '../lib/get_402'
+
+import { models } from '../lib/models'
 
 describe('Getting Prices', () => {
 
@@ -299,7 +299,6 @@ describe('Getting Prices', () => {
     })
 
     it("should not attempt webhook if no get402 client key", async() => {
-
       const account = new Account(await utils.generateAccount())
 
       var webhook_url = "https://anypay.sv/api/test/webhooks"
