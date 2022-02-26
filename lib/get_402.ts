@@ -3,8 +3,7 @@ import * as bsv from 'bsv'
 
 let secret = process.env.GET402_APP_SECRET
 
-//import { App, Client } from 'get402'
-import { App, Client } from '/Users/zyler/github/ProofOfWorkCompany/get402-js/src'
+import { App, Client } from 'get402'
 
 const app = App.load(secret)
 
