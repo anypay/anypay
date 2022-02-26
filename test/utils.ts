@@ -13,11 +13,39 @@ import { setAddress } from '../lib/core';
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
 }
+
+import * as bsv from 'bsv'
+export async function generateKeypair() {
+
+  let privateKey = new bsv.PrivateKey()
+
+  let address = privateKey.toAddress()
+
+  return {
+
+    privateKey: privateKey.toWIF(),
+
+    address: address.toString()
+
+  }
+
+}
+
 import * as chai from 'chai'
+
+export { chai }
 
 const chaiAsPromised = require('chai-as-promised')
 
 chai.use(chaiAsPromised)
+
+const spies = require('chai-spies');
+
+chai.use(spies);
+
+var spy = chai.spy.sandbox()
+
+export { spy }
 
 const expect = chai.expect
 
