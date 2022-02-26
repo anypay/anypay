@@ -13,6 +13,24 @@ import { v4 } from 'uuid'
 
 import { OrmRecord } from './orm'
 
+export class InvoiceNotFound implements Error {
+  name = 'InvoiceNotFound'
+  message = 'Invoice Not Found'
+}
+
+export async function ensureInvoice(uid: string) {
+
+  let record = await models.Invoice.findOne({
+    where: { uid }
+  })
+
+
+  if (!record) { throw new InvoiceNotFound() }
+
+  return new Invoice(record)
+
+}
+
 interface NewInvoice {
 
   account: Account;
@@ -53,6 +71,10 @@ export class Invoice {
     return this.record.toJSON()
   }
 
+  get account_id(): any {
+    return this.record.account_id
+  }
+
   get uid(): string {
     return this.record.uid
   }
@@ -60,6 +82,16 @@ export class Invoice {
   get webhook_url(): string {
 
     return this.record.webhook_url
+
+  }
+
+  async getAccount(): Promise<Account> {
+
+    let record = await models.Account.findOne({
+      where: { id: this.record.account_id }
+    })
+
+    return new Account(record)
 
   }
 

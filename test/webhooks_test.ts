@@ -1,7 +1,9 @@
 
 require('dotenv').config()
 
-import { expect, chai, spy } from './utils'
+import { email } from 'rabbi'
+
+import { assert, expect, chai, spy } from './utils'
 
 import * as utils from './utils'
 
@@ -16,12 +18,17 @@ import { setAddress } from '../lib/addresses'
 import { Account } from '../lib/account'
 import { Invoice } from '../lib/invoices'
 
-import { findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent } from '../lib/webhooks'
-import { ApiKeyPaymentRequired, makePaidWebhook, PaidWebhook, ApiClient } from '../lib/webhooks'
+import {
+
+  findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent,
+  ApiKeyPaymentRequired, makePaidWebhook, PaidWebhook, ApiClient,
+  getPaidWebhookForInvoice
+
+} from '../lib/webhooks'
 
 import { models } from '../lib/models'
 
-import { createClient } from '../lib/get_402'
+import { createClient, loadClientForAccount } from '../lib/get_402'
 
 describe('Getting Prices', () => {
 
@@ -243,6 +250,100 @@ describe('Getting Prices', () => {
         paidWebhook.attemptWebhook()
 
       ).to.be.eventually.rejectedWith('Payment Required To Access This Resource')
+    })
+
+  })
+
+  describe('Triggering Webhook Upon Payment', () => {
+
+    it("should automatically load the correct get402 api client if one doesn't exist", async() => {
+
+      let account = new Account(await utils.generateAccount())
+
+      let client = await loadClientForAccount(account)
+
+      assert(client.privatekey)
+
+    })
+
+    it("should not include the private key subsequent times", async() => {
+
+      let account = new Account(await utils.generateAccount())
+
+      let client = await loadClientForAccount(account)
+
+      client = await loadClientForAccount(account)
+
+      assert(!client.privateKey)
+
+    })
+
+    it("should attempt webhook if client key already exists", async() => {
+
+      const account = new Account(await utils.generateAccount())
+
+      var webhook_url = "https://anypay.sv/api/test/webhooks"
+
+      let invoice = await createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+      await loadClientForAccount(account)
+
+      let webhook = await getPaidWebhookForInvoice(invoice)
+
+      assert(webhook)
+
+    })
+
+    it("should not attempt webhook if no get402 client key", async() => {
+
+      const account = new Account(await utils.generateAccount())
+
+      var webhook_url = "https://anypay.sv/api/test/webhooks"
+
+      let invoice = await createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+      let webhook = await getPaidWebhookForInvoice(invoice)
+
+      assert(!webhook)
+
+    })
+
+    it("should send an email when getting an InsufficientFunds error", async() => {
+
+      const account = new Account(await utils.generateAccount())
+
+      await loadClientForAccount(account)
+
+      var webhook_url = "https://anypay.sv/api/test/webhooks"
+
+      let invoice = await createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+      let webhook = await getPaidWebhookForInvoice(invoice)
+
+      spy.on(email, ['sendEmail'])
+
+      try {
+
+        await webhook.attemptWebhook()
+       
+      } catch(error) {
+
+      }
+
+      expect(email.sendEmail).to.have.been.called.with('get402-insufficient-funds')
+
     })
 
   })

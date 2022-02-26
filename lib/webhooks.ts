@@ -4,7 +4,13 @@ import { log } from './logger';
 
 import { Invoice } from './invoices'
 
-import { createClient, Client } from './get_402'
+import { PaymentRequired } from 'get402'
+
+import { Account, findAccount } from './account'
+
+import { email } from 'rabbi'
+
+import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
 
@@ -138,6 +144,12 @@ export class Webhook {
     this.attempts = params.attempts;
 
     this.invoice = params.invoice;
+
+  }
+
+  async getAccount(): Promise<Account> {
+
+    return findAccount(this.invoice.account_id)
 
   }
 
@@ -300,6 +312,7 @@ export interface ApiClient {
 export class PaidWebhook {
 
   client: Client;
+
   webhook: Webhook
 
   constructor(params: NewPaidWebhook) {
@@ -312,9 +325,25 @@ export class PaidWebhook {
 
   async attemptWebhook(): Promise<Attempt> {
 
-    await this.client.chargeCredit({ credits: 1 })
+    try {
 
-    return attemptWebhook(this.webhook)
+      await this.client.chargeCredit({ credits: 1 })
+
+      return attemptWebhook(this.webhook)
+
+    } catch(error) {
+
+      if (error instanceof PaymentRequired) {
+
+        let account = await this.webhook.getAccount()
+
+        await email.sendEmail('get402-insufficient-funds', account.email, 'noreply@anypayx.com')
+
+      }
+
+      throw error
+
+    }
 
   }
 
@@ -330,4 +359,20 @@ export function makePaidWebhook(params: NewPaidWebhook): PaidWebhook {
   return new PaidWebhook(params)
 
 }
+export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWebhook> {
+
+  let account = await invoice.getAccount()
+
+  let client = await findClient(account)
+
+  if (!client) {
+
+    return null
+  }
+
+  let webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+  return makePaidWebhook({ webhook, client })
+}
+
 
