@@ -8,6 +8,7 @@ export async function start() {
 
   startActors([
     'webhooks',
+    'paid_webhooks',
     'payment_push_notification',
     'grab_and_go_push_notification',
     'invoice_created_to_slack',
