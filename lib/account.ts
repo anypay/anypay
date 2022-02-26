@@ -20,7 +20,6 @@ export class Account {
     return this.record.email
   }
 
-
   get denomination () {
 
     return this.record.denomination
