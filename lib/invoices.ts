@@ -1,5 +1,5 @@
 
-import { isURL } from 'validator'
+const validator = require('validator')
 
 import { createWebhook } from './webhooks'
 
@@ -10,8 +10,6 @@ import { computeInvoiceURI } from './uri'
 import { models } from './models'
 
 import { v4 } from 'uuid'
-
-import { OrmRecord } from './orm'
 
 export class InvoiceNotFound implements Error {
   name = 'InvoiceNotFound'
@@ -130,7 +128,7 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   if (params.webhook_url) {
 
-    if (isURL(params.webhook_url, {protocols: 'https'})) {
+    if (validator.isURL(params.webhook_url, {protocols: 'https'})) {
 
       newInvoice['webhook_url'] = params.webhook_url
 
