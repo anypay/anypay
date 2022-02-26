@@ -1,0 +1,184 @@
+
+require('dotenv').config()
+
+import { expect, chai, spy } from './utils'
+
+import * as utils from './utils'
+
+import * as http from 'superagent'
+
+import { createInvoice, InvalidWebhookURL } from '../lib/invoices'
+
+import { setAddress } from '../lib/addresses'
+
+import { Account } from '../lib/account'
+import { Invoice } from '../lib/invoices'
+
+import { findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent } from '../lib/webhooks'
+
+import { models } from '../lib/models'
+
+describe('Getting Prices', () => {
+
+  var account;
+
+  beforeEach(() => spy.restore())
+
+  before(async () => {
+
+    account = new Account(await utils.generateAccount())
+
+    let { address } = await utils.generateKeypair()
+
+    await setAddress({
+      account_id: account.id,
+      currency: 'BSV',
+      address: address
+    })
+
+  })
+
+  it('should require that a webhook URL is a valid URL', async () => {
+    var webhook_url = "notavalidurl"
+
+    expect(
+
+      createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+    ).to.be.eventually.rejectedWith(new InvalidWebhookURL(webhook_url))
+
+  })
+
+  it('should accept a valid webhook URL', async () => {
+
+    var webhook_url = "https://anypay.sv/api/test/webhooks"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    expect(invoice.webhook_url).to.be.equal(webhook_url)
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.url).to.be.equal(webhook_url)
+
+    expect(webhook.success).to.be.equal(false)
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+  })
+
+  it('should attempt a webhook', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    spy.on(http, ['get', 'post'])
+
+    spy.on(webhook, ['invoiceToJSON'])
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(http.post).to.have.been.called()
+
+    expect(webhook.invoiceToJSON).to.have.been.called()
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.attempts[0].response_code).to.be.equal(200)
+
+    expect(webhook.status).to.be.equal('success')
+
+  })
+
+  it('should fair a webhook when server not responding', async () => {
+
+    var webhook_url = "https://anypay.sv/api/invalid"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    spy.on(http, ['get', 'post'])
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(http.post).to.have.been.called()
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.attempts[0].response_code).to.be.equal(405)
+
+    expect(webhook.status).to.be.equal('failed')
+
+  })
+
+  it('should preventing a webhook attempt given prior success', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.status).to.be.equal('success')
+
+    expect(webhook.success).to.be.equal(true)
+
+    expect(
+
+      attemptWebhook(webhook)
+    
+    ).to.be.eventually.rejectedWith(WebhookAlreadySent)
+
+  })
+
+  it('webhook retry schedule should default to no_retry', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice: Invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.retry_policy).to.be.equal('no_retry')
+
+  })
+
+})
