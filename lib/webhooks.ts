@@ -4,6 +4,8 @@ import { log } from './logger';
 
 import { Invoice } from './invoices'
 
+import { createClient, Client } from './get_402'
+
 import * as http from 'superagent';
 
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
@@ -86,6 +88,11 @@ class WebhookNotFound implements Error {
 export class WebhookAlreadySent implements Error {
   name = 'WebhookAlreadySent'
   message = 'webhook already sent for this invoice'
+}
+
+export class ApiKeyPaymentRequired implements Error {
+  name = 'ApiKeyPaymentRequired'
+  message = 'webhook may not be sent without api key credits'
 }
 
 interface NewAttempt {
@@ -281,6 +288,46 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
   await Promise.all([record.save(), webhook.save()])
 
   return new Attempt({record, webhook})
+
+}
+
+export interface ApiClient {
+  identifier: string;
+}
+
+
+
+export class PaidWebhook {
+
+  client: Client;
+  webhook: Webhook
+
+  constructor(params: NewPaidWebhook) {
+
+    this.client = createClient(params.client.identifier);
+
+    this.webhook = params.webhook;
+
+  }
+
+  async attemptWebhook(): Promise<Attempt> {
+
+    await this.client.chargeCredit({ credits: 1 })
+
+    return attemptWebhook(this.webhook)
+
+  }
+
+}
+
+interface NewPaidWebhook {
+  webhook: Webhook,
+  client: ApiClient
+}
+
+export function makePaidWebhook(params: NewPaidWebhook): PaidWebhook {
+
+  return new PaidWebhook(params)
 
 }
 

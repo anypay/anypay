@@ -7,6 +7,8 @@ import * as utils from './utils'
 
 import * as http from 'superagent'
 
+import * as get402 from 'get402'
+
 import { createInvoice, InvalidWebhookURL } from '../lib/invoices'
 
 import { setAddress } from '../lib/addresses'
@@ -15,8 +17,11 @@ import { Account } from '../lib/account'
 import { Invoice } from '../lib/invoices'
 
 import { findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent } from '../lib/webhooks'
+import { ApiKeyPaymentRequired, makePaidWebhook, PaidWebhook, ApiClient } from '../lib/webhooks'
 
 import { models } from '../lib/models'
+
+import { createClient } from '../lib/get_402'
 
 describe('Getting Prices', () => {
 
@@ -178,6 +183,67 @@ describe('Getting Prices', () => {
     let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
 
     expect(webhook.retry_policy).to.be.equal('no_retry')
+
+  })
+
+  describe('Paid Webhooks', () => {
+
+    it("should be allowed with a key that has a positive balance", async () => {
+
+      var webhook_url = "https://reqbin.com/echo/post/json"
+
+      let invoice: Invoice = await createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+      let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+
+      let client: get402.Client = createClient(process.env.GET402_TEST_CLIENT_IDENTIFIER)
+
+      let paidWebhook: PaidWebhook = new PaidWebhook({ webhook, client })
+
+      let startingBalance = await client.getBalance()
+
+      let attempt = await paidWebhook.attemptWebhook()
+
+      let newBalance = await client.getBalance()
+
+      expect(newBalance).to.be.equal(startingBalance - 1)
+
+      expect(attempt.response_code).to.be.equal(200)
+
+      expect(webhook.status).to.be.equal('success')
+
+    })
+
+    it("should by default declined sending webhooks with empty API key", async () => {
+
+      var webhook_url = "https://reqbin.com/echo/post/json"
+
+      let invoice: Invoice = await createInvoice({
+        account,
+        amount: 10,
+        webhook_url
+      })
+
+      let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+      let {privateKey, address} = await utils.generateKeypair()
+
+      let client: get402.Client = createClient(address, privateKey)
+
+
+      let paidWebhook: PaidWebhook = new PaidWebhook({ webhook, client })
+
+      return expect(
+
+        paidWebhook.attemptWebhook()
+
+      ).to.be.eventually.rejectedWith('Payment Required To Access This Resource')
+    })
 
   })
 
