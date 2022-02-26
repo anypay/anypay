@@ -26,6 +26,8 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
   var response_code, response_body, ended_at, error;
   var resp;
 
+  var status = 'pending'
+
   if (invoice.webhook_url) {
 
     try {
@@ -46,6 +48,8 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
       ended_at = new Date();
 
+      status = 'success'
+
     } catch(e) {
 
       response_code = e.response.statusCode;
@@ -59,7 +63,11 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
       ended_at = new Date();
 
+      status = 'failed'
+
     }
+
+
 
     let webhook = await models.Webhook.create({
       started_at,
@@ -69,7 +77,8 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
       response_body,
       error,
       ended_at,
-      url
+      url,
+      status
     })
 
     return webhook;
