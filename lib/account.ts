@@ -1,28 +1,23 @@
 
 import { models } from './models'
 
-export class Account {
+import { Orm, Record } from './orm'
 
-  record: any;
-
-  constructor(record: any) {
-
-    this.record = record;
-  }
+export class Account extends Orm {
 
   get id () {
 
-    return this.record.id
+    return this.record.dataValues.id
   }
 
   get email () {
 
-    return this.record.email
+    return this.record.dataValues.email
   }
 
   get denomination () {
 
-    return this.record.denomination
+    return this.record.dataValues.denomination
 
   }
 

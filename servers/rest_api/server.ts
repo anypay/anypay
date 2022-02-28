@@ -784,6 +784,16 @@ async function Server() {
     handler: handlers.Webhooks.index
   }); 
 
+  server.route({
+    method: 'POST',
+    path: '/api/v1/webhooks/{invoice_uid}/attempts',
+    options: {
+      auth: "token"
+    },
+    handler: handlers.Webhooks.attempt
+  }); 
+
+
 
 
   accountCSVReports(server);

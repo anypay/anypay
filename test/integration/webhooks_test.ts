@@ -24,6 +24,38 @@ describe("Listing Available Webhooks", async () => {
 
   })
 
+  it("POST /api/v1/webhooks/:invoice_uid should allow retrying failed webhook", async () => {
+
+    let account = await utils.generateAccount()
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url: 'https://anypayx.com/api/invalid'
+    })
+
+    let response = await utils.authRequest(account, {
+      method: 'POST',
+      url: `/api/v1/webhooks/${invoice.uid}/attempts`
+    })
+
+    expect(response.statusCode).to.be.equal(201)
+    expect(response.result.webhook.invoice_uid).to.be.equal(invoice.uid)
+    expect(response.result.webhook.attempts.length).to.be.equal(1)
+    expect(response.result.attempt.response_code).to.be.equal(405)
+
+    response = await utils.authRequest(account, {
+      method: 'GET',
+      url: '/api/v1/webhooks'
+    })
+
+    expect(response.statusCode).to.be.equal(200)
+    expect(response.result.webhooks.length).to.be.equal(1)
+
+  })
+
+
+
   it("should return a list that is not empty", async () => {
 
     var webhook_url = "https://reqbin.com/echo/post/json"
