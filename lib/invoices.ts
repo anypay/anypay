@@ -147,7 +147,9 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
       invoice_uid: uid,
 
-      url: params.webhook_url
+      url: params.webhook_url,
+
+      account_id: invoice.account_id
 
     })
   }

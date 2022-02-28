@@ -1,5 +1,6 @@
 
 import { models } from './models';
+
 import { log } from './logger';
 
 import { Invoice } from './invoices'
@@ -70,6 +71,7 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
 
     let webhook = await models.Webhook.create({
+      account_id: invoice.account_id,
       started_at,
       invoice_uid,
       type,
@@ -214,6 +216,7 @@ export async function findWebhook(where: FindWebhook) {
 interface CreateWebhook {
   invoice_uid: string;
   url: string;
+  account_id: number;
 }
 
 export async function createWebhook(where: CreateWebhook): Promise<Webhook> {
@@ -384,4 +387,24 @@ export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWe
   return makePaidWebhook({ webhook, client })
 }
 
+interface ListOptions {
+  limit?: number;
+  offset?: number;
+}
+
+export async function listForAccount(account: Account, options: ListOptions = {}): Promise<any[]> {
+
+  let webhooks = await models.Webhook.findAll({
+    where: { account_id: account.id },
+    offset: options.offset,
+    limit: options.limit,
+    include: [{
+      model: models.WebhookAttempt,
+      as: 'attempts'
+    }]
+  })
+
+  return webhooks
+
+}
 
