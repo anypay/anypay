@@ -129,5 +129,13 @@ models.Invoice.hasMany(models.InvoiceNote, {
   sourceKey: 'uid'
 });
 
+models.Webhook.hasMany(models.WebhookAttempt, {
+  foreignKey: 'webhook_id',
+  sourceKey: 'id',
+  as: 'attempts'
+});
+
+
+
 export { models };
 

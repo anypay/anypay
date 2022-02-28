@@ -130,7 +130,7 @@
     "ts-node": "^6.2.0"
   },
   "scripts": {
-    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=5000 --exit",
+    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
     "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
     "start": "ts-node main.ts",

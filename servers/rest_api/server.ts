@@ -775,6 +775,17 @@ async function Server() {
     handler: handlers.Accounts.nearby
   }); 
 
+  server.route({
+    method: 'GET',
+    path: '/api/v1/webhooks',
+    options: {
+      auth: "token"
+    },
+    handler: handlers.Webhooks.index
+  }); 
+
+
+
   accountCSVReports(server);
 
   server.route({
