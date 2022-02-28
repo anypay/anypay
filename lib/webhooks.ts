@@ -11,6 +11,8 @@ import { Account, findAccount } from './account'
 
 import { email } from 'rabbi'
 
+import { Orm } from './orm'
+
 import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
@@ -117,21 +119,18 @@ interface NewAttempt {
   webhook: Webhook;
 }
 
-export class Attempt {
+export class Attempt extends Orm {
 
   webhook: Webhook;
 
-  record: any;
-
   constructor(params: NewAttempt) {
+    super(params.record)
     this.webhook = params.webhook
-    this.record = params.record
   }
 
   get response_code() {
-    return this.record.response_code
+    return this.get('response_code')
   }
-
 }
 
 interface NewWebhook {
@@ -140,9 +139,7 @@ interface NewWebhook {
   attempts?: Attempt[];
 }
 
-export class Webhook {
-
-  record: any;
+export class Webhook extends Orm {
 
   attempts: Attempt[];
 
@@ -150,13 +147,24 @@ export class Webhook {
 
   constructor(params: NewWebhook) {
 
-    this.record = params.record;
+    super(params.record)
 
     this.attempts = params.attempts;
 
     this.invoice = params.invoice;
 
   }
+
+  toJSON() {
+
+    let json = super.toJSON()
+
+    let attempts = this.attempts.map(attempt => attempt.toJSON())
+
+    return Object.assign(json, { attempts })
+
+  }
+
 
   async getAccount(): Promise<Account> {
 
@@ -165,27 +173,23 @@ export class Webhook {
   }
 
   get retry_policy(): string {
-    return this.record.retry_policy
+    return this.get('retry_policy')
   }
 
   get id(): number {
-    return this.record.id
+    return this.get('id')
   }
 
   get url(): string {
-    return this.record.url
+    return this.get('url')
   }
 
   get success(): boolean {
-    return this.record.status === 'success'
+    return this.get('status') === 'success'
   }
 
   get status(): boolean {
-    return this.record.status
-  }
-
-  async save() {
-    return this.record.save();
+    return this.get('status')
   }
 
   invoiceToJSON() {
@@ -193,6 +197,24 @@ export class Webhook {
     return this.invoice.toJSON()
 
   }
+
+}
+
+export async function webhookForInvoice(invoice: Invoice) {
+
+  let record = await models.Webhook.findOne({
+    where: { invoice_uid: invoice.uid }
+  })
+
+  if (!record) { throw new WebhookNotFound() }
+
+  let attempts = await models.WebhookAttempt.findAll({
+
+    where: { webhook_id: record.id }
+
+  })
+
+  return new Webhook({ record, attempts, invoice })
 
 }
 
@@ -282,7 +304,7 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
     record.ended_at = new Date();
 
-    webhook.record.status = 'success'
+    await webhook.set('status', 'success')
 
   } catch(e) {
 
@@ -305,7 +327,7 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
     record.ended_at = new Date();
 
-    webhook.record.status = 'failed'
+    await record.set('status', 'failed')
 
   }
 

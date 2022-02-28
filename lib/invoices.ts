@@ -9,6 +9,8 @@ import { computeInvoiceURI } from './uri'
 
 import { models } from './models'
 
+import { Orm } from './orm'
+
 import { v4 } from 'uuid'
 
 export class InvoiceNotFound implements Error {
@@ -53,40 +55,28 @@ export class InvalidWebhookURL implements Error {
   }
 }
 
-export class Invoice {
-
-  record: any;
-
-  constructor(record: any) {
-    this.record = record;
-  }
-
-  async save() {
-    return this.record.save()
-  }
-
-  get toJSON(): any {
-    return this.record.toJSON()
-  }
+export class Invoice extends Orm{
 
   get account_id(): any {
-    return this.record.account_id
+
+    return this.get('account_id')
   }
 
   get uid(): string {
-    return this.record.uid
+
+    return this.get('uid')
   }
 
   get webhook_url(): string {
 
-    return this.record.webhook_url
+    return this.get('webhook_url')
 
   }
 
   async getAccount(): Promise<Account> {
 
     let record = await models.Account.findOne({
-      where: { id: this.record.account_id }
+      where: { id: this.get('account_id') }
     })
 
     return new Account(record)
@@ -143,20 +133,13 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   const account = await findAccount(invoice.account_id)
 
-  console.log('FOUND ACCOUNT', account)
-
   var webhook_url = params.webhook_url
 
   if (!webhook_url) {
 
-    console.log('GET ACCOUNT', account.record.toJSON())
-
     webhook_url = account.get('webhook_url')
-    console.log('ACCOUNT WEBHOOK URL', webhook_url)
 
   }
-
-  console.log('WEBHOOK URL', webhook_url)
 
   if (webhook_url) {
 
