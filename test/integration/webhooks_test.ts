@@ -10,10 +10,6 @@ import { findWebhook, attemptWebhook } from '../../lib/webhooks'
 
 describe("Listing Available Webhooks", async () => {
 
-  before(async () => {
-
-  });
-
   it("GET /api/v1/webhooks get your account's webhooks", async () => {
 
     let account = await utils.generateAccount()
