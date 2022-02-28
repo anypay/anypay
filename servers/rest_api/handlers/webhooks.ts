@@ -13,12 +13,6 @@ export async function index(req, h) {
       limit: req.query.limit,
       offset: req.query.offset
     })
-    
-    webhooks = webhooks.map(webhook => {
-
-      return Object.assign(webhook.toJSON(), { attempts: webhook.attempts.map(a => a.toJSON()) })
-
-    })
 
     return { webhooks }
 
