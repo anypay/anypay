@@ -19,6 +19,12 @@ export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
 }
 
+export async function createAccount(): Promise<Account> {
+  let record = await registerAccount(chance.email(), chance.word());
+
+  return new Account(record)
+}
+
 import * as bsv from 'bsv'
 export async function generateKeypair() {
 

@@ -7,6 +7,8 @@ export interface Record {
 
   dataValues: any;
 
+  updateAttributes: (any) => Promise<any>;
+
 }
 
 interface FindOrCreate {
@@ -50,6 +52,14 @@ export class Orm {
   get(attribute: string): any {
 
     return this.record.dataValues[attribute]
+
+  }
+
+  async set(key: string, value: any): Promise<any> {
+
+    this.record[key] = value
+
+    return this.record.save()
 
   }
 

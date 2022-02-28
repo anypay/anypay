@@ -3,7 +3,7 @@ const validator = require('validator')
 
 import { createWebhook } from './webhooks'
 
-import { Account } from './account'
+import { Account, findAccount } from './account'
 
 import { computeInvoiceURI } from './uri'
 
@@ -141,13 +141,30 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   var invoice = await models.Invoice.create(newInvoice);
 
-  if (params.webhook_url) {
+  const account = await findAccount(invoice.account_id)
+
+  console.log('FOUND ACCOUNT', account)
+
+  var webhook_url = params.webhook_url
+
+  if (!webhook_url) {
+
+    console.log('GET ACCOUNT', account.record.toJSON())
+
+    webhook_url = account.get('webhook_url')
+    console.log('ACCOUNT WEBHOOK URL', webhook_url)
+
+  }
+
+  console.log('WEBHOOK URL', webhook_url)
+
+  if (webhook_url) {
 
     await createWebhook({
 
       invoice_uid: uid,
 
-      url: params.webhook_url,
+      url: webhook_url,
 
       account_id: invoice.account_id
 
