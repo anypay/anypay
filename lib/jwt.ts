@@ -1,4 +1,6 @@
 
+import { Account } from './account'
+
 const fs   = require('fs');
 const jwt  = require('jsonwebtoken');
 const path = require("path");
@@ -15,9 +17,9 @@ const publicKey = fs.readFileSync(
   'utf8'
 );
 
-const issuer  = 'anypayinc.com';          // Issuer 
-const subject  = 'admin@anypayinc.com';        // Subject 
-const audience  = 'https://anypayinc.com'; // Audience/ PRIVATE and PUBLIC key
+const issuer  = 'anypayx.com';          // Issuer 
+const subject  = 'auth@anypayx.com';        // Subject 
+const audience  = 'https://anypayx.com'; // Audience/ PRIVATE and PUBLIC key
 
 export async function generateAdminToken() {
 
@@ -39,11 +41,28 @@ export async function generateAdminToken() {
 
 }
 
-export async function verifyToken(token: string) {
+export function generateAccountToken(account: Account, uid: string) {
 
   var payload = {
-    admin: true
+    account_id: account.id,
+    uid
   };
+
+  var signOptions = {
+     issuer,
+     subject,
+     audience,
+     expiresIn: "30d",
+     algorithm:  "RS512"
+  };
+
+  var token = jwt.sign(payload, privateKey, signOptions);
+
+  return token;
+
+}
+
+export async function verifyToken(token: string) {
 
   var verifyOptions = {
      issuer,
