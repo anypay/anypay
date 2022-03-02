@@ -3,8 +3,9 @@ const bcrypt = require('bcryptjs');
 import { models } from './models';
 
 const uuid = require('uuid');
-const aws = require('aws-sdk');
 const log = require('winston');
+
+import  { ses } from './email/ses'
 
 export function hash(password) {
   return new Promise((resolve, reject) => {
@@ -60,12 +61,10 @@ async function resetPassword(accountId, newPassword): Promise<boolean> {
   return true;
 }
 
-function sendPasswordResetEmail(email) {
+export async function sendPasswordResetEmail(email) {
   return new Promise(async (resolve, reject) => {
 
     let passwordReset = await createPasswordReset(email);
-
-    var ses = new aws.SES({ region: 'us-east-1' });
 
     ses.sendEmail({
       Destination: {
@@ -84,7 +83,7 @@ function sendPasswordResetEmail(email) {
           Data: "Forgotten Password Reset"
         }
       },
-      Source: 'support@anypayx.com'
+      Source: 'no-reply@anypayx.com'
     }, (error, response) => {
       if (error) {
         log.error('error sending password reset email', error.message);

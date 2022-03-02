@@ -67,12 +67,20 @@ export {
   expect
 }
 
+
+var server, request;
+export { server, request }
+
 import {Server} from '../servers/rest_api/server';
+import * as supertest from 'supertest'
 
-var server;
+before(async () => {
 
-export { server }
+  server = await Server();
 
+  request = supertest(server.listener)
+
+})
 
 function auth(username, password) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
@@ -91,8 +99,3 @@ export async function authRequest(account: Account, params) {
 
 }
 
-before(async () => {
-
-  server = await Server();
-
-})
