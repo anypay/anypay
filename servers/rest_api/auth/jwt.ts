@@ -19,8 +19,6 @@ function parseTokenFromRequest(request: Request) {
 
   let token = authorization.split(" ")[1]
 
-  console.log('TOKEN', token)
-
   return token
 
 }
