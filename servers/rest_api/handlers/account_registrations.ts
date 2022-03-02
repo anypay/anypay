@@ -15,17 +15,13 @@ export async function create(request, h) {
 
     geolocateAccountFromRequest(account, request)
 
-    const token = await ensureAccessToken(account);
-
     const { accessToken } = await ensureAccessToken(account)
 
     return h.response({
 
       user: account.toJSON(),
 
-      accessToken,
-
-      token
+      accessToken
 
     }).code(201)
 
