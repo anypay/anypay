@@ -1,8 +1,10 @@
 import * as utils from '../utils'
 
-import { expect, server, chance, request } from '../utils'
+import { expect, server, chance, request, spy } from '../utils'
 
 import { verifyToken } from '../../lib/jwt'
+
+import * as passwords from '../../lib/password'
 
 describe("Listing Available Webhooks", async () => {
 
@@ -90,6 +92,30 @@ describe("Listing Available Webhooks", async () => {
     expect(response.body.user.id).to.be.greaterThan(0);
 
     expect(response.body.user.email).to.be.equal(email);
+
+  })
+
+  it("POST /v1/api/account/password-reset should send an email", async () => {
+
+    let email = chance.email()
+    let password = chance.word()
+
+    var response = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
+
+    const { accessToken } = response.body.accessToken
+
+    spy.on(passwords, ['sendPasswordResetEmail'])
+
+    response = await request
+      .post('/v1/api/account/password-reset')
+      .send({ email });
+
+    expect(passwords.sendPasswordResetEmail).to.have.been.called.with(email)
+
+    expect(response.statusCode).to.be.equal(200)
+
 
   })
 

@@ -1,12 +1,4 @@
 
-import { Request } from 'hapi'
-
-import { badRequest } from 'boom'
-
-import { findAccount } from '../../../lib/account'
-
-import { authorizeAccount } from '../../../lib/auth'
-
 import { logError } from '../../../lib/logger'
 
 import { authorizeRequest } from '../auth/jwt'

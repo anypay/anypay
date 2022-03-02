@@ -2,9 +2,22 @@ require('dotenv').config()
 
 import { Account } from '../lib/account'
 
-import { loginAccount, registerAccount, AccountAlreadyRegisteredError } from '../lib/accounts/registration'
+import { ses } from '../lib/email/ses'
 
-import { chance, expect } from './utils'
+import {
+
+  loginAccount,
+
+  registerAccount,
+
+  AccountAlreadyRegisteredError,
+
+
+} from '../lib/accounts/registration'
+
+import { passwordResetEmail } from '../lib/password_reset'
+
+import { chance, expect, spy } from './utils'
 
 describe("User Authentication", () => {
   
@@ -50,4 +63,27 @@ describe("User Authentication", () => {
 
   })
 
+  it("should send password reset email", async () => {
+
+    const email = chance.email();
+
+    const password = chance.word();
+
+    await registerAccount({ email, password })
+
+    spy.on(ses, 'sendEmail')
+
+    let passwordReset = await passwordResetEmail(email)
+
+    console.log('password reset', passwordReset)
+
+    expect(passwordReset.get('email')).to.be.equal(email)
+
+    expect(passwordReset.get('id')).to.be.greaterThan(0)
+
+    expect(ses.sendEmail).to.have.been.called()
+
+  })
+
 })
+

@@ -27,11 +27,11 @@ export async function create(request, h) {
 
   } catch(error) {
 
-    console.log(error)
+    console.log('error', error)
 
-    logError('account.registration.error', { error });
+    logError('account.registration.error', { error: 'registration error' });
 
-    return badRequest(error);
+    return h.response({ error: 'registration error' }).code(400)
 
   }
 }

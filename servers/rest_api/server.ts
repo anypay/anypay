@@ -13,11 +13,9 @@ import { log } from '../../lib';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
-import { hash, bcryptCompare } from '../../lib/password';
+import { bcryptCompare } from '../../lib/password';
 
 import { accountCSVReports } from './handlers/csv_reports';
-
-import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
 
 import * as payreq from '../payment_requests/server'
 
