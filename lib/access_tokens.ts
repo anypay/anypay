@@ -5,6 +5,8 @@ import { Account } from './account'
 
 import { models } from './models'
 
+import { generateAccountToken } from './jwt'
+
 interface NewAccessTokenV1 {
   record: Record;
   account?: Account
@@ -16,11 +18,22 @@ export class AccessTokenV1 extends Orm {
 
   account: Account;
 
+  jwt: string;
+
   constructor({ record, account }) {
 
     super(record)
 
+    this.jwt = generateAccountToken(account, record.uid)
+
     this.account = account
+  }
+
+  get accessToken() {
+
+    if (this.jwt) { return this.jwt }
+
+    return this.get('uid')
   }
 
 }

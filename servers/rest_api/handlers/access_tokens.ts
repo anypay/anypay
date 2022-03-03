@@ -6,7 +6,6 @@ var geoip = require('geoip-lite');
 import * as Boom from 'boom'
 
 module.exports.create = async (request, h) => {
-  console.log("CREATE ACCESS TOKEN")
 
   try {
 

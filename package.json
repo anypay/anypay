@@ -127,6 +127,7 @@
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "nyc": "^15.1.0",
+    "supertest": "^6.2.2",
     "ts-node": "^6.2.0"
   },
   "scripts": {

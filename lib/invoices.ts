@@ -3,11 +3,13 @@ const validator = require('validator')
 
 import { createWebhook } from './webhooks'
 
-import { Account } from './account'
+import { Account, findAccount } from './account'
 
 import { computeInvoiceURI } from './uri'
 
 import { models } from './models'
+
+import { Orm } from './orm'
 
 import { v4 } from 'uuid'
 
@@ -53,40 +55,28 @@ export class InvalidWebhookURL implements Error {
   }
 }
 
-export class Invoice {
-
-  record: any;
-
-  constructor(record: any) {
-    this.record = record;
-  }
-
-  async save() {
-    return this.record.save()
-  }
-
-  get toJSON(): any {
-    return this.record.toJSON()
-  }
+export class Invoice extends Orm{
 
   get account_id(): any {
-    return this.record.account_id
+
+    return this.get('account_id')
   }
 
   get uid(): string {
-    return this.record.uid
+
+    return this.get('uid')
   }
 
   get webhook_url(): string {
 
-    return this.record.webhook_url
+    return this.get('webhook_url')
 
   }
 
   async getAccount(): Promise<Account> {
 
     let record = await models.Account.findOne({
-      where: { id: this.record.account_id }
+      where: { id: this.get('account_id') }
     })
 
     return new Account(record)
@@ -141,13 +131,23 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   var invoice = await models.Invoice.create(newInvoice);
 
-  if (params.webhook_url) {
+  const account = await findAccount(invoice.account_id)
+
+  var webhook_url = params.webhook_url
+
+  if (!webhook_url) {
+
+    webhook_url = account.get('webhook_url')
+
+  }
+
+  if (webhook_url) {
 
     await createWebhook({
 
       invoice_uid: uid,
 
-      url: params.webhook_url,
+      url: webhook_url,
 
       account_id: invoice.account_id
 

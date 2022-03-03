@@ -2,7 +2,13 @@ require("dotenv").config()
 
 import { hash, bcryptCompare } from '../password';
 
-import { log,models } from '../index';
+import { log } from '../index';
+
+import { models } from '../models'
+
+import { Account, findAccount } from '../account'
+
+import { verifyToken } from '../jwt'
 
 export async function validateSudoPassword(request, username, password, h) {
 
@@ -113,4 +119,12 @@ export async function validateToken(request, username, password, h) {
 
   }
 };
+
+export async function authorizeAccount(token: string): Promise<Account> {
+
+  let verified = await verifyToken(token)
+
+  return findAccount(verified.account_id)
+
+}
 

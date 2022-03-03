@@ -1,4 +1,3 @@
-const bcrypt = require('bcryptjs');
 const Boom = require('boom');
 var geoip = require('geoip-lite');
 
@@ -12,16 +11,6 @@ import { coins, models, accounts, slack, log, utils } from '../../../lib';
 
 import { near } from '../../../lib/accounts'
 
-function hash(password) {
-  return new Promise((resolve, reject) => {
-
-      bcrypt.hash(password, 10, (error, hash) => {
-        if (error) { return reject(error) }
-        resolve(hash);
-    })
-  });
-}
-
 function sanitize(account) {
   let json = account.toJSON()
   delete json['authenticator_secret']
@@ -34,7 +23,6 @@ export async function nearby(req, h) {
   let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
 
   return { accounts }
-
 
 }
 
@@ -88,7 +76,7 @@ export async function registerAnonymous(request, reply) {
 
   log.info('create.account', email);
 
-  let passwordHash = await hash(request.payload.password);
+  let passwordHash = await utils.hash(request.payload.password);
 
   request.account.email = request.payload.email;
   request.account.password_hash = passwordHash;
@@ -118,7 +106,7 @@ export async function create (request, reply) {
 
   log.info('create.account', email);
 
-  let passwordHash = await hash(request.payload.password);
+  let passwordHash = await utils.hash(request.payload.password);
 
   try {
     let account = await models.Account.create({

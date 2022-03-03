@@ -5,24 +5,21 @@ import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
 import { attachMerchantMapRoutes } from '../map/server';
+import { attachV1Routes } from './v1';
+
+import { join } from 'path'
 
 import { log } from '../../lib';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
-import { hash, bcryptCompare } from '../../lib/password';
+import { bcryptCompare } from '../../lib/password';
 
 import { accountCSVReports } from './handlers/csv_reports';
 
-import { parseUnconfirmedTxEventToPayments } from '../../plugins/dash/lib/blockcypher';
-
 import * as payreq from '../payment_requests/server'
 
-/* Import all handlers from './handlers directory */
-import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
-import { join } from 'path';
-const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
-/* end handlers import */
+import { handlers } from './handlers'
 
 const AccountLogin = require("../../lib/account_login");
 
@@ -363,7 +360,6 @@ async function Server() {
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
-
   server.route({
     method: "GET",
     path: "/accounts/{id}", // id or email
@@ -784,7 +780,16 @@ async function Server() {
     handler: handlers.Webhooks.index
   }); 
 
+  server.route({
+    method: 'POST',
+    path: '/api/v1/webhooks/{invoice_uid}/attempts',
+    options: {
+      auth: "token"
+    },
+    handler: handlers.Webhooks.attempt
+  }); 
 
+  await attachV1Routes(server)
 
   accountCSVReports(server);
 

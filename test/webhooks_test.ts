@@ -38,7 +38,7 @@ describe('Getting Prices', () => {
 
   before(async () => {
 
-    account = new Account(await utils.generateAccount())
+    account = await utils.createAccount()
 
     let { address } = await utils.generateKeypair()
 
@@ -193,6 +193,128 @@ describe('Getting Prices', () => {
 
   })
 
+  it('should allow webhook_url to be set on account', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let account = await utils.createAccount()
+
+    let result = await account.set('webhook_url', webhook_url)
+
+    let invoice: Invoice = await createInvoice({
+      account,
+      amount: 10
+      // no webhook_url specified here, default to account webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.url).to.be.equal(webhook_url)
+
+  })
+
+  it('should attempt a webhook', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    spy.on(http, ['get', 'post'])
+
+    spy.on(webhook, ['invoiceToJSON'])
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(http.post).to.have.been.called()
+
+    expect(webhook.invoiceToJSON).to.have.been.called()
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.attempts[0].response_code).to.be.equal(200)
+
+    expect(webhook.status).to.be.equal('success')
+
+  })
+
+  it('should fair a webhook when server not responding', async () => {
+
+    var webhook_url = "https://anypay.sv/api/invalid"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    spy.on(http, ['get', 'post'])
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(http.post).to.have.been.called()
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.attempts[0].response_code).to.be.equal(405)
+
+    expect(webhook.status).to.be.equal('failed')
+
+  })
+
+  it('should preventing a webhook attempt given prior success', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+
+    expect(webhook.attempts.length).to.be.equal(0)
+
+    let attempt = await attemptWebhook(webhook)
+
+    expect(webhook.attempts.length).to.be.equal(1)
+
+    expect(webhook.status).to.be.equal('success')
+
+    expect(webhook.success).to.be.equal(true)
+
+    expect(
+
+      attemptWebhook(webhook)
+    
+    ).to.be.eventually.rejectedWith(WebhookAlreadySent)
+
+  })
+
+  it('webhook retry schedule should default to no_retry', async () => {
+
+    var webhook_url = "https://reqbin.com/echo/post/json"
+
+    let invoice: Invoice = await createInvoice({
+      account,
+      amount: 10,
+      webhook_url
+    })
+
+  })
+
   describe('Paid Webhooks', () => {
 
     it("should be allowed with a key that has a positive balance", async () => {
@@ -258,7 +380,7 @@ describe('Getting Prices', () => {
 
     it("should automatically load the correct get402 api client if one doesn't exist", async() => {
 
-      let account = new Account(await utils.generateAccount())
+      let account = await utils.createAccount()
 
       let client = await loadClientForAccount(account)
 
