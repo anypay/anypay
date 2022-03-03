@@ -26,8 +26,6 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
   var promises: any[] = firebaseTokens.map(firebaseToken => {
     return new Promise(async (resolve, reject) => {
 
-      console.log('token', firebaseToken.toJSON());
-
       var message = {
           to: firebaseToken.token,
           collapse_key: 'your_collapse_key',

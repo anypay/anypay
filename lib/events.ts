@@ -10,6 +10,8 @@ import { Invoice } from './invoices'
 
 import { events } from 'rabbi'
 
+import { logError } from './logger'
+
 import {publishEventToSlack} from './slack/events';
 
 const exchange = 'anypay.events';
@@ -48,7 +50,7 @@ const exchange = 'anypay.events';
 
     } catch (error) {
 
-      console.log('error', error.msg);
+      logError('slack.publish.error', error);
     }
 
   });
@@ -70,8 +72,6 @@ export async function record(data: EventData) {
 }
 
 export async function recordEvent(payload: any, event: string) {
-
-  console.log("RECORD EVENT", { payload, event })
 
   let record = await models.Event.create({ payload, event });
 

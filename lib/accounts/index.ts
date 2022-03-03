@@ -36,8 +36,6 @@ let query = `SELECT *,
     ) AS distance
     from accounts where position is not null and business_name is not null order by distance limit ${limit};`
 
-    console.log(query)
-
   let result = await database.query(query)
 
   return result[0]

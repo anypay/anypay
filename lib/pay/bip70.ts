@@ -10,6 +10,8 @@ import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
 import { codeFromName } from './currencies'
 import { getFee, Fee } from './fees'
 
+import { logError } from '../logger'
+
 
 /*
 
@@ -83,11 +85,9 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
         script = bitcore.Script.buildScriptHashOut(new bitcore.Address(o.address))
 
-        console.log(script.toBuffer().toString('hex'))
-
       } catch(error) {
 
-        console.log('error', error)
+        logError('bitcore.error', error)
       }
 
     } else {
