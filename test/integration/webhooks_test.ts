@@ -10,13 +10,13 @@ import { findWebhook, attemptWebhook } from '../../lib/webhooks'
 
 describe("Listing Available Webhooks", async () => {
 
-  it("GET /api/v1/webhooks get your account's webhooks", async () => {
+  it("GET /v1/api/webhooks get your account's webhooks", async () => {
 
-    let account = await utils.generateAccount()
+    let account = await utils.createAccount()
 
     let response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.statusCode).to.be.equal(200)
@@ -24,9 +24,9 @@ describe("Listing Available Webhooks", async () => {
 
   })
 
-  it("POST /api/v1/webhooks/:invoice_uid should allow retrying failed webhook", async () => {
+  it("POST /v1/api/webhooks/:invoice_uid/attempts should allow retrying failed webhook", async () => {
 
-    let account = await utils.generateAccount()
+    let account = await utils.createAccount()
 
     let invoice = await createInvoice({
       account,
@@ -36,7 +36,7 @@ describe("Listing Available Webhooks", async () => {
 
     let response = await utils.authRequest(account, {
       method: 'POST',
-      url: `/api/v1/webhooks/${invoice.uid}/attempts`
+      url: `/v1/api/webhooks/${invoice.uid}/attempts`
     })
 
     expect(response.statusCode).to.be.equal(201)
@@ -46,7 +46,7 @@ describe("Listing Available Webhooks", async () => {
 
     response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.statusCode).to.be.equal(200)
@@ -60,11 +60,11 @@ describe("Listing Available Webhooks", async () => {
 
     var webhook_url = "https://reqbin.com/echo/post/json"
 
-    let account = await utils.generateAccount()
+    let account = await utils.createAccount()
 
     var response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.result.webhooks.length).to.be.equal(0)
@@ -79,7 +79,7 @@ describe("Listing Available Webhooks", async () => {
 
     response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.result.webhooks.length).to.be.equal(1)
@@ -96,7 +96,7 @@ describe("Listing Available Webhooks", async () => {
 
     response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.result.webhooks.length).to.be.equal(2)
@@ -107,7 +107,7 @@ describe("Listing Available Webhooks", async () => {
 
     var webhook_url = "https://reqbin.com/echo/post/json"
 
-    let account = await utils.generateAccount()
+    let account = await utils.createAccount()
 
     let invoice = await createInvoice({
       account,
@@ -117,7 +117,7 @@ describe("Listing Available Webhooks", async () => {
 
     var response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.result.webhooks.length).to.be.equal(1)
@@ -129,7 +129,7 @@ describe("Listing Available Webhooks", async () => {
 
     var response = await utils.authRequest(account, {
       method: 'GET',
-      url: '/api/v1/webhooks'
+      url: '/v1/api/webhooks'
     })
 
     expect(response.result.webhooks[0].attempts.length).to.be.equal(1)

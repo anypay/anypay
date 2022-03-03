@@ -200,7 +200,7 @@ function selectCurrency(addresses) {
 
 }
 
-export async function create (request, reply) {
+export async function create (request, h) {
 
   var currency_specified = false;
 
@@ -212,7 +212,9 @@ export async function create (request, reply) {
   log.info(`controller:invoices,action:create`);
 
   logInfo('invoices.create', Object.assign({
+
     account_id: request.account.id
+
   }, request.payload))
 
 	if (request.payload.currency) {
@@ -315,10 +317,14 @@ export async function create (request, reply) {
 
     let sanitized = sanitizeInvoice(invoice);
 
-    return Object.assign({
-      invoice: sanitized,
-      payment_options: invoice.payment_options
-    }, sanitized);
+    return h.response(
+
+      Object.assign({
+        invoice: sanitized,
+        payment_options: invoice.payment_options
+      }, sanitized)
+
+    ).code(201);
 
   } catch(error) {
     console.log(error);

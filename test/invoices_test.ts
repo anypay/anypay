@@ -25,7 +25,7 @@ describe("Generating Invoices", () => {
 
   it("should ensure an invoice exists and not throw", async () => {
 
-    let account = new Account(await utils.generateAccount())
+    let account = await utils.createAccount()
 
     var webhook_url = "https://anypay.sv/api/test/webhooks"
 
@@ -38,6 +38,23 @@ describe("Generating Invoices", () => {
     invoice = await ensureInvoice(invoice.uid)
 
     expect(invoice.webhook_url).to.be.equal(webhook_url)
+
+  })
+
+  it('should create payment options for the invoice', async () => {
+
+    let [account] = await utils.createAccountWithAddress()
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10
+    })
+
+    let options = await invoice.getPaymentOptions()
+
+    expect(options.length).to.be.equal(1)
+
+    expect(options[0].get('currency')).to.be.equal("BSV")
 
   })
 

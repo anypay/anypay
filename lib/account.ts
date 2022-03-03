@@ -3,6 +3,15 @@ import { models } from './models'
 
 import { Orm, Record } from './orm'
 
+import { setAddress } from './core'
+
+import { Address, findAddress } from './addresses'
+
+interface SetAddress {
+  currency: string;
+  address: string;
+}
+
 export class Account extends Orm {
 
   get id () {
@@ -18,6 +27,18 @@ export class Account extends Orm {
   get denomination () {
 
     return this.record.dataValues.denomination
+
+  }
+
+  async setAddress(params: SetAddress): Promise<Address> {
+
+    await setAddress({
+      account_id: this.id,
+      currency: params.currency,
+      address: params.address
+    })
+
+    return findAddress(this, params.currency)
 
   }
 

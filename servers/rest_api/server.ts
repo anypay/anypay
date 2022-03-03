@@ -5,7 +5,8 @@ import * as Hapi from "hapi";
 const HapiSwagger = require("hapi-swagger");
 
 import { attachMerchantMapRoutes } from '../map/server';
-import { attachV1Routes } from './v1';
+
+import { attachV1Routes } from '../v1/routes';
 
 import { join } from 'path'
 
@@ -770,25 +771,6 @@ async function Server() {
     path: '/search/accounts/near/{latitude}/{longitude}',
     handler: handlers.Accounts.nearby
   }); 
-
-  server.route({
-    method: 'GET',
-    path: '/api/v1/webhooks',
-    options: {
-      auth: "token"
-    },
-    handler: handlers.Webhooks.index
-  }); 
-
-  server.route({
-    method: 'POST',
-    path: '/api/v1/webhooks/{invoice_uid}/attempts',
-    options: {
-      auth: "token"
-    },
-    handler: handlers.Webhooks.attempt
-  }); 
-
   await attachV1Routes(server)
 
   accountCSVReports(server);

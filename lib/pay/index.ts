@@ -39,7 +39,7 @@ interface PaymentRequestForInvoice {
   protocol: string;
 }
 
-enum Wallets {
+export enum Wallets {
   Edge = 'edge',
   BitcoinCom = 'bitcoin.com',
   Badger = 'badger',

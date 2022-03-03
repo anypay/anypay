@@ -15,6 +15,10 @@ import { AccessTokenV1, ensureAccessToken } from '../lib/access_tokens'
 
 import { Account } from '../lib/account'
 
+import { Address } from '../lib/addresses'
+
+import { Invoice, createInvoice } from '../lib/invoices'
+
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
 }
@@ -23,6 +27,36 @@ export async function createAccount(): Promise<Account> {
   let record = await registerAccount(chance.email(), chance.word());
 
   return new Account(record)
+}
+
+export async function createAccountWithAddress(): Promise<[Account, Address]> {
+  let record = await registerAccount(chance.email(), chance.word());
+
+  let account = new Account(record)
+
+  let keypair = await generateKeypair()
+
+  let address = await  account.setAddress({ currency: 'BSV', address: keypair.address })
+
+  return [account, address]
+}
+
+
+export async function newAccountWithInvoice(): Promise<[Account, Invoice]> {
+
+  let account = await createAccount()
+
+  let { address } = await generateKeypair()
+
+  await account.setAddress({ currency: 'BSV', address })
+
+  let invoice = await createInvoice({
+    account,
+    amount: 10
+  })
+
+  return [ account, invoice ]
+
 }
 
 import * as bsv from 'bsv'
@@ -93,7 +127,7 @@ export async function authRequest(account: Account, params) {
 
   if (!params.headers) { params['headers'] = {} }
 
-  params.headers['Authorization'] = auth(accessToken.get('uid'), "")
+  params.headers['Authorization'] = `Bearer ${accessToken.jwt}`
 
   return server.inject(params)
 

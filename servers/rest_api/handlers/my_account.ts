@@ -7,7 +7,7 @@ export async function show(request, h) {
 
   try {
 
-    let account = await authorizeRequest(request, h)
+    let account = await authorizeRequest(request)
 
     return h.response({
       user: account.toJSON()
