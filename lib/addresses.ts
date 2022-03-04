@@ -3,11 +3,11 @@ import { models } from './models';
 
 import { setAddress } from './core';
 
-export { setAddress }
-
 import { Orm } from './orm'
 
 import { Account } from './account'
+
+export { setAddress } from './core'
 
 export async function lockAddress(accountId: number, currency: string) {
 

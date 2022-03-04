@@ -1,87 +1,114 @@
-import {Server} from '../../servers/rest_api/server';
-import * as assert from 'assert';
+
 import {hash} from '../../lib/password';
 
 import { models, database } from '../../lib';
 
-import * as Chance from 'chance';
-const chance = new Chance();
+import { server, chance, auth, expect  } from '../utils'
+
+import * as utils from '../utils'
 
 describe("Setting Addresses Via REST", async () => {
-  var accessToken, server;
+  var account;
   
   before(async () => {
+  
+    account = await utils.generateAccount()
 
-    server = await Server();
-
-    try {
-      var account = await models.Account.create({
-        email: chance.email(),
-        password_hash: await hash(chance.word())
-      })
-
-      accessToken = await models.AccessToken.create({
-        account_id: account.id
-      })
-
-    } catch(error) {
-      console.error('ERROR', error.message);
-    }
   });
 
   it("PUT /addresses/DASH should set the DASH address", async () => {
-    try {
 
-      var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-      let response = await server.inject({
-        method: 'PUT',
-        url: '/addresses/DASH',
-        payload: {
-          address: address
-        },
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
-      })
+    let response = await auth(account, 0)({
+      method: 'PUT',
+      url: '/addresses/DASH',
+      payload: {
+        address: address
+      }
+    })
 
-      assert.strictEqual(response.result.value, address);
+    expect(response.result.value).to.be.equal(address);
 
-    } catch(error) {
-
-      console.error('ERROR', error.message);
-      throw error;
-    }
   })
 
   it("PUT /addresses/BTC should set the BTC address", async () => {
-    try {
 
-      var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
+    var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
 
-      let response = await server.inject({
-        method: 'PUT',
-        url: '/addresses/BTC',
-        payload: {
-          address: address
-        },
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
-      })
+    let response = await auth(account, 0)({
+      method: 'PUT',
+      url: '/addresses/BTC',
+      payload: {
+        address: address
+      }
+    })
 
-      assert.strictEqual(response.result.value, address);
+    expect(response.result.value).to.be.equal(address);
 
-    } catch(error) {
+  })
 
-      console.error('ERROR', error.message);
-      throw error;
-    }
+  it("GET /addresses should return a list of account addresses", async () => {
+
+    var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
+
+    const account = await utils.generateAccount()
+
+    var response = await auth(account, 0)({
+      method: 'GET',
+      url: '/addresses',
+      payload: {
+        address: address
+      }
+    })
+
+    expect(response.result).to.deep.equal({});
+
+    const address2 = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    await auth(account, 0)({
+      method: 'PUT',
+      url: '/addresses/BTC',
+      payload: {
+        address: address
+      }
+    })
+
+    response = await auth(account, 0)({
+      method: 'GET',
+      url: '/addresses',
+      payload: {
+        address: address
+      }
+    })
+
+    expect(Object.keys(response.result).length).to.be.equal(1);
+
+    await auth(account, 0)({
+      method: 'PUT',
+      url: '/addresses/DASH',
+      payload: {
+        address: address2
+      }
+    })
+
+    response = await auth(account, 0)({
+      method: 'GET',
+      url: '/addresses',
+      payload: {
+        address: address
+      }
+    })
+
+    expect(response.statusCode).to.be.equal(200);
+
+    expect(Object.keys(response.result).length).to.be.equal(2);
+
+    expect(response.result['BTC']).to.be.equal(address);
+
+    expect(response.result['DASH']).to.be.equal(address2);
+
   })
 
 })
-
-function auth(username, password) {
-  return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
-}
 

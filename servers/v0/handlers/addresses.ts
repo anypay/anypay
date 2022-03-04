@@ -21,18 +21,13 @@ module.exports.delete = async function(req, h) {
 
 };
 
-
-module.exports.list = async function(request, reply) {
-
-  let accountId = request.auth.credentials.accessToken.account_id;
-
-  let account = await models.Account.findOne({ where: { id: accountId }})
+export async function list(request, h) {
 
   let addresses = {};
 
   let accountAddresses = await models.Address.findAll({
 
-    where: { account_id: accountId }
+    where: { account_id: request.account.id }
 
   })
   
@@ -44,7 +39,7 @@ module.exports.list = async function(request, reply) {
 
   return addresses;
 
-};
+}
 
 export async function index(req, h) {
 

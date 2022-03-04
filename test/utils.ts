@@ -105,8 +105,14 @@ export {
 var server, request;
 export { server, request }
 
-import {Server} from '../servers/rest_api/server';
+import {Server} from '../servers/v0/server';
 import * as supertest from 'supertest'
+
+beforeEach(() => {
+
+  spy.restore()
+
+})
 
 before(async () => {
 
@@ -115,11 +121,6 @@ before(async () => {
   request = supertest(server.listener)
 
 })
-
-function auth(username, password) {
-  return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
-}
-
 
 export async function authRequest(account: Account, params) {
 
@@ -130,6 +131,38 @@ export async function authRequest(account: Account, params) {
   params.headers['Authorization'] = `Bearer ${accessToken.jwt}`
 
   return server.inject(params)
+
+}
+
+export async function v0AuthRequest(account: Account, params) {
+
+  let accessToken = await ensureAccessToken(account)
+
+  if (!params.headers) { params['headers'] = {} }
+
+  let token = new Buffer(accessToken.get('uid') + ':').toString('base64');
+
+  params.headers['Authorization'] = `Basic ${token}`
+
+  return server.inject(params)
+
+}
+
+export function auth(account, version=1) {
+
+  var strategy = authRequest;
+
+  if (version === 0) {
+
+    strategy = v0AuthRequest
+
+  }
+
+  return async function(params) {
+
+    return strategy(account, params)
+
+  }
 
 }
 

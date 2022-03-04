@@ -20,7 +20,7 @@ import { accountCSVReports } from './handlers/csv_reports';
 
 import * as payreq from '../payment_requests/server'
 
-import { handlers } from './handlers'
+import { v0 } from '../handlers'
 
 const AccountLogin = require("../../lib/account_login");
 
@@ -277,13 +277,13 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/api/accounts-by-email/{email}",
-    handler: handlers.Anypaycity.show
+    handler: v0.Anypaycity.show
   });
 
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
-    handler: handlers.Invoices.show,
+    handler: v0.Invoices.show,
     options: {
       tags: ['api'],
       validate: {
@@ -298,7 +298,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/woocommerce",
-    handler: handlers.Woocommerce.index,
+    handler: v0.Woocommerce.index,
     options: {
       auth: "token",
       tags: ['api']
@@ -308,7 +308,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{invoice_uid}/payment_options",
-    handler: handlers.InvoicePaymentOptions.show,
+    handler: v0.InvoicePaymentOptions.show,
     options: {
       tags: ['api']
     }
@@ -317,7 +317,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{uid}/share/email",
-    handler: handlers.Invoices.shareEmail,
+    handler: v0.Invoices.shareEmail,
     options: {
       tags: ['api'],
       validate: {
@@ -332,7 +332,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/grab_and_go_items",
-    handler: handlers.Products.index,
+    handler: v0.Products.index,
     options: {
       auth: "token",
       tags: ['api']
@@ -342,7 +342,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices",
-    handler: handlers.Invoices.index,
+    handler: v0.Invoices.index,
     options: {
       auth: "token",
       tags: ['api']
@@ -352,7 +352,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts",
-    handler: handlers.Accounts.create,
+    handler: v0.Accounts.create,
     options: {
       tags: ['api'],
       validate: {
@@ -364,7 +364,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/accounts/{id}", // id or email
-    handler: handlers.Accounts.showPublic,
+    handler: v0.Accounts.showPublic,
     options: {
       tags: ['api'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
@@ -374,7 +374,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/anonymous-accounts",
-    handler: handlers.Accounts.registerAnonymous,
+    handler: v0.Accounts.registerAnonymous,
     options: {
       auth: "token",
       tags: ['api'],
@@ -388,7 +388,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/anonymous-accounts",
-    handler: handlers.Accounts.createAnonymous,
+    handler: v0.Accounts.createAnonymous,
     options: {
       tags: ['api']
     },
@@ -397,7 +397,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/access_tokens",
-    handler: handlers.AccessTokens.create,
+    handler: v0.AccessTokens.create,
     options: {
       auth: "password",
       tags: ['api'],
@@ -408,18 +408,18 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/addresses",
-    handler: handlers.Addresses.list,
+    handler: v0.Addresses.list,
     options: {
       auth: "token",
       tags: ['api'],
-      plugins: responsesWithSuccess({ model: handlers.Addresses.PayoutAddresses }),
+      plugins: responsesWithSuccess({ model: v0.Addresses.PayoutAddresses }),
     }
   });
 
   server.route({
     method: "DELETE",
     path: "/addresses/{currency}",
-    handler: handlers.Addresses.delete,
+    handler: v0.Addresses.delete,
     options: {
       auth: "token",
       tags: ['api']
@@ -429,7 +429,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account_addresses",
-    handler: handlers.Addresses.index,
+    handler: v0.Addresses.index,
     options: {
       auth: "token",
       tags: ['api']
@@ -439,7 +439,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/addresses/{id}/notes",
-    handler: handlers.AddressNotes.update,
+    handler: v0.AddressNotes.update,
     options: {
       auth: "token",
       tags: ['api'],
@@ -457,7 +457,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/addresses/{currency}",
-    handler: handlers.Addresses.update,
+    handler: v0.Addresses.update,
     options: {
       auth: "token",
       tags: ['api'],
@@ -465,7 +465,7 @@ async function Server() {
         params: {
           currency: Joi.string().required()
         },
-        payload: handlers.Addresses.PayoutAddressUpdate
+        payload: v0.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
     }
@@ -474,7 +474,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/discounts/{currency}",
-    handler: handlers.Discounts.update,
+    handler: v0.Discounts.update,
     options: {
       auth: "token",
       tags: ['api'],
@@ -492,7 +492,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/account",
-    handler: handlers.Accounts.show,
+    handler: v0.Accounts.show,
     options: {
       auth: "token",
       tags: ['api'],
@@ -503,7 +503,7 @@ async function Server() {
   server.route({
     method: "PUT",
     path: "/account",
-    handler: handlers.Accounts.update,
+    handler: v0.Accounts.update,
     options: {
       auth: "token",
       tags: ['api']
@@ -513,7 +513,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/invoices/{invoice_uid}/notes",
-    handler: handlers.InvoiceNotes.create,
+    handler: v0.InvoiceNotes.create,
     options: {
       validate: {
         payload: {
@@ -528,18 +528,18 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/coins",
-    handler: handlers.Coins.list,
+    handler: v0.Coins.list,
     options: {
       tags: ['api'],
       auth: "token",
-      plugins: responsesWithSuccess({ model: handlers.Coins.CoinsIndexResponse }),
+      plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
     }
   });
 
   server.route({
     method: "POST",
     path: "/invoices",
-    handler: handlers.Invoices.create,
+    handler: v0.Invoices.create,
     options: {
       auth: "token",
       tags: ['api'],
@@ -553,7 +553,7 @@ async function Server() {
   server.route({
     method: "DELETE",
     path: "/invoices/{uid}",
-    handler: handlers.Invoices.cancel,
+    handler: v0.Invoices.cancel,
     options: {
       auth: "token",
       tags: ['api']
@@ -563,7 +563,7 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
-    handler: handlers.Invoices.createPublic,
+    handler: v0.Invoices.createPublic,
     options: {
       tags: ['api'],
       validate: {
@@ -576,33 +576,33 @@ async function Server() {
   server.route({
     method: "POST",
     path: "/password-resets",
-    handler: handlers.Passwords.reset,
+    handler: v0.Passwords.reset,
     options: {
       tags: ['api'],
       validate: {
-        payload: handlers.Passwords.PasswordReset,
+        payload: v0.Passwords.PasswordReset,
       },
-      plugins: responsesWithSuccess({ model: handlers.Passwords.Success }),
+      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
   });
 
   server.route({
     method: "POST",
     path: "/password-resets/{uid}",
-    handler: handlers.Passwords.claim,
+    handler: v0.Passwords.claim,
     options: {
       tags: ['api'],
       validate: {
-        payload: handlers.Passwords.PasswordResetClaim,
+        payload: v0.Passwords.PasswordResetClaim,
       },
-      plugins: responsesWithSuccess({ model: handlers.Passwords.Success }),
+      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
   });
 
   server.route({
     method: "PUT",
     path: "/settings/denomination",
-    handler: handlers.Denominations.update,
+    handler: v0.Denominations.update,
     options: {
       tags: ['api'],
       auth: "token"
@@ -612,7 +612,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/settings/denomination",
-    handler: handlers.Denominations.show,
+    handler: v0.Denominations.show,
     options: {
       tags: ['api'],
       auth: "token"
@@ -622,7 +622,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/base_currencies",
-    handler: handlers.BaseCurrencies.index,
+    handler: v0.BaseCurrencies.index,
     options: {
       tags: ['api']
     }
@@ -631,7 +631,7 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
-    handler: handlers.PriceConversions.show,
+    handler: v0.PriceConversions.show,
     options: {
       tags: ['api']
     }
@@ -642,7 +642,7 @@ async function Server() {
     server.route({
       method: "POST",
       path: "/r",
-      handler: handlers.PaymentRequests.create,
+      handler: v0.PaymentRequests.create,
       options: {
         auth: "app"
       }
@@ -653,25 +653,25 @@ async function Server() {
   server.route({
     method: 'POST',
     path: '/moneybutton/webhooks',
-    handler: handlers.MoneybuttonWebhooks.create
+    handler: v0.MoneybuttonWebhooks.create
   });
 
   server.route({
     method: 'GET',
     path: '/merchants',
-    handler: handlers.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchants',
-    handler: handlers.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchant-coins',
-    handler: handlers.Merchants.listMerchantCoins
+    handler: v0.Merchants.listMerchantCoins
   });
 
   server.route({
@@ -680,7 +680,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: handlers.Apps.index
+      handler: v0.Apps.index
     }
   });
 
@@ -690,7 +690,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: handlers.Apps.show
+      handler: v0.Apps.show
     }
   });
 
@@ -700,7 +700,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: handlers.Apps.create
+      handler: v0.Apps.create
     }
   });
 
@@ -710,7 +710,7 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: handlers.FirebaseTokens.create
+      handler: v0.FirebaseTokens.create
     }
   });
 
@@ -720,20 +720,20 @@ async function Server() {
     options: {
       auth: "token",
       tags: ['api'],
-      handler: handlers.FirebaseTokens.update
+      handler: v0.FirebaseTokens.update
     }
   });
 
   server.route({
     method: 'GET',
     path: '/support/{token}',
-    handler: handlers.SupportProxy.show
+    handler: v0.SupportProxy.show
   }); 
 
   server.route({
     method: 'GET',
     path: '/api_keys',
-    handler: handlers.ApiKeys.index,
+    handler: v0.ApiKeys.index,
     options: {
       auth: "token"
     }
@@ -742,7 +742,7 @@ async function Server() {
   server.route({
     method: 'POST',
     path: '/bittrex_api_keys',
-    handler: handlers.BittrexApiKeys.create,
+    handler: v0.BittrexApiKeys.create,
     options: {
       auth: "token"
     }
@@ -751,7 +751,7 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/bittrex_api_keys',
-    handler: handlers.BittrexApiKeys.show,
+    handler: v0.BittrexApiKeys.show,
     options: {
       auth: "token"
     }
@@ -760,7 +760,7 @@ async function Server() {
   server.route({
     method: 'DELETE',
     path: '/bittrex_api_keys',
-    handler: handlers.BittrexApiKeys.destroy,
+    handler: v0.BittrexApiKeys.destroy,
     options: {
       auth: "token"
     }
@@ -769,7 +769,7 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: handlers.Accounts.nearby
+    handler: v0.Accounts.nearby
   }); 
   await attachV1Routes(server)
 

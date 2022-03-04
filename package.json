@@ -145,7 +145,8 @@
     "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
     "db:seed:prices": "ts-node test/seed_prices.ts",
     "payreq:test:migrate": "NODE_ENV=test ts-node servers/payment_requests/tests/migrate.ts",
-    "payreq:start": "ts-node servers/payment_requests/server.ts"
+    "payreq:start": "ts-node servers/payment_requests/server.ts",
+    "docs": "echo 'build documentation here'"
   },
   "keywords": [],
   "author": "",

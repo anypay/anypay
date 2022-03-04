@@ -1,9 +1,9 @@
 
 import { Request } from 'hapi'
 
-import { logError } from '../../../lib/logger'
+import { logError } from '../../lib/logger'
 
-import { authorizeAccount } from '../../../lib/auth'
+import { authorizeAccount } from '../../lib/auth'
 
 export async function authorizeRequest(request: Request) {
 

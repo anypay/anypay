@@ -1,16 +1,14 @@
 
 import { logError } from '../../../lib/logger'
 
-import { authorizeRequest } from '../auth/jwt'
-
 export async function show(request, h) {
 
   try {
 
-    let account = await authorizeRequest(request)
-
     return h.response({
-      user: account.toJSON()
+
+      user: request.account.toJSON()
+
     })
     .code(200)
 

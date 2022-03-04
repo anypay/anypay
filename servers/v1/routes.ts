@@ -1,9 +1,9 @@
 
 const sequelize = require("../../lib/database");
 
-import { handlers, v1 } from '../rest_api/handlers'
+import { v1 } from '../handlers'
 
-import { useJWT } from '../rest_api/auth/jwt'
+import { useJWT } from '../auth/jwt'
 
 const AuthBearer = require('hapi-auth-bearer-token');
 
@@ -18,7 +18,7 @@ export async function attachV1Routes(server) {
   server.route({
     method: "POST",
     path: "/v1/api/account/register",
-    handler: handlers.AccountRegistrations.create,
+    handler: v1.AccountRegistrations.create,
     options: {
       validate: {
         payload: Joi.object({
@@ -32,7 +32,7 @@ export async function attachV1Routes(server) {
   server.route({
     method: "POST",
     path: "/v1/api/account/login",
-    handler: handlers.AccountLogins.create,
+    handler: v1.AccountLogins.create,
     options: {
       validate: {
         payload: Joi.object({
@@ -46,7 +46,7 @@ export async function attachV1Routes(server) {
   server.route({
     method: "POST",
     path: "/v1/api/account/password-reset",
-    handler: handlers.PasswordResets.create,
+    handler: v1.PasswordResets.create,
     options: {
       validate: {
         payload: Joi.object({
@@ -62,7 +62,7 @@ export async function attachV1Routes(server) {
     options: {
       auth: "jwt"
     },
-    handler: handlers.MyAccount.show
+    handler: v1.MyAccount.show
   });
 
   server.route({

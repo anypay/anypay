@@ -1,21 +1,16 @@
-import {Server} from '../../servers/rest_api/server';
-import * as assert from 'assert';
+
 import {hash} from '../../lib/password';
-import * as Database from '../../lib/database';
 
 import { setAddress} from '../../lib/core';
 
 import { coins, database, settings, models, accounts } from "../../lib";
 
-import * as Chance from 'chance';
-const chance = new Chance();
+import { assert, server, chance } from '../utils'
 
 describe("Account Coins over HTTP", async () => {
-  var accessToken, account, server;
+  var accessToken, account;
   
   before(async () => {
-
-    server = await Server();
 
     account = await accounts.registerAccount(chance.email(), chance.word());
 
@@ -32,8 +27,6 @@ describe("Account Coins over HTTP", async () => {
       currency: "BTC",
       address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
     });
-
-
 
   });
 
