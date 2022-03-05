@@ -1,7 +1,7 @@
 
 require('dotenv').config()
 
-import { start } from './servers/v0/server'
+import { start } from './server/v0/server'
 
 import { start as startPrices } from './lib/prices/cron'
 

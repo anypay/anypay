@@ -105,7 +105,7 @@ export {
 var server, request;
 export { server, request }
 
-import {Server} from '../servers/v0/server';
+import {Server} from '../server/v0/server';
 import * as supertest from 'supertest'
 
 beforeEach(() => {

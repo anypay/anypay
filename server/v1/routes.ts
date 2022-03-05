@@ -25,7 +25,7 @@ export async function attachV1Routes(server) {
           email: Joi.string().email().required(),
           password: Joi.string().required()
         })
-      },
+      }
     },
   });
 
