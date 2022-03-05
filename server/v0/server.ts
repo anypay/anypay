@@ -8,6 +8,7 @@ const HapiSwagger = require("hapi-swagger");
 import { attachMerchantMapRoutes } from '../map/server';
 
 import { attachV1Routes } from '../v1/routes';
+import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
@@ -273,6 +274,9 @@ async function Server() {
   server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
 
   payreq.attach(server)
+
+  attachJsonV2(server)
+
   attachMerchantMapRoutes(server);
 
   server.route({

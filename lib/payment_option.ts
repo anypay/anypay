@@ -15,5 +15,13 @@ export class PaymentOption extends Orm {
 
   }
 
+  get invoice_uid() {
+    return this.invoice.get('uid')
+  }
+
+  get currency() {
+    return this.invoice.get('currency')
+  }
+
 }
 

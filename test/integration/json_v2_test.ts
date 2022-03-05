@@ -6,19 +6,18 @@ import { schema } from '../../lib/pay/json_v2'
 
 import { ensureInvoice } from '../../lib/invoices'
 
-describe("Listing Available Webhooks", async () => {
+describe("JSON Payment Protocol V2", async () => {
 
   it("GET /i/:uid requires accept and x-paypro-2 headers", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
 
     let response = await server.inject({
-      method: 'POST',
+      method: 'GET',
       url: `/i/${invoice.uid}`
     })
 
     expect(response.statusCode).to.be.equal(400)
-    expect(response.text).to.be.equal('Invalid Accept header')
 
   })
 

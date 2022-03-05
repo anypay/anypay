@@ -2,8 +2,8 @@
 import * as Joi from 'joi'
 
 const PaymentOptionsHeaders = Joi.object({
-  'x-paypro-version': 2,
-  'Accept': 'application/payment-options'
+  'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
+  'accept': Joi.string().pattern(/application\/payment-options/).required()
 })
 
 const PaymentOption = Joi.object({
@@ -27,8 +27,8 @@ const PaymentOptions = Joi.object({
 })
 
 const PaymentRequestHeaders = Joi.object({
-  'x-paypro-version': 2,
-  'Content-Type': 'application/payment-request'
+  'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
+  'accept': Joi.string().pattern(/application\/payment-request/).required()
 })
 
 const PaymentRequestReq = Joi.object({
@@ -59,8 +59,8 @@ const PaymentRequest = Joi.object({
 })
 
 const PaymentVerificationHeaders = Joi.object({
-  'x-paypro-version': 2,
-  'Content-Type': 'application/payment-verification'
+  'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
+  'accept': Joi.string().pattern(/application\/payment-verification/).required()
 })
 
 const PaymentVerificationReq = Joi.object({
@@ -84,8 +84,8 @@ const PaymentVerification = Joi.object({
 })
 
 const PaymentHeaders = Joi.object({
-  'x-paypro-version': 2,
-  'Content-Type': 'application/payment'
+  'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
+  'accept': Joi.string().pattern(/application\/payment/).required()
 })
 
 const Payment = Joi.object({

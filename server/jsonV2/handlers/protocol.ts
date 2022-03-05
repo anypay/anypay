@@ -19,16 +19,19 @@ export async function listPaymentOptions(req, h) {
 
   try {
 
-    await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers)
+    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync (req.headers, {
+      allowUnknown: true
+    })
 
     let response = await protocol.listPaymentOptions(req.invoice)
 
+    return h.response(response)
 
   } catch(error) {
 
     log.error('listpaymentoptions.error', error)
 
-    return badRequest({ error: error.message })
+    return badRequest(error)
 
   }
 
@@ -44,7 +47,7 @@ export async function handlePost(req, h) {
 
     if (!req.invoice) { return notFound() }
 
-    switch(req.headers['Content-Type']) {
+    switch(req.headers['content-type']) {
 
       case('application/payment-request'):
 
@@ -78,7 +81,7 @@ async function getPaymentRequest(req, h) {
 
   try {
 
-    await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers)
+    await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers, { allowUnknown: true })
 
     await schema.Protocol.PaymentRequest.request.validateAsync(req.payload)
 
@@ -102,7 +105,7 @@ async function verifyUnsignedPayment(req, h) {
 
   try {
 
-    await schema.Protocol.PaymentVerification.headers.validateAsync(req.headers)
+    await schema.Protocol.PaymentVerification.headers.validateAsync(req.headers, { allowUnknown: true })
 
     await schema.Protocol.PaymentVerification.request.validateAsync(req.payload)
 
@@ -126,7 +129,7 @@ async function submitPayment(req, h) {
 
   try {
 
-    await schema.Protocol.Payment.headers.validateAsync(req.headers)
+    await schema.Protocol.Payment.headers.validateAsync(req.headers, { allowUnknown: true })
 
     await schema.Protocol.Payment.request.validateAsync(req.payload)
 

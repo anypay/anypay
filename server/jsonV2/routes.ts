@@ -32,14 +32,14 @@ export async function attachRoutes(server) {
       validate: {
         headers: {
           'x-paypro-version': Joi.number().integer().required(),
-          'Content-Type': Joi.alternatives([
+          'content-type': Joi.alternatives([
             Joi.string().pattern(/application\/payment-request/).required(),
             Joi.string().pattern(/application\/payment-verification/).required(),
             Joi.string().pattern(/application\/payment/).required(),
           ]).required()
         },
-        query: {
-          r: Joi.string().required()
+        params: {
+          uid: Joi.string().required()
         }
       }
     },
