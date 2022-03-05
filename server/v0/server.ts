@@ -1,7 +1,8 @@
 "use strict";
 require('dotenv').config();
 
-import * as Hapi from "hapi";
+import * as Hapi from "@hapi/hapi";
+
 const HapiSwagger = require("hapi-swagger");
 
 import { attachMerchantMapRoutes } from '../map/server';
@@ -287,9 +288,9 @@ async function Server() {
     options: {
       tags: ['api'],
       validate: {
-        params: {
+        params: Joi.object({
           invoice_id: Joi.string().required()
-        },
+        })
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
@@ -320,11 +321,11 @@ async function Server() {
     handler: v0.Invoices.shareEmail,
     options: {
       tags: ['api'],
-      validate: {
+      validate: Joi.object({
         payload: {
           email: Joi.string().email().required()
         }
-      },
+      })
     }
   });
 
@@ -444,12 +445,12 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        params: {
+        params: Joi.object({
           id: Joi.number().required()
-        },
-        payload: {
+        }),
+        payload: Joi.object({
           note: Joi.string().required()
-        }
+        })
       }
     }
   });
@@ -462,9 +463,9 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        params: {
+        params: Joi.object({
           currency: Joi.string().required()
-        },
+        }),
         payload: v0.Addresses.PayoutAddressUpdate
       },
       plugins: responsesWithSuccess({ model: models.Account.Response })
@@ -479,12 +480,12 @@ async function Server() {
       auth: "token",
       tags: ['api'],
       validate: {
-        params: {
+        params: Joi.object({
           currency: Joi.string().required(),
-        },
-        payload: {
+        }),
+        payload: Joi.object({
           percent: Joi.number().required()
-        },
+        }),
       }
     }
   });
@@ -516,9 +517,9 @@ async function Server() {
     handler: v0.InvoiceNotes.create,
     options: {
       validate: {
-        payload: {
+        payload: Joi.object({
           note: Joi.string().required()
-        }
+        })
       },
       auth: "token",
       tags: ['api']

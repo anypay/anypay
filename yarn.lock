@@ -418,7 +418,14 @@
     "protobufjs" "^6.10.0"
     "yargs" "^16.1.1"
 
-"@hapi/hoek@^9.0.0":
+"@hapi/boom@^9.1.4", "@hapi/boom@>=7.x.x":
+  "integrity" "sha512-Ls1oH8jaN1vNsqcaHVYJrKmgMcKsC1wcp8bujvXrHaAqD2iDYq3HoOwsxwo09Cuda5R5nC0o0IxlrlTuvPuzSw=="
+  "resolved" "https://registry.npmjs.org/@hapi/boom/-/boom-9.1.4.tgz"
+  "version" "9.1.4"
+  dependencies:
+    "@hapi/hoek" "9.x.x"
+
+"@hapi/hoek@^9.0.0", "@hapi/hoek@9.x.x":
   "integrity" "sha512-gfta+H8aziZsm8pZa0vj04KO6biEiisppNgA1kbJvFrrWu9Vm7eaUEy76DIxsuTaWvti5fkJVhllWc6ZTE+Mdw=="
   "resolved" "https://registry.npmjs.org/@hapi/hoek/-/hoek-9.2.1.tgz"
   "version" "9.2.1"
@@ -509,10 +516,10 @@
   "resolved" "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz"
   "version" "1.1.0"
 
-"@sideway/address@^4.1.0":
-  "integrity" "sha512-idTz8ibqWFrPU8kMirL0CoPH/A29XOzzAzpyN3zQ4kAWnzmNfFmRaoMNN6VI8ske5M73HZyhIaW4OuSFIdM4oA=="
-  "resolved" "https://registry.npmjs.org/@sideway/address/-/address-4.1.2.tgz"
-  "version" "4.1.2"
+"@sideway/address@^4.1.3":
+  "integrity" "sha512-8ncEUtmnTsMmL7z1YPB47kPUq7LpKWJNFPsRzHiIajGC5uXlWGn+AmkYPcHNl8S4tcEGx+cnORnNYaw2wvL+LQ=="
+  "resolved" "https://registry.npmjs.org/@sideway/address/-/address-4.1.3.tgz"
+  "version" "4.1.3"
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
@@ -4374,6 +4381,13 @@
     "boom" "7.x.x"
     "hoek" "5.x.x"
 
+"hapi-auth-bearer-token@^8.0.0":
+  "integrity" "sha512-1YeUlwhhky8tnNx9bOQPB/TvsEwbgcYwAZ6DAvHlK+tHRiMbXU+2HNE8qpRia+oj21W2K/omaxyZIB5dOzTPoA=="
+  "resolved" "https://registry.npmjs.org/hapi-auth-bearer-token/-/hapi-auth-bearer-token-8.0.0.tgz"
+  "version" "8.0.0"
+  dependencies:
+    "@hapi/hoek" "^9.0.0"
+
 "hapi-swagger@^9.1.1":
   "integrity" "sha512-IVxcEwszwabkEbUWQ5vbvAwHSs0xngKBVbk4/wKeCH0qNocl/ZUi1KX6wgmRovuD8EWISoQMKYo7cYOAlKV3bw=="
   "resolved" "https://registry.npmjs.org/hapi-swagger/-/hapi-swagger-9.4.2.tgz"
@@ -5359,7 +5373,7 @@
     "isemail" "3.x.x"
     "topo" "3.x.x"
 
-"joi@^14.3.1", "joi@14.x.x":
+"joi@^14.3.1":
   "integrity" "sha512-LQDdM+pkOrpAn4Lp+neNIFV3axv1Vna3j38bisbQhETPMANYRbFJFUyOZcOClYvM/hppMhGWuKSFEK9vjrB+bQ=="
   "resolved" "https://registry.npmjs.org/joi/-/joi-14.3.1.tgz"
   "version" "14.3.1"
@@ -5368,16 +5382,25 @@
     "isemail" "3.x.x"
     "topo" "3.x.x"
 
-"joi@^17.2.1":
-  "integrity" "sha512-Lm56PP+n0+Z2A2rfRvsfWVDXGEWjXxatPopkQ8qQ5mxCEhwHG+Ettgg5o98FFaxilOxozoa14cFhrE/hOzh/Nw=="
-  "resolved" "https://registry.npmjs.org/joi/-/joi-17.4.2.tgz"
-  "version" "17.4.2"
+"joi@^17.2.1", "joi@^17.6.0", "joi@>=17.x.x":
+  "integrity" "sha512-OX5dG6DTbcr/kbMFj0KGYxuew69HPcAE3K/sZpEV2nP6e/j/C0HV+HNiBPCASxdx5T7DMoa0s8UeHWMnb6n2zw=="
+  "resolved" "https://registry.npmjs.org/joi/-/joi-17.6.0.tgz"
+  "version" "17.6.0"
   dependencies:
     "@hapi/hoek" "^9.0.0"
     "@hapi/topo" "^5.0.0"
-    "@sideway/address" "^4.1.0"
+    "@sideway/address" "^4.1.3"
     "@sideway/formula" "^3.0.0"
     "@sideway/pinpoint" "^2.0.0"
+
+"joi@14.x.x":
+  "integrity" "sha512-LQDdM+pkOrpAn4Lp+neNIFV3axv1Vna3j38bisbQhETPMANYRbFJFUyOZcOClYvM/hppMhGWuKSFEK9vjrB+bQ=="
+  "resolved" "https://registry.npmjs.org/joi/-/joi-14.3.1.tgz"
+  "version" "14.3.1"
+  dependencies:
+    "hoek" "6.x.x"
+    "isemail" "3.x.x"
+    "topo" "3.x.x"
 
 "jose@^2.0.5":
   "integrity" "sha512-BAiDNeDKTMgk4tvD0BbxJ8xHEHBZgpeRZ1zGPPsitSyMgjoMWiLGYAE7H7NpP5h0lPppQajQs871E8NHUrzVPA=="

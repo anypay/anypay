@@ -34,6 +34,17 @@ export async function ensureInvoice(uid: string) {
   return new Invoice(record)
 
 }
+export async function getInvoice(uid: string) {
+
+  let record = await models.Invoice.findOne({
+    where: { uid }
+  })
+
+  if (!record) { return }
+
+  return new Invoice(record)
+
+}
 
 interface NewInvoice {
 

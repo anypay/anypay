@@ -8,12 +8,12 @@ require('dotenv').config();
 
 import * as moment from 'moment';
 
-import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
-import { nameFromCode } from './currencies';
+import { PaymentOutput, PaymentOption, GetCurrency, Currency } from '../types';
+import { nameFromCode } from '../currencies';
 import { BigNumber } from 'bignumber.js';
 
-import { getFee, Fee } from './fees';
-import { getBaseURL } from './environment';
+import { getFee, Fee } from '../fees';
+import { getBaseURL } from '../environment';
 
 interface JsonV2Output {
   address?: string;
@@ -111,4 +111,11 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
   }
 
 }
+
+import * as schema from './schema'
+import * as protocol from './protocol'
+
+export { schema, protocol }
+
+export { log } from './log'
 

@@ -71,7 +71,7 @@ export async function record(data: EventData) {
 
 }
 
-export async function recordEvent(payload: any, event: string) {
+export async function recordEvent(payload: any, event: string): Promise<Event> {
 
   let record = await models.Event.create({ payload, event });
 
@@ -79,7 +79,7 @@ export async function recordEvent(payload: any, event: string) {
 
 }
 
-class Event extends Orm {
+export class Event extends Orm {
 
   get(key) {
 
