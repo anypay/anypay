@@ -170,7 +170,7 @@ export function auth(account, version=1) {
 
 }
 
-import { Wallet } from '../../anypay-simple-wallet'
+import { Wallet } from 'anypay-simple-wallet'
 
 const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF
 

@@ -6,7 +6,7 @@ import { schema } from '../../lib/pay/json_v2'
 
 import { ensureInvoice } from '../../lib/invoices'
 
-import { TestClient } from '../../../anypay-simple-wallet'
+import { TestClient } from 'anypay-simple-wallet'
 
 describe("JSON Payment Protocol V2", async () => {
 

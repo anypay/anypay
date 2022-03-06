@@ -1,13 +1,13 @@
 
 import * as utils from '../utils'
 
+import { TestClient } from 'anypay-simple-wallet'
+
 import { expect, spy, wallet, server } from '../utils'
 
 import { protocol, schema, log } from '../../lib/pay/json_v2'
 
 import { ensureInvoice } from '../../lib/invoices'
-
-import { TestClient } from '../../../anypay-simple-wallet'
 
 describe('JSON Payment Protocol V2', () => {
 
@@ -130,7 +130,11 @@ describe('JSON Payment Protocol V2', () => {
 
     let paymentRequest = await client.selectPaymentOption(paymentOptions[0])
 
+    let balance = await wallet.getBalance()
+
     let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
+
+    console.log('__PAY', payment)
 
     let result = await protocol.sendSignedPayment(invoice, {
 
