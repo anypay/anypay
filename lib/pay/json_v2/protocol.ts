@@ -1,7 +1,13 @@
 
 import { Invoice } from '../../invoices'
 
+import { findPaymentOption } from '../../payment_option'
+
+import { submitPayment } from '../../../server/payment_requests/handlers/json_payment_requests'
+
 import { log } from './log'
+
+import { Protocol } from './schema'
 
 interface ProtocolMessage {}
 
@@ -112,6 +118,8 @@ const Errors = require('./errors').errors
 
 export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptions> {
 
+  log.info('pay.jsonv2.paymentoptions', { invoice_uid: invoice.uid })
+
   let paymentOptions = await invoice.getPaymentOptions()
 
   return {
@@ -127,12 +135,13 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
     paymentId: invoice.uid,
 
     paymentOptions: paymentOptions.map(paymentOption => {
+
       return {
         currency: paymentOption.get('currency'),
         chain: paymentOption.get('currency'),
         network: 'main',
-        estimatedAmount: paymentOption.get('amount'),
-        requiredFeeRate: 1,
+        estimatedAmount: parseInt(paymentOption.get('amount')),
+        requiredFeeRate: 0,
         minerFee: 0,
         decimals: 0,
         selected: false
@@ -142,6 +151,12 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
 }
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest): Promise<PaymentRequest> {
+
+  log.info('pay.jsonv2.paymentrequest', option)
+
+  await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
+
+  let paymentOption = await findPaymentOption(invoice, option.currency)
 
   return {
 
@@ -160,9 +175,13 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
     network: 'main',
 
     instructions: [{
+
       type: "transaction",
-      requiredFeeRate: 1,
-      outputs: []
+
+      requiredFeeRate: 0,
+
+      outputs: paymentOption.get('outputs')
+
     }]
 
   }
@@ -171,16 +190,30 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
 export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentVerification> {
 
+  log.info('pay.jsonv2.paymentverification', Object.assign({ invoice_uid: invoice.uid }, params))
+
+  await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
+
   return {
     payment: params,
-    memo: 'Transactions appear to be valid please proceed'
+    memo: 'Transaction Pre-Validation Skipped'
   }
 
 }
 
 export async function sendSignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentResponse> {
 
-  log.info('payment', Object.assign({ invoice_uid: invoice.uid }, params))
+  log.info('pay.jsonv2.payment', Object.assign({ invoice_uid: invoice.uid }, params))
+
+  await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
+
+  let response = await submitPayment({
+    currency: params.currency,
+    transactions: params.transactions.map(({tx}) => tx),
+    invoice_uid: invoice.uid
+  })
+
+  log.info('payment.submit.response', response)
 
   return {
     payment: params,

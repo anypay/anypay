@@ -3,6 +3,8 @@ import { Orm } from './orm'
 
 import { Invoice } from './invoices'
 
+import { models } from './models'
+
 export class PaymentOption extends Orm {
 
   invoice: Invoice;
@@ -22,6 +24,24 @@ export class PaymentOption extends Orm {
   get currency() {
     return this.invoice.get('currency')
   }
+
+}
+
+export async function findPaymentOption(invoice: Invoice, currency: string): Promise<PaymentOption> {
+
+  let record = await models.PaymentOption.findOne({
+
+    where: { invoice_uid: invoice.uid, currency }
+
+  })
+
+  if (!record) {
+
+    throw new Error(`${currency} payment option not found for invoice ${invoice.uid}`)
+
+  }
+
+  return new PaymentOption(invoice, record)
 
 }
 

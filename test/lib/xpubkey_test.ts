@@ -30,15 +30,11 @@ describe("Extended Public Key Service", () => {
 
     let address = await xpub.getNextAddress(xpubkey);
 
-    console.log('address', address);
-
     xpubkey = await models.ExtendedPublicKey.findOne({ where: { id: xpubkey.id }});
 
     assert.strictEqual(xpubkey.nonce, 1);
 
     address = await xpub.getNextAddress(xpubkey);
-
-    console.log('address', address);
 
     assert.strictEqual(xpubkey.nonce, 2);
 
@@ -58,15 +54,11 @@ describe("Extended Public Key Service", () => {
 
     await account.reload(); 
 
-    console.log(account.toJSON());
-
     assert.strictEqual(account.dash_payout_address, xpubkey); 
 
     let xpubRecord = await models.ExtendedPublicKey.findOne({
       where: {account_id: account.id}
     });
-
-    console.log(xpubRecord.toJSON());
 
     assert.strictEqual(xpubRecord.xpubkey, xpubkey);
     assert.strictEqual(xpubRecord.nonce, 0);
@@ -90,8 +82,6 @@ describe("Extended Public Key Service", () => {
       await account.reload(); 
 
       let invoice = await generateInvoice(account.id, 1, 'DASH');
-
-      console.log(invoice.toJSON());
 
       assert(invoice.id > 0);
 

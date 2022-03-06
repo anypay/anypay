@@ -13,7 +13,6 @@ export interface NewPaymentOption {
   address?: string;
   amount?: number;
 }
-
 export function writePaymentOptions(options: NewPaymentOption[]) {
 
   log.info('writepaymentoptions', {options});

@@ -58,8 +58,6 @@ describe("Setting Addresses Via REST", async () => {
       }
     })
 
-    console.log(response.result)
-
     expect(response.result.addresses.length).to.be.equal(0);
 
     var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
@@ -95,8 +93,6 @@ describe("Setting Addresses Via REST", async () => {
       method: 'GET',
       url: '/v1/api/addresses'
     })
-
-    console.log(response)
 
     expect(response.statusCode).to.be.equal(200);
 

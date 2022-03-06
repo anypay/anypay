@@ -1,11 +1,13 @@
 
 import * as utils from '../utils'
 
-import { expect, spy } from '../utils'
+import { expect, spy, wallet, server } from '../utils'
 
 import { protocol, schema, log } from '../../lib/pay/json_v2'
 
 import { ensureInvoice } from '../../lib/invoices'
+
+import { TestClient } from '../../../anypay-simple-wallet'
 
 describe('JSON Payment Protocol V2', () => {
 
@@ -19,7 +21,7 @@ describe('JSON Payment Protocol V2', () => {
 
     let validation = schema.Protocol.PaymentOptions.response.validate(response)
 
-    expect(validation.error).to.be.equal(null)
+    expect(validation.error).to.be.equal(undefined)
 
   })
 
@@ -43,7 +45,7 @@ describe('JSON Payment Protocol V2', () => {
 
     let validation = schema.Protocol.PaymentRequest.response.validate(response)
 
-    expect(validation.error).to.be.equal(null)
+    expect(validation.error).to.be.equal(undefined)
 
   })
 
@@ -65,6 +67,10 @@ describe('JSON Payment Protocol V2', () => {
   it('#getPaymentRequest records an event in the invoice event log', async () => {
     let [account, invoice] = await utils.newAccountWithInvoice()
 
+    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
+
+    let response = await protocol.getPaymentRequest(invoice, paymentOptions[0])
+
     expect(log.info).to.have.been.called.with('pay.jsonv2.paymentrequest')
   })
 
@@ -84,7 +90,19 @@ describe('JSON Payment Protocol V2', () => {
 
     let response = await protocol.getPaymentRequest(invoice, paymentOptions[0])
 
-    expect(log.info).to.have.been.called.with('paypro.jsonv2.paymentverification')
+    let { chain, currency } = paymentOptions[0]
+
+    await protocol.verifyUnsignedPayment(invoice, {
+
+      chain,
+
+      currency,
+
+      transactions: []
+
+    })
+
+    expect(log.info).to.have.been.called.with('pay.jsonv2.paymentverification')
 
   })
 
@@ -102,7 +120,27 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#sendSignedPayment should mark invoice as paid', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+
+    let client = new TestClient(server, `/i/${invoice.uid}`)
+
+    let { paymentOptions } = await client.getPaymentOptions()
+
+    let { chain, currency } = paymentOptions[0]
+
+    let paymentRequest = await client.selectPaymentOption(paymentOptions[0])
+
+    let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
+
+    let result = await protocol.sendSignedPayment(invoice, {
+
+      chain,
+
+      currency,
+
+      transactions: [{ tx: payment }]
+
+    })
 
     invoice = await ensureInvoice(invoice.uid)
 
@@ -112,9 +150,25 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#sendSignedPayment records an event in the invoice evenet log', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
-    expect(log.info).to.have.been.called.with('paypro.jsonv2.payment')
+    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
+
+    let { chain, currency } = paymentOptions[0]
+
+    let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+
+    await protocol.sendSignedPayment(invoice, {
+
+      chain,
+
+      currency,
+
+      transactions: []
+
+    })
+
+    expect(log.info).to.have.been.called.with('pay.jsonv2.payment')
 
   })
 

@@ -185,11 +185,16 @@ async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
-    log.info('server.request', { id: request.info.id, headers: request.headers })
+    log.debug('server.request', { id: request.info.id, headers: request.headers })
 
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment-request' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-request';
     }
 
     if ('application/payment' === request.headers['accept']) {
@@ -325,11 +330,11 @@ async function Server() {
     handler: v0.Invoices.shareEmail,
     options: {
       tags: ['api'],
-      validate: Joi.object({
-        payload: {
+      validate: {
+        payload: Joi.object({
           email: Joi.string().email().required()
-        }
-      })
+        })
+      }
     }
   });
 

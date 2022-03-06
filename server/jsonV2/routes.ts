@@ -13,13 +13,13 @@ export async function attachRoutes(server) {
     handler: jsonV2.Protocol.listPaymentOptions,
     options: {
       validate: {
-        headers: {
+        headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
-          'Accept': Joi.string().pattern(/application\/payment-options/).required()
-        },
-        query: {
-          r: Joi.string().required()
-        }
+          'accept': Joi.string().pattern(/application\/payment-options/).required()
+        }),
+        params: Joi.object({
+          uid: Joi.string().required()
+        })
       }
     },
   });
@@ -30,17 +30,17 @@ export async function attachRoutes(server) {
     handler: jsonV2.Protocol.handlePost,
     options: {
       validate: {
-        headers: {
+        headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
-          'content-type': Joi.alternatives([
+          'x-content-type': Joi.alternatives([
             Joi.string().pattern(/application\/payment-request/).required(),
             Joi.string().pattern(/application\/payment-verification/).required(),
             Joi.string().pattern(/application\/payment/).required(),
           ]).required()
-        },
-        params: {
+        }),
+        params: Joi.object({
           uid: Joi.string().required()
-        }
+        })
       }
     },
   });

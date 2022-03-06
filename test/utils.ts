@@ -41,8 +41,12 @@ export async function createAccountWithAddress(): Promise<[Account, Address]> {
   return [account, address]
 }
 
+interface NewAccountInvoice {
+  amount?: number;
+}
 
-export async function newAccountWithInvoice(): Promise<[Account, Invoice]> {
+
+export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Promise<[Account, Invoice]> {
 
   let account = await createAccount()
 
@@ -52,7 +56,7 @@ export async function newAccountWithInvoice(): Promise<[Account, Invoice]> {
 
   let invoice = await createInvoice({
     account,
-    amount: 10
+    amount: params.amount || 10
   })
 
   return [ account, invoice ]
@@ -165,4 +169,18 @@ export function auth(account, version=1) {
   }
 
 }
+
+import { Wallet } from '../../anypay-simple-wallet'
+
+const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF
+
+if (!WIF) {
+
+  throw new Error('process.env.ANYPAY_SIMPLE_WALLET_WIF must be set before running tests.')
+
+}
+
+const wallet = Wallet.fromWIF(WIF)
+
+export { wallet } 
 

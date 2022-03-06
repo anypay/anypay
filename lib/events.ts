@@ -34,7 +34,7 @@ const exchange = 'anypay.events';
 
     let message = JSON.stringify(data);
 
-    await channel.publish(exchange, this.event, new Buffer(message));
+    await channel.publish(exchange, this.event, Buffer.from(message));
 
     logInfo(`amqp.published`, { exchange, event: this.event, message })
 

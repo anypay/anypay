@@ -1,6 +1,8 @@
 
-import { plugins, models, amqp, log } from '../../../lib'
+import { models, amqp, log } from '../../../lib'
 import { logInfo, logError } from '../../../lib/logger'
+
+import { plugins } from '../../../lib/plugins'
 
 import { detectWallet, verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
 

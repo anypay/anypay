@@ -92,7 +92,7 @@ class Plugins {
 
     payments.forEach(async payment => {
 
-      let message = new Buffer(JSON.stringify(payment));
+      let message = Buffer.from(JSON.stringify(payment));
 
       await channel.publish('anypay.payments', 'payment', message);
 
@@ -121,6 +121,7 @@ class Plugin {
 const plugins = new Plugins();
 
 plugins.load();
+
 
 export {plugins};
 

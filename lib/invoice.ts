@@ -178,7 +178,7 @@ export async function generateInvoice(
 
   var invoice = await models.Invoice.create(invoiceParams);
 
-  await createPaymentOptions(account, invoice)
+  let options = await createPaymentOptions(account, invoice)
 
   return invoice;
 
@@ -203,8 +203,6 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
 export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
 
-  invoice = new Invoice(invoice)
-
   let addresses = await listAvailableAddresses(new Account(account))
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
@@ -213,12 +211,14 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     let coin = getCoin(record.currency)
 
-    let _amount = await convert({
+    const value = invoice.get('amount')
+
+    let { value: amountMinusFees } = await convert({
       currency: account.denomination,
-      value: invoice.denomination_amount
+      value
     }, currency, coin.precision);
 
-    let address = (await getNewInvoiceAddress(account.id, currency, _amount)).value;
+    let address = (await getNewInvoiceAddress(account.id, currency, amountMinusFees)).value;
 
     let url = computeInvoiceURI({
       currency: currency,
@@ -227,24 +227,24 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     let paymentCoin = getCoin(currency);
 
-    let fee = await pay.fees.getFee(currency)
-
     if (address.match(':')) {
       address = address.split(':')[1]
     }
+
+    let fee = await pay.fees.getFee(currency)
     
-    var amount = new BigNumber(pay.toSatoshis(_amount.value)).minus(fee.amount).toNumber();
+    var paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).minus(fee.amount).toNumber();
 
     if (currency === 'BTC') {
 
-      amount = new BigNumber(pay.toSatoshis(_amount.value)).toNumber();
+      paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).toNumber();
     }
 
     let outputs = []
 
     outputs.push({
       address,
-      amount
+      amount: paymentAmount
     })
 
     if (currency != 'BTC') {
@@ -256,12 +256,17 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       uid: invoice.uid
     });
 
+    var amount = outputs.reduce((sum, output) => {
+
+      return sum.plus(output.amount)
+
+    }, new BigNumber(0)).toNumber()
+
     let optionRecord = await models.PaymentOption.create({
-      currency_logo_url: paymentCoin.logo_url,
       currency_name: paymentCoin.name,
       invoice_uid: invoice.uid,
       currency,
-      amount: pay.fromSatoshis(amount),
+      amount,
       address,
       outputs,
       uri,
@@ -322,16 +327,6 @@ export async function replaceInvoice(uid: string, currency: string) {
   await invoice.save();
 
   return invoice;
-
-}
-
-export async function republishTxid( currency: string, txid: string){
-
-  currency = currency.toLowerCase()
-
-  await  channel.publish( `${currency}.anypayinc.com`, 'walletnotify', Buffer.from(txid))
-
-  return txid;
 
 }
 

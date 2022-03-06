@@ -70,7 +70,7 @@ export class InvalidWebhookURL implements Error {
   }
 }
 
-export class Invoice extends Orm{
+export class Invoice extends Orm {
 
   get account_id(): any {
 
@@ -155,7 +155,6 @@ export class Invoice extends Orm{
 
 export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
-
   const uid = v4();
 
   var newInvoice: any = {
@@ -222,9 +221,11 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
     })
   }
 
-  await createPaymentOptions(account.record, record)
+  let invoice = new Invoice(record)
 
-  return new Invoice(record)
+  const options = await createPaymentOptions(account.record, invoice)
+
+  return invoice;
 
 }
 

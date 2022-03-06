@@ -43,7 +43,6 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
 
       fcm.send(message, function(err, response){
           if (err) {
-            console.error(err);
             //return reject(err);
             resolve(null);
           } else {

@@ -15,11 +15,11 @@ async function ensureInvoice(req) {
 
 export async function listPaymentOptions(req, h) {
 
-  await ensureInvoice(req)
-
   try {
 
-    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync (req.headers, {
+    await ensureInvoice(req)
+
+    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
       allowUnknown: true
     })
 
@@ -39,15 +39,11 @@ export async function listPaymentOptions(req, h) {
 
 export async function handlePost(req, h) {
 
-  await ensureInvoice(req)
-
   try {
 
-    req.invoice = await getInvoice(req.params.uid)
+    await ensureInvoice(req)
 
-    if (!req.invoice) { return notFound() }
-
-    switch(req.headers['content-type']) {
+    switch(req.headers['x-content-type']) {
 
       case('application/payment-request'):
 
@@ -82,9 +78,7 @@ async function getPaymentRequest(req, h) {
   try {
 
     await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers, { allowUnknown: true })
-
-    await schema.Protocol.PaymentRequest.request.validateAsync(req.payload)
-
+    
     let response = await protocol.getPaymentRequest(req.invoice, req.payload)
 
     await schema.Protocol.PaymentRequest.response.validate(response)
@@ -106,8 +100,6 @@ async function verifyUnsignedPayment(req, h) {
   try {
 
     await schema.Protocol.PaymentVerification.headers.validateAsync(req.headers, { allowUnknown: true })
-
-    await schema.Protocol.PaymentVerification.request.validateAsync(req.payload)
 
     let response = await protocol.verifyUnsignedPayment(req.invoice, req.payload)
 
@@ -131,11 +123,11 @@ async function submitPayment(req, h) {
 
     await schema.Protocol.Payment.headers.validateAsync(req.headers, { allowUnknown: true })
 
-    await schema.Protocol.Payment.request.validateAsync(req.payload)
-
     let response = await protocol.sendSignedPayment(req.invoice, req.payload)
 
     await schema.Protocol.Payment.response.validateAsync(response)
+
+    return h.response(response)
 
   } catch(error) {
 
