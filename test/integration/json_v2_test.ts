@@ -119,7 +119,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
-  it.skip("POST /i/:uid signs the payload with headers", async () => {
+  it("POST /i/:uid signs the payload with headers", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
 
