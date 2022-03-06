@@ -128,9 +128,9 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
 
     expires: invoice.get('expiry'),
 
-    memo: `Anypay Invoice ${invoice.uid}`,
+    memo: `Anypay Invoice ID: ${invoice.uid}`,
 
-    paymentUrl: `https://anypayx.com/i/${invoice.uid}`,
+    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
@@ -141,7 +141,7 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
         chain: paymentOption.get('currency'),
         network: 'main',
         estimatedAmount: parseInt(paymentOption.get('amount')),
-        requiredFeeRate: 0,
+        requiredFeeRate: 1,
         minerFee: 0,
         decimals: 0,
         selected: false
