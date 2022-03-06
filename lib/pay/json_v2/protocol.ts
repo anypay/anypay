@@ -166,7 +166,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
     memo: 'string',
 
-    paymentUrl: `https://anypayx.com/i/${invoice.uid}`,
+    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
@@ -178,7 +178,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
       type: "transaction",
 
-      requiredFeeRate: 0,
+      requiredFeeRate: 1,
 
       outputs: paymentOption.get('outputs')
 
