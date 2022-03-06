@@ -247,7 +247,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       amount: paymentAmount
     })
 
-    if (currency != 'BTC') {
+    if (currency != 'BTC' && !process.env.FEATURE_SINGLE_OUTPUTS_ONLY) {
       outputs.push(fee)
     }
 

@@ -197,6 +197,11 @@ async function Server() {
       request.headers['x-content-type'] = 'application/payment-request';
     }
 
+    if ('application/payment-verification' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-verification';
+    }
+
     if ('application/payment' === request.headers['accept']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/payment';
