@@ -320,6 +320,7 @@ export async function create (request, h) {
     return h.response(
 
       Object.assign({
+        success: true,
         invoice: sanitized,
         payment_options: invoice.payment_options
       }, sanitized)
