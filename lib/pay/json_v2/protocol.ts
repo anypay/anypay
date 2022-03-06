@@ -128,7 +128,7 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
 
     expires: invoice.get('expiry'),
 
-    memo: 'string',
+    memo: `Anypay Invoice ${invoice.uid}`,
 
     paymentUrl: `https://anypayx.com/i/${invoice.uid}`,
 
@@ -213,7 +213,9 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
     invoice_uid: invoice.uid
   })
 
-  log.info('payment.submit.response', response)
+  log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {
+    invoice_uid: invoice.uid,
+  }))
 
   return {
     payment: params,

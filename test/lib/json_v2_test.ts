@@ -134,8 +134,6 @@ describe('JSON Payment Protocol V2', () => {
 
     let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 
-    console.log('__PAY', payment)
-
     let result = await protocol.sendSignedPayment(invoice, {
 
       chain,

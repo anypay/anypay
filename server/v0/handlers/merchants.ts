@@ -38,12 +38,6 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
   try {
 
-  let today = moment();
-
-  let oneMonthAgo = moment().subtract(1, 'month').format('MM-DD-YYYY');
-
-  let threeMonthsAgo = moment().subtract(3, 'months').format('MM-DD-YYYY');
-
   const oneWeek = await listActiveMerchantsSince(1, 'week')
 
   const oneMonth = await listActiveMerchantsSince(1, 'month')
