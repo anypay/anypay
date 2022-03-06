@@ -1,0 +1,87 @@
+{
+  "errors": [
+    {
+      "code": 404,
+      "cause": "This invoice was not found or has been archived",
+      "response": "Invalid invoiceId, or invoice has been archived (current TTL is 3 days)"
+    },
+    {
+      "code": 400,
+      "cause": "Unsupported Content-Type for payment",
+      "response": "Your Content-Type header was not valid"
+    },
+    {
+      "code": 400,
+      "cause": "Invoice no longer accepting payments",
+      "response": "Invoice is either paid or has expired"
+    },
+    {
+      "code": 400,
+      "cause": "Unsupported Currency or Chain for Payment Option",
+      "response": "Your Payment Option selection was invalid"
+    },
+    {
+      "code": 400,
+      "cause": "We were unable to parse your payment. Please try again or contact your wallet provider",
+      "response": "Request body could not be parsed / empty body"
+    },
+    {
+      "code": 400,
+      "cause": "Request must include exactly one (1) transaction",
+      "response": "Included no transaction in body / Included multiple transactions in body"
+    },
+    {
+      "code": 400,
+      "cause": "Your transaction was an in an invalid format, it must be a hexadecimal string",
+      "response": "Make sure you're sending the raw hex string format of your signed transaction"
+    },
+    {
+      "code": 400,
+      "cause": "We were unable to parse the transaction you sent. Please try again or contact your wallet provider",
+      "response": "Transaction was hex, but it contained invalid transaction data or was in the wrong format"
+    },
+    {
+      "code": 400,
+      "cause": "The transaction you sent does not have any output to the bitcoin address on the invoice",
+      "response": "The transaction you sent does not pay to the address listed on the invoice"
+    },
+    {
+      "code": 400,
+      "cause": "The amount on the transaction (X BTC) does not match the amount requested (Y BTC). This payment will not be accepted.",
+      "response": "Payout amount to address does not match amount that was requested"
+    },
+    {
+      "code": 400,
+      "cause": "Transaction fee (X sat/kb) is below the current minimum threshold (Y sat/kb)",
+      "response": "Your fee must be at least the amount sent in the payment request as requiredFeePerByte"
+    },
+    {
+      "code": 400,
+      "cause": "This invoice is priced in BTC, not BCH. Please try with a BTC wallet instead",
+      "response": "Your transaction currency did not match the one on the invoice"
+    },
+    {
+      "code": 422,
+      "cause": "One or more input transactions for your transaction were not found on the blockchain. Make sure you're not trying to use unconfirmed change",
+      "response": "Spending outputs which have not yet been broadcast to the network"
+    },
+    {
+      "code": 422,
+      "cause": "One or more input transactions for your transactions are not yet confirmed in at least one block. Make sure you're not trying to use unconfirmed change",
+      "response": "Spending outputs which have not yet confirmed in at least one block on the network"
+    },
+    {
+      "code": 500,
+      "cause": "Error broadcasting payment to network",
+      "response": "Our Bitcoin node returned an error when attempting to broadcast your transaction to the network. This could mean our node is experiencing an outage or your transaction is a double spend."
+    }
+  ],
+
+  "mime-types": {
+    "application/payment-options": "Retrieve the options that the invoice can be paid with, this is specified with the Accept header.",
+    "application/payment-request": "Associated with the server's payment request, this specified on the client Accept header when retrieving the payment request",
+    "application/payment-verification": "Used by the client when sending their proposed unsigned payment transaction payload",
+    "application/payment-payment": "Used by the client when sending their proposed payment transaction payload"
+  }
+
+}

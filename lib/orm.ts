@@ -1,4 +1,6 @@
 
+export type Json = any;
+
 export interface Record {
 
   save: () => Promise<any>;
@@ -41,8 +43,21 @@ export class Orm {
 
   }
 
-  save() {
+  async save() {
     return this.record.save()
+  }
+
+  async update(updates: any): Promise<Orm> {
+
+    for (let [key, value] of Object.entries(updates)) {
+
+      this.record[key] = value
+
+    }
+
+    await this.record.save()
+
+    return this
   }
 
   toJSON() {

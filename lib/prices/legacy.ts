@@ -17,7 +17,6 @@ async function updateCurrencies() {
 }
 
 setInterval(async () => {
-    console.log('update base currencies rates');
     await updateCurrencies();
 
 }, 1000 * 60 * 60 * 12); // every twelve hours

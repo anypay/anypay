@@ -38,7 +38,7 @@ export function generateAddress(currency: string, xpubkey: string, nonce: number
 
   var NETWORK = bitcore.Networks.livenet;
 
-  let pkey = new bitcore.HDPublicKey.fromBuffer(new Buffer(xpubkey));
+  let pkey = new bitcore.HDPublicKey.fromBuffer(Buffer.from(xpubkey));
 
   let address = new bitcore.Address(pkey.derive(`m/0/${nonce}`).publicKey, NETWORK);
 

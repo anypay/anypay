@@ -249,8 +249,6 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
 
   let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any = {}) => {
 
-    console.log("ACH", invoice.ach_batch_id)
-
     var newInvoice = invoice.toJSON()
 
     newInvoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
@@ -270,7 +268,7 @@ export async function buildReportCsv(invoices: any[], filepath: string): Promise
       newInvoice.settlement_uid = invoice.bitpay_settlement.url
       newInvoice.settlement_date = moment(invoice.bitpay_settlement.createdAt).format('MM/DD/YYYY')
     } else if (invoice.ach_batch_id) {
-      console.log('ACH', invoice.ach_batch)
+
       newInvoice.settlement_type = 'ACH'
       if (invoice.ach_batch) {
         newInvoice.settlement_uid = invoice.ach_batch.batch_id

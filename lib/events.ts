@@ -4,7 +4,13 @@ import {connect} from 'amqplib';
 import {log, logInfo} from './logger';
 import {models} from './models';
 
+import { Orm } from './orm'
+
+import { Invoice } from './invoices'
+
 import { events } from 'rabbi'
+
+import { logError } from './logger'
 
 import {publishEventToSlack} from './slack/events';
 
@@ -28,7 +34,7 @@ const exchange = 'anypay.events';
 
     let message = JSON.stringify(data);
 
-    await channel.publish(exchange, this.event, new Buffer(message));
+    await channel.publish(exchange, this.event, Buffer.from(message));
 
     logInfo(`amqp.published`, { exchange, event: this.event, message })
 
@@ -44,7 +50,7 @@ const exchange = 'anypay.events';
 
     } catch (error) {
 
-      console.log('error', error.msg);
+      logError('slack.publish.error', error);
     }
 
   });
@@ -65,6 +71,63 @@ export async function record(data: EventData) {
 
 }
 
+export async function recordEvent(payload: any, event: string): Promise<Event> {
+
+  let record = await models.Event.create({ payload, event });
+
+  return new Event(record)
+
+}
+
+export class Event extends Orm {
+
+  get(key) {
+
+    let value = this.record.dataValues[key]
+
+    if (value) return value
+
+    return this.record.dataValues.payload[key]
+
+  }
+
+}
+
+export async function listEvents(event: string, payload: any): Promise<Event[]> {
+
+  let records = await models.Event.findAll({
+
+    where: {
+
+      event,
+
+      payload
+
+    }
+
+  })
+
+  return records.map(record => new Event(record))
+
+}
+
+export async function listInvoiceEvents(invoice: Invoice): Promise<Event[]> {
+
+  let records = await models.Event.findAll({
+
+    where: {
+
+      payload: { invoice_uid: invoice.uid }
+
+    }
+
+  })
+
+  return records.map(record => new Event(record))
+
+}
+
 export { events as emitter }
+
 export { events }
 

@@ -75,8 +75,6 @@ describe("User Authentication", () => {
 
     let passwordReset = await passwordResetEmail(email)
 
-    console.log('password reset', passwordReset)
-
     expect(passwordReset.get('email')).to.be.equal(email)
 
     expect(passwordReset.get('id')).to.be.greaterThan(0)

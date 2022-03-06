@@ -59,7 +59,7 @@ export class PriceNotFoundError implements Error {
   }
 }
 
-async function convert(inputAmount: Amount, outputCurrency: string, precision?: number): Promise<Amount> {
+async function convert(inputAmount: Amount, outputCurrency: string, precision: number = 2): Promise<Amount> {
 
   // Normalize input to USD if neither input or output is USD 
   if (inputAmount.currency !== 'USD' && outputCurrency !== 'USD') {
@@ -116,7 +116,7 @@ export async function setPrice(price: Price): Promise<Price> {
 
   price.value = new BigNumber(price.value).dp(MAX_DECIMALS).toNumber()
 
-  log.info("set price", price);
+  log.debug("price.set", price);
 
   var [record, isNew] = await models.Price.findOrCreate({
 

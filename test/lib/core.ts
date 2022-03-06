@@ -41,7 +41,6 @@ describe("Anypay Core", () => {
         assert(false);
 
       } catch(error) {
-         console.log('ERROR', error.message);
 
         assert.strictEqual(error.message, `DASH address locked`); 
 

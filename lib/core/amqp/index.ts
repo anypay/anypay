@@ -19,7 +19,7 @@ class AnypayCoreAmqp {
 
   async publish(routingKey: string, json: string) {
 
-    await this.channel.publish(this.exchange, routingKey, new Buffer(json));
+    await this.channel.publish(this.exchange, routingKey, Buffer.from(json));
   }
 
   async initialize() {
