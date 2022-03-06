@@ -2,8 +2,6 @@ require('dotenv').config();
 
 import * as assert from 'assert';
 
-console.log("DB_URL", process.env.DATABASE_URL);
-
 import { accounts, models } from '../../lib';
 
 import * as Chance from 'chance';

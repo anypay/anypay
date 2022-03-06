@@ -32,8 +32,6 @@ describe("Payment Handler", () => {
 
       let invoice = await generateInvoice(account.id, 10, 'DASH');
 
-      console.log(invoice.toJSON());
-
       let payment = {
         currency: "DASH",
         amount: invoice.invoice_amount,
@@ -45,8 +43,6 @@ describe("Payment Handler", () => {
       await handlePayment(invoice, payment);
 
       invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
-
-      console.log(invoice.toJSON());
 
       assert.strictEqual(invoice.status, 'paid');
       assert.strictEqual(invoice.invoice_amount_paid, payment.amount);
@@ -79,13 +75,9 @@ describe("Payment Handler", () => {
         output_hash: 'd3e2c274300a3a67dfdf3c264e4ceed624174fbf00fc8740157ccbc3d18fac7c'
       };
 
-      console.log(invoice.toJSON());
-
       await handlePayment(invoice, payment);
 
       invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
-
-      console.log(invoice.toJSON());
 
       assert.strictEqual(invoice.status, 'underpaid');
       assert.strictEqual(invoice.invoice_amount_paid, payment.amount);
@@ -110,8 +102,6 @@ describe("Payment Handler", () => {
 
       let invoice = await generateInvoice(account.id, 10, 'DASH');
 
-      console.log(invoice.toJSON());
-
       let payment = {
         currency: "DASH",
         amount: invoice.invoice_amount * 1.155,
@@ -123,8 +113,6 @@ describe("Payment Handler", () => {
       await handlePayment(invoice, payment);
 
       invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
-
-      console.log(invoice.toJSON());
 
       assert.strictEqual(invoice.status, 'overpaid');
       assert.strictEqual(invoice.invoice_amount_paid, payment.amount);
@@ -151,8 +139,6 @@ describe("Update Output", ()=>{
 
       let invoice = await generateInvoice(account.id, 10, 'DASH');
 
-      console.log(invoice.toJSON());
-
       let payment_1 = {
         currency: "DASH",
         amount: invoice.invoice_amount * 1.155,
@@ -173,8 +159,6 @@ describe("Update Output", ()=>{
       await updateOutput(payment_2)
 
       invoice = await models.Invoice.findOne({ where: { id: invoice.id }});
-
-      console.log(invoice.toJSON());
 
       assert.strictEqual(invoice.status, 'overpaid');
       assert.strictEqual(invoice.invoice_amount_paid, payment_1.amount);

@@ -1,8 +1,11 @@
 import {plugins} from './plugins';
 
-import { getAmbassadorAccount } from './ambassadors';
-
 import { BigNumber } from 'bignumber.js';
+
+import { Account } from './account'
+
+import { Invoice } from './invoices'
+
 import * as moment from 'moment';
 
 import * as pay from './pay';
@@ -29,7 +32,9 @@ import * as shortid from 'shortid'
 
 import { computeInvoiceURI } from './uri';
 
-import { writePaymentOptions, PaymentOption } from './payment_options';
+import { writePaymentOptions, NewPaymentOption } from './payment_options';
+
+import { PaymentOption } from './payment_option';
 
 import {channel} from './amqp';
 
@@ -112,63 +117,6 @@ export async function createEmptyInvoice(app_id: number, uid?: string) {
 
 }
 
-class ClassicInvoice {
-
-  template: any
-
-  addresses: any[]
-
-  params: any
-
-  constructor(params) {
-    this.params = params
-  }
-
-  async applyScalar() {
-
-  }
-
-  async applyCashback() {
-
-  }
-
-  async applyAffiliate() {
-
-  }
-
-  async getTemplate() {
-
-    return this.template;
-
-  }
-}
-
-export async function createPlatformInvoice(account_id, amount, currency) {
-
-  // invoice amount 
-
-  // times scalar
-
-  let platformInvoice = new ClassicInvoice({ account_id, currency, amount })
-
-  await platformInvoice.applyScalar()
-
-  await platformInvoice.applyCashback()
-
-  await platformInvoice.applyAffiliate()
-
-  let template = await platformInvoice.getTemplate()
-
-  let request = await anypay.request(template)
-
-  let invoice = await models.Invoice.findOne({ where: {
-
-    uid: request.uid
-
-  }})
-
-}
-
 export async function refreshInvoice(uid: string): Promise<any> {
 
   let invoice = await models.Invoice.findOne({ where: { uid }})
@@ -213,7 +161,6 @@ export async function generateInvoice(
 
   log.info({ account })
 
-
   var invoiceParams = {
     denomination_currency: account.denomination,
     denomination_amount: denominationAmountValue,
@@ -231,37 +178,13 @@ export async function generateInvoice(
 
   var invoice = await models.Invoice.create(invoiceParams);
 
-  await createPaymentOptions(account, invoice)
+  let options = await createPaymentOptions(account, invoice)
 
   return invoice;
 
 }
 
-export function buildPaymentOptionsMatrix(addresses, invoiceAmounts, newAddresses, invoice) {
-
-  let matrix = _.zip(addresses, invoiceAmounts, newAddresses)
-
-  let uris = matrix.map((row) => {
-    let address = row[0];
-
-    return  computeInvoiceURI({
-      currency: address.currency,
-      uid: invoice.uid
-    });
-  });
-
-  matrix = matrix.map((row, i) => {
-
-    row.push(uris[i]);
-
-    return row;
-  });
-
-  return matrix
-
-}
-
-export async function createPaymentOptions(account, invoice) {
+async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
   let addresses = await models.Address.findAll({ where: {
     account_id: account.id
@@ -274,158 +197,89 @@ export async function createPaymentOptions(account, invoice) {
     return coin.unavailable;
   });
 
-  let invoiceAmounts = await Promise.all(addresses.map(async (address) => {
+  return addresses
 
-    let coin = getCoin(address.currency);
+}
 
-    let conversion = await convert({
+export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
+
+  let addresses = await listAvailableAddresses(new Account(account))
+
+  let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
+
+    const currency = record.currency
+
+    let coin = getCoin(record.currency)
+
+    const value = invoice.get('amount')
+
+    let { value: amountMinusFees } = await convert({
       currency: account.denomination,
-      value: invoice.denomination_amount
-    }, address.currency, coin.precision);
+      value
+    }, currency, coin.precision);
 
-    if (address.price_scalar) {
-      conversion = applyScalar(conversion, address.price_scalar);
-    }
-    let discount = await models.Discount.findOne({
-      where: {
-        account_id: account.id,
-        currency: address.currency
-      }
-    })
-    if (discount) {
-      logInfo('discount.apply', Object.assign(conversion, {percent: discount.percent}))
-      conversion = applyDiscount(conversion, discount.percent);
-    }
+    let address = (await getNewInvoiceAddress(account.id, currency, amountMinusFees)).value;
 
-    return conversion;
-
-  }));
-
-  let newAddresses = await Promise.all(addresses.map(async (address:any, index:number) => {
-    let newAddress = await getNewInvoiceAddress(account.id, address.currency, invoiceAmounts[index]);
-    return {
-      currency: address.currency,
-      address: newAddress.value
-    }
-  }));
-
-  let matrix = buildPaymentOptionsMatrix(addresses, invoiceAmounts, newAddresses, invoice)
-
-  let ambassador = await getAmbassadorAccount(account.ambassador_id)
-
-  log.info({ event: 'ambassador.found', ambassador})
-
-  let paymentOptions: any[] = await Promise.all(matrix.map(async (row) => {
-
-    let currency = row[0].currency;
+    let url = computeInvoiceURI({
+      currency: currency,
+      uid: invoice.uid
+    });
 
     let paymentCoin = getCoin(currency);
 
+    if (address.match(':')) {
+      address = address.split(':')[1]
+    }
+
     let fee = await pay.fees.getFee(currency)
-
-    var address = row[2].address;
-
-    if (currency === 'BTCLN') {
-
-      return {
-        currency_logo_url: paymentCoin.logo_url,
-        currency_name: paymentCoin.name,
-        invoice_uid: invoice.uid,
-        currency,
-        amount,
-        address,
-        outputs: [],
-        uri: `lightning:${address}`,
-        fee: 0
-      }
-    }
-
-    if (address.match(':')) {
-      address = address.split(':')[1]
-    }
-
-    var address = row[2].address;
     
-    if (address.match(':')) {
-      address = address.split(':')[1]
-    }
+    var paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).minus(fee.amount).toNumber();
 
-    var amount = new BigNumber(pay.toSatoshis(row[1].value)).minus(fee.amount).toNumber();
     if (currency === 'BTC') {
-      amount = new BigNumber(pay.toSatoshis(row[1].value)).toNumber();
+
+      paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).toNumber();
     }
 
     let outputs = []
 
-    if (ambassador && currency != 'BTC') {
-
-      let record = await models.Address.findOne({ where: {
-        account_id: ambassador.id,
-        currency
-      }})
-
-      if (record) {
-
-        // ambassador has corresponding address set
-
-        var ambassadorAmount;
-
-        if (account.ambassador_percent > 0) {
-
-          let scalar = new BigNumber(account.ambassador_percent).dividedBy(100)
-
-          if (account.customer_pays_ambassador) {
-
-            ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
-
-          } else {
-
-            // merchant pays ambassador
-
-            ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
-            amount = new BigNumber(amount).minus(ambassadorAmount).toNumber()
-
-          }
-
-          ambassadorAmount = parseInt(new BigNumber(amount).times(scalar).toNumber().toFixed(0))
-
-          outputs.push({
-            address: record.value,
-            amount: ambassadorAmount
-          })
-
-        }
-        
-      }
-
-    }
-
     outputs.push({
       address,
-      amount
+      amount: paymentAmount
     })
 
     if (currency != 'BTC') {
       outputs.push(fee)
     }
 
-    return {
-      currency_logo_url: paymentCoin.logo_url,
+    let uri = computeInvoiceURI({
+      currency: currency,
+      uid: invoice.uid
+    });
+
+    var amount = outputs.reduce((sum, output) => {
+
+      return sum.plus(output.amount)
+
+    }, new BigNumber(0)).toNumber()
+
+    let optionRecord = await models.PaymentOption.create({
       currency_name: paymentCoin.name,
       invoice_uid: invoice.uid,
       currency,
-      amount: pay.fromSatoshis(amount),
+      amount,
       address,
       outputs,
-      uri: row[3],
+      uri,
       fee: fee.amount
-    }
-  }));
+    })
 
-  let paymentOptionRecords = await writePaymentOptions(paymentOptions);
+    return new PaymentOption(invoice, optionRecord)
+
+  }));
 
   events.emit('invoice.created', { uid: invoice.uid });
 
+  return paymentOptions
 }
 
 /*
@@ -473,16 +327,6 @@ export async function replaceInvoice(uid: string, currency: string) {
   await invoice.save();
 
   return invoice;
-
-}
-
-export async function republishTxid( currency: string, txid: string){
-
-  currency = currency.toLowerCase()
-
-  await  channel.publish( `${currency}.anypayinc.com`, 'walletnotify', Buffer.from(txid))
-
-  return txid;
 
 }
 

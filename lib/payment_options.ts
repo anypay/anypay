@@ -7,14 +7,13 @@ import { toSatoshis } from './pay'
 import { computeInvoiceURI } from './uri'
 import {getCoin} from './coins';
 
-export interface PaymentOption {
+export interface NewPaymentOption {
   invoice_uid: string;
   currency: string;
   address?: string;
   amount?: number;
 }
-
-export function writePaymentOptions(options: PaymentOption[]) {
+export function writePaymentOptions(options: NewPaymentOption[]) {
 
   log.info('writepaymentoptions', {options});
 

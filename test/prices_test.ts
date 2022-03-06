@@ -63,9 +63,8 @@ describe('Getting Prices', () => {
 
     let conversion = await convert({ currency: 'BSV', value: 1 }, 'USD')
 
-    console.log(conversion)
-
     expect(conversion.value).to.be.equal(price.value)
+
     expect(conversion.currency).to.be.equal('USD')
 
   })
@@ -79,6 +78,7 @@ describe('Getting Prices', () => {
     let conversion = await convert({ currency: 'USD', value: 100 }, 'BSV')
 
     expect(conversion.value).to.be.greaterThan(0)
+
     expect(conversion.currency).to.be.equal('BSV')
 
   })

@@ -79,8 +79,6 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   if (address) {
 
-    console.log(`${changeset.currency} address already set`);
-
     if (address.locked) {
 
       throw new Error(`${changeset.currency} address locked`);

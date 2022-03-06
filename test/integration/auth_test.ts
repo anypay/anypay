@@ -72,7 +72,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(401);
 
-    expect(response.body.error).to.be.equal('invalid access token');
+    expect(response.body.error).to.be.equal('Unauthorized');
 
     response = await request
       .get('/v1/api/account/my-account')
@@ -80,7 +80,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(401);
 
-    expect(response.body.error).to.be.equal('invalid access token');
+    expect(response.body.error).to.be.equal('Unauthorized');
 
     response = await request
       .get('/v1/api/account/my-account')
