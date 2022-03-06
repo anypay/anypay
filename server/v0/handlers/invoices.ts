@@ -325,7 +325,7 @@ export async function create (request, h) {
         payment_options: invoice.payment_options
       }, sanitized)
 
-    ).code(201);
+    ).code(200);
 
   } catch(error) {
     console.log(error);
