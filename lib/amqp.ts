@@ -54,6 +54,9 @@ export async function publishJson(channel, exchange, routingkey, json) {
   channel = await connection.createChannel();  
 
   await channel.assertExchange('anypay.events', 'direct')
+
+  await channel.assertExchange('anypay:invoices', 'direct')
+
   await channel.assertExchange('rabbi.events', 'direct')
 
   channelIsConnected = true;
