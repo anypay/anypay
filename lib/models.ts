@@ -135,6 +135,20 @@ models.Webhook.hasMany(models.WebhookAttempt, {
   as: 'attempts'
 });
 
+models.Payment.hasOne(models.PaymentOption, {
+  foreignKey: 'id',
+  sourceKey: 'payment_option_id',
+  as: 'option'
+});
+
+models.Payment.hasOne(models.Invoice, {
+  foreignKey: 'uid',
+  sourceKey: 'invoice_uid',
+  as: 'invoice'
+});
+
+
+
 
 
 export { models };
