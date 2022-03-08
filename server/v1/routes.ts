@@ -79,6 +79,12 @@ export async function attachV1Routes(server) {
     path: '/v1/api/account/payments',
     options: {
       auth: "jwt",
+      validate: {
+        query: Joi.object({
+          limit: Joi.number().optional(),
+          offset: Joi.number().optional()
+        })
+      },
       response: {
         schema: v1.Payments.Schema.listPayments
       }
