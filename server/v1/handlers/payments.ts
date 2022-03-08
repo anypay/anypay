@@ -35,9 +35,9 @@ export async function index(req, h) {
 
           uid: payment.invoice.uid,
 
-          amount: payment.invoice.amount,
+          amount: payment.invoice.denomination_amount,
 
-          currency: payment.invoice.currency
+          currency: payment.invoice.denomination_currency
 
         }
 

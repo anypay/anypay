@@ -148,7 +148,7 @@ export async function listPayments(account, params: {limit: number, offset: numb
 
       as: 'invoice',
 
-      attributes: ['uid', 'currency', 'amount']
+      attributes: ['uid', 'currency', 'amount', 'denomination_currency', 'denomination_amount']
 
     }]
 
