@@ -75,6 +75,18 @@ export async function attachV1Routes(server) {
   }); 
 
   server.route({
+    method: 'GET',
+    path: '/v1/api/account/payments',
+    options: {
+      auth: "jwt",
+      response: {
+        schema: v1.Payments.Schema.listPayments
+      }
+    },
+    handler: v1.Payments.index
+  }); 
+
+  server.route({
     method: 'POST',
     path: '/v1/api/webhooks/{invoice_uid}/attempts',
     options: {

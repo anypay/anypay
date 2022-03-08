@@ -268,11 +268,16 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 }
 
 export async function completePayment(paymentOption, hex: string) {
+
   log.info('paymentoption', paymentOption.toJSON())
 
   let bitcore = getBitcore(paymentOption.currency)
 
   let tx = new bitcore.Transaction(hex)
+
+  let invoice = await models.Invoice.findOne({ where: {
+    uid: paymentOption.invoice_uid
+  }})
   
   let payment = {
     txid: tx.hash,
@@ -280,16 +285,13 @@ export async function completePayment(paymentOption, hex: string) {
     txjson: tx.toJSON(),
     txhex: hex,
     payment_option_id: paymentOption.id,
-    invoice_uid: paymentOption.invoice_uid
+    invoice_uid: paymentOption.invoice_uid,
+    account_id: invoice.account_id
   }
 
   log.info('payment', payment)
 
   let paymentRecord = await models.Payment.create(payment)
-
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: paymentOption.invoice_uid
-  }})
 
   var result = await models.Invoice.update(
     {
