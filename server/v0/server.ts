@@ -36,13 +36,6 @@ const validatePassword = async function(request, username, password, h) {
 
   try {
 
-
-    /* 1) check for account by email (username)
-       2) check for account password by hash compare
-       3) check for sudo password by hash compare
-       4) generate access token with expiration
-    */
-
     if (!username || !password) {
 
       return {
@@ -113,30 +106,6 @@ const validatePassword = async function(request, username, password, h) {
   }
 
 };
-
-const getAccount = async function(request, username, password, h) {
-
-  var account = await models.Account.findOne({
-    where: {
-      id: request.params.account_id
-    }
-  });
-
-  if (account) {
-
-		request.account = account;
-		request.is_public_request = true;
-
-    return {
-      isValid: true,
-      credentials: { account: account }
-    }
-  } else {
-    return {
-      isValid: false
-    }
-  }
-}
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -257,11 +226,11 @@ async function Server() {
     return h.continue;
   });
 
-
-
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
   await server.register(require('vision'));
+  await server.register(require('hapi-boom-decorators'))
+
   const swaggerOptions = server.register({
     plugin: HapiSwagger,
     options: {
@@ -280,7 +249,6 @@ async function Server() {
     }
   })
 
-  server.auth.strategy("getaccount", "basic", { validate: getAccount });
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("app", "basic", { validate: validateAppToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
@@ -482,9 +450,10 @@ async function Server() {
         params: Joi.object({
           currency: Joi.string().required()
         }),
-        payload: v0.Addresses.PayoutAddressUpdate
-      },
-      plugins: responsesWithSuccess({ model: models.Account.Response })
+        payload: Joi.object({
+          address: Joi.string().required()
+        })
+      }
     }
   });
 

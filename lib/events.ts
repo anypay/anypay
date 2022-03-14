@@ -111,13 +111,15 @@ export async function listEvents(event: string, payload: any): Promise<Event[]> 
 
 }
 
-export async function listInvoiceEvents(invoice: Invoice): Promise<Event[]> {
+export async function listInvoiceEvents(invoice: Invoice, type?: string): Promise<Event[]> {
 
   let records = await models.Event.findAll({
 
     where: {
 
-      payload: { invoice_uid: invoice.uid }
+      payload: { invoice_uid: invoice.uid },
+
+      event: type
 
     }
 

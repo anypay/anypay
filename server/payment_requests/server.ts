@@ -16,7 +16,7 @@ export function attach(server: Hapi.Server) {
   /* Set Alternate Headers To Avoid BIP70 Binary vs JSON Data Type Conflict */
   server.ext('onRequest', function(request, h) {
 
-    log.info('server.request', { id: request.info.id, headers: request.headers })
+    log.debug('server.request', { id: request.info.id, headers: request.headers })
 
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';

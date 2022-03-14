@@ -1,6 +1,4 @@
 
-const Pino = require('pino')
-
 const riverpig = require('riverpig')
 
 import { models } from './models'
@@ -23,8 +21,6 @@ interface LogQuery {
 class Logger {
 
   namespace: string;
-
-  pino: typeof Pino;
 
   log: any;
 
@@ -58,7 +54,7 @@ class Logger {
 
   async error(error_type: string, payload: any = {}) {
 
-    this.pino.error({...payload, namespace: this.namespace }, error_type)
+    this.log.error({...payload, namespace: this.namespace }, error_type)
 
     let record = await models.Event.create({
       namespace: this.namespace,
@@ -73,13 +69,13 @@ class Logger {
 
   async debug(...params) {
 
-    this.pino.debug(params)
+    this.log.debug(params)
 
   }
 
   async read(query: LogQuery = {}) {
 
-    this.pino.debug('log.read', query)
+    this.log.debug('log.read', query)
 
     const where = {
       namespace: this.namespace,

@@ -106,11 +106,12 @@ export {
 }
 
 
-var server, request;
-export { server, request }
+var request;
 
-import {Server} from '../server/v0/server';
+import {Server, server } from '../server/v0/server';
 import * as supertest from 'supertest'
+
+export { server, request }
 
 beforeEach(() => {
 
@@ -120,7 +121,7 @@ beforeEach(() => {
 
 before(async () => {
 
-  server = await Server();
+  await Server();
 
   request = supertest(server.listener)
 

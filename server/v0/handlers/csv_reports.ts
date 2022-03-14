@@ -48,11 +48,11 @@ export async function accountCSVReports(server) {
     options: {
       tags: ['api'],
       validate: {
-        query: {
+        query: Joi.object({
           start_date: Joi.date().required(),
           end_date: Joi.date().required(),
           token: Joi.string().required()
-        }
+        })
       }
     }
   });
@@ -95,9 +95,9 @@ export async function accountCSVReports(server) {
     options: {
       tags: ['api'],
       validate: {
-        query: {
+        query: Joi.object({
           token: Joi.string().required()
-        }
+        })
       }
     }
   });
