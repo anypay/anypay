@@ -4,8 +4,6 @@ import { WebSocket, WebSocketServer } from 'ws';
 
 import { log } from '../lib/logger/log'
 
-const wss = new WebSocketServer({ port: 8090 });
-
 import * as uuid from 'uuid'
 
 import { awaitChannel } from '../lib/amqp'
@@ -88,8 +86,6 @@ const handlers = {
         }
         const message = msg.content.toString()
 
-        console.log("consume", message)
-
         const json = JSON.parse(message)
 
         if (json.type && json.payload) {
@@ -115,7 +111,19 @@ const handlers = {
   }
 }
 
-export async function start() {
+export async function start(server?: any) {
+
+  const wss = server ? new WebSocketServer({
+
+    server
+
+  }) : new WebSocketServer({
+
+    port: process.env.WEBSOCKETS_PORT || 8090
+
+  })
+
+  log.info('ws.server.start')
 
   const channel = await awaitChannel()
 

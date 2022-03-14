@@ -19,11 +19,9 @@ export async function authenticate(socket: WebSocket, token: string): Promise<Ac
 
   try {
 
-    log.info('socket.io.authorization.bearer', {token})
-
     let account = await authorizeAccount(token)
 
-    log.info('socket.io.authenticated', { account_id: account.id })
+    log.info('websocket.authenticated', { account_id: account.id })
 
     return { socket, account, token }
 
@@ -31,7 +29,7 @@ export async function authenticate(socket: WebSocket, token: string): Promise<Ac
 
     socket.emit('authentication.error', { error: error.message })
 
-    log.error('socket.io.authentication.error', error)
+    log.error('websocket.authentication.error', error)
 
     throw error
 

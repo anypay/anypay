@@ -12,7 +12,7 @@ import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
-import { log } from '../../lib';
+import { log } from '../../lib/logger/log';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
@@ -165,23 +165,24 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-async function Server() {
 
-  var server = new Hapi.Server({
-    host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8000,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      },
-      files: {
-          relativeTo: join(__dirname, '../../docs')
+const server = new Hapi.Server({
+  host: process.env.HOST || "localhost",
+  port: process.env.PORT || 8000,
+  routes: {
+    cors: true,
+    validate: {
+      options: {
+        stripUnknown: true
       }
+    },
+    files: {
+        relativeTo: join(__dirname, '../../docs')
     }
-  });
+  }
+});
+
+async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
@@ -255,6 +256,8 @@ async function Server() {
 
     return h.continue;
   });
+
+
 
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
@@ -343,7 +346,6 @@ async function Server() {
     }
   });
 
-  /* TODO: Update clients to use /products not /grab_and_go_items */
   server.route({
     method: "GET",
     path: "/grab_and_go_items",
@@ -652,8 +654,6 @@ async function Server() {
     }
   });
 
-  /* PAYMENT PROTOCOLS */
-
     server.route({
       method: "POST",
       path: "/r",
@@ -662,8 +662,6 @@ async function Server() {
         auth: "app"
       }
     })
-
-  /* END PAYMENT PROTOCOLS */
 
   server.route({
     method: 'POST',
@@ -809,7 +807,7 @@ if (require.main === module) {
 
 async function start () {
 
-  var server = await Server();
+  await Server();
 
   // Start the server
   await server.start();
@@ -818,5 +816,5 @@ async function start () {
 
 }
 
-export { Server, start }
+export { Server, start, server }
 
