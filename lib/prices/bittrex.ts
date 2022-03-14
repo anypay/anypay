@@ -1,7 +1,7 @@
 
 import * as http from 'superagent'
 
-import { logInfo } from '../logger'
+import { log } from '../log'
 
 import { Price } from './'
 
@@ -17,8 +17,6 @@ class InvalidPricePair implements Error {
 
 export async function getPrice(currency: string): Promise<Price> {
 
-  logInfo('bittrex.getprice', { currency })
-
   const pair = `${currency}-USDT`
 
   try {
@@ -33,7 +31,10 @@ export async function getPrice(currency: string): Promise<Price> {
       value,
       source: 'bittrex'
     }
+
   } catch(error) {
+
+    log.error('bittrex.price.pair.invalid', error)
 
     throw new InvalidPricePair(pair)
 

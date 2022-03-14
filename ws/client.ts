@@ -1,7 +1,7 @@
 
 require('dotenv').config()
 
-import { log } from '../lib/logger/log'
+import { log } from '../lib/log'
 
 import { port } from './server'
 

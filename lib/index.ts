@@ -1,3 +1,5 @@
+console.log = function() {}
+
 require('dotenv').config();
 
 import * as apps from './apps';
@@ -16,7 +18,7 @@ import * as addresses from './addresses';
 import * as coins from './coins';
 import * as xpub from './xpub';
 import * as invoice from './invoice';
-import { log } from './logger';
+import { log } from './log';
 import { plugins } from './plugins';
 import * as blockcypher from './blockcypher';
 import * as email from './email';

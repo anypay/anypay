@@ -4,8 +4,7 @@ require('dotenv').config();
 
 const program = require('commander')
 
-import { log } from '../lib';
-import { logInfo } from '../lib/logger';
+import { log } from '../lib/log';
 
 import { getCryptoPrices, updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 

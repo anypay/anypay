@@ -9,8 +9,6 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
-import { logInfo, logError } from '../../../lib/logger'
-
 import { Invoice, createInvoice } from '../../../lib/invoices'
 
 import { recordEvent } from '../../../lib/events'
@@ -49,7 +47,7 @@ export async function create (request, h) {
 
   }, 'request.invoice.create')
 
-  logInfo('invoices.create', Object.assign({
+  log.info('invoices.create', Object.assign({
 
     account_id: request.account.id
 

@@ -4,7 +4,7 @@ import * as  bchaddr from 'bchaddrjs';
 
 import * as Minercraft from 'minercraft';
 
-import { log } from '../../lib/logger'
+import { log } from '../../lib/log'
 
 import { fromSatoshis } from '../../lib/pay'
 

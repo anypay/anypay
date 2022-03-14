@@ -1,11 +1,11 @@
 
 const Pino = require('pino')
 
-import { logInfo, logError } from './'
+const riverpig = require('riverpig')
 
-import { models } from '../models'
+import { models } from './models'
 
-import { publish } from '../amqp'
+import { publish } from './amqp'
 
 interface NewLogger {
   namespace: string;
@@ -26,17 +26,25 @@ class Logger {
 
   pino: typeof Pino;
 
+  log: any;
+
   constructor(params: NewLogger = {namespace: ''}) {
 
-    this.pino = Pino()
+    this.log = riverpig('anypay')
 
     this.namespace = params.namespace
 
   }
 
   async info(type: string, payload: any = {}) {
+    
+    if (typeof payload.toJSON === 'function') {
 
-    logInfo(type, payload)
+      payload = payload.toJSON()
+
+    }
+
+    this.log.info(type, payload)
 
     await publish(type, payload, 'anypay.topic')
 

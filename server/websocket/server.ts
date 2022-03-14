@@ -384,6 +384,7 @@ if (!AMQP_URL) {
     noAck: false
 
   });
+  /*
 
   Actor.create({
 
@@ -411,6 +412,7 @@ if (!AMQP_URL) {
     await channel.ack(msg);
 
   });
+  */
 
 })();
 

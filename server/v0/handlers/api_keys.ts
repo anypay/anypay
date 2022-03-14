@@ -3,7 +3,7 @@ import * as Boom from 'boom';
 
 import { apikeys } from '../../../lib'
 
-import { logError } from '../../../lib/logger'
+import { log } from '../../../lib/log'
 
 export async function index(req, h) {
 
@@ -19,7 +19,7 @@ export async function index(req, h) {
 
   } catch(error) {
 
-    logError('servers.rest_api.controllers.api_keys.index.error', error)
+    log.error('servers.rest_api.controllers.api_keys.index.error', error)
 
     return Boom.badRequest(error.message)
 

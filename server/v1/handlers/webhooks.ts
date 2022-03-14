@@ -5,7 +5,7 @@ import { findAccount, Account } from '../../../lib/account'
 
 import { ensureInvoice } from '../../../lib/invoices'
 
-import { logError } from '../../../lib/logger'
+import { log } from '../../../lib/log'
 
 import { badRequest } from 'boom'
 
@@ -54,7 +54,7 @@ export async function attempt(request, h) {
 
   } catch(error) {
 
-    logError('request.webhook.attempt', {error})
+    log.error('request.webhook.attempt', error)
 
     return h.response({ error: error.message }).code(500)
   

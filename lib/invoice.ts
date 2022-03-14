@@ -20,7 +20,7 @@ import * as http from 'superagent';
 
 import {events} from './events'
 
-import { log, logInfo } from './logger'
+import { log } from './log'
 
 import { models } from './models';
 
@@ -158,8 +158,6 @@ export async function generateInvoice(
   uid = !!uid ? uid : shortid.generate();
 
   var account = await models.Account.findOne({ where: { id: accountId }});
-
-  log.info({ account })
 
   var invoiceParams = {
     denomination_currency: account.denomination,

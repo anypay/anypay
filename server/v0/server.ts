@@ -12,7 +12,7 @@ import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
-import { log } from '../../lib/logger/log';
+import { log } from '../../lib/log';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 

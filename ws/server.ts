@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { WebSocket, WebSocketServer } from 'ws';
 
-import { log } from '../lib/logger/log'
+import { log } from '../lib/log'
 
 import * as uuid from 'uuid'
 
@@ -123,7 +123,7 @@ export async function start(server?: any) {
 
   })
 
-  log.info('ws.server.start')
+  log.info('ws.server.start', wss.info)
 
   const channel = await awaitChannel()
 

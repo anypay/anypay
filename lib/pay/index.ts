@@ -5,7 +5,8 @@ export { BIP70Protocol }
 import { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest, GetCurrency } from './types';
 export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
-import { log, logError, logInfo } from '../logger'
+import { log } from '../log'
+
 import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
@@ -68,7 +69,7 @@ export function detectWallet(headers, invoice_uid): string {
   }
 
   if (wallet) {
-    logInfo('wallet.detected', { wallet, invoice_uid })
+    log.info('wallet.detected', { wallet, invoice_uid })
   }
 
   return wallet
@@ -100,7 +101,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
-      logError(`verifypayment.error`, error)
+      log.error(`verifypayment.error`, error)
 
       return null
 
@@ -140,7 +141,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
 export async function buildPaymentRequestForInvoice(params: PaymentRequestForInvoice): Promise<PaymentRequest> {
 
-  logInfo('paymentrequest.build', params)
+  log.info('paymentrequest.build', params)
 
   let paymentOption = await models.PaymentOption.findOne({
     where: {
@@ -149,11 +150,11 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     }
   });
 
-  logInfo('paymentrequest.paymentoption', paymentOption.toJSON())
+  log.info('paymentrequest.paymentoption', paymentOption.toJSON())
 
   let paymentRequest = await  buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
 
-  logInfo('paymentrequest', paymentRequest)
+  log.info('paymentrequest', paymentRequest)
 
   return paymentRequest
 

@@ -6,7 +6,7 @@ import * as bsv from 'bsv';
 
 import * as events from '../events'
 
-import { logInfo } from '../logger'
+import { log } from '../log'
 
 import {
   AddressChangeSet,
@@ -110,7 +110,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
     account_id: changeset.account_id
   })
 
-  logInfo('address.set', changeset)
+  log.info('address.set', changeset)
 
   return address.value;
 

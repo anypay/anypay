@@ -3,7 +3,7 @@ import { Account } from '../lib/account'
 
 import { WebSocket } from 'ws'
 
-import { log } from '../lib/logger/log'
+import { log } from '../lib/log'
 
 import { authorizeAccount } from '../lib/auth'
 
