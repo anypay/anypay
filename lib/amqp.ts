@@ -27,11 +27,16 @@ async function awaitChannel() {
 
 }
 
-export async function publish(routingKey: string, json={}) {
+export async function publishEvent(type: string, payload: any={}) {
+
+  return publish(type, payload, 'anypay.topic')
+}
+
+export async function publish(routingKey: string, json={}, exchange: string='anypay.events') {
 
   let channel = await awaitChannel();
 
-  return publishJson(channel, 'anypay.events', routingKey, json);
+  return publishJson(channel, exchange, routingKey, json);
 }
 
 export async function publishJson(channel, exchange, routingkey, json) {
@@ -58,6 +63,8 @@ export async function publishJson(channel, exchange, routingkey, json) {
   await channel.assertExchange('anypay:invoices', 'direct')
 
   await channel.assertExchange('rabbi.events', 'direct')
+
+  await channel.assertExchange('anypay.topic', 'topic')
 
   channelIsConnected = true;
   

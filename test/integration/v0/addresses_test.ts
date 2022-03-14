@@ -1,5 +1,5 @@
 
-import { auth, expect } from '../../utils'
+import { auth, v0AuthRequest, expect } from '../../utils'
 
 import * as utils from '../../utils'
 
@@ -16,16 +16,16 @@ describe("Setting Addresses Via REST", async () => {
 
     var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    let response = await auth(account)({
-      method: 'POST',
-      url: '/v1/api/addresses',
+    let response = await v0AuthRequest(account, {
+      method: 'PUT',
+      url: '/addresses/DASH',
       payload: {
-        address: address,
-        currency: "DASH"
+        address: address
       }
     })
 
-    expect(response.result.address.value).to.be.equal(address);
+    expect(response.result.value).to.be.equal(address);
+    expect(response.result.currency).to.be.equal('DASH');
 
   })
 
@@ -33,12 +33,11 @@ describe("Setting Addresses Via REST", async () => {
 
     var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
 
-    let response = await auth(account)({
-      method: 'POST',
-      url: '/addresses',
+    let response = await v0AuthRequest(account, {
+      method: 'PUT',
+      url: '/addresses/BTC',
       payload: {
-        address: address,
-        currency: 'BTC'
+        address
       }
     })
 
@@ -50,57 +49,25 @@ describe("Setting Addresses Via REST", async () => {
 
     const account = await utils.generateAccount()
 
-    var response = await auth(account)({
+    var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
+
+    await v0AuthRequest(account, {
+      method: 'PUT',
+      url: '/addresses/BTC',
+      payload: {
+        address
+      }
+    })
+
+    var response = await v0AuthRequest(account, {
       method: 'GET',
       url: '/addresses',
       payload: {
-        address: address
+        address
       }
     })
 
-    expect(response.result.addresses.length).to.be.equal(0);
-
-    var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
-
-    const address2 = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
-
-    await auth(account)({
-      method: 'POST',
-      url: '/v1/api/addresses',
-      payload: {
-        address: address,
-        currency: "BTC"
-      }
-    })
-
-    response = await auth(account)({
-      method: 'GET',
-      url: '/v1/api/addresses'
-    })
-
-    expect(response.result.addresses.length).to.be.equal(1);
-
-    await auth(account, 0)({
-      method: 'POST',
-      url: '/v1/api/addresses',
-      payload: {
-        address: address2,
-        currency: 'BTC'
-      }
-    })
-
-    response = await auth(account)({
-      method: 'GET',
-      url: '/v1/api/addresses'
-    })
-
-    expect(response.statusCode).to.be.equal(200);
-
-    expect(response.result.addresses.length).to.be.equal(2);
-
-    expect(response.result.addresses[0].value).to.be.equal(address);
-
-    expect(response.result.addresses[1].value).to.be.equal(address2);
+    expect(response.result['BTC']).to.be.equal(address)
 
   })
 

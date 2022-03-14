@@ -6,12 +6,21 @@ import * as bsv from 'bsv';
 
 import * as events from '../events'
 
-import { logInfo } from '../logger'
+import { log } from '../log'
 
-import {
-  AddressChangeSet,
-  DenominationChangeset
-} from './types/address_change_set';
+interface DenominationChangeset {
+  account_id: number;
+  currency: string;
+}
+
+interface AddressChangeSet {
+  account_id: number;
+  currency: string;
+  address: string;
+  metadata?: string;
+  paymail?: string;
+  address_id?: number;
+}
 
 import {models} from "../models";
 
@@ -43,7 +52,7 @@ async  function getPaymail(currency, address) {
 
 }
 
-export async function setAddress(changeset: AddressChangeSet): Promise<string> {
+export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
@@ -104,38 +113,32 @@ export async function setAddress(changeset: AddressChangeSet): Promise<string> {
 
   changeset.address_id = address.id;
 
-  events.record({
-    event: 'address.set',
-    payload: changeset,
-    account_id: changeset.account_id
-  })
+  log.info('address.set', changeset)
 
-  logInfo('address.set', changeset)
-
-  return address.value;
+  return address;
 
 };
 
 export async function unsetAddress(changeset: AddressChangeSet) {
 
-    var address = await models.Address.findOne({ where: {
-      account_id: changeset.account_id,
-      currency: changeset.currency
-    }});
+  var address = await models.Address.findOne({ where: {
+    account_id: changeset.account_id,
+    currency: changeset.currency
+  }});
 
-    if (address.locked) {
+  if (address.locked) {
 
-      throw new Error(`${changeset.currency} address locked`);
+    let error = new Error(`${changeset.currency} address locked`);
 
-    }
+    log.error('address.unset.locked', error)
 
-    await address.destroy({ force: true });
+    throw error
 
-  events.record({
-    event: 'address:unset',
-    payload: changeset,
-    account_id: changeset.account_id
-  });
+  }
+
+  await address.destroy({ force: true });
+
+  log.info('address.unset', changeset)
 
 };
 

@@ -3,7 +3,6 @@ import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 
 import { log, models, plugins } from '../../../lib'
-import { logError } from '../../../lib/logger'
 
 import * as pay from '../../../lib/pay'
 
@@ -46,10 +45,7 @@ export async function show(req, h) {
     .then(([record, isNew]) => {
 
       if (isNew) {
-        log.info({
-          event: 'paymentrequest.recorded',
-          payload: record.toJSON()
-        })
+        log.info('bip70.paymentrequest.recorded', record)
       }
     })
     .catch(error => {
@@ -120,7 +116,7 @@ export async function create(req, h) {
     })
 
     if (invoice.cancelled) {
-      logError('payment.error.invoicecancelled', { uid: req.params.uid, payment })
+      log.error('payment.error.invoicecancelled', { uid: req.params.uid, payment })
       return Boom.badRequest('invoice cancelled')
     }
 

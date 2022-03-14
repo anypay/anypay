@@ -9,8 +9,6 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
-import { logInfo, logError } from '../../../lib/logger'
-
 import * as moment from 'moment';
 
 export async function cancel(req, h) {
@@ -28,7 +26,7 @@ export async function cancel(req, h) {
 
     if (!invoice) {
 
-      logError('invoice.notfound', where)
+      log.error('invoice.notfound', where)
 
       return Boom.notFound()
 
@@ -41,7 +39,7 @@ export async function cancel(req, h) {
 
       await invoice.save()
 
-      logInfo('invoice.cancelled', where)
+      log.info('invoice.cancelled', where)
 
       where['status'] = 'cancelled'
 
@@ -49,7 +47,7 @@ export async function cancel(req, h) {
 
     } else {
 
-      logError('invoice.cancel.error.alreadycancelled', where)
+      log.error('invoice.cancel.error.alreadycancelled', where)
 
       throw new Error('invoice already cancelled')
 
@@ -211,7 +209,7 @@ export async function create (request, h) {
 
   log.info(`controller:invoices,action:create`);
 
-  logInfo('invoices.create', Object.assign({
+  log.info('invoices.create', Object.assign({
 
     account_id: request.account.id
 

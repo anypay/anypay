@@ -1,5 +1,6 @@
 import * as http from 'superagent'
-import { log } from './logger'
+
+import { log } from './log'
 
 export async function publishBTC(hex) {
 

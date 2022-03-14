@@ -1,11 +1,13 @@
 
 require('dotenv').config()
 
-import { start } from './server/v0/server'
+import { server, start } from './server/v0/server'
 
 import { start as startPrices } from './lib/prices/cron'
 
-import { events, init } from 'rabbi'
+import { plugin as websockets } from './ws/plugin'
+
+import { init } from 'rabbi'
 
 (async () => {
 
@@ -13,9 +15,13 @@ import { events, init } from 'rabbi'
 
   startPrices()
 
-  await start()
+  if (process.env.WEBSOCKETS_SERVER) {
 
-  events.emit('servers.rest_api.started')
+    await server.register(websockets)
+
+  }
+
+  await start()
 
 })()
 

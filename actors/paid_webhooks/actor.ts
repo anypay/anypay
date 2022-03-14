@@ -1,11 +1,8 @@
 require('dotenv').config();
 
-import { log } from '../../lib';
-
-import { logInfo } from '../../lib/logger'
+import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
-//import { Actor } from '/Users/zyler/github/rabbijs/rabbi'
 
 import { Webhook, getPaidWebhookForInvoice, sendWebhookForInvoice } from '../../lib/webhooks';
 
@@ -30,33 +27,33 @@ export async function start() {
 
       let uid = msg.content.toString();
 
-      logInfo('webhook.sendforinvoice', { uid });
+      log.info('webhook.sendforinvoice', { uid });
 
       let invoice: Invoice = await ensureInvoice(uid)
 
-      logInfo('webhook.invoice', { invoice });
+      log.info('webhook.invoice', { invoice });
 
       let account: Account = await invoice.getAccount()
 
-      logInfo('webhook.account', { account });
+      log.info('webhook.account', { account });
 
       let webhook = await getPaidWebhookForInvoice(invoice)
 
-      logInfo('webhook', webhook)
+      log.info('webhook', webhook)
 
       if (webhook) {
 
         let attempt = await webhook.attemptWebhook()
 
-        logInfo('webhook.attempt', attempt.record.toJSON());
+        log.info('webhook.attempt', attempt.record.toJSON());
 
       } else {
 
-        logInfo('webhook.sendforinvoice')
+        log.info('webhook.sendforinvoice')
 
-        let result = await sendWebhookForInvoice(invoice.record, 'actor_onpaid')
+        let result = await sendWebhookForInvoice(invoice.uid, 'actor_onpaid')
 
-        logInfo('webhook.sendforinvoice.result', result)
+        log.info('webhook.sendforinvoice.result', result)
 
       }
 

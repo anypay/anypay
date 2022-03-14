@@ -1,5 +1,5 @@
 
-import { logError } from '../../../lib/logger'
+import { log } from '../../../lib/log'
 
 export async function show(request, h) {
 
@@ -14,7 +14,7 @@ export async function show(request, h) {
 
   } catch(error) {
 
-    logError('myaccount.error', error)
+    log.error('myaccount.error', error)
 
     return h.response({ error: 'invalid access token' }).code(401)
 

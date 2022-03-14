@@ -1,5 +1,5 @@
 
-import { logInfo, logError } from '../logger'
+import { log } from '../log'
 
 import { setAllFiatPrices, setAllCryptoPrices } from './'
 
@@ -10,7 +10,7 @@ const ONE_HOUR = ONE_MINUTE * 60;
 
 export async function start() {
 
-  logInfo('prices.cron.start')
+  log.info('prices.cron.start')
 
   fiatInterval = setInterval(async () => {
 
@@ -20,7 +20,7 @@ export async function start() {
 
     } catch(error) {
 
-      logError('prices.cron.fiat.error', error)
+      log.error('prices.cron.fiat.error', error)
 
     }
 
@@ -36,7 +36,7 @@ export async function start() {
 
     } catch(error) {
 
-      logError('prices.cron.crypto.error', error)
+      log.error('prices.cron.crypto.error', error)
 
     }
 

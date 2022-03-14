@@ -2,11 +2,11 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, Joi } from 'rabbi';
 
 import { models } from '../../lib';
 
-import { logError } from '../../lib/logger'
+import { log } from '../../lib/log'
 
 import * as cron from 'node-cron';
 
@@ -26,7 +26,7 @@ export async function start() {
 
       } catch(error) {
 
-        logError('bittrex.sellall.error', error.message)
+        log.error('bittrex.sellall.error', error.message)
 
       }
 

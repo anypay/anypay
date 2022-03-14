@@ -117,4 +117,29 @@ export async function attachV1Routes(server) {
     },
   });
 
+  server.route({
+    method: 'POST',
+    path: '/v1/api/account/addresses',
+    options: {
+      auth: "jwt",
+      validate: {
+        payload: Joi.object({
+          currency: Joi.string().required(),
+          value: Joi.string().required(),
+          label: Joi.string().optional()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          address: Joi.object({
+            currency: Joi.string().required(),
+            value: Joi.string().required(),
+            label: Joi.string().optional()
+          })
+        })
+      }
+    },
+    handler: v1.Addresses.update
+  }); 
+
 }

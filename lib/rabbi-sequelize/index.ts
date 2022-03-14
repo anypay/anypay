@@ -1,7 +1,6 @@
 
 import { awaitChannel } from '../amqp';
-import { log } from '../logger';
-import * as amqp from 'amqplib';
+import { log } from '../log';
 
 // https://sequelize.readthedocs.io/en/2.0/docs/hooks/
 

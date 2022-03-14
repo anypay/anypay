@@ -3,7 +3,6 @@ import * as Hapi from 'hapi';
 import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
 import { amqp, log, models } from '../../../lib';
-import { logInfo, logError } from '../../../lib/logger';
 
 import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
 
@@ -17,7 +16,7 @@ export async function show(req, h) {
     protocol: 'BIP270'
   })
 
-  logInfo(`pay.request.bsv.content`, content)
+  log.info(`pay.request.bsv.content`, content)
 
   let response = h.response(content);
 
@@ -29,7 +28,7 @@ export async function show(req, h) {
 
 export async function create(req, h) {
 
-  logInfo('bsv.bip270.broadcast', {
+  log.info('bsv.bip270.broadcast', {
     headers: req.headers,
     payload: req.payload
   })
@@ -50,13 +49,13 @@ export async function create(req, h) {
     }
 
     if (invoice.cancelled) {
-      logError('payment.error.invoicecancelled', submission)
+      log.error('payment.error.invoicecancelled', submission)
       return Boom.badRequest('invoice cancelled')
     }
 
     let response: SubmitPaymentResponse = await submitPayment(submission)
 
-    logInfo('bsv.bip270.broadcast.success', {
+    log.info('bsv.bip270.broadcast.success', {
       headers: req.headers,
       payload: req.payload,
       response

@@ -1,6 +1,6 @@
 
 import { models } from './models'
-import { logInfo } from './logger'
+import { log } from './log'
 
 interface SetDiscount {
   account_id: number;
@@ -10,7 +10,7 @@ interface SetDiscount {
 
 export async function set(opts: SetDiscount) {
 
-  logInfo('discount.set', opts)
+  log.info('discount.set', opts)
 
   let [discount, isNew] = await models.Discount.findOrCreate({
     where: {

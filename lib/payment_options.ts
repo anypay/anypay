@@ -1,6 +1,6 @@
 
 import { models } from './models';
-import { log } from './logger';
+import { log } from './log';
 
 import { convert } from './prices'
 import { toSatoshis } from './pay'

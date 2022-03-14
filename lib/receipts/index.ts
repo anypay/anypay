@@ -1,6 +1,9 @@
 require('dotenv');
+
 import { models } from '../models';
-import { log } from '../logger';
+
+import { log } from '../log';
+
 const filepay = require('filepay')
 
 const ENERGY_CITY_BITCOM = '1DRHWrL1jPjH8V7V4E3TxpS63E6a24ysnN';

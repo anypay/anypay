@@ -1,7 +1,7 @@
 
 import * as Joi from 'joi'
 
-import { logError } from '../../../lib/logger'
+import { log } from '../../../lib/log'
 
 import { badRequest } from 'boom'
 
@@ -54,7 +54,7 @@ export async function index(req, h) {
 
   } catch(error) {
 
-    logError('request.listpayments.error', error)
+    log.error('request.listpayments.error', error)
 
     return badRequest(error)
 
