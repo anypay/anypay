@@ -64,6 +64,8 @@ export async function publishJson(channel, exchange, routingkey, json) {
 
   await channel.assertExchange('rabbi.events', 'direct')
 
+  await channel.assertExchange('anypay.topic', 'topic')
+
   channelIsConnected = true;
   
 })();
