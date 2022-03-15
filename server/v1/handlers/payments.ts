@@ -7,15 +7,17 @@ import { badRequest } from 'boom'
 
 import { listPayments } from '../../../lib/payments'
 
-export async function index(req, h) {
+export async function index(request, h) {
+
+  request.log('LIST PAYMENTS')
 
   try {
 
-    let payments: any = await listPayments(req.account, {
+    let payments: any = await listPayments(request.account, {
 
-      limit: req.query.limit || 1000,
+      limit: request.query.limit || 1000,
 
-      offset: req.query.offset || 0
+      offset: request.query.offset || 0
 
     })
 

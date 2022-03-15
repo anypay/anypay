@@ -73,7 +73,7 @@ const validatePassword = async function(request, username, password, h) {
   } catch(error) {
 
 
-    log.error(error.message);
+    log.error('auth.v0', error);
 
   }
 
@@ -143,6 +143,16 @@ const server = new Hapi.Server({
     validate: {
       options: {
         stripUnknown: true
+      },
+      failAction: async (request, h, err) => {
+
+        log.error('hapi.route.validation', err);
+
+        if (err.isJoi) {
+          log.error('hapi.route.validation', err);
+        }
+
+        throw err;
       }
     },
     files: {
@@ -150,6 +160,28 @@ const server = new Hapi.Server({
     }
   }
 });
+
+server.ext('onPreResponse', (request, h) => {
+
+  if (request.response.isBoom) {
+
+    log.error('request.error', request.response)
+
+    return h.response({
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: request.response.message
+    }).code(500)
+
+  } else {
+
+    return h.continue
+
+  }
+
+
+})
+
 
 async function Server() {
 
@@ -227,13 +259,15 @@ async function Server() {
   });
 
   await server.register(require('hapi-auth-basic'));
-  await server.register(require('inert'));
-  await server.register(require('vision'));
+  await server.register(require('@hapi/inert'));
+  await server.register(require('@hapi/vision'));
   await server.register(require('hapi-boom-decorators'))
 
   const swaggerOptions = server.register({
     plugin: HapiSwagger,
     options: {
+      schemes: ['https', 'http'],
+      grouping: 'tags',
       info: {
         title: 'Anypay API Documentation',
         version: '1.0.1',
@@ -263,7 +297,12 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/api/accounts-by-email/{email}",
-    handler: v0.Anypaycity.show
+    handler: v0.Anypaycity.show,
+    options: {
+      description: "Get Public Account With Its Email Address",
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
+    }
   });
 
   server.route({
@@ -271,12 +310,14 @@ async function Server() {
     path: "/invoices/{invoice_id}",
     handler: v0.Invoices.show,
     options: {
-      tags: ['api'],
+      description: "Get Invoice Public Details",
+      tags: ['api', 'v0', 'invoices'],
       validate: {
         params: Joi.object({
           invoice_id: Joi.string().required()
         })
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
@@ -284,10 +325,11 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/woocommerce",
-    handler: v0.Woocommerce.index,
-    options: {
+    handler: v0.Woocommerce.index, options: {
+      description: "WooCommerce Checkout Settings",
+      tags: ['api', 'v0', 'ecommerce', 'woocommerce'],
       auth: "token",
-      tags: ['api']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -296,7 +338,9 @@ async function Server() {
     path: "/invoices/{invoice_uid}/payment_options",
     handler: v0.InvoicePaymentOptions.show,
     options: {
-      tags: ['api']
+      description: 'List Payment Options For Invoice',
+      tags: ['api', 'v0', 'invoices']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -305,22 +349,27 @@ async function Server() {
     path: "/invoices/{uid}/share/email",
     handler: v0.Invoices.shareEmail,
     options: {
-      tags: ['api'],
+      description: 'Share Invoice Via Email',
+      tags: ['api', 'v0', 'invoices'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
         })
       }
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
+
 
   server.route({
     method: "GET",
     path: "/grab_and_go_items",
     handler: v0.Products.index,
     options: {
+      description: "List Your Products For Sale",
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'products']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -329,8 +378,10 @@ async function Server() {
     path: "/invoices",
     handler: v0.Invoices.index,
     options: {
+      description: "List Your Invoices",
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'invoices']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -339,10 +390,12 @@ async function Server() {
     path: "/accounts",
     handler: v0.Accounts.create,
     options: {
-      tags: ['api'],
+      description: "Register a New Account",
+      tags: ['api', 'v0', 'auth'],
       validate: {
         payload: models.Account.Credentials,
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
@@ -351,7 +404,9 @@ async function Server() {
     path: "/accounts/{id}", // id or email
     handler: v0.Accounts.showPublic,
     options: {
-      tags: ['api'],
+      description: "Show Public Details of Account",
+      tags: ['api', 'v0', 'map'],
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
@@ -361,11 +416,13 @@ async function Server() {
     path: "/anonymous-accounts",
     handler: v0.Accounts.registerAnonymous,
     options: {
+      description: "Register an Account Without Email",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0', 'registration'],
       validate: {
         payload: models.Account.Credentials,
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
@@ -375,7 +432,9 @@ async function Server() {
     path: "/anonymous-accounts",
     handler: v0.Accounts.createAnonymous,
     options: {
-      tags: ['api']
+      description: "Register an Account Without Email",
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
     },
   });
 
@@ -384,8 +443,15 @@ async function Server() {
     path: "/access_tokens",
     handler: v0.AccessTokens.create,
     options: {
+      description: "Grant Access Token With Account Login Credentials",
       auth: "password",
-      tags: ['api'],
+      tags: ['api', 'v0', 'auth'],
+      response: {
+        schema: Joi.object({
+          
+        })
+      },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
@@ -395,8 +461,10 @@ async function Server() {
     path: "/addresses",
     handler: v0.Addresses.list,
     options: {
+      description: "List Current Wallet Addresses",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0', 'account', 'addresses'],
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: v0.Addresses.PayoutAddresses }),
     }
   });
@@ -406,8 +474,10 @@ async function Server() {
     path: "/addresses/{currency}",
     handler: v0.Addresses.delete,
     options: {
+      description: "Remove Wallet Address",
       auth: "token",
-      tags: ['api']
+      //TODO: ADD RESPONSE SCHEMA
+      tags: ['api', 'v0', 'account', 'addresses']
     }
   });
 
@@ -416,8 +486,10 @@ async function Server() {
     path: "/account_addresses",
     handler: v0.Addresses.index,
     options: {
+      description: "List Current Wallet Addresses",
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -426,8 +498,9 @@ async function Server() {
     path: "/addresses/{id}/notes",
     handler: v0.AddressNotes.update,
     options: {
+      description: "Include Note About Wallet Address",
+      tags: ['api', 'v0', 'account', 'addresses'],
       auth: "token",
-      tags: ['api'],
       validate: {
         params: Joi.object({
           id: Joi.number().required()
@@ -436,6 +509,7 @@ async function Server() {
           note: Joi.string().required()
         })
       }
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -444,8 +518,9 @@ async function Server() {
     path: "/addresses/{currency}",
     handler: v0.Addresses.update,
     options: {
+      description: "Update Wallet Address",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       validate: {
         params: Joi.object({
           currency: Joi.string().required()
@@ -454,6 +529,7 @@ async function Server() {
           address: Joi.string().required()
         })
       }
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -462,8 +538,9 @@ async function Server() {
     path: "/discounts/{currency}",
     handler: v0.Discounts.update,
     options: {
+      description: "Set A Discount For A Given Currency",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       validate: {
         params: Joi.object({
           currency: Joi.string().required(),
@@ -472,6 +549,7 @@ async function Server() {
           percent: Joi.number().required()
         }),
       }
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -480,19 +558,24 @@ async function Server() {
     path: "/account",
     handler: v0.Accounts.show,
     options: {
+      description: "Account Profile",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
+
 
   server.route({
     method: "PUT",
     path: "/account",
     handler: v0.Accounts.update,
     options: {
+      description: "Update Account Profile Settings",
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -501,13 +584,15 @@ async function Server() {
     path: "/invoices/{invoice_uid}/notes",
     handler: v0.InvoiceNotes.create,
     options: {
+      description: "Attach Note To Invoice",
       validate: {
         payload: Joi.object({
           note: Joi.string().required()
         })
       },
+      //TODO: ADD RESPONSE SCHEMA
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0']
     }
   });
 
@@ -516,71 +601,90 @@ async function Server() {
     path: "/coins",
     handler: v0.Coins.list,
     options: {
-      tags: ['api'],
+      description: "Get List of Coins Available",
+      tags: ['api', 'v0'],
       auth: "token",
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
     }
   });
+
 
   server.route({
     method: "POST",
     path: "/invoices",
     handler: v0.Invoices.create,
     options: {
+      description: "Create New Invoice",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       validate: {
         payload: models.Invoice.Request,
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
+
 
   server.route({
     method: "DELETE",
     path: "/invoices/{uid}",
     handler: v0.Invoices.cancel,
     options: {
+      description: "Cancel An Invoice Before Payment",
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
+
 
   server.route({
     method: "POST",
     path: "/accounts/{account_id}/invoices",
     handler: v0.Invoices.createPublic,
     options: {
-      tags: ['api'],
+      description: "Payment Request To Pay Public Account",
+      tags: ['api', 'v0', 'map', 'invoices'],
       validate: {
         payload: models.Invoice.Request,
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
+
 
   server.route({
     method: "POST",
     path: "/password-resets",
     handler: v0.Passwords.reset,
     options: {
-      tags: ['api'],
+      description: 'Request Password Reset Email Be Sent',
+      tags: ['api', 'v0', 'auth'],
       validate: {
         payload: v0.Passwords.PasswordReset,
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
   });
+
 
   server.route({
     method: "POST",
     path: "/password-resets/{uid}",
     handler: v0.Passwords.claim,
     options: {
-      tags: ['api'],
+      description: 'Reset Password With Claim Token',
+      tags: ['api', 'v0'],
       validate: {
-        payload: v0.Passwords.PasswordResetClaim,
+        payload: Joi.object({
+          password: Joi.string().min(1).required(),
+        }).label('PasswordResetClaim')
       },
+      //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
   });
@@ -590,17 +694,22 @@ async function Server() {
     path: "/settings/denomination",
     handler: v0.Denominations.update,
     options: {
-      tags: ['api'],
+      description: 'Set Default Account Currency Denomination',
+      tags: ['api', 'v0', 'account', 'settings'],
+      //TODO: ADD RESPONSE SCHEMA
       auth: "token"
     }
   });
+
 
   server.route({
     method: "GET",
     path: "/settings/denomination",
     handler: v0.Denominations.show,
     options: {
-      tags: ['api'],
+      description: 'Get Account Currency Denomination Setting',
+      tags: ['api', 'v0'],
+      //TODO: ADD RESPONSE SCHEMA
       auth: "token"
     }
   });
@@ -610,16 +719,21 @@ async function Server() {
     path: "/base_currencies",
     handler: v0.BaseCurrencies.index,
     options: {
-      tags: ['api']
+      description: 'List All Base Currencies Available',
+      tags: ['api', 'v0', 'app']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
+
 
   server.route({
     method: "GET",
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
     handler: v0.PriceConversions.show,
     options: {
-      tags: ['api']
+      description: 'Calculate Exchange Price For Currency Pair',
+      tags: ['api', 'v0']
+      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -628,41 +742,81 @@ async function Server() {
       path: "/r",
       handler: v0.PaymentRequests.create,
       options: {
-        auth: "app"
+        description: 'Create New Arbitrary Payment Request',
+        auth: "app",
+        tags: ['api', 'v0']
+        //TODO: ADD RESPONSE SCHEMA
       }
     })
 
-  server.route({
-    method: 'POST',
-    path: '/moneybutton/webhooks',
-    handler: v0.MoneybuttonWebhooks.create
-  });
+    server.route({
+      method: 'POST',
+      path: '/moneybutton/webhooks',
+      handler: v0.MoneybuttonWebhooks.create,
+      options: {
+        description: 'Handle Money Button Webhook Callback',
+        //TODO: ADD PAYLOAD VALIDATION
+        //TODO: ADD RESPONSE SCHEMA
+        //TODO: EXCLUDE FROM DOCUMENTATION
+      }
+
+    });
 
   server.route({
     method: 'GET',
     path: '/merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      description: 'List Public Merchants'
+      //TODO: ADD PAYLOAD VALIDATION
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      description: 'List Active Merchants',
+      tags: ['api', 'v0', 'map']
+      //TODO: ADD PAYLOAD VALIDATION
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchant-coins',
-    handler: v0.Merchants.listMerchantCoins
+    handler: v0.Merchants.listMerchantCoins,
+    options: {
+      description: 'List Active Merchant Coins',
+      tags: ['api', 'v0', 'map']
+      //TODO: ADD PAYLOAD VALIDATION
+    }
   });
 
   server.route({
     method: "GET",
     path: "/apps",
     options: {
+      description: 'List Your Apps',
       auth: "token",
-      tags: ['api'],
-      handler: v0.Apps.index
+      tags: ['api', 'v0', 'apps'],
+      handler: v0.Apps.index,
+      response: {
+        schema: Joi.object({
+          apps: Joi.array().items(Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().required(),
+            name: Joi.string().required(),
+            webhook_url: Joi.string().optional(),
+            public_key: Joi.string().required(),
+            private_key: Joi.string().required(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }))
+        }),
+        failAction: 'log'
+      }
     }
   });
 
@@ -670,19 +824,43 @@ async function Server() {
     method: "GET",
     path: "/apps/{id}",
     options: {
+      description: 'Get App Details',
       auth: "token",
-      tags: ['api'],
-      handler: v0.Apps.show
+      tags: ['api', 'v0', 'apps'],
+      handler: v0.Apps.show,
+      validate: {
+        params: Joi.object({
+          id: Joi.number().required() 
+        })
+      },
+      response: {
+        schema: Joi.object({
+          app: Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().required(),
+            name: Joi.string().required(),
+            webhook_url: Joi.string().optional(),
+            public_key: Joi.string().required(),
+            private_key: Joi.string().required(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }).required()
+        }),
+        failAction: 'log'
+      }
     }
   });
+
 
   server.route({
     method: "POST",
     path: "/apps",
     options: {
+      description: "Create A New App",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', "v0"],
       handler: v0.Apps.create
+      //TODO: ADD PAYLOAD VALIDATION
     }
   });
 
@@ -690,9 +868,11 @@ async function Server() {
     method: "POST",
     path: "/firebase_token",
     options: {
+      description: "Submit Firebase Token For Mobile Push Notifications",
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.FirebaseTokens.create
+      //TODO: ADD PAYLOAD VALIDATION
     }
   });
 
@@ -700,8 +880,9 @@ async function Server() {
     method: "PUT",
     path: "/firebase_token",
     options: {
+      description: "Submit Firebase Token For Mobile Push Notifications",
       auth: "token",
-      tags: ['api'],
+      tags: ['app', 'v0'],
       handler: v0.FirebaseTokens.update
     }
   });
@@ -709,14 +890,21 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/support/{token}',
-    handler: v0.SupportProxy.show
+    handler: v0.SupportProxy.show,
+    options: {
+      description: "Record User Navigation To Support Page",
+      tags: ['app', 'v0']
+    }
   }); 
+
 
   server.route({
     method: 'GET',
     path: '/api_keys',
     handler: v0.ApiKeys.index,
     options: {
+      description: "List API Key Available For Account",
+      tags: ['api', 'v0'],
       auth: "token"
     }
   }); 
@@ -726,6 +914,8 @@ async function Server() {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.create,
     options: {
+      description: "Submit Bittrex Exchange API Keys",
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -735,6 +925,8 @@ async function Server() {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.show,
     options: {
+      description: "List Bittrex Exchange API Keys",
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -744,6 +936,8 @@ async function Server() {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.destroy,
     options: {
+      description: "Remove Bittrex Exchange API Keys",
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -751,19 +945,16 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: v0.Accounts.nearby
+    handler: v0.Accounts.nearby,
+    options: {
+      description: "Find Businesses Nearby By Geo Coordinates",
+      tags: ['api', 'v0', 'map']
+    }
   }); 
+
   await attachV1Routes(server)
 
   accountCSVReports(server);
-
-  server.route({
-    method: 'GET',
-    path: '/',
-    handler: (req, h) => {
-      return h.redirect('https://anypay.dev')
-    }
-  }); 
 
   return server;
 

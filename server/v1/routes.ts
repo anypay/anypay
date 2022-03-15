@@ -20,12 +20,15 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/register",
     handler: v1.AccountRegistrations.create,
     options: {
+      description: 'Register A New Account',
+      tags: ['api', 'v1', 'registration'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
         })
       }
+      //TODO: ADD RESPONSE SCHEMA
     },
   });
 
@@ -34,12 +37,15 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/login",
     handler: v1.AccountLogins.create,
     options: {
+      description: 'Start A New Session And Receive An Auth Token',
+      tags: ['api', 'v1', 'login'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
         })
       },
+      //TODO: ADD RESPONSE SCHEMA
     },
   });
 
@@ -48,11 +54,14 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/password-reset",
     handler: v1.PasswordResets.create,
     options: {
+      description: 'Request A Password Reset Email',
+      tags: ['api', 'v1', 'login'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
         })
       },
+      //TODO: ADD RESPONSE SCHEMA
     },
   });
 
@@ -60,7 +69,10 @@ export async function attachV1Routes(server) {
     method: "GET",
     path: "/v1/api/account/my-account",
     options: {
+      description: 'Get Your Account Profile',
+      tags: ['api', 'v1', 'account'],
       auth: "jwt"
+      //TODO: ADD RESPONSE SCHEMA
     },
     handler: v1.MyAccount.show
   });
@@ -69,7 +81,10 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/webhooks',
     options: {
+      description: 'List Payment Notification Webhooks',
+      tags: ['api', 'v1', 'webhooks'],
       auth: "jwt"
+      //TODO: ADD RESPONSE SCHEMA
     },
     handler: v1.Webhooks.index
   }); 
@@ -78,12 +93,17 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/account/payments',
     options: {
+      description: 'List Payments Received',
+      tags: ['api', 'v1', 'payments'],
       auth: "jwt",
       validate: {
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        })
+        }),
+        headers: Joi.object({
+          'authorization': Joi.string().required()
+        }).unknown()
       },
       response: {
         schema: v1.Payments.Schema.listPayments
@@ -96,7 +116,10 @@ export async function attachV1Routes(server) {
     method: 'POST',
     path: '/v1/api/webhooks/{invoice_uid}/attempts',
     options: {
+      description: 'Retry Webhook Notification',
+      tags: ['api', 'v1', 'webhooks'],
       auth: "jwt"
+      //TODO: ADD RESPONSE SCHEMA
     },
     handler: v1.Webhooks.attempt
   }); 
@@ -106,6 +129,8 @@ export async function attachV1Routes(server) {
     path: "/v1/api/invoices",
     handler: v1.Invoices.create,
     options: {
+      description: 'Create New Invoice',
+      tags: ['api', 'v1', 'invoices'],
       auth: "jwt",
       validate: {
         payload: Joi.object({
@@ -114,6 +139,7 @@ export async function attachV1Routes(server) {
           currency: Joi.string().optional()
         })
       },
+      //TODO: ADD RESPONSE SCHEMA
     },
   });
 
@@ -121,6 +147,8 @@ export async function attachV1Routes(server) {
     method: 'POST',
     path: '/v1/api/account/addresses',
     options: {
+      description: 'Set Wallet Address',
+      tags: ['api', 'v1', 'addresses'],
       auth: "jwt",
       validate: {
         payload: Joi.object({

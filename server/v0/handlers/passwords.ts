@@ -3,7 +3,7 @@ const Joi = require('joi');
 
 import { models } from '../../../lib';
 
-module.exports.reset = async function(request, reply) {
+export async function reset (request, h) {
 
   try {
 
@@ -17,7 +17,7 @@ module.exports.reset = async function(request, reply) {
   }
 }
 
-module.exports.claim = async function(request, reply) {
+export async function claim(request, h) {
 
   try {
 
@@ -39,15 +39,16 @@ module.exports.claim = async function(request, reply) {
   }
 }
 
-module.exports.PasswordReset = Joi.object({
+export const PasswordReset = Joi.object({
   email: Joi.string().required(),
 }).label('PasswordReset');
 
-module.exports.PasswordResetClaim = Joi.object({
+export const PasswordResetClaim = Joi.object({
   password: Joi.string().min(1).required(),
 }).label('PasswordResetClaim');
 
-module.exports.PasswordResetResponse = Joi.object({
+export const PasswordResetResponse = Joi.object({
   success: Joi.boolean().required(),
   error: Joi.string(),
 }).label('PasswordResetResponse');
+
