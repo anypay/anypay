@@ -51,4 +51,16 @@ export function toKeyValueString(json: any) {
 
 }
 
+export function cleanObjectKeys(json: any): any {
+
+  Object.entries(json).map(([key, value]) => {
+
+    if (value === "" || value === null){
+        delete json[key];
+    }
+  });
+
+  return json
+}
+
 

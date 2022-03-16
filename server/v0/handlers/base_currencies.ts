@@ -1,33 +1,31 @@
 
 import { badRequest } from 'boom'
 
-const Fixer = require('../../../lib/prices/fixer');
+import * as Joi from 'joi'
+
+import { getCurrencies } from '../../../lib/prices/fixer'
 
 export async function index(req, h) {
 
-  try {
+  var currencies = await getCurrencies();
 
-    var currencies = await Fixer.getCurrencies();
+  return { currencies };
 
-    var rates = currencies.rates;
+}
 
-    let sortedCurrencies = Object.keys(rates).sort();
+export const Schema = {
 
-    currencies.rates = sortedCurrencies.reduce((map, key) => {
+  Currency: Joi.object({
 
-      map[key] = rates[key];
+    base_currency: Joi.string().required(),
 
-      return map;
+    currency: Joi.string().required(),
 
-    }, {});
+    value: Joi.number().required(),
 
-    return currencies;
+    source: Joi.string().required()
 
-  } catch(error) {
-
-    return badRequest(error)
-
-  }
+  })
 
 }
 

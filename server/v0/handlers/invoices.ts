@@ -1,13 +1,17 @@
 const Boom = require('boom');
 const uuid = require('uuid')
 
+import * as Joi from 'joi'
+
 const _ = require('lodash')
 
 import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { utils, prices, email, models, invoices, coins } from '../../../lib';
+
+import { log } from '../../../lib/log'
 
 import * as moment from 'moment';
 
@@ -26,9 +30,9 @@ export async function cancel(req, h) {
 
     if (!invoice) {
 
-      log.error('invoice.notfound', where)
+      log.error('invoice.notfound', new Error(JSON.stringify({ where })))
 
-      return Boom.notFound()
+      throw Boom.notFound()
 
     }
 
@@ -47,7 +51,7 @@ export async function cancel(req, h) {
 
     } else {
 
-      log.error('invoice.cancel.error.alreadycancelled', where)
+      log.error('invoice.cancel.error.alreadycancelled', new Error())
 
       throw new Error('invoice already cancelled')
 
@@ -61,7 +65,7 @@ export async function cancel(req, h) {
 
 }
 
-export async function index (request, reply) {
+export async function index (request, h) {
 
   /*
 
@@ -150,20 +154,18 @@ export async function index (request, reply) {
 
   }
 
-  try {
+  var invoices = await models.Invoice.findAll(query);
 
-    var invoices = await models.Invoice.findAll(query);
+  return {
+    invoices: invoices.map(invoice => {
 
-    return { invoices };
+      console.log('denomination_amount_paid', invoice.denomination_amount_paid)
 
-  } catch(error) {
+      return utils.cleanObjectKeys(invoice.toJSON())
 
-    log.error(error);
-    log.error(error.message);
+    })
+  };
 
-    return { error: error.message };
-
-  }
 };
 
 function selectCurrency(addresses) {
@@ -217,13 +219,9 @@ export async function create (request, h) {
 
 	if (request.payload.currency) {
 
-    log.info('currency parameter provided')
-
     currency_specified = true;
 
   } else {
-
-    log.info('no currency parameter provided')
 
     /*
       Find the first address that is from a coin that is currently active
@@ -245,94 +243,90 @@ export async function create (request, h) {
 		throw Boom.badRequest('amount must be greater than zero')	
 	}
 
-	log.info('amount is greater than zero')
+  let plugin = await plugins.findForCurrency(request.payload.currency);
+
+  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
+
+  if(invoice){
+ 
+    log.info('invoice.created', invoice.toJSON());
+
+  }
+
+  invoice.currency_specified = currency_specified;
+
+  if (request.payload.redirect_url) {
+
+    invoice.redirect_url = request.payload.redirect_url;
+
+  }
+
+  if (request.payload.wordpress_site_url) {
+
+    invoice.wordpress_site_url = request.payload.wordpress_site_url;
+
+    invoice.tags = ['wordpress']
+
+  }
+
+  if (request.payload.webhook_url) {
+
+    invoice.webhook_url = request.payload.webhook_url;
+
+  }
+
+  if (request.payload.external_id) {
+
+    invoice.external_id = request.payload.external_id;
+
+  }
+
+  if (request.is_public_request) {
+
+    invoice.is_public_request = true;
+
+  }
+
+  invoice.headers = request.headers
+
+  invoice.email = request.payload.email;
+  invoice.business_id = request.payload.business_id;
+  invoice.location_id = request.payload.location_id;
+  invoice.register_id = request.payload.register_id;
+
+  log.info('invoice.json', invoice.toJSON())
+
+  await invoice.save();
 
   try {
-
-    let plugin = await plugins.findForCurrency(request.payload.currency);
-
-    log.info('plugin.createInvoice');
-
-    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
-
-    if(invoice){
-   
-      log.info('invoice.created', invoice.toJSON());
-
-    }
-
-    invoice.currency_specified = currency_specified;
-
-    if (request.payload.redirect_url) {
-
-      invoice.redirect_url = request.payload.redirect_url;
-
-    }
-
-    if (request.payload.wordpress_site_url) {
-
-      invoice.wordpress_site_url = request.payload.wordpress_site_url;
-
-      invoice.tags = ['wordpress']
-
-    }
-
-    if (request.payload.webhook_url) {
-
-      invoice.webhook_url = request.payload.webhook_url;
-
-    }
-
-    if (request.payload.external_id) {
-
-      invoice.external_id = request.payload.external_id;
-
-    }
-
-    if (request.is_public_request) {
-
-      invoice.is_public_request = true;
-
-    }
-
-    invoice.headers = request.headers
-
-    invoice.email = request.payload.email;
-    invoice.business_id = request.payload.business_id;
-    invoice.location_id = request.payload.location_id;
-    invoice.register_id = request.payload.register_id;
-
-    await invoice.save();
-
-    if (invoice.email) {
-      let note = await models.InvoiceNote.create({
-        content: `Customer Email: ${invoice.email}`,
-        invoice_uid: invoice.uid,
-      });
-    }
+  if (invoice.email) {
+    let note = await models.InvoiceNote.create({
+      content: `Customer Email: ${invoice.email}`,
+      invoice_uid: invoice.uid,
+    });
+  }
 
     invoice.payment_options = await getPaymentOptions(invoice.uid)
 
-    let sanitized = sanitizeInvoice(invoice);
-
-    return h.response(
-
-      Object.assign({
-        success: true,
-        invoice: sanitized,
-        payment_options: invoice.payment_options
-      }, sanitized)
-
-    ).code(200);
-
   } catch(error) {
-    console.log(error);
 
-    log.error(error.message);
-
-    return Boom.badRequest(error.message);
-
+      console.error('ERROR', error)
   }
+
+
+  let sanitized = utils.cleanObjectKeys(invoice);
+
+  log.info('sanitized', sanitized)
+
+  return h.response(
+
+    Object.assign({
+      success: true,
+      invoice: sanitized,
+      payment_options: invoice.payment_options
+    }, sanitized)
+
+  ).code(200);
 
 };
 
@@ -451,67 +445,58 @@ function sanitizeInvoice(invoice) {
   delete resp.webhook_url;
   delete resp.id;
   delete resp.dollar_amount;
+  delete resp.headers;
 
   return resp;
 }
 
-export async function show(request, reply) {
+export async function show(request, h) {
 
   let invoiceId = request.params.invoice_id;
 
   log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
 
-  try {
-
-	  let invoice = await models.Invoice.findOne({
-	    where: {
-	      uid: invoiceId
-	    }
-	  });
-
-    if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
-
-      invoice = await invoices.refreshInvoice(invoice.uid)
-
-    } else {
-
-      log.info('invoice not yet expired');
+  let invoice = await models.Invoice.findOne({
+    where: {
+      uid: invoiceId
     }
+  });
 
-	  if (invoice) {
+  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-	    log.info('invoice.requested', invoice.toJSON());
+    invoice = await invoices.refreshInvoice(invoice.uid)
 
-      invoice.payment_options = await getPaymentOptions(invoice.uid)
+  } else {
 
-      let notes = await models.InvoiceNote.findAll({where: {
-        invoice_uid: invoice.uid
-      }});
-
-      let sanitized = sanitizeInvoice(invoice);
-
-      let resp = Object.assign({
-        invoice: sanitized,
-        payment_options: invoice.payment_options,
-        notes
-      }, sanitized)
-
-      return resp;
-
-	  } else {
-
-	    log.error('no invoice found', invoiceId);
-
-	    throw new Error('invoice not found')
-	  }
-  } catch(error) {
-
-    console.log(error);
-
-    return Boom.badRequest(error.message);
-
+    log.info('invoice not yet expired');
   }
 
+  if (invoice) {
+
+    log.info('invoice.requested', invoice.toJSON());
+
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
+
+    let notes = await models.InvoiceNote.findAll({where: {
+      invoice_uid: invoice.uid
+    }});
+
+    let sanitized = utils.cleanObjectKeys(invoice.toJSON());
+
+    let resp = Object.assign({
+      invoice: sanitized,
+      payment_options: invoice.payment_options,
+      notes
+    }, sanitized)
+
+    return resp;
+
+  } else {
+
+    log.error('no invoice found', invoiceId);
+
+    throw new Error('invoice not found')
+  }
 
 }
 
@@ -519,36 +504,82 @@ export async function shareEmail(req, h) {
 
   log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 
-  try {
 
-	  let invoice = await models.Invoice.findOne({
-	    where: {
-	      uid: req.params.uid
-	    }
-	  });
+  let invoice = await models.Invoice.findOne({
+    where: {
+      uid: req.params.uid
+    }
+  });
 
-	  if (!invoice) {
+  if (!invoice) {
 
-	    log.error('no invoice found', req.params.uid);
+    log.error('no invoice found', req.params.uid);
 
-	    throw new Error('invoice not found')
+    throw new Error('invoice not found')
 
-	  } else {
+  } else {
 
-      await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
+    await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
 
-      return { success: true }
-
-	  }
-
-  } catch(error) {
-
-    console.log(error);
-
-    return Boom.badRequest(error.message);
+    return { success: true }
 
   }
 
+}
+
+export const Schema = {
+
+  //TODO: FIX SCHEMA WITH AMOUNT FIELDS
+  Invoice: Joi.object({
+    id: Joi.number().optional(),
+    uid: Joi.string().required(),
+    account_id: Joi.number().required(),
+    status: Joi.string().required(),
+    createdAt: Joi.date().required(),
+    updatedAt: Joi.date().required(),
+
+    //denomination_amount: Joi.number().optional(),
+    denomination_currency: Joi.string().optional(),
+    currency: Joi.string().optional(),
+    denomination: Joi.string().optional(),
+    //amount: Joi.number().optional(),
+    //denomination_amount_paid: Joi.number().optional(),
+
+    email: Joi.string().optional(),
+    external_id: Joi.string().optional(),
+    business_id: Joi.string().optional(),
+    location_id: Joi.string().optional(),
+    register_id: Joi.string().optional(),
+    cancelled: Joi.boolean().optional(),
+    app_id: Joi.number().optional(),
+    secret: Joi.string().optional(),
+    item_uid: Joi.string().optional(),
+    metadata: Joi.object().optional(),
+    headers: Joi.object().optional(),
+    tags: Joi.array().items(Joi.string()).optional(),
+    is_public_request: Joi.boolean().optional(),
+    currency_specified: Joi.boolean().optional(),
+    replace_by_fee: Joi.boolean().optional(),
+    expiry: Joi.date().optional(),
+    complete: Joi.boolean().optional(),
+    completed_at: Joi.date().optional(),
+    redirect_url: Joi.string().optional(),
+    webhook_url: Joi.string().optional(),
+    invoice_currency: Joi.string().optional(),
+    address: Joi.string().optional(),
+    energycity_account_id: Joi.number().optional(),
+    access_token: Joi.string().optional(),
+    wordpress_site_url: Joi.string().optional(),
+    hash: Joi.string().optional(),
+    locked: Joi.boolean().optional(),
+    uri: Joi.string().optional(),
+    //invoice_amount: Joi.number().optional(),
+    //invoice_amount_paid: Joi.number().optional(),
+    settledAt: Joi.date().optional(),
+    paidAt: Joi.date().optional(),
+    notes: Joi.array().optional()
+  })
+  .unknown()
 
 }
 

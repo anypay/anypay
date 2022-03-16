@@ -299,9 +299,22 @@ async function Server() {
     path: "/api/accounts-by-email/{email}",
     handler: v0.Anypaycity.show,
     options: {
-      description: "Get Public Account With Its Email Address",
-      tags: ['api', 'v0']
-      //TODO: ADD RESPONSE SCHEMA
+      description: "Redirect To Merchant Checkout Page With Its Email Address",
+      tags: ['api', 'v0', 'checkout', 'app'],
+      validate: {
+        params: Joi.object({
+          email: Joi.string().required()
+        })
+      },
+      plugins: {
+        'hapi-swagger': {
+          responses: {
+            301: {
+              description: 'Checkout Redirect'
+            }
+          }
+        }
+      }
     }
   });
 
@@ -317,7 +330,61 @@ async function Server() {
           invoice_id: Joi.string().required()
         })
       },
-      //TODO: ADD RESPONSE SCHEMA
+      response: {
+        schema: Joi.object({
+          invoice: v0.Invoices.Schema.Invoice,
+          payment_options: Joi.array(),
+          notes: Joi.array(),
+
+          id: Joi.number().required(),
+          uid: Joi.string().required(),
+          account_id: Joi.number().required(),
+          status: Joi.string().required(),
+          createdAt: Joi.date().required(),
+          updatedAt: Joi.date().required(),
+
+          //denomination_amount: Joi.number().optional(),
+          denomination_currency: Joi.string().optional(),
+          currency: Joi.string().optional(),
+          denomination: Joi.string().optional(),
+          //amount: Joi.number().optional(),
+          //denomination_amount_paid: Joi.number().optional(),
+
+          email: Joi.string().optional(),
+          external_id: Joi.string().optional(),
+          business_id: Joi.string().optional(),
+          location_id: Joi.string().optional(),
+          register_id: Joi.string().optional(),
+          cancelled: Joi.boolean().optional(),
+          app_id: Joi.number().optional(),
+          secret: Joi.string().optional(),
+          item_uid: Joi.string().optional(),
+          metadata: Joi.object().optional(),
+          headers: Joi.object().optional(),
+          tags: Joi.array().items(Joi.string()).optional(),
+          is_public_request: Joi.boolean().optional(),
+          currency_specified: Joi.boolean().optional(),
+          replace_by_fee: Joi.boolean().optional(),
+          expiry: Joi.date().optional(),
+          complete: Joi.boolean().optional(),
+          completed_at: Joi.date().optional(),
+          redirect_url: Joi.string().optional(),
+          webhook_url: Joi.string().optional(),
+          invoice_currency: Joi.string().optional(),
+          address: Joi.string().optional(),
+          energycity_account_id: Joi.number().optional(),
+          access_token: Joi.string().optional(),
+          wordpress_site_url: Joi.string().optional(),
+          hash: Joi.string().optional(),
+          locked: Joi.boolean().optional(),
+          uri: Joi.string().optional(),
+          //invoice_amount: Joi.number().optional(),
+          //invoice_amount_paid: Joi.number().optional(),
+          settledAt: Joi.date().optional(),
+          paidAt: Joi.date().optional(),
+        })
+        .unknown()
+      },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
@@ -380,8 +447,12 @@ async function Server() {
     options: {
       description: "List Your Invoices",
       auth: "token",
-      tags: ['api', 'v0', 'invoices']
-      //TODO: ADD RESPONSE SCHEMA
+      tags: ['api', 'v0', 'invoices'],
+      response: {
+        schema: Joi.object({
+          invoices: Joi.array().items(v0.Invoices.Schema.Invoice)
+        })
+      }
     }
   });
 
@@ -464,6 +535,9 @@ async function Server() {
       description: "List Current Wallet Addresses",
       auth: "token",
       tags: ['api', 'v0', 'account', 'addresses'],
+      response: {
+
+      },
       //TODO: ADD RESPONSE SCHEMA
       plugins: responsesWithSuccess({ model: v0.Addresses.PayoutAddresses }),
     }
@@ -472,12 +546,21 @@ async function Server() {
   server.route({
     method: "DELETE",
     path: "/addresses/{currency}",
-    handler: v0.Addresses.delete,
+    handler: v0.Addresses.remove,
     options: {
       description: "Remove Wallet Address",
       auth: "token",
-      //TODO: ADD RESPONSE SCHEMA
-      tags: ['api', 'v0', 'account', 'addresses']
+      tags: ['api', 'v0', 'account', 'addresses'],
+      validate: {
+        params: Joi.object({
+          currency: Joi.string().required()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          success: Joi.boolean().required()
+        })
+      }
     }
   });
 
@@ -488,10 +571,16 @@ async function Server() {
     options: {
       description: "List Current Wallet Addresses",
       auth: "token",
-      tags: ['api', 'v0']
-      //TODO: ADD RESPONSE SCHEMA
+      tags: ['api', 'v0', 'addresses'],
+      response: {
+
+        schema: Joi.object({
+          addresses: Joi.array().items(v0.Addresses.schema.Address)
+        })
+      }
     }
   });
+
 
   server.route({
     method: "PUT",
@@ -507,6 +596,11 @@ async function Server() {
         }),
         payload: Joi.object({
           note: Joi.string().required()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          address: v0.Addresses.schema.Address
         })
       }
       //TODO: ADD RESPONSE SCHEMA
@@ -548,8 +642,12 @@ async function Server() {
         payload: Joi.object({
           percent: Joi.number().required()
         }),
+      },
+      response: {
+        schema: Joi.object({
+          discount: v0.Discounts.Schema.Discount
+        })
       }
-      //TODO: ADD RESPONSE SCHEMA
     }
   });
 
@@ -619,10 +717,15 @@ async function Server() {
       auth: "token",
       tags: ['api', 'v0'],
       validate: {
-        payload: models.Invoice.Request,
+        payload: Joi.object({
+          amount: Joi.number()
+        }),
       },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
-      //TODO: ADD RESPONSE SCHEMA
+      response: {
+        //schema: v0.Invoices.Schema.Invoice,
+        //failAction: 'log'
+      },
+      //plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
   });
 
@@ -720,20 +823,33 @@ async function Server() {
     handler: v0.BaseCurrencies.index,
     options: {
       description: 'List All Base Currencies Available',
-      tags: ['api', 'v0', 'app']
-      //TODO: ADD RESPONSE SCHEMA
+      tags: ['api', 'v0', 'app'],
+      response: {
+        schema: Joi.object({
+          currencies: Joi.array().items(v0.BaseCurrencies.Schema.Currency).required()
+        })
+      }
     }
   });
 
 
   server.route({
     method: "GET",
-    path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
+    path: "/convert/{old_amount}-{old_currency}/to-{new_currency}",
     handler: v0.PriceConversions.show,
     options: {
       description: 'Calculate Exchange Price For Currency Pair',
-      tags: ['api', 'v0']
-      //TODO: ADD RESPONSE SCHEMA
+      tags: ['api', 'v0'],
+      validate: {
+        params: Joi.object({
+          old_amount: Joi.number().required(),
+          old_currency: Joi.string().required(),
+          new_currency: Joi.string().required(),
+        })
+      },
+      response: {
+        schema: Joi.object({ conversion: v0.PriceConversions.Schema.Conversion })
+      }
     }
   });
 
@@ -870,9 +986,24 @@ async function Server() {
     options: {
       description: "Submit Firebase Token For Mobile Push Notifications",
       auth: "token",
-      tags: ['api', 'v0'],
-      handler: v0.FirebaseTokens.create
-      //TODO: ADD PAYLOAD VALIDATION
+      tags: ['app', 'v0', 'notifications'],
+      handler: v0.FirebaseTokens.create,
+      validate: {
+        payload: Joi.object({
+          firebase_token: Joi.string().required()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          firebase_token: Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().required(),
+            token: Joi.string().required(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }).required()
+        })
+      }
     }
   });
 
@@ -882,8 +1013,24 @@ async function Server() {
     options: {
       description: "Submit Firebase Token For Mobile Push Notifications",
       auth: "token",
-      tags: ['app', 'v0'],
-      handler: v0.FirebaseTokens.update
+      tags: ['app', 'v0', 'notifications'],
+      handler: v0.FirebaseTokens.update,
+      validate: {
+        payload: Joi.object({
+          firebase_token: Joi.string().required()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          firebase_token: Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().required(),
+            token: Joi.string().required(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }).required()
+        })
+      }
     }
   });
 

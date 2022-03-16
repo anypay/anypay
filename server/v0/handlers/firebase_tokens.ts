@@ -1,5 +1,5 @@
 
-import { models } from '../../../lib';
+import { models, utils } from '../../../lib';
 
 export async function show(req, h) {
 
@@ -44,7 +44,7 @@ export async function create(req, h) {
     }
   })
 
-  return { firebase_token }
+  return { firebase_token: firebase_token.toJSON() }
 
 }
 

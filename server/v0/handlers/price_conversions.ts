@@ -1,28 +1,46 @@
 
-import { badRequest } from 'boom';
 import {createConversion } from '../../../lib/prices';
+
+import * as Joi from 'joi'
 
 export async function show(req, h) {
 
-  try {
+  let inputAmount = {
 
-    let inputAmount = {
+    currency: req.params.old_currency,
 
-      currency: req.params.oldcurrency,
+    value: parseFloat(req.params.old_amount)
 
-      value: parseFloat(req.params.oldamount)
+  };
 
-    };
+  let conversion = await createConversion(inputAmount, req.params.new_currency);
 
-    let conversion = await createConversion(inputAmount, req.params.newcurrency);
-
-    return {conversion};
-
-  } catch(error) {
-
-    return badRequest(error);
-
-  }
+  return { conversion }
 
 }
 
+export const Schema = {
+
+  Conversion: Joi.object({
+
+    input: Joi.object({
+
+      currency: Joi.string().required(),
+
+      value: Joi.number().required()
+
+    }).required(),
+
+    output: Joi.object({
+
+      currency: Joi.string().required(),
+
+      value: Joi.number().required()
+
+    }).required(),
+
+    timestamp: Joi.date().required()
+
+  })
+
+}

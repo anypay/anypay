@@ -3,6 +3,8 @@ import * as Boom from 'boom';
 
 import { models } from '../../../lib';
 
+import { cleanObjectKeys as clean } from '../../../lib/utils'
+
 export async function update(req, h) {
 
   try {
@@ -29,7 +31,7 @@ export async function update(req, h) {
 
     await address.save();
 
-    return { address }
+    return { address: clean(address.toJSON()) }
 
   } catch(error) {
 
