@@ -54,6 +54,10 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   await account.setAddress({ currency: 'BSV', address })
 
+  await account.setAddress({ currency: 'BCH', address: 'qrhqkz3mavm3s58qf3znajgpghf96p7xdgtdj404hy' }) // steven bittrex
+  await account.setAddress({ currency: 'DASH', address: 'XpwZpy6RH4LmkMSHNBeQds7ypSGznExQHd' })  // steven somewhere
+  //await account.setAddress({ currency: 'BTC', address: '19T4miK5CUSLcYQDYSUK9T2jkLUipLhh8g' })  // steven somewhere
+
   let invoice = await createInvoice({
     account,
     amount: params.amount || 10
