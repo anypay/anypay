@@ -53,16 +53,23 @@ export async function show(req, h) {
     })
 
     let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(paymentRequest.content))).toString('hex');
-    var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
-    var signature = Message(digest).sign(privateKey);
+
     let response = h.response(paymentRequest.content.serialize());
+
+    if (process.env.JSON_PROTOCOL_IDENTITY_WIF) {
+
+      var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
+      var signature = Message(digest).sign(privateKey);
+      response.header('x-signature-type', 'ecc');
+      response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
+      response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
+      response.header('digest', `SHA-256=${digest}`);
+
+    }
+
 
     response.type(`application/${currency.name}-paymentrequest`);
 
-    response.header('x-signature-type', 'ecc');
-    response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
-    response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
-    response.header('digest', `SHA-256=${digest}`);
     response.header('Content-Type', `application/${currency.name}-paymentrequest`);
     response.header('Accept', `application/${currency.name}-payment`);
 

@@ -126,9 +126,13 @@ describe('JSON Payment Protocol V2', () => {
 
     let { paymentOptions } = await client.getPaymentOptions()
 
-    let { chain, currency } = paymentOptions[0]
+    let paymentOption = paymentOptions.filter(option => {
+      return option.currency === 'BSV'
+    })[0]
 
-    let paymentRequest = await client.selectPaymentOption(paymentOptions[0])
+    let { chain, currency } = paymentOption
+
+    let paymentRequest = await client.selectPaymentOption(paymentOption)
 
     let balance = await wallet.getBalance()
 

@@ -10,6 +10,8 @@ import { join } from 'path'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
+import * as jsonV2 from '../jsonV2/handlers/protocol'
+
 
 export function attach(server: Hapi.Server) {
 

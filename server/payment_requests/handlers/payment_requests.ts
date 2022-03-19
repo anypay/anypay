@@ -11,6 +11,8 @@ import { detectWallet, Wallets } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
+import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
+
 import { schema } from 'anypay'
 
 import { recordEvent } from '../../../lib/events'
@@ -183,11 +185,15 @@ export async function show(req, h) {
 
     let accept = req.headers['accept']
 
-    if (accept && accept.match(isBIP270)) {
+    if (accept && accept.match(/payment-options/)) {
+
+      return listPaymentOptions(req, h)
+
+    } else if (accept && accept.match(isBIP270)) {
 
       return handleBIP270(req, h)
 
-    } if (accept && accept.match(isBIP70)) {
+    } else if (accept && accept.match(isBIP70)) {
 
       return handleBIP70(req, h)
 

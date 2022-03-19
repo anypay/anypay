@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 import * as assert from 'assert'
 
@@ -5,21 +6,28 @@ import * as http from 'superagent'
 
 import { models } from '../../lib'
 
-describe("End To End Payment Requests With BIP70 Protobufs", () => {
+import { wallet, expect, server, chance, request, spy } from '../utils'
 
-  var uid = 'f6eF_inmN'
-  var base_url = 'https://api.anypayinc.com'
+import { paymentRequestToJSON } from '../../lib/pay/bip70'
+
+import * as utils from '../utils'
+
+describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
   describe("BCH", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let resp = await http
-        .get(`${base_url}/r/${uid}`) 
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+      let resp = await request
+        .get(`/r/${invoice.uid}`) 
         .set({
           'Accept': 'application/bitcoincash-paymentrequest',
           'x-currency': 'BCH'
         })
+
+      expect(resp.statusCode).to.be.equal(200)
 
     })
 
@@ -27,14 +35,18 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
   describe("BTC", () => {
 
-    it('should return a valid BIP70 payment request', async () => {
+    it.skip('should return a valid BIP70 payment request', async () => {
 
-      let resp = await http
-        .get(`${base_url}/r/${uid}`) 
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+      let resp = await request
+        .get(`/r/${invoice.uid}`) 
         .set({
           'Accept': 'application/bitcoin-paymentrequest',
           'x-currency': 'BTC'
         })
+
+      expect(resp.statusCode).to.be.equal(200)
 
     })
   
@@ -44,12 +56,16 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let resp = await http
-        .get(`${base_url}/r/${uid}`) 
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+      let resp = await request
+        .get(`/r/${invoice.uid}`) 
         .set({
           'Accept': 'application/dash-paymentrequest',
           'x-currency': 'DASH'
         })
+
+      expect(resp.statusCode).to.be.equal(200)
 
     })
   
