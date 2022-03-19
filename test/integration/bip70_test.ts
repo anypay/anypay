@@ -20,8 +20,6 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
       let [account, invoice] = await utils.newAccountWithInvoice()
 
-      console.log('INVOICE', invoice.toJSON())
-
       let resp = await request
         .get(`/r/${invoice.uid}`) 
         .set({
@@ -47,8 +45,6 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
           'Accept': 'application/bitcoin-paymentrequest',
           'x-currency': 'BTC'
         })
-
-      console.log(resp)
 
       expect(resp.statusCode).to.be.equal(200)
 
