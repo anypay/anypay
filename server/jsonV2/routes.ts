@@ -45,4 +45,25 @@ export async function attachRoutes(server) {
     },
   });
 
+  server.route({
+    method: "POST",
+    path: "/r/{uid}",
+    handler: jsonV2.Protocol.handlePost,
+    options: {
+      validate: {
+        headers: Joi.object({
+          'x-paypro-version': Joi.number().integer().required(),
+          'x-content-type': Joi.alternatives([
+            Joi.string().pattern(/application\/payment-request/).required(),
+            Joi.string().pattern(/application\/payment-verification/).required(),
+            Joi.string().pattern(/application\/payment/).required(),
+          ]).required()
+        }),
+        params: Joi.object({
+          uid: Joi.string().required()
+        })
+      }
+    },
+  });
+
 }
