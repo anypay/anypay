@@ -229,7 +229,11 @@ describe("JSON Payment Protocol V2", async () => {
 
     let { paymentOptions } = await client.getPaymentOptions()
 
-    let paymentRequest = await client.selectPaymentOption(paymentOptions[0])
+    let paymentOption = paymentOptions.filter(option => {
+      return option.currency === 'BSV'
+    })[0]
+
+    let paymentRequest = await client.selectPaymentOption(paymentOption)
 
     let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 
