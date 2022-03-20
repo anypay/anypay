@@ -29,7 +29,7 @@ import * as Joi from 'joi';
  *       }]
  *     }
  */
-module.exports.list = async function(request, reply) {
+export async function list(request, h) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
@@ -56,6 +56,7 @@ const Coin = Joi.object({
   supported: Joi.boolean().required(),
 }).label('Coin')
 
-module.exports.CoinsIndexResponse = Joi.object({
+export const CoinsIndexResponse = Joi.object({
   coins: Joi.array().items(Coin).label('Coins')
 }).label('CoinsIndexResponse');
+

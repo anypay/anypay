@@ -404,7 +404,7 @@ async function Server() {
   server.route({
     method: "DELETE",
     path: "/addresses/{currency}",
-    handler: v0.Addresses.delete,
+    handler: v0.Addresses.destroy,
     options: {
       auth: "token",
       tags: ['api']

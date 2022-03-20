@@ -149,8 +149,6 @@ export async function create(req, h) {
 
       let transaction = tx.toString('hex') 
 
-      console.log('TRANSACTION', transaction)
-
       await pay.verifyPayment({
         payment_option,
         hex: transaction,

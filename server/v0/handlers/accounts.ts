@@ -149,128 +149,95 @@ export async function create (request, reply) {
 }
 
 export async function showPublic (req, h) {
-  try {
 
-    let account = await models.Account.findOne({
+  let account = await models.Account.findOne({
+    where: {
+      email: req.params.id
+    }
+  });
+
+  if (!account) {
+
+    account = await models.Account.findOne({
       where: {
-        email: req.params.id
+        id: req.params.id
       }
     });
+  }
 
-    if (!account) {
+  if (!account) {
 
-      account = await models.Account.findOne({
-        where: {
-          id: req.params.id
-        }
-      });
+    return Boom.notFound();
+  }
+
+  let addresses = await models.Address.findAll({
+
+    where: {
+      account_id: account.id
     }
 
-    if (!account) {
+  });
 
-      return Boom.notFound();
-    }
+  let payments = await models.Invoice.findAll({
 
-    let addresses = await models.Address.findAll({
-
-      where: {
-        account_id: account.id
+    where: {
+      account_id: account.id,
+      status: 'paid',
+      createdAt: {
+        [Op.gte]: moment().subtract(1, 'month')
       }
+    },
 
-    });
+    order: [["createdAt", "desc"]]
+  
+  })
 
-    let payments = await models.Invoice.findAll({
+  let latest = await models.Invoice.findOne({
 
-      where: {
-        account_id: account.id,
-        status: 'paid',
-        createdAt: {
-          [Op.gte]: moment().subtract(1, 'month')
-        }
-      },
+    where: {
+      account_id: account.id,
+      status: 'paid'
+    },
 
-      order: [["createdAt", "desc"]]
-    
-    })
+    order: [["createdAt", "desc"]]
+  
+  })
 
-    let latest = await models.Invoice.findOne({
-
-      where: {
-        account_id: account.id,
-        status: 'paid'
-      },
-
-      order: [["createdAt", "desc"]]
-    
-    })
-
-    if (latest) {
-      latest = {
-        time: latest.paidAt,
-        denomination_amount: latest.denomination_amount,
-        denomination_currency: latest.denomination_currency,
-        currency: latest.currency
-      }
+  if (latest) {
+    latest = {
+      time: latest.paidAt,
+      denomination_amount: latest.denomination_amount,
+      denomination_currency: latest.denomination_currency,
+      currency: latest.currency
     }
+  }
 
-    return {
-      id: account.id,
-      name: account.business_name,
-      physical_address: account.physical_address,
-      coordinates: {
-        latitude: account.latitude,
-        longitude: account.longitude
-      },
-      coins: addresses.filter(a => {
-        let coin = coins.getCoin(a.currency)
-        return !!coin && !coin.unavailable
-      }).map(a => a.currency),
-      payments: {
-        last_30_days: payments.length,
-        latest: latest
-      }
+  return {
+    id: account.id,
+    name: account.business_name,
+    physical_address: account.physical_address,
+    coordinates: {
+      latitude: account.latitude,
+      longitude: account.longitude
+    },
+    coins: addresses.filter(a => {
+      let coin = coins.getCoin(a.currency)
+      return !!coin && !coin.unavailable
+    }).map(a => a.currency),
+    payments: {
+      last_30_days: payments.length,
+      latest: latest
     }
-
-  } catch(error) {
-
-    console.log(error)
-
-    return Boom.badRequest(error)
 
   }
+
 }
 
 export async function show (request, reply) {
 
   var account = request.account,
-      ambassador,
       addresses,
       tipjars
-
-  if (account.ambassador_id) {
-    log.info(`find ambassador ${account.ambassador_id}`)
-    var record = await models.Ambassador.findOne({ where: { id: account.ambassador_id }})
-    log.info('ambassador', record.toJSON())
-
-    if (record) {
-      let ambassador_account = await models.Account.findOne({
-        where: {
-          id: record.account_id
-        },
-        attributes: ['id', 'email'] 
-      });
-      if (ambassador_account) {
-        log.info('ambassador.account', ambassador)
-
-        ambassador = Object.assign({
-          id: record.id,
-          account_id: ambassador_account.id,
-          email: ambassador_account.email
-        })
-      }
-    }
-
-  }
 
   addresses = await models.Address.findAll({ where: {
     account_id: account.id
@@ -282,54 +249,11 @@ export async function show (request, reply) {
 
   return  {
     account,
-    ambassador,
     addresses,
     tipjars
   }
 
 };
-
-export async function getRewards(request, reply) {
-
-  let accountId = request.auth.credentials.accessToken.account_id;
-
-  var account = await models.Account.findOne({
-   where: {
-     id: accountId 
-   },include:[{
-      model: models.Ambassador,
-      as: 'ambassador'
-    },{
-      model: models.AmbassadorReward,
-      as: 'ambassador_rewards'
-    }]
-  });
-
-  let ambassador = await models.Ambassador.findOne({ 
-    where: {
-      account_id: account.id 
-    },
-    include:[
-      {
-        model: models.Account,
-        as: 'merchants'
-      },{
-        model: models.AmbassadorReward,
-        as: 'rewards'
-      }
-    ]
-  })
-
-  if( ambassador){
-
-    account = Object.assign(ambassador.toJSON(), account.toJSON())
-
-  }
-
-  return {account};
-
-};
-
 
 export async function sudoShow (request, reply) {
 

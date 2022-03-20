@@ -114,8 +114,6 @@ describe("Payment Requests", async () => {
         }
       })
 
-      console.log(response)
-
       assert.strictEqual(response.headers['content-type'], 'application/payment-request')
 
     })

@@ -6,7 +6,7 @@ import { log } from '../../../lib';
 
 import { models } from '../../../lib';
 
-module.exports.delete = async function(req, h) {
+export async function destroy(req, h) {
 
   let address = await models.Address.findOne({ where: {
     account_id: req.account.id,

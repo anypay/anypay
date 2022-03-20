@@ -24,15 +24,21 @@ const WebSocket = require('ws');
   });
 
   ws.on('open', function() {
-    console.log('connected');
+
+    log.info('websocket.test.client.connected');
+
   });
 
   ws.on('message', function incoming(data) {
-    console.log('message', data);
+
+    log.info('websocket.test.client.message', data);
   });
 
   ws.on('error', function incoming(data) {
-    console.log('error', data);
+
+    log.info('websocket.test.client.error', data);
+
   });
 
 })();
+

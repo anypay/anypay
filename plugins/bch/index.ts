@@ -34,7 +34,7 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-function validateAddress(address: string){
+function validateAddress(address: string) {
 
   try {
 
@@ -44,11 +44,11 @@ function validateAddress(address: string){
 
   } catch(error) {
 
-    console.log(error.message);
+    log.info('plugins.bch.address.invalid', error)
 
   }
 
-  try{
+  try {
 
     var isCashAddress = bchaddr.isCashAddress
 
@@ -56,7 +56,7 @@ function validateAddress(address: string){
 
     return valid;
 
-  }catch(error){
+  } catch(error) {
 
     return false;
 
