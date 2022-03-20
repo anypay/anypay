@@ -121,48 +121,6 @@ export async function updateAccount(account, payload) {
 
   }
 
-  if (updateAttrs.ambassador_email) {
-    let ambassadorAccount = await models.Account.findOne({
-      where: {
-        email: updateAttrs.ambassador_email
-      }
-    });
-
-    if (!ambassadorAccount) {
-      throw new Error('ambassador email does not exist');
-    }
-
-    let [ambassador] = await models.Ambassador.findOrCreate({
-      where: { account_id: ambassadorAccount.id },
-      defaults: {
-        account_id: ambassadorAccount.id 
-      }
-    })
-
-    if (ambassador) {
-      log.info('ambassador.found', { ambassador })
-
-      updateAttrs['ambassador_id'] = ambassador.id;
-
-      let channel = await awaitChannel();
-
-      await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
-        account_id: account.id,
-        ambassador_id: ambassador.id,
-        ambassador_email: updateAttrs.ambassador_email
-      })));
-
-    }
-
-  }
-
-  delete updateAttrs['ambassador_email'];
-
-  if (updateAttrs.remove_ambassador) {
-    updateAttrs['ambassador_id'] = null
-    delete updateAttrs['remove_ambassador']
-  }
-
   await account.update(updateAttrs)
 
   return account

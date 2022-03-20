@@ -49,34 +49,6 @@ models.TrueReviewsToken.belongsTo(models.Invoice, {
   as: 'invoice'
 });
 
-models.Ambassador.hasOne(models.Account, {
-  foreignKey: 'id',
-  sourceKey: 'account_id',
-  as: 'account'
-});
-
-models.Ambassador.hasMany(models.Account, {
-  foreignKey: 'ambassador_id',
-  sourceKey: 'id',
-  as: 'merchants'
-});
-
-models.Ambassador.hasMany(models.AmbassadorReward, {
-  foreignKey: 'ambassador_id',
-  as: 'rewards'
-});
-
-models.AmbassadorReward.belongsTo(models.Ambassador, {
-  foreignKey: 'ambassador_id',
-  as: 'ambassador'
-});
-
-models.Account.hasOne(models.Ambassador, {
-  foreignKey: 'id',
-  sourceKey: 'ambassador_id',
-  as: 'ambassador'
-});
-
 models.Account.hasMany(models.Address, {
   foreignKey: 'account_id',
   sourceKey: 'id',
@@ -98,12 +70,6 @@ models.Invoice.belongsTo(models.Account, {
   as: 'account',
   foreignKey: 'account_id'
 })
-
-models.Account.hasMany(models.AmbassadorReward, {
-  foreignKey: 'ambassador_account_id',
-  sourceKey: 'id',
-  as: 'ambassador_rewards'
-});
 
 models.Account.hasMany(models.AccountTag, {
   as: 'tags',

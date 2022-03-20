@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import * as program from 'commander';
-import { sendInvoiceToEmail, ambassadorRewardEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
+import { sendInvoiceToEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
 import { models } from '../lib/models';
 import { email as rabbiEmail } from 'rabbi';
 
@@ -27,28 +27,6 @@ program
     process.exit(0)
   
   })
-
-
-
-program
-  .command('ambassador_reward <invoice_uid>')
-  .action(async (invoice_uid) => {
-
-    try {
-
-      let resp = await ambassadorRewardEmail(invoice_uid)
-
-      console.log(resp);
-
-    } catch(error) {
-
-      console.log(error);
-
-    }
-
-    process.exit(0);
-
-  });
 
 program
   .command('accountcreated <email_address>')
