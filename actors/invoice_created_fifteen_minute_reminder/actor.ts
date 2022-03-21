@@ -69,7 +69,7 @@ export async function start() {
 
     if (invoices.length === 0) {
 
-      await email.sendEmail('reminder_unpaid_invoice', account.email, 'Anypay<support@anypayinc.com>', invoice)
+      await email.sendEmail('reminder_unpaid_invoice', account.email, 'Anypay<support@anypayx.com>', invoice)
 
     }
 
