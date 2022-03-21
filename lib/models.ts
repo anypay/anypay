@@ -37,18 +37,6 @@ models.Invoice.hasMany(models.PaymentOption, {
   as: 'payment_options'
 });
 
-models.Invoice.hasOne(models.TrueReviewsToken, {
-  foreignKey: 'invoice_uid',
-  sourceKey: 'uid',
-  as: 'true_reviews_token'
-});
-
-models.TrueReviewsToken.belongsTo(models.Invoice, {
-  foreignKey: 'invoice_uid',
-  sourceKey: 'uid',
-  as: 'invoice'
-});
-
 models.Account.hasMany(models.Address, {
   foreignKey: 'account_id',
   sourceKey: 'id',
@@ -82,17 +70,6 @@ models.AccountTag.belongsTo(models.Account, {
   foreignKey: 'account_id'
 });
 
-models.Account.hasMany(models.Tipjar, {
-  as: 'tipjars',
-  foreignKey: 'account_id',
-  sourceKey: 'id'
-});
-
-models.Tipjar.belongsTo(models.Account, {
-  as: 'account',
-  foreignKey: 'account_id'
-});
-
 models.Invoice.hasMany(models.InvoiceNote, {
   as: 'notes',
   foreignKey: 'invoice_uid',
@@ -116,10 +93,6 @@ models.Payment.hasOne(models.Invoice, {
   sourceKey: 'invoice_uid',
   as: 'invoice'
 });
-
-
-
-
 
 export { models };
 

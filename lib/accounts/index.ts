@@ -24,7 +24,6 @@ interface AccountAddress {
   account_id: number;
   currency: string;
   address: string;
-  xpubkey: boolean;
   nonce: number;
   enabled: boolean;
   name?: string;
