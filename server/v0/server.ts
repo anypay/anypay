@@ -1,4 +1,4 @@
-"use strict";
+
 require('dotenv').config();
 
 import * as Hapi from "@hapi/hapi";
@@ -450,24 +450,6 @@ async function Server() {
         payload: Joi.object({
           address: Joi.string().required()
         })
-      }
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/discounts/{currency}",
-    handler: v0.Discounts.update,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        params: Joi.object({
-          currency: Joi.string().required(),
-        }),
-        payload: Joi.object({
-          percent: Joi.number().required()
-        }),
       }
     }
   });

@@ -12,8 +12,6 @@ import {getAddress, getSupportedCoins} from './supported_coins';
 
 import {events} from '../events'
 
-import * as geocoder from '../googlemaps';
-
 interface Map<T> {
     [key: string]: T;
 }
@@ -92,33 +90,6 @@ export async function updateAccount(account, payload) {
   let updateAttrs: any = Object.assign(payload, {});
 
   log.info('account.update', updateAttrs)
-
-  if (updateAttrs.physical_address) {
-
-    try {
-
-      let geocodeResult = await geocoder.geocodeFull(updateAttrs.physical_address, account.id);
-
-      let city = geocoder.parseCity(geocodeResult);
-      let state = geocoder.parseState(geocodeResult);
-      let country = geocoder.parseCountry(geocodeResult);
-
-      let geolocation = geocodeResult.geometry.location
-
-      updateAttrs.latitude = geolocation.lat;
-      updateAttrs.longitude = geolocation.lng;
-      updateAttrs.position = pointFromLatLng(geolocation.lat, geolocation.lng)
-      updateAttrs.city = city.long_name;
-      updateAttrs.state = state.short_name;
-      updateAttrs.country = country.short_name;
-
-    } catch (error) {
-
-      log.error('error geocoding address', error.message);
-
-    }
-
-  }
 
   await account.update(updateAttrs)
 
