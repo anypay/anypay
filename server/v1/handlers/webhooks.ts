@@ -11,53 +11,36 @@ import { badRequest } from 'boom'
 
 export async function index(req, h) {
 
-  try {
+  let account: Account = await findAccount(req.account.id)
 
-    let account: Account = await findAccount(req.account.id)
+  let webhooks = await listForAccount(account, {
 
-    let webhooks = await listForAccount(account, {
+    limit: req.query.limit,
 
-      limit: req.query.limit,
+    offset: req.query.offset
 
-      offset: req.query.offset
+  })
 
-    })
+  return { webhooks }
 
-    return { webhooks }
-
-  } catch(error) {
-
-    return badRequest({ error })
-
-  }
 }
 
 export async function attempt(request, h) {
 
-  try {
+  let invoice = await ensureInvoice(request.params.invoice_uid);
 
-    let invoice = await ensureInvoice(request.params.invoice_uid);
+  if (invoice.account_id !== request.account.id) {
 
-    if (invoice.account_id !== request.account.id) {
+    return h.response({ error: 'invoice not authorized' }).code(401)
 
-      return h.response({ error: 'invoice not authorized' }).code(401)
-
-    }
-
-    let webhook = await webhookForInvoice(invoice)
-
-    let attempt = await attemptWebhook(webhook)
-
-    webhook = await webhookForInvoice(invoice)
-    
-    return h.response({ attempt: attempt.toJSON(), webhook: webhook.toJSON() }).code(201)
-
-  } catch(error) {
-
-    log.error('request.webhook.attempt', error)
-
-    return h.response({ error: error.message }).code(500)
-  
   }
+
+  let webhook = await webhookForInvoice(invoice)
+
+  let attempt = await attemptWebhook(webhook)
+
+  webhook = await webhookForInvoice(invoice)
+  
+  return h.response({ attempt: attempt.toJSON(), webhook: webhook.toJSON() }).code(201)
 
 }

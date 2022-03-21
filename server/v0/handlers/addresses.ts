@@ -1,5 +1,4 @@
 
-const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
 import { log } from '../../../lib';
@@ -73,25 +72,15 @@ export async function update(request, h) {
 
   log.info('address.update', changeset);
 
-  try {
+  await setAddress(changeset);
 
-    await setAddress(changeset);
+  return {
 
-    return {
+    currency: changeset.currency,
 
-      currency: changeset.currency,
+    value: changeset.address
 
-      value: changeset.address
-
-    }
-
-  } catch(error) {
-
-    log.error(error)
-
-    return Boom.badRequest(error);
-
-  };
+  }
 
 }
 

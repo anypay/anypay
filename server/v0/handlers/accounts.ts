@@ -28,50 +28,33 @@ export async function nearby(req, h) {
 
 export async function update(req, h) {
 
-  try {
+  let account = await accounts.updateAccount(req.account, req.payload);
 
-    let account = await accounts.updateAccount(req.account, req.payload);
+  slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
 
-    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
+  return {
 
-    return {
+    success: true,
 
-      success: true,
-
-      account
-
-    }
-
-  } catch(error) {
-
-    return Boom.badRequest(error.message);
+    account
 
   }
 
 }
 
-export async function createAnonymous(request, reply) {
+export async function createAnonymous(request, h) {
 
-  try {
+  let account = await models.Account.create();
 
-    let account = await models.Account.create();
+  log.info(`anonymous account ${account.uid} created`);
 
-    log.info(`anonymous account ${account.uid} created`);
+  let access_token = await models.AccessToken.create({ account_id: account.id });
 
-    let access_token = await models.AccessToken.create({ account_id: account.id });
-
-    return { account, access_token }
-
-  } catch(error) {
-
-    log.error(`error creating anonymous account ${error.message}`);
-
-    return Boom.badRequest(error);
-  }
+  return { account, access_token }
 
 }
 
-export async function registerAnonymous(request, reply) {
+export async function registerAnonymous(request, h) {
   let email = request.payload.email;
 
   log.info('create.account', email);
@@ -81,71 +64,52 @@ export async function registerAnonymous(request, reply) {
   request.account.email = request.payload.email;
   request.account.password_hash = passwordHash;
 
-  try {
+  request.account.save();
 
-    request.account.save();
+  slack.notify(`account:registered | ${request.account.email}`);
+  
+  emitter.emit('account.created', request.account)
 
-    slack.notify(`account:registered | ${request.account.email}`);
-    
-    emitter.emit('account.created', request.account)
+  return request.account;
 
-    return request.account;
-
-  } catch(error) {
-
-    log.error(`account ${email} already registered`);
-
-    return Boom.badRequest(
-      new Error(`account ${email} already registered`)
-    );
-  }
 }
 
-export async function create (request, reply) {
+export async function create (request, h) {
   let email = request.payload.email;
 
   log.info('create.account', email);
 
   let passwordHash = await utils.hash(request.payload.password);
 
-  try {
-    let account = await models.Account.create({
-      email: request.payload.email,
-      password_hash: passwordHash
-    });
+  let account = await models.Account.create({
+    email: request.payload.email,
+    password_hash: passwordHash
+  });
 
-    let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+  let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
 
-    if (geoLocation) {
+  if (geoLocation) {
 
-      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+    let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
-      slack.notify(`${account.email} registerd from ${userLocation}`);
+    slack.notify(`${account.email} registerd from ${userLocation}`);
 
-      account.registration_geolocation = geoLocation
+    account.registration_geolocation = geoLocation
 
-    } else {
+  } else {
 
-      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+    slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
 
-    }
-
-    account.registration_ip_address = request.info.remoteAddress
-
-    account.save()
-    
-    emitter.emit('account.created', account)
-
-    return account;
-
-  } catch(error) {
-
-    log.error(`account ${email} already registered`);
-
-    return Boom.badRequest(
-      new Error(`account ${email} already registered`)
-    );
   }
+
+  account.registration_ip_address = request.info.remoteAddress
+
+  account.save()
+  
+  emitter.emit('account.created', account)
+
+  return account;
+
 }
 
 export async function showPublic (req, h) {
@@ -233,7 +197,7 @@ export async function showPublic (req, h) {
 
 }
 
-export async function show (request, reply) {
+export async function show (request, h) {
 
   var account = request.account,
       addresses,
@@ -255,29 +219,7 @@ export async function show (request, reply) {
 
 };
 
-export async function sudoShow (request, reply) {
-
-  var account = await models.Account.findOne({
-    where: {
-      id: request.params.account_id
-    }
-  });
-
-  return account;
-};
-
-export async function sudoAccountWithEmail (request, reply) {
-
-  var account = await models.Account.findOne({
-    where: {
-      email: request.params.email
-    }
-  });
-
-  return account;
-}
-
-export async function index(request, reply) {
+export async function index(request, h) {
 
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
@@ -285,43 +227,5 @@ export async function index(request, reply) {
   var accounts = await models.Account.findAll({ offset, limit });
 
   return accounts;
-};
-
-export async function destroy(request, reply) {
-
-  let account = await models.Account.findOne({
-    where: { id: request.params.account_id }
-  });
-
-  if (!account) {
-    log.error(`account ${request.params.account_id} not found`);
-    return { error: 'account not found' };
-  }
-
-  await models.AccessToken.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Address.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Invoice.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Account.destroy({
-    where: {
-      id: account.id
-    }
-  });
-
-  return { success: true };
 };
 

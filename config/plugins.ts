@@ -16,17 +16,9 @@ export default function() {
 
     let currency = parts[parts.length - 1];
 
-    try {
+    let plugin = require(`../plugins/${currency}`);
 
-      let plugin = require(`../plugins/${currency}`);
-
-      map[currency.toUpperCase()] = plugin;
-
-    } catch(error) {
-
-      console.error('failed to load plugin', error.message);
-
-    }
+    map[currency.toUpperCase()] = plugin;
 
     return map;
 

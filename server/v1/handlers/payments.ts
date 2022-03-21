@@ -9,56 +9,46 @@ import { listPayments } from '../../../lib/payments'
 
 export async function index(req, h) {
 
-  try {
+  let payments: any = await listPayments(req.account, {
 
-    let payments: any = await listPayments(req.account, {
+    limit: req.query.limit || 1000,
 
-      limit: req.query.limit || 1000,
+    offset: req.query.offset || 0
 
-      offset: req.query.offset || 0
+  })
 
-    })
+  payments = payments.map(payment => {
 
-    payments = payments.map(payment => {
+    return {
 
-      return {
+      currency: payment.currency,
 
-        currency: payment.currency,
+      txid: payment.txid,
 
-        txid: payment.txid,
+      createdAt: payment.createdAt,
 
-        createdAt: payment.createdAt,
+      outputs: payment.option.outputs,
 
-        outputs: payment.option.outputs,
+      invoice: {
 
-        invoice: {
+        uid: payment.invoice.uid,
 
-          uid: payment.invoice.uid,
+        amount: payment.invoice.denomination_amount,
 
-          amount: payment.invoice.denomination_amount,
-
-          currency: payment.invoice.denomination_currency
-
-        }
+        currency: payment.invoice.denomination_currency
 
       }
 
-    })
+    }
 
-    return h.response({
+  })
 
-      payments
+  return h.response({
 
-    })
+    payments
 
+  })
 
-  } catch(error) {
-
-    log.error('request.listpayments.error', error)
-
-    return badRequest(error)
-
-  }
 
 }
 

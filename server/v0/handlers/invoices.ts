@@ -13,51 +13,43 @@ import * as moment from 'moment';
 
 export async function cancel(req, h) {
 
-  try {
+  let where = {
+    uid: req.params.uid,
+    account_id: req.account.id
+  }
 
-    let where = {
-      uid: req.params.uid,
-      account_id: req.account.id
-    }
+  let invoice = await models.Invoice.findOne({
+    where
+  })
 
-    let invoice = await models.Invoice.findOne({
-      where
-    })
+  if (!invoice) {
 
-    if (!invoice) {
+    log.error('invoice.notfound', where)
 
-      log.error('invoice.notfound', where)
-
-      return Boom.notFound()
-
-    }
-
-    if (invoice && !invoice.cancelled) {
-
-      invoice.cancelled = true;
-      invoice.status = 'cancelled';
-
-      await invoice.save()
-
-      log.info('invoice.cancelled', where)
-
-      where['status'] = 'cancelled'
-
-      return where
-
-    } else {
-
-      log.error('invoice.cancel.error.alreadycancelled', where)
-
-      throw new Error('invoice already cancelled')
-
-    } 
-
-  } catch(error) {
-
-    return Boom.badRequest(error.message)
+    return Boom.notFound()
 
   }
+
+  if (invoice && !invoice.cancelled) {
+
+    invoice.cancelled = true;
+    invoice.status = 'cancelled';
+
+    await invoice.save()
+
+    log.info('invoice.cancelled', where)
+
+    where['status'] = 'cancelled'
+
+    return where
+
+  } else {
+
+    log.error('invoice.cancel.error.alreadycancelled', where)
+
+    throw new Error('invoice already cancelled')
+
+  } 
 
 }
 
@@ -150,20 +142,10 @@ export async function index (request, reply) {
 
   }
 
-  try {
+  var invoices = await models.Invoice.findAll(query);
 
-    var invoices = await models.Invoice.findAll(query);
+  return { invoices };
 
-    return { invoices };
-
-  } catch(error) {
-
-    log.error(error);
-    log.error(error.message);
-
-    return { error: error.message };
-
-  }
 };
 
 function selectCurrency(addresses) {
