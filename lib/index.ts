@@ -22,7 +22,6 @@ import * as blockcypher from './blockcypher';
 import * as email from './email';
 import * as password from './password';
 import * as auth from './auth';
-import * as receipts from './receipts';
 import * as slack from './slack/notifier';
 import * as events from './events';
 import * as utils from './utils';
@@ -59,7 +58,6 @@ export {
   pay,
   plugins,
   prices,
-  receipts,
   settings,
   slack,
   utils,

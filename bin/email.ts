@@ -22,7 +22,7 @@ program
 
     let account = await models.Account.findOne({ where: { email }})
 
-    await rabbiEmail.sendEmail('one_day_after_signup', email, 'Anypay<support@anypayinc.com>', account)
+    await rabbiEmail.sendEmail('one_day_after_signup', email, 'Anypay<support@anypayx.com>', account)
 
     process.exit(0)
   
@@ -34,7 +34,7 @@ program
 
     try {
 
-      let resp = await rabbiEmail.sendEmail('welcome', email, 'support@anypayinc.com', {
+      let resp = await rabbiEmail.sendEmail('welcome', email, 'support@anypayx.com', {
         email 
       })
 
@@ -99,7 +99,7 @@ program
 
     try {
 
-      let resp = await rabbiEmail.sendEmail('invoice_paid_receipt', account.email, 'support@anypayinc.com', {
+      let resp = await rabbiEmail.sendEmail('invoice_paid_receipt', account.email, 'support@anypayx.com', {
         invoice,
         account,
         email: account.email
