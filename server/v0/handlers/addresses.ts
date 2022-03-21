@@ -53,9 +53,7 @@ export async function index(req, h) {
 
 };
 
-module.exports.update = async function(request, reply) {
-
-  console.log('update address');
+export async function update(request, h) {
 
   let currency = request.params.currency;
 
@@ -73,7 +71,7 @@ module.exports.update = async function(request, reply) {
 
   };
 
-  log.info('setaddress', changeset);
+  log.info('address.update', changeset);
 
   try {
 
@@ -97,12 +95,13 @@ module.exports.update = async function(request, reply) {
 
 }
 
-module.exports.PayoutAddresses = Joi.object({
-  BTC: Joi.string(),
+export const PayoutAddresses = Joi.object({
+  BTC: Joi.string().optional(),
   DASH: Joi.string(),
   BCH: Joi.string(),
-}).label('PayoutAddresses');
+}).label('Addresses');
 
-module.exports.PayoutAddressUpdate = Joi.object({
+export const PayoutAddressUpdate = Joi.object({
   address: Joi.string().required(),
 }).label('PayoutAddressUpdate');
+

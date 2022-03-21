@@ -1,7 +1,7 @@
 
 import { Request } from 'hapi'
 
-import { logError } from '../../lib/logger'
+import { log } from '../../lib/log'
 
 import { authorizeAccount } from '../../lib/auth'
 
@@ -53,7 +53,7 @@ export function useJWT() {
 
       } catch(error) {
 
-        logError('jwt.auth.error', { error })
+        log.error('jwt.auth.error', { error })
 
         return h.unauthenticated(error)
 

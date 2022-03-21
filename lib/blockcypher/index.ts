@@ -2,8 +2,7 @@ const http = require("superagent");
 
 let token = process.env.BLOCKCYPHER_TOKEN;
 
-import { log, logError } from '../logger';
-
+import { log } from '../log';
 
 import { models } from '../models';
 
@@ -21,7 +20,7 @@ export async function publishDASH(hex) {
 
   } catch(error) {
 
-    logError('blockcypher.error', error);
+    log.error('blockcypher.error', error);
 
     throw error;
 
@@ -41,7 +40,7 @@ export async function publishBTC(hex) {
 
   } catch(error) {
 
-    logError('blockcypher.error', error);
+    log.error('blockcypher.error', error);
 
     throw error;
 

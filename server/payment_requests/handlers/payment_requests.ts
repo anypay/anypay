@@ -1,6 +1,5 @@
 
 import { log, models, invoices } from '../../../lib';
-import { logInfo } from '../../../lib/logger' 
 
 import * as Boom from 'boom';
 
@@ -11,6 +10,8 @@ import { show as handleBIP270 } from './bip270_payment_requests'
 import { detectWallet, Wallets } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
+
+import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 
 import { schema } from 'anypay'
 
@@ -73,7 +74,7 @@ export async function create(req, h) {
 
   try {
 
-    logInfo('pay.request.create', { template: req.payload.template, options: req.payload.options })
+    log.info('pay.request.create', { template: req.payload.template, options: req.payload.options })
 
     let { error, template } = schema.PaymentRequestTemplate.validate(req.payload.template)
 
@@ -85,7 +86,7 @@ export async function create(req, h) {
 
     } else {
 
-      logInfo('pay.request.create.template.valid', template)
+      log.info('pay.request.create.template.valid', template)
 
       let record = await models.PaymentRequest.create({
 
@@ -121,7 +122,7 @@ export async function create(req, h) {
 
       await paymentRequestToPaymentOptions(record)
 
-      logInfo('pay.request.created', record.toJSON())
+      log.info('pay.request.created', record.toJSON())
 
       return {
 
@@ -149,7 +150,7 @@ export async function create(req, h) {
 
 export async function show(req, h) {
 
-  logInfo('pay.request.show', { uid: req.params.uid, headers: req.headers })
+  log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
   let wallet = detectWallet(req.headers, req.params.uid)
 
@@ -184,11 +185,15 @@ export async function show(req, h) {
 
     let accept = req.headers['accept']
 
-    if (accept && accept.match(isBIP270)) {
+    if (accept && accept.match(/payment-options/)) {
+
+      return listPaymentOptions(req, h)
+
+    } else if (accept && accept.match(isBIP270)) {
 
       return handleBIP270(req, h)
 
-    } if (accept && accept.match(isBIP70)) {
+    } else if (accept && accept.match(isBIP70)) {
 
       return handleBIP70(req, h)
 

@@ -1,5 +1,5 @@
 
-import { log } from '../logger';
+import { log } from '../log';
 
 import { models } from '../models';
 

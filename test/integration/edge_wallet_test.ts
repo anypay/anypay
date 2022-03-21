@@ -72,7 +72,7 @@ describe('Payment Requests With Edge Wallet', () => {
 
     expect(events[0].get('wallet')).to.be.equal(Wallets.Edge) 
 
-    events = await Events.listInvoiceEvents(invoice)
+    events = await Events.listInvoiceEvents(invoice, 'invoice.requested')
 
     expect(events.length).to.be.equal(1)
 

@@ -1,5 +1,5 @@
 const parentModule  = require('parent-module');
-import { log } from '../logger';
+import { log } from '../log';
 
 export const system = function(f) {
 

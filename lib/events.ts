@@ -1,7 +1,9 @@
 require('dotenv').config();
 
 import {connect} from 'amqplib';
-import {log, logInfo} from './logger';
+
+import {log} from './log';
+
 import {models} from './models';
 
 import { Orm } from './orm'
@@ -9,8 +11,6 @@ import { Orm } from './orm'
 import { Invoice } from './invoices'
 
 import { events } from 'rabbi'
-
-import { logError } from './logger'
 
 import {publishEventToSlack} from './slack/events';
 
@@ -22,7 +22,7 @@ const exchange = 'anypay.events';
 
   let channel = await amqp.createChannel();
 
-  log.debug('amqp channel created');
+  log.debug('amqp.channel.created');
 
   await channel.assertExchange(exchange, 'direct');
 
@@ -36,7 +36,7 @@ const exchange = 'anypay.events';
 
     await channel.publish(exchange, this.event, Buffer.from(message));
 
-    logInfo(`amqp.published`, { exchange, event: this.event, message })
+    log.info(`amqp.published`, { exchange, event: this.event, message })
 
   });
 
@@ -50,7 +50,7 @@ const exchange = 'anypay.events';
 
     } catch (error) {
 
-      logError('slack.publish.error', error);
+      log.error('slack.publish.error', error);
     }
 
   });
@@ -111,13 +111,15 @@ export async function listEvents(event: string, payload: any): Promise<Event[]> 
 
 }
 
-export async function listInvoiceEvents(invoice: Invoice): Promise<Event[]> {
+export async function listInvoiceEvents(invoice: Invoice, type?: string): Promise<Event[]> {
 
   let records = await models.Event.findAll({
 
     where: {
 
-      payload: { invoice_uid: invoice.uid }
+      payload: { invoice_uid: invoice.uid },
+
+      event: type
 
     }
 

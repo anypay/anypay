@@ -1,5 +1,19 @@
 const bcrypt = require('bcryptjs');
 
+import { models } from '../models';
+
+import { awaitChannel } from '../amqp';
+
+import { log } from '../log';
+
+import * as database from '../database';
+
+import {getAddress, getSupportedCoins} from './supported_coins';
+
+import {events} from '../events'
+
+import * as geocoder from '../googlemaps';
+
 interface Map<T> {
     [key: string]: T;
 }
@@ -17,16 +31,7 @@ interface AccountAddress {
   code?: string;
 }
 
-import { models } from '../models';
-import { awaitChannel } from '../amqp';
-import { log } from '../logger';
-import * as database from '../database';
 
-import {getAddress, getSupportedCoins} from './supported_coins';
-
-import {events} from '../events'
-
-import * as geocoder from '../googlemaps';
 
 export async function near(latitude, longitude, limit=100) {
 let query = `SELECT *,

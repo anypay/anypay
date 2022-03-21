@@ -3,7 +3,6 @@ import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 
 import { log, models, plugins } from '../../../lib'
-import { logError } from '../../../lib/logger'
 
 import * as pay from '../../../lib/pay'
 
@@ -46,10 +45,7 @@ export async function show(req, h) {
     .then(([record, isNew]) => {
 
       if (isNew) {
-        log.info({
-          event: 'paymentrequest.recorded',
-          payload: record.toJSON()
-        })
+        log.info('bip70.paymentrequest.recorded', record)
       }
     })
     .catch(error => {
@@ -57,16 +53,23 @@ export async function show(req, h) {
     })
 
     let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(paymentRequest.content))).toString('hex');
-    var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
-    var signature = Message(digest).sign(privateKey);
+
     let response = h.response(paymentRequest.content.serialize());
+
+    if (process.env.JSON_PROTOCOL_IDENTITY_WIF) {
+
+      var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
+      var signature = Message(digest).sign(privateKey);
+      response.header('x-signature-type', 'ecc');
+      response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
+      response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
+      response.header('digest', `SHA-256=${digest}`);
+
+    }
+
 
     response.type(`application/${currency.name}-paymentrequest`);
 
-    response.header('x-signature-type', 'ecc');
-    response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
-    response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
-    response.header('digest', `SHA-256=${digest}`);
     response.header('Content-Type', `application/${currency.name}-paymentrequest`);
     response.header('Accept', `application/${currency.name}-payment`);
 
@@ -120,7 +123,7 @@ export async function create(req, h) {
     })
 
     if (invoice.cancelled) {
-      logError('payment.error.invoicecancelled', { uid: req.params.uid, payment })
+      log.error('payment.error.invoicecancelled', { uid: req.params.uid, payment })
       return Boom.badRequest('invoice cancelled')
     }
 

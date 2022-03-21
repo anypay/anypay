@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import * as Hapi from 'hapi'
 
-import { logInfo } from '../../lib/logger'
+import { log } from '../../lib/log'
 
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
@@ -10,13 +10,15 @@ import { join } from 'path'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
+import * as jsonV2 from '../jsonV2/handlers/protocol'
+
 
 export function attach(server: Hapi.Server) {
 
   /* Set Alternate Headers To Avoid BIP70 Binary vs JSON Data Type Conflict */
   server.ext('onRequest', function(request, h) {
 
-    logInfo('server.request', { id: request.info.id, headers: request.headers })
+    log.debug('server.request', { id: request.info.id, headers: request.headers })
 
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
@@ -148,7 +150,7 @@ async function start(): Promise<Hapi.Server> {
 
   await server.start()
 
-  logInfo(`hapi.server.started`, server.info)
+  log.info(`hapi.server.started`, server.info)
 
   return server
 

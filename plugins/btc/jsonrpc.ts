@@ -1,6 +1,6 @@
 const http = require("superagent");
 
-import { log } from '../../lib/logger';
+import { log } from '../../lib/log';
 
 // make requests to bitcoin cash RPC interface
 

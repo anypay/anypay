@@ -1,17 +1,18 @@
 import * as fs from 'fs'
 
 import * as PaymentProtocol from '../../vendor/bitcore-payment-protocol'
+
 import { getBitcore } from '../bitcore'
-import { log, logInfo } from '../logger'
+
+import { log } from '../log'
 
 import { getBaseURL } from './environment';
 
 import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
+
 import { codeFromName } from './currencies'
+
 import { getFee, Fee } from './fees'
-
-import { logError } from '../logger'
-
 
 /*
 
@@ -87,7 +88,7 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
       } catch(error) {
 
-        logError('bitcore.error', error)
+        log.error('bitcore.error', error)
       }
 
     } else {
@@ -112,7 +113,7 @@ export async function buildPaymentRequest(paymentOption) {
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
-  logInfo(`bip70.${paymentOption.currency}.outputs`, {outputs});
+  log.info(`bip70.${paymentOption.currency}.outputs`, {outputs});
 
   var pd = new PaymentProtocol.PaymentDetails();
 

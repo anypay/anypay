@@ -48,6 +48,13 @@ jobs:
           name: Deploy to Web Servers
           command: echo "no deploy"
 
+  deploy_beta:
+    machine:
+      image: ubuntu-1604:202007-01
+    steps:
+      - run:
+          name: Deploy Develop Branch To Beta Web Server
+          command: ssh beta.anypayx.com "sudo chef-client -o recipe[anypay_api::beta]"
 
 workflows:
   version: 2
@@ -61,6 +68,7 @@ workflows:
             branches:
               only:
                 - master
+                - develop
       - deploy:
           requires:
             - build_docker
@@ -68,4 +76,11 @@ workflows:
             branches:
               only:
                 - master
+      - deploy_beta:
+          requires:
+            - build_docker
+          filters:
+            branches:
+              only:
+                - develop
 

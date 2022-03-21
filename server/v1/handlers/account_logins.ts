@@ -5,7 +5,7 @@ import { loginAccount, geolocateAccountFromRequest } from '../../../lib/accounts
 
 import { ensureAccessToken } from '../../../lib/access_tokens'
 
-import { logError } from '../../../lib/logger'
+import { log } from '../../../lib/log'
 
 export async function create(request, h) {
 
@@ -29,9 +29,7 @@ export async function create(request, h) {
 
   } catch(error) {
 
-    console.log(error)
-
-    logError('account.registration.error', { error });
+    log.error('account.registration.error', { error });
 
     return badRequest(error);
 

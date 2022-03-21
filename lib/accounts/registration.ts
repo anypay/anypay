@@ -11,7 +11,7 @@ import * as utils from '../utils'
 
 import { models } from '../models'
 
-import { logInfo } from '../logger'
+import { log } from '../log'
 
 interface NewAccount {
   email: string;
@@ -22,11 +22,11 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   let { email, password } = params;
 
-  logInfo('account.register', {email});
+  log.info('account.register', {email});
 
   let passwordHash = await utils.hash(password);
 
-  logInfo('account.register.password.hash', { passwordHash })
+  log.info('account.register.password.hash', { passwordHash })
 
   let [account, isNew] = await models.Account.findOrCreate({
 
@@ -47,7 +47,7 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   }
 
-  logInfo('account.created', {account})
+  log.info('account.created', {account})
 
   return new Account(account);
 
@@ -102,7 +102,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   if (!account) {
 
-    logInfo(`account.login.notfound`, { email: params.email });
+    log.info(`account.login.notfound`, { email: params.email });
 
     throw new Error('invalid login')
   }
@@ -113,7 +113,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   } catch(error) {
 
-    logInfo(`account.login.error.password`, { email: params.email });
+    log.info(`account.login.error.password`, { email: params.email });
 
     throw new Error('invalid login')
 

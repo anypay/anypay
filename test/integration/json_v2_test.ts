@@ -44,6 +44,27 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
+  it("GET /r/:uid returns payment options for invoice", async () => {
+
+    let [account, invoice] = await utils.newAccountWithInvoice()
+
+    let response = await server.inject({
+      method: 'GET',
+      url: `/r/${invoice.uid}`,
+      headers: {
+        'Accept': 'application/payment-options',
+        'x-paypro-version': 2
+      }
+    })
+
+    expect(response.statusCode).to.be.equal(200)
+
+    let valid = schema.Protocol.PaymentOptions.response.validate(response.result)
+
+    expect(valid.error).to.be.equal(undefined)
+
+  })
+
   it("POST /i/:uid requires Content-Type and x-paypro-version", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
@@ -119,6 +140,37 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
+  it("POST /r/:uid returns a payment request for chosen option", async () => {
+
+    let [account, invoice] = await utils.newAccountWithInvoice()
+
+    let { result } = await server.inject({
+      method: 'GET',
+      url: `/r/${invoice.uid}`,
+      headers: {
+        'Accept': 'application/payment-options',
+        'x-paypro-version': 2
+      }
+    })
+
+    let response = await server.inject({
+      method: 'POST',
+      url: `/r/${invoice.uid}`,
+      headers: {
+        'x-paypro-version': 2,
+        'Content-Type': 'application/payment-request'
+      },
+      payload: result.paymentOptions[0]
+    })
+
+    expect(response.statusCode).to.be.equal(200)
+
+    let valid = schema.Protocol.PaymentRequest.response.validate(response.result)
+
+    expect(valid.error).to.be.equal(undefined)
+
+  })
+
   it.skip("POST /i/:uid signs the payload with headers", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
@@ -152,6 +204,23 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
+  it("POST /r/:uid should verify the payment is valid", async () => {
+
+    let [account, invoice] = await utils.newAccountWithInvoice()
+
+    let response = await server.inject({
+      method: 'POST',
+      url: `/r/${invoice.uid}`,
+      headers: {
+        'x-paypro-version': 2,
+        'Content-Type': 'application/payment-verification'
+      }
+    })
+
+    let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+
+  })
+
   it("POST /i/:uid should mark the invoice as paid", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
@@ -160,7 +229,11 @@ describe("JSON Payment Protocol V2", async () => {
 
     let { paymentOptions } = await client.getPaymentOptions()
 
-    let paymentRequest = await client.selectPaymentOption(paymentOptions[0])
+    let paymentOption = paymentOptions.filter(option => {
+      return option.currency === 'BSV'
+    })[0]
+
+    let paymentRequest = await client.selectPaymentOption(paymentOption)
 
     let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 

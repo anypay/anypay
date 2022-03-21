@@ -1,6 +1,5 @@
 
 import { models, amqp, log } from '../../../lib'
-import { logInfo, logError } from '../../../lib/logger'
 
 import { plugins } from '../../../lib/plugins'
 
@@ -62,12 +61,12 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
-  logInfo('payment.submit', payment);
+  log.info('payment.submit', payment);
 
   let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
   if (invoice.cancelled) {
-    logError('payment.error.invoicecancelled', { payment })
+    log.error('payment.error.invoicecancelled', { payment })
     return Boom.badRequest('invoice cancelled')
   }
 
@@ -94,11 +93,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       protocol: 'JSONV2'
     })
 
-    logInfo(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
+    log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
 
     let resp = await plugin.broadcastTx(transaction)
 
-    logInfo(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
+    log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
 
     let paymentRecord = await completePayment(payment_option, transaction)
 
@@ -107,7 +106,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       await paymentRecord.save()
     }
 
-    logInfo('payment.completed', paymentRecord.toJSON());
+    log.info('payment.completed', paymentRecord);
 
   }
 

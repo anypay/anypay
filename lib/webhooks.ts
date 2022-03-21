@@ -1,7 +1,7 @@
 
 import { models } from './models';
 
-import { log } from './logger';
+import { log } from './log';
 
 import { Invoice } from './invoices'
 

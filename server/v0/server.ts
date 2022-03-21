@@ -12,7 +12,7 @@ import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
-import { log } from '../../lib';
+import { log } from '../../lib/log';
 
 import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
 
@@ -35,13 +35,6 @@ import { models } from '../../lib'
 const validatePassword = async function(request, username, password, h) {
 
   try {
-
-
-    /* 1) check for account by email (username)
-       2) check for account password by hash compare
-       3) check for sudo password by hash compare
-       4) generate access token with expiration
-    */
 
     if (!username || !password) {
 
@@ -114,30 +107,6 @@ const validatePassword = async function(request, username, password, h) {
 
 };
 
-const getAccount = async function(request, username, password, h) {
-
-  var account = await models.Account.findOne({
-    where: {
-      id: request.params.account_id
-    }
-  });
-
-  if (account) {
-
-		request.account = account;
-		request.is_public_request = true;
-
-    return {
-      isValid: true,
-      credentials: { account: account }
-    }
-  } else {
-    return {
-      isValid: false
-    }
-  }
-}
-
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
@@ -165,23 +134,24 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-async function Server() {
 
-  var server = new Hapi.Server({
-    host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8000,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      },
-      files: {
-          relativeTo: join(__dirname, '../../docs')
+const server = new Hapi.Server({
+  host: process.env.HOST || "localhost",
+  port: process.env.PORT || 8000,
+  routes: {
+    cors: true,
+    validate: {
+      options: {
+        stripUnknown: true
       }
+    },
+    files: {
+        relativeTo: join(__dirname, '../../docs')
     }
-  });
+  }
+});
+
+async function Server() {
 
   server.ext('onRequest', function(request, h) {
 
@@ -259,6 +229,8 @@ async function Server() {
   await server.register(require('hapi-auth-basic'));
   await server.register(require('inert'));
   await server.register(require('vision'));
+  await server.register(require('hapi-boom-decorators'))
+
   const swaggerOptions = server.register({
     plugin: HapiSwagger,
     options: {
@@ -277,7 +249,6 @@ async function Server() {
     }
   })
 
-  server.auth.strategy("getaccount", "basic", { validate: getAccount });
   server.auth.strategy("token", "basic", { validate: validateToken });
   server.auth.strategy("app", "basic", { validate: validateAppToken });
   server.auth.strategy("password", "basic", { validate: validatePassword });
@@ -343,7 +314,6 @@ async function Server() {
     }
   });
 
-  /* TODO: Update clients to use /products not /grab_and_go_items */
   server.route({
     method: "GET",
     path: "/grab_and_go_items",
@@ -480,9 +450,10 @@ async function Server() {
         params: Joi.object({
           currency: Joi.string().required()
         }),
-        payload: v0.Addresses.PayoutAddressUpdate
-      },
-      plugins: responsesWithSuccess({ model: models.Account.Response })
+        payload: Joi.object({
+          address: Joi.string().required()
+        })
+      }
     }
   });
 
@@ -652,8 +623,6 @@ async function Server() {
     }
   });
 
-  /* PAYMENT PROTOCOLS */
-
     server.route({
       method: "POST",
       path: "/r",
@@ -662,8 +631,6 @@ async function Server() {
         auth: "app"
       }
     })
-
-  /* END PAYMENT PROTOCOLS */
 
   server.route({
     method: 'POST',
@@ -809,7 +776,7 @@ if (require.main === module) {
 
 async function start () {
 
-  var server = await Server();
+  await Server();
 
   // Start the server
   await server.start();
@@ -818,5 +785,5 @@ async function start () {
 
 }
 
-export { Server, start }
+export { Server, start, server }
 
