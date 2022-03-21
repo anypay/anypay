@@ -49,8 +49,11 @@ export async function create(req, h) {
     }
 
     if (invoice.cancelled) {
+
       log.error('payment.error.invoicecancelled', submission)
-      return Boom.badRequest('invoice cancelled')
+
+      throw new Error('Invoice Already Cancelled')
+
     }
 
     let response: SubmitPaymentResponse = await submitPayment(submission)
