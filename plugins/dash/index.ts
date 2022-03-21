@@ -9,16 +9,12 @@ import { any } from 'bluebird'
 
 import {generateInvoice} from '../../lib/invoice';
 
-import {Invoice} from '../../types/interfaces';
-
-import {log, xpub, models} from '../../lib'
+import {log, models} from '../../lib'
 
 import { rpc } from './lib/jsonrpc';
 
 import * as blockcypher from '../../lib/blockcypher'
 import * as blockchair from '../../lib/blockchair'
-
-import { I_Address } from '../../types/interfaces';
 
 import * as http from 'superagent';
 
@@ -91,53 +87,9 @@ export async function createInvoice(accountId: number, amount: number) {
 
 }
 
-async function createAddressForward(record: I_Address) {
+export async function getNewAddress(record: any) {
 
-  let url = "https://dash.anypayinc.com/v1/dash/forwards";
-
-  let callbackBase = process.env.API_BASE || 'https://api.anypayinc.com';
-
-  let resp = await http.post(url).send({
-
-    destination: record.value,
-
-    callback_url: `${callbackBase}/dash/address_forward_callbacks`
-
-  });
-
-  return resp.body.input_address;
-
-}
-
-export async function getNewAddress(record: I_Address) {
-
-  var address;
-
-  if (record.value.match(/^xpub/)) {
-
-    address = xpub.generateAddress('DASH', record.value, record.nonce);
-
-    await models.Address.update({
-
-      nonce: record.nonce + 1
-
-    },{
-
-      where: {
-
-        id: record.id
-
-      }
-    
-    });
-
-    return address;
-
-  } else {
-
-    return record.value;
-
-  }
+  return record.value;
 
 }
 

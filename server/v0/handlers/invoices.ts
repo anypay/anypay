@@ -366,8 +366,6 @@ export async function createPublicInvoice(account_id, payload) {
 
   }
 
-  invoice.energycity_account_id = payload.energycity_account_id;
-
   invoice.redirect_url = payload.redirect_url;
 
   invoice.webhook_url = payload.webhook_url;
