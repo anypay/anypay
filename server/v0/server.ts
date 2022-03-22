@@ -625,6 +625,12 @@ async function Server() {
 
   server.route({
     method: 'GET',
+    path: '/merchants/{account_id}',
+    handler: v0.Merchants.show
+  });
+
+  server.route({
+    method: 'GET',
     path: '/active-merchants',
     handler: v0.Merchants.listActiveSince
   });
