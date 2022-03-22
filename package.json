@@ -138,6 +138,9 @@
     "supertest": "^6.2.2",
     "ts-node": "^6.2.0"
   },
+  "nyc": {
+    "exclude": "migrations/*"
+  },
   "scripts": {
     "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
     "console": "ts-node --experimental-repl-await",
