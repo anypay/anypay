@@ -96,7 +96,7 @@
     "qrcode-terminal": "^0.11.0",
     "rabbi": "^1.18.2",
     "reconnecting-websocket": "^4.4.0",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "request-promise": "^4.2.5",
     "require-all": "^3.0.0",
     "riverpig": "^1.1.4",
