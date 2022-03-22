@@ -122,6 +122,7 @@
     "yayson": "^2.0.8"
   },
   "devDependencies": {
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@types/amqplib": "^0.5.7",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
