@@ -200,21 +200,15 @@ export async function showPublic (req, h) {
 export async function show (request, h) {
 
   var account = request.account,
-      addresses,
-      tipjars
+      addresses
 
   addresses = await models.Address.findAll({ where: {
     account_id: account.id
   }});
 
-  tipjars = await models.Tipjar.findAll({ where: {
-    account_id: account.id
-  }});
-
   return  {
     account,
-    addresses,
-    tipjars
+    addresses
   }
 
 };
