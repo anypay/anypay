@@ -1,4 +1,3 @@
-//console.log = function() {}
 
 require('dotenv').config();
 
@@ -11,12 +10,9 @@ import * as invoices from './invoice';
 import * as settings from './settings';
 import * as prices from './prices';
 import { models } from './models';
-import * as ambassadors from './ambassadors';
 import * as database from './database';
-import * as discount from './discount';
 import * as addresses from './addresses';
 import * as coins from './coins';
-import * as xpub from './xpub';
 import * as invoice from './invoice';
 import { log } from './log';
 import { plugins } from './plugins';
@@ -24,7 +20,6 @@ import * as blockcypher from './blockcypher';
 import * as email from './email';
 import * as password from './password';
 import * as auth from './auth';
-import * as receipts from './receipts';
 import * as slack from './slack/notifier';
 import * as events from './events';
 import * as utils from './utils';
@@ -33,7 +28,7 @@ import * as pay from './pay';
 var initialized = false;
 
 (async function() {
-  
+
   await require('../initializers').initialize();
 
   initialized = true;
@@ -43,7 +38,6 @@ var initialized = false;
 export {
   accounts,
   addresses,
-  ambassadors,
   amqp,
   apikeys,
   apps,
@@ -51,7 +45,6 @@ export {
   blockcypher,
   coins,
   database,
-  discount,
   email,
   events,
   invoices,
@@ -62,11 +55,9 @@ export {
   pay,
   plugins,
   prices,
-  receipts,
   settings,
   slack,
-  utils,
-  xpub
+  utils
 }
 
 export async function initialize() {

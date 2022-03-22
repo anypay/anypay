@@ -2,7 +2,7 @@ const Joi = require('joi');
 
 import { settings } from '../../../lib';
 
-module.exports.update = async function(request, h) {
+export async function update(request, h) {
 
   let currency = request.payload.denomination;
 
@@ -17,7 +17,7 @@ module.exports.update = async function(request, h) {
 
 };
 
-module.exports.show = async function(request, h) {
+export async function show(request, h) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
@@ -30,7 +30,7 @@ module.exports.show = async function(request, h) {
 
 };
 
-module.exports.DenominationUpdate = Joi.object({
+export const DenominationUpdate = Joi.object({
   denomination: Joi.string()
 }).label('DenominationUpdate');
 

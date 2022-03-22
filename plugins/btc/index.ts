@@ -4,8 +4,6 @@ import {generateInvoice} from '../../lib/invoice';
 
 import { fromSatoshis, Payment } from '../../lib/pay'
 
-import {Invoice} from '../../types/interfaces';
-
 import { publishBTC } from '../../lib/blockchair'
 
 import {models} from '../../lib/models';

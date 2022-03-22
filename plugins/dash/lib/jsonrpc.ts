@@ -11,8 +11,6 @@ async function rpcRequest(method, params) {
 
   let url = `http://${HOST}:${process.env.DASH_RPC_PORT}`;
 
-  console.log("URL", url);
-
   let resp = await http
     .post(url)
     .send(body)

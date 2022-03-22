@@ -9,30 +9,21 @@ import { log } from '../../../lib/log'
 
 export async function create(request, h) {
 
-  try {
+  const account = await loginAccount(request.payload)
 
-    const account = await loginAccount(request.payload)
+  geolocateAccountFromRequest(account, request)
 
-    geolocateAccountFromRequest(account, request)
+  const token = await ensureAccessToken(account);
 
-    const token = await ensureAccessToken(account);
+  const { accessToken } = await ensureAccessToken(account)
 
-    const { accessToken } = await ensureAccessToken(account)
+  return h.response({
 
-    return h.response({
+    user: account.toJSON(),
 
-      user: account.toJSON(),
+    accessToken,
 
-      accessToken,
+  }).code(200)
 
-    }).code(200)
-
-  } catch(error) {
-
-    log.error('account.registration.error', { error });
-
-    return badRequest(error);
-
-  }
 }
 

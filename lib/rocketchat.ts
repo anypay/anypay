@@ -5,7 +5,6 @@ const http = require("superagent");
 const base = 'https://chat.anypayinc.com/hooks';
 
 const channels = {
-  'ambassadors': 'EZq3CAaXRwaj9NFun/MipnMqrSBu3aH9EydjazKqC3uqnjZd59xggKmy2itdsBtx94',
   'misc': 'nbfWhcsDeXypz4RDu/AXqEGLCQbno7gotBTuipAwsZzuTTMtPZ3LHfRx86u3dHf6aY'
 }
 

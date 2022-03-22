@@ -1,13 +1,12 @@
-"use strict";
+
 require('dotenv').config();
 
 import * as Hapi from "@hapi/hapi";
 
 const HapiSwagger = require("hapi-swagger");
 
-import { attachMerchantMapRoutes } from '../map/server';
-
 import { attachV1Routes } from '../v1/routes';
+
 import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
@@ -258,8 +257,6 @@ async function Server() {
 
   attachJsonV2(server)
 
-  attachMerchantMapRoutes(server);
-
   server.route({
     method: "GET",
     path: "/api/accounts-by-email/{email}",
@@ -404,7 +401,7 @@ async function Server() {
   server.route({
     method: "DELETE",
     path: "/addresses/{currency}",
-    handler: v0.Addresses.delete,
+    handler: v0.Addresses.destroy,
     options: {
       auth: "token",
       tags: ['api']
@@ -453,24 +450,6 @@ async function Server() {
         payload: Joi.object({
           address: Joi.string().required()
         })
-      }
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/discounts/{currency}",
-    handler: v0.Discounts.update,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        params: Joi.object({
-          currency: Joi.string().required(),
-        }),
-        payload: Joi.object({
-          percent: Joi.number().required()
-        }),
       }
     }
   });

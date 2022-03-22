@@ -14,8 +14,6 @@ import * as _ from 'underscore';
 
 import * as database from './database';
 
-import { Payment } from '../types/interfaces';
-
 import * as http from 'superagent';
 
 import {events} from './events'

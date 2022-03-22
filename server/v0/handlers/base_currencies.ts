@@ -5,29 +5,21 @@ const Fixer = require('../../../lib/prices/fixer');
 
 export async function index(req, h) {
 
-  try {
+  var currencies = await Fixer.getCurrencies();
 
-    var currencies = await Fixer.getCurrencies();
+  var rates = currencies.rates;
 
-    var rates = currencies.rates;
+  let sortedCurrencies = Object.keys(rates).sort();
 
-    let sortedCurrencies = Object.keys(rates).sort();
+  currencies.rates = sortedCurrencies.reduce((map, key) => {
 
-    currencies.rates = sortedCurrencies.reduce((map, key) => {
+    map[key] = rates[key];
 
-      map[key] = rates[key];
+    return map;
 
-      return map;
+  }, {});
 
-    }, {});
-
-    return currencies;
-
-  } catch(error) {
-
-    return badRequest(error)
-
-  }
+  return currencies;
 
 }
 

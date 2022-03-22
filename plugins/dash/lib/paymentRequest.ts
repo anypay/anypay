@@ -48,8 +48,6 @@ export async function generatePaymentRequest(invoice: any, paymentOption: any):P
     paymentUrl: `${process.env.API_BASE}/invoices/${invoice.uid}/pay/bip70/dash`,
   }
 
-  console.log(request)
-
   return request
 
 }

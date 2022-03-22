@@ -13,51 +13,43 @@ import * as moment from 'moment';
 
 export async function cancel(req, h) {
 
-  try {
+  let where = {
+    uid: req.params.uid,
+    account_id: req.account.id
+  }
 
-    let where = {
-      uid: req.params.uid,
-      account_id: req.account.id
-    }
+  let invoice = await models.Invoice.findOne({
+    where
+  })
 
-    let invoice = await models.Invoice.findOne({
-      where
-    })
+  if (!invoice) {
 
-    if (!invoice) {
+    log.error('invoice.notfound', where)
 
-      log.error('invoice.notfound', where)
-
-      return Boom.notFound()
-
-    }
-
-    if (invoice && !invoice.cancelled) {
-
-      invoice.cancelled = true;
-      invoice.status = 'cancelled';
-
-      await invoice.save()
-
-      log.info('invoice.cancelled', where)
-
-      where['status'] = 'cancelled'
-
-      return where
-
-    } else {
-
-      log.error('invoice.cancel.error.alreadycancelled', where)
-
-      throw new Error('invoice already cancelled')
-
-    } 
-
-  } catch(error) {
-
-    return Boom.badRequest(error.message)
+    return Boom.notFound()
 
   }
+
+  if (invoice && !invoice.cancelled) {
+
+    invoice.cancelled = true;
+    invoice.status = 'cancelled';
+
+    await invoice.save()
+
+    log.info('invoice.cancelled', where)
+
+    where['status'] = 'cancelled'
+
+    return where
+
+  } else {
+
+    log.error('invoice.cancel.error.alreadycancelled', where)
+
+    throw new Error('invoice already cancelled')
+
+  } 
 
 }
 
@@ -150,20 +142,10 @@ export async function index (request, reply) {
 
   }
 
-  try {
+  var invoices = await models.Invoice.findAll(query);
 
-    var invoices = await models.Invoice.findAll(query);
+  return { invoices };
 
-    return { invoices };
-
-  } catch(error) {
-
-    log.error(error);
-    log.error(error.message);
-
-    return { error: error.message };
-
-  }
 };
 
 function selectCurrency(addresses) {
@@ -247,94 +229,83 @@ export async function create (request, h) {
 
 	log.info('amount is greater than zero')
 
-  try {
+  let plugin = await plugins.findForCurrency(request.payload.currency);
 
-    let plugin = await plugins.findForCurrency(request.payload.currency);
+  log.info('plugin.createInvoice');
 
-    log.info('plugin.createInvoice');
+  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
-    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
-
-    if(invoice){
-   
-      log.info('invoice.created', invoice.toJSON());
-
-    }
-
-    invoice.currency_specified = currency_specified;
-
-    if (request.payload.redirect_url) {
-
-      invoice.redirect_url = request.payload.redirect_url;
-
-    }
-
-    if (request.payload.wordpress_site_url) {
-
-      invoice.wordpress_site_url = request.payload.wordpress_site_url;
-
-      invoice.tags = ['wordpress']
-
-    }
-
-    if (request.payload.webhook_url) {
-
-      invoice.webhook_url = request.payload.webhook_url;
-
-    }
-
-    if (request.payload.external_id) {
-
-      invoice.external_id = request.payload.external_id;
-
-    }
-
-    if (request.is_public_request) {
-
-      invoice.is_public_request = true;
-
-    }
-
-    invoice.headers = request.headers
-
-    invoice.email = request.payload.email;
-    invoice.business_id = request.payload.business_id;
-    invoice.location_id = request.payload.location_id;
-    invoice.register_id = request.payload.register_id;
-
-    await invoice.save();
-
-    if (invoice.email) {
-      let note = await models.InvoiceNote.create({
-        content: `Customer Email: ${invoice.email}`,
-        invoice_uid: invoice.uid,
-      });
-    }
-
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-    let sanitized = sanitizeInvoice(invoice);
-
-    return h.response(
-
-      Object.assign({
-        success: true,
-        invoice: sanitized,
-        payment_options: invoice.payment_options
-      }, sanitized)
-
-    ).code(200);
-
-  } catch(error) {
-    console.log(error);
-
-    log.error(error.message);
-
-    return Boom.badRequest(error.message);
+  if(invoice){
+ 
+    log.info('invoice.created', invoice.toJSON());
 
   }
 
-};
+  invoice.currency_specified = currency_specified;
+
+  if (request.payload.redirect_url) {
+
+    invoice.redirect_url = request.payload.redirect_url;
+
+  }
+
+  if (request.payload.wordpress_site_url) {
+
+    invoice.wordpress_site_url = request.payload.wordpress_site_url;
+
+    invoice.tags = ['wordpress']
+
+  }
+
+  if (request.payload.webhook_url) {
+
+    invoice.webhook_url = request.payload.webhook_url;
+
+  }
+
+  if (request.payload.external_id) {
+
+    invoice.external_id = request.payload.external_id;
+
+  }
+
+  if (request.is_public_request) {
+
+    invoice.is_public_request = true;
+
+  }
+
+  invoice.headers = request.headers
+
+  invoice.email = request.payload.email;
+  invoice.business_id = request.payload.business_id;
+  invoice.location_id = request.payload.location_id;
+  invoice.register_id = request.payload.register_id;
+
+  await invoice.save();
+
+  if (invoice.email) {
+    let note = await models.InvoiceNote.create({
+      content: `Customer Email: ${invoice.email}`,
+      invoice_uid: invoice.uid,
+    });
+  }
+
+  invoice.payment_options = await getPaymentOptions(invoice.uid)
+
+  let sanitized = sanitizeInvoice(invoice);
+
+  return h.response(
+
+    Object.assign({
+      success: true,
+      invoice: sanitized,
+      payment_options: invoice.payment_options
+    }, sanitized)
+
+  ).code(200)
+
+}
 
 export async function createPublicInvoice(account_id, payload) {
   var currency;
@@ -376,8 +347,6 @@ export async function createPublicInvoice(account_id, payload) {
     log.info('invoice.created', invoice.toJSON());
 
   }
-
-  invoice.energycity_account_id = payload.energycity_account_id;
 
   invoice.redirect_url = payload.redirect_url;
 
@@ -427,22 +396,12 @@ async function getPaymentOptions(invoice_uid) {
 
 export async function createPublic (request, reply) {
 
-  try {
+  let response = await createPublicInvoice(
+    request.params.account_id, request.payload);
 
-    let response = await createPublicInvoice(
-      request.params.account_id, request.payload);
+  return response;
 
-    return response;
-
-  } catch(error) {
-
-    console.log(error.message);
-
-    return Boom.badRequest(error.message);
-
-  }
-
-};
+}
 
 function sanitizeInvoice(invoice) {
 
@@ -461,57 +420,47 @@ export async function show(request, reply) {
 
   log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
 
-  try {
-
-	  let invoice = await models.Invoice.findOne({
-	    where: {
-	      uid: invoiceId
-	    }
-	  });
-
-    if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
-
-      invoice = await invoices.refreshInvoice(invoice.uid)
-
-    } else {
-
-      log.info('invoice not yet expired');
+  let invoice = await models.Invoice.findOne({
+    where: {
+      uid: invoiceId
     }
+  });
 
-	  if (invoice) {
+  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-	    log.info('invoice.requested', invoice.toJSON());
+    invoice = await invoices.refreshInvoice(invoice.uid)
 
-      invoice.payment_options = await getPaymentOptions(invoice.uid)
+  } else {
 
-      let notes = await models.InvoiceNote.findAll({where: {
-        invoice_uid: invoice.uid
-      }});
-
-      let sanitized = sanitizeInvoice(invoice);
-
-      let resp = Object.assign({
-        invoice: sanitized,
-        payment_options: invoice.payment_options,
-        notes
-      }, sanitized)
-
-      return resp;
-
-	  } else {
-
-	    log.error('no invoice found', invoiceId);
-
-	    throw new Error('invoice not found')
-	  }
-  } catch(error) {
-
-    console.log(error);
-
-    return Boom.badRequest(error.message);
-
+    log.info('invoice not yet expired');
   }
 
+  if (invoice) {
+
+    log.info('invoice.requested', invoice.toJSON());
+
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
+
+    let notes = await models.InvoiceNote.findAll({where: {
+      invoice_uid: invoice.uid
+    }});
+
+    let sanitized = sanitizeInvoice(invoice);
+
+    let resp = Object.assign({
+      invoice: sanitized,
+      payment_options: invoice.payment_options,
+      notes
+    }, sanitized)
+
+    return resp;
+
+  } else {
+
+    log.error('no invoice found', invoiceId);
+
+    throw new Error('invoice not found')
+  }
 
 }
 
@@ -519,36 +468,25 @@ export async function shareEmail(req, h) {
 
   log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 
-  try {
+  let invoice = await models.Invoice.findOne({
+    where: {
+      uid: req.params.uid
+    }
+  });
 
-	  let invoice = await models.Invoice.findOne({
-	    where: {
-	      uid: req.params.uid
-	    }
-	  });
+  if (!invoice) {
 
-	  if (!invoice) {
+    log.error('no invoice found', req.params.uid);
 
-	    log.error('no invoice found', req.params.uid);
+    throw new Error('invoice not found')
 
-	    throw new Error('invoice not found')
+  } else {
 
-	  } else {
+    await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
 
-      await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
-
-      return { success: true }
-
-	  }
-
-  } catch(error) {
-
-    console.log(error);
-
-    return Boom.badRequest(error.message);
+    return { success: true }
 
   }
-
 
 }
 
