@@ -12,6 +12,14 @@ export async function getMerchantApiKey(account_id) {
     order: [["createdAt", "asc"]]
   })
 
+  if (!token) {
+
+    token = await models.AccessToken.create({
+      account_id
+    })
+
+  }
+
   return token.uid
 
 }
