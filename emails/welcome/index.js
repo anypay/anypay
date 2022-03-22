@@ -10,4 +10,3 @@ exports.default = {
     template,
     body: template({})
 };
-//# sourceMappingURL=index.js.map
