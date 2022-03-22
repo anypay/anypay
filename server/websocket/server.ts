@@ -113,14 +113,13 @@ abstract class AccountSubscriptions {
 
   handleAccountEvent(accountId, event, payload) {
 
-    console.log('handleAccountEvent', {
+    log.info('handleAccountEvent', {
       accountId, event, payload
     });
 
     if (this.invoices[accountId]) {
 
       this.invoices[accountId].forEach(client => {
-        console.log(`messaging client for account ${accountId}`);
 
         this.messageClient(client, event, payload);
 
@@ -175,14 +174,11 @@ class AccountSubscriptionsWebsockets extends AccountSubscriptions {
 
     try {
 
-      console.log(JSON.stringify({ event, payload }))
-
       client.send(JSON.stringify({ event, payload }));
 
     } catch(error) {
 
-      console.error(error.message);
-      console.error(`error sending message to websocket client ${client.uid}`);
+      log.error('websocket.client.send.error', error)
 
     }
 
@@ -196,14 +192,13 @@ class AccountSubscriptionsSocketIO extends AccountSubscriptions {
 
     try {
 
-      console.log(`client.${client.uid}`, JSON.stringify({ event, payload }));
+      log.info(`client.${client.uid}`, { event, payload });
 
       client.emit('event', { event, payload });
 
     } catch(error) {
 
-      console.error(error.message);
-      console.error(`error sending message to websocket client ${client.uid}`);
+      log.error('websocket.client.error', error);
 
     }
 
@@ -237,7 +232,10 @@ io.on("connection", client => {
   client.on("subscribe", data => {
     if (data.invoice) {
       wsSubscriptions.subscribeInvoice(client, data.invoice);
-      log.info("client subscribed to invoice", client.uid, data.invoice);
+      log.info("websocket.client.subscribed.invoice", {
+        client_uid: client.uid,
+        invoice: data.invoice
+      });
     }
   });
 
@@ -255,7 +253,10 @@ io.on("connection", client => {
 
       accountSubscriptionsSocketIO.subscribeAccount(client, accessToken.account_id);
 
-      log.info("subscribed to account", client.uid, accessToken.account_id);
+      log.info("subscribed to account", {
+        client_uid: client.uid,
+        account_id: accessToken.account_id
+      })
 
     } else {
 
@@ -274,8 +275,12 @@ io.on("connection", client => {
     wsSubscriptions.unsubscribeClient(client);
     accountSubscriptionsSocketIO.unsubscribeClient(client);
 
-    log.info("websocket client disconnected", client.uid);
-    log.info("client unsubscribed", client.uid, invoice);
+    log.info("websocket client disconnected", { uid: client.uid });
+    log.info("client unsubscribed", {
+      client_uid: client.uid,
+      invoice
+    });
+
   });
 });
 
@@ -322,10 +327,10 @@ adminServer.route({
 })
 
 adminServer.start();
-console.log('Server running on %s', adminServer.info.uri);
+log.info('admin.server.start', { uri: adminServer.info.uri });
 
 hapiServer.start();
-console.log('Server running on %s', hapiServer.info.uri);
+log.info('hapi.server.start', { uri: hapiServer.info.uri });
 
 const AMQP_URL = process.env.AMQP_URL;
 if (!AMQP_URL) {
@@ -373,7 +378,9 @@ if (!AMQP_URL) {
 
   channel.consume('dashback.notifications', message => {
 
-    console.log('dashback.notifications', message.content.toString());
+    log.info('dashback.notifications', {
+      message: message.content.toString()
+    })
 
     wsSubscriptions.handleDashbackPaid(message.content.toString());
 
@@ -427,18 +434,15 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', async function incoming(message) {
 
-    console.log('received: %s', message);
-
     try {
 
       let json = JSON.parse(message);
 
-      console.log(json);
-
       switch(json.method) {
 
         case 'authenticate': {
-          console.log('ws.raw.authenticate');
+
+          log.info('ws.raw.authenticate');
 
           try {
 
@@ -455,7 +459,8 @@ wss.on('connection', function connection(ws) {
 
           } catch(error) {
 
-            console.log(error);
+            log.error('weboscket.authenticate.error', error)
+
           }
 
           break;
@@ -464,8 +469,6 @@ wss.on('connection', function connection(ws) {
 
         default: {
 
-          console.log(json);
-
           break;
         }
 
@@ -473,7 +476,7 @@ wss.on('connection', function connection(ws) {
 
     } catch(error) {
 
-      console.error(error.message);
+      log.error('websocket.error', message);
 
     }
 
@@ -481,7 +484,7 @@ wss.on('connection', function connection(ws) {
 
   ws.on('close', function close() {
 
-    console.log('disconnected');
+    log.info('websocket.disconnected');
 
   });
 

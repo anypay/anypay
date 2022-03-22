@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+import { log } from '../../../lib/log'
+
 import * as http from 'superagent';
 
 const dash = require("@dashevo/dashcore-lib")
@@ -11,15 +13,13 @@ export async function getCashBackBalance(address) {
 
     let unspent = await callRpc('listunspent', [0, 9999999, [address]])
 
-    console.log(unspent);
-
     return unspent.result.reduce((sum, output) => {
       return sum + output.amount 
     }, 0)
 
   } catch(error) {
 
-    console.log(error);
+    log.error('plugins.dash.cashback.error', error);
   }
 
 
@@ -27,18 +27,12 @@ export async function getCashBackBalance(address) {
 
 export async function _sendToAddress(address: string, amount: number): Promise<string>{
 
-  console.log('cashback.dash.local.sendtoaddress', address, amount);
-
   let privkey = new dash.PrivateKey(process.env.CASHBACK_DASH_PRIVATE_KEY);
 
   let _address = privkey.toAddress();
 
-  console.log(_address.toString())
-
   let response = await callRpc('listunspent', [0, 9999999, [_address.toString()]])
 
-  console.log('UNSPENT', response)
- 
   let utxos = response.result.sort((a, b) => a.amount >= b.amount)
 
   var sum = new BigNumber(0);
@@ -89,17 +83,11 @@ export async function buildSendToAddress(destination: string, amountSatoshis: nu
 
   let tx = new dash.Transaction();
 
-  // fetch dash utxos from some (unspecified) service
-
 }
 
 export async function sendToAddress(address, amount) {
 
-  console.log('dash.sendtoaddress', address, amount);
-
   let response = await callRpc('sendtoaddress', [address, amount]);
-
-  console.log('dash.response', response);
 
   return response.result;
 

@@ -35,12 +35,13 @@ describe("Accounts HTTP API", () => {
 				email, password
 			}
     }, response => {
-      console.log('PAYLOAD', response.payload);
+
       let account = JSON.parse(response.payload);
-			console.log(account);
+
       assert.strictEqual(account.email, email);
       assert(account.password_hash);
       assert(account.id);
+
       done()
     });
   });

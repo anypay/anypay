@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as Joi from 'joi';
 import * as Boom from 'boom';
 
-import { buildReportCsvFromDates, buildAllTimeReport } from '../../../lib/wire';
+import { buildReportCsvFromDates, buildAllTimeReport } from '../../../lib/csv';
 import { models } from '../../../lib';
 
 export async function accountCSVReports(server) {
@@ -62,34 +62,26 @@ export async function accountCSVReports(server) {
     path: '/complete_history.csv',
     handler: async (req, h) => {
 
-      try {
+      let token = await models.AccessToken.findOne({ where: {
 
-        let token = await models.AccessToken.findOne({ where: {
+        uid: req.query.token
 
-          uid: req.query.token
+      }});
 
-        }});
+      if (!token) {
 
-        if (!token) {
-
-          return Boom.unauthorized('invalid access token');
-        }
-
-        let content = await buildAllTimeReport(token.account_id);
-
-        let filename = `anypay_report_complete.csv`
-
-        let response = h.response(content)
-          .header("Content-Disposition", `attachment;filename="${filename}"`)
-          .header("Content-Type", 'text/csv');
-
-        return response;
-
-      } catch(error) {
-
-        return Boom.badRequest(error.message)
-
+        return Boom.unauthorized('invalid access token');
       }
+
+      let content = await buildAllTimeReport(token.account_id);
+
+      let filename = `anypay_report_complete.csv`
+
+      let response = h.response(content)
+        .header("Content-Disposition", `attachment;filename="${filename}"`)
+        .header("Content-Type", 'text/csv');
+
+      return response;
 
     },
     options: {

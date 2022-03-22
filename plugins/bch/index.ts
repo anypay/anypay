@@ -6,9 +6,7 @@ import * as blockchair from '../../lib/blockchair'
 
 import {generateInvoice} from '../../lib/invoice';
 
-import {log, models, xpub} from '../../lib';
-
-import { I_Address } from '../../types/interfaces';
+import {log, models} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -34,7 +32,7 @@ async function createInvoice(accountId: number, amount: number) {
 
 }
 
-function validateAddress(address: string){
+function validateAddress(address: string) {
 
   try {
 
@@ -44,11 +42,11 @@ function validateAddress(address: string){
 
   } catch(error) {
 
-    console.log(error.message);
+    log.info('plugins.bch.address.invalid', error)
 
   }
 
-  try{
+  try {
 
     var isCashAddress = bchaddr.isCashAddress
 
@@ -56,55 +54,19 @@ function validateAddress(address: string){
 
     return valid;
 
-  }catch(error){
+  } catch(error) {
 
     return false;
 
   }
 
-
 }
 
-export async function getNewAddress(record: I_Address) {
+export async function getNewAddress(record: any) {
 
-  var address;
-
-  if (record.value.match(/^xpub/)) {
-
-    address = xpub.generateAddress('BCH', record.value, record.nonce);
-
-    await models.Address.update({
-
-      nonce: record.nonce + 1
-
-    },{
-
-      where: {
-
-        id: record.id
-
-      }
-    
-    });
-
-    return address;
-
-  } else {
-
-    return record.value;
-
-  }
+  return record.value;
 
 }
-
-function deriveAddress(xkey, nonce){
-
-  let address = new bch.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address
-
-}
-
 
 const currency = 'BCH';
 

@@ -1,12 +1,11 @@
 
-const Boom = require('boom');
 const Joi = require('joi');
 import { setAddress } from '../../../lib/core';
 import { log } from '../../../lib';
 
 import { models } from '../../../lib';
 
-module.exports.delete = async function(req, h) {
+export async function destroy(req, h) {
 
   let address = await models.Address.findOne({ where: {
     account_id: req.account.id,
@@ -73,25 +72,15 @@ export async function update(request, h) {
 
   log.info('address.update', changeset);
 
-  try {
+  await setAddress(changeset);
 
-    await setAddress(changeset);
+  return {
 
-    return {
+    currency: changeset.currency,
 
-      currency: changeset.currency,
+    value: changeset.address
 
-      value: changeset.address
-
-    }
-
-  } catch(error) {
-
-    log.error(error)
-
-    return Boom.badRequest(error);
-
-  };
+  }
 
 }
 

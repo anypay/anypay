@@ -28,50 +28,33 @@ export async function nearby(req, h) {
 
 export async function update(req, h) {
 
-  try {
+  let account = await accounts.updateAccount(req.account, req.payload);
 
-    let account = await accounts.updateAccount(req.account, req.payload);
+  slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
 
-    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
+  return {
 
-    return {
+    success: true,
 
-      success: true,
-
-      account
-
-    }
-
-  } catch(error) {
-
-    return Boom.badRequest(error.message);
+    account
 
   }
 
 }
 
-export async function createAnonymous(request, reply) {
+export async function createAnonymous(request, h) {
 
-  try {
+  let account = await models.Account.create();
 
-    let account = await models.Account.create();
+  log.info(`anonymous account ${account.uid} created`);
 
-    log.info(`anonymous account ${account.uid} created`);
+  let access_token = await models.AccessToken.create({ account_id: account.id });
 
-    let access_token = await models.AccessToken.create({ account_id: account.id });
-
-    return { account, access_token }
-
-  } catch(error) {
-
-    log.error(`error creating anonymous account ${error.message}`);
-
-    return Boom.badRequest(error);
-  }
+  return { account, access_token }
 
 }
 
-export async function registerAnonymous(request, reply) {
+export async function registerAnonymous(request, h) {
   let email = request.payload.email;
 
   log.info('create.account', email);
@@ -81,196 +64,144 @@ export async function registerAnonymous(request, reply) {
   request.account.email = request.payload.email;
   request.account.password_hash = passwordHash;
 
-  try {
+  request.account.save();
 
-    request.account.save();
+  slack.notify(`account:registered | ${request.account.email}`);
+  
+  emitter.emit('account.created', request.account)
 
-    slack.notify(`account:registered | ${request.account.email}`);
-    
-    emitter.emit('account.created', request.account)
+  return request.account;
 
-    return request.account;
-
-  } catch(error) {
-
-    log.error(`account ${email} already registered`);
-
-    return Boom.badRequest(
-      new Error(`account ${email} already registered`)
-    );
-  }
 }
 
-export async function create (request, reply) {
+export async function create (request, h) {
   let email = request.payload.email;
 
   log.info('create.account', email);
 
   let passwordHash = await utils.hash(request.payload.password);
 
-  try {
-    let account = await models.Account.create({
-      email: request.payload.email,
-      password_hash: passwordHash
-    });
+  let account = await models.Account.create({
+    email: request.payload.email,
+    password_hash: passwordHash
+  });
 
-    let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+  let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
 
-    if (geoLocation) {
+  if (geoLocation) {
 
-      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+    let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
-      slack.notify(`${account.email} registerd from ${userLocation}`);
+    slack.notify(`${account.email} registerd from ${userLocation}`);
 
-      account.registration_geolocation = geoLocation
+    account.registration_geolocation = geoLocation
 
-    } else {
+  } else {
 
-      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+    slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
 
-    }
-
-    account.registration_ip_address = request.info.remoteAddress
-
-    account.save()
-    
-    emitter.emit('account.created', account)
-
-    return account;
-
-  } catch(error) {
-
-    log.error(`account ${email} already registered`);
-
-    return Boom.badRequest(
-      new Error(`account ${email} already registered`)
-    );
   }
+
+  account.registration_ip_address = request.info.remoteAddress
+
+  account.save()
+  
+  emitter.emit('account.created', account)
+
+  return account;
+
 }
 
 export async function showPublic (req, h) {
-  try {
 
-    let account = await models.Account.findOne({
+  let account = await models.Account.findOne({
+    where: {
+      email: req.params.id
+    }
+  });
+
+  if (!account) {
+
+    account = await models.Account.findOne({
       where: {
-        email: req.params.id
+        id: req.params.id
       }
     });
+  }
 
-    if (!account) {
+  if (!account) {
 
-      account = await models.Account.findOne({
-        where: {
-          id: req.params.id
-        }
-      });
+    return Boom.notFound();
+  }
+
+  let addresses = await models.Address.findAll({
+
+    where: {
+      account_id: account.id
     }
 
-    if (!account) {
+  });
 
-      return Boom.notFound();
-    }
+  let payments = await models.Invoice.findAll({
 
-    let addresses = await models.Address.findAll({
-
-      where: {
-        account_id: account.id
+    where: {
+      account_id: account.id,
+      status: 'paid',
+      createdAt: {
+        [Op.gte]: moment().subtract(1, 'month')
       }
+    },
 
-    });
+    order: [["createdAt", "desc"]]
+  
+  })
 
-    let payments = await models.Invoice.findAll({
+  let latest = await models.Invoice.findOne({
 
-      where: {
-        account_id: account.id,
-        status: 'paid',
-        createdAt: {
-          [Op.gte]: moment().subtract(1, 'month')
-        }
-      },
+    where: {
+      account_id: account.id,
+      status: 'paid'
+    },
 
-      order: [["createdAt", "desc"]]
-    
-    })
+    order: [["createdAt", "desc"]]
+  
+  })
 
-    let latest = await models.Invoice.findOne({
-
-      where: {
-        account_id: account.id,
-        status: 'paid'
-      },
-
-      order: [["createdAt", "desc"]]
-    
-    })
-
-    if (latest) {
-      latest = {
-        time: latest.paidAt,
-        denomination_amount: latest.denomination_amount,
-        denomination_currency: latest.denomination_currency,
-        currency: latest.currency
-      }
+  if (latest) {
+    latest = {
+      time: latest.paidAt,
+      denomination_amount: latest.denomination_amount,
+      denomination_currency: latest.denomination_currency,
+      currency: latest.currency
     }
+  }
 
-    return {
-      id: account.id,
-      name: account.business_name,
-      physical_address: account.physical_address,
-      coordinates: {
-        latitude: account.latitude,
-        longitude: account.longitude
-      },
-      coins: addresses.filter(a => {
-        let coin = coins.getCoin(a.currency)
-        return !!coin && !coin.unavailable
-      }).map(a => a.currency),
-      payments: {
-        last_30_days: payments.length,
-        latest: latest
-      }
+  return {
+    id: account.id,
+    name: account.business_name,
+    physical_address: account.physical_address,
+    coordinates: {
+      latitude: account.latitude,
+      longitude: account.longitude
+    },
+    coins: addresses.filter(a => {
+      let coin = coins.getCoin(a.currency)
+      return !!coin && !coin.unavailable
+    }).map(a => a.currency),
+    payments: {
+      last_30_days: payments.length,
+      latest: latest
     }
-
-  } catch(error) {
-
-    console.log(error)
-
-    return Boom.badRequest(error)
 
   }
+
 }
 
-export async function show (request, reply) {
+export async function show (request, h) {
 
   var account = request.account,
-      ambassador,
       addresses,
       tipjars
-
-  if (account.ambassador_id) {
-    log.info(`find ambassador ${account.ambassador_id}`)
-    var record = await models.Ambassador.findOne({ where: { id: account.ambassador_id }})
-    log.info('ambassador', record.toJSON())
-
-    if (record) {
-      let ambassador_account = await models.Account.findOne({
-        where: {
-          id: record.account_id
-        },
-        attributes: ['id', 'email'] 
-      });
-      if (ambassador_account) {
-        log.info('ambassador.account', ambassador)
-
-        ambassador = Object.assign({
-          id: record.id,
-          account_id: ambassador_account.id,
-          email: ambassador_account.email
-        })
-      }
-    }
-
-  }
 
   addresses = await models.Address.findAll({ where: {
     account_id: account.id
@@ -282,78 +213,13 @@ export async function show (request, reply) {
 
   return  {
     account,
-    ambassador,
     addresses,
     tipjars
   }
 
 };
 
-export async function getRewards(request, reply) {
-
-  let accountId = request.auth.credentials.accessToken.account_id;
-
-  var account = await models.Account.findOne({
-   where: {
-     id: accountId 
-   },include:[{
-      model: models.Ambassador,
-      as: 'ambassador'
-    },{
-      model: models.AmbassadorReward,
-      as: 'ambassador_rewards'
-    }]
-  });
-
-  let ambassador = await models.Ambassador.findOne({ 
-    where: {
-      account_id: account.id 
-    },
-    include:[
-      {
-        model: models.Account,
-        as: 'merchants'
-      },{
-        model: models.AmbassadorReward,
-        as: 'rewards'
-      }
-    ]
-  })
-
-  if( ambassador){
-
-    account = Object.assign(ambassador.toJSON(), account.toJSON())
-
-  }
-
-  return {account};
-
-};
-
-
-export async function sudoShow (request, reply) {
-
-  var account = await models.Account.findOne({
-    where: {
-      id: request.params.account_id
-    }
-  });
-
-  return account;
-};
-
-export async function sudoAccountWithEmail (request, reply) {
-
-  var account = await models.Account.findOne({
-    where: {
-      email: request.params.email
-    }
-  });
-
-  return account;
-}
-
-export async function index(request, reply) {
+export async function index(request, h) {
 
   let limit = parseInt(request.query.limit) || 100;
   let offset = parseInt(request.query.offset) || 0;
@@ -361,43 +227,5 @@ export async function index(request, reply) {
   var accounts = await models.Account.findAll({ offset, limit });
 
   return accounts;
-};
-
-export async function destroy(request, reply) {
-
-  let account = await models.Account.findOne({
-    where: { id: request.params.account_id }
-  });
-
-  if (!account) {
-    log.error(`account ${request.params.account_id} not found`);
-    return { error: 'account not found' };
-  }
-
-  await models.AccessToken.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Address.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Invoice.destroy({
-    where: {
-      account_id: account.id
-    }
-  });
-
-  await models.Account.destroy({
-    where: {
-      id: account.id
-    }
-  });
-
-  return { success: true };
 };
 

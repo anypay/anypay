@@ -22,7 +22,7 @@ export async function start() {
 
     // TODO: send one day after sign up email
 
-    await email.sendEmail('one_day_after_signup', json.email, 'Anypay<support@anypayinc.com>', json)
+    await email.sendEmail('one_day_after_signup', json.email, 'Anypay<support@anypayx.com>', json)
 
     channel.ack(msg);
 

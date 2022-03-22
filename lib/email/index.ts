@@ -17,7 +17,7 @@ export async function sendInvoiceToEmail(uid, email) {
 
   let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
-  return rabbiEmail.sendEmail('share-invoice', email, 'Anypay<support@anypayinc.com>', {
+  return rabbiEmail.sendEmail('share-invoice', email, 'Anypay<support@anypayx.com>', {
     account_id: account.id,
     business_name: account.business_name,
     invoice,
@@ -30,7 +30,7 @@ export async function sendInvoiceToEmail(uid, email) {
 
 export async function firstAddressSetEmail(account) {
 
-  return rabbiEmail.sendEmail('first_address_set', account.email, 'Anypay<support@anypayinc.com>', {
+  return rabbiEmail.sendEmail('first_address_set', account.email, 'Anypay<support@anypayx.com>', {
     account_id: account.id
   });
 
@@ -39,7 +39,7 @@ export async function firstAddressSetEmail(account) {
 
 export async function newAccountCreatedEmail(account) {
 
-  return rabbiEmail.sendEmail('welcome', account.email, 'Anypay<support@anypayinc.com>', { email: account.email });
+  return rabbiEmail.sendEmail('welcome', account.email, 'Anypay<support@anypayx.com>', { email: account.email });
 
 };
 
@@ -49,7 +49,7 @@ export async function firstInvoiceCreatedEmail(email) {
 
   let invoice = await models.Invoice.findOne({ where: { account_id: account.id }})
 
-  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay<support@anypayinc.com>', {
+  return rabbiEmail.sendEmail('first_invoice_created', account.email, 'Anypay<support@anypayx.com>', {
     email: account.email,
     invoice_uid: invoice.uid
   });
@@ -66,7 +66,7 @@ export async function addressChangedEmail(address_id: number) {
     id: address.account_id
   }});
 
-  return rabbiEmail.sendEmail('address_updated', account.email, 'Anypay<support@anypayinc.com>', {
+  return rabbiEmail.sendEmail('address_updated', account.email, 'Anypay<support@anypayx.com>', {
     currency: address.currency,
     address: address.value,
     updated_at_time: address.updated_at,
@@ -75,66 +75,6 @@ export async function addressChangedEmail(address_id: number) {
   });
 
 }
-
-export async function ambassadorRewardEmail(invoice_uid){  
-
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: invoice_uid
-  }});
-
-  let reward = await models.AmbassadorReward.findOne({ where: {
-    invoice_uid: invoice.uid
-  }});
-
-  let ambassador = await models.Ambassador.findOne({ where: {
-    id: reward.ambassador_id
-  }});
-
-  let account = await models.Account.findOne({ where: {
-    id: ambassador.account_id
-  }});
-
-  let business = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
-
-  // compute denomination amount
-  // get the price of the currency at that time
-  // x dollars per currency
-  let price = invoice.denomination_amount_paid / invoice.invoice_amount_paid;
-
-  let denomination_amount = (reward.amount * price).toFixed(4);
-
-  let rewardExplorerUrl = getBlockExplorerTxidUrl(reward);
-
-  let variables = {
-    invoice_paid_date_time: invoice.completed_at,
-    currency: reward.currency,
-    rewardTxid: reward.txid,
-    rewardAmount: reward.amount,
-    rewardAddress: reward.address,
-    rewardCurrency: reward.currency,
-    rewardExplorerUrl,
-    denomination_currency: invoice.denomination_currency,
-    amount_paid: reward.invoice_amount_paid,
-    denomination_amount_paid: denomination_amount,
-    businessName: business.business_name,
-    businessStreetAddress: business.business_street_address,
-    businessCity: business.business_city,
-    businessState: business.business_state,
-    businessZip: business.business_zip
-  };
-
-  let resp = await rabbiEmail.sendEmail(
-    'ambassador_reward',
-    account.email,
-    'support@anypayinc.com',
-    variables
-  )
-
-  return resp;
-}
-
 
 export async function invoicePaidEmail(invoice){  
 
@@ -159,7 +99,7 @@ export async function invoicePaidEmail(invoice){
   let resp = await rabbiEmail.sendEmail(
     'invoice_paid_receipt',
     account.email,
-    'support@anypayinc.com',
+    'support@anypayx.com',
     variables
   )
 
@@ -175,7 +115,7 @@ export async function firstInvoicePaidEmail(invoice){
   let resp = await rabbiEmail.sendEmail(
     'first_invoice_paid',
     account.email,
-    'support@anypayinc.com'
+    'support@anypayx.com'
   )
 
   return resp;

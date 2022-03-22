@@ -62,77 +62,69 @@ export async function createBeta(req, h) {
 
 export async function create(req, h) {
 
-  try {
+  log.info('pay.request.create', { template: req.payload.template, options: req.payload.options })
 
-    log.info('pay.request.create', { template: req.payload.template, options: req.payload.options })
+  let { error, template } = schema.PaymentRequestTemplate.validate(req.payload.template)
 
-    let { error, template } = schema.PaymentRequestTemplate.validate(req.payload.template)
+  if (error) {
 
-    if (error) {
+    log.error('pay.request.create.error', { error })
 
-      log.error('pay.request.create.error', { error })
+    throw error
 
-      throw error
+  } else {
 
-    } else {
+    log.info('pay.request.create.template.valid', template)
 
-      log.info('pay.request.create.template.valid', template)
+    let record = await models.PaymentRequest.create({
 
-      let record = await models.PaymentRequest.create({
+      app_id: req.app_id,
 
-        app_id: req.app_id,
+      template: req.payload.template,
 
-        template: req.payload.template,
+      status: 'unpaid'
 
-        status: 'unpaid'
+    })
 
-      })
+    let invoice = await invoices.createEmptyInvoice(req.app_id)
 
-      let invoice = await invoices.createEmptyInvoice(req.app_id)
+    invoice.currency = req.payload.template[0].currency
 
-      invoice.currency = req.payload.template[0].currency
+    if (req.payload.options) {
 
-      if (req.payload.options) {
-
-        invoice.webhook_url = req.payload.options.webhook
-        invoice.redirect_url = req.payload.options.redirect
-        invoice.secret = req.payload.options.secret
-        invoice.metadata = req.payload.options.metadata
-
-      }
-
-      await invoice.save()
-
-      record.invoice_uid = invoice.uid
-      record.uri = invoice.uri
-      record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
-      record.status = 'unpaid'
-
-      await record.save()
-
-      await paymentRequestToPaymentOptions(record)
-
-      log.info('pay.request.created', record.toJSON())
-
-      return {
-
-        uid: record.uid,
-
-        uri: record.uri,
-
-        url: record.webpage_url,
-
-        payment_request: record.toJSON()
-
-        //options: req.payload.options
-
-      } 
+      invoice.webhook_url = req.payload.options.webhook
+      invoice.redirect_url = req.payload.options.redirect
+      invoice.secret = req.payload.options.secret
+      invoice.metadata = req.payload.options.metadata
 
     }
 
-  } catch(error) {
+    await invoice.save()
 
-    return Boom.badRequest(error.message);
+    record.invoice_uid = invoice.uid
+    record.uri = invoice.uri
+    record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
+    record.status = 'unpaid'
+
+    await record.save()
+
+    await paymentRequestToPaymentOptions(record)
+
+    log.info('pay.request.created', record.toJSON())
+
+    return {
+
+      uid: record.uid,
+
+      uri: record.uri,
+
+      url: record.webpage_url,
+
+      payment_request: record.toJSON()
+
+      //options: req.payload.options
+
+    } 
 
   }
 

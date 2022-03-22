@@ -12,31 +12,21 @@ export async function list(req: Request, h: ResponseToolkit) {
     latitude, longitude from accounts where physical_address is not null and
     business_name is not null`);
 
-  return { merchants: resp[0] };
+  h.response({ merchants: resp[0] })
 
 }
 
 export async function listMerchantCoins( req: Request, h:ResponseToolkit){
 
-  try{
+  let query = `select accounts.id, currency from accounts full join addresses on accounts.id = addresses.account_id where accounts.physical_address is not null and accounts.business_name is not null`
 
-    let query = `select accounts.id, currency from accounts full join addresses on accounts.id = addresses.account_id where accounts.physical_address is not null and accounts.business_name is not null`
+  let coinList = await database.query(query)
 
-    let coinList = await database.query(query)
-
-    return coinList[0]
-
-  }catch(error){
-
-    console.log(error)
-
-  }
-
+  return h.response(coinList[0])
 
 }
-export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
-  try {
+export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
   const oneWeek = await listActiveMerchantsSince(1, 'week')
 
@@ -46,7 +36,7 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
   const merchants = await listAll()
 
-  return {
+  return h.response({
 
     merchants,
 
@@ -56,12 +46,7 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
 
     threeMonths
 
-  };
-
-  } catch (error) {
-
-    return { error: error.message }
-
-  }
+  })
 
 }
+

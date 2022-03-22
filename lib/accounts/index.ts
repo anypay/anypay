@@ -12,8 +12,6 @@ import {getAddress, getSupportedCoins} from './supported_coins';
 
 import {events} from '../events'
 
-import * as geocoder from '../googlemaps';
-
 interface Map<T> {
     [key: string]: T;
 }
@@ -24,7 +22,6 @@ interface AccountAddress {
   account_id: number;
   currency: string;
   address: string;
-  xpubkey: boolean;
   nonce: number;
   enabled: boolean;
   name?: string;
@@ -93,75 +90,6 @@ export async function updateAccount(account, payload) {
   let updateAttrs: any = Object.assign(payload, {});
 
   log.info('account.update', updateAttrs)
-
-  if (updateAttrs.physical_address) {
-
-    try {
-
-      let geocodeResult = await geocoder.geocodeFull(updateAttrs.physical_address, account.id);
-
-      let city = geocoder.parseCity(geocodeResult);
-      let state = geocoder.parseState(geocodeResult);
-      let country = geocoder.parseCountry(geocodeResult);
-
-      let geolocation = geocodeResult.geometry.location
-
-      updateAttrs.latitude = geolocation.lat;
-      updateAttrs.longitude = geolocation.lng;
-      updateAttrs.position = pointFromLatLng(geolocation.lat, geolocation.lng)
-      updateAttrs.city = city.long_name;
-      updateAttrs.state = state.short_name;
-      updateAttrs.country = country.short_name;
-
-    } catch (error) {
-
-      log.error('error geocoding address', error.message);
-
-    }
-
-  }
-
-  if (updateAttrs.ambassador_email) {
-    let ambassadorAccount = await models.Account.findOne({
-      where: {
-        email: updateAttrs.ambassador_email
-      }
-    });
-
-    if (!ambassadorAccount) {
-      throw new Error('ambassador email does not exist');
-    }
-
-    let [ambassador] = await models.Ambassador.findOrCreate({
-      where: { account_id: ambassadorAccount.id },
-      defaults: {
-        account_id: ambassadorAccount.id 
-      }
-    })
-
-    if (ambassador) {
-      log.info('ambassador.found', { ambassador })
-
-      updateAttrs['ambassador_id'] = ambassador.id;
-
-      let channel = await awaitChannel();
-
-      await channel.publish('anypay', 'ambassador_set', Buffer.from(JSON.stringify({
-        account_id: account.id,
-        ambassador_id: ambassador.id,
-        ambassador_email: updateAttrs.ambassador_email
-      })));
-
-    }
-
-  }
-
-  delete updateAttrs['ambassador_email'];
-
-  if (updateAttrs.remove_ambassador) {
-    updateAttrs['ambassador_id'] = null
-    delete updateAttrs['remove_ambassador']
-  }
 
   await account.update(updateAttrs)
 

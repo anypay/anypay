@@ -53,8 +53,6 @@ describe("Invoices HTTP API", () => {
     }, response => {
       let invoices = JSON.parse(response.payload).invoices;
 
-      console.log(invoices);
-
       done()
     });
   });

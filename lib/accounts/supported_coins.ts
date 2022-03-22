@@ -53,14 +53,6 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
       let address = accountCoins[coin.code].address;
 
-      // Enable BCH only if xpubkey set
-
-      if (address && address.match(/^xpub/)) {
-
-        accountCoins[coin.code].unavailable = false;
-
-      }
-
     }
 
 

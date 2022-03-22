@@ -23,40 +23,32 @@ export interface SubmitPaymentResponse {
 
 export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
-  try {
+  let currency = getCurrency({
+    headers: req.headers,
+    protocol: 'JSONV2'
+  })
 
-    let currency = getCurrency({
-      headers: req.headers,
-      protocol: 'JSONV2'
-    })
+  log.info(`paymentrequest.jsonv2`, {
+    currency: currency.code,
+    invoice_uid: req.params.uid
+  })
 
-    log.info(`paymentrequest.jsonv2`, {
-      currency: currency.code,
-      invoice_uid: req.params.uid
-    })
+  const paymentRequest = await buildPaymentRequestForInvoice({
+    uid: req.params.uid,
+    currency: currency.code,
+    protocol: 'JSONV2'
+  })
 
-    const paymentRequest = await buildPaymentRequestForInvoice({
-      uid: req.params.uid,
-      currency: currency.code,
-      protocol: 'JSONV2'
-    })
+  let response = h.response(paymentRequest.content);
 
-    let response = h.response(paymentRequest.content);
+  response.type('application/payment-request');
 
-    response.type('application/payment-request');
+  response.header('Content-Type', 'application/payment-request');
 
-    response.header('Content-Type', 'application/payment-request');
+  response.header('Accept', 'application/payment');
 
-    response.header('Accept', 'application/payment');
+  return response;
 
-    return response;
-
-  } catch(error) {
-
-    log.error(error)
-
-    return Boom.badRequest(error.message)
-  }
 }
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
@@ -121,41 +113,31 @@ export async function create(req, h) {
 
   const currency = req.params.currency.toUpperCase()
 
-  try {
+  let invoice_uid = req.params.uid
 
-    let invoice_uid = req.params.uid
+  let transactions = req.payload.transactions;
 
-    let transactions = req.payload.transactions;
+  let wallet = detectWallet(req.headers, req.params.uid)
 
-    let wallet = detectWallet(req.headers, req.params.uid)
+  for (let transaction of transactions) {
 
-    for (let transaction of transactions) {
-
-      models.PaymentSubmission.create({
-        invoice_uid,
-        txhex: transaction,
-        headers: req.headers,
-        wallet,
-        currency
-      })
-    }
-
-    let response = await submitPayment({
-      currency,
+    models.PaymentSubmission.create({
       invoice_uid,
-      transactions,
-      wallet
+      txhex: transaction,
+      headers: req.headers,
+      wallet,
+      currency
     })
-
-    return response
-
-  } catch(error) {
-
-    console.error(`jsonv2.${currency.toLowerCase()}.submittransaction.error`, error)
-
-    return Boom.badRequest(error)
-
   }
+
+  let response = await submitPayment({
+    currency,
+    invoice_uid,
+    transactions,
+    wallet
+  })
+
+  return response
 
 }
 
