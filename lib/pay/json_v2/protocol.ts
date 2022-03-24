@@ -118,7 +118,10 @@ const Errors = require('./errors').errors
 
 export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptions> {
 
-  log.info('pay.jsonv2.payment-options', { invoice_uid: invoice.uid, account_id: invoice.get('account_id') })
+  log.info('pay.jsonv2.payment-options', {
+    invoice_uid: invoice.uid,
+    account_id: invoice.get('account_id')
+  })
 
   let paymentOptions = await invoice.getPaymentOptions()
 
