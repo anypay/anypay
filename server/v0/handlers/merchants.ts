@@ -1,4 +1,4 @@
-import { database } from '../../../lib';
+import { database, models } from '../../../lib';
 
 import * as moment from 'moment';
 
@@ -47,6 +47,55 @@ export async function listActiveSince(req: Request, h: ResponseToolkit) {
     threeMonths
 
   })
+
+}
+
+interface MerchantInfo {
+  business_address: string;
+  business_name: string;
+  latitude: number;
+  longitude: number;
+  image_url: boolean;
+  account_id: number;
+  denomination: string;
+}
+
+export async function show(req, h) {
+
+  return getMerchantInfo(req.params.account_id);
+
+};
+
+async function getMerchantInfo(accountId: any): Promise<MerchantInfo> {
+
+  console.log("get merchant info", accountId);
+
+  let account = await models.Account.findOne({where: {
+    stub: accountId
+  }})
+
+  if (!account) {
+
+    account = await models.Account.findOne({where: {
+
+      id: parseInt(accountId)
+    }})
+
+  }
+
+  if (!account) {
+    throw new Error('no account found');
+  }
+
+  return {
+    business_name: account.business_name,
+    business_address: account.business_address,
+    latitude: parseFloat(account.latitude),
+    longitude: parseFloat(account.longitude),
+    image_url: account.image_url,
+    account_id: account.id,
+    denomination: account.denomination
+  }
 
 }
 
