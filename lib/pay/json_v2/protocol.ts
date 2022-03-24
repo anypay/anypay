@@ -118,7 +118,7 @@ const Errors = require('./errors').errors
 
 export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptions> {
 
-  log.info('pay.jsonv2.paymentoptions', { invoice_uid: invoice.uid })
+  log.info('pay.jsonv2.payment-options', { invoice_uid: invoice.uid, account_id: invoice.get('account_id') })
 
   let paymentOptions = await invoice.getPaymentOptions()
 
@@ -152,7 +152,10 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest): Promise<PaymentRequest> {
 
-  log.info('pay.jsonv2.paymentrequest', option)
+  log.info('pay.jsonv2.payment-request', Object.assign(option, {
+    account_id: invoice.get('account_id'),
+    invoice_uid: invoice.uid
+  }))
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
@@ -190,7 +193,10 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
 export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentVerification> {
 
-  log.info('pay.jsonv2.paymentverification', Object.assign({ invoice_uid: invoice.uid }, params))
+  log.info('pay.jsonv2.payment-verification', Object.assign({
+    invoice_uid: invoice.uid,
+    account_id: invoice.get('account_id')
+  }, params))
 
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
@@ -203,7 +209,10 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
 export async function sendSignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentResponse> {
 
-  log.info('pay.jsonv2.payment', Object.assign({ invoice_uid: invoice.uid }, params))
+  log.info('pay.jsonv2.payment', Object.assign({
+    invoice_uid: invoice.uid,
+    account_id: invoice.get('account_id')
+  }, params))
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 
@@ -215,6 +224,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
   log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {
     invoice_uid: invoice.uid,
+    account_id: invoice.get('account_id')
   }))
 
   return {

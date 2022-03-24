@@ -3,7 +3,7 @@ require('dotenv').config()
 
 import { log } from '../lib/log'
 
-import { port } from './server'
+import { port } from './plugin'
 
 import { v4 } from 'uuid'
 
@@ -85,13 +85,7 @@ class Socket extends EventEmitter {
 
     this.rws.addEventListener('message', (message) => {
 
-      console.log("RWS MESSAGE", message)
-
       const { data } = message
-
-      console.log('DATA', data)
-
-      log.info('ws.client.message.raw', data)
 
       try {
 
@@ -99,11 +93,13 @@ class Socket extends EventEmitter {
 
         const { type, payload } = json
 
-        log.info('ws.client.message.json', json)
-
-        log.info(`ws.event.${type}`, payload)
-
         this.emit(type, payload)
+
+        if (payload.account_id) {
+
+          this.emit('account.event', { type, payload })
+
+        }
 
       } catch(error) {
 
@@ -122,7 +118,7 @@ class Socket extends EventEmitter {
   send(type: string, payload: Json) {
     const message = JSON.stringify({ type, payload })
 
-    this.ws.send(message)
+    this.rws.send(message)
   }
 
 };
@@ -144,6 +140,14 @@ class Socket extends EventEmitter {
   socket.on('arbitrary.event', data => {
 
     console.log('ARBITRARY EVENT', data)
+
+  })
+
+  socket.on('account.event', data => {
+
+    const { type, payload } = data
+
+    console.log({ type })
 
   })
 

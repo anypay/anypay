@@ -151,7 +151,7 @@ export async function generateInvoice(
 
 ): Promise<any> {
 
-  log.info('invoices.generate', { accountId, denominationAmountValue, invoiceCurrency, uid })
+  log.info('invoices.generate', { account_id: accountId, denominationAmountValue, invoiceCurrency, invoice_uid: uid })
 
   uid = !!uid ? uid : shortid.generate();
 
