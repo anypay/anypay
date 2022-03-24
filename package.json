@@ -91,6 +91,7 @@
     "pino": "^7.8.1",
     "polynym": "^1.0.7",
     "promise-one-success": "^1.0.0",
+    "prompt-async": "^0.9.9",
     "protobufjs": "^5.0.3",
     "qr": "^0.2.4",
     "qrcode-terminal": "^0.11.0",

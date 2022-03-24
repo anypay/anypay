@@ -22,7 +22,7 @@ const host = 'ws://localhost:8090'
 
 type Json = any;
 
-class Socket extends EventEmitter {
+export class Socket extends EventEmitter {
 
   sessionId: string;
 
@@ -123,32 +123,36 @@ class Socket extends EventEmitter {
 
 };
 
-(async () => {
+if (require.main === module) {
 
-  let account = await findAccount(1177)
+  (async () => {
 
-  let { jwt } = await ensureAccessToken(account)
+    let account = await findAccount(1177)
 
-  const socket = new Socket({ token: jwt })
+    let { jwt } = await ensureAccessToken(account)
 
-  socket.on('authenticated', data => {
+    const socket = new Socket({ token: jwt })
 
-    console.log('AUTHENTICATED!', data)
+    socket.on('authenticated', data => {
 
-  })
+      console.log('AUTHENTICATED!', data)
 
-  socket.on('arbitrary.event', data => {
+    })
 
-    console.log('ARBITRARY EVENT', data)
+    socket.on('arbitrary.event', data => {
 
-  })
+      console.log('ARBITRARY EVENT', data)
 
-  socket.on('account.event', data => {
+    })
 
-    const { type, payload } = data
+    socket.on('account.event', data => {
 
-    console.log({ type })
+      const { type, payload } = data
 
-  })
+      console.log({ type })
 
-})()
+    })
+
+  })()
+
+}
