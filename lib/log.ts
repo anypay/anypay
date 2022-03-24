@@ -47,7 +47,8 @@ class Logger {
     return models.Event.create({
       namespace: this.namespace,
       event: type,
-      payload
+      payload,
+      account_id: payload.account_id
     })
 
   }

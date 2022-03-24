@@ -10,6 +10,8 @@ import { Orm } from './orm'
 
 import { Invoice } from './invoices'
 
+import { Account } from './account'
+
 import { events } from 'rabbi'
 
 import {publishEventToSlack} from './slack/events';
@@ -91,6 +93,18 @@ export class Event extends Orm {
 
   }
 
+  toJSON() {
+
+    let json = this.record.toJSON()
+
+    json.type = json.event
+
+    delete json['event']
+
+    return json
+
+  }
+
 }
 
 export async function listEvents(event: string, payload: any): Promise<Event[]> {
@@ -113,17 +127,39 @@ export async function listEvents(event: string, payload: any): Promise<Event[]> 
 
 export async function listInvoiceEvents(invoice: Invoice, type?: string): Promise<Event[]> {
 
-  let records = await models.Event.findAll({
+  var where = {
 
-    where: {
+    payload: { invoice_uid: invoice.uid },
 
-      payload: { invoice_uid: invoice.uid },
+  }
 
-      event: type
+  if (type) {
 
-    }
+    where['event'] = type
 
-  })
+  }
+
+  let records = await models.Event.findAll({ where })
+
+  return records.map(record => new Event(record))
+
+}
+
+export async function listAccountEvents(account: Account, type?: string): Promise<Event[]> {
+
+  var where = {
+
+    account_id: account.id
+
+  }
+
+  if (type) {
+
+    where['event'] = type
+
+  }
+
+  let records = await models.Event.findAll({ where })
 
   return records.map(record => new Event(record))
 
