@@ -1,6 +1,10 @@
 
 const validator = require('validator')
 
+import { log } from './log'
+
+import { Event } from './events'
+
 import { createWebhook } from './webhooks'
 
 import { Account, findAccount } from './account'
@@ -224,6 +228,11 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
   let invoice = new Invoice(record)
 
   const options = await createPaymentOptions(account.record, invoice)
+
+  await log.info('invoice.created', {
+    invoice_uid: invoice.uid,
+    account_id: invoice.account_id
+  })
 
   return invoice;
 

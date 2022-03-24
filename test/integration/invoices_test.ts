@@ -73,6 +73,29 @@ describe('Integration | Invoices', () => {
 
   })
 
+  describe("Listing Events Related To Invoice", () => {
+
+    it('gets the invoice events list from the API', async () => {
+
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+      let response = await utils.authRequest(account, {
+        method: 'GET',
+        url: `/v1/api/invoices/${invoice.uid}/events`
+      })
+      
+      expect(response.statusCode).to.be.equal(200)
+
+      expect(response.result.events).to.be.an('array')
+
+      expect(response.result.events[0].type).to.be.equal('invoice.created')
+
+      expect(response.result.events[0].account_id).to.be.equal(account.id)
+
+    })
+
+  })
+
   describe("Getting Invoice Data", () => {
 
     it.skip("should have notes attached once they are created")

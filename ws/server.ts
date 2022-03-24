@@ -39,7 +39,7 @@ const handlers = {
 
     const sessionId = uuid.v4()
 
-    const queue = `ws.account.1177.${sessionId}`
+    const queue = `ws.account.${account.id}.${sessionId}`
 
     socket.queue = queue
 

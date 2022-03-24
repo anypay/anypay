@@ -44,11 +44,20 @@ class Logger {
 
     await publish(type, payload, 'anypay.topic')
 
+    if (payload.account_id) {
+
+      const routing_key = `accounts.${payload.account_id}.events`
+
+      await publish(routing_key, { payload, type }, 'anypay.topic')
+    }
+
     return models.Event.create({
       namespace: this.namespace,
       event: type,
-      payload
+      payload,
+      account_id: payload.account_id
     })
+
 
   }
 

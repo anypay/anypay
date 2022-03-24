@@ -31,7 +31,7 @@ describe('JSON Payment Protocol V2', () => {
 
     let response = await protocol.listPaymentOptions(invoice)
 
-    expect(log.info).to.have.been.called.with('pay.jsonv2.paymentoptions')
+    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-options')
 
   })
 
@@ -71,7 +71,7 @@ describe('JSON Payment Protocol V2', () => {
 
     let response = await protocol.getPaymentRequest(invoice, paymentOptions[0])
 
-    expect(log.info).to.have.been.called.with('pay.jsonv2.paymentrequest')
+    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-request')
   })
 
   it('#verifyUnsignedPayment should verify valid payment', async () => {
@@ -102,7 +102,7 @@ describe('JSON Payment Protocol V2', () => {
 
     })
 
-    expect(log.info).to.have.been.called.with('pay.jsonv2.paymentverification')
+    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-verification')
 
   })
 

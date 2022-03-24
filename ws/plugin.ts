@@ -6,6 +6,8 @@ import { start } from './server'
 
 import { Server } from 'hapi'
 
+export const port = process.env.PORT || 8090
+
 export const plugin = (() => {
 
   return {
@@ -37,7 +39,7 @@ if (require.main === module) {
 
     const server = new Server({
       host: process.env.HOST || "localhost",
-      port: process.env.PORT || 8090,
+      port,
       routes: {
         cors: true
       }
