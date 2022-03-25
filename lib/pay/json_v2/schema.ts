@@ -1,6 +1,5 @@
 
-//import * as Joi from 'joi'
-const Joi = require('joi')
+import * as Joi from '@hapi/joi'
 
 const PaymentOptionsHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),

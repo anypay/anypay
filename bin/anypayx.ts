@@ -45,7 +45,7 @@ program
 
       const { type, payload } = data
 
-      console.log({ type })
+      console.log({ type }, JSON.stringify(payload))
 
     })
 

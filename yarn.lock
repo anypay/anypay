@@ -426,7 +426,14 @@
     "@hapi/boom" "9.x.x"
     "@hapi/hoek" "9.x.x"
 
-"@hapi/ammo@^5.0.1":
+"@hapi/address@^4.0.1":
+  "integrity" "sha512-SkszZf13HVgGmChdHo/PxchnSaCJ6cetVqLzyciudzZRT0jcOouIF/Q93mgjw8cce+D+4F4C1Z/WrfFN+O3VHQ=="
+  "resolved" "https://registry.npmjs.org/@hapi/address/-/address-4.1.0.tgz"
+  "version" "4.1.0"
+  dependencies:
+    "@hapi/hoek" "^9.0.0"
+
+"@hapi/ammo@^5.0.1", "@hapi/ammo@5.x.x":
   "integrity" "sha512-FbCNwcTbnQP4VYYhLNGZmA76xb2aHg9AMPiy18NZyWMG310P5KdFGyA9v2rm5ujrIny77dEEIkMOwl0Xv+fSSA=="
   "resolved" "https://registry.npmjs.org/@hapi/ammo/-/ammo-5.0.1.tgz"
   "version" "5.0.1"
@@ -505,7 +512,12 @@
   "resolved" "https://registry.npmjs.org/@hapi/file/-/file-2.0.0.tgz"
   "version" "2.0.0"
 
-"@hapi/hapi@^20.2.1", "@hapi/hapi@>=19.x.x":
+"@hapi/formula@^2.0.0":
+  "integrity" "sha512-V87P8fv7PI0LH7LiVi8Lkf3x+KCO7pQozXRssAHNXXL9L1K+uyu4XypLXwxqVDKgyQai6qj3/KteNlrqDx4W5A=="
+  "resolved" "https://registry.npmjs.org/@hapi/formula/-/formula-2.0.0.tgz"
+  "version" "2.0.0"
+
+"@hapi/hapi@^20.0.0", "@hapi/hapi@^20.2.1", "@hapi/hapi@>=19.x.x":
   "integrity" "sha512-OXAU+yWLwkMfPFic+KITo+XPp6Oxpgc9WUH+pxXWcTIuvWbgco5TC/jS8UDvz+NFF5IzRgF2CL6UV/KLdQYUSQ=="
   "resolved" "https://registry.npmjs.org/@hapi/hapi/-/hapi-20.2.1.tgz"
   "version" "20.2.1"
@@ -538,10 +550,22 @@
     "@hapi/hoek" "9.x.x"
     "@hapi/validate" "1.x.x"
 
-"@hapi/hoek@^9.0.0", "@hapi/hoek@^9.0.4", "@hapi/hoek@9.x.x":
+"@hapi/hoek@^9.0.0", "@hapi/hoek@^9.0.2", "@hapi/hoek@^9.0.4", "@hapi/hoek@9.x.x":
   "integrity" "sha512-gfta+H8aziZsm8pZa0vj04KO6biEiisppNgA1kbJvFrrWu9Vm7eaUEy76DIxsuTaWvti5fkJVhllWc6ZTE+Mdw=="
   "resolved" "https://registry.npmjs.org/@hapi/hoek/-/hoek-9.2.1.tgz"
   "version" "9.2.1"
+
+"@hapi/inert@^6.0.5":
+  "integrity" "sha512-eVAdUVhJLmmXLM/Zt7u5H5Vzazs9GKe4zfPK2b97ePHEfs3g/AQkxHfYQjJqMy11hvyB7a21Z6rBEA0R//dtXw=="
+  "resolved" "https://registry.npmjs.org/@hapi/inert/-/inert-6.0.5.tgz"
+  "version" "6.0.5"
+  dependencies:
+    "@hapi/ammo" "5.x.x"
+    "@hapi/boom" "9.x.x"
+    "@hapi/bounce" "2.x.x"
+    "@hapi/hoek" "9.x.x"
+    "@hapi/validate" "1.x.x"
+    "lru-cache" "^6.0.0"
 
 "@hapi/iron@6.x.x":
   "integrity" "sha512-zvGvWDufiTGpTJPG1Y/McN8UqWBu0k/xs/7l++HVU535NLHXsHhy54cfEMdW7EjwKfbBfM9Xy25FmTiobb7Hvw=="
@@ -553,6 +577,17 @@
     "@hapi/bourne" "2.x.x"
     "@hapi/cryptiles" "5.x.x"
     "@hapi/hoek" "9.x.x"
+
+"@hapi/joi@^17.1.1":
+  "integrity" "sha512-p4DKeZAoeZW4g3u7ZeRo+vCDuSDgSvtsB/NpfjXEHTUjSeINAi/RrVOWiVQ1isaoLzMvFEhe8n5065mQq1AdQg=="
+  "resolved" "https://registry.npmjs.org/@hapi/joi/-/joi-17.1.1.tgz"
+  "version" "17.1.1"
+  dependencies:
+    "@hapi/address" "^4.0.1"
+    "@hapi/formula" "^2.0.0"
+    "@hapi/hoek" "^9.0.0"
+    "@hapi/pinpoint" "^2.0.0"
+    "@hapi/topo" "^5.0.0"
 
 "@hapi/mimos@^6.0.0":
   "integrity" "sha512-Op/67tr1I+JafN3R3XN5DucVSxKRT/Tc+tUszDwENoNpolxeXkhrJ2Czt6B6AAqrespHoivhgZBWYSuANN9QXg=="
@@ -580,6 +615,11 @@
     "@hapi/content" "^5.0.2"
     "@hapi/hoek" "9.x.x"
     "@hapi/nigel" "4.x.x"
+
+"@hapi/pinpoint@^2.0.0":
+  "integrity" "sha512-vzXR5MY7n4XeIvLpfl3HtE3coZYO4raKXW766R6DZw/6aLqR26iuZ109K7a0NtF2Db0jxqh7xz2AxkUwpUFybw=="
+  "resolved" "https://registry.npmjs.org/@hapi/pinpoint/-/pinpoint-2.0.0.tgz"
+  "version" "2.0.0"
 
 "@hapi/podium@^4.1.1", "@hapi/podium@4.x.x":
   "integrity" "sha512-ljsKGQzLkFqnQxE7qeanvgGj4dejnciErYd30dbrYzUOF/FyS/DOF97qcrT3bhoVwCYmxa6PEMhxfCPlnUcD2g=="
@@ -658,6 +698,16 @@
   "version" "4.0.0"
   dependencies:
     "@hapi/hoek" "9.x.x"
+
+"@hapi/vision@^6.1.0":
+  "integrity" "sha512-ll0zJ13xDxCYIWvC1aq/8srK0bTXfqZYGT+YoTi/fS42gYYJ3dnvmS35r8T8XXtJ6F6cmya8G2cRlMR/z11LQw=="
+  "resolved" "https://registry.npmjs.org/@hapi/vision/-/vision-6.1.0.tgz"
+  "version" "6.1.0"
+  dependencies:
+    "@hapi/boom" "9.x.x"
+    "@hapi/bounce" "2.x.x"
+    "@hapi/hoek" "9.x.x"
+    "@hapi/validate" "1.x.x"
 
 "@hapi/wreck@17.x.x":
   "integrity" "sha512-nx6sFyfqOpJ+EFrHX+XWwJAxs3ju4iHdbB/bwR8yTNZOiYmuhA8eCe7lYPtYmb4j7vyK/SlbaQsmTtUrMvPEBw=="
@@ -2239,13 +2289,6 @@
   "integrity" "sha512-mpF9KeH8u5cMoEmIic/cr7PNS+F5LWBk0t2ekGT60lFf0Wq+n9LspAj0g3P+o7DQhD3sUdlMln4YFAWhFYn9jg=="
   "resolved" "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001278.tgz"
   "version" "1.0.30001278"
-
-"canvas@1.6.9":
-  "integrity" "sha1-4/lc7HsWvy1vP8clwC2UDTJY9ps="
-  "resolved" "https://registry.npmjs.org/canvas/-/canvas-1.6.9.tgz"
-  "version" "1.6.9"
-  dependencies:
-    "nan" "^2.4.0"
 
 "capture-stack-trace@^1.0.0":
   "integrity" "sha512-mYQLZnx5Qt1JgB1WEiMCf2647plpGeQ2NMR/5L0HNZzGQo4fuSPnK+wjfPnKZV0aiJDgzmWqqkV/g7JD+DW0qw=="
@@ -4668,7 +4711,7 @@
     "google-p12-pem" "^3.0.3"
     "jws" "^4.0.0"
 
-"handlebars@^4.0.11", "handlebars@^4.1.0", "handlebars@^4.7.3":
+"handlebars@^4.1.0", "handlebars@^4.7.3", "handlebars@^4.7.7":
   "integrity" "sha512-aAcXm5OAfE/8IXkcZvCepKU3VzW1/39Fb5ZuqMtgI/hT8X2YgoMvBY5dLhq/cpOvw7Lk1nK/UF71aLG/ZnVYRA=="
   "resolved" "https://registry.npmjs.org/handlebars/-/handlebars-4.7.7.tgz"
   "version" "4.7.7"
@@ -4702,20 +4745,20 @@
   dependencies:
     "boom" "^7.2.2"
 
-"hapi-swagger@^9.1.1":
-  "integrity" "sha512-IVxcEwszwabkEbUWQ5vbvAwHSs0xngKBVbk4/wKeCH0qNocl/ZUi1KX6wgmRovuD8EWISoQMKYo7cYOAlKV3bw=="
-  "resolved" "https://registry.npmjs.org/hapi-swagger/-/hapi-swagger-9.4.2.tgz"
-  "version" "9.4.2"
+"hapi-swagger@^14.2.5":
+  "integrity" "sha512-rIxwCT9i+R9E9Z5m9BT15rwYI58IOKTKu7NEx9+pHO5aVeJK703qW3PWk72D7x9MSAnhmlJoEyUiFAU+6zQJ9A=="
+  "resolved" "https://registry.npmjs.org/hapi-swagger/-/hapi-swagger-14.2.5.tgz"
+  "version" "14.2.5"
   dependencies:
-    "boom" "^7.1.1"
-    "handlebars" "^4.0.11"
-    "hoek" "^6.1.2"
+    "@hapi/boom" "^9.1.0"
+    "@hapi/hoek" "^9.0.2"
+    "handlebars" "^4.7.7"
     "http-status" "^1.0.1"
-    "joi" "^13.1.2"
-    "json-schema-ref-parser" "^4.1.0"
+    "json-schema-ref-parser" "^6.1.0"
     "swagger-parser" "4.0.2"
+    "swagger-ui-dist" "^4.5.0"
 
-"hapi@^18.1.0", "hapi@>=17", "hapi@>=17.0.0", "hapi@>=17.x.x":
+"hapi@^18.1.0", "hapi@>=17", "hapi@>=17.x.x":
   "integrity" "sha512-nSU1VLyTAgp7P5gy47QzJIP2JAb+wOFvJIV3gnL0lFj/mD+HuTXhyUsDYXjF/dhADMVXVEz31z6SUHBJhtsvGA=="
   "resolved" "https://registry.npmjs.org/hapi/-/hapi-18.1.0.tgz"
   "version" "18.1.0"
@@ -4899,15 +4942,15 @@
     "minimalistic-assert" "^1.0.0"
     "minimalistic-crypto-utils" "^1.0.1"
 
-"hoek@^6.1.2", "hoek@6.x.x":
-  "integrity" "sha512-YXXAAhmF9zpQbC7LEcREFtXfGq5K1fmd+4PHkBq8NUqmzW3G+Dq10bI/i0KucLRwss3YYFQ0fSfoxBZYiGUqtQ=="
-  "resolved" "https://registry.npmjs.org/hoek/-/hoek-6.1.3.tgz"
-  "version" "6.1.3"
-
 "hoek@5.x.x":
   "integrity" "sha512-Alr4ZQgoMlnere5FZJsIyfIjORBqZll5POhDsF4q64dPuJR6rNxXdDxtHSQq8OXRurhmx+PWYEE8bXRROY8h0w=="
   "resolved" "https://registry.npmjs.org/hoek/-/hoek-5.0.4.tgz"
   "version" "5.0.4"
+
+"hoek@6.x.x":
+  "integrity" "sha512-YXXAAhmF9zpQbC7LEcREFtXfGq5K1fmd+4PHkBq8NUqmzW3G+Dq10bI/i0KucLRwss3YYFQ0fSfoxBZYiGUqtQ=="
+  "resolved" "https://registry.npmjs.org/hoek/-/hoek-6.1.3.tgz"
+  "version" "6.1.3"
 
 "homedir-polyfill@^1.0.1":
   "integrity" "sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA=="
@@ -5688,15 +5731,6 @@
   "resolved" "https://registry.npmjs.org/jmespath/-/jmespath-0.15.0.tgz"
   "version" "0.15.0"
 
-"joi@^13.1.2":
-  "integrity" "sha512-xuY5VkHfeOYK3Hdi91ulocfuFopwgbSORmIwzcwHKESQhC7w1kD5jaVSPnqDxS2I8t3RZ9omCKAxNwXN5zG1/Q=="
-  "resolved" "https://registry.npmjs.org/joi/-/joi-13.7.0.tgz"
-  "version" "13.7.0"
-  dependencies:
-    "hoek" "5.x.x"
-    "isemail" "3.x.x"
-    "topo" "3.x.x"
-
 "joi@^14.3.1":
   "integrity" "sha512-LQDdM+pkOrpAn4Lp+neNIFV3axv1Vna3j38bisbQhETPMANYRbFJFUyOZcOClYvM/hppMhGWuKSFEK9vjrB+bQ=="
   "resolved" "https://registry.npmjs.org/joi/-/joi-14.3.1.tgz"
@@ -5706,7 +5740,7 @@
     "isemail" "3.x.x"
     "topo" "3.x.x"
 
-"joi@^17.2.1", "joi@^17.6.0", "joi@>=17.x.x":
+"joi@^17.2.1", "joi@^17.6.0", "joi@>=17.x.x", "joi@17.x":
   "integrity" "sha512-OX5dG6DTbcr/kbMFj0KGYxuew69HPcAE3K/sZpEV2nP6e/j/C0HV+HNiBPCASxdx5T7DMoa0s8UeHWMnb6n2zw=="
   "resolved" "https://registry.npmjs.org/joi/-/joi-17.6.0.tgz"
   "version" "17.6.0"
@@ -5749,6 +5783,14 @@
   "version" "4.0.0"
 
 "js-yaml@^3.10.0":
+  "integrity" "sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g=="
+  "resolved" "https://registry.npmjs.org/js-yaml/-/js-yaml-3.14.1.tgz"
+  "version" "3.14.1"
+  dependencies:
+    "argparse" "^1.0.7"
+    "esprima" "^4.0.0"
+
+"js-yaml@^3.12.1":
   "integrity" "sha512-okMH7OXXJ7YrN9Ok3/SXrnu4iX9yOk+25nqX4imS2npuvTYDmo/QEZoqwZkYaIDk3jVvBOTOIEgEhaLOynBS9g=="
   "resolved" "https://registry.npmjs.org/js-yaml/-/js-yaml-3.14.1.tgz"
   "version" "3.14.1"
@@ -5844,6 +5886,15 @@
     "debug" "^3.1.0"
     "js-yaml" "^3.10.0"
     "ono" "^4.0.3"
+
+"json-schema-ref-parser@^6.1.0":
+  "integrity" "sha512-pXe9H1m6IgIpXmE5JSb8epilNTGsmTb2iPohAXpOdhqGFbQjNeHHsZxU+C8w6T81GZxSPFLeUoqDJmzxx5IGuw=="
+  "resolved" "https://registry.npmjs.org/json-schema-ref-parser/-/json-schema-ref-parser-6.1.0.tgz"
+  "version" "6.1.0"
+  dependencies:
+    "call-me-maybe" "^1.0.1"
+    "js-yaml" "^3.12.1"
+    "ono" "^4.0.11"
 
 "json-schema-traverse@^0.4.1":
   "integrity" "sha512-xbbCH5dCYU5T8LcEhhuh7HJ88HXuW3qsI3Y0zOZFKfZEHcpWiHU/Jxzk629Brsab/mMiHQti9wMP+845RPe3Vg=="
@@ -6918,7 +6969,7 @@
   dependencies:
     "lru-cache" "^4.1.3"
 
-"nan@^2.12.1", "nan@^2.4.0":
+"nan@^2.12.1":
   "integrity" "sha512-8ZtvEnA2c5aYCZYd1cvgdnU6cqwixRoYg70xPLWUws5ORTa/lnw+u4amixRS/Ac5U5mQVgp9pnlSUnbNWFaWZQ=="
   "resolved" "https://registry.npmjs.org/nan/-/nan-2.15.0.tgz"
   "version" "2.15.0"
@@ -7306,7 +7357,7 @@
   dependencies:
     "fn.name" "1.x.x"
 
-"ono@^4.0.3":
+"ono@^4.0.11", "ono@^4.0.3":
   "integrity" "sha512-jQ31cORBFE6td25deYeD80wxKBMj+zBmHTrVxnc6CKhx8gho6ipmWM5zj/oeoqioZ99yqBls9Z/9Nss7J26G2g=="
   "resolved" "https://registry.npmjs.org/ono/-/ono-4.0.11.tgz"
   "version" "4.0.11"
@@ -9729,6 +9780,11 @@
   "integrity" "sha1-cAcEaNbSl3ylI3suUZyn0Gouo/0="
   "resolved" "https://registry.npmjs.org/swagger-schema-official/-/swagger-schema-official-2.0.0-bab6bed.tgz"
   "version" "2.0.0-bab6bed"
+
+"swagger-ui-dist@^4.5.0":
+  "integrity" "sha512-TKoCEfy/I7YfI+ukHwmnknSyUR58ebpdLLv6tJ1FcPYGCmnsgFq7g3gIqrG5zrJiafvI6810xBb6r4r6x17PwA=="
+  "resolved" "https://registry.npmjs.org/swagger-ui-dist/-/swagger-ui-dist-4.9.0.tgz"
+  "version" "4.9.0"
 
 "tar@^4.0.2":
   "integrity" "sha512-a20gEsvHnWe0ygBY8JbxoM4w3SJdhc7ZAuxkLqh+nvNQN2IOt0B5lLgM490X5Hl8FF0dl0tOf2ewFYAlIFgzVA=="

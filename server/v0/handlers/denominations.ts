@@ -1,4 +1,5 @@
-const Joi = require('joi');
+
+import * as Joi from '@hapi/joi'
 
 import { settings } from '../../../lib';
 

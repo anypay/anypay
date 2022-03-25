@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 const sequelize = require("../../lib/database");
 
@@ -7,7 +8,7 @@ import { useJWT } from '../auth/jwt'
 
 const AuthBearer = require('hapi-auth-bearer-token');
 
-import * as Joi from 'joi'
+import * as Joi from '@hapi/joi'
 
 export async function attachV1Routes(server) {
 
@@ -86,6 +87,7 @@ export async function attachV1Routes(server) {
         })
       },
       response: {
+        failAction: 'log',
         schema: v1.Payments.Schema.listPayments
       }
     },

@@ -3,6 +3,10 @@ require('dotenv').config();
 
 import * as Hapi from "@hapi/hapi";
 
+const Inert = require('@hapi/inert');
+
+const Vision = require('@hapi/vision');
+
 const HapiSwagger = require("hapi-swagger");
 
 import { attachV1Routes } from '../v1/routes';
@@ -27,7 +31,7 @@ const AccountLogin = require("../../lib/account_login");
 
 const sequelize = require("../../lib/database");
 
-const Joi = require('joi');
+import * as Joi from '@hapi/joi';
 
 import { models } from '../../lib'
 
@@ -226,8 +230,8 @@ async function Server() {
   });
 
   await server.register(require('hapi-auth-basic'));
-  await server.register(require('inert'));
-  await server.register(require('vision'));
+  await server.register(Inert);
+  await server.register(Vision);
   await server.register(require('hapi-boom-decorators'))
 
   const swaggerOptions = server.register({
@@ -278,6 +282,8 @@ async function Server() {
     }
   });
 
+
+
   server.route({
     method: "GET",
     path: "/woocommerce",
@@ -296,6 +302,7 @@ async function Server() {
       tags: ['api']
     }
   });
+
 
   server.route({
     method: "POST",
@@ -320,6 +327,7 @@ async function Server() {
       tags: ['api']
     }
   });
+
 
   server.route({
     method: "GET",
@@ -500,6 +508,7 @@ async function Server() {
       plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
     }
   });
+
 
   server.route({
     method: "POST",
@@ -738,6 +747,7 @@ async function Server() {
     path: '/search/accounts/near/{latitude}/{longitude}',
     handler: v0.Accounts.nearby
   }); 
+
   await attachV1Routes(server)
 
   accountCSVReports(server);
@@ -746,7 +756,7 @@ async function Server() {
     method: 'GET',
     path: '/',
     handler: (req, h) => {
-      return h.redirect('https://anypay.dev')
+      return h.redirect('/documentation')
     }
   }); 
 
