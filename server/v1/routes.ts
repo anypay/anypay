@@ -1,3 +1,4 @@
+require('dotenv').config()
 
 const sequelize = require("../../lib/database");
 
@@ -7,7 +8,7 @@ import { useJWT } from '../auth/jwt'
 
 const AuthBearer = require('hapi-auth-bearer-token');
 
-import * as Joi from 'joi'
+import * as Joi from '@hapi/joi'
 
 export async function attachV1Routes(server) {
 
@@ -86,6 +87,7 @@ export async function attachV1Routes(server) {
         })
       },
       response: {
+        failAction: 'log',
         schema: v1.Payments.Schema.listPayments
       }
     },
@@ -114,6 +116,55 @@ export async function attachV1Routes(server) {
           currency: Joi.string().optional()
         })
       },
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}/events",
+    handler: v1.InvoiceEvents.index,
+    options: {
+      auth: "jwt",
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        })
+      },
+      response: {
+        schema: Joi.object({
+          invoice_uid: Joi.string().required(),
+          events: Joi.array().items(Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().optional(),
+            type: Joi.string().required(),
+            payload: Joi.object().optional(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }))
+        })
+      }
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/account/events",
+    handler: v1.AccountEvents.index,
+    options: {
+      auth: "jwt",
+      response: {
+        schema: Joi.object({
+          account_id: Joi.number().required(),
+          events: Joi.array().items(Joi.object({
+            id: Joi.number().required(),
+            account_id: Joi.number().optional(),
+            type: Joi.string().required(),
+            payload: Joi.object().optional(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required()
+          }))
+        })
+      }
     },
   });
 

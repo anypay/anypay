@@ -3,7 +3,7 @@ const sequelize = require("../../lib/database");
 
 import { jsonV2 } from '../handlers'
 
-import * as Joi from 'joi'
+import * as Joi from '@hapi/joi'
 
 export async function attachRoutes(server) {
 

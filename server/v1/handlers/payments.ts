@@ -1,5 +1,5 @@
 
-import * as Joi from 'joi'
+import * as Joi from '@hapi/joi'
 
 import { log } from '../../../lib/log'
 
@@ -8,6 +8,8 @@ import { badRequest } from 'boom'
 import { listPayments } from '../../../lib/payments'
 
 export async function index(req, h) {
+
+  try {
 
   let payments: any = await listPayments(req.account, {
 
@@ -49,6 +51,13 @@ export async function index(req, h) {
 
   })
 
+  } catch(error) {
+
+    console.log('__ERROR', error)
+
+    throw(error)
+
+  }
 
 }
 

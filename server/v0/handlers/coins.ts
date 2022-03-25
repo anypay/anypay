@@ -1,6 +1,6 @@
 import {accounts}  from '../../../lib';
 
-import * as Joi from 'joi';
+import * as Joi from '@hapi/joi';
 
 /**
  * @api {get} /coins Request User Supported Coins
@@ -33,7 +33,7 @@ export async function list(request, h) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 
-  let accountCoins = await accounts.getSupportedCoins(accountId);
+  let accountCoins = await accounts.getSupportedCoins(request.account.id);
 
   let coins = Object.values(accountCoins);
 

@@ -119,6 +119,8 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   }
 
+  log.info('account.login', { account_id: account.id })
+
   return new Account(account)
 
 }
