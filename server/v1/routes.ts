@@ -128,6 +128,9 @@ export async function attachV1Routes(server) {
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
+        }),
+        query: Joi.object({
+          order: Joi.string().valid('asc', 'desc').optional()
         })
       },
       response: {

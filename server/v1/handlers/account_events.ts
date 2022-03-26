@@ -5,7 +5,11 @@ import { listAccountEvents } from '../../../lib/events'
 
 export async function index(request, h) {
 
-  let events = await listAccountEvents(request.account)
+  let events = await listAccountEvents(request.account, {
+
+    order: request.query.order
+
+  })
 
   return h.response({
 

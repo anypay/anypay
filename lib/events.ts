@@ -145,21 +145,38 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
 }
 
-export async function listAccountEvents(account: Account, type?: string): Promise<Event[]> {
+interface EventLogOptions {
+  type?: string;
+  order?: string;
+}
 
-  var where = {
+export async function listAccountEvents(account: Account, options: EventLogOptions={}): Promise<Event[]> {
 
-    account_id: account.id
+  var query = {
+
+    where: {
+
+      account_id: account.id
+
+    },
+
+    order: [['createdAt', 'desc']]
 
   }
 
-  if (type) {
+  if (options.type) {
 
-    where['event'] = type
+    query.where['event'] = options.type
 
   }
 
-  let records = await models.Event.findAll({ where })
+  if (options.order) {
+
+    query.order = [['createdAt', options.order]]
+
+  }
+
+  let records = await models.Event.findAll(query)
 
   return records.map(record => new Event(record))
 

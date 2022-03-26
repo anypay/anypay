@@ -30,6 +30,36 @@ describe('Integration | Accounts', () => {
 
     })
 
+
+    it('gets the account events list from the API in order', async () => {
+
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+
+      var order = 'asc'
+
+      var response = await utils.authRequest(account, {
+        method: 'GET',
+        url: `/v1/api/account/events?order=${order}`
+      })
+
+      var [event1, event2] = response.result.events
+
+      expect(event2.id).to.be.greaterThan(event1.id)
+
+      order = 'desc'
+
+      var response = await utils.authRequest(account, {
+        method: 'GET',
+        url: `/v1/api/account/events?order=${order}`
+      })
+
+      var [event3, event4] = response.result.events
+
+      expect(event3.id).to.be.greaterThan(event4.id)
+
+    })
+
   })
 
   describe("Getting Invoice Data", () => {
