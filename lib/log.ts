@@ -18,7 +18,7 @@ interface LogQuery {
   error?: boolean;
 }
 
-class Logger {
+export class Logger {
 
   namespace: string;
 
@@ -53,7 +53,7 @@ class Logger {
 
     return models.Event.create({
       namespace: this.namespace,
-      event: type,
+      type,
       payload,
       account_id: payload.account_id
     })
@@ -67,7 +67,7 @@ class Logger {
 
     let record = await models.Event.create({
       namespace: this.namespace,
-      event: error_type,
+      type: error_type,
       payload,
       error: true
     })

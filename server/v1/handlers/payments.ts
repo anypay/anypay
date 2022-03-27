@@ -9,8 +9,6 @@ import { listPayments } from '../../../lib/payments'
 
 export async function index(req, h) {
 
-  try {
-
   let payments: any = await listPayments(req.account, {
 
     limit: req.query.limit || 1000,
@@ -50,14 +48,6 @@ export async function index(req, h) {
     payments
 
   })
-
-  } catch(error) {
-
-    console.log('__ERROR', error)
-
-    throw(error)
-
-  }
 
 }
 
