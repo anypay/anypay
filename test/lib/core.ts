@@ -1,6 +1,5 @@
 
-import { events, setAddress, unsetAddress } from '../../lib/core';
-import { AddressChangeSet } from '../../lib/core/types/address_change_set';
+import { setAddress, unsetAddress } from '../../lib/core';
 
 import { lockAddress, unlockAddress  } from '../../lib/addresses';
 

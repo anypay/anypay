@@ -5,7 +5,9 @@ import { TestClient } from 'anypay-simple-wallet'
 
 import { expect, spy, wallet, server } from '../utils'
 
-import { protocol, schema, log } from '../../lib/pay/json_v2'
+import { protocol, schema } from '../../lib/pay/json_v2'
+
+import { log } from '../../lib/log'
 
 import { ensureInvoice } from '../../lib/invoices'
 

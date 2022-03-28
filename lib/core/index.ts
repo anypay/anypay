@@ -4,8 +4,6 @@ import {plugins} from '../plugins';
 
 import * as bsv from 'bsv';
 
-import * as events from '../events'
-
 import { log } from '../log'
 
 interface DenominationChangeset {
@@ -19,6 +17,7 @@ interface AddressChangeSet {
   address: string;
   metadata?: string;
   paymail?: string;
+  view_key?: string;
   address_id?: number;
 }
 
@@ -97,6 +96,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
     await address.update({
       value: changeset.address,
       paymail: changeset.paymail,
+      view_key: changeset.view_key,
       note: null
     });
 
@@ -106,6 +106,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
       account_id: changeset.account_id,
       currency: changeset.currency,
       value: changeset.address,
+      view_key: changeset.view_key,
       paymail: changeset.paymail
     });
 
@@ -148,14 +149,9 @@ export async function setDenomination(changeset: DenominationChangeset): Promise
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});
 
-  events.record({
-    event: 'denomination.set',
-    payload: changeset,
-    account_id: changeset.account_id
-  });
+  log.info('denomination.set', changeset)
 
   return;
 }
 
-export { events };
 

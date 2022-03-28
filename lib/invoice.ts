@@ -16,8 +16,6 @@ import * as database from './database';
 
 import * as http from 'superagent';
 
-import {events} from './events'
-
 import { log } from './log'
 
 import { models } from './models';
@@ -273,7 +271,10 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  events.emit('invoice.created', { uid: invoice.uid });
+  log.info('invoice.created', {
+    account_id: account.id,
+    uid: invoice.uid
+  });
 
   return paymentOptions
 }

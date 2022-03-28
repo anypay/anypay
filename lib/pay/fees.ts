@@ -29,6 +29,10 @@ const feesFiat = {
   'BTC': {
     currency: 'USD',
     value: 1.00
+  },
+  'XMR': {
+    currency: 'USD',
+    value: 0.05
   }
 }
 
@@ -76,8 +80,12 @@ export async function getFee(currency:string): Promise<Fee> {
       address: '1Q9Z2y3Jhq6xbxD6AU34StgmUjfpbZgxqA',
       amount: fees[currency]
     }
+  case 'XMR':
+    return {
+      address: '43iJfB8tYGFCBNEc8rjJnWHfrXzUapbeifsmS5S9wBEPEzGBCgogtCZSkHaU68UBMWG5pRXk56g7CekSZo7bYkyuNq52Dtn',
+      amount: fees[currency]
+    }
   }
-
 }
 
 async function updateFees() {

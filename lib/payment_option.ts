@@ -25,6 +25,10 @@ export class PaymentOption extends Orm {
     return this.invoice.get('currency')
   }
 
+  get amount() {
+    return parseInt(this.record.dataValues['amount'])
+  }
+
 }
 
 export async function findPaymentOption(invoice: Invoice, currency: string): Promise<PaymentOption> {

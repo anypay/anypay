@@ -4,7 +4,6 @@ require('dotenv').config();
 
 import { models, log, accounts } from '../lib';
 import { Op } from 'sequelize'
-import { emitter } from '../lib/events';
 import { getSupportedCoins, near } from '../lib/accounts';
 import { registerAccount, setPositionFromLatLng } from '../lib/accounts';
 import { setAddress } from '../lib/core';
@@ -79,9 +78,7 @@ program
 
     let account = await models.Account.findOne({ where: { email }});
 
-    log.info('account', account.toJSON())
-
-    emitter.emit('account.create', account)
+    log.debug('account', account.toJSON())
 
   });
 

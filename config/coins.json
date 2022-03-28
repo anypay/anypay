@@ -8,6 +8,12 @@
     },
 
     {
+      "code": "XMR",
+      "name": "Monero",
+      "icon_url": "https://:"
+    },
+
+    {
       "code": "LTC",
       "name": "Litecoin",
       "icon_url": "https://app.anypayinc.com/ltc.png"

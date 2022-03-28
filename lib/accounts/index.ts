@@ -2,15 +2,11 @@ const bcrypt = require('bcryptjs');
 
 import { models } from '../models';
 
-import { awaitChannel } from '../amqp';
-
 import { log } from '../log';
 
 import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
-
-import {events} from '../events'
 
 interface Map<T> {
     [key: string]: T;

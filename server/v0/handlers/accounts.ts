@@ -1,8 +1,6 @@
 const Boom = require('boom');
 var geoip = require('geoip-lite');
 
-import {emitter} from '../../../lib/events'
-
 import {Op} from 'sequelize'
 
 import * as moment from 'moment'
@@ -68,8 +66,6 @@ export async function registerAnonymous(request, h) {
 
   slack.notify(`account:registered | ${request.account.email}`);
   
-  emitter.emit('account.created', request.account)
-
   return request.account;
 
 }
@@ -106,8 +102,6 @@ export async function create (request, h) {
 
   account.save()
   
-  emitter.emit('account.created', account)
-
   return account;
 
 }

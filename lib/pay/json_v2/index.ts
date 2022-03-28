@@ -117,5 +117,4 @@ import * as protocol from './protocol'
 
 export { schema, protocol }
 
-export { log } from './log'
 
