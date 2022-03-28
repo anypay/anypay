@@ -1,4 +1,4 @@
-import * as BIP70Protocol from '../../vendor/bitcore-payment-protocol';
+import * as BIP70Protocol from 'bip70-payment-protocol';
 
 export { BIP70Protocol }
 

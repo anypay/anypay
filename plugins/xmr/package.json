@@ -2,7 +2,7 @@
   "name": "anypay-plugin-monero",
   "version": "0.1.0",
   "description": "Support for XMR Payments",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
