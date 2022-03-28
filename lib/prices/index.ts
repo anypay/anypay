@@ -259,11 +259,7 @@ export async function setAllCryptoPrices() {
 
   prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
 
-  console.log('bittrex', prices)
-
   const xmrPrice = await kraken.getPrice('XMR')
-
-  console.log('xmr', xmrPrice)
 
   prices.push(xmrPrice)
 

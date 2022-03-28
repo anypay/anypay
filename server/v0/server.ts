@@ -498,6 +498,7 @@ async function Server() {
     }
   });
 
+
   server.route({
     method: "GET",
     path: "/coins",
@@ -747,6 +748,8 @@ async function Server() {
     path: '/search/accounts/near/{latitude}/{longitude}',
     handler: v0.Accounts.nearby
   }); 
+
+
 
   await attachV1Routes(server)
 
