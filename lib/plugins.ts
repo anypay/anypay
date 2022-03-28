@@ -38,7 +38,7 @@ class Plugins {
     this.plugins = pluginsConfig;
   }
 
-  async findForCurrency(currency: string) {
+  findForCurrency(currency: string) {
 
     if (!this.plugins[currency]) {
 
@@ -46,9 +46,9 @@ class Plugins {
 
     }
 
-    let plugin = new Plugin(currency, this.plugins[currency]);
+    let { plugin } = new Plugin(currency, this.plugins[currency]);
 
-    return plugin.plugin;
+    return plugin;
 
   }
 

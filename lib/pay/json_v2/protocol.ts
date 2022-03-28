@@ -9,6 +9,8 @@ import { log } from '../../log'
 
 import { Protocol } from './schema'
 
+import { plugins } from '../../plugins'
+
 interface ProtocolMessage {}
 
 interface PaymentOptionsHeaders {
@@ -202,6 +204,14 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
   }, params))
 
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
+
+  let plugin = await plugins.findForCurrency(params.currency)
+
+  if (plugin.validateUnsignedTx) {
+
+    await plugin.validateUnsignedTx(params.transactions[0].tx)
+
+  }
 
   return {
     payment: params,

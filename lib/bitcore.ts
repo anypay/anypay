@@ -1,28 +1,19 @@
-const btc = require('bitcore-lib');
-const bch = require('bitcore-lib-cash');
-const ltc = require('litecore-lib');
-const doge = require('bitcore-doge-lib');
-const dash = require('@dashevo/dashcore-lib');
-const bsv = require('bsv');
 
 import { BigNumber } from 'bignumber.js';
 
+import { plugins } from './plugins'
+
 export function getBitcore(currency) {
 
-  switch(currency) {
-  case 'BTC':
-    return btc;
-  case 'LTC':
-    return ltc;
-  case 'BCH':
-    return bch;
-  case 'DASH':
-    return dash;
-  case 'BSV':
-    return bsv;
-  case 'DOGE':
-    return doge;
+  let plugin = plugins.findForCurrency(currency)
+
+  if (!plugin.bitcore) {
+
+    throw new Error('bitcore not found for currency')
+
   }
+
+  return plugin.bitcore
 
 }
 

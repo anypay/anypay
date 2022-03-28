@@ -79,11 +79,23 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
   for (const transaction of payment.transactions) {
 
-    await verifyPayment({
-      payment_option,
-      hex: transaction,
-      protocol: 'JSONV2'
-    })
+    if (plugin.verifyPayment) {
+
+      await plugin.verifyPayment({
+        payment_option,
+        hex: transaction,
+        protocol: 'JSONV2'
+      })
+
+    } else {
+
+      await verifyPayment({
+        payment_option,
+        hex: transaction,
+        protocol: 'JSONV2'
+      })
+
+    }
 
     log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
 

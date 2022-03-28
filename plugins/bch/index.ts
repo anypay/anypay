@@ -10,6 +10,8 @@ import {log, models} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
+export { bch as bitcore }
+
 var bchaddr: any = require('bchaddrjs');
 
 export async function submitTransaction(rawTx: string) {

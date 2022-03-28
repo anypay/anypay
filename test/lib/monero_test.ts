@@ -10,9 +10,13 @@ import { createInvoice } from '../../lib/invoices'
 
 import { findPaymentOption } from '../../lib/payment_option'
 
+import * as PayProtocol from '../../lib/pay/json_v2/protocol'
+
 import * as utils from '../utils'
 
-import { expect } from '../utils'
+import { expect, spy } from '../utils'
+
+import * as plugin from '../../plugins/xmr'
 
 describe("Monero XMR", () => {
 
@@ -91,15 +95,109 @@ describe("Monero XMR", () => {
 
     })
  
-    it('a wallet chooses xmr on the "payment-option" call')
+    it('a wallet chooses xmr on the "payment-option" call', async () => {
 
-    it('can be multiple output')
+      let invoice = await createInvoice({
+        account,
+        amount: 10
+      })
 
-    it('can be single output')
+      let { paymentOptions } = await PayProtocol.listPaymentOptions(invoice)
 
-    it('calls plugin.validateUnsignedTx on "payment-verification" call')
+      let monero = paymentOptions.filter(option => {
+        return option.currency === 'XMR'
+      })[0]
 
-    it('calls plugin.submitSignedTx on "payment" call')
+      let paymentRequest = await PayProtocol.getPaymentRequest(invoice, monero)
+
+      expect(paymentRequest.chain).to.be.equal('XMR')
+
+      expect(paymentRequest.network).to.be.equal('main')
+
+      expect(paymentRequest.instructions).to.be.an('array')
+
+    })
+
+    it('calls plugin.validateUnsignedTx on "payment-verification" call', async () => {
+
+      let invoice = await createInvoice({
+        account,
+        amount: 10
+      })
+
+      let { paymentOptions } = await PayProtocol.listPaymentOptions(invoice)
+
+      let monero = paymentOptions.filter(option => {
+        return option.currency === 'XMR'
+      })[0]
+
+      let paymentRequest = await PayProtocol.getPaymentRequest(invoice, monero)
+
+      spy.on(plugin, ['validateUnsignedTx'])
+
+      let unsignedTransaction = '123456'
+
+      let verification = await PayProtocol.verifyUnsignedPayment(invoice, {
+        chain: 'XMR',
+        currency: 'XMR',
+        transactions: [{ tx: unsignedTransaction }]
+      })
+
+      expect(plugin.validateUnsignedTx).to.have.been.called()
+
+    })
+
+    it('calls plugin.broadcastTx on "payment" call', async () => {
+
+
+      spy.on(plugin, ['broadcastTx'])
+
+      let invoice = await createInvoice({
+        account,
+        amount: 10
+      })
+
+      let { paymentOptions } = await PayProtocol.listPaymentOptions(invoice)
+
+      let monero = paymentOptions.filter(option => {
+        return option.currency === 'XMR'
+      })[0]
+
+      let paymentRequest = await PayProtocol.getPaymentRequest(invoice, monero)
+
+      spy.on(plugin, ['validateUnsignedTx'])
+
+      let unsignedTransaction = '123456'
+
+      let verification = await PayProtocol.verifyUnsignedPayment(invoice, {
+        chain: 'XMR',
+        currency: 'XMR',
+        transactions: [{ tx: unsignedTransaction }]
+      })
+
+      expect(plugin.validateUnsignedTx).to.have.been.called()
+
+      let signedTransaction = '123456734343'
+
+      try {
+
+        let result = await PayProtocol.sendSignedPayment(invoice, {
+          currency: "XMR",
+          chain: "XMR",
+          transactions: [{ tx: signedTransaction }]
+        })
+      } catch(error) {
+
+        console.log(error.message)
+
+      }
+
+      expect(plugin.broadcastTx).to.have.been.called.with(signedTransaction)
+
+    })
+
+    it.skip('actually broadcasts valid transactions to the network')
+    it.skip('rejects broadcasting invalid transactions to the network')
 
   })
 
