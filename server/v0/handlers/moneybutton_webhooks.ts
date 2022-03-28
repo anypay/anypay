@@ -1,12 +1,5 @@
-require('dotenv');
 
-import { awaitChannel } from '../../../lib/amqp';
-
-import { events, log } from '../../../lib';
-
-import * as bsv from 'bsv';
-
-import { notify } from '../../../lib/slack/notifier';
+import { log } from '../../../lib';
 
 import { submitPayment, SubmitPaymentResponse } from '../../payment_requests/handlers/json_payment_requests';
 
@@ -16,22 +9,11 @@ export async function create(req, h) {
 
   const { secret, payment } = req.payload;
 
-  await events.record({
-    event: 'moneybutton.webhook',
-    payload: req.payload
-  })
+  log.info('moneybutton.webhook', req.payload)
 
   if (secret !== process.env.MONEYBUTTON_WEBHOOK_SECRET) {
     throw new Error('invalid moneybutton webhook secret');
   }
-
-  const channel = await awaitChannel();
-
-  notify(JSON.stringify({ event: 'moneybutton.webhook', payload: req.payload }), 'events')
-
-  await channel.publish('anypay.events', 'moneybutton_webhook', Buffer.from(
-    JSON.stringify(payment) 
-  ))
 
   let response: SubmitPaymentResponse = await submitPayment({
     transactions: [payment.rawtx],

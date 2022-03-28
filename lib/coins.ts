@@ -1,15 +1,11 @@
 
 import { models } from '../lib/models';
 
-import { events } from '../lib/events';
-
 var coins = [];
 
 export async function refreshCoins() {
 
   coins = await models.Coin.findAll();
-
-  events.emit('coins.refreshed');
 
 }
 
@@ -31,13 +27,9 @@ export async function initFromConfig(coinsConfig) {
 
   await refreshCoins();
 
-  events.emit('coins.initialized');
-
 }
 
 export async function getCoins() {
-
-  events.emit('coins.requested');
 
   return coins;
 
@@ -53,8 +45,6 @@ export async function deactivateCoin(code) {
 
   await refreshCoins();
 
-  events.emit('coins.deactivated', { code });
-
 }
 
 export async function activateCoin(code) {
@@ -66,8 +56,6 @@ export async function activateCoin(code) {
   await coin.save();
 
   await refreshCoins();
-
-  events.emit('coins.activated', { code });
 
 }
 

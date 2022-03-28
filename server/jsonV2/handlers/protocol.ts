@@ -1,9 +1,10 @@
 
-import { protocol, schema, log } from '../../../lib/pay/json_v2'
+import { protocol, schema } from '../../../lib/pay/json_v2'
 
 import { badRequest, notFound } from 'boom'
 
 import { getInvoice } from '../../../lib/invoices'
+import { log } from '../../../lib/log'
 
 async function ensureInvoice(req) {
 

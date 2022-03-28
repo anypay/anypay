@@ -15,7 +15,9 @@ import { toSatoshis } from '../pay'
 
 import * as bittrex from './bittrex'
 
-export { bittrex }
+import * as kraken from './kraken'
+
+export { bittrex, kraken }
 
 export interface Price {
   base_currency: string;
@@ -240,8 +242,10 @@ export async function getCryptoPrices(base_currency: string) {
 }
 
 export async function setAllCryptoPrices() {
+
+  var prices: Price[];
  
-  const coins = [
+  const bittrexCoins = [
     'BSV',
     'BCH',
     'BTC',
@@ -249,13 +253,21 @@ export async function setAllCryptoPrices() {
     'DASH',
     'DOGE',
     'ZEC',
-    //'XMR',
+    'ZEC',
     //'SOL'
   ];
 
-  let prices: Price[] = await Promise.all(coins.map(bittrex.getPrice))
+  prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
 
-  return Promise.all(prices.map(setPrice))
+  console.log('bittrex', prices)
+
+  const xmrPrice = await kraken.getPrice('XMR')
+
+  console.log('xmr', xmrPrice)
+
+  prices.push(xmrPrice)
+
+  await Promise.all(prices.map(setPrice))
 
 }
 

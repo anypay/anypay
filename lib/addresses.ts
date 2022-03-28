@@ -64,6 +64,8 @@ interface SetAddress {
   currency: string;
   value: string;
   label?: string;
+  view_key?: string;
+  paymail?: string;
 }
 
 export async function setAddress(account: Account, params: SetAddress): Promise<Address> {
@@ -71,6 +73,7 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
   let result: any = await _setAddress({
     address: params.value,
     currency: params.currency,
+    view_key: params.view_key,
     account_id: account.id
   })
 

@@ -69,12 +69,13 @@ class Plugins {
     log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
 
     if(!this.plugins[currency].getNewAddress){
-      throw new Error('plugin does not implement getNewAddress')
+
+      return address.value
+
+    } else {
+
+      return await this.plugins[currency].getNewAddress(address, amount);
     }
-
-    let input = await this.plugins[currency].getNewAddress(address, amount);
-
-    return input;
 
   }
 

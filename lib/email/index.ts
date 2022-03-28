@@ -4,7 +4,8 @@ import * as AWS from 'aws-sdk';
 import {models} from '../models';
 import {events} from '../events'
 import * as database from '../database';
-const log = require("winston");
+
+import { log } from '../log'
 const moment = require('moment');
 
 import { getBlockExplorerTxidUrl } from '../block_explorer';
@@ -132,7 +133,7 @@ async function checkInvoiceCount(invoice){
     if(result[1].rows[0].count==1){
 
       firstInvoiceCreatedEmail(invoice.id)
-      events.emit('invoice.created.first')
+      log.debug('email.invoice.created.first')
 
     }
   }catch(error){
@@ -151,7 +152,7 @@ async function checkInvoicePaidCount(invoice){
     var result = await database.query(query);
 
     if(result[1].rows[0].count==1){
-      events.emit('invoice.paid.first', invoice)
+      log.debug('invoice.paid.first', invoice)
       //firstInvoicePaidEmail(invoice)
     }
     else{

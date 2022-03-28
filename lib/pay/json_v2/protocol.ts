@@ -5,7 +5,7 @@ import { findPaymentOption } from '../../payment_option'
 
 import { submitPayment } from '../../../server/payment_requests/handlers/json_payment_requests'
 
-import { log } from './log'
+import { log } from '../../log'
 
 import { Protocol } from './schema'
 
