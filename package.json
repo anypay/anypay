@@ -131,6 +131,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-spies": "^1.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "nyc": "^15.1.0",
@@ -155,9 +156,15 @@
     "db:seed:prices": "ts-node test/seed_prices.ts",
     "payreq:test:migrate": "NODE_ENV=test ts-node servers/payment_requests/tests/migrate.ts",
     "payreq:start": "ts-node servers/payment_requests/server.ts",
-    "docs": "echo 'build documentation here'"
+    "docs": "echo 'build documentation here'",
+    "commit": "cz"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
