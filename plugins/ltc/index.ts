@@ -2,6 +2,10 @@ import {generateInvoice} from '../../lib/invoice';
 
 import * as blockchair from '../../lib/blockchair'
 
+const ltc = require('litecore-lib');
+
+export { ltc as bitcore }
+
 const currency = 'LTC'
 
 export async function createInvoice(accountId: number, amount: number) {

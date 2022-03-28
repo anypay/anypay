@@ -10,6 +10,7 @@ import { fromSatoshis } from '../../lib/pay'
 
 import * as Bluebird from 'bluebird'
 
+
 interface Payment{
   amount: number;
   hash: string;
@@ -253,4 +254,6 @@ export {
   createInvoice
 
 }
+
+export { bsv as bitcore }
 

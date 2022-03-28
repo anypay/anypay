@@ -20,6 +20,8 @@ import * as http from 'superagent';
 
 import * as dash from '@dashevo/dashcore-lib';
 
+export { dash as bitcore }
+
 import {oneSuccess} from 'promise-one-success'
 
 var WAValidator = require('anypay-wallet-address-validator');

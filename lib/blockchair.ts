@@ -40,7 +40,7 @@ export async function publish(coin, hex) {
 
   } catch(error) {
 
-    log.error('blockchair.push.transaction.btc.error', error);
+    log.error(`blockchair.push.transaction.${coin}.error`, error);
 
     throw error;
 
