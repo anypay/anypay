@@ -744,6 +744,35 @@ async function Server() {
   }); 
 
   server.route({
+    method: 'POST',
+    path: '/kraken_api_keys',
+    handler: v0.KrakenApiKeys.create,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/kraken_api_keys',
+    handler: v0.KrakenApiKeys.show,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+  server.route({
+    method: 'DELETE',
+    path: '/kraken_api_keys',
+    handler: v0.KrakenApiKeys.destroy,
+    options: {
+      auth: "token"
+    }
+  }); 
+
+
+
+  server.route({
     method: 'GET',
     path: '/search/accounts/near/{latitude}/{longitude}',
     handler: v0.Accounts.nearby

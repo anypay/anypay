@@ -110,12 +110,12 @@ export {
 }
 
 
-var request;
+var request, account;
 
 import {Server, server } from '../server/v0/server';
 import * as supertest from 'supertest'
 
-export { server, request }
+export { server, request, account }
 
 beforeEach(() => {
 
@@ -128,6 +128,8 @@ before(async () => {
   await Server();
 
   request = supertest(server.listener)
+
+  account = await createAccount()
 
 })
 
