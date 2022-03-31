@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       account_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       api_key: {
         type: Sequelize.STRING
