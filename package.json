@@ -2,7 +2,7 @@
   "name": "anypay-platform",
   "version": "1.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "main.ts",
   "engines": {
     "node": ">=8.0"
   },
@@ -12,6 +12,15 @@
   },
   "bin": {
     "anypay": "./bin/anypay.ts"
+  },
+  "release": {
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/changelog",
+      "@semantic-release/npm",
+      "@semantic-release/git"
+    ]
   },
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.17.9",
@@ -126,6 +135,8 @@
     "yayson": "^2.0.8"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.1",
+    "@semantic-release/git": "^10.0.1",
     "@types/amqplib": "^0.5.7",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
@@ -146,20 +157,16 @@
     "check-coverage": false
   },
   "scripts": {
-    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
-    "console": "ts-node --experimental-repl-await",
     "anypay": "./bin/anypay.ts",
-    "start": "ts-node main.ts",
-    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
-    "ws:server": "ts-node servers/websocket/server.ts",
-    "test": "NODE_ENV=test nyc mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit",
-    "docker:build": "rm -rf node_modules && docker-compose build rest-api",
     "build": "tsc",
+    "commit": "npx cz",
+    "console": "ts-node --experimental-repl-await",
     "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
     "db:seed:prices": "ts-node test/seed_prices.ts",
-    "payreq:test:migrate": "NODE_ENV=test ts-node servers/payment_requests/tests/migrate.ts",
-    "payreq:start": "ts-node servers/payment_requests/server.ts",
-    "docs": "echo 'build documentation here'"
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
+    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
+    "start": "ts-node main.ts",
+    "test": "NODE_ENV=test nyc mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit"
   },
   "keywords": [],
   "author": "",
