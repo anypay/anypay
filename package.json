@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.ts",
   "engines": {
-    "node": ">=8.0"
+    "node": ">=14.0"
   },
   "repository": {
     "type": "git",
@@ -100,7 +100,7 @@
     "node-fetch": "^3.2.1",
     "node-statsd": "^0.1.1",
     "parent-module": "^2.0.0",
-    "pg": "^7.9.0",
+    "pg": "^8.7.3",
     "pino": "^7.8.1",
     "polynym": "^1.0.7",
     "promise-one-success": "^1.0.0",
@@ -114,8 +114,8 @@
     "request-promise": "^4.2.5",
     "require-all": "^3.0.0",
     "riverpig": "^1.1.4",
-    "sequelize": "^5.16.0",
-    "sequelize-cli": "^4.0.0",
+    "sequelize": "^6.17.0",
+    "sequelize-cli": "^6.4.1",
     "serve-static": "^1.14.1",
     "shortid": "^2.2.15",
     "socket.io": "^2.0.3",
