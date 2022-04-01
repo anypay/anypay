@@ -7,3 +7,4 @@ nbproject/
 production.env
 .nyc_output/
 dist/
+coverage/
