@@ -20,14 +20,6 @@ Create your databases:
 Migrate your database:
   npm run db:migrate
 
-
-Install and start rabbitmq
-  brew install rabbitmq
-  brew services start rabbitmq
-  rabbitmq-plugins enable rabbitmq_management
-  wget http://127.0.0.1:15672/cli/rabbitmqadmin
-  ./rabbitmqadmin declare exchange --vhost='/'  name='rabbi' type=direct
-
 Seed your database:
   npm run db:seed:prices && ./bin/prices.ts update_crypto_prices
 
