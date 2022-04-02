@@ -44,7 +44,9 @@ export class Orm {
   }
 
   async save() {
+
     return this.record.save()
+
   }
 
   async update(updates: any): Promise<Orm> {

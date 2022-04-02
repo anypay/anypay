@@ -7,6 +7,8 @@ import { start as startPrices } from './lib/prices/cron'
 
 import { plugin as websockets } from './ws/plugin'
 
+import { hapi as kraken } from './plugins/kraken'
+
 import { init } from 'rabbi'
 
 (async () => {
@@ -19,6 +21,12 @@ import { init } from 'rabbi'
 
     await server.register(websockets)
 
+  }
+
+  if (process.env.KRAKEN_PLUGIN) {
+
+    await server.register(kraken)
+    
   }
 
   await start()

@@ -61,14 +61,14 @@ class Logger {
 
   }
 
-  async error(error_type: string, payload: any = {}) {
+  async error(error_type: string, error: any = {}) {
 
-    this.log.error({...payload, namespace: this.namespace }, error_type)
+    this.log.error({...error, namespace: this.namespace }, error_type)
 
     let record = await models.Event.create({
       namespace: this.namespace,
       type: error_type,
-      payload,
+      payload: Object.assign(error, { message: error.message, name: error.name}),
       error: true
     })
 
