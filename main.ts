@@ -11,6 +11,8 @@ import { hapi as kraken } from './plugins/kraken'
 
 import { init } from 'rabbi'
 
+import * as core from './lib'
+
 (async () => {
 
   await init()
@@ -23,13 +25,19 @@ import { init } from 'rabbi'
 
   }
 
+  await start()
+
   if (process.env.KRAKEN_PLUGIN) {
 
-    await server.register(kraken)
+    await server.register({
+
+      plugin: kraken, 
+
+      options: { core }
+
+    })
     
   }
-
-  await start()
 
 })()
 
