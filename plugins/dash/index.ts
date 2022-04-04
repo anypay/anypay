@@ -30,7 +30,7 @@ export async function submitTransaction(rawTx: string) {
 
   return oneSuccess([
     blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
+    //blockcypher.publishDASH(rawTx)
   ])
 
 }
@@ -39,7 +39,7 @@ export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
     blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
+    //blockcypher.publishDASH(rawTx)
   ])
 
 }
