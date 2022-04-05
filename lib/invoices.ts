@@ -198,6 +198,11 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
       throw new InvalidWebhookURL(params.webhook_url)
 
     }
+
+  } else {
+
+    newInvoice['webhook_url'] = 'https://api.anypayx.com/v1/api/test/webhooks'
+
   }
 
   var record = await models.Invoice.create(newInvoice);
