@@ -29,8 +29,8 @@ var WAValidator = require('anypay-wallet-address-validator');
 export async function submitTransaction(rawTx: string) {
 
   return oneSuccess([
-    blockchair.publish(rawTx, 'dash'),
-    //blockcypher.publishDASH(rawTx)
+    //blockchair.publish(rawTx, 'dash'),
+    blockcypher.publishDASH(rawTx)
   ])
 
 }
@@ -38,8 +38,8 @@ export async function submitTransaction(rawTx: string) {
 export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
-    blockchair.publish(rawTx, 'dash'),
-    //blockcypher.publishDASH(rawTx)
+    //blockchair.publish(rawTx, 'dash'),
+    blockcypher.publishDASH(rawTx)
   ])
 
 }
