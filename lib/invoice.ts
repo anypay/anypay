@@ -207,12 +207,12 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     const value = invoice.get('amount')
 
-    let { value: amountMinusFees } = await convert({
+    let { value: amount } = await convert({
       currency: account.denomination,
       value
     }, currency, coin.precision);
 
-    let address = (await getNewInvoiceAddress(account.id, currency, amountMinusFees)).value;
+    let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
 
     let url = computeInvoiceURI({
       currency: currency,
@@ -227,12 +227,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     let fee = await pay.fees.getFee(currency)
     
-    var paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).minus(fee.amount).toNumber();
-
-    if (currency === 'BTC') {
-
-      paymentAmount = new BigNumber(pay.toSatoshis(amountMinusFees)).toNumber();
-    }
+    var paymentAmount = pay.toSatoshis(amount)
 
     let outputs = []
 
@@ -241,16 +236,13 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       amount: paymentAmount
     })
 
-    if (currency != 'BTC' && !process.env.FEATURE_SINGLE_OUTPUTS_ONLY) {
-      outputs.push(fee)
-    }
 
     let uri = computeInvoiceURI({
       currency: currency,
       uid: invoice.uid
     });
 
-    var amount = outputs.reduce((sum, output) => {
+    amount = outputs.reduce((sum, output) => {
 
       return sum.plus(output.amount)
 
