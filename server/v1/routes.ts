@@ -196,4 +196,10 @@ export async function attachV1Routes(server) {
     handler: v1.Addresses.update
   }); 
 
+  server.route({
+    method: 'POST',
+    path: '/v1/api/test/webhooks',
+    handler: v1.Webhooks.test
+  }); 
+
 }
