@@ -17,6 +17,8 @@ import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
 
+export const DEFAULT_WEBHOOK_URL = 'https://api.anypayx.com/v1/api/test/webhooks'
+
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
   let invoice = await models.Invoice.findOne({ where: {

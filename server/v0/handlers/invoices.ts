@@ -9,6 +9,8 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
+import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
+
 import * as moment from 'moment';
 
 export async function cancel(req, h) {
@@ -294,6 +296,8 @@ export async function create (request, h) {
   invoice.payment_options = await getPaymentOptions(invoice.uid)
 
   let sanitized = sanitizeInvoice(invoice);
+
+  sanitized.webhook_url = invoice.webhook_url
 
   return h.response(
 
