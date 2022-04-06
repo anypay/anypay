@@ -93,6 +93,8 @@ export class KrakenAccount extends Orm {
 
       currencies = Object.keys(balances).filter(currency => {
 
+        var pair;
+
         try {
 
           if (currency.match('USD')) return false
@@ -101,7 +103,7 @@ export class KrakenAccount extends Orm {
 
           if (balance == 0) return false 
 
-          let pair = `${currency}USD`
+          pair = `${currency}USD`
 
           if (pair.match(/^X/) && currency !== 'XRP') {
             pair = pair.slice(1)
@@ -115,11 +117,19 @@ export class KrakenAccount extends Orm {
             pair = 'XXRPZUSD'
           }
 
+          if (currency === 'LTC') {
+            pair = 'XLTCZUSD'
+          }
+
+          if (pair === 'LTCUSD') {
+            pair = 'XLTCZUSD'
+          }
+
           let minimum = parseFloat(assetPairs[pair].ordermin)
 
           if (balance < minimum) {
 
-            log.debug('kraken.autosell.lowbalance', { balance, minimum })
+            log.debug('kraken.autosell.lowbalance', { balance, minimum, pair })
 
             return false
           }
@@ -127,6 +137,8 @@ export class KrakenAccount extends Orm {
           return true
 
         } catch(error) {
+
+          error.pair = pair
 
           log.error('kraken.autosell.error', error)
 
