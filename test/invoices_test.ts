@@ -58,4 +58,18 @@ describe("Generating Invoices", () => {
 
   })
 
+  it('should include a default webhook url', async () => {
+
+    let [account] = await utils.createAccountWithAddress()
+
+    let invoice = await createInvoice({
+      account,
+      amount: 10
+    })
+
+    expect(invoice.webhook_url).to.be.equal('https://api.anypayx.com/v1/api/test/webhooks')
+
+
+  })
+
 })
