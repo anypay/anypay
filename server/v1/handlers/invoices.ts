@@ -11,8 +11,6 @@ import { log, prices, email, models, invoices, coins } from '../../../lib';
 
 import { Invoice, createInvoice } from '../../../lib/invoices'
 
-import { recordEvent } from '../../../lib/events'
-
 import * as moment from 'moment';
 
 interface InvoiceAdditions {
@@ -37,17 +35,9 @@ export async function setInvoiceAdditions(invoice: Invoice, additions: InvoiceAd
 
 export async function create (request, h) {
 
-  await recordEvent({
+  // TODO: Refactor to call only a SINGLE core library method
 
-    account_id: request.account.id,
-
-    headers: request.headers,
-
-    payload: request.payload
-
-  }, 'request.invoice.create')
-
-  log.info('invoices.create', Object.assign({
+  log.info('request.invoices.create', Object.assign({
 
     account_id: request.account.id
 
@@ -73,7 +63,11 @@ export async function create (request, h) {
 
   }
 
-  additional.webhook_url = request.payload.webhook_url
+  if (request.payload.webhook_url) {
+
+    additional.webhook_url = request.payload.webhook_url
+
+  }
 
   additional.external_id = request.payload.external_id;
 
