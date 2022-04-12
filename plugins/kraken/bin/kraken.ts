@@ -143,5 +143,28 @@ program
 
   })
 
+
+program
+  .command('assetpairs')
+  .action(async () => {
+
+    try {
+
+      let account = await Account.findOne({ id: 1177 })
+
+      let kraken = await fromAccount(account)
+
+      let result = await kraken.api('AssetPairs')
+
+      console.log(result)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  })
+
 program.parse(process.argv)
 

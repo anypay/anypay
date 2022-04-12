@@ -64,53 +64,57 @@ describe("BIP270 Payment Requests", () => {
 
     })
 
-    it('should accept a valid payment for a BIP270 payment request', async () => {
+    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      it('should accept a valid payment for a BIP270 payment request', async () => {
 
-      let resp = await request
-        .get(`/r/${invoice.uid}`) 
+        let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
-      expect(resp.body.outputs.length).to.be.greaterThan(0)
+        let resp = await request
+          .get(`/r/${invoice.uid}`) 
 
-      expect(resp.body.outputs[0].amount).to.be.greaterThan(0)
+        expect(resp.body.outputs.length).to.be.greaterThan(0)
 
-      expect(resp.body.outputs[0].script).to.be.a('string')
+        expect(resp.body.outputs[0].amount).to.be.greaterThan(0)
 
-      expect(resp.body.paymentUrl).to.be.a('string')
+        expect(resp.body.outputs[0].script).to.be.a('string')
 
-      expect(resp.statusCode).to.be.equal(200)
+        expect(resp.body.paymentUrl).to.be.a('string')
 
-      let transaction = await wallet.buildPayment(resp.body.outputs.map(output => {
-        
-        let address = new Address(new Script(output.script)).toString()
+        expect(resp.statusCode).to.be.equal(200)
 
-        return {
+        let transaction = await wallet.buildPayment(resp.body.outputs.map(output => {
+          
+          let address = new Address(new Script(output.script)).toString()
 
-          address,
+          return {
 
-          amount: output.amount
-        }
+            address,
 
-      }))
+            amount: output.amount
+          }
 
-      expect(transaction).to.be.a('string')
+        }))
 
-      let url = resp.body.paymentUrl.replace('undefined', '')
+        expect(transaction).to.be.a('string')
 
-      let submitResponse = await request.post(url).send({
-        transaction
-      }) 
+        let url = resp.body.paymentUrl.replace('undefined', '')
 
-      expect(submitResponse.statusCode).to.be.equal(200)
+        let submitResponse = await request.post(url).send({
+          transaction
+        }) 
 
-      expect(submitResponse.body.error).to.be.equal(0)
+        expect(submitResponse.statusCode).to.be.equal(200)
 
-      expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
+        expect(submitResponse.body.error).to.be.equal(0)
 
-      expect(submitResponse.body.memo).to.be.a('string')
+        expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
 
-    })
+        expect(submitResponse.body.memo).to.be.a('string')
+
+      })
+
+    }
 
     it('should reject payment for an invoice that was cancelled', async () => {
 
