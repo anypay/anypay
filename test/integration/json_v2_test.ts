@@ -187,79 +187,82 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
-  it("POST /i/:uid should verify the payment is valid", async () => {
+  if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    it("POST /i/:uid should verify the payment is valid", async () => {
 
-    let response = await server.inject({
-      method: 'POST',
-      url: `/i/${invoice.uid}`,
-      headers: {
-        'x-paypro-version': 2,
-        'Content-Type': 'application/payment-verification'
-      }
+      let [account, invoice] = await utils.newAccountWithInvoice()
+
+      let response = await server.inject({
+        method: 'POST',
+        url: `/i/${invoice.uid}`,
+        headers: {
+          'x-paypro-version': 2,
+          'Content-Type': 'application/payment-verification'
+        }
+      })
+
+      let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+
     })
 
-    let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+    it("POST /r/:uid should verify the payment is valid", async () => {
 
-  })
+      let [account, invoice] = await utils.newAccountWithInvoice()
 
-  it("POST /r/:uid should verify the payment is valid", async () => {
+      let response = await server.inject({
+        method: 'POST',
+        url: `/r/${invoice.uid}`,
+        headers: {
+          'x-paypro-version': 2,
+          'Content-Type': 'application/payment-verification'
+        }
+      })
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+      let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
 
-    let response = await server.inject({
-      method: 'POST',
-      url: `/r/${invoice.uid}`,
-      headers: {
-        'x-paypro-version': 2,
-        'Content-Type': 'application/payment-verification'
-      }
     })
 
-    let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+    it("POST /i/:uid should mark the invoice as paid", async () => {
 
-  })
+      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
-  it("POST /i/:uid should mark the invoice as paid", async () => {
+      let client = new TestClient(server, `/i/${invoice.uid}`)
 
-    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let { paymentOptions } = await client.getPaymentOptions()
 
-    let client = new TestClient(server, `/i/${invoice.uid}`)
+      let paymentOption = paymentOptions.filter(option => {
+        return option.currency === 'BSV'
+      })[0]
 
-    let { paymentOptions } = await client.getPaymentOptions()
+      let paymentRequest = await client.selectPaymentOption(paymentOption)
 
-    let paymentOption = paymentOptions.filter(option => {
-      return option.currency === 'BSV'
-    })[0]
+      let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 
-    let paymentRequest = await client.selectPaymentOption(paymentOption)
+      let response = await server.inject({
+        method: 'POST',
+        url: `/i/${invoice.uid}`,
+        headers: {
+          'x-paypro-version': 2,
+          'Content-Type': 'application/payment'
+        },
+        payload: {
+          transactions: [{ tx: payment }],
+          chain: 'BSV',
+          currency: 'BSV'
+        }
+      })
 
-    let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
+      expect(response.statusCode).to.be.equal(200)
 
-    let response = await server.inject({
-      method: 'POST',
-      url: `/i/${invoice.uid}`,
-      headers: {
-        'x-paypro-version': 2,
-        'Content-Type': 'application/payment'
-      },
-      payload: {
-        transactions: [{ tx: payment }],
-        chain: 'BSV',
-        currency: 'BSV'
-      }
+      let valid = schema.Protocol.Payment.response.validate(response.result)
+
+      invoice = await ensureInvoice(invoice.uid)
+
+      expect(invoice.get('status')).to.be.equal('paid')
+
     })
-
-    expect(response.statusCode).to.be.equal(200)
-
-    let valid = schema.Protocol.Payment.response.validate(response.result)
-
-    invoice = await ensureInvoice(invoice.uid)
-
-    expect(invoice.get('status')).to.be.equal('paid')
-
-  })
+  }
 
 })
 
