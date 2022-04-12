@@ -117,6 +117,10 @@ export class KrakenAccount extends Orm {
             pair = 'XXRPZUSD'
           }
 
+          if (currency === 'XXMR') {
+            pair = 'XXMRZUSD'
+          }
+
           if (currency === 'LTC') {
             pair = 'XLTCZUSD'
           }
