@@ -197,6 +197,52 @@ export async function attachV1Routes(server) {
   }); 
 
   server.route({
+    method: 'GET',
+    path: '/v1/api/account/addresses',
+    options: {
+      auth: "jwt",
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          addresses: Joi.array().items(Joi.object({
+            currency: Joi.string().required(),
+            code: Joi.string().required(),
+            name: Joi.string().required(),
+            enabled: Joi.boolean().required(),
+            price: Joi.number().required(),
+            icon: Joi.string().required(),
+            address: Joi.string().required(),
+            supported: Joi.boolean().required(),
+            wallet: Joi.string().optional(),
+            note: Joi.string().optional()
+          }))
+        })
+      }
+    },
+    handler: v1.Addresses.index
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/v1/api/system/coins',
+    options: {
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          addresses: Joi.array().items(Joi.object({
+            code: Joi.string().required(),
+            name: Joi.string().required(),
+            enabled: Joi.boolean().required(),
+            price: Joi.number().required(),
+            icon: Joi.string().required()
+          }))
+        })
+      }
+    },
+    handler: v1.Coins.index
+  }); 
+
+  server.route({
     method: 'POST',
     path: '/v1/api/test/webhooks',
     handler: v1.Webhooks.test

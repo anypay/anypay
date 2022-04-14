@@ -1,5 +1,5 @@
 
-import { setAddress } from '../../../lib/addresses'
+import { setAddress, listAddresses } from '../../../lib/addresses'
 
 export async function update(req, h) {
 
@@ -8,6 +8,14 @@ export async function update(req, h) {
   let address = await setAddress(req.account, req.payload)
 
   return h.response({ address: address.toJSON() }).code(200)
+
+}
+
+export async function index(req, h) {
+
+  let addresses = await listAddresses(req.account)
+
+  return h.response({ addresses }).code(200)
 
 }
 
