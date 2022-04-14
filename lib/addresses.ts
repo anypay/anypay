@@ -3,9 +3,75 @@ import { models } from './models';
 
 import { setAddress as _setAddress } from './core';
 
+import { convert } from './prices'
+
 import { Orm } from './orm'
 
 import { Account } from './account'
+
+import { getCoins } from './coins'
+
+interface Coin {
+  code: string;
+  currency: string;
+  name: string;
+  enabled: boolean;
+  supported: boolean;
+  icon: string;
+  address: string;
+}
+
+export async function listAddresses(account: Account): Promise<Coin[]> {
+
+  let records = await models.Address.findAll({
+
+    where: { account_id: account.id }
+
+  })
+
+  records = records.reduce((map, record) => {
+    map[record.currency] = record
+    return map;
+  }, {})
+
+  let coins = await getCoins()
+
+  return Promise.all(coins.map(async coin => {
+
+    coin = {
+      name: coin.name,
+      code: coin.code,
+      logo: coin.logo_url,
+      precision: coin.precision,
+      enabled: coin.supported && !coin.unavailable,
+      color: coin.color
+    }
+
+    let record = records[coin.code]
+
+    if (record) {
+
+      coin.address = record.value
+      coin.paymail = record.paymail
+      coin.wallet = record.wallet
+      coin.note = record.note
+    }
+
+    try {
+
+      let { value: price } = await convert({ currency: coin.code, value: 1 }, 'USD')
+
+      coin['price'] = price
+
+    } catch(error) {
+
+    }
+
+    return coin
+
+  }))
+
+}
 
 export async function lockAddress(accountId: number, currency: string) {
 
