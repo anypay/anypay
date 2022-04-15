@@ -28,4 +28,3 @@ export async function remove(req, h) {
   return h.response({ success: true }).code(200)
 
 }
-

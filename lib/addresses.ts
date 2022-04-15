@@ -7,6 +7,8 @@ import { setAddress as _setAddress } from './core'
 
 import { convert } from './prices'
 
+import { convert } from './prices'
+
 import { Orm } from './orm'
 
 import { Account } from './account'
