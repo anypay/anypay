@@ -67,6 +67,15 @@ export async function attachV1Routes(server) {
   });
 
   server.route({
+    method: "GET",
+    path: "/v1/api/account/access-keys",
+    options: {
+      auth: "jwt"
+    },
+    handler: v1.AccessKeys.index
+  });
+
+  server.route({
     method: 'GET',
     path: '/v1/api/webhooks',
     options: {
