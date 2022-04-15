@@ -1,7 +1,9 @@
 
-import { models } from './models';
+import { log } from './log'
 
-import { setAddress as _setAddress } from './core';
+import { models } from './models'
+
+import { setAddress as _setAddress } from './core'
 
 import { convert } from './prices'
 
@@ -144,6 +146,28 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
   })
 
   return new Address(result)
+
+}
+
+export async function removeAddress(account: Account, currency: string): Promise<void> {
+
+  let record = await models.Address.findOne({ where: {
+
+    account_id: account.id,
+
+    currency
+
+  }})
+
+  if (!record) {
+    throw new Error('attempted to remove address that does not exist')
+  }
+
+  let address = record.toJSON()
+
+  await record.destroy() 
+
+  log.info('address.removed', address)
 
 }
 

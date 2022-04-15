@@ -67,6 +67,15 @@ export async function attachV1Routes(server) {
   });
 
   server.route({
+    method: "GET",
+    path: "/v1/api/account/access-keys",
+    options: {
+      auth: "jwt"
+    },
+    handler: v1.AccessKeys.index
+  });
+
+  server.route({
     method: 'GET',
     path: '/v1/api/webhooks',
     options: {
@@ -184,6 +193,7 @@ export async function attachV1Routes(server) {
         })
       },
       response: {
+        failAction: 'log',
         schema: Joi.object({
           address: Joi.object({
             currency: Joi.string().required(),
@@ -194,6 +204,28 @@ export async function attachV1Routes(server) {
       }
     },
     handler: v1.Addresses.update
+  }); 
+
+  server.route({
+    method: 'DELETE',
+    path: '/v1/api/account/addresses/{currency}',
+    options: {
+      auth: "jwt",
+      validate: {
+        params: Joi.object({
+          currency: Joi.string().required()
+        })
+      },
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          address: Joi.object({
+            success: Joi.boolean()
+          })
+        })
+      }
+    },
+    handler: v1.Addresses.remove
   }); 
 
   server.route({
