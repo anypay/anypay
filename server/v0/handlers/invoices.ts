@@ -39,7 +39,7 @@ export async function cancel(req, h) {
 
     await invoice.save()
 
-    log.info('invoice.cancelled', where)
+    log.debug('invoice.cancelled', where)
 
     where['status'] = 'cancelled'
 
@@ -436,12 +436,12 @@ export async function show(request, reply) {
 
   } else {
 
-    log.info('invoice not yet expired');
+    log.debug('invoice not yet expired');
   }
 
   if (invoice) {
 
-    log.info('invoice.requested', invoice.toJSON());
+    log.debug('invoice.requested', invoice.toJSON());
 
     invoice.payment_options = await getPaymentOptions(invoice.uid)
 
@@ -470,7 +470,7 @@ export async function show(request, reply) {
 
 export async function shareEmail(req, h) {
 
-  log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
+  log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 
   let invoice = await models.Invoice.findOne({
     where: {
