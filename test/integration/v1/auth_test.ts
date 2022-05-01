@@ -1,10 +1,10 @@
-import * as utils from '../utils'
+import * as utils from '../../utils'
 
-import { expect, server, chance, request, spy } from '../utils'
+import { expect, server, chance, request, spy } from '../../utils'
 
-import { verifyToken } from '../../lib/jwt'
+import { verifyToken } from '../../../lib/jwt'
 
-import * as passwords from '../../lib/password'
+import * as passwords from '../../../lib/password'
 
 describe("Listing Available Webhooks", async () => {
 
@@ -53,6 +53,25 @@ describe("Listing Available Webhooks", async () => {
     const decodedToken = await verifyToken(accessToken);
 
     expect(decodedToken.account_id).to.be.equal(body.user.id)
+
+  })
+
+  it("POST /v1/api/account/login with invalid creds should return a 401", async () => {
+
+    let email = chance.email()
+    let password = chance.word()
+
+    let { body } = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
+
+    let response = await request
+      .post('/v1/api/account/login')
+      .send({ email, password: 'inv@lid' })
+
+    expect(response.statusCode).to.be.equal(401)
+
+    expect(response.body.error).to.be.a('string')
 
   })
 
