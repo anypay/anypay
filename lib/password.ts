@@ -75,7 +75,7 @@ export async function sendPasswordResetEmail(email) {
           Text: {
             Charset: "UTF-8",
             Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link
-            below:\n\nhttps://anypayx.com/auth/reset-password/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            below:\n\nhttps://legacy.anypayx.com/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
