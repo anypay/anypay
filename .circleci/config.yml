@@ -55,7 +55,7 @@ jobs:
     steps:
       - run:
           name: Deploy to Web Servers
-          command: echo "no deploy"
+          command: ssh api.anypayx.com "sudo chef-client -o recipe[anypay_api]"
 
   deploy_beta:
     machine:
