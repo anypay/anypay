@@ -1,7 +1,7 @@
 
 const sequelize = require("../../lib/database");
 
-import { jsonV2 } from '../handlers'
+import { jsonV2, failAction } from '../handlers'
 
 import * as Joi from '@hapi/joi'
 
@@ -19,7 +19,8 @@ export async function attachRoutes(server) {
         }),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
@@ -40,7 +41,8 @@ export async function attachRoutes(server) {
         }),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
@@ -61,7 +63,8 @@ export async function attachRoutes(server) {
         }),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
