@@ -147,6 +147,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-spies": "^1.0.0",
+    "cz-conventional-changelog": "^3.3.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "nyc": "^15.1.0",
@@ -171,5 +172,10 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
