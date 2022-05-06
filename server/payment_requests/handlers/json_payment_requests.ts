@@ -53,70 +53,80 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
-  log.info('payment.submit', payment);
+  try {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+    log.info('payment.submit', payment);
 
-  if (invoice.cancelled) {
-    log.error('payment.error.invoicecancelled', { payment })
-    return Boom.badRequest('invoice cancelled')
-  }
+    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
-  if (!invoice) {
-    throw new Error(`invoice ${payment.invoice_uid} not found`)
-  }
+    if (invoice.cancelled) {
+      log.error('payment.error.invoicecancelled', { payment })
+      return Boom.badRequest('invoice cancelled')
+    }
 
-  let payment_option = await models.PaymentOption.findOne({ where: {
-    invoice_uid: invoice.uid,
-    currency: payment.currency
-  }})
+    if (!invoice) {
+      throw new Error(`invoice ${payment.invoice_uid} not found`)
+    }
 
-  if (!payment_option) {
-    throw new Error(`${payment.currency} payment option not found for invoice l${payment.invoice_uid}`)
-  }
+    let payment_option = await models.PaymentOption.findOne({ where: {
+      invoice_uid: invoice.uid,
+      currency: payment.currency
+    }})
 
-  let plugin = await plugins.findForCurrency(payment.currency)
+    if (!payment_option) {
+      throw new Error(`${payment.currency} payment option not found for invoice l${payment.invoice_uid}`)
+    }
 
-  for (const transaction of payment.transactions) {
+    let plugin = await plugins.findForCurrency(payment.currency)
 
-    if (plugin.verifyPayment) {
+    for (const transaction of payment.transactions) {
 
-      await plugin.verifyPayment({
-        payment_option,
-        hex: transaction,
-        protocol: 'JSONV2'
-      })
+      if (plugin.verifyPayment) {
 
-    } else {
+        await plugin.verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
 
-      await verifyPayment({
-        payment_option,
-        hex: transaction,
-        protocol: 'JSONV2'
-      })
+      } else {
+
+        await verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      }
+
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
+
+      let resp = await plugin.broadcastTx(transaction)
+
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
+
+      let paymentRecord = await completePayment(payment_option, transaction)
+
+      if (payment.wallet) {
+        paymentRecord.wallet = payment.wallet
+        await paymentRecord.save()
+      }
+
+      log.info('payment.completed', paymentRecord);
 
     }
 
-    log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
-
-    let resp = await plugin.broadcastTx(transaction)
-
-    log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
-
-    let paymentRecord = await completePayment(payment_option, transaction)
-
-    if (payment.wallet) {
-      paymentRecord.wallet = payment.wallet
-      await paymentRecord.save()
+    return {
+      success: true,
+      transactions: payment.transactions
     }
 
-    log.info('payment.completed', paymentRecord);
+  } catch(error) {
 
-  }
+    log.error('json.paymentrequest.submit.error', error)
 
-  return {
-    success: true,
-    transactions: payment.transactions
+    throw error
+
   }
 
 }
