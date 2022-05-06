@@ -25,7 +25,7 @@ import { accountCSVReports } from './handlers/csv_reports';
 
 import * as payreq from '../payment_requests/server'
 
-import { v0 } from '../handlers'
+import { v0, failAction } from '../handlers'
 
 const AccountLogin = require("../../lib/account_login");
 
@@ -276,7 +276,8 @@ async function Server() {
       validate: {
         params: Joi.object({
           invoice_id: Joi.string().required()
-        })
+        }),
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
@@ -313,7 +314,8 @@ async function Server() {
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
-        })
+        }),
+        failAction
       }
     }
   });
@@ -347,6 +349,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Account.Credentials,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
@@ -370,6 +373,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Account.Credentials,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
@@ -439,7 +443,8 @@ async function Server() {
         }),
         payload: Joi.object({
           note: Joi.string().required()
-        })
+        }),
+        failAction
       }
     }
   });
@@ -457,7 +462,8 @@ async function Server() {
         }),
         payload: Joi.object({
           address: Joi.string().required()
-        })
+        }),
+        failAction
       }
     }
   });
@@ -491,7 +497,8 @@ async function Server() {
       validate: {
         payload: Joi.object({
           note: Joi.string().required()
-        })
+        }),
+        failAction
       },
       auth: "token",
       tags: ['api']
@@ -520,6 +527,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
@@ -543,6 +551,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
@@ -556,6 +565,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: v0.Passwords.PasswordReset,
+        failAction
       },
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
@@ -569,6 +579,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: v0.Passwords.PasswordResetClaim,
+        failAction
       },
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
