@@ -5,6 +5,8 @@ import * as bitcore from './bitcore'
 
 import { publish } from '../../lib/blockchair'
 
+import { rpc } from './jsonrpc'
+
 export { bitcore }
 
 export async function validateAddress(): Promise<Boolean> {
@@ -37,9 +39,22 @@ export async function submitSignedPayment(rawTx: string): Promise<MoneroSumbmitR
 
 export async function broadcastTx(rawTx) {
 
+  let response = await rpc.call('submit_transfer', {
+    "tx_data_hex": rawTx
+  })
+
+  if (response.error) {
+
+    throw new Error(response.error.message)
+  }
+
+  console.log('RPC_RESPONSE', response)
+
+  return response
+
   /* TODO: Actually Broadcast Transaction */
 
-  await publish('monero', rawTx)
+  //await publish('monero', rawTx)
 
   return {}
 }

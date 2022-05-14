@@ -187,7 +187,11 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
   addresses = _.reject(addresses, (address) => {
     let coin = getCoin(address.currency);
     if (!coin) { return true }
-    if (!coin) { return true }
+
+    // Reject XMR without view key set
+    if (address.currency === 'XMR' && !address.view_key) {
+      return true
+    }
     return coin.unavailable;
   });
 
