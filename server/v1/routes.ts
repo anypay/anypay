@@ -340,6 +340,14 @@ export async function attachV1Routes(server) {
     method: "GET",
     path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
     handler: v1.WoocommerceCheckoutImages.image
+    options: {
+      validate: {
+        /*params: Joi.object({
+          account_id: Joi.number().required()
+        })
+        */
+      }
+    },
   });
 
 

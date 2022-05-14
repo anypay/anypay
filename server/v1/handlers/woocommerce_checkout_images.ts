@@ -86,3 +86,4 @@ export async function update(request, hapi) {
   return hapi.response({ name: request.payload.name, url }).code(200)
 
 }
+
