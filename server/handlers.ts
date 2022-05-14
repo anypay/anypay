@@ -11,5 +11,7 @@ const jsonV2 = requireHandlersDirectory(join(__dirname, './jsonV2/handlers'))
 
 export { v0, v1, jsonV2 }
 
-
+export function failAction(request, h, error) {
+  return error
+}
 
