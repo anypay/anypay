@@ -3,7 +3,7 @@ import { readFileSync } from 'fs'
 
 import axios from 'axios'
 
-import { getAccountSetting } from '../../../lib/settings'
+import { getAccountSetting, setAccountSetting } from '../../../lib/settings'
 
 const files = {
   'XMR': 'https://doge.bitcoinfiles.org/406e0f115578598c4364ea42aa3887e8aeccf513d948c183054c42d12782cd38',
@@ -16,7 +16,7 @@ const files = {
   'ANYPAY': 'https://doge.bitcoinfiles.org/31bc517ddae2134408f15acd582606ffe493e4d3800e8a60250899c61ace9bb3'
 }
 
-export async function show(request, hapi) {
+export async function image(request, hapi) {
 
   try {
 
@@ -41,3 +41,49 @@ export async function show(request, hapi) {
   }
 
 }
+
+export async function show(request, hapi) {
+
+  try {
+
+    let image = await getAccountSetting(request.account.id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
+
+    const url = files[image]
+
+    return hapi.response({
+      image: {
+        name: image,
+        url
+      }
+    })
+
+  } catch(error) {
+
+    console.error(error)
+
+    return hapi.response({ error: error.message }).code(500)
+
+  }
+
+}
+
+export async function index(request, hapi) {
+
+  return hapi.response({ images: files }).code(200)
+
+}
+
+export async function update(request, hapi) {
+
+  let url = files[request.payload.name]
+
+  if (url) {
+
+    await setAccountSetting(request.account.id, 'woocommerce.checkout.image', request.payload.name)
+
+  }
+
+  return hapi.response({ name: request.payload.name, url }).code(200)
+
+}
+

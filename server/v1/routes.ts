@@ -309,15 +309,38 @@ export async function attachV1Routes(server) {
 
   server.route({
     method: "GET",
-    path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
+    path: "/v1/woocommerce/checkout_images",
+    handler: v1.WoocommerceCheckoutImages.index,
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/checkout_image",
     handler: v1.WoocommerceCheckoutImages.show,
     options: {
+      auth: "jwt",
+    }
+  })
+
+  server.route({
+    method: "PUT",
+    path: "/v1/woocommerce/checkout_image",
+    handler: v1.WoocommerceCheckoutImages.update,
+    options: {
+      auth: "jwt",
       validate: {
-        /*params: Joi.object({
-          account_id: Joi.number().required()
+        payload: Joi.object({
+          name: Joi.string()
         })
-        */
       }
+    }
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
+    handler: v1.WoocommerceCheckoutImages.image,
+    options: {
     },
   });
 
