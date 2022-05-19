@@ -33,6 +33,43 @@ export async function setInvoiceAdditions(invoice: Invoice, additions: InvoiceAd
 
 }
 
+export async function show(request, hapi) {
+
+  try {
+
+    let invoice = await models.Invoice.findOne({ where: { uid: request.params.invoice_uid }})
+
+    if (!invoice) {
+
+      return hapi.response({ error: 'invoice not found' }).code(404)
+
+    }
+
+    let payment = await models.Payment.findOne({ where: { invoice_uid: invoice.uid }})
+
+    var response = {
+      invoice: {
+        currency: invoice.denomination,
+        amount: invoice.denomination_amount,
+        status: invoice.status,
+        createdAt: invoice.createdAt
+      }
+    }
+
+    if (payment) { response['payment'] = payment.toJSON() }
+
+    return hapi.response(response).code(200)
+
+  } catch(error) {
+
+    console.error('invoic.show.error', error)
+
+    return hapi.response({ error: error.message }).code(500)
+
+  }
+
+}
+
 export async function create (request, h) {
 
   // TODO: Refactor to call only a SINGLE core library method

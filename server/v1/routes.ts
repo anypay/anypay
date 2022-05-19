@@ -137,6 +137,18 @@ export async function attachV1Routes(server) {
 
   server.route({
     method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}",
+    handler: v1.Invoices.show,
+    options: {
+      auth: "jwt",
+      validate: {
+        failAction
+      },
+    },
+  });
+
+  server.route({
+    method: "GET",
     path: "/v1/api/invoices/{invoice_uid}/events",
     handler: v1.InvoiceEvents.index,
     options: {
