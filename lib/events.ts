@@ -90,7 +90,7 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
   }
 
-  let records = await models.Event.findAll({ where })
+  let records = await models.Event.findAll({ where, order: [['createdAt', 'desc']] })
 
   return records.map(record => new Event(record))
 
