@@ -168,12 +168,14 @@ export async function attachV1Routes(server) {
           events: Joi.array().items(Joi.object({
             id: Joi.number().required(),
             account_id: Joi.number().optional(),
+            invoice_uid: Joi.number().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required()
           }))
-        })
+        }),
+        failAction: 'log'
       }
     },
   });
