@@ -50,7 +50,7 @@ describe('Payment Requests With Edge Wallet', () => {
 
   })
 
-  it('should detect and record when Edge requests a payment request', async () => {
+  it.skip('should detect and record when Edge requests a payment request', async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
 

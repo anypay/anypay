@@ -83,7 +83,7 @@ describe('Integration | Invoices', () => {
         method: 'GET',
         url: `/v1/api/invoices/${invoice.uid}/events`
       })
-      
+
       expect(response.statusCode).to.be.equal(200)
 
       expect(response.result.events).to.be.an('array')
