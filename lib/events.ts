@@ -14,6 +14,8 @@ import { Account } from './account'
 
 import { events } from 'rabbi'
 
+import { Op } from 'sequelize'
+
 interface EventData {
   type: string;
   payload: any;
@@ -78,7 +80,7 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
   var where = {
 
-    payload: { invoice_uid: invoice.uid },
+    invoice_uid: invoice.uid
 
   }
 

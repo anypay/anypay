@@ -4,9 +4,9 @@ module.exports = {
 
   up: async (queryInterface, Sequelize) => {
 
-    return queryInterface.addColumn('Events', 'invoice_uid', {
+    return queryInterface.addColumn('events', 'invoice_uid', {
 
-      type: 'string',
+      type: Sequelize.STRING,
 
       allowNull: true
 
@@ -16,7 +16,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
 
-    return queryInterface.removeColumn('Events', 'invoice_uid')
+    return queryInterface.removeColumn('events', 'invoice_uid')
 
   }
 

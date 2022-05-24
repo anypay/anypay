@@ -101,6 +101,7 @@
     "node-fetch": "^3.2.1",
     "node-statsd": "^0.1.1",
     "parent-module": "^2.0.0",
+    "payment-protocol": "^0.2.0",
     "pg": "^8.7.3",
     "pino": "^7.8.1",
     "polynym": "^1.0.7",

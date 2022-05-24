@@ -1,5 +1,6 @@
 
 import { protocol, schema } from '../../../lib/pay/json_v2'
+import { detectWallet } from '../../../lib/pay'
 
 import { badRequest, notFound } from 'boom'
 
@@ -24,7 +25,9 @@ export async function listPaymentOptions(req, h) {
       allowUnknown: true
     })
 
-    let response = await protocol.listPaymentOptions(req.invoice)
+    let wallet = detectWallet(req.headers, req.invoice.uid)
+
+    let response = await protocol.listPaymentOptions(req.invoice, { wallet })
 
     return h.response(response)
 
@@ -79,8 +82,10 @@ async function getPaymentRequest(req, h) {
   try {
 
     await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers, { allowUnknown: true })
+
+    let wallet = detectWallet(req.headers, req.invoice.uid)
     
-    let response = await protocol.getPaymentRequest(req.invoice, req.payload)
+    let response = await protocol.getPaymentRequest(req.invoice, req.payload, { wallet })
 
     await schema.Protocol.PaymentRequest.response.validate(response)
 
@@ -102,7 +107,9 @@ async function verifyUnsignedPayment(req, h) {
 
     await schema.Protocol.PaymentVerification.headers.validateAsync(req.headers, { allowUnknown: true })
 
-    let response = await protocol.verifyUnsignedPayment(req.invoice, req.payload)
+    let wallet = detectWallet(req.headers, req.invoice.uid)
+
+    let response = await protocol.verifyUnsignedPayment(req.invoice, req.payload, { wallet })
 
     await schema.Protocol.PaymentVerification.response.validate(response)
 
@@ -124,7 +131,9 @@ async function submitPayment(req, h) {
 
     await schema.Protocol.Payment.headers.validateAsync(req.headers, { allowUnknown: true })
 
-    let response = await protocol.sendSignedPayment(req.invoice, req.payload)
+    let wallet = detectWallet(req.headers, req.invoice.uid)
+
+    let response = await protocol.sendSignedPayment(req.invoice, req.payload, { wallet })
 
     await schema.Protocol.Payment.response.validateAsync(response)
 
