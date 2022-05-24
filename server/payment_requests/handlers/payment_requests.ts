@@ -154,14 +154,6 @@ export async function show(req, h) {
 
   let wallet = detectWallet(req.headers, req.params.uid)
 
-  await recordEvent({
-
-    wallet,
-
-    invoice_uid: req.params.uid
-
-  }, 'invoice.requested')
-
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
   if (invoice.cancelled) {
