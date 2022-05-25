@@ -145,8 +145,6 @@ async function submitPayment(req, h) {
 
     let response = await protocol.sendSignedPayment(req.invoice, req.payload, { wallet })
 
-    console.log(response)
-
     //await schema.Protocol.Payment.response.validateAsync(response)
 
     return h.response(response)
