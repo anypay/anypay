@@ -252,7 +252,6 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
     }
 
   } catch(error) {
-    console.log('PHAROH', error)
 
     log.info('pay.jsonv2.payment.error', Object.assign(options, {
       error: error.message,
