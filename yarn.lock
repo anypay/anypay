@@ -9537,10 +9537,10 @@
   "resolved" "https://registry.npmjs.org/pathval/-/pathval-1.1.1.tgz"
   "version" "1.1.1"
 
-"payment-protocol@^0.2.0":
-  "integrity" "sha512-AZjOBi3uOndozbgaWy9hZzbLKf20qncXi85FTeXDdJpM4nuTDMd2WXB+iFcEcjf5ZzyEqG/Y8sM0q5JaRfnadw=="
-  "resolved" "https://registry.npmjs.org/payment-protocol/-/payment-protocol-0.2.0.tgz"
-  "version" "0.2.0"
+"payment-protocol@^0.3.0":
+  "integrity" "sha512-LGzXRlpo9BVXWWf/OYp+A71KcpNSZbvjRaknYTpcsAe6PnbQgBfEejI6BiaFZn79FGZhjEdB38XpgM66Bo5sCA=="
+  "resolved" "https://registry.npmjs.org/payment-protocol/-/payment-protocol-0.3.0.tgz"
+  "version" "0.3.0"
   dependencies:
     "axios" "^0.27.2"
 

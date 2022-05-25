@@ -13,6 +13,16 @@ async function ensureInvoice(req) {
 
   if (!req.invoice) { throw notFound() }
 
+  console.log(req.invoice.toJSON())
+
+  if (req.invoice.status === 'paid') {
+    throw new Error('invoice already paid')
+  }
+
+  if (req.invoice.status === 'cancelled') {
+    throw new Error('invoice cancelled')
+  }
+
 }
 
 export async function listPaymentOptions(req, h) {
@@ -35,7 +45,7 @@ export async function listPaymentOptions(req, h) {
 
     log.error('listpaymentoptions.error', error)
 
-    return badRequest(error)
+    return badRequest({ error: error.message })
 
   }
 
@@ -69,9 +79,9 @@ export async function handlePost(req, h) {
 
   } catch(error) {
 
-    log.error('handlepost.error', error)
+    log.error('handlepost.error', error.message)
 
-    return badRequest({ error: error.message })
+    return h.response({ error: error.message }).code(400)
 
   }
 
