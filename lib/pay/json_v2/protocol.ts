@@ -243,8 +243,6 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
     for (let tx of params.transactions) {
 
-      console.log('__TX__', tx)
-
       if (!tx.tx_key || !tx.tx_hash) {
 
         throw new Error('tx_key and tx_hash required for all XMR transactions')
