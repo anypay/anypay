@@ -36,7 +36,8 @@ export async function syncDeposits(account: Account) {
         where: {
           refid: deposit.refid,
           account_id: account.id,
-          kraken_account_id: kraken.get('id')
+          kraken_account_id: kraken.get('id'),
+          status: deposit.status
         },
         defaults: deposit
       })
