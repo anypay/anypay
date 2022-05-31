@@ -12,7 +12,25 @@ import { models } from '../../../lib/models'
 
 import { log } from '../../../lib/log'
 
-import { syncDeposits } from '../'
+import { syncDeposits, syncTrades } from '../'
+
+program
+  .command('trades <account_id> [start]')
+  .action(async (id, start) => {
+
+    try {
+
+      let account = await Account.findOne({ id })
+
+      let trades = await syncTrades(account, { start })
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  })
 
 program
   .command('listaccounts')
