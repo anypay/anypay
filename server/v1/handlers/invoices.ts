@@ -58,6 +58,13 @@ export async function show(request, hapi) {
 
     if (payment) { response['payment'] = payment.toJSON() }
 
+    response['kraken_deposits'] = await models.KrakenDeposit.findAll({
+      where: {
+        account_id: invoice.account_id,
+        txid: invoice.hash
+      }
+    })
+
     return hapi.response(response).code(200)
 
   } catch(error) {
