@@ -8,6 +8,12 @@ import { KrakenAccount, listAll, fromAccount } from '../lib/kraken_account'
 
 import { Account } from '../../../lib/account'
 
+import { models } from '../../../lib/models'
+
+import { log } from '../../../lib/log'
+
+import { syncDeposits } from '../'
+
 program
   .command('listaccounts')
   .action(async () => {
@@ -18,7 +24,9 @@ program
 
       for (let account of accounts) {
 
-        console.log(account.toJSON())
+        console.log(account)
+
+        console.log(Object.assign(account.toJSON(), { email: account.get('email') }))
 
       }
 
@@ -105,11 +113,7 @@ program
 
       let account = await Account.findOne({ id })
 
-      let kraken = await fromAccount(account)
-
-      let deposits = await kraken.api('DepositStatus', {
-        asset: 'BTC'
-      })
+      let deposits = await syncDeposits(account)
 
       console.log(deposits)
 
@@ -118,6 +122,8 @@ program
       console.error(error)
 
     }
+
+    process.exit(0)
 
   })
 
