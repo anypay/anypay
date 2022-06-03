@@ -55,6 +55,8 @@ program
         currency: 'XMR'
       })
 
+      console.log(paymentRequest)
+
       let destinations = paymentRequest.instructions[0].outputs
 
       let { tx_blob: tx, tx_key, tx_hash } = await transfer(destinations)
