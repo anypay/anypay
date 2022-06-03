@@ -121,8 +121,7 @@ export async function attachV1Routes(server) {
   server.route({
     method: "POST",
     path: "/v1/api/invoices",
-    handler: v1.
-    .create,
+    handler: v1.Invoices.create,
     options: {
       auth: "jwt",
       validate: {
@@ -132,7 +131,6 @@ export async function attachV1Routes(server) {
           currency: Joi.string().optional()
         }),
         failAction
-
       },
     },
   });
@@ -145,7 +143,7 @@ export async function attachV1Routes(server) {
       auth: "jwt",
       validate: {
         failAction
-      },
+      }
     },
   });
 
