@@ -93,7 +93,13 @@ const Payment = Joi.object({
     chain: Joi.string().required(),
     transactions: Joi.array().required().items(Joi.object({
       tx: Joi.string().required(),
-      weightedSize: Joi.number().optional()
+      weightedSize: Joi.number().optional(),
+      tx_key: Joi.string().custom((value) => {
+        return Buffer.byteLength(value, 'hex') === 32
+      }).optional(),
+      tx_hash: Joi.string().custom((value) => {
+        return Buffer.byteLength(value, 'hex') === 32
+      }).optional()
     })),
     currency: Joi.string().required()
   }).required(),

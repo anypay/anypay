@@ -121,7 +121,8 @@ export async function attachV1Routes(server) {
   server.route({
     method: "POST",
     path: "/v1/api/invoices",
-    handler: v1.Invoices.create,
+    handler: v1.
+    .create,
     options: {
       auth: "jwt",
       validate: {
@@ -130,6 +131,19 @@ export async function attachV1Routes(server) {
           denomination: Joi.string().optional(),
           currency: Joi.string().optional()
         }),
+        failAction
+
+      },
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}",
+    handler: v1.Invoices.show,
+    options: {
+      auth: "jwt",
+      validate: {
         failAction
       },
     },
@@ -156,12 +170,14 @@ export async function attachV1Routes(server) {
           events: Joi.array().items(Joi.object({
             id: Joi.number().required(),
             account_id: Joi.number().optional(),
+            invoice_uid: Joi.number().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required()
           }))
-        })
+        }),
+        failAction: 'log'
       }
     },
   });
@@ -289,5 +305,61 @@ export async function attachV1Routes(server) {
     path: '/v1/api/test/webhooks',
     handler: v1.Webhooks.test
   }); 
+
+  server.route({
+    method: 'POST',
+    path: '/v1/api/fail',
+    handler: (req, h) => { return h.response(200) },
+    options: {
+      validate: {
+        query: Joi.object({
+          error: Joi.string().required()
+        }).required(),
+        headers: Joi.object({
+          'fail': Joi.string().required()
+        }),
+        //failAction
+      }
+    }
+  }); 
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/checkout_images",
+    handler: v1.WoocommerceCheckoutImages.index,
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/checkout_image",
+    handler: v1.WoocommerceCheckoutImages.show,
+    options: {
+      auth: "jwt",
+    }
+  })
+
+  server.route({
+    method: "PUT",
+    path: "/v1/woocommerce/checkout_image",
+    handler: v1.WoocommerceCheckoutImages.update,
+    options: {
+      auth: "jwt",
+      validate: {
+        payload: Joi.object({
+          name: Joi.string()
+        })
+      }
+    }
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
+    handler: v1.WoocommerceCheckoutImages.image,
+    options: {
+    },
+  });
+
+
 
 }

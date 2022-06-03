@@ -187,7 +187,7 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
   addresses = _.reject(addresses, (address) => {
     let coin = getCoin(address.currency);
     if (!coin) { return true }
-    if (!coin) { return true }
+
     return coin.unavailable;
   });
 

@@ -55,7 +55,8 @@ class Logger {
       namespace: this.namespace,
       type,
       payload,
-      account_id: payload.account_id
+      account_id: payload.account_id,
+      invoice_uid: payload.invoice_uid
     })
 
 
