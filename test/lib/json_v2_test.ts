@@ -108,77 +108,81 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  it('#sendSignedPayment should accept and broadcast transaction', async () => {
+  if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    it('#sendSignedPayment should accept and broadcast transaction', async () => {
 
-    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
+      let [account, invoice] = await utils.newAccountWithInvoice()
 
-    let { chain, currency } = paymentOptions[0]
+      let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
-    let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+      let { chain, currency } = paymentOptions[0]
 
-  })
-
-  it('#sendSignedPayment should mark invoice as paid', async () => {
-
-    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
-
-    let client = new TestClient(server, `/i/${invoice.uid}`)
-
-    let { paymentOptions } = await client.getPaymentOptions()
-
-    let paymentOption = paymentOptions.filter(option => {
-      return option.currency === 'BSV'
-    })[0]
-
-    let { chain, currency } = paymentOption
-
-    let paymentRequest = await client.selectPaymentOption(paymentOption)
-
-    let balance = await wallet.getBalance()
-
-    let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
-
-    let result = await protocol.sendSignedPayment(invoice, {
-
-      chain,
-
-      currency,
-
-      transactions: [{ tx: payment }]
+      let response = await protocol.getPaymentRequest(invoice, { chain, currency })
 
     })
 
-    invoice = await ensureInvoice(invoice.uid)
+    it('#sendSignedPayment should mark invoice as paid', async () => {
 
-    expect(invoice.get('status')).to.be.equal('paid')
+      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
-  })
+      let client = new TestClient(server, `/i/${invoice.uid}`)
 
-  it('#sendSignedPayment records an event in the invoice evenet log', async () => {
+      let { paymentOptions } = await client.getPaymentOptions()
 
-    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let paymentOption = paymentOptions.filter(option => {
+        return option.currency === 'BSV'
+      })[0]
 
-    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
+      let { chain, currency } = paymentOption
 
-    let { chain, currency } = paymentOptions[0]
+      let paymentRequest = await client.selectPaymentOption(paymentOption)
 
-    let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+      let balance = await wallet.getBalance()
 
-    await protocol.sendSignedPayment(invoice, {
+      let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 
-      chain,
+      let result = await protocol.sendSignedPayment(invoice, {
 
-      currency,
+        chain,
 
-      transactions: []
+        currency,
+
+        transactions: [{ tx: payment }]
+
+      })
+
+      invoice = await ensureInvoice(invoice.uid)
+
+      expect(invoice.get('status')).to.be.equal('paid')
 
     })
 
-    expect(log.info).to.have.been.called.with('pay.jsonv2.payment')
+    it('#sendSignedPayment records an event in the invoice evenet log', async () => {
 
-  })
+      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+
+      let {paymentOptions} = await protocol.listPaymentOptions(invoice)
+
+      let { chain, currency } = paymentOptions[0]
+
+      let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+
+      await protocol.sendSignedPayment(invoice, {
+
+        chain,
+
+        currency,
+
+        transactions: []
+
+      })
+
+      expect(log.info).to.have.been.called.with('pay.jsonv2.payment')
+
+    })
+
+  }
 
 })
 

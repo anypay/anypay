@@ -103,6 +103,8 @@ interface PaymentVerification {
 interface Transaction {
   tx: string;
   weightedSize?: number;
+  tx_key?: string;
+  tx_hash?: string;
 }
 
 interface Payment {
@@ -118,12 +120,16 @@ interface PaymentResponse {
 
 const Errors = require('./errors').errors
 
-export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptions> {
+interface LogOptions {
+  wallet?: string;
+}
 
-  log.info('pay.jsonv2.payment-options', {
+export async function listPaymentOptions(invoice: Invoice, options: LogOptions = {}): Promise<PaymentOptions> {
+
+  log.info('pay.jsonv2.payment-options', Object.assign(options, {
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
-  })
+  }))
 
   let paymentOptions = await invoice.getPaymentOptions()
 
@@ -155,9 +161,13 @@ export async function listPaymentOptions(invoice: Invoice): Promise<PaymentOptio
   }
 }
 
-export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest): Promise<PaymentRequest> {
+export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
 
-  log.info('pay.jsonv2.payment-request', Object.assign(option, {
+  if (invoice.status !== 'unpaid') {
+    throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
+  }
+
+  log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
     account_id: invoice.get('account_id'),
     invoice_uid: invoice.uid
   }))
@@ -196,12 +206,12 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
 }
 
-export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentVerification> {
+export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVerificationRequest, options: LogOptions = {}): Promise<PaymentVerification> {
 
   log.info('pay.jsonv2.payment-verification', Object.assign({
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
-  }, params))
+  }, Object.assign(params, options)))
 
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
@@ -220,29 +230,57 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
 }
 
-export async function sendSignedPayment(invoice: Invoice, params: PaymentVerificationRequest): Promise<PaymentResponse> {
+export async function sendSignedPayment(invoice: Invoice, params: PaymentVerificationRequest, options: LogOptions = {}): Promise<PaymentResponse> {
 
   log.info('pay.jsonv2.payment', Object.assign({
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
-  }, params))
+  }, Object.assign(params, options)))
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 
-  let response = await submitPayment({
-    currency: params.currency,
-    transactions: params.transactions.map(({tx}) => tx),
-    invoice_uid: invoice.uid
-  })
+  if (params.currency === 'XMR') {
 
-  log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {
-    invoice_uid: invoice.uid,
-    account_id: invoice.get('account_id')
-  }))
+    for (let tx of params.transactions) {
 
-  return {
-    payment: params,
-    memo: 'Transactions accepted and broadcast to the network'
+      if (!tx.tx_key || !tx.tx_hash) {
+
+        throw new Error('tx_key and tx_hash required for all XMR transactions')
+
+      }
+
+    }
+    
+  }
+
+  try {
+
+    let response = await submitPayment({
+      currency: params.currency,
+      transactions: params.transactions.map(({tx}) => tx),
+      invoice_uid: invoice.uid
+    })
+
+    log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {
+      invoice_uid: invoice.uid,
+      account_id: invoice.get('account_id')
+    }))
+
+    return {
+      payment: params,
+      memo: 'Transactions accepted and broadcast to the network'
+    }
+
+  } catch(error) {
+
+    log.info('pay.jsonv2.payment.error', Object.assign(options, {
+      error: error.message,
+      invoice_uid: invoice.uid,
+      account_id: invoice.get('account_id')
+    }))
+
+    throw error
+
   }
 }
 

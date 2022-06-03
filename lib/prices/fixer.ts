@@ -21,7 +21,9 @@ export async function fetchCurrencies(base_currency): Promise<Price[]> {
 
   let response = await http.get(url);
 
-  let rates = response.body.rates;
+  console.log(response.body)
+
+  let rates = response.body.rates || {};
 
   return Object.keys(rates).map((currency) => {
 

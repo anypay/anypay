@@ -9,7 +9,19 @@ import { log } from '../../../lib/log'
 
 export async function create(request, h) {
 
-  const account = await loginAccount(request.payload)
+  var account;
+
+  try {
+
+    account = await loginAccount(request.payload)
+
+  } catch(error) {
+
+    log.error('login.error', error)
+
+    return h.response({ error: error.message }).code(401)
+
+  }
 
   geolocateAccountFromRequest(account, request)
 

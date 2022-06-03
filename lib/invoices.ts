@@ -87,6 +87,11 @@ export class Invoice extends Orm {
 
   }
 
+  get status(): string {
+
+    return this.get('status')
+  }
+
   get uid(): string {
 
     return this.get('uid')

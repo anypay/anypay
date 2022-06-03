@@ -1,6 +1,12 @@
 
 require('dotenv').config()
 
+import { join } from 'path'
+
+import { log } from './lib'
+
+import { startActorsDirectory } from 'rabbi';
+
 import { server, start } from './server/v0/server'
 
 import { start as startPrices } from './lib/prices/cron'
@@ -36,6 +42,10 @@ import * as core from './lib'
       options: { core }
 
     })
+
+    startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
+
+    log.info('rabbi.kraken.actors.start')
     
   }
 

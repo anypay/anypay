@@ -1,4 +1,6 @@
 
+import { createHmac } from 'crypto'
+
 export class Transaction {
 
   hex: string;
@@ -16,6 +18,8 @@ export class Transaction {
 
   get hash() {
 
-    return '12345'
+    let hash = createHmac('sha256', Math.random().toString()).update(Math.random().toString()).digest("hex")
+
+    return hash
   }
 }

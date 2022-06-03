@@ -1,7 +1,7 @@
 
 const sequelize = require("../../lib/database");
 
-import { jsonV2 } from '../handlers'
+import { jsonV2, failAction } from '../handlers'
 
 import * as Joi from '@hapi/joi'
 
@@ -16,10 +16,11 @@ export async function attachRoutes(server) {
         headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
           'accept': Joi.string().pattern(/application\/payment-options/).required()
-        }),
+        }).unknown(),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
@@ -37,10 +38,11 @@ export async function attachRoutes(server) {
             Joi.string().pattern(/application\/payment-verification/).required(),
             Joi.string().pattern(/application\/payment/).required(),
           ]).required()
-        }),
+        }).unknown(),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
@@ -61,7 +63,8 @@ export async function attachRoutes(server) {
         }),
         params: Joi.object({
           uid: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
