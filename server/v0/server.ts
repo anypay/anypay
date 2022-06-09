@@ -450,6 +450,22 @@ async function Server() {
   });
 
   server.route({
+    method: "POST",
+    path: "/v0/search",
+    handler: v0.Search.create,
+    options: {
+      auth: "token",
+      tags: ['api', 'invoices'],
+      validate: {
+        payload: Joi.object({
+          search: Joi.string().required()
+        }),
+        failAction
+      }
+    }
+  });
+
+  server.route({
     method: "PUT",
     path: "/addresses/{currency}",
     handler: v0.Addresses.update,
