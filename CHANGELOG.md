@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/anypay/anypay/compare/v1.2.0...v1.2.1) (2022-06-09)
+
+
+### Bug Fixes
+
+* **kraken-listall-fix:** fix query when no parameters are provided for kraken plugin listAll method ([2104156](https://github.com/anypay/anypay/commit/2104156555e6a358161313d1a3117fc272debb36))
+
 # [1.2.0](https://github.com/anypay/anypay/compare/v1.1.0...v1.2.0) (2022-06-09)
 
 
