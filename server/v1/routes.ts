@@ -358,6 +358,21 @@ export async function attachV1Routes(server) {
     },
   });
 
+  server.route({
+    method: "POST",
+    path: "/v1/api/search",
+    handler: v1.Search.create,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'search'],
+      validate: {
+        payload: Joi.object({
+          search: Joi.string().required()
+        }),
+        failAction
+      }
+    }
+  });
 
 
 }
