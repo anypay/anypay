@@ -224,7 +224,7 @@ export async function fromAccount(account: Account) {
 
 }
 
-export async function listAll({ where }: { where?: any }) {
+export async function listAll({ where }: { where?: any } = {}) {
 
   let records = await models.KrakenAccount.findAll({
     where,
