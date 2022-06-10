@@ -374,5 +374,28 @@ export async function attachV1Routes(server) {
     }
   });
 
+  server.route({
+    method: "GET",
+    path: "/v1/api/account/invoices/{invoice_uid}/refund",
+    handler: v1.Refunds.show,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'refunds'],
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        })
+      },
+      /*response: {
+        schema: Joi.object({
+          invoice_uid: Joi.string().required(),
+          currency: Joi.string().required(),
+          value: Joi.string().required()
+        }),
+        //failAction
+      }*/
+    }
+  });
+
 
 }

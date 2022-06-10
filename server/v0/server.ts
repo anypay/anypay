@@ -639,14 +639,14 @@ async function Server() {
     }
   });
 
-    server.route({
-      method: "POST",
-      path: "/r",
-      handler: v0.PaymentRequests.create,
-      options: {
-        auth: "app"
-      }
-    })
+  server.route({
+    method: "POST",
+    path: "/r",
+    handler: v0.PaymentRequests.create,
+    options: {
+      auth: "app"
+    }
+  })
 
   server.route({
     method: 'POST',
