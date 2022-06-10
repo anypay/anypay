@@ -28,13 +28,17 @@ export function writePaymentOptions(options: NewPaymentOption[]) {
 
 export async function paymentRequestToPaymentOptions(paymentRequest) {
 
+  console.log('PR2PO', paymentRequest)
+
   let options = await Promise.all(paymentRequest.template.map(async (option) => {
 
     let outputs = await Promise.all(option.to.map(async (to) => {
 
+      console.log({ to })
+
       let conversion = await convert({
         currency: to.currency,
-        value: to.amount
+        value: parseFloat(to.amount)
       }, option.currency)
 
       return {
