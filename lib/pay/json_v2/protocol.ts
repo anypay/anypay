@@ -147,11 +147,14 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     paymentOptions: paymentOptions.map(paymentOption => {
 
+      const estimatedAmount = paymentOption.get('outputs')
+        .reduce((sum, output) => sum + output.amount, 0)
+
       return {
         currency: paymentOption.get('currency'),
         chain: paymentOption.get('currency'),
         network: 'main',
-        estimatedAmount: parseInt(paymentOption.get('amount')),
+        estimatedAmount,
         requiredFeeRate: 1,
         minerFee: 0,
         decimals: 0,
