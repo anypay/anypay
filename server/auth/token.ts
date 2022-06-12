@@ -90,9 +90,8 @@ async function validateToken (request, username, password, h) {
 };
 
 export async function validateAppToken (request, username, password, h) {
-  log.info('validate app token')
 
-  log.info('auth.app', { username, password }) 
+  log.debug('auth.app', { username, password }) 
 
   if (!username) {
     return {
