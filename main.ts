@@ -30,8 +30,14 @@ import * as core from './lib'
     await server.register(websockets)
 
   }
+  try {
 
   await start()
+  } catch(error) {
+
+    console.error(error)
+
+  }
 
   if (process.env.KRAKEN_PLUGIN) {
 

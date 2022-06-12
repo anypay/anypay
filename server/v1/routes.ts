@@ -1,9 +1,5 @@
 require('dotenv').config()
 
-import * as Boom from 'boom'
-
-const sequelize = require("../../lib/database");
-
 import { v1, failAction } from '../handlers'
 
 import { useJWT } from '../auth/jwt'
