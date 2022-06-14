@@ -87,6 +87,14 @@ export class Invoice extends Orm {
 
   }
 
+  get payment(): any {
+    return this.record['payment']
+  }
+
+  get refund(): any {
+    return this.record['refund']
+  }
+
   get status(): string {
 
     return this.get('status')
