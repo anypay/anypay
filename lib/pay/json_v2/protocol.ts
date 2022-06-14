@@ -133,6 +133,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   let paymentOptions = await invoice.getPaymentOptions()
 
+
   return {
 
     time: invoice.get('createdAt'),
