@@ -15,6 +15,8 @@ import { plugin as websockets } from './ws/plugin'
 
 import { hapi as kraken } from './plugins/kraken'
 
+import { start as refunds } from './actors/refunds/actor'
+
 import { init } from 'rabbi'
 
 import * as core from './lib'
@@ -50,6 +52,8 @@ import * as core from './lib'
     })
 
     startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
+
+    refunds()
 
     log.info('rabbi.kraken.actors.start')
     
