@@ -117,8 +117,6 @@ export async function getTransaction(_coin, txid) {
 
     let { data } = await axios.get(`https://api.blockchair.com/${coin}/raw/transaction/${txid}`)
 
-    console.log(data.data[txid].raw_transaction)
-
     const bitcore = getBitcore(_coin)
 
     const tx = new bitcore.Transaction( data.data[txid].raw_transaction)
@@ -126,7 +124,7 @@ export async function getTransaction(_coin, txid) {
     return tx
 
   } catch(error) {
-
+    
     log.error(`blockchair.transaction.get.${coin}.${txid}.error`, error);
 
     throw error;

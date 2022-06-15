@@ -51,7 +51,11 @@ class Payment extends Orm {
 
       createdAt: this.get('createdAt'),
 
-      outputs: this.outputs
+      outputs: this.outputs,
+
+      tx_hex: this.get('txhex'),
+
+      tx_json: this.get('txjson')
 
     }
 

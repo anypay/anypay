@@ -29,8 +29,6 @@ export async function getMiningFee(currency: string, txhex: string): Promise<Fee
 
     let txid = input.prevTxId.toString('hex')
 
-    let result = await getTransaction(currency, txid)
-
     let satoshis: number = await getTxOutputSatoshis(currency, txid, input.outputIndex)
 
     total_input += satoshis
