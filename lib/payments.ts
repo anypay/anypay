@@ -150,6 +150,12 @@ export async function listPayments(account, params: {limit: number, offset: numb
 
       attributes: ['uid', 'currency', 'amount', 'denomination_currency', 'denomination_amount']
 
+    }, {
+
+      model: models.Refund,
+
+      as: 'refund'
+
     }]
 
   })
