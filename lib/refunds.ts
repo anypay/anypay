@@ -36,7 +36,7 @@ export async function getRefund(invoice: Invoice): Promise<Refund> {
       currency: invoice.get('invoice_currency'),
       to: [{
         address,
-        amount: invoice.get('denomination_amount_paid'),
+        amount: parseFloat(invoice.get('denomination_amount_paid')),
         currency: invoice.denomination
       }]
     }]
