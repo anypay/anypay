@@ -38,6 +38,10 @@ class Plugins {
     this.plugins = pluginsConfig;
   }
 
+  find(currency: string): Plugin {
+    return this.findForCurrency(currency)
+  }
+
   findForCurrency(currency: string) {
 
     if (!this.plugins[currency]) {
@@ -115,6 +119,10 @@ class Plugin {
 
     this.currency = currency;
     this.plugin = plugin;
+  }
+
+  getTransaction(txid) {
+    return this.plugin.getTransaction(txid)
   }
   
 }

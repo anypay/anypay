@@ -4,12 +4,15 @@ import * as  bchaddr from 'bchaddrjs';
 
 import * as Minercraft from 'minercraft';
 
+import * as bsv from 'bsv';
+
 import { log } from '../../lib/log'
 
 import { fromSatoshis } from '../../lib/pay'
 
 import * as Bluebird from 'bluebird'
 
+import * as whatsonchain from './lib/whatsonchain'
 
 interface Payment{
   amount: number;
@@ -17,6 +20,15 @@ interface Payment{
   currency: string;
   address: string;
   invoice_uid?: string;
+}
+
+export async function getTransaction(txid: string): Promise<any> {
+
+  let tx_hex = await whatsonchain.getTransaction(txid)
+
+  return new bsv.Transaction(tx_hex)
+
+
 }
 
 export function transformHexToPayments(hex: string): Payment[]{
@@ -102,8 +114,6 @@ export async function broadcastTx(hex) {
 
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
-
-import * as bsv from 'bsv';
 
 import { rpc } from './lib/jsonrpc';
 
