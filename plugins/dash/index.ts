@@ -11,7 +11,9 @@ import {generateInvoice} from '../../lib/invoice';
 
 import {log, models} from '../../lib'
 
-import { rpc } from './lib/jsonrpc';
+import { getTransaction } from './lib/jsonrpc';
+
+export { getTransaction }
 
 import * as blockcypher from '../../lib/blockcypher'
 import * as blockchair from '../../lib/blockchair'
