@@ -9,9 +9,13 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
+import { createInvoice } from '../../../lib/invoice'
+
 import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
 
 import * as moment from 'moment';
+
+import { Account } from '../../../lib/account'
 
 export async function cancel(req, h) {
 
@@ -191,59 +195,23 @@ export async function create (request, h) {
     provided.
   */
 
-  log.info(`controller:invoices,action:create`);
-
-  log.info('invoices.create', Object.assign({
+  log.info('api.invoices.create', Object.assign({
 
     account_id: request.account.id
 
   }, request.payload))
 
-	if (request.payload.currency) {
-
-    log.info('currency parameter provided')
-
-    currency_specified = true;
-
-  } else {
-
-    log.info('no currency parameter provided')
-
-    /*
-      Find the first address that is from a coin that is currently active
-      and set that as the invoice currency. This is a hack because the
-      invoice currency actually does not matter any more since moving to
-      payment options.
-    */
-
-    let addresses = await models.Address.findAll({
-      where: { account_id: request.account.id }
-    });
-
-
-    request.payload.currency = selectCurrency(addresses);
-	}
-
-
 	if (!(request.payload.amount > 0)) {
 		throw Boom.badRequest('amount must be greater than zero')	
 	}
 
-	log.info('amount is greater than zero')
-
-  let plugin = await plugins.findForCurrency(request.payload.currency);
-
-  log.info('plugin.createInvoice');
-
-  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
+  let invoice = await createInvoice(request.account.id, request.payload.amount);
 
   if(invoice){
  
     log.info('invoice.created', invoice.toJSON());
 
   }
-
-  invoice.currency_specified = currency_specified;
 
   if (request.payload.redirect_url) {
 
@@ -311,46 +279,14 @@ export async function create (request, h) {
 
 }
 
-export async function createPublicInvoice(account_id, payload) {
+export async function createPublicInvoice(account: Account, payload) {
   var currency;
 
   if (!(payload.amount > 0)) {
     throw new Error('amount must be greater than zero');
   }
 
-  let addresses = await models.Address.findAll({ where: {
-
-    account_id
-
-  }});
- 
-  let addressesMap = addresses.reduce((set, record) => {
-
-    set[record.currency] = record.value;
-    return set;
-  }, {});
-
-  if (addressesMap['BCH']) {
-    currency = 'BCH';
-  } else if (addressesMap['DASH']) {
-    currency = 'DASH';
-  } else if (addressesMap['BSV']) {
-    currency = 'BSV';
-  } else {
-    currency = addresses[0].currency;
-  }
-
-  let plugin = await plugins.findForCurrency(currency);
-
-  log.info('plugin.createInvoice');
-
-  let invoice = await plugin.createInvoice(account_id, payload.amount);
-
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
-
-  }
+  let invoice = await createInvoice(account, payload.amount);
 
   invoice.redirect_url = payload.redirect_url;
 

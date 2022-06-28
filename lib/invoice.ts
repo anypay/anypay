@@ -50,12 +50,9 @@ interface InvoiceChangeset {
   invoiceAmount: Amount;
 }
 
-interface Address {
-  currency: string,
-  value: string
-}
+import { Address } from './addresses'
 
-async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<Address> {
+async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<string> {
   var address;
 
   address = await plugins.getNewAddress(currency, accountId, amount);
@@ -64,10 +61,7 @@ async function getNewInvoiceAddress(accountId: number, currency: string, amount)
     throw new Error(`unable to generate address for ${currency}`);
   }
 
-  return {
-    currency,
-    value: address
-  }
+  return address
 
 };
 
@@ -140,39 +134,31 @@ export async function refreshInvoice(uid: string): Promise<any> {
 
 }
 
-export async function generateInvoice(
+export async function createInvoice(account: Account, amount: number): Promise<any> {
 
-  accountId: number,
-  denominationAmountValue: number,
-  invoiceCurrency: string,
-  uid?: string
+  const account_id = account.get('id')
 
-): Promise<any> {
+  log.info('invoices.create', { account_id, amount })
 
-  log.info('invoices.generate', { account_id: accountId, denominationAmountValue, invoiceCurrency, invoice_uid: uid })
+  const uid = shortid.generate();
 
-  uid = !!uid ? uid : shortid.generate();
-
-  var account = await models.Account.findOne({ where: { id: accountId }});
-
-  var invoiceParams = {
-    denomination_currency: account.denomination,
-    denomination_amount: denominationAmountValue,
-    currency: account.denomination,
-    amount: denominationAmountValue,
-    account_id: account.id,
+  var params = {
+    denomination_currency: account.get('denomination'),
+    denomination_amount: amount,
+    currency: account.get('denomination'),
+    amount,
+    account_id: account.get('id'),
     status: 'unpaid',
     uid,
     uri: computeInvoiceURI({
       currency: 'ANYPAY',
       uid
-    }),
-    should_settle: account.should_settle
+    })
   }
 
-  var invoice = await models.Invoice.create(invoiceParams);
+  var invoice = await models.Invoice.create(params);
 
-  let options = await createPaymentOptions(account, invoice)
+  let options = await createPaymentOptions(account.record, invoice)
 
   return invoice;
 
@@ -191,7 +177,7 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
     return coin.unavailable;
   });
 
-  return addresses
+  return addresses.map(record => new Address(record))
 
 }
 
@@ -201,9 +187,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
 
-    const currency = record.currency
+    const currency = record.get('currency')
 
-    let coin = getCoin(record.currency)
+    let coin = getCoin(record.get('currency'))
 
     const value = invoice.get('amount')
 
@@ -212,7 +198,11 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       value
     }, currency, coin.precision);
 
-    let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
+    if (record.get('price_scalar')) {
+      amount = new BigNumber(amount).times(record.get('price_scalar')).toNumber()
+    }
+
+    let address = await getNewInvoiceAddress(account.id, currency, amount);
 
     let url = computeInvoiceURI({
       currency: currency,
@@ -269,54 +259,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
   });
 
   return paymentOptions
-}
-
-/*
-
-  Function to mark invoice as paid, accepts an Invoice model record, and a
-  Payment struct.
-
-  Called after the settlement payment has already been sent
-
-  Emits an event `invoice.settled`
-
-*/
-
-export async function replaceInvoice(uid: string, currency: string) {
-
-  let invoice = await models.Invoice.findOne({ where: { uid: uid }});
-
-  let option = await models.PaymentOption.findOne({ 
-    where: { 
-      invoice_uid: uid,
-      currency: currency
-     }
-  });
-
-  if (!invoice) {
-    throw new Error(`invoice ${uid} not found`);
-  }
-
-  if (!option) {
-    throw new Error(`currency ${currency} is not a payment option for invoice ${uid}`);
-  }
-
-  log.info('replace with payment option', option.toJSON());
-
-  invoice.currency = option.currency;
-  invoice.invoice_currency = option.currency;
-
-  invoice.amount = option.amount;
-  invoice.invoice_amount = option.amount;
-
-  invoice.address = option.address;
-
-  invoice.uri = option.uri;
-  
-  await invoice.save();
-
-  return invoice;
-
 }
 
 export function isExpired(invoice) {

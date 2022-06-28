@@ -56,12 +56,12 @@ jobs:
           name: Deploy to Web Servers
           command: ssh ubuntu@api.anypayx.com "sudo chef-client -o recipe[anypay_api]"
 
-  deploy_beta:
+  deploy_next:
     machine: true
     steps:
       - run:
           name: Deploy Develop Branch To Beta Web Server
-          command: ssh beta.anypayx.com "sudo chef-client -o recipe[anypay_api::beta]"
+          command: ssh api.next.anypayx.com "sudo chef-client -o recipe[anypay::api_next]"
 
 workflows:
   version: 2
@@ -83,11 +83,11 @@ workflows:
             branches:
               only:
                 - master
-      - deploy_beta:
+      - deploy_next:
           requires:
             - build_docker
           filters:
             branches:
               only:
-                - develop
+                - next
 
