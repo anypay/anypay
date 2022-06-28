@@ -4,8 +4,6 @@ import * as http from 'superagent';
 
 import * as blockchair from '../../lib/blockchair'
 
-import {generateInvoice} from '../../lib/invoice';
-
 import {log, models} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
@@ -23,14 +21,6 @@ export async function submitTransaction(rawTx: string) {
 export async function broadcastTx(hex: string) {
 
   return blockchair.publish('bitcoin-cash', hex)
-
-}
-
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BCH');
-
-  return invoice;
 
 }
 
@@ -70,13 +60,9 @@ export async function getNewAddress(record: any) {
 
 }
 
-const currency = 'BCH';
+export const currency = 'BCH';
 
 export {
-
-  currency,
-
-  createInvoice,
 
   validateAddress
 

@@ -7,8 +7,6 @@ import { fromSatoshis, Payment } from '../../lib/pay'
 
 import { any } from 'bluebird'
 
-import {generateInvoice} from '../../lib/invoice';
-
 import {log, models} from '../../lib'
 
 import { getTransaction } from './lib/jsonrpc';
@@ -82,25 +80,11 @@ export function transformAddress(address: string){
 
 }
 
-
-export async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'DASH');
-
-  return invoice;
-
-}
-
 export async function getNewAddress(record: any) {
 
   return record.value;
 
 }
 
-const currency = 'DASH';
+export const currency = 'DASH';
 
-export {
-
-  currency
-
-};

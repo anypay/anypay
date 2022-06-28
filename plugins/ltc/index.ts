@@ -1,4 +1,3 @@
-import {generateInvoice} from '../../lib/invoice';
 
 import * as blockchair from '../../lib/blockchair'
 
@@ -6,13 +5,7 @@ const ltc = require('litecore-lib');
 
 export { ltc as bitcore }
 
-const currency = 'LTC'
-
-export async function createInvoice(accountId: number, amount: number) {
-
-  return generateInvoice(accountId, amount, 'LTC');
-
-}
+export const currency = 'LTC'
 
 export async function getNewAddress(record) {
   return record.value;
@@ -27,12 +20,6 @@ export async function submitTransaction(rawTx: string) {
 export async function broadcastTx(rawTx: string) {
 
   return blockchair.publish('litecoin', rawTx)
-
-}
-
-export {
-
-  currency
 
 }
 

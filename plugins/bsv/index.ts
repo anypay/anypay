@@ -117,8 +117,6 @@ var isCashAddress = bchaddr.isCashAddress;
 
 import { rpc } from './lib/jsonrpc';
 
-import {generateInvoice} from '../../lib/invoice';
-
 import {models} from '../../lib/models';
 
 const polynym = require('polynym');
@@ -128,14 +126,6 @@ var WAValidator = require('anypay-wallet-address-validator');
 export async function submitTransaction(rawTx: string) {
 
   return rpc.call('sendrawtransaction', [rawTx]);
-
-}
-
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BSV');
-
-  return invoice;
 
 }
 
@@ -247,23 +237,11 @@ export function validateAddress(address: string){
 
 }
 
-const name = 'Bitcoin Satoshi Vision';
+export const name = 'Bitcoin Satoshi Vision';
 
-const currency = 'BSV';
+export const currency = 'BSV';
 
-const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
-
-export {
-
-  name,
-
-  currency,
-
-  icon,
-
-  createInvoice
-
-}
+export const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
 
 export { bsv as bitcore }
 
