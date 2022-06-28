@@ -151,9 +151,13 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
 
 export async function removeAddress(account: Account, currency: string): Promise<void> {
 
+  const account_id = account.id
+
+  console.log('remove_address', { account_id, currency }) 
+
   let record = await models.Address.findOne({ where: {
 
-    account_id: account.id,
+    account_id,
 
     currency
 
