@@ -71,11 +71,6 @@ workflows:
       - build_docker:
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - master
-                - develop
       - deploy:
           requires:
             - build_docker
