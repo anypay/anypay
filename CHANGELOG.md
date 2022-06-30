@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/anypay/anypay/compare/v1.2.1...v1.2.2) (2022-06-30)
+
+
+### Bug Fixes
+
+* **error-messages:** return standard badRequest error message correctly ([27b013b](https://github.com/anypay/anypay/commit/27b013b66547711195ee2e15cffb7e66609d6470))
+
 ## [1.2.1](https://github.com/anypay/anypay/compare/v1.2.0...v1.2.1) (2022-06-09)
 
 
