@@ -98,6 +98,7 @@
     "mustache": "^4.0.0",
     "mysql": "^2.17.1",
     "mysql2": "^2.2.5",
+    "nconf": "^0.12.0",
     "node-cron": "^2.0.3",
     "node-fetch": "^3.2.1",
     "node-statsd": "^0.1.1",
