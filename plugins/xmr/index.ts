@@ -25,7 +25,19 @@ export async function validateUnsignedTx(): Promise<Boolean> {
 
 export async function broadcastTx(tx_as_hex) {
 
-  return send_raw_transaction({ tx_as_hex, do_not_relay: false })
+  let result = await  send_raw_transaction({ tx_as_hex, do_not_relay: false })
+
+  if (result.sanity_check_failed) {
+    throw new Error(result.reason)
+  }
+
+  if (result.double_spend) {
+    throw new Error('double spend')
+  }
+
+  if (result.status === 'Failed') {
+    throw new Error(result.reason)
+  }
 
 }
 
@@ -38,21 +50,55 @@ interface SendRawTransaction {
   do_not_relay
 }
 
-export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<any> {
+interface SendRawTransactionResult {
+  credits: number;
+  double_spend: boolean;
+  fee_too_low: boolean;
+  invalid_input: boolean;
+  invalid_output: boolean;
+  low_mixin: boolean;
+  not_relayed: boolean;
+  overspend: boolean;
+  reason: string;
+  sanity_check_failed: boolean,
+  status: string;
+  too_big: boolean;
+  too_few_outputs: boolean;
+  top_hash: string;
+  untrusted: boolean;
+}
+
+export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<SendRawTransactionResult> {
 
   log.info('plugins.xmr.send_raw_transaction', { tx_as_hex, do_not_relay })
 
-  let { data } = await axios.post('https://xmr.nodes.anypayx.com/send_raw_transaction', {
-    tx_as_hex,
-    do_not_relay
-  }, {
+  let { data } = await axios.post(`${process.env.XMR_RPC_URL}/send_raw_transaction`, {
+    params: {
+      tx_as_hex,
+      do_not_relay
+    }
+  }/*, {
     auth: {
       username: process.env.XMR_RPC_USER,
       password: process.env.XMR_RPC_PASSWORD
     }
-  })
+  }*/)
+
+  let result: SendRawTransactionResult = data
 
   log.info('plugins.xmr.send_raw_transaction.result', data)
+
+  if (data.status === 'OK') {
+
+  } else {
+
+    const error = new Error(data)
+
+    log.error('plugins.xmr.send_raw_transaction.rejected', error)
+
+    throw error
+
+  }
 
   return data
 
@@ -106,14 +152,6 @@ interface VerifyPayment {
 export async function verifyPayment({payment_option,tx_hex,tx_key}: any) {
 
   return true
-
-  /*
-  let { invoice_uid } = payment_option
-
-  let url = `https://api.anypayx.com/i/${invoice_uid}`
-
-  return verify({ url, txid, tx_key })
-  */
 
 }
 

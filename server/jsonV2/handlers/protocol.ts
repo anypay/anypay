@@ -79,6 +79,7 @@ export async function handlePost(req, h) {
   } catch(error) {
 
     log.info('pay.jsonv2.post.error', { error: error.message })
+    
     log.error('pay.jsonv2.post.error', error)
 
     return h.response({ error: error.message }).code(400)

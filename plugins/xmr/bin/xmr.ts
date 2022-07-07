@@ -134,7 +134,7 @@ program
     })
 
     console.log({ payment })
-
+    
     process.exit(0)
 
   })
