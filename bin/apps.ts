@@ -11,7 +11,7 @@ program
   .command('create <account_id> <name>')
   .action(async (account_id, name) => {
 
-    let [app] = await createApp({ account_id, name })
+    let app = await createApp({ account_id, name })
 
     console.log(app.toJSON())
 

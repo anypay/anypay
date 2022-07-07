@@ -3,6 +3,8 @@
 
 require('dotenv').config();
 
+import { Op } from 'sequelize'
+
 import { log } from '../../lib';
 
 import { listAll } from './lib/kraken_account'
@@ -11,7 +13,13 @@ import * as cron from 'node-cron'
 
 async function marketSellAllAccounts() {
 
-  let accounts = await listAll()
+  let accounts = await listAll({
+    where: {
+      autosell: {
+        [Op.ne]: null
+      }
+    }
+  })
 
   for (let kraken of accounts) {
 

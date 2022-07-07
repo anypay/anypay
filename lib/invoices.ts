@@ -3,6 +3,8 @@ const validator = require('validator')
 
 import { log } from './log'
 
+import { config } from './config'
+
 import { Event } from './events'
 
 import { createWebhook } from './webhooks'
@@ -85,6 +87,19 @@ export class Invoice extends Orm {
 
     return this.get('denomination_currency')
 
+  }
+
+  get payment(): any {
+    return this.record['payment']
+  }
+
+  get refund(): any {
+    return this.record['refund']
+  }
+
+  get status(): string {
+
+    return this.get('status')
   }
 
   get uid(): string {
@@ -198,6 +213,11 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
       throw new InvalidWebhookURL(params.webhook_url)
 
     }
+
+  } else {
+
+    newInvoice['webhook_url'] = `${config.get('API_BASE')}/v1/api/test/webhooks`
+
   }
 
   var record = await models.Invoice.create(newInvoice);

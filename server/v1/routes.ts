@@ -1,8 +1,6 @@
 require('dotenv').config()
 
-const sequelize = require("../../lib/database");
-
-import { v1 } from '../handlers'
+import { v1, failAction } from '../handlers'
 
 import { useJWT } from '../auth/jwt'
 
@@ -25,7 +23,8 @@ export async function attachV1Routes(server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        })
+        }),
+        failAction
       }
     },
   });
@@ -39,7 +38,8 @@ export async function attachV1Routes(server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        })
+        }),
+        failAction
       },
     },
   });
@@ -52,7 +52,8 @@ export async function attachV1Routes(server) {
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
-        })
+        }),
+        failAction
       },
     },
   });
@@ -64,6 +65,15 @@ export async function attachV1Routes(server) {
       auth: "jwt"
     },
     handler: v1.MyAccount.show
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/account/access-keys",
+    options: {
+      auth: "jwt"
+    },
+    handler: v1.AccessKeys.index
   });
 
   server.route({
@@ -84,7 +94,8 @@ export async function attachV1Routes(server) {
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        })
+        }),
+        failAction
       },
       response: {
         failAction: 'log',
@@ -114,7 +125,20 @@ export async function attachV1Routes(server) {
           amount: Joi.number().min(0).required(),
           denomination: Joi.string().optional(),
           currency: Joi.string().optional()
-        })
+        }),
+        failAction
+      },
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}",
+    handler: v1.Invoices.show,
+    options: {
+      auth: "jwt",
+      validate: {
+        failAction
       },
     },
   });
@@ -131,7 +155,8 @@ export async function attachV1Routes(server) {
         }),
         query: Joi.object({
           order: Joi.string().valid('asc', 'desc').optional()
-        })
+        }),
+        failAction
       },
       response: {
         schema: Joi.object({
@@ -139,12 +164,14 @@ export async function attachV1Routes(server) {
           events: Joi.array().items(Joi.object({
             id: Joi.number().required(),
             account_id: Joi.number().optional(),
+            invoice_uid: Joi.number().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required()
           }))
-        })
+        }),
+        failAction: 'log'
       }
     },
   });
@@ -181,9 +208,11 @@ export async function attachV1Routes(server) {
           currency: Joi.string().required(),
           value: Joi.string().required(),
           label: Joi.string().optional()
-        })
+        }),
+        failAction
       },
       response: {
+        failAction: 'log',
         schema: Joi.object({
           address: Joi.object({
             currency: Joi.string().required(),
@@ -195,5 +224,174 @@ export async function attachV1Routes(server) {
     },
     handler: v1.Addresses.update
   }); 
+
+  server.route({
+    method: 'DELETE',
+    path: '/v1/api/account/addresses/{currency}',
+    options: {
+      auth: "jwt",
+      validate: {
+        params: Joi.object({
+          currency: Joi.string().required()
+        }),
+        failAction
+      },
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          address: Joi.object({
+            success: Joi.boolean()
+          })
+        })
+      }
+    },
+    handler: v1.Addresses.remove
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/v1/api/account/addresses',
+    options: {
+      auth: "jwt",
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          addresses: Joi.array().items(Joi.object({
+            currency: Joi.string().required(),
+            code: Joi.string().required(),
+            name: Joi.string().required(),
+            enabled: Joi.boolean().required(),
+            price: Joi.number().required(),
+            icon: Joi.string().required(),
+            address: Joi.string().required(),
+            supported: Joi.boolean().required(),
+            wallet: Joi.string().optional(),
+            note: Joi.string().optional()
+          }))
+        })
+      }
+    },
+    handler: v1.Addresses.index
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/v1/api/system/coins',
+    options: {
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          addresses: Joi.array().items(Joi.object({
+            code: Joi.string().required(),
+            name: Joi.string().required(),
+            enabled: Joi.boolean().required(),
+            price: Joi.number().required(),
+            icon: Joi.string().required()
+          }))
+        })
+      }
+    },
+    handler: v1.Coins.index
+  }); 
+
+  server.route({
+    method: 'POST',
+    path: '/v1/api/test/webhooks',
+    handler: v1.Webhooks.test
+  }); 
+
+  server.route({
+    method: 'POST',
+    path: '/v1/api/fail',
+    handler: (req, h) => { return h.response(200) },
+    options: {
+      validate: {
+        query: Joi.object({
+          error: Joi.string().required()
+        }).required(),
+        headers: Joi.object({
+          'fail': Joi.string().required()
+        }),
+        //failAction
+      }
+    }
+  }); 
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/checkout_images",
+    handler: v1.WoocommerceCheckoutImages.index,
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/checkout_image",
+    handler: v1.WoocommerceCheckoutImages.show,
+    options: {
+      auth: "jwt",
+    }
+  })
+
+  server.route({
+    method: "PUT",
+    path: "/v1/woocommerce/checkout_image",
+    handler: v1.WoocommerceCheckoutImages.update,
+    options: {
+      auth: "jwt",
+      validate: {
+        payload: Joi.object({
+          name: Joi.string()
+        })
+      }
+    }
+  })
+
+  server.route({
+    method: "GET",
+    path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
+    handler: v1.WoocommerceCheckoutImages.image,
+    options: {
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/v1/api/search",
+    handler: v1.Search.create,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'search'],
+      validate: {
+        payload: Joi.object({
+          search: Joi.string().required()
+        }),
+        failAction
+      }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/account/invoices/{invoice_uid}/refund",
+    handler: v1.Refunds.show,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'refunds'],
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        })
+      },
+      /*response: {
+        schema: Joi.object({
+          invoice_uid: Joi.string().required(),
+          currency: Joi.string().required(),
+          value: Joi.string().required()
+        }),
+        //failAction
+      }*/
+    }
+  });
+
 
 }

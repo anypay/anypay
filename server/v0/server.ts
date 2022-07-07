@@ -9,6 +9,8 @@ const Vision = require('@hapi/vision');
 
 const HapiSwagger = require("hapi-swagger");
 
+import { HealthPlugin } from 'hapi-k8s-health'
+
 import { attachV1Routes } from '../v1/routes';
 
 import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
@@ -17,98 +19,21 @@ import { join } from 'path'
 
 import { log } from '../../lib/log';
 
-import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
+import { prometheus, getHistogram } from '../../lib/prometheus'
 
-import { bcryptCompare } from '../../lib/password';
+import { requireDirectory } from 'rabbi'
+
+const auth = requireDirectory('../auth')
 
 import { accountCSVReports } from './handlers/csv_reports';
 
 import * as payreq from '../payment_requests/server'
 
-import { v0 } from '../handlers'
-
-const AccountLogin = require("../../lib/account_login");
-
-const sequelize = require("../../lib/database");
+import { v0, failAction } from '../handlers'
 
 import * as Joi from '@hapi/joi';
 
 import { models } from '../../lib'
-
-const validatePassword = async function(request, username, password, h) {
-
-  try {
-
-    if (!username || !password) {
-
-      return {
-        isValid: false
-      };
-    }
-
-    var account = await models.Account.findOne({
-      where: {
-        email: username.toLowerCase()
-      }
-    });
-
-    if (!account) {
-
-      return {
-        isValid: false
-      }
-    }
-
-
-    var accessToken = await AccountLogin.withEmailPassword(username, password);
-
-    if (accessToken) {
-
-      return {
-        isValid: true,
-        credentials: { accessToken, account }
-      };
-
-    } else {
-
-
-    }
-  } catch(error) {
-
-
-    log.error(error.message);
-
-  }
-
-  // check for sudo password
-  try {
-
-    await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
-
-  } catch(error) {
-
-    return {
-      isValid: false
-    }
-
-  }
-
-  var isNew;
-  [accessToken, isNew] = await models.AccessToken.findOrCreate({
-    where: {
-      account_id: account.id
-    },
-    defaults: {
-      account_id: account.id
-    }
-  });
-
-  return {
-    isValid: true,
-    credentials: { accessToken, account }
-  }
-
-};
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -155,6 +80,45 @@ const server = new Hapi.Server({
 });
 
 async function Server() {
+
+  server.ext('onRequest', (request, h) => {
+
+    try {
+
+      let { method, path } = request
+
+      const histogram = getHistogram({ method, path })
+
+      request.endTimer = histogram.startTimer();
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    return h.continue;
+
+  })
+
+  server.ext('onPreResponse', (request, h) => {
+
+    try {
+
+      if (request.endTimer) {
+
+        request.endTimer()
+
+      }
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+    return h.continue;
+  })
 
   server.ext('onRequest', function(request, h) {
 
@@ -252,10 +216,18 @@ async function Server() {
     }
   })
 
-  server.auth.strategy("token", "basic", { validate: validateToken });
-  server.auth.strategy("app", "basic", { validate: validateAppToken });
-  server.auth.strategy("password", "basic", { validate: validatePassword });
-  server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
+  server.auth.strategy("token", "basic", { validate: auth.Token.validateToken });
+  server.auth.strategy("app", "basic", { validate: auth.Token.validateAppToken });
+  server.auth.strategy("password", "basic", { validate: auth.Password.validate });
+  server.auth.strategy("adminwebtoken", "basic", { validate: auth.Token.validateAdminToken });
+  server.auth.strategy("prometheus", "basic", { validate: auth.Prometheus.auth });
+
+  await server.register({
+    plugin: HealthPlugin,
+    options: {
+      auth: 'prometheus'
+    }
+  })
 
   payreq.attach(server)
 
@@ -276,7 +248,8 @@ async function Server() {
       validate: {
         params: Joi.object({
           invoice_id: Joi.string().required()
-        })
+        }),
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
@@ -313,7 +286,8 @@ async function Server() {
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
-        })
+        }),
+        failAction
       }
     }
   });
@@ -347,6 +321,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Account.Credentials,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
@@ -370,6 +345,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Account.Credentials,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
@@ -439,7 +415,24 @@ async function Server() {
         }),
         payload: Joi.object({
           note: Joi.string().required()
-        })
+        }),
+        failAction
+      }
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/v0/search",
+    handler: v0.Search.create,
+    options: {
+      auth: "token",
+      tags: ['api', 'invoices'],
+      validate: {
+        payload: Joi.object({
+          search: Joi.string().required()
+        }),
+        failAction
       }
     }
   });
@@ -457,7 +450,8 @@ async function Server() {
         }),
         payload: Joi.object({
           address: Joi.string().required()
-        })
+        }),
+        failAction
       }
     }
   });
@@ -491,7 +485,8 @@ async function Server() {
       validate: {
         payload: Joi.object({
           note: Joi.string().required()
-        })
+        }),
+        failAction
       },
       auth: "token",
       tags: ['api']
@@ -520,6 +515,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
@@ -543,6 +539,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: models.Invoice.Request,
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
@@ -556,6 +553,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: v0.Passwords.PasswordReset,
+        failAction
       },
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
@@ -569,6 +567,7 @@ async function Server() {
       tags: ['api'],
       validate: {
         payload: v0.Passwords.PasswordResetClaim,
+        failAction
       },
       plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
     }
@@ -612,14 +611,14 @@ async function Server() {
     }
   });
 
-    server.route({
-      method: "POST",
-      path: "/r",
-      handler: v0.PaymentRequests.create,
-      options: {
-        auth: "app"
-      }
-    })
+  server.route({
+    method: "POST",
+    path: "/r",
+    handler: v0.PaymentRequests.create,
+    options: {
+      auth: "app"
+    }
+  })
 
   server.route({
     method: 'POST',
@@ -791,6 +790,15 @@ async function Server() {
       return h.redirect('/documentation')
     }
   }); 
+
+  server.route({
+    method: 'GET',
+    path: '/_metrics',
+    handler: v0.Prometheus.show,
+    options: {
+      auth: "prometheus"
+    }
+});
 
   return server;
 

@@ -55,7 +55,8 @@ class Logger {
       namespace: this.namespace,
       type,
       payload,
-      account_id: payload.account_id
+      account_id: payload.account_id,
+      invoice_uid: payload.invoice_uid
     })
 
 
@@ -64,6 +65,8 @@ class Logger {
   async error(error_type: string, error: any = {}) {
 
     this.log.error({...error, namespace: this.namespace }, error_type)
+
+    console.error(error)
 
     let record = await models.Event.create({
       namespace: this.namespace,

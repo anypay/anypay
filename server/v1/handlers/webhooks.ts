@@ -25,6 +25,14 @@ export async function index(req, h) {
 
 }
 
+export async function test(req, h) {
+
+  log.info('webhooks.test.received', req.payload)
+
+  return { success: true }
+
+}
+
 export async function attempt(request, h) {
 
   let invoice = await ensureInvoice(request.params.invoice_uid);

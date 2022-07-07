@@ -37,6 +37,18 @@ models.Invoice.hasMany(models.PaymentOption, {
   as: 'payment_options'
 });
 
+models.Invoice.hasOne(models.Payment, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'payment'
+})
+
+models.Invoice.hasOne(models.Refund, {
+  foreignKey: 'original_invoice_uid',
+  sourceKey: 'uid',
+  as: 'refund'
+})
+
 models.Account.hasMany(models.Address, {
   foreignKey: 'account_id',
   sourceKey: 'id',

@@ -113,7 +113,7 @@ export async function buildPaymentRequest(paymentOption) {
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
-  log.info(`bip70.${paymentOption.currency}.outputs`, {outputs});
+  log.info(`$ip70.${paymentOption.currency}.outputs`, {outputs});
 
   var pd = new PaymentProtocol.PaymentDetails();
 
@@ -142,29 +142,42 @@ export async function buildPaymentRequest(paymentOption) {
   paypro.makePaymentRequest();
 
   paypro.set('serialized_payment_details', pd.toBuffer());
+  console.log('ABOUT TO SIGN', paypro.serialize())
 
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+    try {
 
-    let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
-    let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
-    let keyPath = process.env.X509_PRIVATE_KEY_PATH;
+      let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
+      let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
+      let keyPath = process.env.X509_PRIVATE_KEY_PATH;
 
-    const file_with_x509_private_key = fs.readFileSync(keyPath);
+      console.log({ keyPath })
 
-    const certificates = new PaymentProtocol().makeX509Certificates();
+      const file_with_x509_private_key = fs.readFileSync(keyPath);
 
-    certificates.set('certificate', [
-      fs.readFileSync(domainDerPath),
-      fs.readFileSync(rootDerPath)
-    ]);
+      console.log({ file: file_with_x509_private_key })
 
-    paypro.set('payment_details_version', 1);
+      const certificates = new PaymentProtocol().makeX509Certificates();
 
-    paypro.set('pki_type', 'x509+sha256');
+      certificates.set('certificate', [
+        fs.readFileSync(domainDerPath),
+        fs.readFileSync(rootDerPath)
+      ]);
 
-    paypro.set('pki_data', certificates.serialize());
+      paypro.set('payment_details_version', 1);
 
-    paypro.sign(file_with_x509_private_key);
+      paypro.set('pki_type', 'x509+sha256');
+
+      paypro.set('pki_data', certificates.serialize());
+
+      paypro.sign(file_with_x509_private_key);
+
+    } catch(error) {
+
+      console.log(error)
+      log.error('paypro.bip70.error', error)
+
+    }
 
   }
 

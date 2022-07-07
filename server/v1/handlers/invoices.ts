@@ -11,8 +11,6 @@ import { log, prices, email, models, invoices, coins } from '../../../lib';
 
 import { Invoice, createInvoice } from '../../../lib/invoices'
 
-import { recordEvent } from '../../../lib/events'
-
 import * as moment from 'moment';
 
 interface InvoiceAdditions {
@@ -35,19 +33,55 @@ export async function setInvoiceAdditions(invoice: Invoice, additions: InvoiceAd
 
 }
 
+export async function show(request, hapi) {
+
+  try {
+
+    let invoice = await models.Invoice.findOne({ where: { uid: request.params.invoice_uid }})
+
+    if (!invoice) {
+
+      return hapi.response({ error: 'invoice not found' }).code(404)
+
+    }
+
+    let payment = await models.Payment.findOne({ where: { invoice_uid: invoice.uid }})
+
+    var response = {
+      invoice: {
+        currency: invoice.denomination,
+        amount: invoice.denomination_amount,
+        status: invoice.status,
+        createdAt: invoice.createdAt
+      }
+    }
+
+    if (payment) { response['payment'] = payment.toJSON() }
+
+    response['kraken_deposits'] = await models.KrakenDeposit.findAll({
+      where: {
+        account_id: invoice.account_id,
+        txid: invoice.hash
+      }
+    })
+
+    return hapi.response(response).code(200)
+
+  } catch(error) {
+
+    console.error('invoic.show.error', error)
+
+    return hapi.response({ error: error.message }).code(500)
+
+  }
+
+}
+
 export async function create (request, h) {
 
-  await recordEvent({
+  // TODO: Refactor to call only a SINGLE core library method
 
-    account_id: request.account.id,
-
-    headers: request.headers,
-
-    payload: request.payload
-
-  }, 'request.invoice.create')
-
-  log.info('invoices.create', Object.assign({
+  log.info('request.invoices.create', Object.assign({
 
     account_id: request.account.id
 
@@ -73,7 +107,11 @@ export async function create (request, h) {
 
   }
 
-  additional.webhook_url = request.payload.webhook_url
+  if (request.payload.webhook_url) {
+
+    additional.webhook_url = request.payload.webhook_url
+
+  }
 
   additional.external_id = request.payload.external_id;
 

@@ -3,6 +3,8 @@ import { models } from './models';
 
 import { log } from './log';
 
+import { config } from './config'
+
 import { Invoice } from './invoices'
 
 import { PaymentRequired } from 'get402'
@@ -16,6 +18,8 @@ import { Orm } from './orm'
 import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
+
+export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
@@ -371,7 +375,7 @@ export class PaidWebhook {
 
         let account = await this.webhook.getAccount()
 
-        await email.sendEmail('get402-insufficient-funds', account.email, 'noreply@anypayx.com')
+        await email.sendEmail('get402-insufficient-funds', account.email, config.get('EMAIL_SENDER'))
 
       }
 

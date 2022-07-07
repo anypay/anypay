@@ -9,6 +9,8 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
+import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
+
 import * as moment from 'moment';
 
 export async function cancel(req, h) {
@@ -37,7 +39,7 @@ export async function cancel(req, h) {
 
     await invoice.save()
 
-    log.info('invoice.cancelled', where)
+    log.debug('invoice.cancelled', where)
 
     where['status'] = 'cancelled'
 
@@ -295,6 +297,8 @@ export async function create (request, h) {
 
   let sanitized = sanitizeInvoice(invoice);
 
+  sanitized.webhook_url = invoice.webhook_url
+
   return h.response(
 
     Object.assign({
@@ -432,12 +436,12 @@ export async function show(request, reply) {
 
   } else {
 
-    log.info('invoice not yet expired');
+    log.debug('invoice not yet expired');
   }
 
   if (invoice) {
 
-    log.info('invoice.requested', invoice.toJSON());
+    log.debug('invoice.requested', invoice.toJSON());
 
     invoice.payment_options = await getPaymentOptions(invoice.uid)
 
@@ -466,7 +470,7 @@ export async function show(request, reply) {
 
 export async function shareEmail(req, h) {
 
-  log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
+  log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 
   let invoice = await models.Invoice.findOne({
     where: {
