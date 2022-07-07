@@ -1,11 +1,23 @@
 
 import { models } from './models'
 
+import { Orm } from './orm'
+
 import * as bsv from 'bsv'
 
 interface NewApp {
   name: string;
   account_id: number;
+}
+
+export class App extends Orm {
+}
+
+export async function findApp(id: number): Promise<App> {
+
+  let record = await models.App.findOne({ where: { id }})
+
+  return new App(record)
 }
 
 export async function createApp(params: NewApp) {
