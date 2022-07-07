@@ -1,9 +1,5 @@
 require('dotenv').config()
 
-import * as Boom from 'boom'
-
-const sequelize = require("../../lib/database");
-
 import { v1, failAction } from '../handlers'
 
 import { useJWT } from '../auth/jwt'
@@ -358,6 +354,44 @@ export async function attachV1Routes(server) {
     },
   });
 
+  server.route({
+    method: "POST",
+    path: "/v1/api/search",
+    handler: v1.Search.create,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'search'],
+      validate: {
+        payload: Joi.object({
+          search: Joi.string().required()
+        }),
+        failAction
+      }
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/v1/api/account/invoices/{invoice_uid}/refund",
+    handler: v1.Refunds.show,
+    options: {
+      auth: "jwt",
+      tags: ['api', 'invoices', 'refunds'],
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        })
+      },
+      /*response: {
+        schema: Joi.object({
+          invoice_uid: Joi.string().required(),
+          currency: Joi.string().required(),
+          value: Joi.string().required()
+        }),
+        //failAction
+      }*/
+    }
+  });
 
 
 }

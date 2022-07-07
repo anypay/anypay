@@ -5,6 +5,8 @@ const fs   = require('fs');
 const jwt  = require('jsonwebtoken');
 const path = require("path");
 
+import { config } from './config'
+
 const privateKey = fs.readFileSync(
   process.env.JSONWEBTOKEN_PRIVATE_KEY_PATH ||
   path.join(__dirname, '../config/jwt/jwtRS512.key'),
@@ -17,9 +19,9 @@ const publicKey = fs.readFileSync(
   'utf8'
 );
 
-const issuer  = 'anypayx.com';          // Issuer 
-const subject  = 'auth@anypayx.com';        // Subject 
-const audience  = 'https://anypayx.com'; // Audience/ PRIVATE and PUBLIC key
+const issuer  = config.get('DOMAIN');          // Issuer 
+const subject  = `auth@${config.get('DOMAIN')}`;        // Subject 
+const audience  = `https://${config.get('DOMAIN')}`; // Audience/ PRIVATE and PUBLIC key
 
 export async function generateAdminToken() {
 

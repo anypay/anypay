@@ -50,16 +50,14 @@ jobs:
             docker push anypay/anypay:$CIRCLE_BRANCH
 
   deploy:
-    machine:
-      image: ubuntu-1604:202007-01
+    machine: true
     steps:
       - run:
           name: Deploy to Web Servers
-          command: ssh ubuntu@api.anypayx.com "sudo chef-client -o recipe[anypay_api]"
+          command: ssh ubuntu@api_next.anypayx.com "sudo chef-client -o recipe[anypay::api_next]"
 
   deploy_beta:
-    machine:
-      image: ubuntu-1604:202007-01
+    machine: true
     steps:
       - run:
           name: Deploy Develop Branch To Beta Web Server

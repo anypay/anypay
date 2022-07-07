@@ -1,6 +1,8 @@
 
 import { Invoice } from '../../invoices'
 
+import { config } from '../../config'
+
 import { findPaymentOption } from '../../payment_option'
 
 import { submitPayment } from '../../../server/payment_requests/handlers/json_payment_requests'
@@ -133,6 +135,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   let paymentOptions = await invoice.getPaymentOptions()
 
+
   return {
 
     time: invoice.get('createdAt'),
@@ -141,17 +144,20 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     memo: `Anypay Invoice ID: ${invoice.uid}`,
 
-    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
     paymentOptions: paymentOptions.map(paymentOption => {
 
+      const estimatedAmount = paymentOption.get('outputs')
+        .reduce((sum, output) => sum + output.amount, 0)
+
       return {
         currency: paymentOption.get('currency'),
         chain: paymentOption.get('currency'),
         network: 'main',
-        estimatedAmount: parseInt(paymentOption.get('amount')),
+        estimatedAmount,
         requiredFeeRate: 1,
         minerFee: 0,
         decimals: 0,
@@ -184,7 +190,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
     memo: 'string',
 
-    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
