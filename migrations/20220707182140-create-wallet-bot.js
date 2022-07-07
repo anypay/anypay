@@ -15,10 +15,10 @@ module.exports = {
         type: Sequelize.STRING
       },
       account_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       app_id: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       slack_webhook_url: {
         type: Sequelize.STRING
