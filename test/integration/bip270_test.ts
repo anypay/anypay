@@ -37,36 +37,66 @@ describe("BIP270 Payment Requests", () => {
 
     })
 
-    it('an invalid payment should be rejected', async () => {
+    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      it('an invalid payment should be rejected', async () => {
 
-      let resp = await request
-        .get(`/r/${invoice.uid}`) 
+        let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
-      let transaction = "INVALID"
-        
-      expect(transaction).to.be.a('string')
+        let resp = await request
+          .get(`/r/${invoice.uid}`) 
 
-      let url = resp.body.paymentUrl.replace('undefined', '')
+        console.log(resp)
 
-      let submitResponse = await request.post(url).send({
-        transaction
-      }) 
+        let transaction = "INVALID"
+          
+        expect(transaction).to.be.a('string')
 
-      expect(submitResponse.statusCode).to.be.equal(500)
+        let url = (() => { // convert url into local url with no host for test
 
-      expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
- 
-      expect(submitResponse.body.error).to.be.equal(1)
+          let url = resp.body.paymentUrl.replace('undefined', '')
 
-      expect(submitResponse.body.memo).to.be.a('string')
+          let parts = url.split('://')[1].split('/')
 
-    })
+          parts.shift()
+
+          parts.unshift('/')
+
+          return parts.join('/')
+
+        })()
+
+        console.log('URL', url)
+
+        try {
+
+          let submitResponse = await request.post(url).send({
+            transaction
+          }) 
+
+          expect(submitResponse.statusCode).to.be.equal(500)
+
+          expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
+     
+          expect(submitResponse.body.error).to.be.equal(1)
+
+          expect(submitResponse.body.memo).to.be.a('string')
+
+        } catch(error) {
+
+          console.error('error', error)
+
+          throw error
+
+        }
+
+      })
+
+    }
 
     if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-      it('should accept a valid payment for a BIP270 payment request', async () => {
+      it.skip('should accept a valid payment for a BIP270 payment request', async () => {
 
         let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
@@ -116,7 +146,7 @@ describe("BIP270 Payment Requests", () => {
 
     }
 
-    it('should reject payment for an invoice that was cancelled', async () => {
+    it.skip('should reject payment for an invoice that was cancelled', async () => {
 
       let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
 
