@@ -113,5 +113,35 @@ program
 
   });
 
+program
+  .command('info <invoice_uid>')
+  .action(async (uid) => {
+
+    try {
+
+      let invoice = await models.Invoice.findOne({
+        where: {
+          uid
+        },
+        include: [{
+          model: models.Payment,
+          as: 'payment'
+        }, {
+          model: models.Refund,
+          as: 'refund'
+        }]
+      });
+
+      console.log(invoice.toJSON())
+
+    } catch(error) {
+
+      console.log(error);
+    }
+
+    process.exit(0);
+
+  });
+
 program.parse(process.argv);
 

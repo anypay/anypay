@@ -1,6 +1,8 @@
 
 import { Invoice } from '../../invoices'
 
+import { config } from '../../config'
+
 import { findPaymentOption } from '../../payment_option'
 
 import { submitPayment } from '../../../server/payment_requests/handlers/json_payment_requests'
@@ -103,6 +105,8 @@ interface PaymentVerification {
 interface Transaction {
   tx: string;
   weightedSize?: number;
+  tx_key?: string;
+  tx_hash?: string;
 }
 
 interface Payment {
@@ -131,6 +135,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   let paymentOptions = await invoice.getPaymentOptions()
 
+
   return {
 
     time: invoice.get('createdAt'),
@@ -139,17 +144,20 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     memo: `Anypay Invoice ID: ${invoice.uid}`,
 
-    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
     paymentOptions: paymentOptions.map(paymentOption => {
 
+      const estimatedAmount = paymentOption.get('outputs')
+        .reduce((sum, output) => sum + output.amount, 0)
+
       return {
         currency: paymentOption.get('currency'),
         chain: paymentOption.get('currency'),
         network: 'main',
-        estimatedAmount: parseInt(paymentOption.get('amount')),
+        estimatedAmount,
         requiredFeeRate: 1,
         minerFee: 0,
         decimals: 0,
@@ -160,6 +168,10 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 }
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
+
+  if (invoice.status !== 'unpaid') {
+    throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
+  }
 
   log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
     account_id: invoice.get('account_id'),
@@ -178,7 +190,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
     memo: 'string',
 
-    paymentUrl: `https://api.anypayinc.com/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
@@ -232,6 +244,20 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
   }, Object.assign(params, options)))
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
+
+  if (params.currency === 'XMR') {
+
+    for (let tx of params.transactions) {
+
+      if (!tx.tx_key || !tx.tx_hash) {
+
+        throw new Error('tx_key and tx_hash required for all XMR transactions')
+
+      }
+
+    }
+    
+  }
 
   try {
 

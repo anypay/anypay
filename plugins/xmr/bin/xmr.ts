@@ -61,7 +61,7 @@ program
 
       console.log({ tx, tx_key, tx_hash })
 
-      let payment = client.payment({
+      let payment = await client.payment({
         chain: 'XMR',
         currency: 'XMR',
         transactions: [{
@@ -134,6 +134,8 @@ program
     })
 
     console.log({ payment })
+    
+    process.exit(0)
 
   })
 

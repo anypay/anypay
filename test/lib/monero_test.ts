@@ -192,7 +192,7 @@ describe("Monero XMR", () => {
 
       }
 
-      expect(plugin.broadcastTx).to.have.been.called.with(signedTransaction)
+      expect(plugin.broadcastTx).to.have.not.been.called()
 
     })
 

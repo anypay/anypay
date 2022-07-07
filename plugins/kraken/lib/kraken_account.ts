@@ -75,7 +75,7 @@ export class KrakenAccount extends Orm {
 
     let currencies = this.get('autosell')
 
-    if (currencies.length === 0) {
+    if (currencies && currencies.length === 0) {
  
       log.debug('kraken.autosell.currencies.empty', {
         account_id: this.get('account_id')
@@ -224,9 +224,10 @@ export async function fromAccount(account: Account) {
 
 }
 
-export async function listAll() {
+export async function listAll({ where }: { where?: any } = {}) {
 
   let records = await models.KrakenAccount.findAll({
+    where,
     includes: [{
       model: models.Account,
       as: 'account'

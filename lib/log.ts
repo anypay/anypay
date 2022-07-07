@@ -66,6 +66,8 @@ class Logger {
 
     this.log.error({...error, namespace: this.namespace }, error_type)
 
+    console.error(error)
+
     let record = await models.Event.create({
       namespace: this.namespace,
       type: error_type,
