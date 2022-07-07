@@ -4,7 +4,7 @@ require('dotenv').config()
 
 import * as program from 'commander'
 
-import { getTransaction }  from '../lib/taal'
+import { getTransaction, broadcastTransaction }  from '../lib/taal'
 
 program 
   .command('gettransaction <txid>')
@@ -15,6 +15,24 @@ program
       let tx = await getTransaction(txid)
 
       console.log(tx)
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  })
+
+program 
+  .command('broadcast <txhex>')
+  .action(async (txhex) => {
+
+    try {
+
+      let result = await broadcastTransaction(txhex)
+
+      console.log(result)
 
     } catch(error) {
 

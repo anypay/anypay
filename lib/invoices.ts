@@ -216,7 +216,7 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   } else {
 
-    newInvoice['webhook_url'] = `https://${config.get('DOMAIN')}/v1/api/test/webhooks`
+    newInvoice['webhook_url'] = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
   }
 
