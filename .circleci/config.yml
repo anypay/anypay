@@ -54,7 +54,7 @@ jobs:
     steps:
       - run:
           name: Deploy to Web Servers
-          command: ssh ubuntu@api.anypayx.com "sudo chef-client -o recipe[anypay_api]"
+          command: ssh ubuntu@api_next.anypayx.com "sudo chef-client -o recipe[anypay::api_next]"
 
   deploy_next:
     machine: true

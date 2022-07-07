@@ -44,7 +44,7 @@ export async function listPaymentOptions(req, h) {
     log.info('pay.jsonv2.payment-options.error', error)
     log.error('pay.jsonv2.payment-options.error', error)
 
-    return badRequest({ error: error.message })
+    return badRequest(error)
 
   }
 
@@ -136,7 +136,7 @@ async function verifyUnsignedPayment(req, h) {
     log.info('pay.jsonv2.payment-verification.error', { error: error.message })
     log.error('pay.jsonv2.payment-verification.error', error)
 
-    return badRequest({ error: error.message })
+    return badRequest(error)
 
   }
 
@@ -163,7 +163,7 @@ async function submitPayment(req, h) {
     log.error('pay.jsonv2.payment.error', error)
     log.info('pay.jsonv2.payment.error', { error: error.message })
 
-    return badRequest({ error: error.message })
+    return badRequest(error)
 
   }
 
