@@ -3,6 +3,8 @@ require('dotenv').config()
 
 import { join } from 'path'
 
+import { config } from './lib/config'
+
 import { log } from './lib'
 
 import { startActorsDirectory } from 'rabbi';
@@ -43,7 +45,7 @@ import * as core from './lib'
 
   }
 
-  if (process.env.KRAKEN_PLUGIN) {
+  if (config.get('KRAKEN_PLUGIN')) {
 
     await server.register({
 

@@ -5,6 +5,8 @@ import * as jwt from '../../lib/jwt';
 
 import { models, log, password } from '../../lib';
 
+import { findApp } from '../../lib/apps'
+
 export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
   try {
@@ -118,6 +120,8 @@ export async function validateAppToken (request, username, password, h) {
   if (accessToken.app_id) {
 
     request.app_id = accessToken.app_id
+
+    request.app = await findApp(accessToken.app_id)
 
     return {
       isValid: true,
