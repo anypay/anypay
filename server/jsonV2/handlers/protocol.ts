@@ -13,8 +13,6 @@ async function ensureInvoice(req) {
 
   if (!req.invoice) { throw notFound() }
 
-  console.log(req.invoice.toJSON())
-
   if (req.invoice.status === 'paid') {
     throw new Error('invoice already paid')
   }
@@ -43,7 +41,8 @@ export async function listPaymentOptions(req, h) {
 
   } catch(error) {
 
-    log.error('listpaymentoptions.error', error)
+    log.info('pay.jsonv2.payment-options.error', error)
+    log.error('pay.jsonv2.payment-options.error', error)
 
     return badRequest({ error: error.message })
 
@@ -79,7 +78,9 @@ export async function handlePost(req, h) {
 
   } catch(error) {
 
-    log.error('handlepost.error', error.message)
+    log.info('pay.jsonv2.post.error', { error: error.message })
+    
+    log.error('pay.jsonv2.post.error', error)
 
     return h.response({ error: error.message }).code(400)
 
@@ -90,6 +91,8 @@ export async function handlePost(req, h) {
 async function getPaymentRequest(req, h) {
 
   try {
+
+    await ensureInvoice(req)
 
     await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers, { allowUnknown: true })
 
@@ -103,9 +106,11 @@ async function getPaymentRequest(req, h) {
 
   } catch(error) {
 
-    log.error('getpaymentrequest.error', error)
+    log.error('pay.jsonv2.payment-request.error', error)
+    log.info('pay.jsonv2.payment-request.error', error)
+    console.error('pay.jsonv2.payment-request.error', error)
 
-    return badRequest({ error: error.message })
+    return h.response({ error: error.message }).code(400)
 
   }
 
@@ -114,6 +119,8 @@ async function getPaymentRequest(req, h) {
 async function verifyUnsignedPayment(req, h) {
 
   try {
+
+    await ensureInvoice(req)
 
     await schema.Protocol.PaymentVerification.headers.validateAsync(req.headers, { allowUnknown: true })
 
@@ -127,7 +134,8 @@ async function verifyUnsignedPayment(req, h) {
 
   } catch(error) {
 
-    log.error('validatepayment.error', error)
+    log.info('pay.jsonv2.payment-verification.error', { error: error.message })
+    log.error('pay.jsonv2.payment-verification.error', error)
 
     return badRequest({ error: error.message })
 
@@ -143,6 +151,8 @@ async function submitPayment(req, h) {
 
     let wallet = detectWallet(req.headers, req.invoice.uid)
 
+    await ensureInvoice(req)
+
     let response = await protocol.sendSignedPayment(req.invoice, req.payload, { wallet })
 
     //await schema.Protocol.Payment.response.validateAsync(response)
@@ -151,7 +161,8 @@ async function submitPayment(req, h) {
 
   } catch(error) {
 
-    log.error('submitpayment.error', error)
+    log.error('pay.jsonv2.payment.error', error)
+    log.info('pay.jsonv2.payment.error', { error: error.message })
 
     return badRequest({ error: error.message })
 

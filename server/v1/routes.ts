@@ -143,7 +143,7 @@ export async function attachV1Routes(server) {
       auth: "jwt",
       validate: {
         failAction
-      },
+      }
     },
   });
 

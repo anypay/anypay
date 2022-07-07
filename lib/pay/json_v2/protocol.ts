@@ -103,6 +103,8 @@ interface PaymentVerification {
 interface Transaction {
   tx: string;
   weightedSize?: number;
+  tx_key?: string;
+  tx_hash?: string;
 }
 
 interface Payment {
@@ -160,6 +162,10 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 }
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
+
+  if (invoice.status !== 'unpaid') {
+    throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
+  }
 
   log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
     account_id: invoice.get('account_id'),
@@ -232,6 +238,20 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
   }, Object.assign(params, options)))
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
+
+  if (params.currency === 'XMR') {
+
+    for (let tx of params.transactions) {
+
+      if (!tx.tx_key || !tx.tx_hash) {
+
+        throw new Error('tx_key and tx_hash required for all XMR transactions')
+
+      }
+
+    }
+    
+  }
 
   try {
 
