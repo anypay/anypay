@@ -19,7 +19,7 @@ import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
 
-export const DEFAULT_WEBHOOK_URL = `https://${config.get('DOMAIN')}/v1/api/test/webhooks`
+export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
