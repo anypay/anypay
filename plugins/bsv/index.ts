@@ -10,6 +10,8 @@ import { log } from '../../lib/log'
 
 import { fromSatoshis } from '../../lib/pay'
 
+import * as taal from './lib/taal'
+
 import * as Bluebird from 'bluebird'
 
 import * as whatsonchain from './lib/whatsonchain'
@@ -74,41 +76,9 @@ export function transformHexToPayments(hex: string): Payment[]{
 }
 
 
-export async function broadcastTx(hex) {
+export async function broadcastTx(hex): Promise<string> { // returns txid
 
-  let miners = [
-    new Minercraft({
-      url: "https://merchantapi.matterpool.io"
-    }),
-    new Minercraft({
-      url: "https://merchantapi.taal.com"
-    })
-  ]
-
-  return Bluebird.any(miners.map(async miner => {
-
-    let result = await  miner.tx.push(hex); 
-
-    log.info(`miner.tx.push.result`, {
-      result,
-      hex
-    })
-
-    if (result.returnResult === 'success') {
-
-      return result
-
-    } else if (result.resultDescription.match('Transaction already in the mempool')) {
-
-      return result
-
-    } else {
-
-      throw new Error(result.resultDescription)
-
-    }
-
-  }))
+  return taal.broadcastTransaction(hex)
 
 }
 
