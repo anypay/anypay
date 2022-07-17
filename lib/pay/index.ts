@@ -384,9 +384,19 @@ export async function completeLNPayment(paymentOption, r_hash: string) {
 
 const SATOSHIS = 100000000
 
-export function toSatoshis(decimal: number): number {
+export function toSatoshis(decimal: number, currency?: string): number {
 
-  return (new BigNumber(decimal)).times(SATOSHIS).toNumber()
+  const satoshis = new BigNumber(decimal).times(SATOSHIS)
+  
+  if (currency === 'XMR') {
+
+    return satoshis.times(10000).toNumber()
+
+  } else {
+
+    return satoshis.toNumber()
+
+  }
 
 }
 

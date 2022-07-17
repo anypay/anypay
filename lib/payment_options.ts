@@ -7,6 +7,8 @@ import { toSatoshis } from './pay'
 import { computeInvoiceURI } from './uri'
 import {getCoin} from './coins';
 
+import { BigNumber } from 'bignumber.js'
+
 export interface NewPaymentOption {
   invoice_uid: string;
   currency: string;
@@ -28,8 +30,6 @@ export function writePaymentOptions(options: NewPaymentOption[]) {
 
 export async function paymentRequestToPaymentOptions(paymentRequest) {
 
-  console.log('PR2PO', paymentRequest)
-
   let options = await Promise.all(paymentRequest.template.map(async (option) => {
 
     let outputs = await Promise.all(option.to.map(async (to) => {
@@ -40,6 +40,14 @@ export async function paymentRequestToPaymentOptions(paymentRequest) {
         currency: to.currency,
         value: parseFloat(to.amount)
       }, option.currency)
+
+      var amount = toSatoshis(conversion.value)
+
+      if (to.currency === 'XMR') {
+
+        amount = new BigNumber(amount).times(10000).toNumber()
+
+      }
 
       return {
         address: to.address,
