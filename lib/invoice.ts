@@ -227,7 +227,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     let fee = await pay.fees.getFee(currency)
     
-    var paymentAmount = pay.toSatoshis(amount)
+    var paymentAmount = pay.toSatoshis(amount, currency)
 
     let outputs = []
 
