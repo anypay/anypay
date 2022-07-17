@@ -82,6 +82,12 @@ export async function broadcastTx(hex): Promise<string> { // returns txid
 
 }
 
+export async function broadcast(hex): Promise<string> { // returns txid
+
+  return taal.broadcastTransaction(hex)
+
+}
+
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
 
