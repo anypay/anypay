@@ -394,4 +394,18 @@ export async function attachV1Routes(server) {
   });
 
 
+  server.route({
+    method: "POST",
+    path: "/v1/api/transactions",
+    handler: v1.Transactions.create,
+    options: {
+      validate: {
+        payload: Joi.object({
+          chain: Joi.string().required(),
+          transaction: Joi.string().required()
+        }),
+        failAction
+      }
+    },
+  });
 }
