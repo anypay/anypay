@@ -13,6 +13,8 @@ import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
 
 import * as moment from 'moment';
 
+import { badRequest } from 'boom'
+
 export async function cancel(req, h) {
 
   let where = {
@@ -184,130 +186,139 @@ function selectCurrency(addresses) {
 
 export async function create (request, h) {
 
-  var currency_specified = false;
+  try {
 
-  /*
-    Dynamicallly look up coin and corresponding plugin given the currency
-    provided.
-  */
-
-  log.info(`controller:invoices,action:create`);
-
-  log.info('invoices.create', Object.assign({
-
-    account_id: request.account.id
-
-  }, request.payload))
-
-	if (request.payload.currency) {
-
-    log.info('currency parameter provided')
-
-    currency_specified = true;
-
-  } else {
-
-    log.info('no currency parameter provided')
+    var currency_specified = false;
 
     /*
-      Find the first address that is from a coin that is currently active
-      and set that as the invoice currency. This is a hack because the
-      invoice currency actually does not matter any more since moving to
-      payment options.
+      Dynamicallly look up coin and corresponding plugin given the currency
+      provided.
     */
 
-    let addresses = await models.Address.findAll({
-      where: { account_id: request.account.id }
-    });
+    log.info(`controller:invoices,action:create`);
+
+    log.info('invoices.create', Object.assign({
+
+      account_id: request.account.id
+
+    }, request.payload))
+
+    if (request.payload.currency) {
+
+      log.info('currency parameter provided')
+
+      currency_specified = true;
+
+    } else {
+
+      log.info('no currency parameter provided')
+
+      /*
+        Find the first address that is from a coin that is currently active
+        and set that as the invoice currency. This is a hack because the
+        invoice currency actually does not matter any more since moving to
+        payment options.
+      */
+
+      let addresses = await models.Address.findAll({
+        where: { account_id: request.account.id }
+      });
 
 
-    request.payload.currency = selectCurrency(addresses);
-	}
+      request.payload.currency = selectCurrency(addresses);
+    }
 
 
-	if (!(request.payload.amount > 0)) {
-		throw Boom.badRequest('amount must be greater than zero')	
-	}
+    if (!(request.payload.amount > 0)) {
+      throw Boom.badRequest('amount must be greater than zero')	
+    }
 
-	log.info('amount is greater than zero')
+    log.info('amount is greater than zero')
 
-  let plugin = await plugins.findForCurrency(request.payload.currency);
+    let plugin = await plugins.findForCurrency(request.payload.currency);
 
-  log.info('plugin.createInvoice');
+    log.info('plugin.createInvoice');
 
-  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
+    let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
 
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
+    if(invoice){
+   
+      log.info('invoice.created', invoice.toJSON());
 
-  }
+    }
 
-  invoice.currency_specified = currency_specified;
+    invoice.currency_specified = currency_specified;
 
-  if (request.payload.redirect_url) {
+    if (request.payload.redirect_url) {
 
-    invoice.redirect_url = request.payload.redirect_url;
+      invoice.redirect_url = request.payload.redirect_url;
 
-  }
+    }
 
-  if (request.payload.wordpress_site_url) {
+    if (request.payload.wordpress_site_url) {
 
-    invoice.wordpress_site_url = request.payload.wordpress_site_url;
+      invoice.wordpress_site_url = request.payload.wordpress_site_url;
 
-    invoice.tags = ['wordpress']
+      invoice.tags = ['wordpress']
 
-  }
+    }
 
-  if (request.payload.webhook_url) {
+    if (request.payload.webhook_url) {
 
-    invoice.webhook_url = request.payload.webhook_url;
+      invoice.webhook_url = request.payload.webhook_url;
 
-  }
+    }
 
-  if (request.payload.external_id) {
+    if (request.payload.external_id) {
 
-    invoice.external_id = request.payload.external_id;
+      invoice.external_id = request.payload.external_id;
 
-  }
+    }
 
-  if (request.is_public_request) {
+    if (request.is_public_request) {
 
-    invoice.is_public_request = true;
+      invoice.is_public_request = true;
 
-  }
+    }
 
-  invoice.headers = request.headers
+    invoice.headers = request.headers
 
-  invoice.email = request.payload.email;
-  invoice.business_id = request.payload.business_id;
-  invoice.location_id = request.payload.location_id;
-  invoice.register_id = request.payload.register_id;
+    invoice.email = request.payload.email;
+    invoice.business_id = request.payload.business_id;
+    invoice.location_id = request.payload.location_id;
+    invoice.register_id = request.payload.register_id;
 
-  await invoice.save();
+    await invoice.save();
 
-  if (invoice.email) {
-    let note = await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.email}`,
-      invoice_uid: invoice.uid,
-    });
-  }
+    if (invoice.email) {
+      let note = await models.InvoiceNote.create({
+        content: `Customer Email: ${invoice.email}`,
+        invoice_uid: invoice.uid,
+      });
+    }
 
-  invoice.payment_options = await getPaymentOptions(invoice.uid)
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
 
-  let sanitized = sanitizeInvoice(invoice);
+    let sanitized = sanitizeInvoice(invoice);
 
-  sanitized.webhook_url = invoice.webhook_url
+    sanitized.webhook_url = invoice.webhook_url
 
-  return h.response(
+    return h.response(
 
-    Object.assign({
-      success: true,
-      invoice: sanitized,
-      payment_options: invoice.payment_options
-    }, sanitized)
+      Object.assign({
+        success: true,
+        invoice: sanitized,
+        payment_options: invoice.payment_options
+      }, sanitized)
 
-  ).code(200)
+    ).code(200)
+
+ } catch(error) {
+
+   log.error('api.v0.handlers.invoices.create', error)
+
+   return badRequest(error)
+ }
 
 }
 

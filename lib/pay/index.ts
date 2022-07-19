@@ -148,6 +148,8 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     }
   });
 
+  log.info('paymentrequest.build', { paymentOption: paymentOption.toJSON()})
+
   let paymentRequest = await  buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
 
   log.info('paymentrequest', paymentRequest)
@@ -402,9 +404,17 @@ export function toSatoshis(decimal: number, currency?: string): number {
 
 export { broadcast }
 
-export function fromSatoshis(integer: number): number {
+export function fromSatoshis(integer: number, currency?: string): number {
 
-  return (new BigNumber(integer)).dividedBy(SATOSHIS).toNumber()
+  var satoshis = new BigNumber(SATOSHIS)
+
+  if (currency && currency === 'XMR') {
+
+    satoshis = satoshis.times(10000)
+
+  }
+
+  return (new BigNumber(integer)).dividedBy(satoshis).toNumber()
 
 }
 

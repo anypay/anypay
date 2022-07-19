@@ -15,6 +15,8 @@ import { BigNumber } from 'bignumber.js';
 import { getFee, Fee } from '../fees';
 import { getBaseURL } from '../environment';
 
+import { toSatoshis } from '../'
+
 interface JsonV2Output {
   address?: string;
   amount: number; // integer
@@ -87,26 +89,27 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 
   } else {
 
-    let fee: Fee = await getFee(paymentOption.currency);
+    var { address, currency } = paymentOption;
 
-    if (paymentOption.fee) {
-      fee.amount = paymentOption.fee;
-    }
-
-    let amount = new BigNumber(paymentOption.amount);
-    var address = paymentOption.address;
+    const amount = toSatoshis(paymentOption.amount)
 
     if (address.match(/\:/)) {
       address = address.split(':')[1];
     }
 
-    return [{
-      "amount": amount.times(100000000).toNumber(),
+    const outputs = [{
+      "amount": amount,
       "address": address
-    }, {
+    }]
+
+    let fee: Fee = await getFee(currency, amount);
+
+    outputs.push({
       "amount": fee.amount,
       "address": fee.address
-    }]
+    })
+
+    return outputs
 
   }
 

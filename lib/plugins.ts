@@ -70,13 +70,14 @@ class Plugins {
       throw new Error(`${currency} address not found for account ${accountId}`);
     }
 
-    log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
-
     if(!this.plugins[currency].getNewAddress){
 
       return address.value
 
     } else {
+
+      log.info(`plugins.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
+
 
       return await this.plugins[currency].getNewAddress(address, amount);
     }

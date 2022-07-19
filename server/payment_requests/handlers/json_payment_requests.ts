@@ -28,7 +28,7 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
     protocol: 'JSONV2'
   })
 
-  log.info(`paymentrequest.jsonv2`, {
+  log.info(`pay.jsonv2.request`, {
     currency: currency.code,
     invoice_uid: req.params.uid
   })

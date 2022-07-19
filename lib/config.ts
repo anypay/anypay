@@ -17,7 +17,8 @@ config.defaults({
   'AMQP_URL': 'amqp://guest:guest@localhost:5672/',
   'DATABASE_URL': 'postgres://postgres@localhost:5432/anypay',
   'EMAIL_SENDER': 'support@anypayx.com',
-  'KRAKEN_PLUGIN': false
+  'KRAKEN_PLUGIN': false,
+  'platform_fee_percent': 0.1
 })
 
 export { config } 
