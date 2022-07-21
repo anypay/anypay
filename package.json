@@ -3,7 +3,7 @@
   "version": "1.2.2",
   "description": "Bitcoin Payments For Enterprises",
   "private": true,
-  "main": "main.ts",
+  "main": "lib/index.ts",
   "engines": {
     "node": ">=14.0"
   },

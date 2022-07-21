@@ -1,9 +1,11 @@
 
 import { log } from './log'
 
-import { models } from './models'
+import * as bsv from 'bsv';
 
-import { setAddress as _setAddress } from './core'
+import { plugins } from './plugins';
+
+import { models } from './models'
 
 import { convert } from './prices'
 
@@ -21,6 +23,114 @@ interface Coin {
   supported: boolean;
   icon: string;
   address: string;
+}
+
+interface AddressChangeSet {
+  account_id: number;
+  currency: string;
+  address: string;
+  metadata?: string;
+  paymail?: string;
+  view_key?: string;
+  address_id?: number;
+}
+
+
+async function _setAddress(changeset: AddressChangeSet): Promise<any> {
+
+  var isValid = true;
+
+  let plugin = await plugins.findForCurrency(changeset.currency);
+
+  let paymail = await getPaymail(changeset.currency, changeset.address);
+
+  changeset.paymail = paymail;
+
+  if (plugin.transformAddress) {
+
+    changeset.address = await plugin.transformAddress(changeset.address);
+
+  }
+
+  if (plugin.validateAddress) {
+
+    isValid = await plugin.validateAddress(changeset.address);
+
+  }
+
+
+  if(!isValid){
+  
+    throw(`invalid ${changeset.currency} address`)
+
+  }
+
+  var address = await models.Address.findOne({ where: {
+    account_id: changeset.account_id,
+    currency: changeset.currency
+  }});
+
+  if (address) {
+
+    if (address.locked) {
+
+      throw new Error(`${changeset.currency} address locked`);
+
+    }
+
+    await address.update({
+      value: changeset.address,
+      paymail: changeset.paymail,
+      view_key: changeset.view_key,
+      note: null
+    });
+
+  } else {
+
+    address = await models.Address.create({
+      account_id: changeset.account_id,
+      currency: changeset.currency,
+      value: changeset.address,
+      view_key: changeset.view_key,
+      paymail: changeset.paymail
+    });
+
+  }
+
+  changeset.address_id = address.id;
+
+  log.info('address.set', changeset)
+
+  return address;
+
+};
+
+import {getPaymail as bsvGetPaymail} from '../plugins/bsv';
+
+async  function getPaymail(currency, address) {
+
+  if (currency !== 'BSV') {
+    return null;
+  }
+
+  let paymail = await bsvGetPaymail(address);
+
+  if (paymail) {
+
+    try {
+
+      new bsv.Address(address); 
+
+      return null;
+
+    } catch(error) {
+
+      return address;
+
+    }
+
+  }
+
 }
 
 export async function listAddresses(account: Account): Promise<Coin[]> {

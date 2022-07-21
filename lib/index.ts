@@ -35,6 +35,10 @@ var initialized = false;
 
 })();
 
+export { Account } from './account'
+
+export { Invoice } from './invoices'
+
 export {
   accounts,
   addresses,

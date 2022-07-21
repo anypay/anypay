@@ -7,7 +7,9 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, prices, email, models, invoices, coins } from '../../..';
+
+import { Account, Invoice } from '../../..'
 
 import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
 
@@ -184,50 +186,46 @@ function selectCurrency(addresses) {
 
 }
 
+interface CreateInvoice {
+  account: Account;
+  amount: number;
+  currency?: string;
+  redirect_url?: string;
+  wordpress_site_url?: string;
+  is_public_request?: string;
+  email: string;
+  business_id: string;
+  location_id: string;
+  register_id: string;
+}
+
+async function createInvoice(params: CreateInvoice): Promise<Invoice> {
+
+  const { account, amount } = params
+
+  delete params.account
+
+  log.info('invoices.create', { ...params, account_id: account.id })
+
+  var currency_specified = !!params.currency
+
+  return invoices.generateInvoice(account.id, amount)
+
+}
+
 export async function create (request, h) {
 
+  const { account, payload } = request
+
+  let invoice = await createInvoice({
+
+    account,
+
+    ...payload
+
+  })
+
   try {
-
-    var currency_specified = false;
-
-    /*
-      Dynamicallly look up coin and corresponding plugin given the currency
-      provided.
-    */
-
-    log.info(`controller:invoices,action:create`);
-
-    log.info('invoices.create', Object.assign({
-
-      account_id: request.account.id
-
-    }, request.payload))
-
-    if (request.payload.currency) {
-
-      log.info('currency parameter provided')
-
-      currency_specified = true;
-
-    } else {
-
-      log.info('no currency parameter provided')
-
-      /*
-        Find the first address that is from a coin that is currently active
-        and set that as the invoice currency. This is a hack because the
-        invoice currency actually does not matter any more since moving to
-        payment options.
-      */
-
-      let addresses = await models.Address.findAll({
-        where: { account_id: request.account.id }
-      });
-
-
-      request.payload.currency = selectCurrency(addresses);
-    }
-
 
     if (!(request.payload.amount > 0)) {
       throw Boom.badRequest('amount must be greater than zero')	
@@ -247,11 +245,13 @@ export async function create (request, h) {
 
     }
 
-    invoice.currency_specified = currency_specified;
+    invoice.tags = []
 
     if (request.payload.redirect_url) {
 
       invoice.redirect_url = request.payload.redirect_url;
+
+      invoice.tags.push('redirect')
 
     }
 
@@ -259,7 +259,7 @@ export async function create (request, h) {
 
       invoice.wordpress_site_url = request.payload.wordpress_site_url;
 
-      invoice.tags = ['wordpress']
+      invoice.tags.push('wordpress')
 
     }
 
@@ -267,17 +267,23 @@ export async function create (request, h) {
 
       invoice.webhook_url = request.payload.webhook_url;
 
+      invoice.tags.push('webhook')
+
     }
 
     if (request.payload.external_id) {
 
       invoice.external_id = request.payload.external_id;
 
+      invoice.tags.push('reference')
+
     }
 
     if (request.is_public_request) {
 
       invoice.is_public_request = true;
+
+      invoice.tags.push('public')
 
     }
 

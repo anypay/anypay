@@ -3,9 +3,7 @@ import { models } from './models'
 
 import { Orm, Record } from './orm'
 
-import { setAddress } from './core'
-
-import { Address, findAddress } from './addresses'
+import { Address, findAddress, setAddress } from './addresses'
 
 import { Invoice } from './invoices'
 
@@ -48,10 +46,9 @@ export class Account extends Orm {
 
   async setAddress(params: SetAddress): Promise<Address> {
 
-    await setAddress({
-      account_id: this.id,
+    await setAddress(this, {
       currency: params.currency,
-      address: params.address
+      value: params.address
     })
 
     return findAddress(this, params.currency)

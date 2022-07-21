@@ -1,43 +1,57 @@
 
-import * as Joi from '@hapi/joi';
-
-import { setAddress } from '../../../lib/core';
-import { log } from '../../../lib';
-
-import { models } from '../../../lib';
+import { models, log, addresses } from '../../..';
 
 export async function destroy(req, h) {
 
-  let address = await models.Address.findOne({ where: {
-    account_id: req.account.id,
-    currency: req.params.currency
-  }})
+  try {
 
-  if (address) {
-    await address.destroy()
+    let address = await models.Address.findOne({ where: {
+      account_id: req.account.id,
+      currency: req.params.currency
+    }})
+
+    if (address) {
+      await address.destroy()
+    }
+
+    return { success: true };
+ 
+  } catch(error) {
+
+    log.error('server.v0.handlers.addresses.update', error)
+
+    return h.badRequest(error)
+
   }
-
-  return { success: true };
 
 };
 
 export async function list(request, h) {
+  try {
 
-  let addresses = {};
+    let addresses = {};
 
-  let accountAddresses = await models.Address.findAll({
+    let accountAddresses = await models.Address.findAll({
 
-    where: { account_id: request.account.id }
+      where: { account_id: request.account.id }
 
-  })
-  
-  accountAddresses.forEach(address => {
+    })
+    
+    accountAddresses.forEach(address => {
 
-    addresses[address.currency] = address.value;
+      addresses[address.currency] = address.value;
 
-  });
+    });
 
-  return addresses;
+    return h.json(addresses);
+
+  } catch(error) {
+
+    log.error('server.v0.handlers.addresses.update', error)
+
+    return h.badRequest(error)
+
+  }
 
 }
 
@@ -55,43 +69,42 @@ export async function index(req, h) {
 
 export async function update(request, h) {
 
-  let currency = request.params.currency;
+  try {
 
-  let address = request.payload.address;
+    const { account } = request
 
-  let accountId = request.account.id;
+    const { currency } = request.params
 
-  var changeset = {
+    const value = request.payload.address
 
-    account_id: accountId,
+    const address = await addresses.setAddress(account, { currency, value });
 
-    currency: currency.toUpperCase(),
+    h.json({ address: address.toJSON() })
 
-    address: address
+  } catch(error) {
 
-  };
+    log.error('server.v0.handlers.addresses.update', error)
 
-  log.info('address.update', changeset);
-
-  await setAddress(changeset);
-
-  return {
-
-    currency: changeset.currency,
-
-    value: changeset.address
+    return h.badRequest(error)
 
   }
 
+
 }
 
-export const PayoutAddresses = Joi.object({
-  BTC: Joi.string().optional(),
-  DASH: Joi.string(),
-  BCH: Joi.string(),
-}).label('Addresses');
+export async function handler_name(request, h) {
 
-export const PayoutAddressUpdate = Joi.object({
-  address: Joi.string().required(),
-}).label('PayoutAddressUpdate');
+  try {
 
+    request.log.info('')
+
+    return h.json({ success: true })
+
+  } catch(error) {
+
+    request.log.error('server.handlers.handler_name', error)
+
+    return h.badRequest(error)
+
+  }
+}
