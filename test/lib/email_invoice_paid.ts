@@ -1,8 +1,7 @@
 import * as assert from 'assert'
 import {email, accounts} from '../../lib';
-import {setAddress} from '../../lib/core';
+import {setAddress} from '../../lib/addresses';
 import {generateInvoice} from '../../lib/invoice';
-import {handlePayment} from '../../lib/payment_processor';
 import * as Chance from 'chance';
 const chance = new Chance();
 
@@ -14,10 +13,9 @@ describe("Emails when invoice is paid", ()=>{
 
     account = await accounts.create(chance.email(), chance.word())
 
-    await setAddress({
-      account_id:account.id,
+    await setAddress(account, {
       currency:"XRP",
-      address:"rEdid5kDsz8U4jGqkkvrPgRHpsKQ8gESsG"
+      value:"rEdid5kDsz8U4jGqkkvrPgRHpsKQ8gESsG"
     })
 
     invoice1 = await generateInvoice(account.id, 10, 'XRP');

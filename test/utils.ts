@@ -9,13 +9,11 @@ import * as assert from 'assert';
 
 import { registerAccount } from '../lib/accounts';
 
-import { setAddress } from '../lib/core';
-
 import { AccessTokenV1, ensureAccessToken } from '../lib/access_tokens'
 
 import { Account } from '../lib/account'
 
-import { Address } from '../lib/addresses'
+import { Address, setAddress } from '../lib/addresses'
 
 import { Invoice, createInvoice } from '../lib/invoices'
 

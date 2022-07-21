@@ -1,7 +1,7 @@
 
 import {hash} from '../../lib/password';
 
-import { setAddress} from '../../lib/core';
+import { setAddress} from '../../lib/addresses';
 
 import { coins, database, settings, models, accounts } from "../../lib";
 
@@ -16,16 +16,14 @@ describe("Account Coins over HTTP", async () => {
 
     accessToken = await accounts.createAccessToken(account.id);
 
-    await setAddress({
-      account_id: account.id,
+    await setAddress(account, {
       currency: "DASH",
-      address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
+      value: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
     });
 
-    await setAddress({
-      account_id: account.id,
+    await setAddress(account, {
       currency: "BTC",
-      address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
+      value: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
     });
 
   });
