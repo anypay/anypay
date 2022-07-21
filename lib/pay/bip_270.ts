@@ -1,8 +1,11 @@
 
 import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
 
-import { getBitcore, toSatoshis } from '../bitcore';
+import { getBitcore } from '../bitcore';
+
 import { getFee, Fee } from './fees';
+
+import { toSatoshis } from './';
 
 import * as moment from 'moment';
 
