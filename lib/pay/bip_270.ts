@@ -80,7 +80,9 @@ export async function getMerchantData(invoiceUid: string, account_id?: number): 
   }
 }
 
-export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<Bip270PaymentRequest> {
+import { PaymentRequest, PaymentRequestOptions } from './'
+
+export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<Bip270PaymentRequest> {
 
   let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }});
 

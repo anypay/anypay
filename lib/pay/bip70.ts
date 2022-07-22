@@ -108,7 +108,9 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
 const BASE_URL = getBaseURL();
 
-export async function buildPaymentRequest(paymentOption) {
+import { PaymentRequest, PaymentRequestOptions } from './'
+
+export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
   // build outputs
   let outputs = await buildOutputs(paymentOption);
@@ -122,10 +124,14 @@ export async function buildPaymentRequest(paymentOption) {
 
   var now = Date.now() / 1000 | 0;
 
-  pd.set('time', now);
-  pd.set('expires', now + 60 * 60 * 24);
+  pd.set('time', options.time || now);
+  pd.set('expires', options.expires || now + 60 * 60 * 24);
 
-  pd.set('memo', `Anypay® Payment Request ${paymentOption.invoice_uid}`);
+  if (options.memo) {
+
+    pd.set('memo', options.memo)
+
+  }
 
   pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
@@ -142,7 +148,6 @@ export async function buildPaymentRequest(paymentOption) {
   paypro.makePaymentRequest();
 
   paypro.set('serialized_payment_details', pd.toBuffer());
-  console.log('ABOUT TO SIGN', paypro.serialize())
 
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
     try {
