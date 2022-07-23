@@ -277,6 +277,11 @@ export async function create (request, h) {
 
   }
 
+  if (request.payload.memo) {
+
+    invoice.memo = request.payload.memo
+  }
+
   invoice.headers = request.headers
 
   invoice.email = request.payload.email;

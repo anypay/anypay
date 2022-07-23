@@ -7,6 +7,8 @@ export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
 import { log } from '../log'
 
+import { Invoice, ensureInvoice } from '../invoices'
+
 import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
@@ -147,8 +149,17 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
       currency: params.currency
     }
   });
+  
+  let invoice = await ensureInvoice(params.uid)
 
-  let paymentRequest = await  buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
+  paymentOption = Object.assign(paymentOption, {
+    protocol: params.protocol
+  })
+
+  let paymentRequest = await  buildPaymentRequest({
+    paymentOption,
+    invoice
+  });
 
   log.info('paymentrequest', paymentRequest)
 
@@ -156,7 +167,20 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
 
 }
 
-export async function buildPaymentRequest(paymentOption): Promise<PaymentRequest> {
+interface BuildPaymentRequest {
+  paymentOption: any;
+  invoice: Invoice;
+}
+
+export interface PaymentRequestOptions {
+  memo?: string;
+  time?: number;
+  expires?: number;
+  payment_url?: string;
+}
+
+
+export async function buildPaymentRequest({paymentOption, invoice}: BuildPaymentRequest): Promise<PaymentRequest> {
 
   var content;
 
@@ -164,17 +188,24 @@ export async function buildPaymentRequest(paymentOption): Promise<PaymentRequest
 
   case 'BIP70':
 
-    content = await  bip70.buildPaymentRequest(paymentOption);
+    content = await  bip70.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
+
     break;
 
   case 'BIP270':
 
-    content = await bip270.buildPaymentRequest(paymentOption);
+    content = await bip270.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
     break;
 
   case 'JSONV2':
 
-    content = await jsonV2.buildPaymentRequest(paymentOption);
+    content = await jsonV2.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
     break;
 
   default:

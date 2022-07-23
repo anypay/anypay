@@ -50,7 +50,9 @@ export interface JsonV2PaymentRequest {
 
 const BASE_URL = getBaseURL();
 
-export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<JsonV2PaymentRequest> {
+import { PaymentRequest, PaymentRequestOptions } from '../'
+
+export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<JsonV2PaymentRequest> {
   var outputs;
 
   if (paymentOption.outputs) {
