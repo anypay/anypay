@@ -89,9 +89,17 @@ async function Server() {
 
     request.startTimer = function({ method, path }) {
 
-      const histogram = getHistogram({ method, path })
+      try {
 
-      request.endTimer = histogram.startTimer();
+        const histogram = getHistogram({ method, path })
+
+        request.endTimer = histogram.startTimer();
+
+      } catch(error) {
+
+        log.debug('prometheus.histogram.error', error)
+
+      }
 
     }
 

@@ -22,14 +22,6 @@ export async function getNewAddress(record) {
   return record.value;
 }
 
-export async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'DOGE');
-
-  return invoice;
-
-}
-
 export async function submitTransaction(rawTx: string) {
 
   return blockchair.publish('dogecoin', rawTx)

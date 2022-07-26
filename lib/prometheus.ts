@@ -17,8 +17,6 @@ export function getHistogram({ method, path }: {method: String, path: String}): 
 
   const name = `anypay_api_request_${method}__${path}`
 
-  console.log('metric name___', name)
-
   if (!histograms[key]) {
 
     histograms[key] = new prometheus.Histogram({

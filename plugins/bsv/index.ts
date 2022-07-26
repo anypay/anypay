@@ -107,14 +107,6 @@ export async function submitTransaction(rawTx: string) {
 
 }
 
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BSV');
-
-  return invoice;
-
-}
-
 export async function getPaymail(alias: string) {
 
   try {
@@ -236,8 +228,6 @@ export {
   currency,
 
   icon,
-
-  createInvoice
 
 }
 
