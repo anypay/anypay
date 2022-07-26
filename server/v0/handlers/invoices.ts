@@ -9,7 +9,11 @@ import {plugins} from '../../../lib/plugins';
 
 import { log, prices, email, models, invoices, coins } from '../../../lib';
 
-import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
+import { Account } from '../../../lib/account';
+
+import { Invoice } from '../../../lib/invoices';
+
+import { generateInvoice } from '../../../lib/invoice'
 
 import * as moment from 'moment';
 
@@ -35,6 +39,7 @@ export async function cancel(req, h) {
   if (invoice && !invoice.cancelled) {
 
     invoice.cancelled = true;
+
     invoice.status = 'cancelled';
 
     await invoice.save()
@@ -150,169 +155,115 @@ export async function index (request, reply) {
 
 };
 
-function selectCurrency(addresses) {
+interface CreateInvoice {
+  account: Account,
+  amount: number;
+  currency: string;
+  redirect_url?: string;
+  webhook_url?: string;
+  wordpress_site_url?: string;
+  external_id?: string;
+  memo?: string;
+  email?: string;
+  business_id?: string;
+  location_id?: string;
+  register_id?: string;
+}
 
-  let currency = addresses.reduce((c, address) => {
+async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
-    if (c) {
+    let invoice = await generateInvoice({
+      account: params.account,
+      amount: params.amount,
+      currency: params.currency
+    });
 
-      return c;
+    if (invoice) {
+  
+      log.info('invoice.created', invoice.toJSON());
+    }
 
-    } else {
+    invoice.redirect_url = params.redirect_url;
 
-      if (!coins.getCoin(address.currency).unavailable) {
+    invoice.wordpress_site_url = params.wordpress_site_url;
 
-        c = address.currency
+    if (params.wordpress_site_url) {
 
-      }
+      invoice.tags = ['wordpress']
 
     }
 
-    return c;
+    invoice.webhook_url = params.webhook_url;
 
-  }, null);
+    invoice.external_id = params.external_id;
 
-  if (!currency) {
+    invoice.memo = params.memo
 
-    throw new Error('no address set for any active coins');
+    invoice.email = params.email;
 
-  }
+    invoice.business_id = params.business_id;
 
-  return currency;
+    invoice.location_id = params.location_id;
+    
+    invoice.register_id = params.register_id;
+
+    await invoice.save();
+
+    if (invoice.email) {
+      let note = await models.InvoiceNote.create({
+        content: `Customer Email: ${invoice.email}`,
+        invoice_uid: invoice.uid,
+      });
+    }
+
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
+
+    return new Invoice(invoice)
 
 }
 
 export async function create (request, h) {
 
-  var currency_specified = false;
+  const account = new Account(request.account)
 
-  /*
-    Dynamicallly look up coin and corresponding plugin given the currency
-    provided.
-  */
+  try {
 
-  log.info(`controller:invoices,action:create`);
+    let invoice: Invoice = await createInvoice({
+      account,
+      amount: request.payload.amount,
+      currency: request.payload.currency || account.get('denomination'),
+      redirect_url: request.payload.redirect_url
+    })
 
-  log.info('invoices.create', Object.assign({
+    if (request.is_public_request) {
 
-    account_id: request.account.id
+      invoice.set('is_public_request', true);
 
-  }, request.payload))
+    }
 
-	if (request.payload.currency) {
+    invoice.set('headers', request.headers)
 
-    log.info('currency parameter provided')
+    let sanitized = sanitizeInvoice(invoice);
 
-    currency_specified = true;
+    sanitized.webhook_url = invoice.webhook_url;
 
-  } else {
+    return h.response(
 
-    log.info('no currency parameter provided')
+      Object.assign({
+        success: true,
+        invoice: sanitized,
+        payment_options: invoice.get('payment_options')
+      }, sanitized)
 
-    /*
-      Find the first address that is from a coin that is currently active
-      and set that as the invoice currency. This is a hack because the
-      invoice currency actually does not matter any more since moving to
-      payment options.
-    */
+    ).code(200)
 
-    let addresses = await models.Address.findAll({
-      where: { account_id: request.account.id }
-    });
+  } catch(error) {
 
+    log.error('api.v0.invoices.create', error)
 
-    request.payload.currency = selectCurrency(addresses);
-	}
-
-
-	if (!(request.payload.amount > 0)) {
-		throw Boom.badRequest('amount must be greater than zero')	
-	}
-
-	log.info('amount is greater than zero')
-
-  let plugin = await plugins.findForCurrency(request.payload.currency);
-
-  log.info('plugin.createInvoice');
-
-  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
-
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
+    return h.badRequest(error)
 
   }
-
-  invoice.currency_specified = currency_specified;
-
-  if (request.payload.redirect_url) {
-
-    invoice.redirect_url = request.payload.redirect_url;
-
-  }
-
-  if (request.payload.wordpress_site_url) {
-
-    invoice.wordpress_site_url = request.payload.wordpress_site_url;
-
-    invoice.tags = ['wordpress']
-
-  }
-
-  if (request.payload.webhook_url) {
-
-    invoice.webhook_url = request.payload.webhook_url;
-
-  }
-
-  if (request.payload.external_id) {
-
-    invoice.external_id = request.payload.external_id;
-
-  }
-
-  if (request.is_public_request) {
-
-    invoice.is_public_request = true;
-
-  }
-
-  if (request.payload.memo) {
-
-    invoice.memo = request.payload.memo
-  }
-
-  invoice.headers = request.headers
-
-  invoice.email = request.payload.email;
-  invoice.business_id = request.payload.business_id;
-  invoice.location_id = request.payload.location_id;
-  invoice.register_id = request.payload.register_id;
-
-  await invoice.save();
-
-  if (invoice.email) {
-    let note = await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.email}`,
-      invoice_uid: invoice.uid,
-    });
-  }
-
-  invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-  let sanitized = sanitizeInvoice(invoice);
-
-  sanitized.webhook_url = invoice.webhook_url
-
-  return h.response(
-
-    Object.assign({
-      success: true,
-      invoice: sanitized,
-      payment_options: invoice.payment_options
-    }, sanitized)
-
-  ).code(200)
 
 }
 

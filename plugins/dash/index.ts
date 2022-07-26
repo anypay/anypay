@@ -82,15 +82,6 @@ export function transformAddress(address: string){
 
 }
 
-
-export async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'DASH');
-
-  return invoice;
-
-}
-
 export async function getNewAddress(record: any) {
 
   return record.value;

@@ -12,6 +12,7 @@ import { startActorsDirectory } from 'rabbi';
 import { server, start } from './server/v0/server'
 
 import { start as startPrices } from './lib/prices/cron'
+
 import { start as startFees } from './actors/detect_fees/actor'
 
 import { plugin as websockets } from './ws/plugin'
@@ -29,6 +30,7 @@ import * as core from './lib'
   await init()
 
   startPrices()
+
   startFees()
 
   if (process.env.WEBSOCKETS_SERVER) {
@@ -36,9 +38,11 @@ import * as core from './lib'
     await server.register(websockets)
 
   }
+
   try {
 
-  await start()
+    await start()
+
   } catch(error) {
 
     console.error(error)

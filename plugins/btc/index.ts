@@ -78,24 +78,5 @@ function deriveAddress(xkey, nonce){
 
 }
 
-async function createInvoice(accountId: number, amount: number) {
+export const currency = 'BTC';
 
-  let invoice = await generateInvoice(accountId, amount, 'BTC');
-
-  return invoice;
-
-}
-
-const currency = 'BTC';
-
-const poll = false;
-
-export {
-
-  currency,
-
-  createInvoice,
-
-  poll
-
-};

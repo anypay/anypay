@@ -177,6 +177,7 @@ export interface PaymentRequestOptions {
   time?: number;
   expires?: number;
   payment_url?: string;
+  fee_rate_level?: string;
 }
 
 

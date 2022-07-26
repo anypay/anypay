@@ -4,10 +4,12 @@ import { log, models, invoices } from '../../../lib';
 import * as Boom from 'boom';
 
 import { show as handleBIP70 } from './bip70_payment_requests'
+
 import { show as handleJsonV2 } from './json_payment_requests'
+
 import { show as handleBIP270 } from './bip270_payment_requests'
 
-import { detectWallet, Wallets } from '../../../lib/pay'
+import { detectWallet, Wallets} from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
@@ -24,49 +26,6 @@ function upcase(str) {
   }
 
   return str.toUpperCase()
-
-}
-
-export async function createBeta(req, h) {
-
-  /* 
-
-    Create payment request. Does not require access token. Will accept either a single Payment struct or an Array of
-    Payment structs.
-
-    [{
-      coin: 'BSV',
-      currency: 'CAD',
-      amount: 15.99,
-      address: '1Dn4dU42sjV5UXQPfHwxY187DoQAwRkyga'
-    }]
-
-  */
-
-  if (req.payload.template) {
-    return create(req, h)
-  }
-
-  var template;
-
-  if (Array.isArray(req.payload)) {
-
-    template = {
-      currency: upcase(req.params.currency) || 'BSV',
-
-      to: req.payload
-    }
-
-
-  } else {
-
-    template = {
-      currency: upcase(req.params.currency) || 'BSV',
-
-      to: [req.payload]
-    }
-
-  }
 
 }
 
@@ -105,8 +64,11 @@ export async function create(req, h) {
       if (req.payload.options) {
 
         invoice.webhook_url = req.payload.options.webhook
+
         invoice.redirect_url = req.payload.options.redirect
+
         invoice.secret = req.payload.options.secret
+
         invoice.metadata = req.payload.options.metadata
 
       }
@@ -142,7 +104,7 @@ export async function create(req, h) {
 
   } catch(error) {
 
-    return Boom.badRequest(error.message);
+    return h.badRequest(error.message);
 
   }
 
@@ -157,7 +119,7 @@ export async function show(req, h) {
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
   if (invoice.cancelled) {
-    return Boom.badRequest('invoice cancelled')
+    return h.badRequest('invoice cancelled')
   }
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
@@ -172,7 +134,9 @@ export async function show(req, h) {
   try {
 
     let isBIP70 = /paymentrequest$/
+
     let isBIP270 = /bitcoinsv-paymentrequest$/
+
     let isJsonV2 = /application\/payment-request$/
 
     let accept = req.headers['accept']
@@ -203,7 +167,7 @@ export async function show(req, h) {
 
     log.error('pay.request.error', { error: error.message });
 
-    return Boom.badRequest(error.message);
+    return h.badRequest(error.message);
 
   }
 

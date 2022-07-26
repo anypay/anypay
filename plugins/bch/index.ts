@@ -26,14 +26,6 @@ export async function broadcastTx(hex: string) {
 
 }
 
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BCH');
-
-  return invoice;
-
-}
-
 function validateAddress(address: string) {
 
   try {
@@ -75,8 +67,6 @@ const currency = 'BCH';
 export {
 
   currency,
-
-  createInvoice,
 
   validateAddress
 

@@ -41,7 +41,7 @@ export async function findPaymentOption(invoice: Invoice, currency: string): Pro
 
   if (!record) {
 
-    throw new Error(`${currency} payment option not found for invoice ${invoice.uid}`)
+    throw new Error(`Unsupported Currency or Chain for Payment Option`)
 
   }
 
