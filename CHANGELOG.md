@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/anypay/anypay/compare/v1.2.2...v1.2.3) (2022-07-26)
+
+
+### Bug Fixes
+
+* **save-fee-rate:** persist invoice required fee rate level to database ([#1030](https://github.com/anypay/anypay/issues/1030)) ([216d8ca](https://github.com/anypay/anypay/commit/216d8ca1ac1b1a494f7678ef9234a773aa3c64b4))
+
 ## [1.2.2](https://github.com/anypay/anypay/compare/v1.2.1...v1.2.2) (2022-06-30)
 
 
