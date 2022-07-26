@@ -1,7 +1,7 @@
 
 import { log } from '../../../lib';
 
-import { submitPayment, SubmitPaymentResponse } from '../../payment_requests/handlers/json_payment_requests';
+import { submitPayment, SubmitPaymentResponse } from '../../../lib/pay/json_v2/protocol';
 
 export async function create(req, h) {
 

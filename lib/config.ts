@@ -7,8 +7,8 @@ import { join } from 'path'
 
 let file = join(process.cwd(), 'config', 'anypay.json')
 
-config.argv()
-   .env()
+config.argv({ parseValues: true })
+   .env({ parseValues: true })
    .file({ file });
 
 config.defaults({
@@ -17,7 +17,8 @@ config.defaults({
   'AMQP_URL': 'amqp://guest:guest@localhost:5672/',
   'DATABASE_URL': 'postgres://postgres@localhost:5432/anypay',
   'EMAIL_SENDER': 'support@anypayx.com',
-  'KRAKEN_PLUGIN': false
+  'KRAKEN_PLUGIN': false,
+  'mempool_space_fees_enabled': true
 })
 
 export { config } 

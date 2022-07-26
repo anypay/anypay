@@ -2,11 +2,9 @@ import * as Hapi from 'hapi';
 
 import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
-import { amqp, log, models } from '../../../lib';
+import { log, models } from '../../../lib';
 
-import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
-
-import * as Boom from 'boom';
+import { submitPayment, SubmitPaymentResponse } from '../../../lib/pay/json_v2/protocol';
 
 export async function show(req, h) {
 

@@ -46,7 +46,7 @@ describe("BIP270 Payment Requests", () => {
         let resp = await request
           .get(`/r/${invoice.uid}`) 
 
-        console.log(resp)
+        console.log(resp.body)
 
         let transaction = "INVALID"
           

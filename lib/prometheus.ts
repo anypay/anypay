@@ -15,10 +15,14 @@ export function getHistogram({ method, path }: {method: String, path: String}): 
 
   let key = `${method}_${path}`
 
+  const name = `anypay_api_request_${method}__${path}`
+
+  console.log('metric name___', name)
+
   if (!histograms[key]) {
 
     histograms[key] = new prometheus.Histogram({
-      name: `anypay_api_request_${method}__${path}`,
+      name,
       help: 'Duration of HTTP Request in ms',
       //labelNames: ['status_code'],
       buckets: [0.1, 5, 15, 50, 100, 500]

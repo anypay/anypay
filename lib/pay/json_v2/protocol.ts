@@ -5,13 +5,112 @@ import { config } from '../../config'
 
 import { findPaymentOption } from '../../payment_option'
 
-import { submitPayment } from '../../../server/payment_requests/handlers/json_payment_requests'
+import * as mempool from '../../mempool.space'
 
 import { log } from '../../log'
 
 import { Protocol } from './schema'
 
 import { plugins } from '../../plugins'
+
+import { models } from '../../models'
+
+import { verifyPayment, completePayment  } from '../'
+
+export interface SubmitPaymentRequest {
+  currency: string;
+  invoice_uid: string;
+  transactions: string[];
+  wallet?: string;
+}
+
+export interface SubmitPaymentResponse {
+  success: boolean;
+  transactions: string[];
+}
+
+export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
+
+  try {
+
+    log.info('payment.submit', payment);
+
+    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+
+    if (invoice.cancelled) {
+
+      log.error('payment.error.invoicecancelled', { payment })
+
+      throw new Error('invoice cancelled')
+    }
+
+    if (!invoice) {
+      throw new Error(`invoice ${payment.invoice_uid} not found`)
+    }
+
+    let payment_option = await models.PaymentOption.findOne({ where: {
+      invoice_uid: invoice.uid,
+      currency: payment.currency
+    }})
+
+    if (!payment_option) {
+      throw new Error(`Unsupported Currency or Chain for Payment Option`)
+    }
+
+    let plugin = await plugins.findForCurrency(payment.currency)
+
+    for (const transaction of payment.transactions) {
+
+      if (plugin.verifyPayment) {
+
+        await plugin.verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      } else {
+
+        await verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      }
+
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
+
+      let resp = await plugin.broadcastTx(transaction)
+
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
+
+      let paymentRecord = await completePayment(payment_option, transaction)
+
+      if (payment.wallet) {
+        paymentRecord.wallet = payment.wallet
+        await paymentRecord.save()
+      }
+
+      log.info('payment.completed', paymentRecord);
+
+    }
+
+    return {
+      success: true,
+      transactions: payment.transactions
+    }
+
+  } catch(error) {
+
+    log.error('json.paymentrequest.submit.error', error)
+
+    throw error
+
+  }
+
+}
+
 
 interface ProtocolMessage {}
 
@@ -126,6 +225,26 @@ interface LogOptions {
   wallet?: string;
 }
 
+async function getRequiredFeeRate(invoice: Invoice, currency: string): Promise<number> {
+
+  var requiredFeeRate = 1
+
+  if (currency === 'BTC') {
+
+    if (config.get('mempool_space_fees_enabled')) {
+
+      const level = mempool.FeeLevels[invoice.get('fee_rate_level')]
+
+      requiredFeeRate = await mempool.getFeeRate(level || mempool.FeeLevels.fastestFee)
+
+    }
+
+  }
+
+  return requiredFeeRate
+
+}
+
 export async function listPaymentOptions(invoice: Invoice, options: LogOptions = {}): Promise<PaymentOptions> {
 
   log.info('pay.jsonv2.payment-options', Object.assign(options, {
@@ -133,8 +252,27 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
     account_id: invoice.get('account_id')
   }))
 
-  let paymentOptions = await invoice.getPaymentOptions()
+  let _paymentOptions = await invoice.getPaymentOptions()
 
+  let paymentOptions = await Promise.all(_paymentOptions.map(async paymentOption => {
+
+    const estimatedAmount = paymentOption.get('outputs')
+      .reduce((sum, output) => sum + output.amount, 0)
+
+    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.currency)
+
+    return {
+      currency: paymentOption.get('currency'),
+      chain: paymentOption.get('currency'),
+      network: 'main',
+      estimatedAmount,
+      requiredFeeRate,
+      minerFee: 0,
+      decimals: 0,
+      selected: false
+    }
+
+  }))
 
   return {
 
@@ -142,28 +280,14 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     expires: invoice.get('expiry'),
 
-    memo: `Anypay Invoice ID: ${invoice.uid}`,
+    memo: invoice.get('memo'),
 
     paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
-    paymentOptions: paymentOptions.map(paymentOption => {
+    paymentOptions
 
-      const estimatedAmount = paymentOption.get('outputs')
-        .reduce((sum, output) => sum + output.amount, 0)
-
-      return {
-        currency: paymentOption.get('currency'),
-        chain: paymentOption.get('currency'),
-        network: 'main',
-        estimatedAmount,
-        requiredFeeRate: 1,
-        minerFee: 0,
-        decimals: 0,
-        selected: false
-      }
-    })
   }
 }
 
@@ -182,13 +306,15 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   let paymentOption = await findPaymentOption(invoice, option.currency)
 
+  const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
+
   return {
 
     time: invoice.get('createdAt'),
 
     expires: invoice.get('expiry'),
 
-    memo: 'string',
+    memo: invoice.get('memo'),
 
     paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
 
@@ -202,7 +328,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
       type: "transaction",
 
-      requiredFeeRate: 1,
+      requiredFeeRate,
 
       outputs: paymentOption.get('outputs')
 

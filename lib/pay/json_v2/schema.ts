@@ -20,7 +20,7 @@ const PaymentOption = Joi.object({
 const PaymentOptions = Joi.object({
   time: Joi.date().timestamp().required(),
   expires: Joi.date().timestamp().required(),
-  memo: Joi.string().required(),
+  memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
   paymentOptions: Joi.array().required().items(PaymentOption)
@@ -50,7 +50,7 @@ const AuthHeaders = Joi.object({
 const PaymentRequest = Joi.object({
   time: Joi.date().timestamp(),
   expires: Joi.date().timestamp(),
-  memo: Joi.string().required(),
+  memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
   chain: Joi.string().required(),
@@ -80,7 +80,7 @@ const PaymentVerification = Joi.object({
       tx: Joi.string().required()
     }))
   }),
-  memo: Joi.string().required()
+  memo: Joi.string().optional().allow('', null)
 })
 
 const PaymentHeaders = Joi.object({
@@ -103,7 +103,7 @@ const Payment = Joi.object({
     })),
     currency: Joi.string().required()
   }).required(),
-  memo: Joi.string().required()
+  memo: Joi.string().optional().allow('', null)
 })
 
 const SigningKeys = Joi.object({

@@ -140,26 +140,25 @@ export async function refreshInvoice(uid: string): Promise<any> {
 
 }
 
-export async function generateInvoice(
+interface GenerateInvoice {
+  account: Account;
+  amount: number;
+  currency: string;
+}
 
-  accountId: number,
-  denominationAmountValue: number,
-  invoiceCurrency: string,
-  uid?: string
+export async function generateInvoice({
+  account,
+  amount,
+  currency
+}: GenerateInvoice ): Promise<any> {
 
-): Promise<any> {
-
-  log.info('invoices.generate', { account_id: accountId, denominationAmountValue, invoiceCurrency, invoice_uid: uid })
-
-  uid = !!uid ? uid : shortid.generate();
-
-  var account = await models.Account.findOne({ where: { id: accountId }});
+  const uid = shortid.generate();
 
   var invoiceParams = {
-    denomination_currency: account.denomination,
-    denomination_amount: denominationAmountValue,
-    currency: account.denomination,
-    amount: denominationAmountValue,
+    denomination_currency: currency,
+    denomination_amount: amount,
+    currency: currency,
+    amount: amount,
     account_id: account.id,
     status: 'unpaid',
     uid,
@@ -167,12 +166,12 @@ export async function generateInvoice(
       currency: 'ANYPAY',
       uid
     }),
-    should_settle: account.should_settle
+    should_settle: account.get('should_settle')
   }
 
   var invoice = await models.Invoice.create(invoiceParams);
 
-  let options = await createPaymentOptions(account, invoice)
+  let options = await createPaymentOptions(account.record, invoice)
 
   return invoice;
 
