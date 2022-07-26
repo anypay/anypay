@@ -264,7 +264,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   log.info('invoice.created', {
     account_id: account.id,
-    uid: invoice.uid
+    invoice_uid: invoice.uid
   });
 
   return paymentOptions
