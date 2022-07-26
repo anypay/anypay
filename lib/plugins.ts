@@ -70,7 +70,7 @@ class Plugins {
       throw new Error(`${currency} address not found for account ${accountId}`);
     }
 
-    log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
+    log.debug(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
 
     if(!this.plugins[currency].getNewAddress){
 
@@ -82,30 +82,6 @@ class Plugins {
     }
 
   }
-
-  async checkAddressForPayments(address: string, currency: string) {
-
-    log.info(`global.checkaddressforpayments.${address}.${currency}`);
-
-    if(!this.plugins[currency].checkAddressForPayments){
-      throw new Error('plugin does not implement checkAddressForPayments')
-    }
-
-    let payments = await this.plugins[currency].checkAddressForPayments(address, currency);
-
-    log.info(`checkaddressforpayments.found`, payments);
-
-    payments.forEach(async payment => {
-
-      let message = Buffer.from(JSON.stringify(payment));
-
-      await channel.publish('anypay.payments', 'payment', message);
-
-      log.info(`amqp.message.published`, `anypay.payments.${JSON.stringify(payment)}`);
-
-    });
-
- }
 
 }
 

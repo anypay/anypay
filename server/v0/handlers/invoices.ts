@@ -77,8 +77,6 @@ export async function index (request, reply) {
 
   */
 
-  log.info(`controller:invoices,action:index`);
-
   let query = {
 
     where: {
@@ -159,6 +157,7 @@ interface CreateInvoice {
   account: Account,
   amount: number;
   currency: string;
+  fee_rate_level?: string;
   redirect_url?: string;
   webhook_url?: string;
   wordpress_site_url?: string;
@@ -178,12 +177,9 @@ async function createInvoice(params: CreateInvoice): Promise<Invoice> {
       currency: params.currency
     });
 
-    if (invoice) {
-  
-      log.info('invoice.created', invoice.toJSON());
-    }
-
     invoice.redirect_url = params.redirect_url;
+
+    invoice.fee_rate_level = params.fee_rate_level;
 
     invoice.wordpress_site_url = params.wordpress_site_url;
 
@@ -232,7 +228,8 @@ export async function create (request, h) {
       account,
       amount: request.payload.amount,
       currency: request.payload.currency || account.get('denomination'),
-      redirect_url: request.payload.redirect_url
+      redirect_url: request.payload.redirect_url,
+      fee_rate_level: request.payload.fee_rate_level
     })
 
     if (request.is_public_request) {
@@ -298,15 +295,7 @@ export async function createPublicInvoice(account_id, payload) {
 
   let plugin = await plugins.findForCurrency(currency);
 
-  log.info('plugin.createInvoice');
-
   let invoice = await plugin.createInvoice(account_id, payload.amount);
-
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
-
-  }
 
   invoice.redirect_url = payload.redirect_url;
 
@@ -377,8 +366,6 @@ function sanitizeInvoice(invoice) {
 export async function show(request, reply) {
 
   let invoiceId = request.params.invoice_id;
-
-  log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
 
   let invoice = await models.Invoice.findOne({
     where: {

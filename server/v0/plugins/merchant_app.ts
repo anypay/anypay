@@ -67,8 +67,25 @@ export async function register(server: Server) {
       auth: "token",
       tags: ['api'],
       validate: {
-        payload: models.Invoice.Request,
-        failAction
+        payload:  Joi.object({
+          amount: Joi.number().required(),
+          currency: Joi.string().optional(),
+          redirect_url: Joi.string().optional(),
+          webhook_url: Joi.string().optional(),
+          wordpress_site_url: Joi.string().optional(),
+          external_id: Joi.string().optional(),
+          business_id: Joi.string().optional(),
+          location_id: Joi.string().optional(),
+          register_id: Joi.string().optional(),
+          required_fee_rate: Joi.string().allow(
+            'fastestFee',
+            'halfHourFee',
+            'hourFee',
+            'economyFee',
+            'minimumFee'
+          ).optional()
+        }).label('InvoiceRequest'),
+        //failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }
