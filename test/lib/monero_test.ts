@@ -91,7 +91,7 @@ describe("Monero XMR", () => {
 
       expect(option.get('currency')).to.be.equal('XMR')
 
-      expect(option.get('outputs').length).to.be.equal(1)
+      expect(option.get('outputs').length).to.be.equal(2)
 
     })
  
