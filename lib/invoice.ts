@@ -224,9 +224,11 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       address = address.split(':')[1]
     }
 
-    let fee = await pay.fees.getFee(currency)
-    
     var paymentAmount = pay.toSatoshis(amount, currency)
+
+    let fee = await pay.fees.getFee(currency, paymentAmount)
+
+    paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
 
     let outputs = []
 
@@ -235,6 +237,10 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       amount: paymentAmount
     })
 
+    outputs.push({
+      address: fee.address,
+      amount: fee.amount
+    })
 
     let uri = computeInvoiceURI({
       currency: currency,
