@@ -59,13 +59,21 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
     } catch(e) {
 
-      response_code = e.response.statusCode;
+      log.debug('webhook.error', e)
+      log.debug('webhook.error', e.message)
 
-      if (typeof e.response.body !== 'string') {
-        response_body = JSON.stringify(e.response.text); 
-      } else {
-        response_body = e.response.body; 
+      if (e.response) {
+
+        response_code = e.response.statusCode;
+
+        if (typeof e.response.body !== 'string') {
+          response_body = JSON.stringify(e.response.text); 
+        } else {
+          response_body = e.response.body; 
+        }
+
       }
+
       error = e.message;
 
       ended_at = new Date();
@@ -73,8 +81,6 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
       status = 'failed'
 
     }
-
-
 
     let webhook = await models.Webhook.create({
       account_id: invoice.account_id,
