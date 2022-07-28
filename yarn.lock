@@ -997,17 +997,13 @@
   version "0.7.31"
   resolved "https://registry.npmjs.org/@types/ms/-/ms-0.7.31.tgz"
 
-"@types/node@*", "@types/node@^10.17.46", "@types/node@^10.3.5":
-  version "10.17.60"
-  resolved "https://registry.npmjs.org/@types/node/-/node-10.17.60.tgz"
-
-"@types/node@>=12":
+"@types/node@*", "@types/node@>=12", "@types/node@>=12.12.47", "@types/node@>=13.7.0", "@types/node@>=8.9.0":
   version "17.0.30"
   resolved "https://registry.npmjs.org/@types/node/-/node-17.0.30.tgz"
 
-"@types/node@>=12.12.47", "@types/node@>=13.7.0", "@types/node@>=8.9.0":
-  version "16.11.6"
-  resolved "https://registry.npmjs.org/@types/node/-/node-16.11.6.tgz"
+"@types/node@^10.17.46", "@types/node@^10.3.5":
+  version "10.17.60"
+  resolved "https://registry.npmjs.org/@types/node/-/node-10.17.60.tgz"
 
 "@types/node@^11.13.8":
   version "11.15.54"
@@ -1016,6 +1012,10 @@
 "@types/node@^12.12.26":
   version "12.20.46"
   resolved "https://registry.npmjs.org/@types/node/-/node-12.20.46.tgz"
+
+"@types/node@^13.7.0":
+  version "13.13.52"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-13.13.52.tgz#03c13be70b9031baaed79481c0c0cfb0045e53f7"
 
 "@types/node@^14.6.0":
   version "14.17.32"
@@ -1358,13 +1358,6 @@ ascii-art@^1.5.0:
   optionalDependencies:
     canvas "1.6.9"
     jsftp "2.1.3"
-
-ascli@~1:
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/ascli/-/ascli-1.0.1.tgz"
-  dependencies:
-    colour "~0.7.1"
-    optjs "~3.2.2"
 
 asn1.js-rfc3280@=4.0.0:
   version "4.0.0"
@@ -1960,12 +1953,6 @@ bunnies@^1.0.2:
     dotenv "^8.0.0"
     winston "^3.2.1"
 
-bytebuffer@~5:
-  version "5.0.1"
-  resolved "https://registry.npmjs.org/bytebuffer/-/bytebuffer-5.0.1.tgz"
-  dependencies:
-    long "~3"
-
 bytes@3.1.2:
   version "3.1.2"
   resolved "https://registry.npmjs.org/bytes/-/bytes-3.1.2.tgz"
@@ -2050,10 +2037,6 @@ callsite@^1.0.0:
 callsites@^3.0.0, callsites@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz"
-
-camelcase@^2.0.1:
-  version "2.1.1"
-  resolved "https://registry.npmjs.org/camelcase/-/camelcase-2.1.1.tgz"
 
 camelcase@^4.0.0:
   version "4.1.0"
@@ -2269,14 +2252,6 @@ cli-width@^2.0.0:
   version "2.2.1"
   resolved "https://registry.npmjs.org/cli-width/-/cli-width-2.2.1.tgz"
 
-cliui@^3.0.3:
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/cliui/-/cliui-3.2.0.tgz"
-  dependencies:
-    string-width "^1.0.1"
-    strip-ansi "^3.0.1"
-    wrap-ansi "^2.0.0"
-
 cliui@^4.0.0:
   version "4.1.0"
   resolved "https://registry.npmjs.org/cliui/-/cliui-4.1.0.tgz"
@@ -2390,10 +2365,6 @@ colorspace@1.1.x:
   dependencies:
     color "^3.1.3"
     text-hex "1.0.x"
-
-colour@~0.7.1:
-  version "0.7.1"
-  resolved "https://registry.npmjs.org/colour/-/colour-0.7.1.tgz"
 
 combined-stream@^1.0.6, combined-stream@^1.0.8, combined-stream@~1.0.6:
   version "1.0.8"
@@ -2787,7 +2758,7 @@ debug@^4.0.0, debug@^4.3.3:
   dependencies:
     ms "2.1.2"
 
-decamelize@^1.1.1, decamelize@^1.2.0:
+decamelize@^1.2.0:
   version "1.2.0"
   resolved "https://registry.npmjs.org/decamelize/-/decamelize-1.2.0.tgz"
 
@@ -4054,7 +4025,7 @@ glob@7.1.4:
     once "^1.3.0"
     path-is-absolute "^1.0.0"
 
-glob@7.1.6, glob@^7.0.5, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
+glob@7.1.6, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.1.6"
   resolved "https://registry.npmjs.org/glob/-/glob-7.1.6.tgz"
   dependencies:
@@ -4617,10 +4588,6 @@ internal-slot@^1.0.3:
 interpret@^2.0.0, interpret@^2.2.0:
   version "2.2.0"
   resolved "https://registry.npmjs.org/interpret/-/interpret-2.2.0.tgz"
-
-invert-kv@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/invert-kv/-/invert-kv-1.0.0.tgz"
 
 invert-kv@^2.0.0:
   version "2.0.0"
@@ -5403,12 +5370,6 @@ lazy@^1.0.11:
   version "1.0.11"
   resolved "https://registry.npmjs.org/lazy/-/lazy-1.0.11.tgz"
 
-lcid@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/lcid/-/lcid-1.0.0.tgz"
-  dependencies:
-    invert-kv "^1.0.0"
-
 lcid@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/lcid/-/lcid-2.0.0.tgz"
@@ -5573,10 +5534,6 @@ logform@^2.2.0:
 long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/long/-/long-4.0.0.tgz"
-
-long@~3:
-  version "3.2.0"
-  resolved "https://registry.npmjs.org/long/-/long-3.2.0.tgz"
 
 longest@^2.0.1:
   version "2.0.1"
@@ -6471,21 +6428,11 @@ optional-require@^1.1.8:
   dependencies:
     require-at "^1.0.6"
 
-optjs@~3.2.2:
-  version "3.2.2"
-  resolved "https://registry.npmjs.org/optjs/-/optjs-3.2.2.tgz"
-
 original-url@^1.2.3:
   version "1.2.3"
   resolved "https://registry.npmjs.org/original-url/-/original-url-1.2.3.tgz"
   dependencies:
     forwarded-parse "^2.1.0"
-
-os-locale@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.npmjs.org/os-locale/-/os-locale-1.4.0.tgz"
-  dependencies:
-    lcid "^1.0.0"
 
 os-locale@^3.0.0:
   version "3.1.0"
@@ -6963,14 +6910,23 @@ protobufjs@6.11.2, protobufjs@^6.10.0, protobufjs@^6.8.6:
     "@types/node" ">=13.7.0"
     long "^4.0.0"
 
-protobufjs@^5.0.3:
-  version "5.0.3"
-  resolved "https://registry.npmjs.org/protobufjs/-/protobufjs-5.0.3.tgz"
+protobufjs@^6.10.3:
+  version "6.10.3"
+  resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.10.3.tgz#11ed1dd02acbfcb330becf1611461d4b407f9eef"
   dependencies:
-    ascli "~1"
-    bytebuffer "~5"
-    glob "^7.0.5"
-    yargs "^3.10.0"
+    "@protobufjs/aspromise" "^1.1.2"
+    "@protobufjs/base64" "^1.1.2"
+    "@protobufjs/codegen" "^2.0.4"
+    "@protobufjs/eventemitter" "^1.1.0"
+    "@protobufjs/fetch" "^1.1.0"
+    "@protobufjs/float" "^1.0.2"
+    "@protobufjs/inquire" "^1.1.0"
+    "@protobufjs/path" "^1.1.2"
+    "@protobufjs/pool" "^1.1.0"
+    "@protobufjs/utf8" "^1.1.0"
+    "@types/long" "^4.0.1"
+    "@types/node" "^13.7.0"
+    long "^4.0.0"
 
 proxy-addr@~2.0.7:
   version "2.0.7"
@@ -8965,10 +8921,6 @@ widest-line@^2.0.0:
   dependencies:
     string-width "^2.1.1"
 
-window-size@^0.1.4:
-  version "0.1.4"
-  resolved "https://registry.npmjs.org/window-size/-/window-size-0.1.4.tgz"
-
 winston-transport@^4.4.0:
   version "4.4.0"
   resolved "https://registry.npmjs.org/winston-transport/-/winston-transport-4.4.0.tgz"
@@ -9133,10 +9085,6 @@ xtend@^4.0.0:
   version "4.0.2"
   resolved "https://registry.npmjs.org/xtend/-/xtend-4.0.2.tgz"
 
-y18n@^3.2.0:
-  version "3.2.2"
-  resolved "https://registry.npmjs.org/y18n/-/y18n-3.2.2.tgz"
-
 "y18n@^3.2.1 || ^4.0.0", y18n@^4.0.0:
   version "4.0.3"
   resolved "https://registry.npmjs.org/y18n/-/y18n-4.0.3.tgz"
@@ -9262,18 +9210,6 @@ yargs@^15.0.2:
     which-module "^2.0.0"
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
-
-yargs@^3.10.0:
-  version "3.32.0"
-  resolved "https://registry.npmjs.org/yargs/-/yargs-3.32.0.tgz"
-  dependencies:
-    camelcase "^2.0.1"
-    cliui "^3.0.3"
-    decamelize "^1.1.1"
-    os-locale "^1.4.0"
-    string-width "^1.0.1"
-    window-size "^0.1.4"
-    y18n "^3.2.0"
 
 yauzl@^2.9.2:
   version "2.10.0"
