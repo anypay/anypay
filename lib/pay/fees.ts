@@ -61,8 +61,6 @@ export async function getFee(currency:string, amount?: number): Promise<Fee> {
 
     let feeAmount = new BigNumber(amount).times(0.001).toNumber()
 
-    console.log({ currency, feeAmount, fee })
-
     if (feeAmount > fee) {
 
       fee = feeAmount
