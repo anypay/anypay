@@ -244,15 +244,13 @@ export async function create (request, h) {
 
     sanitized.webhook_url = invoice.webhook_url;
 
-    return h.response(
+    sanitized.payment_options = await getPaymentOptions(invoice.uid)
 
-      Object.assign({
-        success: true,
-        invoice: sanitized,
-        payment_options: invoice.get('payment_options')
-      }, sanitized)
-
-    ).code(200)
+    return h.response({
+      success: true,
+      invoice: sanitized
+    })
+    .code(200)
 
   } catch(error) {
 
