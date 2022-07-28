@@ -218,7 +218,7 @@ async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
 }
 
-export async function create (request, h) {
+export async function create(request, h) {
 
   const account = new Account(request.account)
 
@@ -240,19 +240,24 @@ export async function create (request, h) {
 
     invoice.set('headers', request.headers)
 
-    let sanitized = sanitizeInvoice(invoice);
+    const json = invoice.toJSON();
 
-    sanitized.webhook_url = invoice.webhook_url;
+    const payment_options = await getPaymentOptions(invoice.uid)
 
-    return h.response(
-
-      Object.assign({
-        success: true,
-        invoice: sanitized,
-        payment_options: invoice.get('payment_options')
-      }, sanitized)
-
-    ).code(200)
+    return h.response({
+      success: true,
+      invoice: {
+        amount: json['amount'],
+        currency: json['denomination'],
+        status: json['status'],
+        uid: json['uid'],
+        uri: json['uri'],
+        createdAt: json['createdAt'],
+        expiresAt: json['expiry'],
+        payment_options
+      }
+    })
+    .code(200)
 
   } catch(error) {
 
@@ -333,13 +338,19 @@ async function getPaymentOptions(invoice_uid) {
     invoice_uid
   }});
 
-  return payment_options.map(option => _.pick(option,
-    'uri',
-    'currency',
-    'currency_name',
-    'currency_logo_url',
-    'amount'
-  ))
+  return payment_options.map(option => {
+
+    option = _.pick(option,
+      'uri',
+      'currency',
+      'amount'
+    )
+
+    option['chain'] = option['currency']
+
+    return option
+
+  })
 
 }
 

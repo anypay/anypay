@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/anypay/anypay/compare/v1.2.4...v1.2.5) (2022-07-28)
+
+
+### Bug Fixes
+
+* **readd-payment-options:** in POST /invoices API response, return payment_options ([#1035](https://github.com/anypay/anypay/issues/1035)) ([276c398](https://github.com/anypay/anypay/commit/276c3980a3637afe307080678e70be403a8777a7))
+
 ## [1.2.4](https://github.com/anypay/anypay/compare/v1.2.3...v1.2.4) (2022-07-28)
 
 
