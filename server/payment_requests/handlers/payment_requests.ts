@@ -1,6 +1,8 @@
 
 import { log, models, invoices } from '../../../lib';
 
+import { Invoice } from '../../../lib/invoices'
+
 import * as Boom from 'boom';
 
 import { show as handleBIP70 } from './bip70_payment_requests'
@@ -14,6 +16,8 @@ import { detectWallet, Wallets} from '../../../lib/pay'
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
 import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
+
+import { createWebhook } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
 
@@ -85,6 +89,8 @@ export async function create(req, h) {
       await paymentRequestToPaymentOptions(record)
 
       log.info('pay.request.created', record.toJSON())
+
+      createWebhook(new Invoice(invoice))
 
       return {
 

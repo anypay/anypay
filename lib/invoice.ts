@@ -146,37 +146,6 @@ interface GenerateInvoice {
   currency: string;
 }
 
-export async function generateInvoice({
-  account,
-  amount,
-  currency
-}: GenerateInvoice ): Promise<any> {
-
-  const uid = shortid.generate();
-
-  var invoiceParams = {
-    denomination_currency: currency,
-    denomination_amount: amount,
-    currency: currency,
-    amount: amount,
-    account_id: account.id,
-    status: 'unpaid',
-    uid,
-    uri: computeInvoiceURI({
-      currency: 'ANYPAY',
-      uid
-    }),
-    should_settle: account.get('should_settle')
-  }
-
-  var invoice = await models.Invoice.create(invoiceParams);
-
-  let options = await createPaymentOptions(account.record, invoice)
-
-  return invoice;
-
-}
-
 async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
   let addresses = await models.Address.findAll({ where: {

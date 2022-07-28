@@ -1,4 +1,3 @@
-import {generateInvoice} from '../../lib/invoice';
 
 import * as blockchair from '../../lib/blockchair'
 

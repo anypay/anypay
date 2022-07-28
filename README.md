@@ -1,32 +1,5 @@
-## Usage
-
 ```
 
-npm install
-npm link
-
-
-Add to .bash_profile or envrc (for local directories)
-  DATABASE_URL=postgres://username@localhost:5432/anypay_dev
-
-Create your databases:
-  psql -c "create database anypay_dev"
-  psql anypay_dev -c "CREATE EXTENSION postgis" # adds type "geometry"
-
-  psql -c "create database anypay_test"
-  psql anypay_test -c "CREATE EXTENSION postgis" # adds type "geometry"
-
-
-Migrate your database:
-  npm run db:migrate
-
-Seed your database:
-  npm run db:seed:prices && ./bin/prices.ts update_crypto_prices
-
-Start your server:
-  anypay --api --actors --websockets --blockcypher --payments
-
-  ___   _   _ __   ________   ___  __   __
  / _ \ | \ | |\ \ / /| ___ \ / _ \ \ \ / /
 / /_\ \|  \| | \ V / | |_/ // /_\ \ \ V /
 |  _  || . ` |  \ /  |  __/ |  _  |  \ /

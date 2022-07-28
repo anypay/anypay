@@ -1,6 +1,5 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
-import {generateInvoice} from '../../lib/invoice';
 
 export { btc as bitcore }
 

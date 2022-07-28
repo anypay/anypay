@@ -13,8 +13,6 @@ import { Account } from '../../../lib/account';
 
 import { Invoice, createInvoice } from '../../../lib/invoices';
 
-import { generateInvoice } from '../../../lib/invoice'
-
 import * as moment from 'moment';
 
 export async function cancel(req, h) {

@@ -175,7 +175,7 @@ export class Invoice extends Orm {
 interface CreateInvoice {
   account: Account,
   amount: number;
-  currency: string;
+  currency?: string;
   fee_rate_level?: string;
   redirect_url?: string;
   webhook_url?: string;
@@ -194,7 +194,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const uid = shortid.generate();
 
-  var { webhook_url, account, amount } = params
+  var { webhook_url, account, amount, currency } = params
 
   if (!webhook_url) {
 
@@ -202,13 +202,13 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   }
 
-  var newInvoice: any = {
+  const newInvoice: any = {
 
-    denomination_currency: account.denomination,
+    denomination_currency: currency || account.denomination,
 
     denomination_amount: amount,
 
-    currency: account.denomination,
+    currency: currency || account.denomination,
 
     amount: amount,
 
