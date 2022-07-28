@@ -19,7 +19,7 @@ import { models } from './models'
 
 import { Orm } from './orm'
 
-import { v4 } from 'uuid'
+import * as shortid from 'shortid';
 
 import { createPaymentOptions } from './invoice'
 
@@ -172,21 +172,49 @@ export class Invoice extends Orm {
 
 }
 
-export async function createInvoice(params: NewInvoice): Promise<Invoice> {
+interface CreateInvoice {
+  account: Account,
+  amount: number;
+  currency: string;
+  fee_rate_level?: string;
+  redirect_url?: string;
+  webhook_url?: string;
+  wordpress_site_url?: string;
+  external_id?: string;
+  memo?: string;
+  email?: string;
+  business_id?: string;
+  location_id?: string;
+  register_id?: string;
+}
 
-  const uid = v4();
+
+
+export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
+
+  const uid = shortid.generate();
+
+  var { webhook_url, account, amount } = params
+
+  if (!webhook_url) {
+
+    webhook_url = account.get('webhook_url')
+
+  }
 
   var newInvoice: any = {
 
-    denomination_currency: params.account.denomination,
+    denomination_currency: account.denomination,
 
-    denomination_amount: params.amount,
+    denomination_amount: amount,
 
-    currency: params.account.denomination,
+    currency: account.denomination,
 
-    amount: params.amount,
+    amount: amount,
 
-    account_id: params.account.id,
+    account_id: account.id,
+
+    webhook_url: webhook_url,
 
     status: 'unpaid',
 
@@ -202,54 +230,15 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   }
 
-  if (params.webhook_url) {
-
-    if (validator.isURL(params.webhook_url, {protocols: 'https'})) {
-
-      newInvoice['webhook_url'] = params.webhook_url
-
-    } else {
-
-      throw new InvalidWebhookURL(params.webhook_url)
-
-    }
-
-  } else {
-
-    newInvoice['webhook_url'] = `${config.get('API_BASE')}/v1/api/test/webhooks`
-
-  }
-
   var record = await models.Invoice.create(newInvoice);
-
-  const account = await findAccount(record.account_id)
-
-  var webhook_url = params.webhook_url
-
-  if (!webhook_url) {
-
-    webhook_url = account.get('webhook_url')
-
-  }
-
-  if (webhook_url) {
-
-    await createWebhook({
-
-      invoice_uid: uid,
-
-      url: webhook_url,
-
-      account_id: record.account_id
-
-    })
-  }
 
   let invoice = new Invoice(record)
 
+  createWebhook(invoice)
+
   const options = await createPaymentOptions(account.record, invoice)
 
-  await log.info('invoice.created', {
+  log.info('invoice.created', {
     invoice_uid: invoice.uid,
     account_id: invoice.account_id
   })

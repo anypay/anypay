@@ -251,9 +251,18 @@ interface CreateWebhook {
   account_id: number;
 }
 
-export async function createWebhook(where: CreateWebhook): Promise<Webhook> {
+export async function createWebhook(invoice: Invoice): Promise<Webhook> {
 
-  let [webhook] = await models.Webhook.findOrCreate({where, defaults: where})
+  const where = {
+    invoice_uid: invoice.uid,
+    url: invoice.get('webhook_url'),
+    account_id: invoice.get('account_id')
+  }
+
+  let [webhook] = await models.Webhook.findOrCreate({
+    where,
+    defaults: where
+  })
 
   if (!webhook) { throw new WebhookNotFound() }
 
