@@ -1,6 +1,6 @@
 {
   "name": "anypay-platform",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "description": "Bitcoin Payments For Enterprises",
   "private": true,
   "main": "main.ts",

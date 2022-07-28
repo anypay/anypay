@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/anypay/anypay/compare/v1.2.3...v1.2.4) (2022-07-28)
+
+
+### Bug Fixes
+
+* **failed-webhooks-bug:** fix bug when failed webhooks don't log to database ([#1033](https://github.com/anypay/anypay/issues/1033)) ([ee927f3](https://github.com/anypay/anypay/commit/ee927f3c9c30dce78f29d60f4c97263189cfd122))
+
 ## [1.2.3](https://github.com/anypay/anypay/compare/v1.2.2...v1.2.3) (2022-07-26)
 
 
