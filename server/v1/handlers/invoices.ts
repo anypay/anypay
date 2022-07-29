@@ -81,60 +81,33 @@ export async function create (request, h) {
 
   // TODO: Refactor to call only a SINGLE core library method
 
-  log.info('request.invoices.create', Object.assign({
-
+  log.info('api.v1.invoices.create', Object.assign({
     account_id: request.account.id
-
   }, request.payload))
 
   let invoice = await createInvoice({
-
     account: request.account,
-
-    amount: request.payload.amount
-
+    amount: request.payload.amount,
+    currency: request.payload.currency,
+    external_id: request.payload.external_id,
+    business_id: request.payload.business_id,
+    location_id: request.payload.location_id,
+    register_id: request.payload.register_id,
+    webhook_url: request.payload.webhook_url,
+    redirect_url: request.payload.redirect_url,
+    memo: request.payload.memo,
+    fee_rate_level: request.payload.fee_rate_level,
+    wordpress_site_url: request.payload.wordpress_site_url,
+    email: request.payload.email
   })
 
   const additional: InvoiceAdditions = {}
-
-  additional.redirect_url = request.payload.redirect_url
-
-  if (request.payload.wordpress_site_url) {
-
-    additional.wordpress_site_url = request.payload.wordpress_site_url
-
-    additional.tags = ['wordpress']
-
-  }
-
-  if (request.payload.webhook_url) {
-
-    additional.webhook_url = request.payload.webhook_url
-
-  }
-
-  additional.external_id = request.payload.external_id;
 
   additional.is_public_request = request.is_public_request
 
   additional.headers = request.headers
 
-  additional.email = request.payload.email;
-
-  additional.business_id = request.payload.business_id;
-
-  additional.location_id = request.payload.location_id;
-
-  additional.register_id = request.payload.register_id;
-
   await invoice.update(additional)
-
-  if (invoice.get('email')) {
-    let note = await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.get('email')}`,
-      invoice_uid: invoice.uid,
-    });
-  }
 
   let payment_options = await getPaymentOptions(invoice)
 

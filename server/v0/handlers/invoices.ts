@@ -159,11 +159,7 @@ export async function create(request, h) {
 
     let invoice: Invoice = await createInvoice({
       account,
-      amount: request.payload.amount,
-      currency: request.payload.currency,
-      redirect_url: request.payload.redirect_url,
-      webhook_url: request.payload.webhook_url,
-      fee_rate_level: request.payload.fee_rate_level
+      ...request.payload
     })
 
     if (request.is_public_request) {

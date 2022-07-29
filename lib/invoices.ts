@@ -216,6 +216,20 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
     webhook_url,
 
+    external_id: params.external_id,
+
+    business_id: params.business_id,
+
+    location_id: params.location_id,
+
+    register_id: params.register_id,
+
+    memo: params.memo,
+
+    wordpress_site_url: params.wordpress_site_url,
+
+    fee_rate_level: params.fee_rate_level,
+
     status: 'unpaid',
 
     uid,
@@ -238,10 +252,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const options = await createPaymentOptions(account.record, invoice)
 
-  log.info('invoice.created', {
-    invoice_uid: invoice.uid,
-    account_id: invoice.account_id
-  })
+  log.info('invoice.created', record.toJSON())
 
   return invoice;
 

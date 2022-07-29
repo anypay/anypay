@@ -73,6 +73,8 @@ export async function register(server: Server) {
           redirect_url: Joi.string().optional(),
           webhook_url: Joi.string().optional(),
           wordpress_site_url: Joi.string().optional(),
+          memo: Joi.string().optional(),
+          email: Joi.string().optional(),
           external_id: Joi.string().optional(),
           business_id: Joi.string().optional(),
           location_id: Joi.string().optional(),
@@ -85,7 +87,7 @@ export async function register(server: Server) {
             'minimumFee'
           ).optional()
         }).label('InvoiceRequest'),
-        //failAction
+        failAction
       },
       plugins: responsesWithSuccess({ model: models.Invoice.Response }),
     }

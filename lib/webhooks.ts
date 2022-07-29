@@ -255,7 +255,7 @@ export async function createWebhook(invoice: Invoice): Promise<Webhook> {
 
   const where = {
     invoice_uid: invoice.uid,
-    url: invoice.get('webhook_url'),
+    url: invoice.get('webhook_url') || DEFAULT_WEBHOOK_URL,
     account_id: invoice.get('account_id')
   }
 
