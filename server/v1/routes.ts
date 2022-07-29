@@ -191,14 +191,30 @@ export async function attachV1Routes(server) {
     options: {
       auth: "jwt",
       validate: {
-        payload: Joi.object({
-          amount: Joi.number().min(0).required(),
-          denomination: Joi.string().optional(),
-          currency: Joi.string().optional()
-        }),
+        payload:  Joi.object({
+          amount: Joi.number().required(),
+          currency: Joi.string().optional(),
+          redirect_url: Joi.string().optional(),
+          webhook_url: Joi.string().optional(),
+          wordpress_site_url: Joi.string().optional(),
+          memo: Joi.string().optional(),
+          email: Joi.string().optional(),
+          external_id: Joi.string().optional(),
+          business_id: Joi.string().optional(),
+          location_id: Joi.string().optional(),
+          register_id: Joi.string().optional(),
+          metadata: Joi.object().optional(),
+          required_fee_rate: Joi.string().allow(
+            'fastestFee',
+            'halfHourFee',
+            'hourFee',
+            'economyFee',
+            'minimumFee'
+          ).optional()
+        }).label('InvoiceRequest'),
         failAction
-      },
-    },
+      }
+    }
   });
 
   server.route({

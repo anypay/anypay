@@ -4,8 +4,6 @@ import * as http from 'superagent';
 
 import * as blockchair from '../../lib/blockchair'
 
-import {generateInvoice} from '../../lib/invoice';
-
 import {log, models} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');

@@ -48,9 +48,9 @@ export async function generateAccount() {
   return account
 }
 
-import { generateInvoice } from '../../../lib/invoice';
+import { createInvoice } from '../../../lib/invoices';
 
-export { generateInvoice }
+export { createInvoice }
 
 export async function initServer() {
 

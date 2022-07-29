@@ -18,7 +18,8 @@ config.defaults({
   'DATABASE_URL': 'postgres://postgres@localhost:5432/anypay',
   'EMAIL_SENDER': 'support@anypayx.com',
   'KRAKEN_PLUGIN': false,
-  'mempool_space_fees_enabled': true
+  'mempool_space_fees_enabled': true,
+  'rocketchat_webhook_url': false
 })
 
 export { config } 

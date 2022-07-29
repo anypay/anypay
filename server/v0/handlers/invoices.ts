@@ -11,9 +11,7 @@ import { log, prices, email, models, invoices, coins } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
-import { Invoice } from '../../../lib/invoices';
-
-import { generateInvoice } from '../../../lib/invoice'
+import { Invoice, createInvoice } from '../../../lib/invoices';
 
 import * as moment from 'moment';
 
@@ -153,72 +151,7 @@ export async function index (request, reply) {
 
 };
 
-interface CreateInvoice {
-  account: Account,
-  amount: number;
-  currency: string;
-  fee_rate_level?: string;
-  redirect_url?: string;
-  webhook_url?: string;
-  wordpress_site_url?: string;
-  external_id?: string;
-  memo?: string;
-  email?: string;
-  business_id?: string;
-  location_id?: string;
-  register_id?: string;
-}
-
-async function createInvoice(params: CreateInvoice): Promise<Invoice> {
-
-    let invoice = await generateInvoice({
-      account: params.account,
-      amount: params.amount,
-      currency: params.currency
-    });
-
-    invoice.redirect_url = params.redirect_url;
-
-    invoice.fee_rate_level = params.fee_rate_level;
-
-    invoice.wordpress_site_url = params.wordpress_site_url;
-
-    if (params.wordpress_site_url) {
-
-      invoice.tags = ['wordpress']
-
-    }
-
-    invoice.webhook_url = params.webhook_url;
-
-    invoice.external_id = params.external_id;
-
-    invoice.memo = params.memo
-
-    invoice.email = params.email;
-
-    invoice.business_id = params.business_id;
-
-    invoice.location_id = params.location_id;
-    
-    invoice.register_id = params.register_id;
-
-    await invoice.save();
-
-    if (invoice.email) {
-      let note = await models.InvoiceNote.create({
-        content: `Customer Email: ${invoice.email}`,
-        invoice_uid: invoice.uid,
-      });
-    }
-
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-    return new Invoice(invoice)
-
-}
-
-export async function create (request, h) {
+export async function create(request, h) {
 
   const account = new Account(request.account)
 
@@ -226,10 +159,7 @@ export async function create (request, h) {
 
     let invoice: Invoice = await createInvoice({
       account,
-      amount: request.payload.amount,
-      currency: request.payload.currency || account.get('denomination'),
-      redirect_url: request.payload.redirect_url,
-      fee_rate_level: request.payload.fee_rate_level
+      ...request.payload
     })
 
     if (request.is_public_request) {
@@ -240,19 +170,24 @@ export async function create (request, h) {
 
     invoice.set('headers', request.headers)
 
-    let sanitized = sanitizeInvoice(invoice);
+    const json = invoice.toJSON();
 
-    sanitized.webhook_url = invoice.webhook_url;
+    const payment_options = await getPaymentOptions(invoice.uid)
 
-    return h.response(
-
-      Object.assign({
-        success: true,
-        invoice: sanitized,
-        payment_options: invoice.get('payment_options')
-      }, sanitized)
-
-    ).code(200)
+    return h.response({
+      success: true,
+      invoice: {
+        amount: json['amount'],
+        currency: json['denomination'],
+        status: json['status'],
+        uid: json['uid'],
+        uri: json['uri'],
+        createdAt: json['createdAt'],
+        expiresAt: json['expiry'],
+        payment_options
+      }
+    })
+    .code(200)
 
   } catch(error) {
 
@@ -333,13 +268,19 @@ async function getPaymentOptions(invoice_uid) {
     invoice_uid
   }});
 
-  return payment_options.map(option => _.pick(option,
-    'uri',
-    'currency',
-    'currency_name',
-    'currency_logo_url',
-    'amount'
-  ))
+  return payment_options.map(option => {
+
+    option = _.pick(option,
+      'uri',
+      'currency',
+      'amount'
+    )
+
+    option['chain'] = option['currency']
+
+    return option
+
+  })
 
 }
 
