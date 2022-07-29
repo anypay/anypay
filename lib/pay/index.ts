@@ -322,7 +322,7 @@ export async function completePayment(paymentOption, hex: string) {
 
   let paymentRecord = await models.Payment.create(payment)
 
-  var result = await models.Invoice.update(
+  await models.Invoice.update(
     {
       amount_paid: invoice.amount,
       invoice_amount: paymentOption.amount,
@@ -377,7 +377,7 @@ export async function completeLNPayment(paymentOption, r_hash: string) {
     uid: paymentOption.invoice_uid
   }})
 
-  var result = await models.Invoice.update(
+  await models.Invoice.update(
     {
       amount_paid: invoice.amount,
       invoice_amount: paymentOption.amount,

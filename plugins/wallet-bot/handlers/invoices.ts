@@ -29,7 +29,7 @@ function formatInvoice(invoice: any): Invoice {
 
 }
 
-export async function index(req, h) {
+export async function index(req) {
 
   console.log(req)
 

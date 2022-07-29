@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
-import { models, accounts } from '../../lib';
+import { models } from '../../lib';
 
 import { sendMessage } from '../../lib/push_notifications';
 

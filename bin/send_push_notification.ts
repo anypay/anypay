@@ -1,13 +1,10 @@
 #!/usr/bin/env ts-node
-require('dotenv').config();
 
-import { models } from '../lib';
+require('dotenv').config();
 
 import * as program from 'commander';
 
 import { sendMessage } from '../lib/push_notifications';
-
-var FCM = require('fcm-node');
 
 program
   .command('sendmessage <email> <title> <body>') 

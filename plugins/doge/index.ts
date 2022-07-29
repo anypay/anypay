@@ -1,4 +1,3 @@
-const http = require("superagent");
 
 import * as blockchair from '../../lib/blockchair';
 

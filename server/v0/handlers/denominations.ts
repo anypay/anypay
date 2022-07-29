@@ -3,7 +3,7 @@ import * as Joi from '@hapi/joi'
 
 import { settings } from '../../../lib';
 
-export async function update(request, h) {
+export async function update(request) {
 
   let currency = request.payload.denomination;
 
@@ -18,7 +18,7 @@ export async function update(request, h) {
 
 };
 
-export async function show(request, h) {
+export async function show(request) {
 
   let accountId = request.auth.credentials.accessToken.account_id;
 

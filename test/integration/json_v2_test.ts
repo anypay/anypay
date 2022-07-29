@@ -1,6 +1,6 @@
 import * as utils from '../utils'
 
-import { wallet, expect, server, chance, request, spy } from '../utils'
+import { wallet, expect, server } from '../utils'
 
 import { schema } from '../../lib/pay/json_v2'
 
@@ -12,7 +12,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("GET /i/:uid requires accept and x-paypro-2 headers", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let response = await server.inject({
       method: 'GET',
@@ -25,7 +25,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("GET /i/:uid returns payment options for invoice", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let response = await server.inject({
       method: 'GET',
@@ -46,7 +46,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("GET /r/:uid returns payment options for invoice", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let response = await server.inject({
       method: 'GET',
@@ -67,7 +67,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("POST /i/:uid requires Content-Type and x-paypro-version", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let { result } = await server.inject({
       method: 'GET',
@@ -111,7 +111,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("POST /i/:uid returns a payment request for chosen option", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let { result } = await server.inject({
       method: 'GET',
@@ -142,7 +142,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("POST /r/:uid returns a payment request for chosen option", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let { result } = await server.inject({
       method: 'GET',
@@ -173,7 +173,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   it.skip("POST /i/:uid signs the payload with headers", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {invoice} = await utils.newAccountWithInvoice()
 
     let response = await server.inject({
       method: 'POST',
@@ -191,7 +191,7 @@ describe("JSON Payment Protocol V2", async () => {
 
     it("POST /i/:uid should verify the payment is valid", async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {invoice} = await utils.newAccountWithInvoice()
 
       let response = await server.inject({
         method: 'POST',
@@ -202,13 +202,13 @@ describe("JSON Payment Protocol V2", async () => {
         }
       })
 
-      let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+      schema.Protocol.PaymentVerification.response.validate(response.result)
 
     })
 
     it("POST /r/:uid should verify the payment is valid", async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {invoice} = await utils.newAccountWithInvoice()
 
       let response = await server.inject({
         method: 'POST',
@@ -219,13 +219,13 @@ describe("JSON Payment Protocol V2", async () => {
         }
       })
 
-      let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+      schema.Protocol.PaymentVerification.response.validate(response.result)
 
     })
 
     it("POST /i/:uid should mark the invoice as paid", async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let {invoice} = await utils.newAccountWithInvoice({ amount: 0.02 })
 
       let client = new TestClient(server, `/i/${invoice.uid}`)
 
@@ -255,7 +255,7 @@ describe("JSON Payment Protocol V2", async () => {
 
       expect(response.statusCode).to.be.equal(200)
 
-      let valid = schema.Protocol.Payment.response.validate(response.result)
+      schema.Protocol.Payment.response.validate(response.result)
 
       invoice = await ensureInvoice(invoice.uid)
 

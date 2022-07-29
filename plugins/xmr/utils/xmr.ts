@@ -1,7 +1,5 @@
 
-import axios from 'axios'
-
-const { tx_blob } = require('./test/data/xmr.json');
+import axios from 'axios';
 
 (async () => {
 
@@ -44,4 +42,4 @@ const { tx_blob } = require('./test/data/xmr.json');
 
   console.log(response)*/
 
-})()
+})();

@@ -33,8 +33,6 @@ class Merchant {
 
 export async function listActiveSince(units: any, span: string): Promise<Merchant[]> {
 
-  let today = moment();
-
   let date = moment().subtract(units, span).format('MM-DD-YYYY');
 
   let query = `select accounts.id from accounts inner join invoices on accounts.id = invoices.account_id where invoices."createdAt" > '${date}' and status='paid' and accounts.physical_address is not null and accounts.business_name is not null group by accounts.id`;

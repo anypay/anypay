@@ -1,20 +1,11 @@
 
 require('dotenv').config()
 
-import { email } from 'rabbi'
-
-import { assert, expect, chai, spy } from './utils'
+import { expect } from './utils'
 
 import * as moment from 'moment'
 
 import * as utils from './utils'
-
-import * as http from 'superagent'
-
-import { Account } from '../lib/account'
-import { Invoice } from '../lib/invoices'
-
-import { models } from '../lib/models'
 
 import { listActiveSince } from '../lib/merchants'
 
@@ -48,7 +39,7 @@ describe('Getting Prices', () => {
 
     let startCount = (await listActiveSince(3, 'months')).length
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {account, invoice} = await utils.newAccountWithInvoice()
 
     await account.set('physical_address', '110 State St, Portsmouth, NH')
 
@@ -66,11 +57,7 @@ describe('Getting Prices', () => {
 
     let startCount = (await listActiveSince(3, 'months')).length
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
-
-    await invoice.set('status', 'paid')
-    
-    let sameCount = (await listActiveSince(3, 'months')).length
+    let {account} = await utils.newAccountWithInvoice()
 
     await account.set('physical_address', '110 State St, Portsmouth, NH')
 
@@ -86,13 +73,13 @@ describe('Getting Prices', () => {
 
     let twoWeeksAgo = moment().subtract(2, 'weeks')
 
-    let [account1, invoice1] = await utils.newAccountWithInvoice()
+    let {account: account1, invoice: invoice1} = await utils.newAccountWithInvoice()
 
     await account1.set('physical_address', '110 State St, Portsmouth, NH')
 
     await account1.set('business_name', 'Free State Bitcoin Shoppe')
 
-    let [account2, invoice2] = await utils.newAccountWithInvoice()
+    let {account: account2, invoice: invoice2} = await utils.newAccountWithInvoice()
 
     await account2.set('physical_address', '59 Fleet Street, Portsmouth, NH')
 

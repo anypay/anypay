@@ -1,7 +1,7 @@
 
 import {createConversion } from '../../../lib/prices';
 
-export async function show(req, h) {
+export async function show(req) {
 
   let inputAmount = {
 

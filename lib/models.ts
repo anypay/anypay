@@ -4,10 +4,6 @@ import * as sequelize from './database';
 
 import { join } from 'path';
 
-import { awaitChannel } from './amqp';
-
-import { log } from './log';
-
 import { bindAllModelsHooks } from './rabbi-sequelize';
 
 function capitalizeFirstLetter(string) {
@@ -16,7 +12,7 @@ function capitalizeFirstLetter(string) {
 
 var models: any = require('require-all')({
   dirname: join(__dirname, 'models'),
-  map: function(name, path) {
+  map: function(name) {
     return name.split('_').map(p => {
 
       return capitalizeFirstLetter(p);    

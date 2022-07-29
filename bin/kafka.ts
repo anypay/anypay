@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import { kafka, producer, consumer, admin } from '../lib/kafka'
+import { producer, consumer, admin } from '../lib/kafka'
 
 import * as program from 'commander';
 
@@ -61,7 +61,7 @@ program
     await consumer.subscribe({ topic: 'test-topic' })
 
     await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
+      eachMessage: async ({ partition, message }) => {
         console.log({
           partition,
           offset: message.offset,

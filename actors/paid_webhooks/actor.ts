@@ -4,7 +4,7 @@ import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
 
-import { Webhook, getPaidWebhookForInvoice, sendWebhookForInvoice } from '../../lib/webhooks';
+import { getPaidWebhookForInvoice, sendWebhookForInvoice } from '../../lib/webhooks';
 
 import { ensureInvoice, Invoice } from '../../lib/invoices'
 

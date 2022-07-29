@@ -1,11 +1,7 @@
 
 import * as utils from '../utils'
 
-import { expect, server, spy } from '../utils'
-
-import { Invoice } from '../../lib/invoices'
-
-import { listInvoiceEvents } from '../../lib/events'
+import { expect } from '../utils'
 
 describe('Integration | Invoices', () => {
 
@@ -77,7 +73,7 @@ describe('Integration | Invoices', () => {
 
     it('gets the invoice events list from the API', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {account, invoice} = await utils.newAccountWithInvoice()
 
       let response = await utils.authRequest(account, {
         method: 'GET',

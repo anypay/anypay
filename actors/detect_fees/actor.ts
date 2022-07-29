@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
 import { ensureInvoice } from '../../lib/invoices'
 
@@ -21,7 +21,7 @@ export async function start() {
     queue: 'cache_fees_after_payment'
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (channel, msg) => {
 
     let uid = msg.content.toString();
 

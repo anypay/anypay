@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, getChannel, log, email } from 'rabbi';
+import { Actor, email } from 'rabbi';
 
 import { config } from '../../lib/config'
 
@@ -41,7 +41,7 @@ export async function start() {
     queue: 'create_delay_one_day_after_signup'
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (channel, msg) => {
 
     await channel.publish('delayed', 'one_day_after_signup', msg, {
       headers: {

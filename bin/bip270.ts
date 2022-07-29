@@ -5,10 +5,13 @@ import * as program from 'commander';
 import * as http from 'superagent';
 import * as bitcoin from 'bsv';
 import * as datapay from 'datapay';
-import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
+
+import * as PaymentProtocol from 'bip70-payment-protocol'
 
 import { rawTxToPayment } from '../plugins/bch/lib/rawtx_to_payment';
+
 import { awaitChannel } from '../lib/amqp';
+
 const axios = require('axios');
 
 program

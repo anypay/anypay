@@ -5,7 +5,7 @@ import { expect } from './utils'
 
 import { bittrex } from '../lib/prices'
 
-import { convert, setPrice, setAllFiatPrices, Price, PriceNotFoundError } from '../lib/prices'
+import { convert, setPrice, setAllFiatPrices, PriceNotFoundError } from '../lib/prices'
 
 import { models } from '../lib/models'
 
@@ -51,7 +51,7 @@ describe('Getting Prices', () => {
 
     let price = await bittrex.getPrice('BSV')
 
-    let record = await setPrice(price)
+    await setPrice(price)
 
   })
 

@@ -1,9 +1,11 @@
-import { Server } from '../../../servers/rest_api/server';
+
+import { Server } from '../../../server/v0/server';
+
 import * as assert from 'assert';
 
 import * as bsv from 'bsv';
 
-import { database, models } from '../../../lib';
+import { models } from '../../../lib';
 
 import * as Chance from 'chance';
 const chance = new Chance();

@@ -2,8 +2,6 @@ require('dotenv').config()
 
 import * as http from "superagent";
 
-import { log } from '../../../lib';
-
 export async function call(method, params) {
 
   let body = { jsonrpc: "2.0", method: method, params: params, id: 1 };

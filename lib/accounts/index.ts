@@ -8,12 +8,6 @@ import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
-interface Map<T> {
-    [key: string]: T;
-}
-
-type AccountAddresses = Map<AccountAddress>;
-
 interface AccountAddress {
   account_id: number;
   currency: string;
@@ -201,7 +195,7 @@ export async function setAddressScalar(account_id: number, currency: string, pri
 
   log.info('address.scalar.set', { account_id, currency, price_scalar })
 
-  let result = await models.Address.update({
+  await models.Address.update({
     price_scalar 
   }, {
     where: {
@@ -228,8 +222,6 @@ export async function setAddressNote(account_id: number, currency: string, note:
 export async function getAccountAddress(accountId: number, currency: string): Promise<AccountAddress> {
 
   let coins = await getSupportedCoins(accountId);
-
-  let coin = coins[currency];
 
   return coins[currency];
 

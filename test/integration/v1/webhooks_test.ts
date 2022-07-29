@@ -11,7 +11,9 @@ describe("Webhooks Default Endpoint", async () => {
 
     spy.on(log, ['info'])
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {account, invoice} = await utils.newAccountWithInvoice()
+
+    log.debug("account.created", account)
 
     var response = await server.inject({
       method: 'POST',

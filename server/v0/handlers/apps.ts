@@ -1,7 +1,7 @@
 
 import { models, apps } from '../../../lib'
 
-export async function index(req, h) {
+export async function index(req) {
 
   let apps = await models.App.findAll({ where: {
   
@@ -13,7 +13,7 @@ export async function index(req, h) {
 
 }
 
-export async function show(req, h) {
+export async function show(req) {
 
   let app = await models.App.findOne({ where: {
   
@@ -32,7 +32,7 @@ export async function show(req, h) {
 
 }
 
-export async function create(req, h) {
+export async function create(req) {
 
   let app = await apps.createApp({
     account_id: req.account.id,

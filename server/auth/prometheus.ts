@@ -1,11 +1,11 @@
 
-import { validateAppToken } from './token'
-
 import { models } from '../../lib/models'
 
 import { log } from '../../lib/log'
 
-export async function auth(request, username, password, hapi) {
+export async function auth(request, username, password) {
+
+  log.debug('auth.prometheus', { hostname: request.hostname })
 
   if (username.toLowerCase() !== 'prometheus') {
     return {

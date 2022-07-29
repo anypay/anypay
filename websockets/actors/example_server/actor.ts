@@ -16,13 +16,6 @@ import { account_subscriptions } from '../../lib/websocket_servers';
 
 import { Actor } from 'rabbi';
 
-interface ServerConnectedEvent {
-  server_id: string;
-  server_ip?: string;
-  server_port?: string;
-
-}
-
 var server_id, queue;
 
 const websockets = {};

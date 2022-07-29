@@ -22,7 +22,7 @@ program
     }, {
       name: 'password',
       hidden: true,
-      conform: function (value) {
+      conform: function () {
         return true;
       }
     }])
@@ -35,7 +35,7 @@ program
 
     let socket = new Socket({ token: jwt })
 
-    socket.on('authenticated', data => {
+    socket.on('authenticated', () => {
 
       console.log('socket.authenticated')
 

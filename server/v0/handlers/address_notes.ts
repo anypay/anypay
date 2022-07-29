@@ -1,7 +1,7 @@
 
 import { models } from '../../../lib';
 
-export async function update(req, h) {
+export async function update(req) {
 
   let address = await models.Address.findOne({
 

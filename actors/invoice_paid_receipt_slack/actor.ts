@@ -4,9 +4,9 @@ require('dotenv').config();
 
 import { notify } from '../../lib/slack/notifier';
 
-import { Actor, Joi } from 'rabbi';
+import { Actor } from 'rabbi';
 
-import {email, models} from '../../lib';
+import { models } from '../../lib';
 
 export async function start() {
 

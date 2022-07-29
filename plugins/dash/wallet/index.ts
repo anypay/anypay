@@ -1,6 +1,6 @@
 import * as http from 'superagent';
 
-import {log, models, prices} from '../../../lib';
+import {log} from '../../../lib';
 
 require('dotenv').config();
 

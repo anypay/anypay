@@ -23,7 +23,7 @@ function sendMessage(socket: WebSocket, type: string, payload: any) {
 
 const handlers = {
 
-  'authorization': async (socket: WebSocket, {type, payload}: Event) => {
+  'authorization': async (socket: WebSocket, {payload}: Event) => {
 
     const { account } = await authenticate(socket, payload.token)
 

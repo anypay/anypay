@@ -7,7 +7,9 @@ import * as AccountLogin from '../../lib/account_login'
 
 import { bcryptCompare } from '../../lib/password';
 
-export async function validate(request, username, password, h) {
+export async function validate(request, username, password) {
+
+  log.debug('server.auth.password.validate', { hostname: request.hostname })
 
   try {
 
@@ -65,8 +67,7 @@ export async function validate(request, username, password, h) {
 
   }
 
-  var isNew;
-  [accessToken, isNew] = await models.AccessToken.findOrCreate({
+  var [accessToken] = await models.AccessToken.findOrCreate({
     where: {
       account_id: account.id
     },

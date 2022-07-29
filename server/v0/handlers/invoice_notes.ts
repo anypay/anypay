@@ -1,9 +1,7 @@
 
-import { Request, ResponseToolkit } from 'hapi';
 import { models } from '../../../lib';
-import * as Sequelize from 'sequelize';
 
-export async function create(req, h: ResponseToolkit) {
+export async function create(req) {
 
   let invoice = await models.Invoice.findOne({
 

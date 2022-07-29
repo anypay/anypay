@@ -1,8 +1,7 @@
-require('dotenv').config();
-import * as dash from '@dashevo/dashcore-lib';
-import BigNumber from 'bignumber.js';
 
-import {models} from '../../../lib';
+require('dotenv').config();
+
+import * as dash from '@dashevo/dashcore-lib';
 
 import { toSatoshis } from '../../../lib/pay';
 

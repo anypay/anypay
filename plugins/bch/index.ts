@@ -1,10 +1,8 @@
 require('dotenv').config();
 
-import * as http from 'superagent';
-
 import * as blockchair from '../../lib/blockchair'
 
-import {log, models} from '../../lib';
+import {log} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 

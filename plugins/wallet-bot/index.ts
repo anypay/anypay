@@ -5,7 +5,7 @@ import { requireHandlersDirectory } from '../../lib/rabbi_hapi';
 
 import { join } from 'path'
 
-import Joi from '@hapi/joi'
+import { log } from '../../lib/log'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
@@ -49,5 +49,6 @@ export async function register(server: Server) {
 }
 
 export function failAction(request, h, error) {
+  log.debug('plugins.wallet-bot.hapi.failAction', { request, h })
   return error
 }

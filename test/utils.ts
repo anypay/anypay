@@ -9,9 +9,7 @@ import * as assert from 'assert';
 
 import { registerAccount } from '../lib/accounts';
 
-import { setAddress } from '../lib/core';
-
-import { AccessTokenV1, ensureAccessToken } from '../lib/access_tokens'
+import { ensureAccessToken } from '../lib/access_tokens'
 
 import { Account } from '../lib/account'
 
@@ -46,7 +44,7 @@ interface NewAccountInvoice {
 }
 
 
-export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Promise<[Account, Invoice]> {
+export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Promise<{ account: Account, invoice: Invoice }> {
 
   let account = await createAccount()
 
@@ -63,7 +61,7 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
     amount: params.amount || 10
   })
 
-  return [ account, invoice ]
+  return { account, invoice }
 
 }
 

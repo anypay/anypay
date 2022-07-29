@@ -1,9 +1,9 @@
 
 import { models } from '../../../lib'
 
-export async function create(req, h) { 
+export async function create(req) { 
 
-  let [krakenAccount, isNew] = await models.KrakenAccount.findOrCreate({
+  let [krakenAccount] = await models.KrakenAccount.findOrCreate({
     where: {
       account_id: req.account.id
     },
@@ -26,7 +26,7 @@ export async function create(req, h) {
 
 }
 
-export async function show(req, h) { 
+export async function show(req) { 
 
   let krakenAccount = await models.KrakenAccount.findOne({
     where: {
@@ -51,7 +51,7 @@ export async function show(req, h) {
 
 }
 
-export async function destroy(req, h) { 
+export async function destroy(req) { 
 
   let krakenAccount = await models.KrakenAccount.findOne({
     where: {

@@ -36,19 +36,5 @@ program
   });
 
 program
-  .command('createsquareorder <invoice_uid>')
-  .action((invoiceUid) => {
-
-    /*
-     * 1) Get Invoice from Database
-     * 2) Look up grab and go item from order information
-     * 3) Look up square item info from grab and go item record
-     * 4) Create square order using API, marked as COMPLETED
-     *
-     */
-
-  });
-
-program
   .parse(process.argv);
 

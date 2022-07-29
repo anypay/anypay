@@ -3,15 +3,11 @@ import { log, models, invoices } from '../../../lib';
 
 import { Invoice } from '../../../lib/invoices'
 
-import * as Boom from 'boom';
-
 import { show as handleBIP70 } from './bip70_payment_requests'
 
 import { show as handleJsonV2 } from './json_payment_requests'
 
 import { show as handleBIP270 } from './bip270_payment_requests'
-
-import { detectWallet, Wallets} from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
@@ -20,18 +16,6 @@ import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 import { createWebhook } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
-
-import { recordEvent } from '../../../lib/events'
-
-function upcase(str) {
-
-  if (!str) {
-    return null
-  }
-
-  return str.toUpperCase()
-
-}
 
 export async function create(req, h) {
 
@@ -119,8 +103,6 @@ export async function create(req, h) {
 export async function show(req, h) {
 
   log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
-
-  let wallet = detectWallet(req.headers, req.params.uid)
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 

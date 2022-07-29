@@ -7,7 +7,7 @@ var channelIsConnected = false;
 
 function wait(ms) {
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
 
     setTimeout(resolve, ms);
 

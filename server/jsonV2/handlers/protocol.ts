@@ -1,10 +1,12 @@
 
 import { protocol, schema } from '../../../lib/pay/json_v2'
+
 import { detectWallet } from '../../../lib/pay'
 
 import { badRequest, notFound } from 'boom'
 
 import { getInvoice } from '../../../lib/invoices'
+
 import { log } from '../../../lib/log'
 
 async function ensureInvoice(req) {
@@ -29,7 +31,7 @@ export async function listPaymentOptions(req, h) {
 
     await ensureInvoice(req)
 
-    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
+    await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
       allowUnknown: true
     })
 

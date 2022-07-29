@@ -2,8 +2,6 @@
 
 require('dotenv').config();
 
-import { log } from 'rabbi';
-
 import * as cron from 'node-cron'
 
 import { listAll } from '../../lib/kraken_account'

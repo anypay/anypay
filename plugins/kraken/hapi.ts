@@ -1,13 +1,11 @@
 
-import { log } from '../../lib/log'
-
 import { Server } from 'hapi'
 
 import { start } from './main'
 
 import * as Joi from '@hapi/joi'
 
-export const plugin = ((server, options) => {
+export const plugin = (() => {
 
   const handlers = {
 
@@ -15,7 +13,7 @@ export const plugin = ((server, options) => {
 
       index: (core) => {
 
-        return async function(req, h) {
+        return async function(req) {
 
           let account = await core.models.KrakenAccount.findOne({
             where: { account_id: req.account.id}
@@ -56,7 +54,7 @@ export const plugin = ((server, options) => {
 
     name: 'kraken',
 
-    register: function(server: Server, options, next) {
+    register: function(server: Server, options) {
 
       options.core.log.info('server.plugins.register.kraken')
 

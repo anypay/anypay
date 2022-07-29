@@ -7,9 +7,15 @@ export async function bcryptCompare(password, hash) {
 
     bcrypt.compare(password, hash, (error, res) => {
 
+      if (error) {
+
+        reject(new Error("invalid email or password"));
+        return 
+      }
+
       if (res) {
 
-        resolve();
+        resolve(null);
 
       } else {
 

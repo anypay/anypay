@@ -1,10 +1,10 @@
 
+import { config } from './config'
+
 interface InvoiceURIParams {
   currency: string;
   uid: string;
 }
-
-import { getBaseURL } from './pay/environment';
 
 const protocols = {
   'DASH': 'dash',
@@ -26,7 +26,7 @@ export function computeInvoiceURI(params: InvoiceURIParams) {
 
   const protocol = protocols[params.currency] || 'pay';
 
-  const baseUrl = getBaseURL();
+  const baseUrl = config.get('API_BASE');
 
   const uri = `${protocol}:?r=${baseUrl}/r/${params.uid}`;
 

@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 
 import { models } from './models';
 
-const uuid = require('uuid');
 const log = require('winston');
 
 import { config } from './config'
@@ -24,6 +23,10 @@ export function hash(password) {
 export async function bcryptCompare(password, hash) {
   return new Promise((resolve, reject) => {
     bcrypt.compare(password, hash, (error, res) => {
+      if (error) {
+        reject(new Error("invalid password"));
+        return
+      }
       if (res) {
         resolve(null);
       } else {

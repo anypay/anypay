@@ -6,23 +6,11 @@ import { getBitcore } from '../bitcore'
 
 import { log } from '../log'
 
-import { getBaseURL } from './environment';
+import { config } from '../config'
 
 import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
 
 import { codeFromName } from './currencies'
-
-import { getFee, Fee } from './fees'
-
-/*
-
-  BIP70 Protocol In The Context Of the Anypay Pay Protocol
-
-*/
-
-interface Bip70PaymentRequest {
-
-}
 
 export function getCurrency(params: GetCurrency): Currency {
 
@@ -106,8 +94,6 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
 }
 
-const BASE_URL = getBaseURL();
-
 import { PaymentRequest, PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
@@ -133,7 +119,7 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
 
   }
 
-  pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
+  pd.set('payment_url', `${config.get('API_BASE')}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
   if (process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]) {
     pd.set('required_fee_rate', parseInt(process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]));

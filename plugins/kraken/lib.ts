@@ -157,7 +157,7 @@ export async function withdrawInfo(kraken, options={}) {
 
 }
 
-export async function withdrawAllUSD(kraken, options: any={}) {
+export async function withdrawAllUSD(kraken) {
 
   let balances = await getAccountBalance(kraken)
 
@@ -315,13 +315,13 @@ export async function sellAllOfPair(kraken, pair, balance) {
 
 }
 
-export async function syncAllNewTrades(kraken) {
+export async function syncAllNewTrades() {
 
   var newTrades = [true];
 
   while (newTrades.length > 0) {
 
-    newTrades = await syncNewTrades(kraken);
+    newTrades = await syncNewTrades();
 
     log.info('kraken.trades', {message: `${newTrades.length} new trades recorded`});
 
@@ -330,7 +330,7 @@ export async function syncAllNewTrades(kraken) {
 }
   
 
-export async function syncNewTrades(kraken) {
+export async function syncNewTrades() {
 
   let tradeCount = await database.query(`select count(*) from "KrakenTrades";`);
 

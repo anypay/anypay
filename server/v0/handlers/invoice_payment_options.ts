@@ -1,7 +1,7 @@
 
 import { models } from '../../../lib';
 
-export async function show(req, h) {
+export async function show(req) {
   
   let payment_options = await models.PaymentOption.findAll({
     where: {

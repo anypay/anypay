@@ -1,6 +1,6 @@
 import { models } from '../../../lib';
 
-export async function index(req, h) {
+export async function index(req) {
 
   let grab_and_go_items = await models.Product.findAll({
 

@@ -12,12 +12,11 @@ import { config } from '../../config'
 
 import * as mempool from '../../mempool.space'
 
-import { PaymentOutput, PaymentOption, GetCurrency, Currency } from '../types';
+import { PaymentOption, GetCurrency, Currency } from '../types';
 import { nameFromCode } from '../currencies';
 import { BigNumber } from 'bignumber.js';
 
 import { getFee, Fee } from '../fees';
-import { getBaseURL } from '../environment';
 
 interface JsonV2Output {
   address?: string;
@@ -52,9 +51,7 @@ export interface JsonV2PaymentRequest {
   paymentId: string;
 }
 
-const BASE_URL = getBaseURL();
-
-import { PaymentRequest, PaymentRequestOptions } from '../'
+import { PaymentRequestOptions } from '../'
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<JsonV2PaymentRequest> {
   var outputs;
@@ -103,7 +100,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   const { memo } = options
 
-  const paymentUrl = `${BASE_URL}/r/${invoice_uid}/pay/${currency}/jsonv2`
+  const paymentUrl = `${config.get('API_BASE')}/r/${invoice_uid}/pay/${currency}/jsonv2`
 
   const paymentId = invoice_uid
 

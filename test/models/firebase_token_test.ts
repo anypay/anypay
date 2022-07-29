@@ -1,6 +1,8 @@
 
 import { chance, generateAccount } from '../utils';
-import { log, models, accounts } from '../../lib';
+
+import { models } from '../../lib';
+
 import * as assert from 'assert';
 
 describe("Firebase Token Model", () => {

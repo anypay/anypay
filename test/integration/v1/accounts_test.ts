@@ -1,11 +1,7 @@
 
 import * as utils from '../../utils'
 
-import { expect, server } from '../../utils'
-
-import { Invoice } from '../../../lib/invoices'
-
-import { listInvoiceEvents } from '../../../lib/events'
+import { expect } from '../../utils'
 
 describe('Integration | Accounts', () => {
 
@@ -33,7 +29,7 @@ describe('Integration | Accounts', () => {
 
     it('gets the account events list from the API in order', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {account} = await utils.newAccountWithInvoice()
 
 
       var order = 'asc'

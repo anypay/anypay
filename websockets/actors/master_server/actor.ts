@@ -4,8 +4,6 @@ import { Actor, log } from 'rabbi';
 import { requireHandlersDirectory } from '../../../lib/rabbi_hapi';
 import { join } from 'path';
 
-import { websocket_servers } from '../../lib/websocket_servers';
-
 const handlers = requireHandlersDirectory(join(__dirname, 'handlers'));
 
 export async function start() {

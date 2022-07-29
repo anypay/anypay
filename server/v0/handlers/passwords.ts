@@ -4,7 +4,7 @@ import * as Joi from '@hapi/joi'
 
 import { models } from '../../../lib';
 
-export async function reset (request, h) {
+export async function reset (request) {
 
   await password.sendPasswordResetEmail(request.payload.email);
 
@@ -12,7 +12,7 @@ export async function reset (request, h) {
 
 }
 
-export async function claim(request, h) {
+export async function claim(request) {
 
   let passwordReset = await models.PasswordReset.findOne({ where:
     { uid: request.params.uid }

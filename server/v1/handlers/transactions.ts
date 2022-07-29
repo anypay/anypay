@@ -3,9 +3,7 @@ import { plugins } from '../../../lib/plugins'
 
 import { badRequest } from 'boom'
 
-// broadcast transaction
-
-export async function create(req, h) {
+export async function create(req) {
 
   try {
 

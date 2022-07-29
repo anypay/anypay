@@ -29,9 +29,7 @@ import * as Joi from '@hapi/joi';
  *       }]
  *     }
  */
-export async function list(request, h) {
-
-  let accountId = request.auth.credentials.accessToken.account_id;
+export async function list(request) {
 
   let accountCoins = await accounts.getSupportedCoins(request.account.id);
 

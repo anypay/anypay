@@ -7,8 +7,6 @@ import { models } from '../../../lib/models'
 
 import { log } from '../../../lib/log'
 
-import { convert } from '../../../lib/prices'
-
 import * as krakenLib from '../lib'
 
 import * as KrakenClient from 'kraken-api'

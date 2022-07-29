@@ -1,18 +1,16 @@
 import * as utils from '../../utils'
 
-import { expect, server } from '../../utils'
+import { expect } from '../../utils'
 
 import { recordPayment } from '../../../lib/payments'
 
 import { Schema } from '../../../server/v1/handlers/payments'
 
-import * as Joi from 'joi'
-
 describe("Listing Available Webhooks", async () => {
 
   it("GET /v1/api/account/payments get your account's paid invoices", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let {account, invoice} = await utils.newAccountWithInvoice()
 
     var response = await utils.authRequest(account, {
       method: 'GET',

@@ -3,7 +3,7 @@ import { log } from '../../../lib';
 
 import { submitPayment, SubmitPaymentResponse } from '../../../lib/pay/json_v2/protocol';
 
-export async function create(req, h) {
+export async function create(req) {
 
   log.info('moneybutton.webhook', req.payload);
 

@@ -1,16 +1,13 @@
 
-import { Orm, Record } from './orm'
+import { Orm } from './orm'
 
 import { Account } from './account'
+
+import { log } from './log'
 
 import { models } from './models'
 
 import { generateAccountToken } from './jwt'
-
-interface NewAccessTokenV1 {
-  record: Record;
-  account?: Account
-}
 
 export class AccessTokenV1 extends Orm {
 
@@ -45,6 +42,8 @@ export enum Versions {
 }
 
 export async function ensureAccessToken(account: Account, version: Versions = Versions.AccessTokenV1): Promise<AccessTokenV1> {
+
+  log.debug('ensureAccessToken', { account_id: account.id, version })
 
   let [record] = await models.AccessToken.findOrCreate({
 

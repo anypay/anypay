@@ -6,7 +6,7 @@ import { models } from './models'
 
 import { createPaymentRequest } from './payment_requests'
 
-import { getRawTransaction, getDecodedTransaction, CURRENCIES } from './blockchair'
+import { getDecodedTransaction, CURRENCIES } from './blockchair'
 
 interface RefundAddress {
   currency: string;

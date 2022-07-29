@@ -11,7 +11,12 @@ const jsonV2 = requireHandlersDirectory(join(__dirname, './jsonV2/handlers'))
 
 export { v0, v1, jsonV2 }
 
+import { log } from '../lib/log'
+
 export function failAction(request, h, error) {
+
+  log.debug('hapi.failAction', { request, h })
+
   return error
 }
 

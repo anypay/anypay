@@ -6,7 +6,7 @@ const program = require('commander')
 
 import { log } from '../lib/log';
 
-import { getCryptoPrices, updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
+import { getCryptoPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 
 program
   .command('seed_prices')
@@ -19,7 +19,6 @@ program
 
       log.info('updating crypto prices');
 
-      await updateCryptoUSDPrices();
 
       log.info('updated crypto prices');
 
@@ -38,8 +37,6 @@ program
     try {
 
       log.info('updating crypto prices');
-
-      await updateCryptoUSDPrices();
 
       log.info('updated crypto prices');
 

@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
 import { accounts, models } from '../../lib';
 
@@ -48,7 +48,7 @@ export async function start() {
     queue: 'account_tag_after_create_update_energycity'
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (channel, msg) => {
 
     await updateEnergyCityAccounts();
 
@@ -65,7 +65,7 @@ export async function start() {
     queue: 'account_tag_after_create_update_energycity'
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (channel, msg) => {
 
     await updateEnergyCityAccounts();
 
@@ -75,7 +75,7 @@ export async function start() {
 
   async function checkIfIsEnergyCityInvoice(invoice: any): Promise<boolean> {
 
-    let tag = await models.AccountTag.findOne({
+    await models.AccountTag.findOne({
 
       where: {
 

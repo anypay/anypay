@@ -3,10 +3,6 @@ export const currency = 'XMR'
 
 import * as bitcore from './bitcore'
 
-import { publish } from '../../lib/blockchair'
-
-import { rpc } from './jsonrpc'
-
 import { log } from '../../lib'
 
 export { bitcore }
@@ -84,8 +80,6 @@ export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTra
     do_not_relay
   })
 
-  let result: SendRawTransactionResult = data
-
   log.info('plugins.xmr.send_raw_transaction.result', data)
 
   return data
@@ -137,7 +131,9 @@ interface VerifyPayment {
   tx_key: string;
 }
 
-export async function verifyPayment({payment_option,tx_hex,tx_key}: any) {
+export async function verifyPayment(params: any) {
+
+  log.info('plugins.xmr.verifyPayment', params)
 
   return true
 

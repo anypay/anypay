@@ -1,7 +1,7 @@
 
-import { readFileSync } from 'fs'
-
 import axios from 'axios'
+
+import { log } from '../../../lib/log'
 
 import { getAccountSetting, setAccountSetting } from '../../../lib/settings'
 
@@ -67,9 +67,11 @@ export async function show(request, hapi) {
 
 }
 
-export async function index(request, hapi) {
+export async function index(request, h) {
 
-  return hapi.response({ images: files }).code(200)
+  log.debug('api.v1.woocommerce_checkout_images.index', { path: request.path })
+
+  return h.response({ images: files }).code(200)
 
 }
 

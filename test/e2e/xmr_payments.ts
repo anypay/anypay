@@ -4,23 +4,15 @@ import { expect, server } from '../utils'
 
 import { TestClient } from 'anypay-simple-wallet'
 
-import { ensureInvoice, createInvoice } from '../../lib/invoices'
+import { createInvoice } from '../../lib/invoices'
 
 import { setAddress } from '../../lib/addresses'
-
-const wallet = {
-
-  async buildPayment(outputs: any) {
-
-  }
-
-}
 
 describe("XMR End To End Payments", async () => {
 
   it("should not have payment options without monero address", async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.25 })
+    let {invoice} = await utils.newAccountWithInvoice({ amount: 0.25 })
 
     let client = new TestClient(server, `/i/${invoice.uid}`)
 
@@ -38,7 +30,7 @@ describe("XMR End To End Payments", async () => {
 
     let account = await utils.createAccount()
 
-    let address = await  account.setAddress({
+    await account.setAddress({
       currency: 'XMR',
       address: '463jsVqBMm36nf4EM8QEZnPBSFVAoNP1ydfJGbkePR5q53CU3UDjGBGfHDDT2dNowZh1PeqYZbFvjMr1hac2kpaoKGcF2fk'
     })
@@ -61,7 +53,7 @@ describe("XMR End To End Payments", async () => {
 
     let account = await utils.createAccount()
 
-    let address = await  setAddress(account, {
+    await  setAddress(account, {
       currency: 'XMR',
       value: '463jsVqBMm36nf4EM8QEZnPBSFVAoNP1ydfJGbkePR5q53CU3UDjGBGfHDDT2dNowZh1PeqYZbFvjMr1hac2kpaoKGcF2fk',
       view_key: '456c22b9b337307c459d937f107d0e5d86323750475e6375c1dec86000cd5f09'
@@ -84,10 +76,11 @@ describe("XMR End To End Payments", async () => {
   })
 
   it.skip("should make a live XMR payment with success", async () => {
+    /*
 
     let account = await utils.createAccount()
 
-    let address = await setAddress(account, {
+    await setAddress(account, {
       currency: 'XMR',
       value: '463jsVqBMm36nf4EM8QEZnPBSFVAoNP1ydfJGbkePR5q53CU3UDjGBGfHDDT2dNowZh1PeqYZbFvjMr1hac2kpaoKGcF2fk',
       view_key: '456c22b9b337307c459d937f107d0e5d86323750475e6375c1dec86000cd5f09'
@@ -126,6 +119,7 @@ describe("XMR End To End Payments", async () => {
     invoice = await ensureInvoice(invoice.uid)
 
     expect(invoice.get('status')).to.be.equal('paid')
+    */
 
   })
 
@@ -133,7 +127,7 @@ describe("XMR End To End Payments", async () => {
 
     let account = await utils.createAccount()
 
-    let address = await setAddress(account, {
+    await setAddress(account, {
       currency: 'XMR',
       value: '463jsVqBMm36nf4EM8QEZnPBSFVAoNP1ydfJGbkePR5q53CU3UDjGBGfHDDT2dNowZh1PeqYZbFvjMr1hac2kpaoKGcF2fk',
       view_key: '456c22b9b337307c459d937f107d0e5d86323750475e6375c1dec86000cd5f09'
@@ -149,7 +143,7 @@ describe("XMR End To End Payments", async () => {
       return option.currency === 'XMR'
     })[0]
 
-    let paymentRequest = await client.selectPaymentOption(paymentOption)
+    await client.selectPaymentOption(paymentOption)
 
     let payment = '12345'
 

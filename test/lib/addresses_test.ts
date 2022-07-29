@@ -3,10 +3,11 @@ require('dotenv').config();
 import { models } from '../../lib';
 
 import {addresses} from '../../lib';
+
 import {registerAccount} from '../../lib/accounts';
 
-import * as database from '../../lib/database';
 import * as assert from 'assert';
+
 import * as Chance from 'chance';
 
 const chance = new Chance();

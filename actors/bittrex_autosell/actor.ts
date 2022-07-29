@@ -2,8 +2,6 @@
 
 require('dotenv').config();
 
-import { Actor, Joi } from 'rabbi';
-
 import { models } from '../../lib';
 
 import { log } from '../../lib/log'

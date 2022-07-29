@@ -7,6 +7,8 @@ import { log } from '../../../lib/log'
 
 export async function index(req, h) {
 
+  log.debug('api.v1.coins.index', { path: req.path })
+
   let coins = await getCoins()
 
   //coins = coins.filter(coin => coin.supported && !coin.unavailable)

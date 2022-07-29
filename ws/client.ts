@@ -3,8 +3,6 @@ require('dotenv').config()
 
 import { log } from '../lib/log'
 
-import { port } from './plugin'
-
 import { v4 } from 'uuid'
 
 import { EventEmitter } from 'events'
@@ -43,27 +41,6 @@ export class Socket extends EventEmitter {
     this.rws = new ReconnectingWebSocket(host, [], {
       WebSocket
     });
-    /*
-
-    this.ws = new WebSocket(host)
-
-    this.ws.on('open', () => {
-
-      this.send('authorization', {
-
-        token: this.token,
-
-        sessionId: this.sessionId
-
-      })
-
-      this.on('message', (data) => {
-        console.log("WS DATA", data)
-
-      })
-
-    })
-    */
 
     this.rws.addEventListener('open', async () => {
 
@@ -145,11 +122,8 @@ if (require.main === module) {
 
     })
 
-    socket.on('account.event', data => {
+    socket.on('account.event', () => {
 
-      const { type, payload } = data
-
-      console.log({ type })
 
     })
 

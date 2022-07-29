@@ -1,5 +1,6 @@
+
 import {awaitChannel} from '../../../lib/amqp';
-import * as Hapi from 'hapi';
+
 import * as Boom from 'boom';
 
 import { log, models, plugins } from '../../../lib'

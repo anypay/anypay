@@ -11,11 +11,13 @@ import { expect, server } from '../utils'
 
 describe('Invoice Events', () => {
 
-  var account, invoice;
+  var invoice;
 
   before(async () => {
 
-    [account, invoice] = await utils.newAccountWithInvoice()
+    var {invoice: i} = await utils.newAccountWithInvoice();
+
+    invoice = i;
 
   })
 
@@ -57,7 +59,9 @@ describe('Invoice Events', () => {
 
     before(async () => {
 
-      [account, invoice] = await utils.newAccountWithInvoice()
+      let {account: a, invoice: i} = await utils.newAccountWithInvoice()
+
+      account = a; invoice = i;
 
     })
 
@@ -129,7 +133,7 @@ describe('Invoice Events', () => {
 
       await client.selectPaymentOption(paymentOptions[0])
  
-      let response = await await client.verifyPayment({
+      await await client.verifyPayment({
         chain: "BSV",
         currency: "BSV",
         transactions: [{
@@ -162,7 +166,7 @@ describe('Invoice Events', () => {
 
       await client.selectPaymentOption(paymentOptions[0])
  
-      let response = await await client.sendPayment({
+      await client.sendPayment({
         chain: "BSV",
         currency: "BSV",
         transactions: [{

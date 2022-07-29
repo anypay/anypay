@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
-import { models, receipts, amqp } from '../../lib';
+import { models, amqp } from '../../lib';
 
 export async function start() {
 
@@ -21,7 +21,7 @@ export async function start() {
 
     log.info(msg.content.toString());
 
-    let [receipt, isNew] = await models.BlockchainReceipt.findOrCreate({
+    let [receipt] = await models.BlockchainReceipt.findOrCreate({
       where: {
         invoice_uid: msg.content.toString()
       },
@@ -36,13 +36,6 @@ export async function start() {
     }
 
     log.info('blockchain_receipt.created', receipt.toJSON());
-
-    let publication: any = await receipts.publishReceipt(receipt.id);
-
-    console.log('publication', publication);
-
-    receipt.txid = publication.txid;
-    receipt.hex = publication.hex;
 
     await receipt.save();
 

@@ -1,7 +1,7 @@
 
 import { models } from '../../../lib';
 
-export async function show(req, h) {
+export async function show(req) {
 
   let firebase_token = await models.FirebaseToken.findOne({
     where: {
@@ -13,7 +13,7 @@ export async function show(req, h) {
 
 }
 
-export async function index(req, h) {
+export async function index(req) {
 
   let firebase_tokens = await models.FirebaseToken.findAll({
     where: {
@@ -25,9 +25,9 @@ export async function index(req, h) {
 
 }
 
-export async function create(req, h) {
+export async function create(req) {
 
-  let [firebase_token, isNew] = await models.FirebaseToken.findOrCreate({
+  let [firebase_token] = await models.FirebaseToken.findOrCreate({
 
     where: {
       account_id: req.account.id,
@@ -48,9 +48,9 @@ export async function create(req, h) {
 
 }
 
-export async function update(req, h) {
+export async function update(req) {
 
-  return create(req, h)
+  return create(req)
 
 }
 

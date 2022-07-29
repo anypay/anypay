@@ -1,6 +1,6 @@
 require("dotenv").config()
 
-import { hash, bcryptCompare } from '../password';
+import { bcryptCompare } from '../password';
 
 import { log } from '../index';
 
@@ -10,9 +10,9 @@ import { Account, findAccount } from '../account'
 
 import { verifyToken } from '../jwt'
 
-export async function validateSudoPassword(request, username, password, h) {
+export async function validateSudoPassword(request, username) {
 
-  log.info('validate sudo password');
+  log.debug('auth.validatesudopassword', { hostname: request.hostname });
 
   if (!username) {
 
@@ -57,7 +57,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
 
 
-export async function validateToken(request, username, password, h) {
+export async function validateToken(request, username, password) {
 
   if (!username) {
     return {

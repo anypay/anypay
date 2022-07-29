@@ -1,8 +1,6 @@
 import * as utils from '../utils'
 
-import { expect, server } from '../utils'
-
-import { ensureAccessToken } from '../../lib/access_tokens'
+import { expect } from '../utils'
 
 import { createInvoice } from '../../lib/invoices'
 
@@ -76,7 +74,7 @@ describe("Listing Available Webhooks", async () => {
       webhook_url
     })
 
-    let webhook = await findWebhook({ invoice_uid: invoice.uid })
+    await findWebhook({ invoice_uid: invoice.uid })
 
     response = await utils.authRequest(account, {
       method: 'GET',

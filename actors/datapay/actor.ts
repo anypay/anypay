@@ -2,7 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
+
+import * as Joi from '@hapi/joi'
 
 import * as datapay from 'datapay';
 
@@ -27,7 +29,7 @@ export async function start() {
 
     try {
 
-      let txid = await datapay.send({
+      await datapay.send({
         safe: true,
         data: array,
         pay: { key: process.env.DATAPAY_WIF }
@@ -90,15 +92,13 @@ export async function start() {
     schema: Joi.array()
 
   })
-  .start(async (channel, msg, array) => {
+  .start(async (channel, msg) => {
 
     log.info('datapay.error', msg.content.toString());
 
     await channel.ack(msg);
 
   });
-
-
 
 }
 

@@ -11,8 +11,6 @@ import { BigNumber } from 'bignumber.js'
 
 import * as http from 'superagent';
 
-import { toSatoshis } from '../pay'
-
 import * as bittrex from './bittrex'
 
 import * as kraken from './kraken'
@@ -62,6 +60,8 @@ export class PriceNotFoundError implements Error {
 }
 
 async function convert(inputAmount: Amount, outputCurrency: string, precision: number = 2): Promise<Amount> {
+
+  log.debug('prices.convert', { inputAmount, outputCurrency, precision })
 
   // Normalize input to USD if neither input or output is USD 
   if (inputAmount.currency !== 'USD' && outputCurrency !== 'USD') {
@@ -197,7 +197,7 @@ export async function updateUSDPrices() {
 
   await Promise.all(prices.map(async (price: Price) => {
 
-    let record = await setPrice(price)
+    await setPrice(price)
 
   }))
 

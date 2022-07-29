@@ -14,7 +14,7 @@ export const plugin = (() => {
 
     name: 'websockets',
 
-    register: function(server: Server, options, next) {
+    register: function(server: Server) {
 
       log.info('server.plugins.register.websockets')
 
@@ -24,7 +24,7 @@ export const plugin = (() => {
 
       })
 
-      const wss = start(server.listener)
+      start(server.listener)
 
     }
 

@@ -3,13 +3,11 @@
 require('dotenv').config(); 
 import * as program from 'commander';
 
-import { generateInvoice } from '../lib/invoice';
+import { createInvoice } from '../lib/invoices';
 
 import { coins, log, models, invoices } from '../lib';
 
 import { invoicePaidEmail } from '../lib/email';
-
-import { email } from 'rabbi';
 
 import { listInvoiceEvents } from '../lib/events'
 
@@ -29,7 +27,7 @@ program
 
       console.log('account', account.toJSON())
 
-      let invoice = await generateInvoice(account.id, amount, currency);
+      let invoice = await createInvoice({account, amount, currency});
 
       log.info('invoice.generated', invoice.toJSON());
 
@@ -102,7 +100,7 @@ program
         uid
       }});
 
-      let resp = await invoicePaidEmail(invoice);
+      await invoicePaidEmail(invoice);
 
     } catch(error) {
 

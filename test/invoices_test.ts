@@ -3,8 +3,6 @@ import * as utils from './utils'
 
 import { expect } from './utils'
 
-import { Account } from '../lib/account'
-
 import { InvoiceNotFound, ensureInvoice, createInvoice } from '../lib/invoices'
 
 describe("Generating Invoices", () => {

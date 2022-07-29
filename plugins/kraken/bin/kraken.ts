@@ -4,13 +4,9 @@ require('dotenv').config();
 
 import * as program from 'commander';
 
-import { KrakenAccount, listAll, fromAccount } from '../lib/kraken_account'
+import { listAll, fromAccount } from '../lib/kraken_account'
 
 import { Account } from '../../../lib/account'
-
-import { models } from '../../../lib/models'
-
-import { log } from '../../../lib/log'
 
 import { syncDeposits, syncTrades } from '../'
 
@@ -23,6 +19,8 @@ program
       let account = await Account.findOne({ id })
 
       let trades = await syncTrades(account, { start })
+
+      console.log(trades)
 
     } catch(error) {
 

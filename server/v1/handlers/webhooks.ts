@@ -11,7 +11,7 @@ import { config } from '../../../lib/config'
 
 import axios from 'axios'
 
-export async function index(req, h) {
+export async function index(req) {
 
   let account: Account = await findAccount(req.account.id)
 
@@ -50,7 +50,7 @@ async function notifyRocketchat({ uid }) {
 
 }
 
-export async function test(req, h) {
+export async function test(req) {
 
   log.info('webhooks.test.received', req.payload)
 

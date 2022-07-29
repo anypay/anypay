@@ -1,18 +1,12 @@
 require('dotenv').config()
-import * as requireAll from  'require-all';
-import * as AWS from 'aws-sdk';
+
 import {models} from '../models';
+
 import {events} from '../events'
-import * as database from '../database';
 
 import { config } from '../config'
 
 const sender = config.get("EMAIL_SENDER")
-
-import { log } from '../log'
-const moment = require('moment');
-
-import { getBlockExplorerTxidUrl } from '../block_explorer';
 
 import { email as rabbiEmail } from 'rabbi';
 
@@ -126,60 +120,11 @@ export async function firstInvoicePaidEmail(invoice){
   return resp;
 }
 
-async function checkInvoiceCount(invoice){
-
-  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`
-
-  try{
-
-    var result = await database.query(query);
-
-    if(result[1].rows[0].count==1){
-
-      firstInvoiceCreatedEmail(invoice.id)
-      log.debug('email.invoice.created.first')
-
-    }
-  }catch(error){
-    log.error(error)
-  }
-
-
-}
-
-async function checkInvoicePaidCount(invoice){
-
-  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id} AND status='paid';`
-  
-  try{
-  
-    var result = await database.query(query);
-
-    if(result[1].rows[0].count==1){
-      log.debug('invoice.paid.first', invoice)
-      //firstInvoicePaidEmail(invoice)
-    }
-    else{
-      invoicePaidEmail(invoice)
-    }
-
-  }catch(err){
-    log.error(err)
-  }
-
-}
-
 events.on('account.created', (account) => {
    
   newAccountCreatedEmail(account)
     
 })   
-
-events.on('invoice.created', (invoice)=>{
- 
-  checkInvoiceCount(invoice)
- 
-})
 
 events.on('address.set', (changeset)=>{
 

@@ -145,7 +145,7 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
 export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
 
-  var res = await models.Account.update({
+  await models.Account.update({
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});
 

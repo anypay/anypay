@@ -3,11 +3,13 @@ import * as Hapi from 'hapi';
 
 import * as jwt from '../../lib/jwt';
 
-import { models, log, password } from '../../lib';
+import { models, log } from '../../lib';
 
 import { findApp } from '../../lib/apps'
 
-export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
+export async function validateAdminToken(request: Hapi.Request, username:string) {
+
+  log.debug('validateAdminToken', { path: request.path })
 
   try {
 
@@ -27,7 +29,7 @@ export async function validateAdminToken(request: Hapi.Request, username:string,
   }
 }
 
-async function validateToken (request, username, password, h) {
+async function validateToken (request, username, password) {
 
   if (!username) {
     return {
@@ -91,7 +93,7 @@ async function validateToken (request, username, password, h) {
   }
 };
 
-export async function validateAppToken (request, username, password, h) {
+export async function validateAppToken (request, username, password) {
 
   log.debug('auth.app', { username, password }) 
 

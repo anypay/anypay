@@ -3,9 +3,10 @@
 require('dotenv').config();
 
 import { models } from '../../lib'
+
 import { firstAddressSetEmail } from '../../lib/email'
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
 export async function start() {
 
@@ -18,7 +19,7 @@ export async function start() {
     queue: 'first_address_set_email',
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (channel, msg) => {
 
     let address = JSON.parse(msg.content.toString())
 

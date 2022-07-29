@@ -36,10 +36,6 @@ const PaymentRequestReq = Joi.object({
   currency: Joi.string().required()
 })
 
-const Instruction = Joi.object({
-  type: Joi.string().required()
-})
-
 const AuthHeaders = Joi.object({
   'digest': Joi.string().required(),
   'x-identity': Joi.string().required(),
@@ -104,22 +100,6 @@ const Payment = Joi.object({
     currency: Joi.string().required()
   }).required(),
   memo: Joi.string().optional().allow('', null)
-})
-
-const SigningKeys = Joi.object({
-  owner: Joi.string().required(),
-  expirationDate: Joi.date().timestamp().required(),
-  validDomains: Joi.array().required().items(Joi.string()),
-  publicKeys: Joi.array().required().items(Joi.string())
-})
-
-const KeySignatures = Joi.object({
-  keyHash: Joi.string().required(),
-  signatures: Joi.array().required().items(Joi.object({
-    created: Joi.date().timestamp().required(),
-    identifier: Joi.string().required(),
-    signature: Joi.string().required()
-  }))
 })
 
 export const Protocol = {

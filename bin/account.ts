@@ -129,6 +129,12 @@ program
         }
       });
 
+      if (!isNew) {
+
+        log.debug('tag.created', record.toJSON())
+
+      }
+
       if (isNew) {
 
         console.log(`${email} tagged as "${tag}"`);

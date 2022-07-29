@@ -21,7 +21,7 @@ import { join } from 'path'
 
 import { log } from '../../lib/log';
 
-import { prometheus, getHistogram } from '../../lib/prometheus'
+import { getHistogram } from '../../lib/prometheus'
 
 import { requireDirectory } from 'rabbi'
 
@@ -134,7 +134,7 @@ async function Server() {
 
   await server.register(require('hapi-boom-decorators'))
 
-  const swaggerOptions = server.register({
+  server.register({
     plugin: HapiSwagger,
     options: {
       info: {
@@ -278,15 +278,6 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: "POST",
-    path: "/anonymous-accounts",
-    handler: v0.Accounts.createAnonymous,
-    options: {
-      tags: ['api']
-    },
-  });
-
   // END PUBLIC ROUTES
 
   server.route({
@@ -335,6 +326,7 @@ async function Server() {
     method: 'GET',
     path: '/',
     handler: (req, h) => {
+      log.debug('api.v0.root', { path: req.path })
       return h.redirect('/documentation')
     }
   }); 

@@ -6,8 +6,6 @@ import * as program from 'commander';
 
 import { sendWebhookForInvoice } from '../lib/webhooks';
 
-import * as http from 'superagent';
-
 program
   .command('sendwebhook <invoice_uid>')
   .action(async (invoiceUid) => {

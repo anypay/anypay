@@ -2,11 +2,12 @@
 import * as Joi from '@hapi/joi';
 
 import { setAddress } from '../../../lib/core';
+
 import { log } from '../../../lib';
 
 import { models } from '../../../lib';
 
-export async function destroy(req, h) {
+export async function destroy(req) {
 
   let address = await models.Address.findOne({ where: {
     account_id: req.account.id,
@@ -21,7 +22,7 @@ export async function destroy(req, h) {
 
 };
 
-export async function list(request, h) {
+export async function list(request) {
 
   let addresses = {};
 
@@ -41,7 +42,7 @@ export async function list(request, h) {
 
 }
 
-export async function index(req, h) {
+export async function index(req) {
 
   let addresses = await models.Address.findAll({
 
@@ -53,7 +54,7 @@ export async function index(req, h) {
 
 };
 
-export async function update(request, h) {
+export async function update(request) {
 
   let currency = request.params.currency;
 

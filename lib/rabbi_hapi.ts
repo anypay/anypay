@@ -8,7 +8,7 @@ export function requireHandlersDirectory(dirname) {
   var handlers: any = require('require-all')({
     dirname,
     filter      :  /(.+)\.ts$/,
-    map: function(name, path) {
+    map: function(name) {
 
       return name.split('_').map(p => {
 

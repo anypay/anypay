@@ -24,7 +24,8 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
   if (firebaseTokens.length == 0) { throw new Error('no firebase token found') }
 
   var promises: any[] = firebaseTokens.map(firebaseToken => {
-    return new Promise(async (resolve, reject) => {
+
+    return new Promise(async (resolve) => {
 
       var message = {
           to: firebaseToken.token,

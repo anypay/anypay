@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const uuid = require('uuid')
 
 const _ = require('lodash')
 
@@ -7,7 +6,7 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
@@ -15,7 +14,7 @@ import { Invoice, createInvoice } from '../../../lib/invoices';
 
 import * as moment from 'moment';
 
-export async function cancel(req, h) {
+export async function cancel(req) {
 
   let where = {
     uid: req.params.uid,
@@ -58,7 +57,7 @@ export async function cancel(req, h) {
 
 }
 
-export async function index (request, reply) {
+export async function index (request) {
 
   /*
 
@@ -245,7 +244,7 @@ export async function createPublicInvoice(account_id, payload) {
   await invoice.save();
 
   if (invoice.email) {
-    let note = await models.InvoiceNote.create({
+    await models.InvoiceNote.create({
       content: `Customer Email: ${invoice.email}`,
       invoice_uid: invoice.uid,
     });
@@ -284,7 +283,7 @@ async function getPaymentOptions(invoice_uid) {
 
 }
 
-export async function createPublic (request, reply) {
+export async function createPublic (request) {
 
   let response = await createPublicInvoice(
     request.params.account_id, request.payload);
@@ -304,7 +303,7 @@ function sanitizeInvoice(invoice) {
   return resp;
 }
 
-export async function show(request, reply) {
+export async function show(request) {
 
   let invoiceId = request.params.invoice_id;
 
@@ -352,7 +351,7 @@ export async function show(request, reply) {
 
 }
 
-export async function shareEmail(req, h) {
+export async function shareEmail(req) {
 
   log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 

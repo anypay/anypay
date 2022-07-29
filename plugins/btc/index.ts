@@ -3,15 +3,9 @@ const btc = require('bitcore-lib')
 
 export { btc as bitcore }
 
-import { fromSatoshis, Payment } from '../../lib/pay'
-
 import { publishBTC } from '../../lib/blockchair'
 
-import {models} from '../../lib/models';
-
 import {oneSuccess} from 'promise-one-success'
-
-import {rpc} from './jsonrpc';
 
 import * as blockcypher from '../../lib/blockcypher'
 
@@ -45,8 +39,6 @@ export function transformAddress(address: string) {
 
 }
 
-var WAValidator = require('anypay-wallet-address-validator');
-
 export function validateAddress(address: string){
 
   try {
@@ -66,14 +58,6 @@ export function validateAddress(address: string){
 export async function getNewAddress(deprecatedParam){
 
   return deprecatedParam.value;
-
-}
-
-function deriveAddress(xkey, nonce){
-
-  let address = new btc.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
 
 }
 

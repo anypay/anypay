@@ -1,6 +1,5 @@
-import * as utils from '../../utils'
 
-import { expect, server, chance, request, spy } from '../../utils'
+import { expect, chance, request, spy } from '../../utils'
 
 import { verifyToken } from '../../../lib/jwt'
 
@@ -61,7 +60,7 @@ describe("Listing Available Webhooks", async () => {
     let email = chance.email()
     let password = chance.word()
 
-    let { body } = await request
+    await request
       .post('/v1/api/account/register')
       .send({ email, password })
 
@@ -122,8 +121,6 @@ describe("Listing Available Webhooks", async () => {
     var response = await request
       .post('/v1/api/account/register')
       .send({ email, password })
-
-    const { accessToken } = response.body.accessToken
 
     spy.on(passwords, ['sendPasswordResetEmail'])
 

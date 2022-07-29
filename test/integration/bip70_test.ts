@@ -1,14 +1,6 @@
 require('dotenv').config()
 
-import * as assert from 'assert'
-
-import * as http from 'superagent'
-
-import { models } from '../../lib'
-
-import { wallet, expect, server, chance, request, spy } from '../utils'
-
-import { paymentRequestToJSON } from '../../lib/pay/bip70'
+import { expect, request } from '../utils'
 
 import * as utils from '../utils'
 
@@ -18,7 +10,7 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {invoice} = await utils.newAccountWithInvoice()
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 
@@ -37,7 +29,7 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it.skip('should return a valid BIP70 payment request', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {invoice} = await utils.newAccountWithInvoice()
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 
@@ -56,7 +48,7 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let {invoice} = await utils.newAccountWithInvoice()
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 

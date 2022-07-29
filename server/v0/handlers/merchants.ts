@@ -1,12 +1,12 @@
-import { database, models } from '../../../lib';
-
-import * as moment from 'moment';
+import { database, models, log } from '../../../lib';
 
 import { Request, ResponseToolkit } from 'hapi';
 
 import { listAll, listActiveSince as listActiveMerchantsSince } from '../../../lib/merchants'
 
 export async function list(req: Request, h: ResponseToolkit) {
+
+  log.debug('api.v0.merchants.list', { path: req.path })
 
   let resp = await database.query(`select physical_address, business_name,
     latitude, longitude from accounts where physical_address is not null and
@@ -18,6 +18,8 @@ export async function list(req: Request, h: ResponseToolkit) {
 
 export async function listMerchantCoins( req: Request, h:ResponseToolkit){
 
+  log.debug('api.v0.merchants.listMerchantCoins', { path: req.path })
+
   let query = `select accounts.id, currency from accounts full join addresses on accounts.id = addresses.account_id where accounts.physical_address is not null and accounts.business_name is not null`
 
   let coinList = await database.query(query)
@@ -27,6 +29,8 @@ export async function listMerchantCoins( req: Request, h:ResponseToolkit){
 }
 
 export async function listActiveSince(req: Request, h: ResponseToolkit) {
+
+  log.debug('api.v0.merchants.listActiveSince', { path: req.path })
 
   const oneWeek = await listActiveMerchantsSince(1, 'week')
 
@@ -60,7 +64,7 @@ interface MerchantInfo {
   denomination: string;
 }
 
-export async function show(req, h) {
+export async function show(req) {
 
   return getMerchantInfo(req.params.account_id);
 

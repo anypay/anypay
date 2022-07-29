@@ -317,23 +317,6 @@ export async function attachV1Routes(server) {
   }); 
 
   server.route({
-    method: 'POST',
-    path: '/v1/api/fail',
-    handler: (req, h) => { return h.response(200) },
-    options: {
-      validate: {
-        query: Joi.object({
-          error: Joi.string().required()
-        }).required(),
-        headers: Joi.object({
-          'fail': Joi.string().required()
-        }),
-        //failAction
-      }
-    }
-  }); 
-
-  server.route({
     method: "GET",
     path: "/v1/woocommerce/checkout_images",
     handler: v1.WoocommerceCheckoutImages.index,

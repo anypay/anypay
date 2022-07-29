@@ -33,7 +33,7 @@ export async function setAccountSetting(account_id, key: string, value: string) 
 
 async function setDenomination(accountId: number, denomination: string): Promise<string> {
 
-  let result = await models.Account.update({
+  await models.Account.update({
     denomination: denomination  
   }, {
     where: {
