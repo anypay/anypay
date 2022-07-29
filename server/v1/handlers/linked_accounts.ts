@@ -35,20 +35,21 @@ export async function create(request, h) {
 
   try {
 
-    request.log.info('api.v1.linked_accounts.create', {
+    log.info('api.v1.linked_accounts.create', {
       ...request.payload,
       account_id: request.account.id
     })
 
     const linked_account = await links.linkAccount(request.account, request.payload)
 
-    return h.json({
+    return h.response({
       linked_account
     })
+    .code(201)
 
   }  catch(error) {
 
-    request.log.error('api.v1.linked_accounts.create', error)
+    log.error('api.v1.linked_accounts.create', error)
 
     return h.badRequest(error)
 
@@ -60,20 +61,21 @@ export async function unlink(request, h) {
 
   try {
 
-    request.log.info('api.v1.linked_accounts.unlink', {
+    log.info('api.v1.linked_accounts.unlink', {
       ...request.payload,
       account_id: request.account.id
     })
 
-    const linked_account = await links.unlinkAccount(request.account, request.payload)
+    const linked_account = await links.unlinkAccount(request.account, request.params)
 
-    return h.json({
-      linked_account
+    return h.response({
+      success: true
     })
+    .code(200)
 
-  }  catch(error) {
+  } catch(error) {
 
-    request.log.error('api.v1.linked_accounts.unlink', error)
+    log.error('api.v1.linked_accounts.unlink', error)
 
     return h.badRequest(error)
 

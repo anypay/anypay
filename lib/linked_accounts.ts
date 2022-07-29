@@ -59,9 +59,13 @@ export async function linkAccount(account: Account, { email }: { email: string }
 
   if (!target) { throw new Error(`account not found with email ${email}`) }
 
-  let record = await models.LinkedAccount.find({
+  let [record] = await models.LinkedAccount.findOrCreate({
 
     where: {
+
+      target: target.id,
+
+      source: account.id
 
     }
 
@@ -73,7 +77,7 @@ export async function linkAccount(account: Account, { email }: { email: string }
 
 export async function unlinkAccount(account: Account, {id}: {id: string}): Promise<void> {
 
-  let link = await models.AccountLink.findOne({ where: { id }})
+  let link = await models.LinkedAccount.findOne({ where: { id }})
 
   log.info('accounts.unlink', { account_id: account.id, account_link_id: id })
 
