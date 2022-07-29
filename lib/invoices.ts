@@ -214,7 +214,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
     account_id: account.id,
 
-    webhook_url: webhook_url,
+    webhook_url,
 
     status: 'unpaid',
 
