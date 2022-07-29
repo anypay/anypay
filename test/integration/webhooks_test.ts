@@ -20,6 +20,7 @@ describe("Listing Available Webhooks", async () => {
     })
 
     expect(response.statusCode).to.be.equal(200)
+
     expect(response.result.webhooks.length).to.be.equal(0)
 
   })

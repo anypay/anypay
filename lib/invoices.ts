@@ -234,7 +234,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   let invoice = new Invoice(record)
 
-  createWebhook(invoice)
+  await createWebhook(invoice)
 
   const options = await createPaymentOptions(account.record, invoice)
 
