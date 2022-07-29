@@ -1,7 +1,5 @@
 const http = require("superagent");
 
-import {generateInvoice} from '../../lib/invoice';
-
 import * as blockchair from '../../lib/blockchair';
 
 var WAValidator = require('anypay-wallet-address-validator');

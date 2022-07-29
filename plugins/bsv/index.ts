@@ -93,8 +93,6 @@ var isCashAddress = bchaddr.isCashAddress;
 
 import { rpc } from './lib/jsonrpc';
 
-import {generateInvoice} from '../../lib/invoice';
-
 import {models} from '../../lib/models';
 
 const polynym = require('polynym');

@@ -7,7 +7,9 @@ import { ensureInvoice } from '../../../lib/invoices'
 
 import { log } from '../../../lib/log'
 
-import { badRequest } from 'boom'
+import { config } from '../../../lib/config'
+
+import axios from 'axios'
 
 export async function index(req, h) {
 
@@ -25,9 +27,36 @@ export async function index(req, h) {
 
 }
 
+async function notifyRocketchat({ uid }) {
+
+  if (config.get('rocketchat_webhook_url')) {
+
+    let { data } = await axios.post(config.get('rocketchat_webhook_url'), {
+      "alias": "webhooks",
+      "text": "Payment Webhook Received",
+      "attachments": [
+        {
+          "title": `Anypay Invoice ${uid}`,
+          "text": `Anypay Invoice ${uid}`,
+          //"image_url": "/images/integration-attachment-example.png",
+          "color": "#764FA5"
+        }
+      ]
+    }) 
+
+    log.debug('rocketchat.webhook.result', data)
+
+  }
+
+}
+
 export async function test(req, h) {
 
   log.info('webhooks.test.received', req.payload)
+
+  const { uid } = req.payload
+
+  notifyRocketchat({ uid }) 
 
   return { success: true }
 
