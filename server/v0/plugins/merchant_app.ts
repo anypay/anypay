@@ -70,7 +70,7 @@ export async function register(server: Server) {
         payload:  Joi.object({
           amount: Joi.number().required(),
           currency: Joi.string().optional(),
-          //redirect_url: Joi.string().optional().allow(''),
+          redirect_url: Joi.string().optional().allow(''),
           webhook_url: Joi.string().optional().allow(''),
           wordpress_site_url: Joi.string().optional().allow(''),
           memo: Joi.string().optional().allow(''),
