@@ -1,3 +1,10 @@
+## [1.2.8](https://github.com/anypay/anypay/compare/v1.2.7...v1.2.8) (2022-07-30)
+
+
+### Bug Fixes
+
+* **return-uid:** after creating invoie return uid for legacy clients ([#1044](https://github.com/anypay/anypay/issues/1044)) ([c392e86](https://github.com/anypay/anypay/commit/c392e8649e018d57f792560d355840a7436679b2))
+
 ## [1.2.7](https://github.com/anypay/anypay/compare/v1.2.6...v1.2.7) (2022-07-30)
 
 
