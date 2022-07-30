@@ -1,3 +1,10 @@
+## [1.2.6](https://github.com/anypay/anypay/compare/v1.2.5...v1.2.6) (2022-07-29)
+
+
+### Bug Fixes
+
+* **webhook-url:** actually set webhook url for invoice ([#1038](https://github.com/anypay/anypay/issues/1038)) ([4ae4d41](https://github.com/anypay/anypay/commit/4ae4d412e0d7d4a80bc3ea11ef6880670c614001))
+
 ## [1.2.5](https://github.com/anypay/anypay/compare/v1.2.4...v1.2.5) (2022-07-28)
 
 

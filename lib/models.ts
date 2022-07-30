@@ -60,6 +60,16 @@ models.Address.belongsTo(models.Account, {
   foreignKey: 'account_id'
 })
 
+models.LinkedAccount.belongsTo(models.Account, {
+  as: 'source_account',
+  foreignKey: 'source',
+})
+
+models.LinkedAccount.belongsTo(models.Account, {
+  as: 'target_account',
+  foreignKey: 'target'
+})
+
 models.Account.hasMany(models.Invoice, {
   foreignKey: 'account_id',
   sourceKey: 'id',

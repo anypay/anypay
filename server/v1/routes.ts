@@ -106,6 +106,76 @@ export async function attachV1Routes(server) {
   }); 
 
   server.route({
+    method: 'GET',
+    path: '/v1/api/linked-accounts',
+    options: {
+      auth: "jwt",
+      validate: {
+        query: Joi.object({
+          limit: Joi.number().optional(),
+          offset: Joi.number().optional()
+        }),
+        failAction
+      }
+    },
+    handler: v1.LinkedAccounts.index
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/v1/api/linked-accounts',
+    options: {
+      auth: "jwt",
+      validate: {
+        payload: Joi.object({
+          email: Joi.string().optional()
+        }),
+        failAction
+      }
+    },
+    handler: v1.LinkedAccounts.create
+  });
+
+  server.route({
+    method: 'DELETE',
+    path: '/v1/api/linked-accounts/{id}',
+    options: {
+      auth: "jwt",
+      validate: {
+        query: Joi.object({
+          limit: Joi.number().optional(),
+          offset: Joi.number().optional()
+        }),
+        failAction
+      }
+    },
+    handler: v1.LinkedAccounts.unlink
+  }); 
+
+  server.route({
+    method: 'GET',
+    path: '/v1/api/linked-accounts/{account_id}/payments',
+    options: {
+      auth: "jwt",
+      validate: {
+        params: Joi.object({
+          account_id: Joi.number().required()
+        }),
+        query: Joi.object({
+          limit: Joi.number().optional(),
+          offset: Joi.number().optional()
+        }),
+        failAction
+      },
+      response: {
+        failAction: 'log',
+        schema: v1.Payments.Schema.listPayments
+      }
+    },
+    handler: v1.LinkedAccountPayments.index
+  }); 
+
+  server.route({
     method: 'POST',
     path: '/v1/api/webhooks/{invoice_uid}/attempts',
     options: {
@@ -121,14 +191,30 @@ export async function attachV1Routes(server) {
     options: {
       auth: "jwt",
       validate: {
-        payload: Joi.object({
-          amount: Joi.number().min(0).required(),
-          denomination: Joi.string().optional(),
-          currency: Joi.string().optional()
-        }),
+        payload:  Joi.object({
+          amount: Joi.number().required(),
+          currency: Joi.string().optional(),
+          redirect_url: Joi.string().optional(),
+          webhook_url: Joi.string().optional(),
+          wordpress_site_url: Joi.string().optional(),
+          memo: Joi.string().optional(),
+          email: Joi.string().optional(),
+          external_id: Joi.string().optional(),
+          business_id: Joi.string().optional(),
+          location_id: Joi.string().optional(),
+          register_id: Joi.string().optional(),
+          metadata: Joi.object().optional(),
+          required_fee_rate: Joi.string().allow(
+            'fastestFee',
+            'halfHourFee',
+            'hourFee',
+            'economyFee',
+            'minimumFee'
+          ).optional()
+        }).label('InvoiceRequest'),
         failAction
-      },
-    },
+      }
+    }
   });
 
   server.route({
