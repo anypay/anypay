@@ -185,7 +185,8 @@ export async function create(request, h) {
         createdAt: json['createdAt'],
         expiresAt: json['expiry'],
         payment_options
-      }
+      },
+      uid: json['uid']
     })
     .code(200)
 
