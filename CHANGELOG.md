@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/anypay/anypay/compare/v1.2.8...v1.3.0) (2022-08-09)
+
+
+### Features
+
+* **output-addresses:** xRP, SOL, ETH, AVAX addresses plus new BTC,BCH,BSV,DASH,LTC,DOGE ([#1046](https://github.com/anypay/anypay/issues/1046)) ([e5cfaf3](https://github.com/anypay/anypay/commit/e5cfaf3c7b232baa0081ff620fc025c1108a18e4))
+
 ## [1.2.8](https://github.com/anypay/anypay/compare/v1.2.7...v1.2.8) (2022-07-30)
 
 
