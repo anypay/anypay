@@ -37,6 +37,10 @@ export class Orm {
 
   }
 
+  get id() {
+    return this.get('id')
+  }
+
   static findOrCreate(params: FindOrCreate) {
 
     return Orm.model.findOrCreate(params)
@@ -79,6 +83,24 @@ export class Orm {
     return this.record.save()
 
   }
+
+}
+
+export async function findOrCreate<T>(constructor: any, params: any): Promise<[T, boolean]> {
+
+  let [record, isNew] = await constructor.model.findOrCreate(params)
+
+  let instance = new constructor(record)
+
+  return [instance, isNew]
+
+}
+
+export async function find<T>(constructor: any, model: any, params: any): Promise<T> {
+
+  let record = await model.find(params)
+
+  return new constructor(record)
 
 }
 

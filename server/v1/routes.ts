@@ -2,17 +2,9 @@ require('dotenv').config()
 
 import { v1, failAction } from '../handlers'
 
-import { useJWT } from '../auth/jwt'
-
-const AuthBearer = require('hapi-auth-bearer-token');
-
 import * as Joi from '@hapi/joi'
 
 export async function attachV1Routes(server) {
-
-  await server.register(AuthBearer)
-
-  server.auth.strategy("jwt", "bearer-access-token", useJWT());
 
   server.route({
     method: "POST",
