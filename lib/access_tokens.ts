@@ -1,5 +1,5 @@
 
-import { Orm, Record } from './orm'
+import { Orm, Record, findOrCreate } from './orm'
 
 import { Account } from './account'
 
@@ -10,6 +10,18 @@ import { generateAccountToken } from './jwt'
 interface NewAccessTokenV1 {
   record: Record;
   account?: Account
+}
+
+export class AccessTokenV0 extends Orm {
+
+  static model: any = models.AccessToken;
+
+  static findOrCreate(params: any): Promise<[AccessTokenV0, boolean]> {
+
+    return findOrCreate<AccessTokenV0>(AccessTokenV0, params)
+
+  }
+
 }
 
 export class AccessTokenV1 extends Orm {
@@ -28,6 +40,7 @@ export class AccessTokenV1 extends Orm {
 
     this.account = account
   }
+
 
   get accessToken() {
 
@@ -60,4 +73,5 @@ export async function ensureAccessToken(account: Account, version: Versions = Ve
   return new AccessTokenV1({ record, account })
 
 }
+
 
