@@ -9,6 +9,8 @@ const Vision = require('@hapi/vision');
 
 const HapiSwagger = require("hapi-swagger");
 
+import { config } from '../../lib/config'
+
 import { HealthPlugin } from 'hapi-k8s-health'
 
 import { register as registerWalletBotRoutes } from '../../plugins/wallet-bot'
@@ -18,6 +20,8 @@ import { attachV1Routes } from '../v1/routes';
 import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
+
+const AuthBearer = require('hapi-auth-bearer-token');
 
 import { log } from '../../lib/log';
 
@@ -82,6 +86,8 @@ const server = new Hapi.Server({
     }
   }
 });
+
+import { useJWT } from '../auth/jwt'
 
 async function Server() {
 
@@ -160,6 +166,10 @@ async function Server() {
 
   server.auth.strategy("prometheus", "basic", { validate: auth.Prometheus.auth });
 
+  await server.register(AuthBearer)
+
+  server.auth.strategy("jwt", "bearer-access-token", useJWT());
+
   await server.register({
     plugin: HealthPlugin,
     options: {
@@ -174,6 +184,16 @@ async function Server() {
   await merchant_app(server)
 
   // BEGIN PUBLIC ROUTES
+
+  if (config.get('wallet_bot_app_enabled')) {
+
+    log.debug('apps.wallet-bot.enabled')
+
+    await server.register(require('../../apps/wallet-bot/plugin'))
+
+    log.debug('apps.wallet-bot.plugin.registered')
+
+  }
 
   server.route({
     method: "GET",
