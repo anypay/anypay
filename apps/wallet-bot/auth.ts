@@ -44,7 +44,7 @@ export async function authenticate(socket: Socket): Promise<AuthorizedSocket> {
 
     const walletBot = await authorizeWalletBot(token)
 
-    log.info('wallet-bot.socket.io.authenticated', { walletBot })
+    log.info('wallet-bot.socket.io.authenticated', walletBot)
 
     return { socket, walletBot }
 

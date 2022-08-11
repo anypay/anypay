@@ -33,11 +33,12 @@ import * as core from './lib'
 
   startFees()
 
-  if (process.env.WEBSOCKETS_SERVER) {
+  if (config.get('websockets_server_enabled')) {
 
     await server.register(websockets)
 
   }
+
   try {
 
     await start()
