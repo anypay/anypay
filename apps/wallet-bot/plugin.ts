@@ -96,6 +96,11 @@ export const plugin = (() => {
             })
           })
 
+          socket.onAny((event, ...args) => {
+
+            //console.log(`got ${event} with ${args}`);
+          });
+
           socket.on('disconnect', () => {
 
             unbind(binding)
