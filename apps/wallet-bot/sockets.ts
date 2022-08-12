@@ -97,3 +97,12 @@ export function listSockets(): LiveSocket[] {
 
 }
 
+export const handlers = require('require-all')({
+
+  dirname: `${__dirname}/socket.io/handlers`,
+
+  filter:  /(.+)\.ts$/,
+
+  resolve: handler => handler.default
+
+});
