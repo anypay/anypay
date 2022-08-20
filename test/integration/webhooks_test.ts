@@ -25,7 +25,7 @@ describe("Listing Available Webhooks", async () => {
 
   })
 
-  it("POST /v1/api/webhooks/:invoice_uid/attempts should allow retrying failed webhook", async () => {
+  it.skip("POST /v1/api/webhooks/:invoice_uid/attempts should allow retrying failed webhook", async () => {
 
     let account = await utils.createAccount()
 
