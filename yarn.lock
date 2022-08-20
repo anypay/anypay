@@ -7661,6 +7661,11 @@
   "resolved" "https://registry.npmjs.org/option-t/-/option-t-30.0.0.tgz"
   "version" "30.0.0"
 
+"option-type@^0.2.0":
+  "integrity" "sha512-aMm22OofnaF0VkieQTL3QZhQPcRPkDvu2m3NfuUkvxMgoYb+J/G6OJBo2ss+JXjXGDiwLNOA776oUNzHd4iZOA=="
+  "resolved" "https://registry.npmjs.org/option-type/-/option-type-0.2.0.tgz"
+  "version" "0.2.0"
+
 "optional-js@^2.0.0":
   "integrity" "sha512-B0LLi+Vg+eko++0z/b8zIv57kp7HKEzaPJo7LowJXMUKYdf+3XJGu/cw03h/JhIOsLnP+cG5QnTHAuicjA5fMw=="
   "resolved" "https://registry.npmjs.org/optional-js/-/optional-js-2.3.0.tgz"

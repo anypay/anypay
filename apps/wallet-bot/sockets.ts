@@ -1,6 +1,8 @@
 
 import { Socket } from 'socket.io'
 
+import { Option, Some, None } from 'option-type';
+
 import * as Joi from 'joi'
 
 import { authenticate } from './auth'
@@ -9,31 +11,98 @@ import { subscribe, unsubscribe } from './pubsub'
 
 import * as uuid from 'uuid'
 
+import { WalletBot } from './'
+
+
+/*
+ *
+ * In-memory data structure for tracking sockets connections.
+ *
+ */
+
 type LiveSockets = {
+
   [key: string]: Socket
+
 }
 
 export const sockets: LiveSockets = {}
 
-export class Sockets {
+export function getSocket(walletBot: WalletBot): Socket | null {
 
-  static async connect(socket) {
+  const socket = sockets[walletBot.id]
 
-    socket.sessionId = uuid.v4()
+  return socket
 
-    socket.on('authenticate', async (token) => {
+}
 
-      await subscribe(socket)
+export function setSocket(walletBot: WalletBot, socket: Socket): Socket {
 
-    })
+  let existingSocket = getSocket(walletBot)
 
+  if (existingSocket) {
+
+    throw new Error('Socket Already Connected For Wallet Bot')
   }
 
-  static async disconnect(socket: Socket) {
+  sockets[walletBot.get('id')] = socket
 
-    await unsubscribe(socket)
+  return socket
+
+}
+
+
+export function removeSocket(socket: Socket): void {
+
+  if (socket.data && socket.data.walletBot) {
+
+    let existingSocket = getSocket(socket.data.walletBot)
+
+    if (existingSocket) {
+
+      if (socket.connected) {
+
+        socket.disconnect()
+
+      }
+
+      delete sockets[socket.data.walletBot.id]
+
+    }
 
   }
 
 }
 
+interface LiveSocket {
+
+  wallet_bot_id: string;
+
+  socket: Socket;
+}
+
+export function listSockets(): LiveSocket[] {
+
+  return Object.keys(sockets).map(wallet_bot_id => {
+
+    return {
+
+      wallet_bot_id,
+
+      socket: sockets[wallet_bot_id]
+
+    }
+
+  })
+
+}
+
+export const handlers = require('require-all')({
+
+  dirname: `${__dirname}/socket.io/handlers`,
+
+  filter:  /(.+)\.ts$/,
+
+  resolve: handler => handler.default
+
+});

@@ -24,6 +24,8 @@ import { findOrCreateWalletBot, getAccessToken } from './'
 
 import { badImplementation } from '@hapi/boom'
 
+import { listSockets, setSocket, removeSocket, getSocket, handlers } from './sockets'
+
 export const plugin = (() => {
 
   return {
@@ -32,28 +34,47 @@ export const plugin = (() => {
 
     register: async function(server: Server, options, next) {
 
-      const path = '/v1/apps/wallet-bot/socket.io'
+      const path = '/v1/apps/wallet-bot'
 
-      //const io = socketio(server.listener, { path })
-      const io = socketio(server.listener)
+      const io = socketio(server.listener, { path })
 
       log.info('socket.io.started', { path })
 
       io.use(async (socket, next) => {
 
-        log.debug('wallet-bot.socket.io.handshake', socket.handshake)
+        try {
 
-        const { address } = socket.handshake
+          log.info('wallet-bot.socket.io.connecting')
 
-        const { walletBot } = await authenticate(socket)
+          log.info('wallet-bot.socket.io.handshake', socket.handshake)
 
-        socket.data.walletBot = walletBot
+          const { address } = socket.handshake
 
-        log.info('wallet-bot.socket.io.authenticated', { address, walletBot })
+          const { walletBot } = await authenticate(socket)
 
-        socket.emit('authenticated')
+          if (!walletBot) {
 
-        next()
+            throw new Error('unauthorized')
+
+          }
+
+          socket.data.walletBot = walletBot
+
+          setSocket(walletBot, socket)
+
+          log.info('wallet-bot.socket.io.authenticated', { address, walletBot })
+
+          socket.emit('authenticated')
+
+          next()
+
+        } catch(error) {
+
+          socket.emit('error', error)
+
+          removeSocket(socket)
+
+        }
 
       })
 
@@ -67,17 +88,36 @@ export const plugin = (() => {
 
           const binding = await bind({ socket })
 
-          socket.on('*', (message) => {
-            log.info('wallet-bot-socket.io.message', message)
+          Object.keys(handlers).forEach(event => {
+
+            socket.on(event, (message) => {
+
+              handlers[event](socket, message)
+            })
           })
+
+          socket.onAny((event, ...args) => {
+
+            //console.log(`got ${event} with ${args}`);
+          });
 
           socket.on('disconnect', () => {
 
             unbind(binding)
 
+            removeSocket(socket)
+
             log.info('wallet-bot.socket.io.disconnect', socket.info)
 
+            const sockets = listSockets()
+
+            log.info('wallet-bot.socket.io.sockets', { count: sockets.length })
+
           })
+
+          const sockets = listSockets()
+
+          log.info('wallet-bot.socket.io.sockets', { count: sockets.length })
 
         } catch(error) {
 
@@ -101,13 +141,19 @@ export const plugin = (() => {
 
             const accessToken = await getAccessToken(walletBot)
 
+            const socket = getSocket(walletBot)
+
+            const status = socket ? 'connected' : 'disconnected'
+
             const wallet_bot = {
 
               id: walletBot.get('id'),
 
-              status: 'disconnected'
+              status
 
             }
+
+            const balances = socket ? socket.data.balances : null
 
             const access_token = accessToken.get('uid')
 
@@ -115,7 +161,9 @@ export const plugin = (() => {
 
               wallet_bot,
 
-              access_token
+              access_token,
+
+              balances
 
             }
            
@@ -148,9 +196,6 @@ export const plugin = (() => {
   }
 
 })()
-
-
-import { io } from "socket.io-client";
 
 if (require.main === module) {
 
