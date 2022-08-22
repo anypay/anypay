@@ -103,6 +103,7 @@
     "node-cron": "^2.0.3",
     "node-fetch": "^3.2.1",
     "node-statsd": "^0.1.1",
+    "option-type": "^0.2.0",
     "parent-module": "^2.0.0",
     "payment-protocol": "^0.3.0",
     "pg": "^8.7.3",
