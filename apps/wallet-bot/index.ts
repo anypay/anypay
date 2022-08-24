@@ -1,6 +1,6 @@
 
 import { models } from '../../lib/models'
-import { Orm, findOrCreate } from '../../lib/orm';
+import { Orm, findOrCreate, findOne, create } from '../../lib/orm';
 
 import { App } from  '../../lib/apps'
 import { Account } from  '../../lib/account'
@@ -9,6 +9,7 @@ import { AccessTokenV0 as AccessToken } from  '../../lib/access_tokens'
 import { log } from '../../lib/log'
 
 import * as uuid from 'uuid'
+import { apps } from '../../lib';
 
 // Wallet Bot Events
 // It should receive the following events:
@@ -38,6 +39,8 @@ import * as uuid from 'uuid'
 // messages down to the wallet but by publishing to the routing key `wallet-bots.${id}.events`.
 // Relevant events shall be validated and sent along to the websocket if connected. Upon dis-
 // connection of the websocket the queue shall be released from amqp.
+
+const APP_NAME = '@wallet-bot'
 
 export class WalletBot extends Orm {
 
@@ -81,7 +84,7 @@ export async function getWalletBot({ token }: {token: string}): Promise<WalletBo
     throw new Error('Invalid Access Token')
   }
 
-  if (app.name !== '@wallet-bot') {
+  if (app.name !== APP_NAME) {
     throw new Error('Invalid Access Token')
   }
 
@@ -109,7 +112,7 @@ export async function createWalletBot(account: Account): Promise<WalletBot> {
 
   let [app] = await findOrCreate<App>(App, {
     where: {
-      name: '@wallet-bot',
+      name: APP_NAME,
       account_id: account.id
     }
   })
@@ -120,7 +123,7 @@ export async function createWalletBot(account: Account): Promise<WalletBot> {
       account_id: account.id
     },
     defaults: {
-      name: '@wallet-bot',
+      name: APP_NAME,
       app_id: app.id,
       account_id: account.id,
       identifier: uuid.v4()
@@ -138,17 +141,27 @@ export async function createWalletBot(account: Account): Promise<WalletBot> {
 
 export async function findOrCreateWalletBot(account: Account): Promise<WalletBot> {
 
-  const query = {
-
+  const existingBot = await findOne<WalletBot>(WalletBot, {
     where: {
       account_id: account.id
-    },
-    defaults: {
-      account_id: account.id
     }
+  })
+
+  if (existingBot) {
+
+    return existingBot
   }
 
-  const [walletBot] = await WalletBot.findOrCreate(query)
+  const app = await apps.createApp({
+    account_id: account.id,
+    name: APP_NAME
+  })
+
+  const walletBot = await create<WalletBot>(WalletBot, {
+    account_id: account.id,
+    name: APP_NAME,
+    app_id: app.id
+  })
   
   return walletBot
 
@@ -156,7 +169,7 @@ export async function findOrCreateWalletBot(account: Account): Promise<WalletBot
 
 export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken> {
 
-  let [accessToken] = await AccessToken.findOrCreate({
+  let [accessToken] = await findOrCreate<AccessToken>(AccessToken, {
 
     where: {
       account_id: walletBot.get('account_id'),
@@ -164,7 +177,8 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
     },
     defaults: {
       account_id: walletBot.get('account_id'),
-      app_id: walletBot.get('app_id')
+      app_id: walletBot.get('app_id'),
+      name: APP_NAME
     }
   })
 
