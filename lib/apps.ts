@@ -20,6 +20,13 @@ export async function findApp(id: number): Promise<App> {
   return new App(record)
 }
 
+export async function findOne(where: any): Promise<App> {
+
+  let record = await models.App.findOne({ where })
+
+  return new App(record)
+}
+
 export async function createApp(params: NewApp) {
 
   let privkey = new bsv.PrivateKey()

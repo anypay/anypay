@@ -78,6 +78,8 @@ export class InvalidWebhookURL implements Error {
 
 export class Invoice extends Orm {
 
+  static model = models.Invoice;
+
   get account_id(): any {
 
     return this.get('account_id')
@@ -187,8 +189,6 @@ interface CreateInvoice {
   location_id?: string;
   register_id?: string;
 }
-
-
 
 export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 

@@ -73,6 +73,9 @@ export async function getWalletBot({ token }: {token: string}): Promise<WalletBo
   }
 
   if (!accessToken.app_id) {
+
+    log.debug('wallet-bot.access-token.invalid', { reason: 'no app_id'})
+
     throw new Error('Invalid Access Token')
   }
 
@@ -92,6 +95,8 @@ export async function getWalletBot({ token }: {token: string}): Promise<WalletBo
       where: { app_id: app.id }
   })
 
+  log.debug('debug.record', record.toJSON())
+
   return new WalletBot(record);
 
 }
@@ -110,12 +115,16 @@ export async function findWalletBot(account: Account): Promise<WalletBot | null>
 
 export async function createWalletBot(account: Account): Promise<WalletBot> {
 
+  log.debug('create wallet bot', account)
+
   let [app] = await findOrCreate<App>(App, {
     where: {
       name: APP_NAME,
       account_id: account.id
     }
   })
+
+  log.debug('app', app)
 
   let [walletBot, isNew] = await findOrCreate<WalletBot>(WalletBot, {
     where: {
@@ -139,7 +148,7 @@ export async function createWalletBot(account: Account): Promise<WalletBot> {
 
 }
 
-export async function findOrCreateWalletBot(account: Account): Promise<WalletBot> {
+export async function findOrCreateWalletBot(account: Account): Promise<{walletBot: WalletBot, app: App }> {
 
   const existingBot = await findOne<WalletBot>(WalletBot, {
     where: {
@@ -149,7 +158,13 @@ export async function findOrCreateWalletBot(account: Account): Promise<WalletBot
 
   if (existingBot) {
 
-    return existingBot
+    const app = await apps.findOne({
+      account_id: account.id,
+      name: APP_NAME
+    })
+
+    return {walletBot: existingBot, app}
+
   }
 
   const app = await apps.createApp({
@@ -163,7 +178,7 @@ export async function findOrCreateWalletBot(account: Account): Promise<WalletBot
     app_id: app.id
   })
   
-  return walletBot
+  return { walletBot, app }
 
 }
 
