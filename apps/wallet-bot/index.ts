@@ -9,7 +9,7 @@ import { AccessTokenV0 as AccessToken } from  '../../lib/access_tokens'
 import { log } from '../../lib/log'
 
 import * as uuid from 'uuid'
-import { apps } from '../../lib';
+import { apps, database } from '../../lib';
 
 // Wallet Bot Events
 // It should receive the following events:
@@ -198,6 +198,21 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
   })
 
   return accessToken
+
+}
+
+interface PaymentCounts {
+  unpaid: number;
+  paid: number;
+  cancelled: number;
+  failed: number;
+}
+
+export async function getPaymentCounts(walletBot: WalletBot): Promise<any> {
+
+  let results = await database.query(`select count(*), status from invoices where app_id = ${walletBot.get('app_id')} group by status`)
+
+  return results[0]
 
 }
 
