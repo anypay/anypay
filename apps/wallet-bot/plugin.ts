@@ -12,19 +12,19 @@ import { log } from '../../lib/log'
 
 import { useJWT } from '../../server/auth/jwt'
 
-import { bind, unbind, Context } from './socket.io/amqp_queue_socket_binding'
+import { bind, unbind } from './socket.io/amqp_queue_socket_binding'
 
 import { config } from '../../lib/config'
 
-import * as Joi from '@hapi/joi';
-
-import { failAction } from '../../server/handlers'
-
 import { findOrCreateWalletBot, getAccessToken } from './'
 
-import { badImplementation } from '@hapi/boom'
+import { badImplementation, badRequest } from '@hapi/boom'
 
 import { listSockets, setSocket, removeSocket, getSocket, handlers } from './sockets'
+import { Invoice } from '../../lib/invoices';
+import { findAll } from '../../lib/orm';
+
+import { models } from '../../lib'
 
 export const plugin = (() => {
 
@@ -116,7 +116,7 @@ export const plugin = (() => {
 
         } catch(error) {
 
-          console.error('io.connection.error', error)
+          log.error('io.connection.error', error)
 
         }
 
@@ -132,7 +132,7 @@ export const plugin = (() => {
 
           try {
 
-            const walletBot = await findOrCreateWalletBot(req.account)
+            const {walletBot} = await findOrCreateWalletBot(req.account)
 
             const accessToken = await getAccessToken(walletBot)
 
@@ -184,6 +184,55 @@ export const plugin = (() => {
           }
           */
         }
+      })
+
+      server.route({
+        path: `${base}/invoices`,
+        method: 'GET',
+        options: {
+          auth: "jwt"
+        },
+        handler: async (req, h) => {
+
+          try {
+
+            const { app } = await findOrCreateWalletBot(req.account)
+
+            const { status, limit, offset } = req.query
+
+            const where = {
+              app_id: app.id,
+              status: status || 'paid'
+            }
+
+            const query = { where }
+
+            if (limit) {
+              query['limit'] = limit
+            }
+
+            if (offset) {
+              query['offset'] = offset
+            }
+
+            const invoices = await findAll<Invoice>(Invoice, query)
+
+            return {
+              app: '@wallet-bot',
+              invoices: invoices.map(invoice => invoice.toJSON())
+            }
+
+          } catch(error) {
+
+            log.error('wallet-bot.handlers.invoices.list', error)
+
+            return badRequest(error)
+
+          }
+
+        }
+
+      
       })
 
     }

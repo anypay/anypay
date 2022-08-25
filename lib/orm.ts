@@ -106,9 +106,9 @@ export async function create<T>(constructor: any, params: any): Promise<T> {
 
 }
 
-export async function find<T>(constructor: any, params: any): Promise<T[]> {
+export async function findAll<T>(constructor: any, params: any): Promise<T[]> {
 
-  let records = await constructor.model.find(params)
+  let records = await constructor.model.findAll(params)
 
   return records.map(record => new constructor(record))
 
