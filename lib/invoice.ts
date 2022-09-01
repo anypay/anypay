@@ -95,7 +95,9 @@ interface EmptyInvoiceOptions {
   amount?: number
 }
 
-export async function createEmptyInvoice(app_id: number, { uid, currency, amount }: EmptyInvoiceOptions) {
+export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}) {
+
+  var { uid, currency, amount } = options
 
   uid = !!uid ? uid : shortid.generate();
 
