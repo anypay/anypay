@@ -16,7 +16,7 @@ import { bind, unbind } from './socket.io/amqp_queue_socket_binding'
 
 import { config } from '../../lib/config'
 
-import { findOrCreateWalletBot, getAccessToken } from './'
+import { findOrCreateWalletBot, getAccessToken, getPaymentCounts } from './'
 
 import { badImplementation, badRequest } from '@hapi/boom'
 
@@ -136,6 +136,8 @@ export const plugin = (() => {
 
             const accessToken = await getAccessToken(walletBot)
 
+            const counts = await getPaymentCounts(walletBot)
+
             const socket = getSocket(walletBot)
 
             const status = socket ? 'connected' : 'disconnected'
@@ -158,7 +160,9 @@ export const plugin = (() => {
 
               access_token,
 
-              balances
+              balances,
+
+              counts
 
             }
            
@@ -202,13 +206,13 @@ export const plugin = (() => {
 
             const where = {
               app_id: app.id,
-              status: status || 'paid'
+              status: status || 'unpaid'
             }
 
             const query = { where }
 
             if (limit) {
-              query['limit'] = limit
+              query['limit'] = limit || 100
             }
 
             if (offset) {
