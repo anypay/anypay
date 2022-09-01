@@ -89,7 +89,13 @@ function applyDiscount(invoiceAmount, discountPercent) {
   });
 }
 
-export async function createEmptyInvoice(app_id: number, uid?: string) {
+interface EmptyInvoiceOptions {
+  uid?: string;
+  currency?: string;
+  amount?: number
+}
+
+export async function createEmptyInvoice(app_id: number, { uid, currency, amount }: EmptyInvoiceOptions) {
 
   uid = !!uid ? uid : shortid.generate();
 
@@ -108,7 +114,9 @@ export async function createEmptyInvoice(app_id: number, uid?: string) {
     app_id,
     account_id: app.account_id,
     uid,
-    uri
+    uri,
+    currency,
+    amount
   })
 
 }

@@ -7,6 +7,8 @@ import { models, log, password } from '../../lib';
 
 import { findApp } from '../../lib/apps'
 
+import { findAccount } from '../../lib/account'
+
 export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
   try {
@@ -48,6 +50,7 @@ async function validateToken (request, username, password, h) {
 			}
 		})
 		request.account = account;
+
     request.account_id = accessToken.account_id;
 
     return {
@@ -117,11 +120,19 @@ export async function validateAppToken (request, username, password, h) {
 
   }
 
+  request.token = username
+
+
+
   if (accessToken.app_id) {
 
     request.app_id = accessToken.app_id
 
     request.app = await findApp(accessToken.app_id)
+
+    request.account = await findAccount(accessToken.account_id)
+
+    request.token = username
 
     return {
       isValid: true,

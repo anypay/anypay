@@ -20,11 +20,13 @@ import { findOrCreateWalletBot, getAccessToken, getPaymentCounts } from './'
 
 import { badImplementation, badRequest } from '@hapi/boom'
 
+import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
+
 import { listSockets, setSocket, removeSocket, getSocket, handlers } from './sockets'
 import { Invoice } from '../../lib/invoices';
 import { findAll } from '../../lib/orm';
 
-import { models } from '../../lib'
+import { failAction } from '../../server/handlers'
 
 export const plugin = (() => {
 
@@ -191,6 +193,73 @@ export const plugin = (() => {
       })
 
       server.route({
+        path: `${base}/unpaid`,
+        method: 'GET',
+        options: {
+          auth: "app"
+        },
+        handler: async (req, h) => {
+
+          try {
+
+            const { app } = await findOrCreateWalletBot(req.app)
+
+            const { status, limit, offset } = req.query
+
+            const where = {
+              app_id: app.id,
+              status: 'unpaid'
+            }
+
+            const query = { where }
+
+            if (limit) {
+              query['limit'] = limit || 100
+            }
+
+            if (offset) {
+              query['offset'] = offset
+            }
+
+            const invoices = await findAll<Invoice>(Invoice, query)
+
+            return {
+              app: '@wallet-bot',
+              invoices: invoices.map(invoice => invoice.toJSON())
+            }
+
+          } catch(error) {
+
+            log.error('wallet-bot.handlers.invoices.list', error)
+
+            return badRequest(error)
+
+          }
+
+        }
+
+      })
+
+      var handlers = requireHandlersDirectory(`${__dirname}/api/handlers`)
+
+      server.route({
+        path: `${base}/invoices`,
+        method: 'POST',
+        handler: handlers.Invoices.create,
+        options: {
+          auth: "app",
+          validate: {
+            payload: handlers.Invoices.schema.payload,
+            failAction
+          },
+          response: {
+            failAction: 'log',
+            schema: handlers.Invoices.schema.response
+          }
+        },
+      })
+
+      server.route({
         path: `${base}/invoices`,
         method: 'GET',
         options: {
@@ -245,31 +314,45 @@ export const plugin = (() => {
 
 })()
 
+import { requireDirectory } from 'rabbi'
+
+const auth = requireDirectory('../../server/auth')
+
+export async function createServer(): Promise<Server> {
+
+  const server = new Server({
+    host: config.get('HOST'),
+    port: config.get('PORT'),
+    routes: {
+      cors: true
+    }
+  });
+
+  await server.register(AuthBearer)
+
+  await server.register(require('hapi-auth-basic'));
+
+  server.auth.strategy("app", "basic", { validate: auth.Token.validateAppToken });
+
+  server.auth.strategy("jwt", "bearer-access-token", useJWT());
+
+  await server.register(plugin)
+
+  return server
+
+}
+
 if (require.main === module) {
 
   (async () => {
 
-    const server = new Server({
-      host: config.get('HOST'),
-      port: config.get('PORT'),
-      routes: {
-        cors: true
-      }
-    });
-
-    await server.register(AuthBearer)
-
-    server.auth.strategy("jwt", "bearer-access-token", useJWT());
-
-    await server.register(plugin)
+    const server = await createServer()
 
     log.info('wallet-bot.socket.io.server.start')
 
     await server.start();
     
     log.info('wallet-bot.socket.io.server.started', server.info)
-
-
 
   })()
 
