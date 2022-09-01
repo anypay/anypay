@@ -47,7 +47,9 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   }
 
-  log.info('account.created', {account})
+  const { id } = account
+
+  log.info('account.created', { id, email })
 
   return new Account(account);
 

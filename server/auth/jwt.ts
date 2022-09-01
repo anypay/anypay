@@ -4,6 +4,7 @@ import { Request } from 'hapi'
 import { log } from '../../lib/log'
 
 import { authorizeAccount } from '../../lib/auth'
+import { paymentRequestToPaymentOptions } from '../../lib/payment_options'
 
 export async function authorizeRequest(request: Request) {
 
@@ -40,6 +41,8 @@ export function useJWT() {
         const artifacts = { account }
 
         request.account = account
+
+        request.token = token
 
         return {
 
