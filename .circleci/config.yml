@@ -25,8 +25,8 @@ jobs:
       - run:
           name: Run Main Tests
           command: npm test
-      - coveralls/upload:
-          path_to_lcov: ./coverage
+            #- coveralls/upload:
+            #path_to_lcov: ./coverage
       - run:
           name: Report Code Coverage
           command: |
