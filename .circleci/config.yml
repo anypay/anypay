@@ -1,4 +1,6 @@
 version: 2.1
+orbs:
+  coveralls: coveralls/coveralls@1.0.6
 jobs:
   build:
     docker:
@@ -23,6 +25,7 @@ jobs:
       - run:
           name: Run Main Tests
           command: npm test
+      - coveralls/upload
       - run:
           name: Report Code Coverage
           command: |

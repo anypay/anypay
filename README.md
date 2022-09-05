@@ -8,6 +8,7 @@
 
 ```
 [![Build](https://github.com/anypay/anypay/actions/workflows/build.yml/badge.svg)](https://github.com/anypay/anypay/actions/workflows/build.yml)
+[![Anypay](https://circleci.com/gh/anypay/anypay.svg?style=svg)](https://circleci.com/gh/anypay/anypay)
 
 ## Configuration
 
