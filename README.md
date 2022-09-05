@@ -7,6 +7,7 @@
 \_| |_/\_| \_/  \_/  \_|    \_| |_/  \_/
 
 ```
+[![Build](https://github.com/anypay/anypay/actions/workflows/build.yml/badge.svg)](https://github.com/anypay/anypay/actions/workflows/build.yml)
 
 ## Configuration
 
