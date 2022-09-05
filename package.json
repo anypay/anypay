@@ -28,6 +28,7 @@
     "@google/maps": "^0.5.5",
     "@hapi/basic": "^7.0.0",
     "@hapi/boom": "^9.1.4",
+    "@hapi/hapi": "^20.2.2",
     "@hapi/inert": "^6.0.5",
     "@hapi/joi": "^17.1.1",
     "@hapi/vision": "^6.1.0",
