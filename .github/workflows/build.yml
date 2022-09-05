@@ -36,6 +36,8 @@ jobs:
       - name: install, build and test
         env:
           SKIP_E2E_PAYMENTS_TESTS: true
+          DATABASE_URL: postgres://postgres:letmein@postgres:5432/database
+          AMQP_URL: amqp://guest:guest@rabbitmq:5672/
         run: |
           npm install
           npm test
