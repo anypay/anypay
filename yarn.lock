@@ -2197,7 +2197,7 @@
   "resolved" "https://registry.npmjs.org/bsv-coinselect/-/bsv-coinselect-4.2.5.tgz"
   "version" "4.2.5"
 
-"bsv@^1.2.0", "bsv@^1.5.3", "bsv@^1.5.6", "bsv@0.27.1", "bsv@1.5.6":
+"bsv@^1.2.0", "bsv@^1.5.3", "bsv@^1.5.6", "bsv@1.5.6":
   "integrity" "sha512-A0g36x63lVF9Ia6/z/RjcxaQMHE5cLl2rDxjUIKz0UTMLf5bPPyLI9yVyY2JkecF77MrU+MQdKVt0MSdU5abtw=="
   "resolved" "https://registry.npmjs.org/bsv/-/bsv-1.5.6.tgz"
   "version" "1.5.6"
@@ -3183,15 +3183,6 @@
   "integrity" "sha512-Vr3mLBA8qWmcuschSLAOogKgQ/Jwxulv3RNE4FXnYWRGujzrRWQI4m12fQqRkwX06C0KanhLr4hK+GydchZsaA=="
   "resolved" "https://registry.npmjs.org/data-uri-to-buffer/-/data-uri-to-buffer-4.0.0.tgz"
   "version" "4.0.0"
-
-"datapay@^0.0.18":
-  "integrity" "sha512-HV9fXl9SeHxSh+ighkClBlmndzopAH4B/bkTLgSfQqiI56VhCg3oQKJtOD0CfzH7+Z0hXMjbRVumCNUu+ptCSQ=="
-  "resolved" "https://registry.npmjs.org/datapay/-/datapay-0.0.18.tgz"
-  "version" "0.0.18"
-  dependencies:
-    "bitcore-explorers" "^1.0.1"
-    "buffer" "^5.2.1"
-    "mingo" "^2.2.4"
 
 "date-and-time@^2.0.0":
   "integrity" "sha512-O7Xe5dLaqvY/aF/MFWArsAM1J4j7w1CSZlPCX9uHgmb+6SbkPd8Q4YOvfvH/cZGvFlJFfHOZKxQtmMUOoZhc/w=="

@@ -64,7 +64,6 @@
     "crypto-js": "^4.0.0",
     "csv-parse": "^4.6.1",
     "csv-writer": "^1.2.0",
-    "datapay": "^0.0.18",
     "dotenv": "^8.1.0",
     "elastic-apm-node": "^3.16.0",
     "elasticsearch": "^16.7.1",

@@ -4,7 +4,6 @@ require('dotenv').config()
 import * as program from 'commander';
 import * as http from 'superagent';
 import * as bitcoin from 'bsv';
-import * as datapay from 'datapay';
 import * as PaymentProtocol from '../vendor/bitcore-payment-protocol';
 
 import { rawTxToPayment } from '../plugins/bch/lib/rawtx_to_payment';
@@ -63,13 +62,6 @@ program
 
     });
 
-    var config = {
-      pay: {
-        key: process.env.BIP_270_EXTRA_OUTPUT_WIF,
-        to: outputs
-      }
-    }
-    datapay.send(config, console.log);
 
   });
 
