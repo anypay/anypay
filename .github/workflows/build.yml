@@ -20,6 +20,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm install -g typescript tsc
       - name: install, build and test
+        env:
+          SKIP_E2E_PAYMENTS_TESTS: true
         run: |
           npm install
           npm test
