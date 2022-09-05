@@ -1,14 +1,8 @@
-```
+![](https://bitcoinfilesystem.com/44ccdab033dff03d755bfa0b3db669954b7855cd21ea167b812e758fe3987ddd)
 
- / _ \ | \ | |\ \ / /| ___ \ / _ \ \ \ / /
-/ /_\ \|  \| | \ V / | |_/ // /_\ \ \ V /
-|  _  || . ` |  \ /  |  __/ |  _  |  \ /
-| | | || |\  |  | |  | |    | | | |  | |
-\_| |_/\_| \_/  \_/  \_|    \_| |_/  \_/
-
-```
 [![Build](https://github.com/anypay/anypay/actions/workflows/build.yml/badge.svg)](https://github.com/anypay/anypay/actions/workflows/build.yml)
 [![Anypay](https://circleci.com/gh/anypay/anypay.svg?style=svg)](https://circleci.com/gh/anypay/anypay)
+[![Coverage Status](https://coveralls.io/repos/github/anypay/anypay/badge.svg?branch=master)](https://coveralls.io/github/anypay/anypay?branch=master)
 
 ## Configuration
 
