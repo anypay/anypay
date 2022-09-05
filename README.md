@@ -1,81 +1,27 @@
 ![](https://bitcoinfilesystem.com/44ccdab033dff03d755bfa0b3db669954b7855cd21ea167b812e758fe3987ddd)
 
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/anypay/anypay)
-[![Build](https://github.com/anypay/anypay/actions/workflows/build.yml/badge.svg)](https://github.com/anypay/anypay/actions/workflows/build.yml)
-[![Anypay](https://circleci.com/gh/anypay/anypay.svg?style=svg)](https://circleci.com/gh/anypay/anypay)
-[![Coverage Status](https://coveralls.io/repos/github/anypay/anypay/badge.svg?branch=master)](https://coveralls.io/github/anypay/anypay?branch=master)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/anypay/anypay?style=for-the-badge)
+![Docker Pulls](https://img.shields.io/docker/pulls/anypay/anypay?style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/anypay/anypay/build?label=GITHUB%20BUILD&style=for-the-badge)
+![CircleCI](https://img.shields.io/circleci/build/github/anypay/anypay?label=Circle%20CI%20Build&style=for-the-badge)![Coveralls](https://img.shields.io/coveralls/github/anypay/anypay?style=for-the-badge)
 
-## Configuration
+<h1 style="text-align: center;">Peer to Peer Payments APIs for Developers</h1>
 
-Configuration of the application is done via environment variables
+### API Documentation
+[https://api.anypayx.com/](https://api.anypayx.com)
 
-## Enabling Features
 
-- set environment variable `ANYPAY_FEATURE_BITCOINCASH=1` to enable support
-for bitcoin cash
+### Run with Docker
 
-## Generating API Documenation
-
-To generate API documenation locally with swagger you must run the REST API process.
-
-First set the DATABASE_URL to a valid postgresql database, as outlined below.
-
-Then run `node servers/rest_api/server.js` and navigate your browser to `http://localhost:8000/documentation`.
-
-The JSON schema used to generate Swagger clients is then available at `http://localhost:8000/swagger.json`.
-
-Setting the `PORT` environment variable to something other than 8000 will allow use of a different http port.
-
-## Running the Tests
-
-Ideally every piece of the application will have accompanying tests to increase
-the security, availability and quality of the software.
+[https://hub.docker.com/r/anypay/anypay](https://hub.docker.com/r/anypay/anypay)
 
 ```
-npm test
+docker run -d -p 5200:5200 anypay/anypay
 ```
 
-#### Configuring the Postgres Database for Testing
+### Environment
 
-The tests require a postgres database to be created.
-Install postgres and create a database named `anypay_test`.
-
-```
-psql
-postgres> create database anypay_test;
-```
-
-Then export the `DATABASE_URL` connection string as an environment variable. 
-
-```
-export DATABASE_URL=postgres://postgres:@127.0.0.1:5432/anypay_test
-```
-
-Note that the connection string format is as follows:
-
-```
-postgres://{postgres_user}:{postgres_password}@{host}:{port}/{database_name}
-```
-Depending on your system configuration you may need to chance `postgres_user`
-and `postgres_password`.
-
-#### Install Mocha
-
-Finally install the javascript testing framework `mocha`
-
-```
-npm install -g mocha
-```
-
-#### Runnig The Tests
-
-Now you can run the tests with `npm test`!
-
-`npm test` is defined in the `package.json` file under `scripts`. It runs mocha
-on all tests under the `/test` directory of the project.
-
-#### Write Your Own Tests
-
-For more information on how to write tests, please see
-[https://mochajs.org/#getting-started](https://mochajs.org/#getting-started)
-
+- HOST
+- PORT
+- DATABASE_URL
+- AMQP_URL
