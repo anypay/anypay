@@ -132,7 +132,7 @@ async function Server() {
     return h.continue;
   })
 
-  await server.register(require('hapi-auth-basic'));
+  await server.register(require('@hapi/basic'));
 
   await server.register(Inert);
 

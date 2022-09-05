@@ -330,7 +330,7 @@ export async function createServer(): Promise<Server> {
 
   await server.register(AuthBearer)
 
-  await server.register(require('hapi-auth-basic'));
+  await server.register(require('@hapi/basic'));
 
   server.auth.strategy("app", "basic", { validate: auth.Token.validateAppToken });
 
