@@ -210,7 +210,7 @@ export function auth(account, version=1) {
 
 import { Wallet } from 'anypay-simple-wallet'
 
-const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF
+const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 
 if (!WIF) {
 
