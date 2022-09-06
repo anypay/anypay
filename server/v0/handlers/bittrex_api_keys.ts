@@ -3,7 +3,7 @@ import { models } from '../../../lib'
 
 export async function create(req, h) { 
 
-  let [bittrexAccount, isNew] = await models.BittrexAccount.findOrCreate({
+  let [bittrexAccount] = await models.BittrexAccount.findOrCreate({
     where: {
       account_id: req.account.id
     },

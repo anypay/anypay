@@ -9,13 +9,6 @@ import { coins, models, accounts, slack, log, utils } from '../../../lib';
 
 import { near } from '../../../lib/accounts'
 
-function sanitize(account) {
-  let json = account.toJSON()
-  delete json['authenticator_secret']
-  delete json['password_hash']
-  delete json['is_admin']
-}
-
 export async function nearby(req, h) {
 
   try {

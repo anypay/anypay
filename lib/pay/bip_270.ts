@@ -1,8 +1,7 @@
 
 import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
 
-import { getBitcore, toSatoshis } from '../bitcore';
-import { getFee, Fee } from './fees';
+import { getBitcore } from '../bitcore';
 
 import * as moment from 'moment';
 
@@ -19,11 +18,6 @@ export function getCurrency(params: GetCurrency): Currency {
 export async function buildOutputs(paymentOption: PaymentOption): Promise<PaymentOutput[]> {
 
   let bitcore = getBitcore(paymentOption.currency);
-
-
-  let fee: Fee = await getFee(paymentOption.currency);
-  let feeAddress = new bitcore.Address(fee.address);
-  let feeScript = new bitcore.Script(feeAddress);
 
   let outputs = paymentOption.outputs.map(output => {
 
@@ -80,7 +74,7 @@ export async function getMerchantData(invoiceUid: string, account_id?: number): 
   }
 }
 
-import { PaymentRequest, PaymentRequestOptions } from './'
+import { PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<Bip270PaymentRequest> {
 

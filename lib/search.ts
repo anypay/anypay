@@ -32,7 +32,7 @@ export async function search(query: string, account?: Account): Promise<SearchRe
 
 }
 
-async function searchInvoiceUid(uid: string, account?: Account): Promise<SearchResult[]>{
+export async function searchInvoiceUid(uid: string, account?: Account): Promise<SearchResult[]>{
 
   const where = { uid }
 
@@ -49,7 +49,7 @@ async function searchInvoiceUid(uid: string, account?: Account): Promise<SearchR
 
 }
 
-async function searchAccountEmail(email: string, account?: Account): Promise<SearchResult[]> {
+export async function searchAccountEmail(email: string, account?: Account): Promise<SearchResult[]> {
 
   const where = { email }
 
@@ -63,7 +63,7 @@ async function searchAccountEmail(email: string, account?: Account): Promise<Sea
 
 }
 
-async function searchInvoiceHash(hash: string, account?: Account): Promise<SearchResult[]> {
+export async function searchInvoiceHash(hash: string, account?: Account): Promise<SearchResult[]> {
 
   const where = { hash }
 
@@ -77,7 +77,7 @@ async function searchInvoiceHash(hash: string, account?: Account): Promise<Searc
 
 }
 
-async function searchInvoiceExternalId(external_id: string, account?: Account): Promise<SearchResult[]> {
+export async function searchInvoiceExternalId(external_id: string, account?: Account): Promise<SearchResult[]> {
 
   const where = { external_id }
 

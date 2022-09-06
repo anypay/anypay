@@ -3,7 +3,7 @@ import * as moment from 'moment';
 import * as Joi from '@hapi/joi';
 import * as Boom from 'boom';
 
-import { buildAccountCsvReport, buildReportCsvFromDates, buildAllTimeReport } from '../../../lib/csv';
+import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';
 import { models } from '../../../lib';
 
 import { findAccount } from '../../../lib/account';

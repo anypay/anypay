@@ -9,9 +9,7 @@ import * as assert from 'assert';
 
 import { registerAccount } from '../lib/accounts';
 
-import { setAddress } from '../lib/core';
-
-import { AccessTokenV1, ensureAccessToken } from '../lib/access_tokens'
+import { ensureAccessToken } from '../lib/access_tokens'
 
 import { Account } from '../lib/account'
 
@@ -42,6 +40,10 @@ export async function createAccountWithAddress(): Promise<[Account, Address]> {
 }
 
 interface NewAccountInvoice {
+  amount?: number;
+}
+
+interface NewInvoice {
   amount?: number;
 }
 
@@ -107,6 +109,29 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
   })
 
   return [ account, invoice ]
+
+}
+
+export async function newInvoice(params: NewInvoice = {}): Promise<Invoice> {
+
+  let { address } = await generateKeypair()
+
+  await account.setAddress({ currency: 'BSV', address })
+
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
+  
+  await account.setAddress({ currency: 'DASH', address: dash_address })
+
+  let invoice = await createInvoice({
+    account,
+    amount: params.amount || 10
+  })
+
+  return invoice
 
 }
 

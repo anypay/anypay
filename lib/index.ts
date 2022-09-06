@@ -13,7 +13,6 @@ import { models } from './models';
 import * as database from './database';
 import * as addresses from './addresses';
 import * as coins from './coins';
-import * as invoice from './invoice';
 import { log } from './log';
 import { plugins } from './plugins';
 import * as blockcypher from './blockcypher';

@@ -19,7 +19,6 @@ export function getBitcore(currency) {
 
 export function toSatoshis(amount): number{
   let amt = new BigNumber(amount); 
-  let scalar = new BigNumber(100000000);
 
   return amt.times(amount).toNumber();
 }

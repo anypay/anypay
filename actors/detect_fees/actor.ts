@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
 import { ensureInvoice } from '../../lib/invoices'
 
@@ -11,7 +11,7 @@ import { getPayment } from '../../lib/payments'
 import { getMiningFee } from '../../lib/fees'
 
 export async function start() {
-
+``
   Actor.create({
 
     exchange: 'anypay:invoices',

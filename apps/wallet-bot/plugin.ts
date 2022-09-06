@@ -22,7 +22,7 @@ import { badImplementation, badRequest } from '@hapi/boom'
 
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
-import { listSockets, setSocket, removeSocket, getSocket, handlers } from './sockets'
+import { listSockets, setSocket, removeSocket, getSocket } from './sockets'
 import { Invoice } from '../../lib/invoices';
 import { findAll } from '../../lib/orm';
 
@@ -204,7 +204,7 @@ export const plugin = (() => {
 
             const { app } = await findOrCreateWalletBot(req.app)
 
-            const { status, limit, offset } = req.query
+            const { limit, offset } = req.query
 
             const where = {
               app_id: app.id,

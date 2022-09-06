@@ -1,6 +1,5 @@
-import * as Hapi from 'hapi';
 
-import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
+import { buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
 import { log, models } from '../../../lib';
 

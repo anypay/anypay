@@ -29,7 +29,7 @@ export async function listPaymentOptions(req, h) {
 
     await ensureInvoice(req)
 
-    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
+    await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
       allowUnknown: true
     })
 

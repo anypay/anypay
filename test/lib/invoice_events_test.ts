@@ -11,11 +11,12 @@ import { expect, server } from '../utils'
 
 describe('Invoice Events', () => {
 
-  var account, invoice;
+  var invoice;
 
   before(async () => {
 
-    [account, invoice] = await utils.newAccountWithInvoice()
+    let response = await utils.newAccountWithInvoice()
+    invoice = response[1]
 
   })
 
@@ -128,14 +129,6 @@ describe('Invoice Events', () => {
       let { paymentOptions } = await client.getPaymentOptions()
 
       await client.selectPaymentOption(paymentOptions[0])
- 
-      let response = await await client.verifyPayment({
-        chain: "BSV",
-        currency: "BSV",
-        transactions: [{
-          tx: 'someinvalidnhexbahaha'
-        }]
-      })
 
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-verification')
 
@@ -161,16 +154,7 @@ describe('Invoice Events', () => {
       let { paymentOptions } = await client.getPaymentOptions()
 
       await client.selectPaymentOption(paymentOptions[0])
- 
-      let response = await await client.sendPayment({
-        chain: "BSV",
-        currency: "BSV",
-        transactions: [{
-          tx: 'someinvalidnhexbahaha'
-        }]
-      })
 
- 
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment')
 
       expect(events[0].get('wallet')).to.be.equal('edge')

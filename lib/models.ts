@@ -4,10 +4,6 @@ import * as sequelize from './database';
 
 import { join } from 'path';
 
-import { awaitChannel } from './amqp';
-
-import { log } from './log';
-
 import { bindAllModelsHooks } from './rabbi-sequelize';
 
 function capitalizeFirstLetter(string) {

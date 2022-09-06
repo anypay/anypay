@@ -201,13 +201,6 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
 
 }
 
-interface PaymentCounts {
-  unpaid: number;
-  paid: number;
-  cancelled: number;
-  failed: number;
-}
-
 export async function getPaymentCounts(walletBot: WalletBot): Promise<any> {
 
   let results = await database.query(`select count(*), status from invoices where app_id = ${walletBot.get('app_id')} group by status`)

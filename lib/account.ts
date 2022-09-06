@@ -1,7 +1,7 @@
 
 import { models } from './models'
 
-import { Orm, Record } from './orm'
+import { Orm } from './orm'
 
 import { setAddress } from './core'
 

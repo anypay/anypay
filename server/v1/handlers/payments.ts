@@ -3,8 +3,6 @@ import * as Joi from '@hapi/joi'
 
 import { log } from '../../../lib/log'
 
-import { badRequest } from 'boom'
-
 import { listPayments } from '../../../lib/payments'
 
 export async function index(req, h) {

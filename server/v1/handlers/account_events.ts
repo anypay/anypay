@@ -1,6 +1,4 @@
 
-import { log } from '../../../lib/log';
-
 import { listAccountEvents } from '../../../lib/events'
 
 export async function index(request, h) {

@@ -1,16 +1,11 @@
 
-import { Orm, Record, findOrCreate } from './orm'
+import { Orm, findOrCreate } from './orm'
 
 import { Account } from './account'
 
 import { models } from './models'
 
 import { generateAccountToken } from './jwt'
-
-interface NewAccessTokenV1 {
-  record: Record;
-  account?: Account
-}
 
 export class AccessTokenV0 extends Orm {
 

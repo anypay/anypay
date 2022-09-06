@@ -1,9 +1,8 @@
 
-import {hash} from '../../lib/password';
 
 import { setAddress} from '../../lib/core';
 
-import { coins, database, settings, models, accounts } from "../../lib";
+import { coins, accounts } from "../../lib";
 
 import { assert, server, chance } from '../utils'
 

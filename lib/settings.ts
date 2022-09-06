@@ -1,7 +1,7 @@
 
-import { models } from '../models'; 
+import { models } from './models'; 
 
-import { log } from '../log'
+import { log } from './log'
 
 export async function getAccountSetting(account_id, key: string, options: { default?: string} = {}) {
 
@@ -31,15 +31,17 @@ export async function setAccountSetting(account_id, key: string, value: string) 
 
 }
 
-async function setDenomination(accountId: number, denomination: string): Promise<string> {
+async function setDenomination(account_id: number, denomination: string): Promise<string> {
 
-  let result = await models.Account.update({
+  await models.Account.update({
     denomination: denomination  
   }, {
     where: {
-      id: accountId
+      id: account_id
     }
   });
+
+  log.info('account.denomination.set', { account_id, denomination })
 
   return denomination;
 

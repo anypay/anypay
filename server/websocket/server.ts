@@ -1,4 +1,3 @@
-let server = require("http").createServer();
 const uuid = require("uuid");
 import * as amqp from "amqplib";
 const QUEUE = process.env.AMQP_QUEUE || 'ws.notify.invoice.paid';
@@ -13,8 +12,6 @@ require('dotenv').config();
 
 const PORT = process.env.PORT || 3000;
 
-const subscriptions = {};
-const invoices = {};
 const websockets = {};
 
 import { log } from '../../lib';
@@ -271,7 +268,6 @@ io.on("connection", client => {
     delete websockets[client.uid];
 
     let invoice = wsSubscriptions.subscriptions[client.uid];
-    let accountId = accountSubscriptionsSocketIO.subscriptions[client.uid];
     wsSubscriptions.unsubscribeClient(client);
     accountSubscriptionsSocketIO.unsubscribeClient(client);
 

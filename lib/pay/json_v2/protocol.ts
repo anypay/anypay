@@ -81,7 +81,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
 
-      let resp = await plugin.broadcastTx(transaction)
+      plugin.broadcastTx(transaction)
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
 
@@ -204,11 +204,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
 interface ProtocolMessage {}
 
-interface PaymentOptionsHeaders {
-  Accept: string;
-  'x-paypro-version': number;
-}
-
 interface PaymentOption {
   chain: string;
   currency: string;
@@ -227,11 +222,6 @@ interface PaymentOptions extends ProtocolMessage {
   paymentUrl: string;
   paymentId: string;
   paymentOptions: PaymentOption[];
-}
-
-interface SelectPaymentRequestHeaders {
-  'Content-Type': string;
-  'x-paypro-version': 2;
 }
 
 interface SelectPaymentRequest extends ProtocolMessage {
@@ -308,8 +298,6 @@ interface PaymentResponse {
   payment: Payment;
   memo: string;
 }
-
-const Errors = require('./errors').errors
 
 interface LogOptions {
   wallet?: string;
@@ -437,8 +425,6 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
-  let plugin = await plugins.findForCurrency(params.currency)
-
   await verifyUnsigned({
     invoice_uid: invoice.uid,
     transactions: params.transactions.map(({tx}) => tx),
@@ -505,46 +491,3 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
   }
 }
-
-interface Log {
-  info: Function;
-  error: Function;
-}
-
-class PaymentProtocol {
-
-  invoice: Invoice;
-
-  log: Log;
-
-  constructor(invoice: Invoice) {
-
-    this.invoice = invoice
-
-    this.log = {
-
-      info: (event, payload) => {
-
-        return log.info(event, Object.assign({ invoice_uid: invoice.uid }, payload))
-
-      },
-
-      error: log.error
-    }
-
-  }
-
-  listPaymentOptions() {
-
-    return listPaymentOptions(this.invoice)
-
-  }
-
-  sendSignedPayment(params) {
-
-    return sendSignedPayment(this.invoice, params)
-
-  }
-
-}
-
