@@ -78,6 +78,12 @@ describe('Payment Requests With Edge Wallet', () => {
 
   })
 
+  it('payment-verification step should reject with incorrect number of outputs', async () => {
+
+
+  })
+
+
   it('should detect and record when Edge submits a payment request', async () => {
 
 
