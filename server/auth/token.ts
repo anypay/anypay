@@ -3,11 +3,13 @@ import * as Hapi from 'hapi';
 
 import * as jwt from '../../lib/jwt';
 
-import { models, log, password } from '../../lib';
+import { models, log } from '../../lib';
 
 import { findApp } from '../../lib/apps'
 
 import { findAccount } from '../../lib/account'
+
+import { compare } from '../../lib/bcrypt'
 
 export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
@@ -62,7 +64,7 @@ async function validateToken (request, username, password, h) {
 
     try {
 
-      await password.bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+      await compare(password, process.env.SUDO_PASSWORD_HASH);
 
       request.account = account;
       request.account_id = account.id;

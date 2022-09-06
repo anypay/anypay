@@ -1,6 +1,4 @@
 
-import { readFileSync } from 'fs'
-
 import axios from 'axios'
 
 import { getAccountSetting, setAccountSetting } from '../../../lib/settings'

@@ -2,7 +2,7 @@
   "name": "anypay-platform",
   "version": "1.4.0",
   "description": "Bitcoin Payments For Enterprises",
-  "private": true,
+  "private": false,
   "main": "main.ts",
   "engines": {
     "node": ">=14.0"
@@ -13,6 +13,44 @@
   },
   "bin": {
     "anypay": "./bin/anypay.ts"
+  },
+  "scripts": {
+    "anypay": "./bin/anypay.ts",
+    "build": "tsc",
+    "commit": "npx cz",
+    "console": "ts-node --experimental-repl-await",
+    "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
+    "db:seed:prices": "ts-node test/seed_prices.ts",
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
+    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
+    "start": "ts-node main.ts",
+    "test": "NODE_ENV=test nyc  --reporter=lcov mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit",
+    "cover": "npm run cover:unit && npm run cover:integration && npm run cover:report",
+    "cover:unit": "nyc --silent npm run test:unit",
+    "cover:integration": "nyc --silent --no-clean npm run test:integration",
+    "cover:report": "nyc report --reporter=lcov --reporter=text"
+  },
+  "keywords": [],
+  "author": "Anypay",
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "nyc": {
+    "check-coverage": false,
+    "all": true,
+    "include": [
+      "lib/**.ts"
+    ],
+    "exclude": [
+      "apps/**.ts",
+      "bin/**.ts",
+      "actors/**.ts"
+    ],
+    "reporter": "lcov",
+    "report-dir": "./coverage"
   },
   "release": {
     "plugins": [
@@ -26,8 +64,9 @@
   "dependencies": {
     "@dashevo/dashcore-lib": "^0.17.9",
     "@google/maps": "^0.5.5",
+    "@hapi/basic": "^7.0.0",
     "@hapi/boom": "^9.1.4",
-    "@hapi/hapi": "^20.2.1",
+    "@hapi/hapi": "^20.2.2",
     "@hapi/inert": "^6.0.5",
     "@hapi/joi": "^17.1.1",
     "@hapi/vision": "^6.1.0",
@@ -35,7 +74,7 @@
     "@slack/webhook": "^5.0.3",
     "@types/axios": "^0.14.0",
     "@types/bluebird": "^3.5.20",
-    "amqplib": "^0.5.2",
+    "amqplib": "^0.5.6",
     "anypay": "^0.1.0",
     "anypay-simple-wallet": "^0.0.2",
     "anypay-wallet-address-validator": "^0.2.6",
@@ -64,7 +103,6 @@
     "crypto-js": "^4.0.0",
     "csv-parse": "^4.6.1",
     "csv-writer": "^1.2.0",
-    "datapay": "^0.0.18",
     "dotenv": "^8.1.0",
     "elastic-apm-node": "^3.16.0",
     "elasticsearch": "^16.7.1",
@@ -77,18 +115,16 @@
     "get402": "^0.3.0",
     "got": "^9.6.0",
     "handlebars": "^4.1.0",
-    "hapi-auth-basic": "^5.0.0",
     "hapi-auth-bearer-token": "^8.0.0",
     "hapi-boom-decorators": "^4.1.2",
     "hapi-k8s-health": "^1.1.1",
-    "hapi-swagger": "^14.2.5",
+    "hapi-swagger": "^14.5.5",
     "inert": "^5.1.0",
     "jayson": "^2.0.5",
     "joi": "^17.1.1",
     "jsonwebtoken": "^8.3.0",
     "jsrsasign": "^8.0.4",
     "kafkajs": "^1.12.0",
-    "knex": "^0.20.8",
     "kraken-api": "^1.0.0",
     "litecore-lib": "^0.13.22",
     "lodash": "^4.17.21",
@@ -144,7 +180,7 @@
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
-    "@types/amqplib": "^0.5.7",
+    "@types/amqplib": "^0.5.17",
     "@types/chai": "^4.3.0",
     "@types/chai-as-promised": "^7.1.5",
     "@types/chai-spies": "^1.0.3",
@@ -153,35 +189,13 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "chai-spies": "^1.0.0",
+    "codecov": "^3.8.3",
+    "coveralls": "^3.1.1",
     "cz-conventional-changelog": "^3.3.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.8",
     "nyc": "^15.1.0",
     "supertest": "^6.2.2",
     "ts-node": "^6.2.0"
-  },
-  "nyc": {
-    "exclude": "migrations/*",
-    "check-coverage": false
-  },
-  "scripts": {
-    "anypay": "./bin/anypay.ts",
-    "build": "tsc",
-    "commit": "npx cz",
-    "console": "ts-node --experimental-repl-await",
-    "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
-    "db:seed:prices": "ts-node test/seed_prices.ts",
-    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
-    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
-    "start": "ts-node main.ts",
-    "test": "NODE_ENV=test nyc mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
 }

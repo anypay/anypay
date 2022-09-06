@@ -8,3 +8,4 @@ production.env
 .nyc_output/
 dist/
 coverage/
+coverage

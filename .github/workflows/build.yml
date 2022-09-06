@@ -1,0 +1,48 @@
+name: Build
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.10
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: letmein
+          POSTGRES_DB: database
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3
+        ports:
+          - 5672/tcp
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: codecov/codecov-action@v3
+        with:
+          #token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          verbose: true
+      - name: Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install -g typescript tsc
+      - name: install, build and test
+        env:
+          SKIP_E2E_PAYMENTS_TESTS: true
+          TEST_DATABASE_URL: postgres://postgres:letmein@postgres:5432/database
+          AMQP_URL: amqp://guest:guest@rabbitmq:5672/
+        run: |
+          npm install
+          npm test
+          steps:

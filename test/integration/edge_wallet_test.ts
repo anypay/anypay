@@ -38,7 +38,7 @@ describe('Payment Requests With Edge Wallet', () => {
 
   it('requests payments with edge-specific headers', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 0.02 })
 
     let headers = wallet.getHeaders()
 
@@ -52,11 +52,9 @@ describe('Payment Requests With Edge Wallet', () => {
 
   it.skip('should detect and record when Edge requests a payment request', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 0.02 })
 
     spy.on(Events, ['recordEvent'])
-
-    let response = await wallet.fetchPaymentRequest(invoice, server)
 
     expect(Events.recordEvent).to.have.been.called.with({
       invoice_uid: invoice.uid,
@@ -78,7 +76,13 @@ describe('Payment Requests With Edge Wallet', () => {
 
   })
 
-  it('should detect and record when Edge submits a payment request', async () => {
+  it.skip('payment-verification step should reject with incorrect number of outputs', async () => {
+
+
+  })
+
+
+  it.skip('should detect and record when Edge submits a payment request', async () => {
 
 
   })

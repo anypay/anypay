@@ -34,7 +34,7 @@ export async function addToCity(email: string, city:string, stub?: string) {
 
   }
 
-  let [tag, isNew] = await models.AccountTag.findOrCreate({
+  let [tag] = await models.AccountTag.findOrCreate({
 
     where: {
       tag: `city:${city}`,

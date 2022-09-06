@@ -8,12 +8,6 @@ import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 
-interface Map<T> {
-    [key: string]: T;
-}
-
-type AccountAddresses = Map<AccountAddress>;
-
 interface AccountAddress {
   account_id: number;
   currency: string;
@@ -23,8 +17,6 @@ interface AccountAddress {
   name?: string;
   code?: string;
 }
-
-
 
 export async function near(latitude, longitude, limit=100) {
 let query = `SELECT *,
@@ -137,7 +129,9 @@ export async function registerAccount(email: string, password: string): Promise<
   if( account ){
 
     await log.info('account.created', {
-      id: account.id
+      id: account.id,
+      account_id: account.id,
+      email: account.email
     })
 
   }
@@ -201,7 +195,7 @@ export async function setAddressScalar(account_id: number, currency: string, pri
 
   log.info('address.scalar.set', { account_id, currency, price_scalar })
 
-  let result = await models.Address.update({
+  await models.Address.update({
     price_scalar 
   }, {
     where: {
@@ -231,7 +225,7 @@ export async function getAccountAddress(accountId: number, currency: string): Pr
 
   let coin = coins[currency];
 
-  return coins[currency];
+  return coin;
 
 }
 

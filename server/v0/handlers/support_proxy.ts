@@ -1,8 +1,6 @@
 
 import { log, models, slack } from '../../../lib'
 
-import { badRequest } from 'boom'
-
 export async function show(req, h) {
 
   let accessToken = await models.AccessToken.findOne({ where: { uid: req.params.token }})

@@ -50,13 +50,9 @@ export async function bind(context: Context): Promise<Context> {
 
                 const message = JSON.parse(msg.content.toString())
 
-                console.log('MESSAGE', message)
-
                 const { type, payload } = message
 
                 if (type && payload) {
-
-                    console.log('EMIT', { type, payload })
 
                     context.socket.emit(type, payload)
 

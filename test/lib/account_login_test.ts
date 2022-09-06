@@ -2,7 +2,6 @@ require("dotenv").config();
 
 import * as assert from 'assert';
 import * as Chance from 'chance';
-import {models} from '../../lib';
 import {withEmailPassword} from '../../lib/account_login';
 import {registerAccount} from '../../lib/accounts';
 

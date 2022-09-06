@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const uuid = require('uuid')
 
 const _ = require('lodash')
 
@@ -7,7 +6,7 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
@@ -246,7 +245,7 @@ export async function createPublicInvoice(account_id, payload) {
   await invoice.save();
 
   if (invoice.email) {
-    let note = await models.InvoiceNote.create({
+    await models.InvoiceNote.create({
       content: `Customer Email: ${invoice.email}`,
       invoice_uid: invoice.uid,
     });
@@ -319,9 +318,6 @@ export async function show(request, reply) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.debug('invoice not yet expired');
   }
 
   if (invoice) {

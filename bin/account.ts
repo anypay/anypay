@@ -118,7 +118,7 @@ program
 
       let account = await models.Account.findOne({ where: { email }});
 
-      let [record, isNew] = await models.AccountTag.findOrCreate({
+      let [isNew] = await models.AccountTag.findOrCreate({
         where: {
           account_id: account.id,
           tag

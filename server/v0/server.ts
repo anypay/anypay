@@ -25,7 +25,7 @@ const AuthBearer = require('hapi-auth-bearer-token');
 
 import { log } from '../../lib/log';
 
-import { prometheus, getHistogram } from '../../lib/prometheus'
+import { getHistogram } from '../../lib/prometheus'
 
 import { requireDirectory } from 'rabbi'
 
@@ -132,7 +132,7 @@ async function Server() {
     return h.continue;
   })
 
-  await server.register(require('hapi-auth-basic'));
+  await server.register(require('@hapi/basic'));
 
   await server.register(Inert);
 
@@ -140,7 +140,7 @@ async function Server() {
 
   await server.register(require('hapi-boom-decorators'))
 
-  const swaggerOptions = server.register({
+  await server.register({
     plugin: HapiSwagger,
     options: {
       info: {

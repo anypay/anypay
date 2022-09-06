@@ -1,10 +1,10 @@
 require('dotenv').config();
 
-import {plugins} from '../plugins';
+import {plugins} from './plugins';
 
 import * as bsv from 'bsv';
 
-import { log } from '../log'
+import { log } from './log'
 
 interface DenominationChangeset {
   account_id: number;
@@ -21,9 +21,9 @@ interface AddressChangeSet {
   address_id?: number;
 }
 
-import {models} from "../models";
+import {models} from "./models";
 
-import {getPaymail as bsvGetPaymail} from '../../plugins/bsv';
+import {getPaymail as bsvGetPaymail} from '../plugins/bsv';
 
 async  function getPaymail(currency, address) {
 
@@ -145,7 +145,7 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
 export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
 
-  var res = await models.Account.update({
+  await models.Account.update({
     denomination: changeset.currency
   }, {where: { id: changeset.account_id }});
 

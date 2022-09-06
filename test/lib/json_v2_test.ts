@@ -17,7 +17,7 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#listPaymentOptions should invoice payment options', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
     let response = await protocol.listPaymentOptions(invoice)
 
@@ -29,9 +29,9 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#listPaymentOptions record an event in the invoice event log', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
-    let response = await protocol.listPaymentOptions(invoice)
+    await protocol.listPaymentOptions(invoice)
 
     expect(log.info).to.have.been.called.with('pay.jsonv2.payment-options')
 
@@ -39,7 +39,7 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#getPaymentRequest returns a payment request', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
     let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
@@ -53,7 +53,7 @@ describe('JSON Payment Protocol V2', () => {
 
   it('#getPaymentRequest should reject for unsupported currency', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice();
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
     expect(
 
@@ -67,30 +67,28 @@ describe('JSON Payment Protocol V2', () => {
   })
 
   it('#getPaymentRequest records an event in the invoice event log', async () => {
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
     let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
-    let response = await protocol.getPaymentRequest(invoice, paymentOptions[0])
+    await protocol.getPaymentRequest(invoice, paymentOptions[0])
 
     expect(log.info).to.have.been.called.with('pay.jsonv2.payment-request')
   })
 
-  it('#verifyUnsignedPayment should verify valid payment', async () => {
-    let [account, invoice] = await utils.newAccountWithInvoice()
+  it.skip('#verifyUnsignedPayment should verify valid payment', async () => {
   })
 
-  it('#verifyUnsignedPayment should reject invalid payment', async () => {
-    let [account, invoice] = await utils.newAccountWithInvoice()
+  it.skip('#verifyUnsignedPayment should reject invalid payment', async () => {
   })
 
   it('#verifyUnsignedPayment records an event in the invoice event log', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 5.20 })
 
     let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
-    let response = await protocol.getPaymentRequest(invoice, paymentOptions[0])
+    await protocol.getPaymentRequest(invoice, paymentOptions[0])
 
     let { chain, currency } = paymentOptions[0]
 
@@ -112,19 +110,19 @@ describe('JSON Payment Protocol V2', () => {
 
     it('#sendSignedPayment should accept and broadcast transaction', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice()
+      let invoice = await utils.newInvoice({ amount: 5.20 })
 
       let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
       let { chain, currency } = paymentOptions[0]
 
-      let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+      await protocol.getPaymentRequest(invoice, { chain, currency })
 
     })
 
     it('#sendSignedPayment should mark invoice as paid', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 5.20 })
 
       let client = new TestClient(server, `/i/${invoice.uid}`)
 
@@ -138,11 +136,9 @@ describe('JSON Payment Protocol V2', () => {
 
       let paymentRequest = await client.selectPaymentOption(paymentOption)
 
-      let balance = await wallet.getBalance()
-
       let payment = await wallet.buildPayment(paymentRequest.instructions[0].outputs)
 
-      let result = await protocol.sendSignedPayment(invoice, {
+      await protocol.sendSignedPayment(invoice, {
 
         chain,
 
@@ -160,13 +156,13 @@ describe('JSON Payment Protocol V2', () => {
 
     it('#sendSignedPayment records an event in the invoice evenet log', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 5.20 })
 
       let {paymentOptions} = await protocol.listPaymentOptions(invoice)
 
       let { chain, currency } = paymentOptions[0]
 
-      let response = await protocol.getPaymentRequest(invoice, { chain, currency })
+      await protocol.getPaymentRequest(invoice, { chain, currency })
 
       await protocol.sendSignedPayment(invoice, {
 

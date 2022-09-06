@@ -81,7 +81,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
 
-      let resp = await plugin.broadcastTx(transaction)
+      plugin.broadcastTx(transaction)
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
 
@@ -103,7 +103,97 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
   } catch(error) {
 
-    log.error('json.paymentrequest.submit.error', error)
+    log.error('pay.jsonv2.payment.error', error)
+
+    throw error
+
+  }
+
+}
+
+export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
+
+  try {
+
+    log.info('payment.unsigned.verify', payment);
+
+    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+
+    if (invoice.cancelled) {
+
+      log.error('payment.error.invoice.cancelled', { payment })
+
+      throw new Error('payment.error.invoice.cancelled')
+    }
+
+    if (!invoice) {
+      throw new Error(`invoice ${payment.invoice_uid} not found`)
+    }
+
+    let payment_option = await models.PaymentOption.findOne({ where: {
+      invoice_uid: invoice.uid,
+      currency: payment.currency
+    }})
+
+    if (!payment_option) {
+      throw new Error(`Unsupported Currency or Chain for Payment Option`)
+    }
+
+    let plugin = await plugins.findForCurrency(payment.currency)
+
+    if (plugin.validateUnsignedTx) {
+
+      const valid = await plugin.validateUnsignedTx({
+        payment_option,
+        transactions: payment.transactions
+      })
+
+      if (valid) {
+        
+        return {
+          success: true,
+          transactions: payment.transactions
+        }
+
+      } else {
+
+        throw new Error('Invalid unsigned transaction')
+      }
+
+    }
+
+    for (const transaction of payment.transactions) {
+
+      if (plugin.verifyPayment) {
+
+        await plugin.verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      } else {
+
+        await verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      }
+
+      log.debug('payment.unsigned.verified', payment);
+
+    }
+
+    return {
+      success: true,
+      transactions: payment.transactions
+    }
+
+  } catch(error) {
+
+    log.error('pay.jsonv2.payment.unsigned.verify.error', error)
 
     throw error
 
@@ -113,11 +203,6 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
 
 interface ProtocolMessage {}
-
-interface PaymentOptionsHeaders {
-  Accept: string;
-  'x-paypro-version': number;
-}
 
 interface PaymentOption {
   chain: string;
@@ -137,11 +222,6 @@ interface PaymentOptions extends ProtocolMessage {
   paymentUrl: string;
   paymentId: string;
   paymentOptions: PaymentOption[];
-}
-
-interface SelectPaymentRequestHeaders {
-  'Content-Type': string;
-  'x-paypro-version': 2;
 }
 
 interface SelectPaymentRequest extends ProtocolMessage {
@@ -218,8 +298,6 @@ interface PaymentResponse {
   payment: Payment;
   memo: string;
 }
-
-const Errors = require('./errors').errors
 
 interface LogOptions {
   wallet?: string;
@@ -347,17 +425,15 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
-  let plugin = await plugins.findForCurrency(params.currency)
-
-  if (plugin.validateUnsignedTx) {
-
-    await plugin.validateUnsignedTx(params.transactions[0].tx)
-
-  }
+  await verifyUnsigned({
+    invoice_uid: invoice.uid,
+    transactions: params.transactions.map(({tx}) => tx),
+    currency: params.currency
+  })
 
   return {
     payment: params,
-    memo: 'Transaction Pre-Validation Skipped'
+    memo: 'Un-Signed Transaction Validated with Success'
   }
 
 }
@@ -415,46 +491,3 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
   }
 }
-
-interface Log {
-  info: Function;
-  error: Function;
-}
-
-class PaymentProtocol {
-
-  invoice: Invoice;
-
-  log: Log;
-
-  constructor(invoice: Invoice) {
-
-    this.invoice = invoice
-
-    this.log = {
-
-      info: (event, payload) => {
-
-        return log.info(event, Object.assign({ invoice_uid: invoice.uid }, payload))
-
-      },
-
-      error: log.error
-    }
-
-  }
-
-  listPaymentOptions() {
-
-    return listPaymentOptions(this.invoice)
-
-  }
-
-  sendSignedPayment(params) {
-
-    return sendSignedPayment(this.invoice, params)
-
-  }
-
-}
-

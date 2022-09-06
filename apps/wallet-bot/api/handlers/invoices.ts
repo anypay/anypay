@@ -1,7 +1,4 @@
 
-import { app } from 'anypay'
-import axios from 'axios'
-
 import * as Joi from 'joi'
 
 import { log } from '../../../../lib/log'
@@ -14,8 +11,6 @@ export async function create(req, h) {
 
     try {
 
-        const anypay = app(req.token)
-
         const template = [{
             currency: req.payload.currency,
             to: [{
@@ -26,8 +21,6 @@ export async function create(req, h) {
         }]
 
         const options = req.payload.options
-
-        console.log({ app_id: req.app_id, template, options })
 
         let result = await createPaymentRequest(
             req.app_id,

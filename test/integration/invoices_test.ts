@@ -1,11 +1,7 @@
 
 import * as utils from '../utils'
 
-import { expect, server, spy } from '../utils'
-
-import { Invoice } from '../../lib/invoices'
-
-import { listInvoiceEvents } from '../../lib/events'
+import { expect } from '../utils'
 
 describe('Integration | Invoices', () => {
 

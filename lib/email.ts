@@ -1,18 +1,17 @@
 require('dotenv').config()
-import * as requireAll from  'require-all';
-import * as AWS from 'aws-sdk';
-import {models} from '../models';
-import {events} from '../events'
-import * as database from '../database';
+import {models} from './models';
+import {events} from './events'
+import * as database from './database';
 
-import { config } from '../config'
+import { config } from './config'
 
 const sender = config.get("EMAIL_SENDER")
 
-import { log } from '../log'
-const moment = require('moment');
+import { log } from './log'
 
-import { getBlockExplorerTxidUrl } from '../block_explorer';
+const aws = require('aws-sdk');
+
+export const ses = new aws.SES({ region: 'us-east-1' });
 
 import { email as rabbiEmail } from 'rabbi';
 
@@ -142,29 +141,6 @@ async function checkInvoiceCount(invoice){
     }
   }catch(error){
     log.error(error)
-  }
-
-
-}
-
-async function checkInvoicePaidCount(invoice){
-
-  const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id} AND status='paid';`
-  
-  try{
-  
-    var result = await database.query(query);
-
-    if(result[1].rows[0].count==1){
-      log.debug('invoice.paid.first', invoice)
-      //firstInvoicePaidEmail(invoice)
-    }
-    else{
-      invoicePaidEmail(invoice)
-    }
-
-  }catch(err){
-    log.error(err)
   }
 
 }

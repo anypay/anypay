@@ -1,7 +1,7 @@
 
 import * as utils from '../utils'
 
-import { expect, server } from '../utils'
+import { expect } from '../utils'
 
 import { recordPayment, getPayment } from './../../lib/payments'
 
@@ -9,7 +9,7 @@ describe('Payments', () => {
 
   it('should have exactly one invoice always', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 0.52 })
 
     let payment = await recordPayment(invoice, {
       txid: '12345',
@@ -28,7 +28,7 @@ describe('Payments', () => {
 
   it('should prevent multiple payments for a single invoice', async () => {
 
-    let [account, invoice] = await utils.newAccountWithInvoice()
+    let invoice = await utils.newInvoice({ amount: 0.52 })
 
     let payment = await recordPayment(invoice, {
       txid: '12345',

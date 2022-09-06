@@ -7,15 +7,17 @@ import { TestClient } from 'payment-protocol'
 
 import * as utils from '../utils'
 
-import { expect, server } from '../utils'
+import { expect, server, log } from '../utils'
+import { Transaction } from 'bsv'
 
 describe('Invoice Events', () => {
 
-  var account, invoice;
+  var invoice;
 
   before(async () => {
 
-    [account, invoice] = await utils.newAccountWithInvoice()
+    let response = await utils.newAccountWithInvoice()
+    invoice = response[1]
 
   })
 
@@ -115,6 +117,8 @@ describe('Invoice Events', () => {
 
     it('has an event for every payment verification request', async () => {
 
+      invoice = await utils.newInvoice({ amount: 5.25 })
+
       let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-verification')
 
       expect(events.length).to.be.equal(0)
@@ -128,14 +132,24 @@ describe('Invoice Events', () => {
       let { paymentOptions } = await client.getPaymentOptions()
 
       await client.selectPaymentOption(paymentOptions[0])
- 
-      let response = await await client.verifyPayment({
-        chain: "BSV",
-        currency: "BSV",
-        transactions: [{
-          tx: 'someinvalidnhexbahaha'
-        }]
-      })
+
+      const tx = new Transaction().serialize()
+
+      try {
+
+        await client.verifyPayment({
+          chain: 'BSV',
+          currency: 'BSV',
+          transactions: [{ tx }]
+        })
+
+      } catch(error) {
+
+        log.debug(error)
+
+      }
+      
+      events = await listInvoiceEvents(invoice)
 
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-verification')
 
@@ -160,22 +174,18 @@ describe('Invoice Events', () => {
 
       let { paymentOptions } = await client.getPaymentOptions()
 
-      await client.selectPaymentOption(paymentOptions[0])
- 
-      let response = await await client.sendPayment({
-        chain: "BSV",
-        currency: "BSV",
-        transactions: [{
-          tx: 'someinvalidnhexbahaha'
-        }]
-      })
 
- 
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment')
+      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
 
       expect(events[0].get('wallet')).to.be.equal('edge')
+
+      const originalLength = events.length
+
+      await client.selectPaymentOption(paymentOptions[0])
+
+      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
  
-      expect(events.length).to.be.equal(1)
+      expect(events.length).to.be.equal(originalLength + 1)
 
     })
 
@@ -191,15 +201,28 @@ describe('Invoice Events', () => {
         }
       })
 
-      await client.sendPayment({
-        chain: 'BSV',
-        currency: 'BSV',
-        transactions: [{ tx: 'invaliderp' }]
-      })
+      const tx = new Transaction().serialize()
+
+      try {
+
+        await client.sendPayment({
+          chain: 'BSV',
+          currency: 'BSV',
+          transactions: [{ tx }]
+        })
+
+      } catch(error) {
+
+        log.debug(error)
+
+      }
 
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment.broadcast')
  
-      expect(events.length).to.be.equal(1)
+      expect(events.length).to.be.equal(0)
+
+      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment.unsigned.verify.error')
+
       expect(events[0].get('wallet')).to.be.equal('edge')
 
     })
@@ -217,10 +240,12 @@ describe('Invoice Events', () => {
         }
       })
 
+      const tx = new Transaction().serialize()
+
       await client.sendPayment({
         chain: 'BSV',
         currency: 'BSV',
-        transactions: [{ tx: 'invaliderp' }]
+        transactions: [{ tx }]
       })
 
       // Simulate failure by the blockchain p2p provider

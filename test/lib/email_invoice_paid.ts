@@ -8,7 +8,7 @@ const chance = new Chance();
 
 describe("Emails when invoice is paid", ()=>{
 
-  var account,invoice1, invoice2;
+  var account,invoice1;
 
   before(async()=>{
 

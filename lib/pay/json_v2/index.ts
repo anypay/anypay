@@ -12,7 +12,7 @@ import { config } from '../../config'
 
 import * as mempool from '../../mempool.space'
 
-import { PaymentOutput, PaymentOption, GetCurrency, Currency } from '../types';
+import { PaymentOption, GetCurrency, Currency } from '../types';
 import { nameFromCode } from '../currencies';
 import { BigNumber } from 'bignumber.js';
 
@@ -54,7 +54,7 @@ export interface JsonV2PaymentRequest {
 
 const BASE_URL = getBaseURL();
 
-import { PaymentRequest, PaymentRequestOptions } from '../'
+import { PaymentRequestOptions } from '../'
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<JsonV2PaymentRequest> {
   var outputs;

@@ -1,7 +1,5 @@
 import { database, models } from '../../../lib';
 
-import * as moment from 'moment';
-
 import { Request, ResponseToolkit } from 'hapi';
 
 import { listAll, listActiveSince as listActiveMerchantsSince } from '../../../lib/merchants'

@@ -13,6 +13,8 @@ import { models } from '../models'
 
 import { log } from '../log'
 
+import { compare } from '../bcrypt'
+
 interface NewAccount {
   email: string;
   password: string;
@@ -26,7 +28,7 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   let passwordHash = await utils.hash(password);
 
-  log.info('account.register.password.hash', { passwordHash })
+  log.debug('account.register.password.hash', { passwordHash })
 
   let [account, isNew] = await models.Account.findOrCreate({
 
@@ -111,7 +113,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   try {
 
-    await utils.bcryptCompare(params.password, account.password_hash);
+    await compare(params.password, account.password_hash);
 
   } catch(error) {
 

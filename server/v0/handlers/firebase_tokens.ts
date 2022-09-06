@@ -27,7 +27,7 @@ export async function index(req, h) {
 
 export async function create(req, h) {
 
-  let [firebase_token, isNew] = await models.FirebaseToken.findOrCreate({
+  let [firebase_token] = await models.FirebaseToken.findOrCreate({
 
     where: {
       account_id: req.account.id,

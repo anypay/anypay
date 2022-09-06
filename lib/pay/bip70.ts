@@ -12,18 +12,6 @@ import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
 
 import { codeFromName } from './currencies'
 
-import { getFee, Fee } from './fees'
-
-/*
-
-  BIP70 Protocol In The Context Of the Anypay Pay Protocol
-
-*/
-
-interface Bip70PaymentRequest {
-
-}
-
 export function getCurrency(params: GetCurrency): Currency {
 
   let headers = params.headers
@@ -112,10 +100,12 @@ import { PaymentRequest, PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
+  console.log('BIP70 BUILD PR')
+
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
-  log.info(`$ip70.${paymentOption.currency}.outputs`, {outputs});
+  log.info(`bip70.${paymentOption.currency}.outputs`, {outputs});
 
   var pd = new PaymentProtocol.PaymentDetails();
 
