@@ -21,10 +21,6 @@ jobs:
           POSTGRES_PORT: 5432
           # optional (defaults to `postgres`)
           POSTGRES_USER: postgres_user
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: letmein
-          POSTGRES_DB: database
         ports:
           - 5432/tcp
         options: >-
