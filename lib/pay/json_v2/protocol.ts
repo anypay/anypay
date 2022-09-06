@@ -141,6 +141,27 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     let plugin = await plugins.findForCurrency(payment.currency)
 
+    if (plugin.validateUnsignedTx) {
+
+      const valid = await plugin.validateUnsignedTx({
+        payment_option,
+        transactions: payment.transactions
+      })
+
+      if (valid) {
+        
+        return {
+          success: true,
+          transactions: payment.transactions
+        }
+
+      } else {
+
+        throw new Error('Invalid unsigned transaction')
+      }
+
+    }
+
     for (const transaction of payment.transactions) {
 
       if (plugin.verifyPayment) {
