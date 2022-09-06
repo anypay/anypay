@@ -2,7 +2,6 @@
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/anypay/anypay?style=for-the-badge)
 ![Docker Pulls](https://img.shields.io/docker/pulls/anypay/anypay?style=for-the-badge)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/anypay/anypay/build?label=GITHUB%20BUILD&style=for-the-badge)
 ![CircleCI](https://img.shields.io/circleci/build/github/anypay/anypay?label=Circle%20CI%20Build&style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/anypay/anypay?style=for-the-badge&label=coverage)
 
@@ -26,3 +25,4 @@ docker run -d -p 5200:5200 anypay/anypay
 - PORT
 - DATABASE_URL
 - AMQP_URL
+
