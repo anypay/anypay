@@ -111,6 +111,75 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
 }
 
+export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
+
+  try {
+
+    log.info('payment.unsigned.verify', payment);
+
+    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+
+    if (invoice.cancelled) {
+
+      log.error('payment.error.invoice.cancelled', { payment })
+
+      throw new Error('payment.error.invoice.cancelled')
+    }
+
+    if (!invoice) {
+      throw new Error(`invoice ${payment.invoice_uid} not found`)
+    }
+
+    let payment_option = await models.PaymentOption.findOne({ where: {
+      invoice_uid: invoice.uid,
+      currency: payment.currency
+    }})
+
+    if (!payment_option) {
+      throw new Error(`Unsupported Currency or Chain for Payment Option`)
+    }
+
+    let plugin = await plugins.findForCurrency(payment.currency)
+
+    for (const transaction of payment.transactions) {
+
+      if (plugin.verifyPayment) {
+
+        await plugin.verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      } else {
+
+        await verifyPayment({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      }
+
+      log.info('payment.unsigned.verified', payment);
+
+    }
+
+    return {
+      success: true,
+      transactions: payment.transactions
+    }
+
+  } catch(error) {
+
+    log.error('json.paymentrequest.submit.error', error)
+
+    throw error
+
+  }
+
+}
+
 
 interface ProtocolMessage {}
 
@@ -349,15 +418,15 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   let plugin = await plugins.findForCurrency(params.currency)
 
-  if (plugin.validateUnsignedTx) {
-
-    await plugin.validateUnsignedTx(params.transactions[0].tx)
-
-  }
+  await verifyUnsigned({
+    invoice_uid: invoice.uid,
+    transactions: params.transactions.map(({tx}) => tx),
+    currency: params.currency
+  })
 
   return {
     payment: params,
-    memo: 'Transaction Pre-Validation Skipped'
+    memo: 'Un-Signed Transaction Validated with Success'
   }
 
 }

@@ -186,6 +186,40 @@ describe("JSON Payment Protocol V2", async () => {
     expect(response.headers['x-signature']).to.be.a('string')
 
   })
+  
+  it("POST /i/:uid should rejects invalid un-signed transaction upon payment verification", async () => {
+
+    console.log("UN-SIGNED")
+
+    let [account, invoice] = await utils.newAccountWithInvoice()
+
+    const transaction = new bch.Transaction()
+
+    console.log('TRANS', transaction.serialize())
+
+    let response = await server.inject({
+      method: 'POST',
+      url: `/i/${invoice.uid}`,
+      headers: {
+        'x-paypro-version': 2,
+        'Content-Type': 'application/payment-verification'
+      },
+      payload: {
+        chain: 'BCH',
+        currency: 'BCH',
+        transactions: [transaction.serialize()]
+      }
+    })
+    console.log("VERR", response.result)
+
+    expect(response.statusCode).to.be.equal(400)
+
+
+    let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+
+    expect(valid).to.be.equal(false)
+
+  })
 
   if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
