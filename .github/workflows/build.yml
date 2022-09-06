@@ -48,7 +48,7 @@ jobs:
       - name: Setup database
         run: psql -h postgres -U postgres_user -c 'CREATE DATABASE "postgres_db";'
         env:
-      PGPASSWORD: postgres_password
+          PGPASSWORD: postgres_password
 
       - name: Node.js
         uses: actions/setup-node@v1
