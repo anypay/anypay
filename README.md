@@ -26,4 +26,3 @@ docker run -d -p 5200:5200 anypay/anypay
 - PORT
 - DATABASE_URL
 - AMQP_URL
-
