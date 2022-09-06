@@ -35,8 +35,6 @@ export async function start() {
       JSON.stringify(invoice.toJSON())
     ));
 
-    console.log(routingKey2, JSON.stringify(invoice.toJSON()));
-
     channel.ack(msg);
 
   });

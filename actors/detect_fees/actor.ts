@@ -31,11 +31,7 @@ export async function start() {
 
     log.info(invoice);
 
-    console.log(payment.toJSON())
-
     let fee = await getMiningFee(payment.currency, payment.get('txhex'))
-
-    console.log({ fee })
 
     await payment.set('total_input', fee.total_input)
     await payment.set('total_output', fee.total_output)

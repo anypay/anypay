@@ -103,7 +103,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
   } catch(error) {
 
-    log.error('json.paymentrequest.submit.error', error)
+    log.error('pay.jsonv2.payment.error', error)
 
     throw error
 
@@ -182,7 +182,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
       }
 
-      log.info('payment.unsigned.verified', payment);
+      log.debug('payment.unsigned.verified', payment);
 
     }
 
@@ -193,7 +193,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
   } catch(error) {
 
-    log.error('json.paymentrequest.submit.error', error)
+    log.error('pay.jsonv2.payment.unsigned.verify.error', error)
 
     throw error
 

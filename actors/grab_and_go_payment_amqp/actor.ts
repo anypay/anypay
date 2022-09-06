@@ -65,7 +65,7 @@ export async function start() {
 
       } catch(error) {
 
-        console.log(error);
+        log.error(error);
 
       }
 

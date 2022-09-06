@@ -78,7 +78,7 @@ export function detectWallet(headers, invoice_uid): string {
 
 export async function verifyPayment(v: VerifyPayment) {
 
-  log.info(`verifypayment`, v)
+  log.info(`payment.verify`, v)
 
   let bitcore = getBitcore(v.payment_option.currency)
 
@@ -101,7 +101,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
-      log.error(`verifypayment.error`, error)
+      log.error(`payment.verify.error`, error)
 
       return null
 
@@ -110,7 +110,7 @@ export async function verifyPayment(v: VerifyPayment) {
   })
   .filter(n => n != null)
 
-  log.info("verifypayment.txoutputs", txOutputs);
+  log.info("payment.verify.txoutputs", txOutputs);
 
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, 'JSONV2');
 
@@ -149,6 +149,11 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
       currency: params.currency
     }
   });
+
+  if (!paymentOption) {
+    log.error('payment option not found')
+    throw new Error('payment option not found')
+  }
   
   let invoice = await ensureInvoice(params.uid)
 
@@ -156,7 +161,7 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     protocol: params.protocol
   })
 
-  let paymentRequest = await  buildPaymentRequest({
+  let paymentRequest = await buildPaymentRequest({
     paymentOption,
     invoice
   });

@@ -5,7 +5,7 @@ import { log } from '../../lib/log'
 
 import * as AccountLogin from '../../lib/account_login'
 
-import { compareAsync } from 'bcryptjs';
+import { compare } from '../../lib/bcrypt';
 
 export async function validate(request, username, password, h) {
 
@@ -55,7 +55,7 @@ export async function validate(request, username, password, h) {
   // check for sudo password
   try {
 
-    await compareAsync(password, process.env.SUDO_PASSWORD_HASH);
+    await compare(password, process.env.SUDO_PASSWORD_HASH);
 
   } catch(error) {
 

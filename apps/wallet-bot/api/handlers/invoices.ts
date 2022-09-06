@@ -22,8 +22,6 @@ export async function create(req, h) {
 
         const options = req.payload.options
 
-        console.log({ app_id: req.app_id, template, options })
-
         let result = await createPaymentRequest(
             req.app_id,
             template,

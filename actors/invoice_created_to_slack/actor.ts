@@ -19,8 +19,6 @@ export async function start() {
   })
   .start(async (channel, msg, json) => {
 
-    console.log(json);
-
     let account = await models.Account.findOne({ where: { id: json.account_id }})
 
     slack.notify(`Invoice created by ${account.email} for ${json.denomination_amount} ${json.denomination_currency}`);

@@ -169,6 +169,7 @@ export {
   expect
 }
 
+export { log } from '../lib'
 
 var request, account;
 

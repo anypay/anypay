@@ -40,13 +40,11 @@ export async function start() {
         path: `/payments/${invoiceUid}`,
       });
 
-      console.log('firebase.notification.sent', resp);
-
       return channel.ack(msg);
 
     } catch(error) {
 
-      console.log(error);
+      log.error(error);
 
     }
 
