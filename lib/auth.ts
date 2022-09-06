@@ -8,7 +8,7 @@ import { Account, findAccount } from './account'
 
 import { verifyToken } from './jwt'
 
-import { compareAsync } from 'bcryptjs'
+import { compare } from './bcrypt'
 
 export async function validateSudoPassword(request, username, password, h) {
 
@@ -26,7 +26,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
   try {
 
-    await compareAsync(username, process.env.SUDO_PASSWORD_HASH);
+    await compare(username, process.env.SUDO_PASSWORD_HASH);
 
     return {
 
@@ -88,7 +88,7 @@ export async function validateToken(request, username, password, h) {
 
     try {
 
-      await compareAsync(password, process.env.SUDO_PASSWORD_HASH);
+      await compare(password, process.env.SUDO_PASSWORD_HASH);
 
       request.account = account;
       request.account_id = account.id;

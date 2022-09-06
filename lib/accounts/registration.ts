@@ -13,7 +13,7 @@ import { models } from '../models'
 
 import { log } from '../log'
 
-import { compareAsync } from 'bcryptjs'
+import { compare } from '../bcrypt'
 
 interface NewAccount {
   email: string;
@@ -113,7 +113,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   try {
 
-    await compareAsync(params.password, account.password_hash);
+    await compare(params.password, account.password_hash);
 
   } catch(error) {
 

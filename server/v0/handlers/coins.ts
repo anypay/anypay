@@ -35,7 +35,7 @@ export async function list(request, h) {
 
   let coins = Object.values(accountCoins);
 
-  h.response({
+  return h.response({
     'coins': sortBCHFirst(coins)
   })
 }

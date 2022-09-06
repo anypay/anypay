@@ -1,5 +1,4 @@
 
-
 import { setAddress} from '../../lib/core';
 
 import { coins, accounts } from "../../lib";
@@ -44,7 +43,6 @@ describe("Account Coins over HTTP", async () => {
 
     } catch(error) {
 
-      console.error('ERROR', error.message);
       throw error;
     }
   });

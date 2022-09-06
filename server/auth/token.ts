@@ -9,7 +9,7 @@ import { findApp } from '../../lib/apps'
 
 import { findAccount } from '../../lib/account'
 
-import { compareAsync } from 'bcryptjs'
+import { compare } from '../../lib/bcrypt'
 
 export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
@@ -64,7 +64,7 @@ async function validateToken (request, username, password, h) {
 
     try {
 
-      await compareAsync(password, process.env.SUDO_PASSWORD_HASH);
+      await compare(password, process.env.SUDO_PASSWORD_HASH);
 
       request.account = account;
       request.account_id = account.id;
