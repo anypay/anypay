@@ -319,9 +319,6 @@ export async function show(request, reply) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.debug('invoice not yet expired');
   }
 
   if (invoice) {

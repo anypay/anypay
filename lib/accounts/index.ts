@@ -137,7 +137,9 @@ export async function registerAccount(email: string, password: string): Promise<
   if( account ){
 
     await log.info('account.created', {
-      id: account.id
+      id: account.id,
+      account_id: account.id,
+      email: account.email
     })
 
   }

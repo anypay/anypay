@@ -247,61 +247,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  log.info('invoice.created', {
-    account_id: account.id,
-    invoice_uid: invoice.uid
-  });
-
   return paymentOptions
 }
 
-/*
-
-  Function to mark invoice as paid, accepts an Invoice model record, and a
-  Payment struct.
-
-  Called after the settlement payment has already been sent
-
-  Emits an event `invoice.settled`
-
-*/
-
-export async function replaceInvoice(uid: string, currency: string) {
-
-  let invoice = await models.Invoice.findOne({ where: { uid: uid }});
-
-  let option = await models.PaymentOption.findOne({ 
-    where: { 
-      invoice_uid: uid,
-      currency: currency
-     }
-  });
-
-  if (!invoice) {
-    throw new Error(`invoice ${uid} not found`);
-  }
-
-  if (!option) {
-    throw new Error(`currency ${currency} is not a payment option for invoice ${uid}`);
-  }
-
-  log.info('replace with payment option', option.toJSON());
-
-  invoice.currency = option.currency;
-  invoice.invoice_currency = option.currency;
-
-  invoice.amount = option.amount;
-  invoice.invoice_amount = option.amount;
-
-  invoice.address = option.address;
-
-  invoice.uri = option.uri;
-  
-  await invoice.save();
-
-  return invoice;
-
-}
 
 export function isExpired(invoice) {
   let expiry = moment(invoice.expiry);  

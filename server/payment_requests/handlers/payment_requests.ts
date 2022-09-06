@@ -125,6 +125,7 @@ export async function show(req, h) {
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
   if (invoice.cancelled) {
+    
     return h.badRequest('invoice cancelled')
   }
 
@@ -132,9 +133,6 @@ export async function show(req, h) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.info('invoice not yet expired');
   }
 
   try {

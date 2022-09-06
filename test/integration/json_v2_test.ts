@@ -191,8 +191,6 @@ describe("JSON Payment Protocol V2", async () => {
   
   it("POST /i/:uid should rejects invalid un-signed transaction upon payment verification", async () => {
 
-    console.log("UN-SIGNED")
-
     let [account, invoice] = await utils.newAccountWithInvoice()
 
     const transaction = new bch.Transaction()
@@ -209,15 +207,25 @@ describe("JSON Payment Protocol V2", async () => {
       payload: {
         chain: 'BCH',
         currency: 'BCH',
-        transactions: [transaction.serialize()]
+        transactions: [{
+          tx: transaction.serialize()
+        }]
       }
     })
+
     console.log("VERR", response.result)
 
-    expect(response.statusCode).to.be.equal(400)
+    expect(response.result.statusCode).to.be.equal(400)
+    expect(response.result.error).to.be.equal('Bad Request')
 
+    console.log('MESSAGE:', response.result.message)
+
+    expect(response.result.message.match('Missing required output qpd5plj0cr8g9u7xdphyyy670thy6uh09untdqwd79'))
+      .to.be.a('array')
 
     let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
+
+    console.log('VALID', valid)
 
     expect(valid).to.be.equal(false)
 

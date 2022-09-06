@@ -30,11 +30,13 @@ function validateAddress(address: string) {
 
     new bch.HDPublicKey(address);
 
+    log.debug('plugins.bch.hdpublickey.valid', address)
+
     return true;
 
   } catch(error) {
 
-    log.info('plugins.bch.address.invalid', error)
+    log.debug('plugins.bch.hdpublickey.invalid', error)
 
   }
 

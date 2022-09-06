@@ -55,9 +55,13 @@ export async function createAccountWithAddresses(): Promise<Account> {
 
   await account.setAddress({ currency: 'BSV', address })
 
-  await account.setAddress({ currency: 'BCH', address: 'qrhqkz3mavm3s58qf3znajgpghf96p7xdgtdj404hy' })
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', address: 'XpwZpy6RH4LmkMSHNBeQds7ypSGznExQHd' })
+  await account.setAddress({ currency: 'DASH', address: dash_address })
 
   return account
 }
@@ -70,9 +74,13 @@ export async function setAddresses(account: Account): Promise<Account> {
 
   await account.setAddress({ currency: 'BSV', address })
 
-  await account.setAddress({ currency: 'BCH', address: 'qrhqkz3mavm3s58qf3znajgpghf96p7xdgtdj404hy' })
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', address: 'XpwZpy6RH4LmkMSHNBeQds7ypSGznExQHd' })
+  await account.setAddress({ currency: 'DASH', address: dash_address })
 
   return account
 }
@@ -85,9 +93,13 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   await account.setAddress({ currency: 'BSV', address })
 
-  await account.setAddress({ currency: 'BCH', address: 'qrhqkz3mavm3s58qf3znajgpghf96p7xdgtdj404hy' })
+  let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'DASH', address: 'XpwZpy6RH4LmkMSHNBeQds7ypSGznExQHd' })
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
+  
+  await account.setAddress({ currency: 'DASH', address: dash_address })
 
   let invoice = await createInvoice({
     account,
@@ -99,9 +111,12 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 }
 
 import * as bsv from 'bsv'
-export async function generateKeypair() {
 
-  let privateKey = new bsv.PrivateKey()
+export async function generateKeypair(currency: string = 'BSV') {
+
+  var bitcore = getBitcore(currency)
+
+  let privateKey = new bitcore.PrivateKey()
 
   let address = privateKey.toAddress()
 
@@ -209,6 +224,7 @@ export function auth(account, version=1) {
 }
 
 import { Wallet } from 'anypay-simple-wallet'
+import { getBitcore } from '../lib/bitcore';
 
 const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 

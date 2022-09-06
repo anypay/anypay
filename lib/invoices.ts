@@ -252,7 +252,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const options = await createPaymentOptions(account.record, invoice)
 
-  log.info('invoice.created', record.toJSON())
+  log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 
   return invoice;
 
