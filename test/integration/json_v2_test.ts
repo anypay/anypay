@@ -222,13 +222,7 @@ describe("JSON Payment Protocol V2", async () => {
 
     expect(response.result.message.match('Missing required output qpd5plj0cr8g9u7xdphyyy670thy6uh09untdqwd79'))
       .to.be.a('array')
-
-    let valid = schema.Protocol.PaymentVerification.response.validate(response.result)
-
-    console.log('VALID', valid)
-
-    expect(valid).to.be.equal(false)
-
+      
   })
 
   if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
