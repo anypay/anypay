@@ -5,7 +5,7 @@ import { models } from './models'
 
 import { publish } from './amqp'
 
-import { config } from './config'
+//import { config } from './config'
 
 interface NewLogger {
   namespace: string;
@@ -42,11 +42,11 @@ class Logger {
 
     }
 
-    if (config.get('NODE_ENV') !== 'test') {
+    //if (config.get('NODE_ENV') !== 'test') {
 
       this.log.info(type, payload)
 
-    }
+    //}
 
     await publish(type, payload, 'anypay.topic')
 
@@ -64,7 +64,6 @@ class Logger {
       account_id: payload.account_id,
       invoice_uid: payload.invoice_uid
     })
-
 
   }
 

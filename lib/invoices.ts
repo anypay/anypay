@@ -15,6 +15,7 @@ import { models } from './models'
 import { Orm } from './orm'
 
 import * as shortid from 'shortid';
+import { createPaymentOptions } from './invoice'
 
 export class InvoiceNotFound implements Error {
   name = 'InvoiceNotFound'
@@ -230,6 +231,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
   let invoice = new Invoice(record)
 
   await createWebhook(invoice)
+
+  await createPaymentOptions(account.record, invoice)
 
   log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 

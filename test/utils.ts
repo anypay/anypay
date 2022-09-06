@@ -45,6 +45,7 @@ interface NewAccountInvoice {
 
 interface NewInvoice {
   amount?: number;
+  account?: Account;
 }
 
 export async function createAccountWithAddresses(): Promise<Account> {
@@ -114,21 +115,9 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
 export async function newInvoice(params: NewInvoice = {}): Promise<Invoice> {
 
-  let { address } = await generateKeypair()
-
-  await account.setAddress({ currency: 'BSV', address })
-
-  let { address: bch_address } = await generateKeypair('BCH')
-
-  await account.setAddress({ currency: 'BCH', address: bch_address })
-
-  let { address: dash_address } = await generateKeypair('DASH')
-  
-  await account.setAddress({ currency: 'DASH', address: dash_address })
-
   let invoice = await createInvoice({
-    account,
-    amount: params.amount || 10
+    account: params.account || account,
+    amount: params.amount || 52.00
   })
 
   return invoice
@@ -200,7 +189,7 @@ before(async () => {
 
   request = supertest(server.listener)
 
-  account = await createAccount()
+  account = await createAccountWithAddresses()
 
 })
 
