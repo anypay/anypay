@@ -213,16 +213,14 @@ describe("JSON Payment Protocol V2", async () => {
       }
     })
 
-    console.log("VERR", response.result)
-
     expect(response.result.statusCode).to.be.equal(400)
     expect(response.result.error).to.be.equal('Bad Request')
 
     console.log('MESSAGE:', response.result.message)
 
-    expect(response.result.message.match('Missing required output qpd5plj0cr8g9u7xdphyyy670thy6uh09untdqwd79'))
+    expect(response.result.message.match('Missing required output'))
       .to.be.a('array')
-      
+
   })
 
   if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
