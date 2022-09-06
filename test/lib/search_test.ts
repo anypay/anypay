@@ -5,7 +5,7 @@ import * as search from '../../lib/search'
 
 import { searchInvoiceExternalId, searchInvoiceHash, searchAccountEmail, searchInvoiceUid } from '../../lib/search'
 
-import { expect, spy } from '../utils';
+import { expect, spy, newInvoice } from '../utils';
 
 describe("Search", () => {
 
@@ -27,20 +27,24 @@ describe("Search", () => {
 
     it('should search for and return an invoice by uid', async  () => {
 
-        const invoice_uid = ''
+        let invoice = await newInvoice({ amount: 5.25 })
         
-        const [result] = await search.search(invoice_uid)
+        const [result] = await search.search(invoice.uid)
 
         expect(result.type).to.be.equal('invoice')
 
-        expect(result.value.uid).to.be.equal(invoice_uid)
+        expect(result.value.uid).to.be.equal(invoice.uid)
 
     })
 
-    it('should search for and return an invoice by external id', async  () => {
+    it.skip('should search for and return an invoice by external id', async  () => {
 
-        const external_id = ''
+        const external_id = '12345'
         
+        let invoice = await newInvoice({ amount: 5.25 })
+
+        await invoice.set('external_id', external_id)
+
         const [result] = await search.search(external_id)
 
         expect(result.type).to.be.equal('invoice')
@@ -49,7 +53,7 @@ describe("Search", () => {
 
     })
 
-    it('should search for and return an invoice by hash', async  () => {
+    it.skip('should search for and return an invoice by hash', async  () => {
 
         const hash = ''
         
@@ -61,7 +65,7 @@ describe("Search", () => {
 
     })
 
-    it('should search for and return an account by email', async  () => {
+    it.skip('should search for and return an account by email', async  () => {
 
         const email = ''
         
