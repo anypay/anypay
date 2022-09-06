@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/anypay/anypay/compare/v1.4.0...v1.5.0) (2022-09-06)
+
+
+### Features
+
+* **connect-wallet-bot:** connect Wallet Bot Via Access Tokens API ([bd54294](https://github.com/anypay/anypay/commit/bd54294f2660542d20e05a12deba594ddec99afd))
+
 # [1.4.0](https://github.com/anypay/anypay/compare/v1.3.0...v1.4.0) (2022-08-10)
 
 
