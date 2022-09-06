@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: codecov/codecov-action@v3
         with:
-          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          #token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           verbose: true
       - name: Node.js
         uses: actions/setup-node@v1
