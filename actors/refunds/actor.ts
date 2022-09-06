@@ -2,11 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
 import { models } from '../../lib/models'
-
-const REFUNDS_APP_ID = 130;
 
 export async function start() {
 

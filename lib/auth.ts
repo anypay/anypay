@@ -1,14 +1,14 @@
 require("dotenv").config()
 
-import { hash, bcryptCompare } from '../password';
+import { log } from './log';
 
-import { log } from '../index';
+import { models } from './models'
 
-import { models } from '../models'
+import { Account, findAccount } from './account'
 
-import { Account, findAccount } from '../account'
+import { verifyToken } from './jwt'
 
-import { verifyToken } from '../jwt'
+import { compare } from './bcrypt'
 
 export async function validateSudoPassword(request, username, password, h) {
 
@@ -26,7 +26,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
   try {
 
-    await bcryptCompare(username, process.env.SUDO_PASSWORD_HASH);
+    await compare(username, process.env.SUDO_PASSWORD_HASH);
 
     return {
 
@@ -88,7 +88,7 @@ export async function validateToken(request, username, password, h) {
 
     try {
 
-      await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+      await compare(password, process.env.SUDO_PASSWORD_HASH);
 
       request.account = account;
       request.account_id = account.id;

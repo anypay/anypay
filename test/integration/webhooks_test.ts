@@ -1,8 +1,6 @@
 import * as utils from '../utils'
 
-import { expect, server } from '../utils'
-
-import { ensureAccessToken } from '../../lib/access_tokens'
+import { expect } from '../utils'
 
 import { createInvoice } from '../../lib/invoices'
 
@@ -70,14 +68,12 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.result.webhooks.length).to.be.equal(0)
 
-    let invoice = await createInvoice({
+    await createInvoice({
       account,
       amount: 10,
       webhook_url
     })
-
-    let webhook = await findWebhook({ invoice_uid: invoice.uid })
-
+    
     response = await utils.authRequest(account, {
       method: 'GET',
       url: '/v1/api/webhooks'
@@ -89,7 +85,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.result.webhooks[0].status).to.be.equal('pending')
 
-    invoice = await createInvoice({
+    await createInvoice({
       account,
       amount: 10,
       webhook_url

@@ -41,6 +41,8 @@ export function useJWT() {
 
         request.account = account
 
+        request.token = token
+
         return {
 
           isValid: true,

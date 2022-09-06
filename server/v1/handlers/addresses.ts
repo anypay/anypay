@@ -25,7 +25,7 @@ export async function remove(req, h) {
 
   try {
 
-    let addresses = await removeAddress(req.account, req.params.currency)
+    await removeAddress(req.account, req.params.currency)
 
     return h.response({ success: true }).code(200)
 

@@ -1,23 +1,9 @@
 
 require('dotenv').config();
 
-import {createWebhook} from './lib/blockcypher';
-
 import { fromSatoshis, Payment } from '../../lib/pay'
 
-import { any } from 'bluebird'
-
-import {log, models} from '../../lib'
-
-import { getTransaction } from './lib/jsonrpc';
-
-export { getTransaction }
-
 import * as blockcypher from '../../lib/blockcypher'
-
-import * as blockchair from '../../lib/blockchair'
-
-import * as http from 'superagent';
 
 import * as dash from '@dashevo/dashcore-lib';
 

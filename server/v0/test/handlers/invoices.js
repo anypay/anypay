@@ -13,6 +13,8 @@ const Database = require("../../../../lib/database");
 const server = require('../../server');
 const bcrypt = require('bcrypt');
 
+import bcrypt from 'bcrypt'
+
 function auth(username, password) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
 }

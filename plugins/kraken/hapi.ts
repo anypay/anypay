@@ -1,6 +1,4 @@
 
-import { log } from '../../lib/log'
-
 import { Server } from 'hapi'
 
 import { start } from './main'

@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi } from 'rabbi';
+import { Actor } from 'rabbi';
 
-import {email, models} from '../../lib';
+import {email } from '../../lib';
 
 export async function start() {
 

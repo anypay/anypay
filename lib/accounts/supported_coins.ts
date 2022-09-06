@@ -49,13 +49,6 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
 
     }
 
-    if (coin.code === 'BCH') {
-
-      let address = accountCoins[coin.code].address;
-
-    }
-
-
   });
 
   return accountCoins;

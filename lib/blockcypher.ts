@@ -4,10 +4,6 @@ let token = process.env.BLOCKCYPHER_TOKEN;
 
 import { log } from './log';
 
-import { models } from './models';
-
-const CALLBACKS_BASE = process.env.BLOCKCYPHER_CALLBACKS_BASE || "https://blockcypher.anypayinc.com";
-
 export async function publishDASH(hex) {
 
   return publish('dash', hex)
@@ -25,8 +21,6 @@ export async function publish(currency, hex) {
     return resp.body.hash;
 
   } catch(error) {
-
-    var error = error.response.body.error
 
     if (error.match('already exists..')) {
 

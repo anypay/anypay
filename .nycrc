@@ -1,0 +1,13 @@
+{
+  "nyc": {
+    "all": true,
+    "include": [
+      "lib/**.ts"
+    ],
+    "exclude": [
+      "apps/**.ts",
+      "bin/**.ts",
+      "actors/**.ts"
+    ]
+  }
+}

@@ -1,5 +1,4 @@
 
-import { validateAppToken } from './token'
 
 import { models } from '../../lib/models'
 

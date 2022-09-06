@@ -2,14 +2,13 @@ const bcrypt = require('bcryptjs');
 
 import { models } from './models';
 
-const uuid = require('uuid');
 const log = require('winston');
 
 import { config } from './config'
 
 const sender = config.get('EMAIL_SENDER')
 
-import  { ses } from './email/ses'
+import  { ses } from './email'
 
 export function hash(password) {
   return new Promise((resolve, reject) => {
@@ -19,18 +18,6 @@ export function hash(password) {
       resolve(hash);
     })
   });
-}
-
-export async function bcryptCompare(password, hash) {
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, hash, (error, res) => {
-      if (res) {
-        resolve(null);
-      } else {
-        reject(new Error("invalid password"));
-      }
-    })
-  })
 }
 
 export async function resetPasswordByEmail(email, newPassword) {

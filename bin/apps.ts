@@ -5,7 +5,6 @@ require("dotenv").config()
 import * as program from 'commander'
 
 import { createApp, createAppToken } from '../lib/apps';
-import { models } from '../lib';
 
 program
   .command('create <account_id> <name>')
