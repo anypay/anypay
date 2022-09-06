@@ -14,6 +14,44 @@
   "bin": {
     "anypay": "./bin/anypay.ts"
   },
+  "scripts": {
+    "anypay": "./bin/anypay.ts",
+    "build": "tsc",
+    "commit": "npx cz",
+    "console": "ts-node --experimental-repl-await",
+    "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
+    "db:seed:prices": "ts-node test/seed_prices.ts",
+    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
+    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
+    "start": "ts-node main.ts",
+    "test": "NODE_ENV=test nyc  --reporter=lcov mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit",
+    "cover": "npm run cover:unit && npm run cover:integration && npm run cover:report",
+    "cover:unit": "nyc --silent npm run test:unit",
+    "cover:integration": "nyc --silent --no-clean npm run test:integration",
+    "cover:report": "nyc report --reporter=lcov --reporter=text"
+  },
+  "keywords": [],
+  "author": "Anypay",
+  "license": "ISC",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "nyc": {
+    "check-coverage": false,
+    "all": true,
+    "include": [
+      "lib/**.ts"
+    ],
+    "exclude": [
+      "apps/**.ts",
+      "bin/**.ts",
+      "actors/**.ts"
+    ],
+    "reporter": "lcov",
+    "report-dir": "./coverage"
+  },
   "release": {
     "plugins": [
       "@semantic-release/commit-analyzer",
@@ -158,29 +196,6 @@
     "nyc": "^15.1.0",
     "supertest": "^6.2.2",
     "ts-node": "^6.2.0"
-  },
-  "nyc": {
-    "exclude": "migrations/*",
-    "check-coverage": false
-  },
-  "scripts": {
-    "anypay": "./bin/anypay.ts",
-    "build": "tsc",
-    "commit": "npx cz",
-    "console": "ts-node --experimental-repl-await",
-    "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
-    "db:seed:prices": "ts-node test/seed_prices.ts",
-    "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
-    "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
-    "start": "ts-node main.ts",
-    "test": "NODE_ENV=test nyc mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts --exit"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
   }
+
 }
