@@ -28,6 +28,14 @@ jobs:
         node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
+      - uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./coverage1.xml,./coverage2.xml # optional
+          flags: unittests # optional
+          name: codecov-umbrella # optional
+          fail_ci_if_error: true # optional (default = false)
+          verbose: true # optional (default = false)
       - name: Node.js
         uses: actions/setup-node@v1
         with:
@@ -41,3 +49,4 @@ jobs:
         run: |
           npm install
           npm test
+          steps:
