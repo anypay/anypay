@@ -2,7 +2,7 @@
   "name": "anypay-platform",
   "version": "1.4.0",
   "description": "Bitcoin Payments For Enterprises",
-  "private": false,
+  "private": true,
   "main": "main.ts",
   "engines": {
     "node": ">=14.0"
