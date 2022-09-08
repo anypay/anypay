@@ -5,8 +5,6 @@ import configurePlugins from "../config/plugins";
 
 import { models } from './';
 
-import { log } from './';
-
 class Plugins {
 
   plugins: any;
@@ -66,8 +64,6 @@ class Plugins {
     if (!address) {
       throw new Error(`${currency} address not found for account ${accountId}`);
     }
-
-    log.debug(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
 
     if(!this.plugins[currency].getNewAddress){
 

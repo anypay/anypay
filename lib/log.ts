@@ -133,7 +133,7 @@ class Logger {
 
   }
 
-  async debug(type, payload) {
+  async debug(type: string, payload:any={}) {
 
     this.log.debug(type, payload)
 

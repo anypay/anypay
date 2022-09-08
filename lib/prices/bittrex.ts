@@ -34,9 +34,7 @@ export async function getPrice(currency: string): Promise<Price> {
 
   } catch(error) {
 
-    log.error('bittrex.price.pair.invalid', error)
-
-    throw new InvalidPricePair(pair)
+    log.error('bittrex.price.pair.invalid', new InvalidPricePair(pair))
 
   }
 }
