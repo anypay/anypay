@@ -15,8 +15,6 @@ import { start as startPrices } from './lib/prices/cron'
 
 import { start as startFees } from './actors/detect_fees/actor'
 
-import { plugin as websockets } from './ws/plugin'
-
 import { hapi as kraken } from './plugins/kraken'
 
 import { start as refunds } from './actors/refunds/actor'
@@ -32,12 +30,6 @@ import * as core from './lib'
   startPrices()
 
   startFees()
-
-  if (config.get('websockets_server_enabled')) {
-
-    await server.register(websockets)
-
-  }
 
   try {
 
