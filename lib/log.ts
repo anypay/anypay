@@ -100,7 +100,7 @@ class Logger {
 
         const routing_key = `invoices.${payload.invoice_uid}.events`
 
-        await publish(routing_key, { payload, type }, 'anypay.events')
+        await publish(routing_key, { payload, type }, 'anypay.topic')
 
       }
 
