@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 
 import { log } from '../../lib/log'
 
