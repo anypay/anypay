@@ -99,10 +99,9 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
   } else {
 
-    throw new Error('no webhook_url set for invoice');
+    log.debug('invoice.webhook_url.empty', { invoice_uid: invoiceUid });
 
   }
-
 }
 
 interface FindWebhook { 
