@@ -1,6 +1,6 @@
 
 import * as moment from 'moment';
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import * as Boom from 'boom';
 
 import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';

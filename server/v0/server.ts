@@ -37,7 +37,7 @@ import * as payreq from '../payment_requests/server'
 
 import { v0, failAction } from '../handlers'
 
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 
 import { models } from '../../lib'
 
@@ -145,13 +145,15 @@ async function Server() {
     options: {
       info: {
         title: 'Anypay API Documentation',
-        version: '1.0.1',
+        version: '1.5.0',
       },
       securityDefinitions: {
         simple: {
           type: 'basic',
         },
       },
+      host: 'https://api.anypayx.com',
+      documentationPath: '/api',
       security: [{
         simple: [],
       }],
@@ -355,7 +357,7 @@ async function Server() {
     method: 'GET',
     path: '/',
     handler: (req, h) => {
-      return h.redirect('/documentation')
+      return h.redirect('/api')
     }
   }); 
 
