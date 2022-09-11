@@ -1,6 +1,8 @@
 
 import { plugins } from '../../../lib/plugins'
 
+import { log } from '../../../lib'
+
 import { badRequest } from 'boom'
 
 // broadcast transaction
@@ -13,13 +15,11 @@ export async function create(req, h) {
 
     let result = await plugin.broadcast(req.payload.transaction)
 
-    console.log(result)
-
     return { result }
 
   } catch(error) {
 
-    console.error(error)
+    log.error('server.v1.handlers.transactions.create', error)
 
     return badRequest(error)
 

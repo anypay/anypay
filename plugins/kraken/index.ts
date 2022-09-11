@@ -79,8 +79,6 @@ export async function syncTrades(account: Account, options: SyncTradesOptions={}
     options['start'] = parseFloat(latestTrade.time)
   }
 
-  console.log({ options })
-
   let kraken = await fromAccount(account)
 
   const newTrades = []
@@ -116,8 +114,6 @@ export async function syncTrades(account: Account, options: SyncTradesOptions={}
       }
 
     }
-
-    console.log(`${newTrades.length} new trades`)
 
   }
 
