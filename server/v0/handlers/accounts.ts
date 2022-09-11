@@ -53,57 +53,6 @@ export async function update(req, h) {
 
 }
 
-export async function createAnonymous(request, h) {
-
-  try {
-
-    let account = await models.Account.create();
-
-    log.info(`anonymous account ${account.uid} created`);
-
-    let access_token = await models.AccessToken.create({ account_id: account.id });
-
-    return { account, access_token }
-
-  } catch(error) {
-
-    log.error('api.v0.Accounts.createAnonymous', error)
-
-    return h.badRequest(error)
-
-  }
-
-}
-
-export async function registerAnonymous(request, h) {
-
-  try {
-
-    let email = request.payload.email;
-
-    log.info('create.account', email);
-
-    let passwordHash = await utils.hash(request.payload.password);
-
-    request.account.email = request.payload.email;
-    request.account.password_hash = passwordHash;
-
-    request.account.save();
-
-    slack.notify(`account:registered | ${request.account.email}`);
-    
-    return request.account;
-
-  } catch(error) {
-
-    log.error('api.v0.Accounts.registerAnonymous', error)
-
-    return h.badRequest(error)
-
-  }
-
-}
-
 export async function create (request, h) {
 
   try {

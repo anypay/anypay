@@ -48,7 +48,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           start_date: Joi.date().required(),
@@ -89,7 +89,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           token: Joi.string().required()
