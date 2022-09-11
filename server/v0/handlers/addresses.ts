@@ -55,31 +55,41 @@ export async function index(req, h) {
 
 export async function update(request, h) {
 
-  let currency = request.params.currency;
+  try {
 
-  let address = request.payload.address;
+    let currency = request.params.currency;
 
-  let accountId = request.account.id;
+    let address = request.payload.address;
 
-  var changeset = {
+    let accountId = request.account.id;
 
-    account_id: accountId,
+    var changeset = {
 
-    currency: currency.toUpperCase(),
+      account_id: accountId,
 
-    address: address
+      currency: currency.toUpperCase(),
 
-  };
+      address: address
 
-  log.info('address.update', changeset);
+    };
 
-  await setAddress(changeset);
+    log.info('address.update', changeset);
 
-  return {
+    await setAddress(changeset);
 
-    currency: changeset.currency,
+    return {
 
-    value: changeset.address
+      currency: changeset.currency,
+
+      value: changeset.address
+
+    }
+
+  } catch(error) {
+
+    log.error('server.v0.handlers.addresses', error)
+
+    return h.badRequest(error)
 
   }
 
