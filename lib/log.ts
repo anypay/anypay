@@ -28,8 +28,6 @@ const transports = []
 
 if (config.get('loki_enabled') && config.get('loki_host')) {
 
-  console.log('loki enabled')
-
   const LokiTransport = require("winston-loki");
 
   const lokiConfig = {
