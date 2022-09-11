@@ -15,7 +15,7 @@ export { v0, v1, jsonV2 }
 
 export function failAction(request, h, error) {
 
-  log.error('api.failAction', request)
+  log.error('api.failAction', error)
 
   return error
 }

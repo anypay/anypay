@@ -151,8 +151,12 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
   });
 
   if (!paymentOption) {
-    log.error('payment option not found')
-    throw new Error('payment option not found')
+
+    const error = new Error('payment option not found')
+
+    log.error('payment-option.missing', error)
+
+    throw error
   }
   
   let invoice = await ensureInvoice(params.uid)

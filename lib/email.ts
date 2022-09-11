@@ -140,7 +140,7 @@ async function checkInvoiceCount(invoice){
 
     }
   }catch(error){
-    log.error(error)
+    log.error('checkInvoiceCount.error', error)
   }
 
 }

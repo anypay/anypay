@@ -111,7 +111,8 @@ export async function create(req, h) {
   })
 
   if (invoice.cancelled) {
-    log.error('payment.error.invoicecancelled', { uid: req.params.uid, payment })
+
+    log.error('payment.error.invoice.cancelled', new Error('invoice cancelled'))
     return Boom.badRequest('invoice cancelled')
   }
 

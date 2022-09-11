@@ -77,7 +77,7 @@ export async function sendPasswordResetEmail(email) {
       Source: sender
     }, (error, response) => {
       if (error) {
-        log.error('error sending password reset email', error.message);
+        log.error('error sending password reset email', error);
         return reject(error)
       }
       log.info(`successfully set password reset email to ${email}`);

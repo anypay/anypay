@@ -47,8 +47,7 @@ export async function validate(request, username, password, h) {
     }
   } catch(error) {
 
-
-    log.error(error.message);
+    log.error('auth.passwords.validate.error', error);
 
   }
 

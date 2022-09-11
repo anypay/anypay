@@ -74,10 +74,10 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-
 const server = new Hapi.Server({
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 8000,
+  //debug: { 'request': ['error', 'uncaught'] },
   routes: {
     cors: true,
     validate: {
@@ -134,6 +134,40 @@ async function Server() {
     }
 
     return h.continue;
+  })
+
+  // Transform non-boom errors into boom ones
+  server.ext('onPreResponse', (request, h) => {
+    // Transform only server errors 
+    if (request.response.isBoom) {
+
+      log.error('hapi.error.response', request.response)
+
+      const statusCode = request.response.output.statusCode || 500
+
+      log.error('hapi.error.response', request.response)
+
+      if (statusCode === 500) {
+
+        const response = {
+          statusCode,
+          error: request.response.error || request.response.message,
+          message: request.response.message
+        }
+  
+        return h.response(response).code(statusCode)
+
+      } else {
+    
+        return h.response(request.response.output).code(statusCode)
+
+      }
+
+    } else {
+      // Otherwise just continue with previous response
+      return h.continue
+
+    }
   })
 
   await server.register(require('@hapi/basic'));
@@ -220,6 +254,22 @@ async function Server() {
     log.debug('apps.wallet-bot.plugin.registered')
 
   }
+
+  server.route({
+    method: "GET",
+    path: "/throws",
+    handler: () => {
+      throw new Error('big bad wolf')
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/bad-request",
+    handler: (req, h) => {
+      return h.badRequest('unexpected hurricane')
+    }
+  });
 
   server.route({
     method: "GET",
