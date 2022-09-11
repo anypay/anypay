@@ -11,6 +11,7 @@ export async function attachRoutes(server) {
     path: "/i/{uid}",
     handler: jsonV2.Protocol.listPaymentOptions,
     options: {
+      tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
@@ -29,6 +30,7 @@ export async function attachRoutes(server) {
     path: "/i/{uid}",
     handler: jsonV2.Protocol.handlePost,
     options: {
+      tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
@@ -51,6 +53,7 @@ export async function attachRoutes(server) {
     path: "/r/{uid}",
     handler: jsonV2.Protocol.handlePost,
     options: {
+      tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
           'x-paypro-version': Joi.number().integer().required(),
