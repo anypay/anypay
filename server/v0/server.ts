@@ -143,17 +143,25 @@ async function Server() {
 
       log.error('hapi.error.response', request.response)
 
-      const code = request.response.output.statusCode || 500
-
-      const response = {
-        code,
-        error: request.response.error || request.response.message,
-        message: request.response.message
-      }
+      const statusCode = request.response.output.statusCode || 500
 
       log.error('hapi.error.response', request.response)
 
-      return h.response(response).code(code)
+      if (statusCode === 500) {
+
+        const response = {
+          statusCode,
+          error: request.response.error || request.response.message,
+          message: request.response.message
+        }
+  
+        return h.response(response).code(statusCode)
+
+      } else {
+    
+        return h.response(request.response.output).code(statusCode)
+
+      }
 
     } else {
       // Otherwise just continue with previous response
