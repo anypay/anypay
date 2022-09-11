@@ -261,6 +261,16 @@ async function Server() {
   })
 
   server.route({
+    method: "DELETE",
+    path: "/r/{uid}",
+    handler: v0.PaymentRequests.cancel,
+    options: {
+      auth: "app",
+      tags: ['api', 'v0', 'platform'],
+    }
+  })
+
+  server.route({
     method: "POST",
     path: "/payment-requests",
     handler: v0.PaymentRequests.create,
