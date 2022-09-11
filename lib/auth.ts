@@ -107,7 +107,7 @@ export async function validateToken(request, username, password, h) {
 
     } catch(error) {
 
-      log.error('auth.token.error', message);
+      log.error('auth.token.error', error);
 
       return {
 
