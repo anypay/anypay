@@ -65,7 +65,7 @@ export async function start() {
 
       } catch(error) {
 
-        log.error(error);
+        log.error('grab_and_go_payment_amqp', error);
 
       }
 

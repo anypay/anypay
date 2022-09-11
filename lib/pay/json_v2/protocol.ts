@@ -39,9 +39,12 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     if (invoice.cancelled) {
 
-      log.error('payment.error.invoicecancelled', { payment })
+      const error = new Error('invoice cancelled')
 
-      throw new Error('invoice cancelled')
+      log.error('payment.error.invoicecancelled', error)
+
+      throw error
+      
     }
 
     if (!invoice) {
@@ -121,9 +124,11 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     if (invoice.cancelled) {
 
-      log.error('payment.error.invoice.cancelled', { payment })
+      const error = new Error('payment.error.invoice.cancelled')
 
-      throw new Error('payment.error.invoice.cancelled')
+      log.error('payment.error.invoice.cancelled', error)
+
+      throw error
     }
 
     if (!invoice) {

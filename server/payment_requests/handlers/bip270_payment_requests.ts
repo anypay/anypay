@@ -47,7 +47,7 @@ export async function create(req, h) {
 
     if (invoice.cancelled) {
 
-      log.error('payment.error.invoicecancelled', submission)
+      log.error('payment.error.invoicecancelled', new Error('Invoice Already Cancelled'))
 
       throw new Error('Invoice Already Cancelled')
 

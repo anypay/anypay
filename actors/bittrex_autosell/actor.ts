@@ -24,7 +24,7 @@ export async function start() {
 
       } catch(error) {
 
-        log.error('bittrex.sellall.error', error.message)
+        log.error('bittrex.sellall.error', error)
 
       }
 

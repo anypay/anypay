@@ -44,7 +44,7 @@ export async function start() {
 
     } catch(error) {
 
-      log.error(error);
+      log.error('actors.payment_push_notification', error);
 
     }
 

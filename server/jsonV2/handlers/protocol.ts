@@ -107,8 +107,6 @@ async function getPaymentRequest(req, h) {
   } catch(error) {
 
     log.error('pay.jsonv2.payment-request.error', error)
-    log.info('pay.jsonv2.payment-request.error', error)
-    console.error('pay.jsonv2.payment-request.error', error)
 
     return h.response({ error: error.message }).code(400)
 
@@ -166,7 +164,6 @@ async function submitPayment(req, h) {
   } catch(error) {
 
     log.error('pay.jsonv2.payment.error', error)
-    log.info('pay.jsonv2.payment.error', { error: error.message })
 
     return badRequest(error)
 

@@ -336,7 +336,7 @@ export async function show(request, reply) {
 
   } else {
 
-    log.error('no invoice found', invoiceId);
+    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
 
     throw new Error('invoice not found')
   }
@@ -355,7 +355,7 @@ export async function shareEmail(req, h) {
 
   if (!invoice) {
 
-    log.error('no invoice found', req.params.uid);
+    log.error('no invoice found', new Error(`invoice ${req.params.uid} not found`));
 
     throw new Error('invoice not found')
 
