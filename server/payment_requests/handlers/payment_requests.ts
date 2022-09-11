@@ -1,7 +1,7 @@
 
 import { log, models, invoices } from '../../../lib';
 
-import { Invoice } from '../../../lib/invoices'
+import { cancelInvoice, Invoice } from '../../../lib/invoices'
 
 import { show as handleBIP70 } from './bip70_payment_requests'
 
@@ -18,6 +18,42 @@ import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 import { createWebhook } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
+
+import { findOne } from '../../../lib/orm';
+
+export async function cancel(req, h) {
+
+  try {
+
+    const invoice: Invoice = await findOne<Invoice>(Invoice, {
+      where: {
+        uid: req.params.uid
+      }
+    })
+  
+    if (!invoice) {
+  
+      return h.notFound()
+    }
+  
+    if (invoice.get('app_id') !== req.app.id) {
+  
+      return h.notAuthorized()
+    }
+  
+    await cancelInvoice(invoice)
+  
+    return h.response({ success: true })
+
+  } catch(error) {
+
+    log.error('api.payment-requests.cancel', error)
+
+    return h.badRequest(error)
+
+  }
+
+}
 
 export async function create(req, h) {
 
