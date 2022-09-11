@@ -65,7 +65,7 @@ export async function create(req, h) {
 
     if (error) {
 
-      log.error('pay.request.create.error', { error })
+      log.error('pay.request.create.error', error)
 
       throw error
 
@@ -191,7 +191,7 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    log.error('pay.request.error', { error: error.message });
+    log.error('pay.request.error', error);
 
     return h.badRequest(error.message);
 

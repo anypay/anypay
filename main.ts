@@ -61,3 +61,10 @@ import * as core from './lib'
 
 })()
 
+process.on('uncaughtException', (error) => {
+  log.error('uncuaghtException', error)
+})
+
+process.on('unhandledRejected', (error) => {
+  log.error('uncuaghtException', error)
+})

@@ -51,7 +51,7 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
   if (error) {
 
-    log.error('pay.request.create.error', { error })
+    log.error('pay.request.create.error', error)
 
     throw error
 

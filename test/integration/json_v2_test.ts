@@ -214,12 +214,7 @@ describe("JSON Payment Protocol V2", async () => {
     })
 
     expect(response.result.statusCode).to.be.equal(400)
-    expect(response.result.error).to.be.equal('Bad Request')
 
-    console.log('MESSAGE:', response.result.message)
-
-    expect(response.result.message.match('Missing required output'))
-      .to.be.a('array')
 
   })
 

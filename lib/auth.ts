@@ -42,7 +42,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
   } catch(error) {
 
-    log.error(error.message);
+    log.error('auth.sudo.error', error);
 
     return {
 
@@ -107,7 +107,7 @@ export async function validateToken(request, username, password, h) {
 
     } catch(error) {
 
-      log.error(error.message);
+      log.error('auth.token.error', error);
 
       return {
 

@@ -55,7 +55,7 @@ export function useJWT() {
 
       } catch(error) {
 
-        log.error('jwt.auth.error', { error })
+        log.error('jwt.auth.error', error)
 
         return h.unauthenticated(error)
 
