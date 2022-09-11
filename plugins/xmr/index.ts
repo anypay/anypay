@@ -145,22 +145,10 @@ export async function verify({url,txid,tx_key}: VerifyPayment) {
     chain: 'XMR',
     currency: 'XMR'
   })
-
-  console.log({ paymentRequest })
-
   let destinations = paymentRequest.instructions[0].outputs
 
   for (let { address, amount } of destinations) {
-   
-    console.log({ address, amount })
-
     let result = await call('check_tx_key', { txid, tx_key, address })
-
-    console.log({
-      address,
-      expected: amount,
-      received: result.received
-    })
 
     if (amount !== result.received) {
       throw new Error('Invalid XMR Payment')

@@ -7,8 +7,6 @@ export async function index(request, h) {
 
   try {
 
-    console.log({ account_idd : request.account.id })
-
     log.info('api.v1.linked_accounts.index', {
       ...request.query,
       account_id: request.account.id

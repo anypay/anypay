@@ -65,9 +65,7 @@ export async function show(req, h) {
 };
 
 async function getMerchantInfo(accountId: any): Promise<MerchantInfo> {
-
-  console.log("get merchant info", accountId);
-
+  
   let account = await models.Account.findOne({where: {
     stub: accountId
   }})

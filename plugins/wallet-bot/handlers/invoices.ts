@@ -31,8 +31,6 @@ function formatInvoice(invoice: any): Invoice {
 
 export async function index(req, h) {
 
-  console.log(req)
-
   try {
 
     let invoices = await models.Invoice.findAll({

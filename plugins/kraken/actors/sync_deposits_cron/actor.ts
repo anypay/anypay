@@ -24,20 +24,17 @@ export async function start() {
 
       let account = await findAccount(krakenAccount.get('account_id'))
 
-      console.log('kraken.deposits.sync', {account_id: account.get('id') })
+      log.info('kraken.deposits.sync', {account_id: account.get('id') })
 
       try {
 
         await syncDeposits(account)
 
-        console.log('kraken.deposits.sync.complete', {account_id: account.get('id') })
+        log.info('kraken.deposits.sync.complete', {account_id: account.get('id') })
 
       } catch(error) { 
 
-        console.error('kraken.deposits.sync.error', {
-          account_id: account.get('id'),
-          error
-        })
+        log.error('kraken.deposits.sync.error', error)
 
       }
 

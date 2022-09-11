@@ -23,10 +23,14 @@ import { badImplementation, badRequest } from '@hapi/boom'
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
 import { listSockets, setSocket, removeSocket, getSocket } from './sockets'
-import { Invoice } from '../../lib/invoices';
-import { findAll } from '../../lib/orm';
+
+import { Invoice } from '../../lib/invoices'
+
+import { findAll } from '../../lib/orm'
 
 import { failAction } from '../../server/handlers'
+
+import { handlers as websocketsHandlers } from './sockets'
 
 export const plugin = (() => {
 
@@ -90,11 +94,16 @@ export const plugin = (() => {
 
           const binding = await bind({ socket })
 
-          Object.keys(handlers).forEach(event => {
+          Object.keys(websocketsHandlers).forEach(event => {
 
             socket.on(event, (message) => {
 
-              handlers[event](socket, message)
+              if (websocketsHandlers[event]) {
+
+                websocketsHandlers[event](socket, message)
+
+              }
+              
             })
           })
 
