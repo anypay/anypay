@@ -2,12 +2,14 @@
   "nyc": {
     "all": true,
     "include": [
-      "lib/**.ts"
+      "lib/**.ts",
+      "server/**.ts",
+      "plugins/**.ts",
+      "actors/**.ts",
+      "apps/**.ts"
     ],
     "exclude": [
-      "apps/**.ts",
-      "bin/**.ts",
-      "actors/**.ts"
+      "bin/**.ts"
     ]
   }
 }
