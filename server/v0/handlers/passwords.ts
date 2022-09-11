@@ -1,6 +1,6 @@
 const password = require("../../../lib/password")
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 import { models } from '../../../lib';
 

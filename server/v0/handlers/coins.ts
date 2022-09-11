@@ -1,6 +1,6 @@
 import {accounts}  from '../../../lib';
 
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 
 /**
  * @api {get} /coins Request User Supported Coins

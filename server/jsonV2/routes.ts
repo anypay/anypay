@@ -2,7 +2,7 @@
 
 import { jsonV2, failAction } from '../handlers'
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export async function attachRoutes(server) {
 
