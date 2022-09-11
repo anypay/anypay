@@ -43,9 +43,10 @@
     "all": true,
     "include": [
       "lib/**.ts",
-      "plugins/**.ts",
-      "apps/**.ts",
-      "server/**.ts"
+      "lib/**/*.ts",
+      "plugins/**/*.ts",
+      "apps/**/*.ts",
+      "server/**/*.ts"
     ],
     "exclude": [
       "bin/**.ts",
