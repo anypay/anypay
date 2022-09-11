@@ -3,6 +3,8 @@ import { getRefund } from '../../../lib/refunds'
 
 import { ensureInvoice } from '../../../lib/invoices'
 
+import { log } from '../../../lib'
+
 export async function show(req, h) {
 
   try {
@@ -26,10 +28,9 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    console.log(error.message)
-    console.error(error)
+    log.error('servers.v1.handlers.Refunds.show', error)
 
-    return h.response({ error }).code(500)
+    return h.badRequest(error)
 
   }
 

@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { log } from 'rabbi';
+import { log } from '../../../../lib/log';
 
 import * as cron from 'node-cron'
 
@@ -24,20 +24,17 @@ export async function start() {
 
       let account = await findAccount(krakenAccount.get('account_id'))
 
-      console.log('kraken.trades.sync', {account_id: account.get('id') })
+      log.info('kraken.trades.sync', {account_id: account.get('id') })
 
       try {
 
         await syncTrades(account)
 
-        console.log('kraken.trades.sync.complete', {account_id: account.get('id') })
+        log.info('kraken.trades.sync.complete', {account_id: account.get('id') })
 
       } catch(error) { 
 
-        console.error('kraken.trades.sync.error', {
-          account_id: account.get('id'),
-          error
-        })
+        log.error('kraken.trades.sync.error', error)
 
       }
 

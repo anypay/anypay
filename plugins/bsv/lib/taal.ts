@@ -22,8 +22,6 @@ export async function getTransaction(txid: string): Promise<string> {
 
 export async function broadcastTransaction(rawTx: string): Promise<string> {
 
-  console.log(process.env.TAAL_API_KEY)
-
   let { data } = await axios.post(`https://api.taal.com/api/v1/broadcast`, {
     rawTx
   }, {

@@ -45,8 +45,6 @@ export async function index(req, h) {
 
       } catch(error) {
 
-        console.log(payment)
-
         log.error('listpayments', error)
 
       }

@@ -26,8 +26,6 @@ const { tx_blob } = require('./test/data/xmr.json');
     }
   })
 
-  console.log(data)
-
   /*let response = await axios.post('https://xmr.nodes.anypayx.com/json_rpc', {
     jsonrpc:"2.0",
     id:"0",
@@ -42,6 +40,6 @@ const { tx_blob } = require('./test/data/xmr.json');
     }
   })
 
-  console.log(response)*/
+  */
 
 })()
