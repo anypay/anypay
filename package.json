@@ -42,10 +42,12 @@
     "check-coverage": false,
     "all": true,
     "include": [
-      "lib/**.ts"
+      "lib/**.ts",
+      "plugins/**.ts",
+      "apps/**.ts",
+      "server/**.ts"
     ],
     "exclude": [
-      "apps/**.ts",
       "bin/**.ts",
       "actors/**.ts"
     ],
