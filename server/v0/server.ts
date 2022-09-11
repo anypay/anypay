@@ -74,10 +74,10 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-
 const server = new Hapi.Server({
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 8000,
+  //debug: { 'request': ['error', 'uncaught'] },
   routes: {
     cors: true,
     validate: {
@@ -134,6 +134,30 @@ async function Server() {
     }
 
     return h.continue;
+  })
+
+  // Transform non-boom errors into boom ones
+  server.ext('onPreResponse', (request, h) => {
+    // Transform only server errors 
+    if (request.response.isBoom) {
+
+      const code = request.response.code || 500
+
+      const response = {
+        code,
+        error: request.response.error || request.response.message,
+        message: request.response.message
+      }
+
+      log.error('hapi.error.response', response)
+
+      return h.response(response).code(code)
+
+    } else {
+      // Otherwise just continue with previous response
+      return h.continue
+
+    }
   })
 
   await server.register(require('@hapi/basic'));
