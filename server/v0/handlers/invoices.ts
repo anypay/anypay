@@ -27,7 +27,7 @@ export async function cancel(req, h) {
 
   if (!invoice) {
 
-    log.error('invoice.notfound', where)
+    log.error('invoice.notfound', new Error(JSON.stringify(where)))
 
     return Boom.notFound()
 
@@ -43,7 +43,7 @@ export async function cancel(req, h) {
 
   } else {
 
-    log.error('invoice.cancel.error.alreadycancelled', where)
+    log.error('invoice.cancel.error.alreadycancelled', new Error(JSON.stringify(where)))
 
     throw new Error('invoice already cancelled')
 

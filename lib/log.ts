@@ -116,16 +116,16 @@ class Logger {
 
   }
 
-  async error(error_type: string, error: any = {}) {
+  async error(error_type: string, error: Error) {
 
-    this.log.error({...error, namespace: this.namespace }, error_type)
+    this.log.error(error_type, error.message)
 
-    loki.error(error_type, error)
+    loki.error(error_type, error.message)
 
     let record = await models.Event.create({
       namespace: this.namespace,
       type: error_type,
-      payload: Object.assign(error, { message: error.message, name: error.name}),
+      payload: { error: error.message },
       error: true
     })
 

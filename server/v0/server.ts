@@ -141,7 +141,9 @@ async function Server() {
     // Transform only server errors 
     if (request.response.isBoom) {
 
-      const code = request.response.code || 500
+      log.error('hapi.error.response', request.response)
+
+      const code = request.response.output.statusCode || 500
 
       const response = {
         code,
@@ -149,7 +151,7 @@ async function Server() {
         message: request.response.message
       }
 
-      log.error('hapi.error.response', response)
+      log.error('hapi.error.response', request.response)
 
       return h.response(response).code(code)
 
@@ -244,6 +246,22 @@ async function Server() {
     log.debug('apps.wallet-bot.plugin.registered')
 
   }
+
+  server.route({
+    method: "GET",
+    path: "/throws",
+    handler: () => {
+      throw new Error('big bad wolf')
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/bad-request",
+    handler: (req, h) => {
+      return h.badRequest('unexpected hurricane')
+    }
+  });
 
   server.route({
     method: "GET",
