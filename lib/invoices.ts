@@ -15,7 +15,10 @@ import { models } from './models'
 import { Orm } from './orm'
 
 import * as shortid from 'shortid';
+
 import { createPaymentOptions } from './invoice'
+
+import { publish } from './amqp'
 
 export class InvoiceNotFound implements Error {
   name = 'InvoiceNotFound'
@@ -43,6 +46,24 @@ export async function getInvoice(uid: string) {
   if (!record) { return }
 
   return new Invoice(record)
+
+}
+
+export async function cancelInvoice(invoice: Invoice) {
+
+  if (invoice.get('status') !== 'unpaid') {
+    throw new Error('can only cancel unpaid invoices')
+  }
+
+  await invoice.set('status', 'cancelled')
+
+  await invoice.set('cancelled', true)
+
+  log.info('invoice.cancelled', { uid: invoice.get('uid') })
+
+  publish('invoice.cancelled', { uid: invoice.get('uid') })
+
+  return invoice
 
 }
 

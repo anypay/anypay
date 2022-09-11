@@ -10,7 +10,7 @@ import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
-import { Invoice, createInvoice } from '../../../lib/invoices';
+import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
 
 import * as moment from 'moment';
 
@@ -35,13 +35,7 @@ export async function cancel(req, h) {
 
   if (invoice && !invoice.cancelled) {
 
-    invoice.cancelled = true;
-
-    invoice.status = 'cancelled';
-
-    await invoice.save()
-
-    log.debug('invoice.cancelled', where)
+    await cancelInvoice(invoice)
 
     where['status'] = 'cancelled'
 
