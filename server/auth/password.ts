@@ -5,7 +5,7 @@ import { log } from '../../lib/log'
 
 import * as AccountLogin from '../../lib/account_login'
 
-import { bcryptCompare } from '../../lib/password';
+import { compare } from '../../lib/bcrypt';
 
 export async function validate(request, username, password, h) {
 
@@ -47,15 +47,14 @@ export async function validate(request, username, password, h) {
     }
   } catch(error) {
 
-
-    log.error(error.message);
+    log.error('auth.passwords.validate.error', error);
 
   }
 
   // check for sudo password
   try {
 
-    await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+    await compare(password, process.env.SUDO_PASSWORD_HASH);
 
   } catch(error) {
 

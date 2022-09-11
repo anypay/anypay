@@ -9,15 +9,49 @@ import { paymentRequestToPaymentOptions } from './payment_options'
 
 import { schema } from 'anypay'
 
+import BigNumber from 'bignumber.js'
+
+function ensureConsistentCurrencyAmount(template: any): {currency: string, amount: number} {
+
+  var currency, amount = new BigNumber(0);
+
+  for (let option of template) {
+
+    for (let to of option.to) {
+
+      if (!currency) {
+
+        currency = to.currency
+
+        amount = amount.plus(to.amount)
+
+      }
+
+      if (currency !== to.currency) {
+
+        throw new Error('all template options to.currency must equal the same value')
+
+      }
+
+    }
+
+  }
+
+  return {currency, amount: amount.toNumber()}
+
+}
+
 export async function createPaymentRequest(app_id: number, template: any, options: any) {
 
   log.info('pay.request.create', { template, options })
+
+  const { currency, amount } = ensureConsistentCurrencyAmount(template)
 
   let { error } = schema.PaymentRequestTemplate.validate(template)
 
   if (error) {
 
-    log.error('pay.request.create.error', { error })
+    log.error('pay.request.create.error', error)
 
     throw error
 
@@ -35,13 +69,9 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     })
 
-    let invoice = await invoices.createEmptyInvoice(app_id)
-
-    console.log('empty created')
+    let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount })
 
     invoice.currency = template[0].currency
-
-    console.log('empty created after currency')
 
     if (options) {
 
@@ -52,11 +82,7 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     }
 
-    console.log('about to save', invoice.toJSON())
-
     await invoice.save()
-
-    console.log('saved', invoice.toJSON())
 
     record.invoice_uid = invoice.uid
     record.uri = invoice.uri
@@ -65,8 +91,6 @@ export async function createPaymentRequest(app_id: number, template: any, option
     record.status = 'unpaid'
 
     await record.save()
-
-    console.log('saved', invoice.toJSON())
 
     await paymentRequestToPaymentOptions(record)
 

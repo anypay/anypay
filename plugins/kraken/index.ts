@@ -1,7 +1,7 @@
 
 export { plugin as hapi } from './hapi'
 
-import { KrakenAccount, listAll, fromAccount } from './lib/kraken_account'
+import { fromAccount } from './lib/kraken_account'
 
 import { Account } from '../../lib/account'
 
@@ -85,7 +85,7 @@ export async function syncTrades(account: Account, options: SyncTradesOptions={}
 
   const newTrades = []
 
-  for (let asset of currencies) {
+  for (let _ of currencies) {
 
     let { result } = await kraken.api('TradesHistory', options)
 

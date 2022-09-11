@@ -3,9 +3,13 @@ import * as Hapi from 'hapi';
 
 import * as jwt from '../../lib/jwt';
 
-import { models, log, password } from '../../lib';
+import { models, log } from '../../lib';
 
 import { findApp } from '../../lib/apps'
+
+import { findAccount } from '../../lib/account'
+
+import { compare } from '../../lib/bcrypt'
 
 export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
@@ -48,6 +52,7 @@ async function validateToken (request, username, password, h) {
 			}
 		})
 		request.account = account;
+
     request.account_id = accessToken.account_id;
 
     return {
@@ -59,7 +64,7 @@ async function validateToken (request, username, password, h) {
 
     try {
 
-      await password.bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
+      await compare(password, process.env.SUDO_PASSWORD_HASH);
 
       request.account = account;
       request.account_id = account.id;
@@ -78,7 +83,7 @@ async function validateToken (request, username, password, h) {
 
     } catch(error) {
 
-      log.error(error.message);
+      log.error('auth.token.error', error);
 
       return {
 
@@ -117,11 +122,19 @@ export async function validateAppToken (request, username, password, h) {
 
   }
 
+  request.token = username
+
+
+
   if (accessToken.app_id) {
 
     request.app_id = accessToken.app_id
 
     request.app = await findApp(accessToken.app_id)
+
+    request.account = await findAccount(accessToken.account_id)
+
+    request.token = username
 
     return {
       isValid: true,

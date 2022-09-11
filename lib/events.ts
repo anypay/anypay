@@ -1,9 +1,5 @@
 require('dotenv').config();
 
-import {connect} from 'amqplib';
-
-import {log} from './log';
-
 import {models} from './models';
 
 import { Orm } from './orm'
@@ -13,8 +9,6 @@ import { Invoice } from './invoices'
 import { Account } from './account'
 
 import { events } from 'rabbi'
-
-import { Op } from 'sequelize'
 
 interface EventData {
   type: string;

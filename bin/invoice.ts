@@ -35,7 +35,7 @@ program
 
     } catch(error) {
 
-      log.error(error);
+      log.error('invoice.generate.error', error);
 
     }
 
@@ -63,7 +63,7 @@ program
 
       console.log(error)
 
-      log.error(error);
+      log.error('events.error', error);
 
     }
 
@@ -84,7 +84,6 @@ program
     } catch(error) {
 
       console.log(error)
-      log.error(error)
 
     }
 

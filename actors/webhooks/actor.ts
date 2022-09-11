@@ -24,9 +24,7 @@ export async function start() {
     try {
 
       let webhook = await sendWebhookForInvoice(uid, 'actor_on_invoice_paid');
-
-      console.log('webhook.sent', webhook.toJSON());
-
+      
     } catch(error) {
 
       log.error('webhook.failed', error);

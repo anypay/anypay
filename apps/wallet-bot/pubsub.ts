@@ -1,6 +1,4 @@
 
-import { Socket } from 'socket.io'
-
 import { sockets } from './sockets'
 
 import { log } from '../../lib/log'

@@ -2,8 +2,6 @@
 
 require('dotenv').config();
 
-import { Actor, Joi } from 'rabbi';
-
 import { models } from '../../lib';
 
 import { log } from '../../lib/log'
@@ -26,7 +24,7 @@ export async function start() {
 
       } catch(error) {
 
-        log.error('bittrex.sellall.error', error.message)
+        log.error('bittrex.sellall.error', error)
 
       }
 

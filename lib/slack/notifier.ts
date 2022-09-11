@@ -21,7 +21,7 @@ export function notify(message: string, channel: string = 'invoice-bot') {
       })
       .end((error, response) => {
         if (error) {
-          log.error("slack:error", error.message);
+          log.error("slack:error", error);
         } else {
           log.info("slack:notified", response.body);
         }

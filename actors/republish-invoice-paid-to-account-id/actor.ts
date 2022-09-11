@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log, getChannel } from 'rabbi';
+import { Actor, log, getChannel } from 'rabbi';
 
 import { models } from '../../lib';
 
@@ -34,8 +34,6 @@ export async function start() {
     await channel.publish('anypay.account_events', routingKey2, Buffer.from(
       JSON.stringify(invoice.toJSON())
     ));
-
-    console.log(routingKey2, JSON.stringify(invoice.toJSON()));
 
     channel.ack(msg);
 

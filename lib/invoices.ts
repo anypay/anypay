@@ -1,15 +1,10 @@
 
-const validator = require('validator')
 
 import { log } from './log'
 
-import { config } from './config'
-
-import { Event } from './events'
-
 import { createWebhook } from './webhooks'
 
-import { Account, findAccount } from './account'
+import { Account } from './account'
 
 import { PaymentOption } from './payment_option'
 
@@ -22,6 +17,8 @@ import { Orm } from './orm'
 import * as shortid from 'shortid';
 
 import { createPaymentOptions } from './invoice'
+
+import { publish } from './amqp'
 
 export class InvoiceNotFound implements Error {
   name = 'InvoiceNotFound'
@@ -52,15 +49,21 @@ export async function getInvoice(uid: string) {
 
 }
 
-interface NewInvoice {
+export async function cancelInvoice(invoice: Invoice) {
 
-  account: Account;
+  if (invoice.get('status') !== 'unpaid') {
+    throw new Error('can only cancel unpaid invoices')
+  }
 
-  amount: number;
+  await invoice.set('status', 'cancelled')
 
-  webhook_url?: string;
+  await invoice.set('cancelled', true)
 
-  external_url?: string;
+  log.info('invoice.cancelled', { uid: invoice.get('uid') })
+
+  publish('invoice.cancelled', { uid: invoice.get('uid') })
+
+  return invoice
 
 }
 
@@ -77,6 +80,8 @@ export class InvalidWebhookURL implements Error {
 }
 
 export class Invoice extends Orm {
+
+  static model = models.Invoice;
 
   get account_id(): any {
 
@@ -188,8 +193,6 @@ interface CreateInvoice {
   register_id?: string;
 }
 
-
-
 export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const uid = shortid.generate();
@@ -250,9 +253,9 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   await createWebhook(invoice)
 
-  const options = await createPaymentOptions(account.record, invoice)
+  await createPaymentOptions(account.record, invoice)
 
-  log.info('invoice.created', record.toJSON())
+  log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 
   return invoice;
 

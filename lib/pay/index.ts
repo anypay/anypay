@@ -78,7 +78,7 @@ export function detectWallet(headers, invoice_uid): string {
 
 export async function verifyPayment(v: VerifyPayment) {
 
-  log.info(`verifypayment`, v)
+  log.info(`payment.verify`, v)
 
   let bitcore = getBitcore(v.payment_option.currency)
 
@@ -101,7 +101,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
-      log.error(`verifypayment.error`, error)
+      log.error(`payment.verify.error`, error)
 
       return null
 
@@ -110,7 +110,7 @@ export async function verifyPayment(v: VerifyPayment) {
   })
   .filter(n => n != null)
 
-  log.info("verifypayment.txoutputs", txOutputs);
+  log.info("payment.verify.txoutputs", txOutputs);
 
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, 'JSONV2');
 
@@ -149,6 +149,15 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
       currency: params.currency
     }
   });
+
+  if (!paymentOption) {
+
+    const error = new Error('payment option not found')
+
+    log.error('payment-option.missing', error)
+
+    throw error
+  }
   
   let invoice = await ensureInvoice(params.uid)
 
@@ -156,7 +165,7 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     protocol: params.protocol
   })
 
-  let paymentRequest = await  buildPaymentRequest({
+  let paymentRequest = await buildPaymentRequest({
     paymentOption,
     invoice
   });
@@ -322,7 +331,7 @@ export async function completePayment(paymentOption, hex: string) {
 
   let paymentRecord = await models.Payment.create(payment)
 
-  var result = await models.Invoice.update(
+  await models.Invoice.update(
     {
       amount_paid: invoice.amount,
       invoice_amount: paymentOption.amount,
@@ -332,61 +341,6 @@ export async function completePayment(paymentOption, hex: string) {
       currency: paymentOption.currency,
       address: paymentOption.address,
       hash: tx.hash,
-      status: 'paid',
-      paidAt: new Date(),
-      complete: true,
-      completed_at: new Date()
-    },
-    {
-      where: { uid: paymentOption.invoice_uid }
-    }
-  );
-
-  invoice = await models.Invoice.findOne({ where: {
-    id: invoice.id
-  }})
-
-  log.info('invoice.paid', invoice)
-  log.debug('invoice.payment', invoice.uid)
-
-  let channel = await awaitChannel()
-
-  channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
-
-  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
-
-  return paymentRecord
-
-}
-
-export async function completeLNPayment(paymentOption, r_hash: string) {
-  log.info('paymentoption', paymentOption.toJSON())
-
-  let payment = {
-    txid: r_hash,
-    currency: paymentOption.currency,
-    payment_option_id: paymentOption.id,
-    invoice_uid: paymentOption.invoice_uid
-  }
-
-  log.info('payment', payment)
-
-  let paymentRecord = await models.Payment.create(payment)
-
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: paymentOption.invoice_uid
-  }})
-
-  var result = await models.Invoice.update(
-    {
-      amount_paid: invoice.amount,
-      invoice_amount: paymentOption.amount,
-      invoice_amount_paid: paymentOption.amount,
-      invoice_currency: paymentOption.currency,
-      denomination_amount_paid: invoice.denomination_amount,
-      currency: paymentOption.currency,
-      address: paymentOption.address,
-      hash: r_hash,
       status: 'paid',
       paidAt: new Date(),
       complete: true,

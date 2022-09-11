@@ -1,5 +1,5 @@
 
-import { coins, models } from '../lib';
+import { coins } from '../lib';
 
 let coinsConfig = require('../config/coins')['coins'];
 
@@ -7,6 +7,4 @@ export async function initialize() {
 
   await coins.initFromConfig(coinsConfig);
 
-
 }
-

@@ -1,9 +1,7 @@
 
 import { log, models, invoices } from '../../../lib';
 
-import { Invoice } from '../../../lib/invoices'
-
-import * as Boom from 'boom';
+import { cancelInvoice, Invoice } from '../../../lib/invoices'
 
 import { show as handleBIP70 } from './bip70_payment_requests'
 
@@ -11,7 +9,7 @@ import { show as handleJsonV2 } from './json_payment_requests'
 
 import { show as handleBIP270 } from './bip270_payment_requests'
 
-import { detectWallet, Wallets} from '../../../lib/pay'
+import { detectWallet } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
@@ -21,15 +19,39 @@ import { createWebhook } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
 
-import { recordEvent } from '../../../lib/events'
+import { findOne } from '../../../lib/orm';
 
-function upcase(str) {
+export async function cancel(req, h) {
 
-  if (!str) {
-    return null
+  try {
+
+    const invoice: Invoice = await findOne<Invoice>(Invoice, {
+      where: {
+        uid: req.params.uid
+      }
+    })
+  
+    if (!invoice) {
+  
+      return h.notFound()
+    }
+  
+    if (invoice.get('app_id') !== req.app.id) {
+  
+      return h.notAuthorized()
+    }
+  
+    await cancelInvoice(invoice)
+  
+    return h.response({ success: true })
+
+  } catch(error) {
+
+    log.error('api.payment-requests.cancel', error)
+
+    return h.badRequest(error)
+
   }
-
-  return str.toUpperCase()
 
 }
 
@@ -43,7 +65,7 @@ export async function create(req, h) {
 
     if (error) {
 
-      log.error('pay.request.create.error', { error })
+      log.error('pay.request.create.error', error)
 
       throw error
 
@@ -120,11 +142,12 @@ export async function show(req, h) {
 
   log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
-  let wallet = detectWallet(req.headers, req.params.uid)
+  detectWallet(req.headers, req.params.uid)
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
   if (invoice.cancelled) {
+    
     return h.badRequest('invoice cancelled')
   }
 
@@ -132,9 +155,6 @@ export async function show(req, h) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.info('invoice not yet expired');
   }
 
   try {
@@ -171,7 +191,7 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    log.error('pay.request.error', { error: error.message });
+    log.error('pay.request.error', error);
 
     return h.badRequest(error.message);
 

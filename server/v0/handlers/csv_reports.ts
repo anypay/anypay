@@ -1,9 +1,9 @@
 
 import * as moment from 'moment';
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import * as Boom from 'boom';
 
-import { buildAccountCsvReport, buildReportCsvFromDates, buildAllTimeReport } from '../../../lib/csv';
+import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';
 import { models } from '../../../lib';
 
 import { findAccount } from '../../../lib/account';
@@ -48,7 +48,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           start_date: Joi.date().required(),
@@ -89,7 +89,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           token: Joi.string().required()

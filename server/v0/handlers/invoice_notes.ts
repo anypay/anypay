@@ -1,7 +1,6 @@
 
-import { Request, ResponseToolkit } from 'hapi';
+import { ResponseToolkit } from 'hapi';
 import { models } from '../../../lib';
-import * as Sequelize from 'sequelize';
 
 export async function create(req, h: ResponseToolkit) {
 

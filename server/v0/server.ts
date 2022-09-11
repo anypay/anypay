@@ -21,11 +21,13 @@ import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
+const Pack = require('../../package.json')
+
 const AuthBearer = require('hapi-auth-bearer-token');
 
 import { log } from '../../lib/log';
 
-import { prometheus, getHistogram } from '../../lib/prometheus'
+import { getHistogram } from '../../lib/prometheus'
 
 import { requireDirectory } from 'rabbi'
 
@@ -37,11 +39,13 @@ import * as payreq from '../payment_requests/server'
 
 import { v0, failAction } from '../handlers'
 
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 
 import { models } from '../../lib'
 
 import { register as merchant_app } from './plugins/merchant_app'
+
+import { schema } from 'anypay'
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -70,10 +74,10 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-
 const server = new Hapi.Server({
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 8000,
+  //debug: { 'request': ['error', 'uncaught'] },
   routes: {
     cors: true,
     validate: {
@@ -132,7 +136,41 @@ async function Server() {
     return h.continue;
   })
 
-  await server.register(require('hapi-auth-basic'));
+  // Transform non-boom errors into boom ones
+  server.ext('onPreResponse', (request, h) => {
+    // Transform only server errors 
+    if (request.response.isBoom) {
+
+      log.error('hapi.error.response', request.response)
+
+      const statusCode = request.response.output.statusCode || 500
+
+      log.error('hapi.error.response', request.response)
+
+      if (statusCode === 500) {
+
+        const response = {
+          statusCode,
+          error: request.response.error || request.response.message,
+          message: request.response.message
+        }
+  
+        return h.response(response).code(statusCode)
+
+      } else {
+    
+        return h.response(request.response.output).code(statusCode)
+
+      }
+
+    } else {
+      // Otherwise just continue with previous response
+      return h.continue
+
+    }
+  })
+
+  await server.register(require('@hapi/basic'));
 
   await server.register(Inert);
 
@@ -140,18 +178,40 @@ async function Server() {
 
   await server.register(require('hapi-boom-decorators'))
 
-  const swaggerOptions = server.register({
+  await server.register({
     plugin: HapiSwagger,
     options: {
       info: {
-        title: 'Anypay API Documentation',
-        version: '1.0.1',
+        title: 'Anypay API Reference',
+        version: Pack.version,
       },
+      grouping: 'tags',
+      tags: [
+        {
+          name: 'platform',
+          description: 'Base Payments Platform'
+        },
+        {
+          name: 'v1',
+          description: 'Version 1 (Current)'
+        },
+        {
+          name: 'wordpress',
+          description: 'Woocommerce Wordpress App'
+        },
+        {
+          name: 'v0',
+          description: 'Version 0 (Deprecated)'
+        }
+      ],
       securityDefinitions: {
         simple: {
           type: 'basic',
         },
       },
+      host: 'api.anypayx.com',
+      schemes: ['https'],
+      documentationPath: '/api',
       security: [{
         simple: [],
       }],
@@ -197,10 +257,26 @@ async function Server() {
 
   server.route({
     method: "GET",
+    path: "/throws",
+    handler: () => {
+      throw new Error('big bad wolf')
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/bad-request",
+    handler: (req, h) => {
+      return h.badRequest('unexpected hurricane')
+    }
+  });
+
+  server.route({
+    method: "GET",
     path: "/base_currencies",
     handler: v0.BaseCurrencies.index,
     options: {
-      tags: ['api']
+      tags: ['api', 'v0']
     }
   });
 
@@ -209,7 +285,7 @@ async function Server() {
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
     handler: v0.PriceConversions.show,
     options: {
-      tags: ['api']
+      tags: ['api', 'v0']
     }
   });
 
@@ -218,44 +294,96 @@ async function Server() {
     path: "/r",
     handler: v0.PaymentRequests.create,
     options: {
-      auth: "app"
+      auth: "app",
+      tags: ['api', 'v0'],
+      validate: {
+        payload: Joi.object({
+          template: schema.PaymentRequestTemplate.required(),
+          options: Joi.object({
+            webhook: Joi.string().optional(),
+            redirect: Joi.string().optional(),
+            secret: Joi.string().optional(),
+            metadata: Joi.object().optional()
+          }).optional()
+        })
+      }
     }
   })
 
   server.route({
-    method: 'POST',
-    path: '/moneybutton/webhooks',
-    handler: v0.MoneybuttonWebhooks.create
-  });
+    method: "DELETE",
+    path: "/r/{uid}",
+    handler: v0.PaymentRequests.cancel,
+    options: {
+      auth: "app",
+      tags: ['api', 'v0', 'platform'],
+    }
+  })
+
+  server.route({
+    method: "POST",
+    path: "/payment-requests",
+    handler: v0.PaymentRequests.create,
+    options: {
+      auth: "app",
+      tags: ['api', 'platform'],
+      validate: {
+        payload: Joi.object({
+          template: schema.PaymentRequestTemplate.required(),
+          options: Joi.object({
+            webhook: Joi.string().optional(),
+            redirect: Joi.string().optional(),
+            secret: Joi.string().optional(),
+            metadata: Joi.object().optional()
+          }).optional()
+        })
+      }
+    }
+  })
 
   server.route({
     method: 'GET',
     path: '/merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/merchants/{account_id}',
-    handler: v0.Merchants.show
+    handler: v0.Merchants.show,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchant-coins',
-    handler: v0.Merchants.listMerchantCoins
+    handler: v0.Merchants.listMerchantCoins,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: "GET",
     path: "/api/accounts-by-email/{email}",
-    handler: v0.Anypaycity.show
+    handler: v0.Anypaycity.show,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
@@ -263,7 +391,7 @@ async function Server() {
     path: "/invoices/{invoice_id}",
     handler: v0.Invoices.show,
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0'],
       validate: {
         params: Joi.object({
           invoice_id: Joi.string().required()
@@ -279,7 +407,7 @@ async function Server() {
     path: "/accounts/{id}", // id or email
     handler: v0.Accounts.showPublic,
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'accounts'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
@@ -289,7 +417,7 @@ async function Server() {
     path: "/accounts/{account_id}/invoices",
     handler: v0.Invoices.createPublic,
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'invoices'],
       validate: {
         payload: models.Invoice.Request,
         failAction
@@ -298,14 +426,6 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: "POST",
-    path: "/anonymous-accounts",
-    handler: v0.Accounts.createAnonymous,
-    options: {
-      tags: ['api']
-    },
-  });
 
   // END PUBLIC ROUTES
 
@@ -314,7 +434,7 @@ async function Server() {
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.index
     }
   });
@@ -324,7 +444,7 @@ async function Server() {
     path: "/apps/{id}",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.show
     }
   });
@@ -334,7 +454,7 @@ async function Server() {
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.create
     }
   });
@@ -342,7 +462,10 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: v0.Accounts.nearby
+    handler: v0.Accounts.nearby,
+    options: {
+      tags: ['api', 'v0']
+    }
   }); 
 
   await attachV1Routes(server)
@@ -355,7 +478,7 @@ async function Server() {
     method: 'GET',
     path: '/',
     handler: (req, h) => {
-      return h.redirect('/documentation')
+      return h.redirect('/api')
     }
   }); 
 

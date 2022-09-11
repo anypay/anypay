@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { getMerchantApiKey, getPlatformApiKey } from '../../lib/apikeys'
 
-import { createAccount, expect } from '../utils'
+import { createAccount } from '../utils'
 
 describe('API Keys', () => {
 

@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
-import { models, accounts } from '../../lib';
+import { models } from '../../lib';
 
 export async function start() {
 
@@ -65,7 +65,7 @@ export async function start() {
 
       } catch(error) {
 
-        console.log(error);
+        log.error('grab_and_go_payment_amqp', error);
 
       }
 

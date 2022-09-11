@@ -11,8 +11,6 @@ import { BigNumber } from 'bignumber.js'
 
 import * as http from 'superagent';
 
-import { toSatoshis } from '../pay'
-
 import * as bittrex from './bittrex'
 
 import * as kraken from './kraken'
@@ -197,7 +195,7 @@ export async function updateUSDPrices() {
 
   await Promise.all(prices.map(async (price: Price) => {
 
-    let record = await setPrice(price)
+    await setPrice(price)
 
   }))
 
@@ -257,6 +255,8 @@ export async function setAllCryptoPrices() {
   ];
 
   prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
+
+  prices = prices.filter(p => !!p)
 
   prices.push(await kraken.getPrice('XMR'))
   //prices.push(await kraken.getPrice('SOL'))

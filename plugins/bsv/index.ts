@@ -2,17 +2,11 @@ require('dotenv').config()
 
 import * as  bchaddr from 'bchaddrjs';
 
-import * as Minercraft from 'minercraft';
-
 import * as bsv from 'bsv';
-
-import { log } from '../../lib/log'
 
 import { fromSatoshis } from '../../lib/pay'
 
 import * as taal from './lib/taal'
-
-import * as Bluebird from 'bluebird'
 
 import * as whatsonchain from './lib/whatsonchain'
 
@@ -92,8 +86,6 @@ var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
 
 import { rpc } from './lib/jsonrpc';
-
-import {models} from '../../lib/models';
 
 const polynym = require('polynym');
 
@@ -176,34 +168,8 @@ export async function getNewAddress(params){
 
   }
 
-  /*
-  //Create a new HDKeyAddress 
-  let record = await models.Hdkeyaddresses.create({
-
-    currency:'BSV',
-
-    xpub_key:process.env.BSV_HD_PUBLIC_KEY
-
-  })
-
-  record.address = deriveAddress(process.env.BSV_HD_PUBLIC_KEY, record.id)
-
-  await record.save()
-
-  rpc.call('importaddress', [record.address, "", false, false])
-
-  return record.address;
-  */
-
 }
 
-function deriveAddress(xkey, nonce){
-
-  let address = new bsv.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
-
-}
 
 export function validateAddress(address: string){
 

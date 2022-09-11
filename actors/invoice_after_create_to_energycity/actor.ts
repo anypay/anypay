@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
-import { accounts, models } from '../../lib';
+import { accounts } from '../../lib';
 
 var energyCityAccounts;
 
@@ -74,16 +74,6 @@ export async function start() {
   });
 
   async function checkIfIsEnergyCityInvoice(invoice: any): Promise<boolean> {
-
-    let tag = await models.AccountTag.findOne({
-
-      where: {
-
-        account_id: invoice.account_id,
-        tag: 'energycity'
-      }
-
-    })
 
     return energyCityAccounts[invoice.account_id] ? true : false;
 

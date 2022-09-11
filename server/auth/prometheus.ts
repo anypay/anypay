@@ -1,5 +1,4 @@
 
-import { validateAppToken } from './token'
 
 import { models } from '../../lib/models'
 
@@ -37,10 +36,7 @@ export async function auth(request, username, password, hapi) {
 
   if (!accessToken) {
 
-    log.error('auth.app.error', {
-      app_id: prometheusApp.id,
-      message: 'access token not found'
-    }) 
+    log.error('auth.app.error', new Error('access token not found'))
 
     return {
       isValid: false

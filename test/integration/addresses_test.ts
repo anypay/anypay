@@ -1,9 +1,6 @@
 
-import {hash} from '../../lib/password';
 
-import { models, database } from '../../lib';
-
-import { server, chance, auth, expect  } from '../utils'
+import {  auth, expect  } from '../utils'
 
 import * as utils from '../utils'
 

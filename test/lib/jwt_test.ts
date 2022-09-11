@@ -27,7 +27,7 @@ describe("JWT Authentication", () => {
 
     try {
 
-      let legit = await verifyToken(invalidToken);
+      await verifyToken(invalidToken);
 
       assert(false, 'token should not be verified');
 

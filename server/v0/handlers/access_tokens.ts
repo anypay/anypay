@@ -1,11 +1,9 @@
 
-import { events, models } from '../../../lib';
+import { models } from '../../../lib';
 
 import { log } from '../../../lib/log'
 
 var geoip = require('geoip-lite');
-
-import * as Boom from 'boom'
 
 export async function create(request, h) {
 
@@ -31,7 +29,7 @@ export async function create(request, h) {
 
     }
 
-    let loginLog = await models.Login.create(login)
+    await models.Login.create(login)
 
     log.info('user.login', {
       payload: {

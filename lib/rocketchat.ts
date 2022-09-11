@@ -24,7 +24,7 @@ export function notify(channel, message: string) {
     })
     .end((error, response) => {
       if (error) {
-        log.error("rocketchat.error", error.message);
+        log.error("rocketchat.error", error);
       } else {
         log.info("rocketchat.notified", response.body);
       }
