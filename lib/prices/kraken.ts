@@ -40,9 +40,7 @@ export async function getPrice(currency: string): Promise<Price> {
 
   } catch(error) {
 
-    log.error('kraken.price.pair.invalid', error)
-
-    throw new InvalidPricePair(pair)
-
+    log.error('kraken.price.pair.invalid', new InvalidPricePair(pair))
+    
   }
 }

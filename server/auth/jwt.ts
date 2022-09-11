@@ -41,6 +41,8 @@ export function useJWT() {
 
         request.account = account
 
+        request.token = token
+
         return {
 
           isValid: true,
@@ -53,7 +55,7 @@ export function useJWT() {
 
       } catch(error) {
 
-        log.error('jwt.auth.error', { error })
+        log.error('jwt.auth.error', error)
 
         return h.unauthenticated(error)
 

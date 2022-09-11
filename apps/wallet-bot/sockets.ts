@@ -1,18 +1,7 @@
 
 import { Socket } from 'socket.io'
 
-import { Option, Some, None } from 'option-type';
-
-import * as Joi from 'joi'
-
-import { authenticate } from './auth'
-
-import { subscribe, unsubscribe } from './pubsub'
-
-import * as uuid from 'uuid'
-
 import { WalletBot } from './'
-
 
 /*
  *

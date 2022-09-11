@@ -1,10 +1,8 @@
 require('dotenv').config();
 
-import * as http from 'superagent';
-
 import * as blockchair from '../../lib/blockchair'
 
-import {log, models} from '../../lib';
+import {log} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -30,11 +28,13 @@ function validateAddress(address: string) {
 
     new bch.HDPublicKey(address);
 
+    log.debug('plugins.bch.hdpublickey.valid', address)
+
     return true;
 
   } catch(error) {
 
-    log.info('plugins.bch.address.invalid', error)
+    log.debug('plugins.bch.hdpublickey.invalid', error)
 
   }
 

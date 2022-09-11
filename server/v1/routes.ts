@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { v1, failAction } from '../handlers'
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export async function attachV1Routes(server) {
 
@@ -11,6 +11,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/register",
     handler: v1.AccountRegistrations.create,
     options: {
+      tags: ['api', 'v1', 'accounts'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required(),
@@ -26,6 +27,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/login",
     handler: v1.AccountLogins.create,
     options: {
+      tags: ['api', 'v1', 'sessions'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required(),
@@ -41,6 +43,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/password-reset",
     handler: v1.PasswordResets.create,
     options: {
+      tags: ['api', 'v1', 'accounts'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
@@ -54,6 +57,7 @@ export async function attachV1Routes(server) {
     method: "GET",
     path: "/v1/api/account/my-account",
     options: {
+      tags: ['api', 'v1', 'accounts'],
       auth: "jwt"
     },
     handler: v1.MyAccount.show
@@ -63,6 +67,7 @@ export async function attachV1Routes(server) {
     method: "GET",
     path: "/v1/api/account/access-keys",
     options: {
+      tags: ['api', 'v1', 'sessions'],
       auth: "jwt"
     },
     handler: v1.AccessKeys.index
@@ -72,6 +77,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/webhooks',
     options: {
+      tags: ['api', 'v1', 'webhooks'],
       auth: "jwt"
     },
     handler: v1.Webhooks.index
@@ -81,6 +87,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/account/payments',
     options: {
+      tags: ['api', 'v1', 'payments'],
       auth: "jwt",
       validate: {
         query: Joi.object({
@@ -101,6 +108,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/linked-accounts',
     options: {
+      tags: ['api', 'v1', 'accounts'],
       auth: "jwt",
       validate: {
         query: Joi.object({
@@ -117,6 +125,7 @@ export async function attachV1Routes(server) {
     method: 'POST',
     path: '/v1/api/linked-accounts',
     options: {
+      tags: ['api', 'v1', 'linked-accounts'],
       auth: "jwt",
       validate: {
         payload: Joi.object({
@@ -132,6 +141,7 @@ export async function attachV1Routes(server) {
     method: 'DELETE',
     path: '/v1/api/linked-accounts/{id}',
     options: {
+      tags: ['api', 'v1', 'linked-accounts'],
       auth: "jwt",
       validate: {
         query: Joi.object({
@@ -148,6 +158,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/linked-accounts/{account_id}/payments',
     options: {
+      tags: ['api', 'v1', 'linked-accounts'],
       auth: "jwt",
       validate: {
         params: Joi.object({
@@ -171,6 +182,7 @@ export async function attachV1Routes(server) {
     method: 'POST',
     path: '/v1/api/webhooks/{invoice_uid}/attempts',
     options: {
+      tags: ['api', 'v1', 'webhooks'],
       auth: "jwt"
     },
     handler: v1.Webhooks.attempt
@@ -181,6 +193,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/invoices",
     handler: v1.Invoices.create,
     options: {
+      tags: ['api', 'v1', 'invoices'],
       auth: "jwt",
       validate: {
         payload:  Joi.object({
@@ -214,6 +227,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/invoices/{invoice_uid}",
     handler: v1.Invoices.show,
     options: {
+      tags: ['api', 'v1', 'invoices'],
       auth: "jwt",
       validate: {
         failAction
@@ -226,6 +240,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/invoices/{invoice_uid}/events",
     handler: v1.InvoiceEvents.index,
     options: {
+      tags: ['api', 'v1', 'invoices'],
       auth: "jwt",
       validate: {
         params: Joi.object({
@@ -259,6 +274,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/account/events",
     handler: v1.AccountEvents.index,
     options: {
+      tags: ['api', 'v1', 'events'],
       auth: "jwt",
       response: {
         schema: Joi.object({
@@ -280,6 +296,7 @@ export async function attachV1Routes(server) {
     method: 'POST',
     path: '/v1/api/account/addresses',
     options: {
+      tags: ['api', 'v1', 'addresses'],
       auth: "jwt",
       validate: {
         payload: Joi.object({
@@ -307,6 +324,7 @@ export async function attachV1Routes(server) {
     method: 'DELETE',
     path: '/v1/api/account/addresses/{currency}',
     options: {
+      tags: ['api', 'v1', 'addresses'],
       auth: "jwt",
       validate: {
         params: Joi.object({
@@ -330,6 +348,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/account/addresses',
     options: {
+      tags: ['api', 'v1', 'addresses'],
       auth: "jwt",
       response: {
         failAction: 'log',
@@ -356,6 +375,7 @@ export async function attachV1Routes(server) {
     method: 'GET',
     path: '/v1/api/system/coins',
     options: {
+      tags: ['api', 'v1', 'system'],
       response: {
         failAction: 'log',
         schema: Joi.object({
@@ -375,7 +395,10 @@ export async function attachV1Routes(server) {
   server.route({
     method: 'POST',
     path: '/v1/api/test/webhooks',
-    handler: v1.Webhooks.test
+    handler: v1.Webhooks.test,
+    options: {
+      tags: ['api', 'v1', 'test'],
+    }
   }); 
 
   server.route({
@@ -383,6 +406,7 @@ export async function attachV1Routes(server) {
     path: '/v1/api/fail',
     handler: (req, h) => { return h.response(200) },
     options: {
+      tags: ['api', 'v1', 'test'],
       validate: {
         query: Joi.object({
           error: Joi.string().required()
@@ -399,6 +423,9 @@ export async function attachV1Routes(server) {
     method: "GET",
     path: "/v1/woocommerce/checkout_images",
     handler: v1.WoocommerceCheckoutImages.index,
+    options: {
+      tags: ['api', 'v1', 'wordpress']
+    }
   })
 
   server.route({
@@ -407,6 +434,7 @@ export async function attachV1Routes(server) {
     handler: v1.WoocommerceCheckoutImages.show,
     options: {
       auth: "jwt",
+      tags: ['api', 'v1', 'wordpress'],
     }
   })
 
@@ -415,6 +443,7 @@ export async function attachV1Routes(server) {
     path: "/v1/woocommerce/checkout_image",
     handler: v1.WoocommerceCheckoutImages.update,
     options: {
+      tags: ['api', 'v1', 'wordpress'],
       auth: "jwt",
       validate: {
         payload: Joi.object({
@@ -429,6 +458,7 @@ export async function attachV1Routes(server) {
     path: "/v1/woocommerce/accounts/{account_id}/checkout_image.png",
     handler: v1.WoocommerceCheckoutImages.image,
     options: {
+      tags: ['api', 'v1', 'wordpress']
     },
   });
 
@@ -438,7 +468,7 @@ export async function attachV1Routes(server) {
     handler: v1.Search.create,
     options: {
       auth: "jwt",
-      tags: ['api', 'invoices', 'search'],
+      tags: ['api', 'v1', 'search'],
       validate: {
         payload: Joi.object({
           search: Joi.string().required()
@@ -454,7 +484,7 @@ export async function attachV1Routes(server) {
     handler: v1.Refunds.show,
     options: {
       auth: "jwt",
-      tags: ['api', 'invoices', 'refunds'],
+      tags: ['api', 'v1', 'refunds'],
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
@@ -477,6 +507,7 @@ export async function attachV1Routes(server) {
     path: "/v1/api/transactions",
     handler: v1.Transactions.create,
     options: {
+      tags: ['api', 'v1', 'transactions'],
       validate: {
         payload: Joi.object({
           chain: Joi.string().required(),

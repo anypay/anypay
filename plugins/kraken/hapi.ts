@@ -1,11 +1,9 @@
 
-import { log } from '../../lib/log'
-
 import { Server } from 'hapi'
 
 import { start } from './main'
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export const plugin = ((server, options) => {
 

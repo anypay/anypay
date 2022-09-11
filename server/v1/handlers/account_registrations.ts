@@ -1,11 +1,7 @@
 
-import { badRequest } from 'boom'
-
 import { geolocateAccountFromRequest, registerAccount } from '../../../lib/accounts/registration'
 
 import { ensureAccessToken } from '../../../lib/access_tokens'
-
-import { log } from '../../../lib/log'
 
 export async function create(request, h) {
 

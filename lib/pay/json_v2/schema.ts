@@ -1,5 +1,5 @@
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 const PaymentOptionsHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
@@ -34,10 +34,6 @@ const PaymentRequestHeaders = Joi.object({
 const PaymentRequestReq = Joi.object({
   chain: Joi.string().required(),
   currency: Joi.string().required()
-})
-
-const Instruction = Joi.object({
-  type: Joi.string().required()
 })
 
 const AuthHeaders = Joi.object({
@@ -104,22 +100,6 @@ const Payment = Joi.object({
     currency: Joi.string().required()
   }).required(),
   memo: Joi.string().optional().allow('', null)
-})
-
-const SigningKeys = Joi.object({
-  owner: Joi.string().required(),
-  expirationDate: Joi.date().timestamp().required(),
-  validDomains: Joi.array().required().items(Joi.string()),
-  publicKeys: Joi.array().required().items(Joi.string())
-})
-
-const KeySignatures = Joi.object({
-  keyHash: Joi.string().required(),
-  signatures: Joi.array().required().items(Joi.object({
-    created: Joi.date().timestamp().required(),
-    identifier: Joi.string().required(),
-    signature: Joi.string().required()
-  }))
 })
 
 export const Protocol = {

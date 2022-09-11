@@ -29,7 +29,7 @@ export async function listPaymentOptions(req, h) {
 
     await ensureInvoice(req)
 
-    let valid = await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
+    await schema.Protocol.PaymentOptions.headers.validateAsync(req.headers, {
       allowUnknown: true
     })
 
@@ -107,8 +107,6 @@ async function getPaymentRequest(req, h) {
   } catch(error) {
 
     log.error('pay.jsonv2.payment-request.error', error)
-    log.info('pay.jsonv2.payment-request.error', error)
-    console.error('pay.jsonv2.payment-request.error', error)
 
     return h.response({ error: error.message }).code(400)
 
@@ -134,8 +132,12 @@ async function verifyUnsignedPayment(req, h) {
 
   } catch(error) {
 
-    log.info('pay.jsonv2.payment-verification.error', { error: error.message })
-    log.error('pay.jsonv2.payment-verification.error', error)
+    log.info('pay.jsonv2.payment-verification.error', {
+      error: error.message,
+      account_id:
+      req.invoice.account_id,
+      invoice_uid: req.invoice.uid
+    })
 
     return badRequest(error)
 
@@ -162,7 +164,6 @@ async function submitPayment(req, h) {
   } catch(error) {
 
     log.error('pay.jsonv2.payment.error', error)
-    log.info('pay.jsonv2.payment.error', { error: error.message })
 
     return badRequest(error)
 

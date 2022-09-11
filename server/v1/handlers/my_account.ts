@@ -1,5 +1,4 @@
 
-import { log } from '../../../lib/log'
 
 export async function show(request, h) {
 

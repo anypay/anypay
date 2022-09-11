@@ -1,6 +1,4 @@
 
-import { badRequest } from 'boom'
-
 import { loginAccount, geolocateAccountFromRequest } from '../../../lib/accounts/registration'
 
 import { ensureAccessToken } from '../../../lib/access_tokens'
@@ -24,8 +22,6 @@ export async function create(request, h) {
   }
 
   geolocateAccountFromRequest(account, request)
-
-  const token = await ensureAccessToken(account);
 
   const { accessToken } = await ensureAccessToken(account)
 

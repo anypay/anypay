@@ -12,19 +12,21 @@ import { log } from '../../lib/log'
 
 import { useJWT } from '../../server/auth/jwt'
 
-import { bind, unbind, Context } from './socket.io/amqp_queue_socket_binding'
+import { bind, unbind } from './socket.io/amqp_queue_socket_binding'
 
 import { config } from '../../lib/config'
 
-import * as Joi from '@hapi/joi';
+import { findOrCreateWalletBot, getAccessToken, getPaymentCounts } from './'
+
+import { badImplementation, badRequest } from '@hapi/boom'
+
+import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
+
+import { listSockets, setSocket, removeSocket, getSocket } from './sockets'
+import { Invoice } from '../../lib/invoices';
+import { findAll } from '../../lib/orm';
 
 import { failAction } from '../../server/handlers'
-
-import { findOrCreateWalletBot, getAccessToken } from './'
-
-import { badImplementation } from '@hapi/boom'
-
-import { listSockets, setSocket, removeSocket, getSocket, handlers } from './sockets'
 
 export const plugin = (() => {
 
@@ -96,11 +98,6 @@ export const plugin = (() => {
             })
           })
 
-          socket.onAny((event, ...args) => {
-
-            //console.log(`got ${event} with ${args}`);
-          });
-
           socket.on('disconnect', () => {
 
             unbind(binding)
@@ -121,7 +118,7 @@ export const plugin = (() => {
 
         } catch(error) {
 
-          console.error('io.connection.error', error)
+          log.error('io.connection.error', error)
 
         }
 
@@ -137,9 +134,11 @@ export const plugin = (() => {
 
           try {
 
-            const walletBot = await findOrCreateWalletBot(req.account)
+            const {walletBot} = await findOrCreateWalletBot(req.account)
 
             const accessToken = await getAccessToken(walletBot)
+
+            const counts = await getPaymentCounts(walletBot)
 
             const socket = getSocket(walletBot)
 
@@ -163,7 +162,9 @@ export const plugin = (() => {
 
               access_token,
 
-              balances
+              balances,
+
+              counts
 
             }
            
@@ -191,29 +192,161 @@ export const plugin = (() => {
         }
       })
 
+      server.route({
+        path: `${base}/unpaid`,
+        method: 'GET',
+        options: {
+          auth: "app"
+        },
+        handler: async (req, h) => {
+
+          try {
+
+            const { app } = await findOrCreateWalletBot(req.app)
+
+            const { limit, offset } = req.query
+
+            const where = {
+              app_id: app.id,
+              status: 'unpaid'
+            }
+
+            const query = { where }
+
+            if (limit) {
+              query['limit'] = limit || 100
+            }
+
+            if (offset) {
+              query['offset'] = offset
+            }
+
+            const invoices = await findAll<Invoice>(Invoice, query)
+
+            return {
+              app: '@wallet-bot',
+              invoices: invoices.map(invoice => invoice.toJSON())
+            }
+
+          } catch(error) {
+
+            log.error('wallet-bot.handlers.invoices.list', error)
+
+            return badRequest(error)
+
+          }
+
+        }
+
+      })
+
+      var handlers = requireHandlersDirectory(`${__dirname}/api/handlers`)
+
+      server.route({
+        path: `${base}/invoices`,
+        method: 'POST',
+        handler: handlers.Invoices.create,
+        options: {
+          auth: "app",
+          validate: {
+            payload: handlers.Invoices.schema.payload,
+            failAction
+          },
+          response: {
+            failAction: 'log',
+            schema: handlers.Invoices.schema.response
+          }
+        },
+      })
+
+      server.route({
+        path: `${base}/invoices`,
+        method: 'GET',
+        options: {
+          auth: "jwt"
+        },
+        handler: async (req, h) => {
+
+          try {
+
+            const { app } = await findOrCreateWalletBot(req.account)
+
+            const { status, limit, offset } = req.query
+
+            const where = {
+              app_id: app.id,
+              status: status || 'unpaid'
+            }
+
+            const query = { where }
+
+            if (limit) {
+              query['limit'] = limit || 100
+            }
+
+            if (offset) {
+              query['offset'] = offset
+            }
+
+            const invoices = await findAll<Invoice>(Invoice, query)
+
+            return {
+              app: '@wallet-bot',
+              invoices: invoices.map(invoice => invoice.toJSON())
+            }
+
+          } catch(error) {
+
+            log.error('wallet-bot.handlers.invoices.list', error)
+
+            return badRequest(error)
+
+          }
+
+        }
+
+      
+      })
+
     }
 
   }
 
 })()
 
+import { requireDirectory } from 'rabbi'
+
+const auth = requireDirectory('../../server/auth')
+
+export async function createServer(): Promise<Server> {
+
+  const server = new Server({
+    host: config.get('HOST'),
+    port: config.get('PORT'),
+    routes: {
+      cors: true
+    }
+  });
+
+  await server.register(AuthBearer)
+
+  await server.register(require('@hapi/basic'));
+
+  server.auth.strategy("app", "basic", { validate: auth.Token.validateAppToken });
+
+  server.auth.strategy("jwt", "bearer-access-token", useJWT());
+
+  await server.register(plugin)
+
+  return server
+
+}
+
 if (require.main === module) {
 
   (async () => {
 
-    const server = new Server({
-      host: config.get('HOST'),
-      port: config.get('PORT'),
-      routes: {
-        cors: true
-      }
-    });
-
-    await server.register(AuthBearer)
-
-    server.auth.strategy("jwt", "bearer-access-token", useJWT());
-
-    await server.register(plugin)
+    const server = await createServer()
 
     log.info('wallet-bot.socket.io.server.start')
 
@@ -221,9 +354,6 @@ if (require.main === module) {
     
     log.info('wallet-bot.socket.io.server.started', server.info)
 
-
-
   })()
 
 }
-

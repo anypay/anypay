@@ -1,0 +1,63 @@
+name: Build
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - '*'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:10.10
+        env:
+          # optional (defaults to `postgres`)
+          POSTGRES_DB: postgres_db
+          # required
+          POSTGRES_PASSWORD: postgres_password
+          # optional (defaults to `5432`)
+          POSTGRES_PORT: 5432
+          # optional (defaults to `postgres`)
+          POSTGRES_USER: postgres_user
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      rabbitmq:
+        image: rabbitmq:3
+        ports:
+          - 5672/tcp
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install PostgreSQL client
+        run: |
+          apt-get update
+          apt-get install --yes postgresql-client
+      - name: Setup database
+        run: psql -h postgres -U postgres_user -c 'CREATE DATABASE "postgres_db";'
+        env:
+          PGPASSWORD: postgres_password
+      - name: Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm install -g typescript tsc
+      - name: install, build and test
+        env:
+          SKIP_E2E_PAYMENTS_TESTS: true
+          DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
+          TEST_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
+          AMQP_URL: amqp://guest:guest@rabbitmq:5672/
+        run: |
+          npm install
+          npm test
+      - uses: codecov/codecov-action@v3
+

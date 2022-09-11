@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const uuid = require('uuid')
 
 const _ = require('lodash')
 
@@ -7,11 +6,11 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
-import { Invoice, createInvoice } from '../../../lib/invoices';
+import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
 
 import * as moment from 'moment';
 
@@ -28,7 +27,7 @@ export async function cancel(req, h) {
 
   if (!invoice) {
 
-    log.error('invoice.notfound', where)
+    log.error('invoice.notfound', new Error(JSON.stringify(where)))
 
     return Boom.notFound()
 
@@ -36,13 +35,7 @@ export async function cancel(req, h) {
 
   if (invoice && !invoice.cancelled) {
 
-    invoice.cancelled = true;
-
-    invoice.status = 'cancelled';
-
-    await invoice.save()
-
-    log.debug('invoice.cancelled', where)
+    await cancelInvoice(invoice)
 
     where['status'] = 'cancelled'
 
@@ -50,7 +43,7 @@ export async function cancel(req, h) {
 
   } else {
 
-    log.error('invoice.cancel.error.alreadycancelled', where)
+    log.error('invoice.cancel.error.alreadycancelled', new Error(JSON.stringify(where)))
 
     throw new Error('invoice already cancelled')
 
@@ -246,7 +239,7 @@ export async function createPublicInvoice(account_id, payload) {
   await invoice.save();
 
   if (invoice.email) {
-    let note = await models.InvoiceNote.create({
+    await models.InvoiceNote.create({
       content: `Customer Email: ${invoice.email}`,
       invoice_uid: invoice.uid,
     });
@@ -319,9 +312,6 @@ export async function show(request, reply) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.debug('invoice not yet expired');
   }
 
   if (invoice) {
@@ -346,7 +336,7 @@ export async function show(request, reply) {
 
   } else {
 
-    log.error('no invoice found', invoiceId);
+    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
 
     throw new Error('invoice not found')
   }
@@ -365,7 +355,7 @@ export async function shareEmail(req, h) {
 
   if (!invoice) {
 
-    log.error('no invoice found', req.params.uid);
+    log.error('no invoice found', new Error(`invoice ${req.params.uid} not found`));
 
     throw new Error('invoice not found')
 

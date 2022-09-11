@@ -1,16 +1,8 @@
 require('dotenv').config()
 
-import * as assert from 'assert'
-
 import { Script, Address } from 'bsv'
 
-import * as http from 'superagent'
-
-import { models } from '../../lib'
-
-import { wallet, expect, server, chance, request, spy } from '../utils'
-
-import { paymentRequestToJSON } from '../../lib/pay/bip70'
+import { wallet, expect, request } from '../utils'
 
 import * as utils from '../utils'
 
@@ -20,10 +12,10 @@ describe("BIP270 Payment Requests", () => {
 
     it('should return a valid BIP270 payment request', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 0.02 })
 
       let resp = await request
-        .get(`/r/${invoice.uid}`) 
+        .get(`/r/${invoice.uid}`)
 
       expect(resp.body.outputs.length).to.be.greaterThan(0)
 
@@ -41,7 +33,7 @@ describe("BIP270 Payment Requests", () => {
 
       it('an invalid payment should be rejected', async () => {
 
-        let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+        let invoice = await utils.newInvoice({ amount: 0.02 })
 
         let resp = await request
           .get(`/r/${invoice.uid}`) 
@@ -98,7 +90,7 @@ describe("BIP270 Payment Requests", () => {
 
       it.skip('should accept a valid payment for a BIP270 payment request', async () => {
 
-        let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+        let invoice = await utils.newInvoice({ amount: 0.02 })
 
         let resp = await request
           .get(`/r/${invoice.uid}`) 
@@ -148,7 +140,7 @@ describe("BIP270 Payment Requests", () => {
 
     it.skip('should reject payment for an invoice that was cancelled', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 0.02 })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 

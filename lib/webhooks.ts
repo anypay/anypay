@@ -99,10 +99,9 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
   } else {
 
-    throw new Error('no webhook_url set for invoice');
+    log.debug('invoice.webhook_url.empty', { invoice_uid: invoiceUid });
 
   }
-
 }
 
 interface FindWebhook { 
@@ -245,12 +244,6 @@ export async function findWebhook(where: FindWebhook) {
   return new Webhook({ record, attempts, invoice })
 }
 
-interface CreateWebhook {
-  invoice_uid: string;
-  url: string;
-  account_id: number;
-}
-
 export async function createWebhook(invoice: Invoice): Promise<Webhook> {
 
   const where = {
@@ -295,7 +288,6 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
   record.started_at = new Date();
 
-  var response_code, response_body, ended_at, error;
   var resp;
 
   let attemp = new Attempt({record, webhook})

@@ -66,7 +66,7 @@ export async function unlink(request, h) {
       account_id: request.account.id
     })
 
-    const linked_account = await links.unlinkAccount(request.account, request.params)
+    await links.unlinkAccount(request.account, request.params)
 
     return h.response({
       success: true

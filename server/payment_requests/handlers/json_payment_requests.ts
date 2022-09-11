@@ -1,9 +1,7 @@
 
-import { models, amqp, log } from '../../../lib'
+import { models, log } from '../../../lib'
 
-import { plugins } from '../../../lib/plugins'
-
-import { detectWallet, verifyPayment, buildPaymentRequestForInvoice, completePayment, getCurrency } from '../../../lib/pay';
+import { detectWallet, buildPaymentRequestForInvoice, getCurrency } from '../../../lib/pay';
 
 import { submitPayment } from '../../../lib/pay/json_v2/protocol'
 

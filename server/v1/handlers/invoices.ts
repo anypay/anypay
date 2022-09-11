@@ -1,17 +1,9 @@
-const Boom = require('boom');
-const uuid = require('uuid')
 
 const _ = require('lodash')
 
-import { Op } from 'sequelize';
-
-import {plugins} from '../../../lib/plugins';
-
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, models } from '../../../lib';
 
 import { Invoice, createInvoice } from '../../../lib/invoices'
-
-import * as moment from 'moment';
 
 interface InvoiceAdditions {
   webhook_url?: string;
@@ -134,20 +126,3 @@ async function getPaymentOptions(invoice: Invoice) {
   ))
 
 }
-
-function sanitizeInvoice(invoice) {
-
-  let resp = invoice.toJSON();
-
-  resp.denomination = invoice.currency
-
-  delete resp.webhook_url;
-
-  delete resp.id;
-
-  delete resp.dollar_amount;
-
-  return resp;
-}
-
-

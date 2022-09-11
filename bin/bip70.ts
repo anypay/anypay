@@ -4,8 +4,6 @@ require('dotenv').config()
 
 import * as program from 'commander'
 
-import * as bitcoin from 'bitcore-lib'
-
 import * as pay from '../lib/pay'
 
 let dashHex =

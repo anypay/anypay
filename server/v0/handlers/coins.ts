@@ -1,6 +1,6 @@
 import {accounts}  from '../../../lib';
 
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 
 /**
  * @api {get} /coins Request User Supported Coins
@@ -31,15 +31,13 @@ import * as Joi from '@hapi/joi';
  */
 export async function list(request, h) {
 
-  let accountId = request.auth.credentials.accessToken.account_id;
-
   let accountCoins = await accounts.getSupportedCoins(request.account.id);
 
   let coins = Object.values(accountCoins);
 
-  return {
+  return h.response({
     'coins': sortBCHFirst(coins)
-  };
+  })
 }
 
 function sortBCHFirst(data) {

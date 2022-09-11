@@ -5,6 +5,10 @@ import { models } from './models'
 
 import { publish } from './amqp'
 
+import { config } from './config'
+
+const lokiEnabled = config.get('loki_enabled')
+
 interface NewLogger {
   namespace: string;
 }
@@ -17,6 +21,39 @@ interface LogQuery {
   order?: 'asc' | 'desc';
   error?: boolean;
 }
+
+import * as winston from 'winston';
+
+const transports = []
+
+if (config.get('loki_enabled') && config.get('loki_host')) {
+
+  const LokiTransport = require("winston-loki");
+
+  const lokiConfig = {
+    format: winston.format.json(),
+    host: config.get('loki_host'),
+    json: true,
+    batching: false,
+    labels: { app: config.get('loki_label_app') }
+  }
+
+  if (config.get('loki_basic_auth')) {
+
+    lokiConfig['basicAuth'] = config.get('loki_basic_auth')
+  }
+
+  transports.push(
+    new LokiTransport(lokiConfig)
+  )
+
+}
+
+const loki = winston.createLogger({
+  level: 'info',
+  transports,
+  format: winston.format.json()
+});
 
 class Logger {
 
@@ -40,15 +77,31 @@ class Logger {
 
     }
 
-    this.log.info(type, payload)
+    if (config.get('NODE_ENV') !== 'test') {
 
-    await publish(type, payload, 'anypay.topic')
+      this.log.info(type, payload)
 
-    if (payload.account_id) {
+      if (lokiEnabled) {
+        loki.info(type, payload)
+      }
+      
+      await publish(type, payload, 'anypay.topic')
 
-      const routing_key = `accounts.${payload.account_id}.events`
+      if (payload.account_id) {
 
-      await publish(routing_key, { payload, type }, 'anypay.topic')
+        const routing_key = `accounts.${payload.account_id}.events`
+
+        await publish(routing_key, { payload, type }, 'anypay.topic')
+      }
+
+      if (payload.invoice_uid) {
+
+        const routing_key = `invoices.${payload.invoice_uid}.events`
+
+        await publish(routing_key, { payload, type }, 'anypay.events')
+
+      }
+
     }
 
     return models.Event.create({
@@ -59,19 +112,18 @@ class Logger {
       invoice_uid: payload.invoice_uid
     })
 
-
   }
 
-  async error(error_type: string, error: any = {}) {
+  async error(error_type: string, error: Error) {
 
-    this.log.error({...error, namespace: this.namespace }, error_type)
+    this.log.error(error_type, error.message)
 
-    console.error(error)
+    loki.error(error_type, error.message)
 
     let record = await models.Event.create({
       namespace: this.namespace,
       type: error_type,
-      payload: Object.assign(error, { message: error.message, name: error.name}),
+      payload: { error: error.message },
       error: true
     })
 
@@ -79,9 +131,13 @@ class Logger {
 
   }
 
-  async debug(...params) {
+  async debug(type: string, payload:any={}) {
 
-    this.log.debug(params)
+    this.log.debug(type, payload)
+
+    if (lokiEnabled) {
+      loki.debug(type, payload)
+    }
 
   }
 
@@ -121,4 +177,12 @@ class Logger {
 const log = new Logger({ namespace: 'anypay' })
 
 export { log }
+
+if (config.get('loki_host')) {
+
+  log.info('loki.enabled')
+
+}
+
+
 

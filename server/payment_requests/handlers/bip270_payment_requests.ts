@@ -1,6 +1,5 @@
-import * as Hapi from 'hapi';
 
-import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
+import { buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
 import { log, models } from '../../../lib';
 
@@ -48,7 +47,7 @@ export async function create(req, h) {
 
     if (invoice.cancelled) {
 
-      log.error('payment.error.invoicecancelled', submission)
+      log.error('payment.error.invoicecancelled', new Error('Invoice Already Cancelled'))
 
       throw new Error('Invoice Already Cancelled')
 

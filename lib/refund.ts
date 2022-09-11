@@ -1,6 +1,4 @@
 
-import { log } from './log'
-
 import { Invoice } from './invoices'
 
 import { Orm } from './orm'

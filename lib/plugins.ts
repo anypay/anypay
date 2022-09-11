@@ -2,13 +2,8 @@ require("dotenv").config();
 require('bitcore-lib')
 
 import configurePlugins from "../config/plugins";
-import * as assert from 'assert';
-
-import { channel } from './amqp';
 
 import { models } from './';
-
-import { log } from './';
 
 class Plugins {
 
@@ -69,8 +64,6 @@ class Plugins {
     if (!address) {
       throw new Error(`${currency} address not found for account ${accountId}`);
     }
-
-    log.debug(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
 
     if(!this.plugins[currency].getNewAddress){
 

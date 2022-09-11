@@ -1,5 +1,5 @@
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),

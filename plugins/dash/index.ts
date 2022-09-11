@@ -1,23 +1,12 @@
 
 require('dotenv').config();
 
-import {createWebhook} from './lib/blockcypher';
-
 import { fromSatoshis, Payment } from '../../lib/pay'
 
-import { any } from 'bluebird'
-
-import {log, models} from '../../lib'
-
-import { getTransaction } from './lib/jsonrpc';
-
-export { getTransaction }
-
-import * as blockcypher from '../../lib/blockcypher'
+//import * as blockcypher from '../../lib/blockcypher'
 
 import * as blockchair from '../../lib/blockchair'
 
-import * as http from 'superagent';
 
 import * as dash from '@dashevo/dashcore-lib';
 
@@ -30,8 +19,8 @@ var WAValidator = require('anypay-wallet-address-validator');
 export async function submitTransaction(rawTx: string) {
 
   return oneSuccess([
-    //blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
+    blockchair.publish('dash', rawTx),
+    //blockcypher.publishDASH(rawTx)
   ])
 
 }
@@ -39,8 +28,8 @@ export async function submitTransaction(rawTx: string) {
 export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
-    //blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
+    blockchair.publish('dash', rawTx),
+    //blockcypher.publishDASH(rawTx)
   ])
 
 }

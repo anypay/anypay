@@ -1,5 +1,5 @@
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 import { models } from '../../../lib'
 
@@ -17,7 +17,7 @@ export async function register(server: Server) {
     handler: v0.Invoices.index,
     options: {
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'invoices']
     }
   });
 
@@ -27,7 +27,7 @@ export async function register(server: Server) {
     handler: v0.Woocommerce.index,
     options: {
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'wordpress']
     }
   });
 
@@ -38,7 +38,7 @@ export async function register(server: Server) {
     handler: v0.AccessTokens.create,
     options: {
       auth: "password",
-      tags: ['api'],
+      tags: ['api', 'v0', 'sessions'],
       plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
@@ -55,7 +55,7 @@ export async function register(server: Server) {
         failAction
       },
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'invoices']
     }
   });
 
@@ -65,7 +65,7 @@ export async function register(server: Server) {
     handler: v0.Invoices.create,
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0', 'invoices'],
       validate: {
         payload:  Joi.object({
           amount: Joi.number().required(),
@@ -99,7 +99,7 @@ export async function register(server: Server) {
     handler: v0.Invoices.cancel,
     options: {
       auth: "token",
-      tags: ['api']
+      tags: ['api', 'v0', 'invoices']
     }
   });
 
@@ -110,7 +110,7 @@ export async function register(server: Server) {
     handler: v0.Addresses.update,
     options: {
       auth: "token",
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'addresses'],
       validate: {
         params: Joi.object({
           currency: Joi.string().required()
@@ -129,7 +129,7 @@ export async function register(server: Server) {
     handler: v0.Addresses.list,
     options: {
       auth: "token",
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'addresses'],
       plugins: responsesWithSuccess({ model: v0.Addresses.PayoutAddresses }),
     }
   });
@@ -140,7 +140,7 @@ export async function register(server: Server) {
     handler: v0.Addresses.destroy,
     options: {
       auth: "token",
-      tags: ['merchant_app']
+      tags: ['api', 'v0', 'addresses']
     }
   });
 
@@ -150,7 +150,7 @@ export async function register(server: Server) {
     handler: v0.Addresses.index,
     options: {
       auth: "token",
-      tags: ['merchant_app']
+      tags: ['api', 'v0', 'addresses']
     }
   });
 
@@ -160,7 +160,7 @@ export async function register(server: Server) {
     handler: v0.AddressNotes.update,
     options: {
       auth: "token",
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'addresses'],
       validate: {
         params: Joi.object({
           id: Joi.number().required()
@@ -179,7 +179,7 @@ export async function register(server: Server) {
     handler: v0.Search.create,
     options: {
       auth: "token",
-      tags: ['merchant_app', 'invoices'],
+      tags: ['api', 'v0', 'search'],
       validate: {
         payload: Joi.object({
           search: Joi.string().required()
@@ -194,7 +194,7 @@ export async function register(server: Server) {
     handler: v0.Accounts.show,
     options: {
       auth: "token",
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
@@ -205,7 +205,7 @@ export async function register(server: Server) {
     handler: v0.Accounts.update,
     options: {
       auth: "token",
-      tags: ['merchant_app']
+      tags: ['api', 'v0', 'accounts'],
     }
   });
 
@@ -214,7 +214,7 @@ export async function register(server: Server) {
     path: "/coins",
     handler: v0.Coins.list,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'coins'],
       auth: "token",
       plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
     }
@@ -225,7 +225,7 @@ export async function register(server: Server) {
     path: "/password-resets",
     handler: v0.Passwords.reset,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       validate: {
         payload: v0.Passwords.PasswordReset,
         failAction
@@ -239,7 +239,7 @@ export async function register(server: Server) {
     path: "/password-resets/{uid}",
     handler: v0.Passwords.claim,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       validate: {
         payload: v0.Passwords.PasswordResetClaim,
         failAction
@@ -253,7 +253,7 @@ export async function register(server: Server) {
     path: "/settings/denomination",
     handler: v0.Denominations.update,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       auth: "token"
     }
   });
@@ -263,7 +263,7 @@ export async function register(server: Server) {
     path: "/settings/denomination",
     handler: v0.Denominations.show,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       auth: "token"
     }
   });
@@ -273,7 +273,7 @@ export async function register(server: Server) {
     path: "/firebase_token",
     options: {
       auth: "token",
-      tags: ['firebase', 'merchant_app'],
+      tags: ['api', 'v0', 'firebase'],
       handler: v0.FirebaseTokens.create
     }
   });
@@ -283,7 +283,7 @@ export async function register(server: Server) {
     path: "/firebase_token",
     options: {
       auth: "token",
-      tags: ['firebase', 'merchant_app'],
+      tags: ['api', 'v0', 'firebase'],
       handler: v0.FirebaseTokens.update
     }
   });
@@ -302,7 +302,7 @@ export async function register(server: Server) {
     path: "/invoices/{invoice_uid}/payment_options",
     handler: v0.InvoicePaymentOptions.show,
     options: {
-      tags: ['merchant_app']
+      tags: ['api', 'v0', 'invoices']
     }
   });
 
@@ -312,7 +312,7 @@ export async function register(server: Server) {
     path: "/invoices/{uid}/share/email",
     handler: v0.Invoices.shareEmail,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'invoices'],
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
@@ -327,8 +327,7 @@ export async function register(server: Server) {
     path: "/grab_and_go_items",
     handler: v0.Products.index,
     options: {
-      auth: "token",
-      tags: ['merchant_app', 'grab_and_go']
+      tags: ['api', 'v0', 'grab-and-go']
     }
   });
 
@@ -337,7 +336,7 @@ export async function register(server: Server) {
     path: "/accounts",
     handler: v0.Accounts.create,
     options: {
-      tags: ['merchant_app'],
+      tags: ['api', 'v0', 'accounts'],
       validate: {
         payload: models.Account.Credentials,
         failAction
@@ -351,6 +350,7 @@ export async function register(server: Server) {
     path: '/api_keys',
     handler: v0.ApiKeys.index,
     options: {
+      tags: ['api', 'v0', 'api-keys'],
       auth: "token"
     }
   }); 
@@ -360,6 +360,7 @@ export async function register(server: Server) {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.create,
     options: {
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -369,6 +370,7 @@ export async function register(server: Server) {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.show,
     options: {
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -378,6 +380,7 @@ export async function register(server: Server) {
     path: '/bittrex_api_keys',
     handler: v0.BittrexApiKeys.destroy,
     options: {
+      tags: ['api', 'v0', 'bittrex'],
       auth: "token"
     }
   }); 
@@ -387,6 +390,7 @@ export async function register(server: Server) {
     path: '/kraken_api_keys',
     handler: v0.KrakenApiKeys.create,
     options: {
+      tags: ['api', 'v0', 'kraken'],
       auth: "token"
     }
   }); 
@@ -396,6 +400,7 @@ export async function register(server: Server) {
     path: '/kraken_api_keys',
     handler: v0.KrakenApiKeys.show,
     options: {
+      tags: ['api', 'v0', 'kraken'],
       auth: "token"
     }
   }); 
@@ -405,11 +410,10 @@ export async function register(server: Server) {
     path: '/kraken_api_keys',
     handler: v0.KrakenApiKeys.destroy,
     options: {
+      tags: ['api', 'v0', 'kraken'],
       auth: "token"
     }
   }); 
-
-
 
   return server
 
