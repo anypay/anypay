@@ -19,7 +19,7 @@ describe('Framework for Cron Jobs', () => {
 
     expect(cronJob.name).to.be.equal('wallet_bot_send_on_interval')
 
-    expect(cronJob.pattern).to.be.equal('*/10 * * * * *')
+    expect(cronJob.pattern).to.be.equal('*/5 * * * * *')
 
   })
 
