@@ -1,6 +1,7 @@
 
 require('dotenv').config();
 
+import { config } from './config'
 import * as apps from './apps';
 import * as accounts from './accounts';
 import * as amqp from './amqp';
@@ -25,6 +26,7 @@ import * as utils from './utils';
 import * as pay from './pay';
 import * as mempool from './mempool.space'
 
+
 var initialized = false;
 
 (async function() {
@@ -44,6 +46,7 @@ export {
   auth,
   blockcypher,
   coins,
+  config,
   database,
   email,
   events,

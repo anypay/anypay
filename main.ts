@@ -19,6 +19,8 @@ import { hapi as kraken } from './plugins/kraken'
 
 import { start as refunds } from './actors/refunds/actor'
 
+import { startDirectory as startCronDirectory } from './lib/rabbi/cron'
+
 import { init } from 'rabbi'
 
 import * as core from './lib'
@@ -57,6 +59,12 @@ import * as core from './lib'
 
     log.info('rabbi.kraken.actors.start')
     
+  }
+
+  if (config.get('rabbi_start_cron')) {
+
+    startCronDirectory(join(__dirname, 'cron'))
+
   }
 
 })()
