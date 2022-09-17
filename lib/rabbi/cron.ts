@@ -71,7 +71,7 @@ function startCronJob(cronModule: CronModule): CronJob {
 
         const { name, pattern } = cronModule
 
-        core.log.debug('rabbi.cron.start', { name, pattern })
+        core.log.info('rabbi.cron.start', { name, pattern })
 
         try {
 

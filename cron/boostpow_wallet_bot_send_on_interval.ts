@@ -12,8 +12,6 @@ import axios from 'axios'
 
 export default async function({ log, config }) {
 
-  return
-
   const content = config.get('boostpow_wallet_bot_content_txid')
 
   const { data: bip270 } = await axios.get(`https://askbitcoin.ai/api/v1/boostpow/${content}/new?currency=USD&value=0.052`)
@@ -42,5 +40,5 @@ export default async function({ log, config }) {
 
 }
 
-// every five seconds
-export const pattern = '*/52 * * * * *'
+// every hour on the 52nd minute
+export const pattern = '0 */52 * * * *'
