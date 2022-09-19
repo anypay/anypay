@@ -11,13 +11,13 @@ describe('Framework for Cron Jobs', () => {
 
   })
 
-  it('should have a cron named wallet_bot_send_on_interval', () => {
+  it('should have a cron named wallet_bot_send_bsv_on_interval', () => {
 
     const cronJobs = listCronJobs()
 
-    const cronJob = cronJobs.filter(({ name }) => name === 'wallet_bot_send_on_interval')[0]
+    const cronJob = cronJobs.filter(({ name }) => name === 'wallet_bot_send_bsv_on_interval')[0]
 
-    expect(cronJob.name).to.be.equal('wallet_bot_send_on_interval')
+    expect(cronJob.name).to.be.equal('wallet_bot_send_bsv_on_interval')
 
     expect(cronJob.pattern).to.be.equal('*/5 * * * * *')
 
@@ -25,13 +25,13 @@ describe('Framework for Cron Jobs', () => {
 
   it('stop and start task should toggle the status of started property', () => {
 
-    let cronJob = getCronJob('wallet_bot_send_on_interval')
+    let cronJob = getCronJob('wallet_bot_send_bsv_on_interval')
 
     expect(cronJob.started).to.be.equal(true)
 
     stopTask(cronJob.name)
 
-    cronJob = getCronJob('wallet_bot_send_on_interval')
+    cronJob = getCronJob('wallet_bot_send_bsv_on_interval')
 
     expect(cronJob.started).to.be.equal(false)
 
