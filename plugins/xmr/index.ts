@@ -7,6 +7,10 @@ import { log } from '../../lib'
 
 export { bitcore }
 
+import axios from 'axios'
+
+import { Client } from 'payment-protocol'
+
 export async function validateAddress(): Promise<Boolean> {
 
   return true
@@ -19,14 +23,9 @@ export async function validateUnsignedTx(): Promise<Boolean> {
 
 }
 
-export async function broadcast(tx_as_hex) {
-
-  return broadcastTx(tx_as_hex)
-}
-
 export async function broadcastTx(tx_as_hex) {
 
-  let result = await  send_raw_transaction({ tx_as_hex, do_not_relay: false })
+  let result = await send_raw_transaction({ tx_as_hex, do_not_relay: false })
 
   if (result.sanity_check_failed) {
     throw new Error(result.reason)
@@ -43,10 +42,6 @@ export async function broadcastTx(tx_as_hex) {
   return result
 
 }
-
-import axios from 'axios'
-
-import { Client } from 'payment-protocol'
 
 interface SendRawTransaction {
   tx_as_hex,
@@ -123,17 +118,17 @@ export async function transfer(destinations: Destination[]) {
 
 }
 
-
-
 interface VerifyPayment {
   url: string;
   txid: string;
   tx_key: string;
 }
 
-export async function verifyPayment({payment_option,tx_hex,tx_key}: any) {
+export async function verifyPayment({payment_option,tx_hex,tx_key,tx_id}: any): Promise<boolean> {
 
-  return true
+  log.info('xmr.verifyPayment', {payment_option, tx_hex, tx_key, tx_id })
+
+  return false
 
 }
 
@@ -155,4 +150,3 @@ export async function verify({url,txid,tx_key}: VerifyPayment) {
     }
   }
 }
-
