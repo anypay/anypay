@@ -126,7 +126,9 @@ interface VerifyPayment {
 
 export async function verifyPayment({payment_option,tx_hex,tx_key,tx_id}: any): Promise<boolean> {
 
-  log.info('xmr.verifyPayment', {payment_option, tx_hex, tx_key, tx_id })
+  const { invoice_uid } = payment_option
+
+  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx_hex, tx_key, tx_id })
 
   return false
 
