@@ -10,7 +10,7 @@ import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-interface Payment{
+interface Payment {
   amount: number;
   hash: string;
   currency: string;
@@ -76,26 +76,12 @@ export async function broadcastTx(hex): Promise<string> { // returns txid
 
 }
 
-export async function broadcast(hex): Promise<string> { // returns txid
-
-  return taal.broadcastTransaction(hex)
-
-}
-
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
-
-import { rpc } from './lib/jsonrpc';
 
 const polynym = require('polynym');
 
 var WAValidator = require('anypay-wallet-address-validator');
-
-export async function submitTransaction(rawTx: string) {
-
-  return rpc.call('sendrawtransaction', [rawTx]);
-
-}
 
 export async function getPaymail(alias: string) {
 
@@ -170,7 +156,6 @@ export async function getNewAddress(params){
 
 }
 
-
 export function validateAddress(address: string){
 
   let valid = WAValidator.validate( address, 'bitcoin')
@@ -179,21 +164,4 @@ export function validateAddress(address: string){
 
 }
 
-const name = 'Bitcoin Satoshi Vision';
-
-const currency = 'BSV';
-
-const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
-
-export {
-
-  name,
-
-  currency,
-
-  icon,
-
-}
-
 export { bsv as bitcore }
-

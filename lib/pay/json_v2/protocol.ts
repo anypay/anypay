@@ -31,11 +31,13 @@ export interface SubmitPaymentResponse {
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
+  const { invoice_uid } = payment
+
   try {
 
     log.info('payment.submit', payment);
 
-    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+    let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
     if (invoice.cancelled) {
 
@@ -51,12 +53,19 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       throw new Error(`invoice ${payment.invoice_uid} not found`)
     }
 
+
     let payment_option = await models.PaymentOption.findOne({ where: {
-      invoice_uid: invoice.uid,
+      invoice_uid,
       currency: payment.currency
     }})
 
     if (!payment_option) {
+
+      log.info('pay.jsonv2.payment.error.currency_unsupported', {
+        invoice_uid,
+        currency: payment.currency
+      })
+
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
@@ -64,29 +73,30 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     for (const transaction of payment.transactions) {
 
-      if (plugin.verifyPayment) {
+      const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
 
-        await plugin.verifyPayment({
-          payment_option,
+      const verified: boolean = await verify({
+        payment_option,
+        hex: transaction,
+        protocol: 'JSONV2'
+      })
+
+      if (!verified) {
+        
+        log.info(`pay.jsonv2.${payment.currency.toLowerCase()}.verifyPayment.failed`, {
+          invoice_uid: invoice.uid,
           hex: transaction,
           protocol: 'JSONV2'
         })
 
-      } else {
-
-        await verifyPayment({
-          payment_option,
-          hex: transaction,
-          protocol: 'JSONV2'
-        })
-
+        throw new Error(`pay.jsonv2.${payment.currency.toLowerCase()}.verifyPayment.failed`)
       }
 
-      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction`, {transaction })
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit`, {invoice_uid, transaction })
 
-      plugin.broadcastTx(transaction)
+      const response = await plugin.broadcastTx(transaction)
 
-      log.info(`jsonv2.${payment.currency.toLowerCase()}.submittransaction.success`, { transaction })
+      log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
       let paymentRecord = await completePayment(payment_option, transaction)
 

@@ -1,3 +1,4 @@
+
 require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
@@ -9,12 +10,6 @@ const bch: any = require('bitcore-lib-cash');
 export { bch as bitcore }
 
 var bchaddr: any = require('bchaddrjs');
-
-export async function submitTransaction(rawTx: string) {
-
-  return broadcastTx(rawTx)
-
-}
 
 export async function broadcastTx(hex: string) {
 

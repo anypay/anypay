@@ -6,6 +6,8 @@ import { app } from 'anypay'
 
 export default async function({ log, config }) {
 
+  return 
+
   const token = config.get('interval_wallet_bot_access_token')
 
   const anypay = app(token)
@@ -36,5 +38,5 @@ export default async function({ log, config }) {
 
 }
 
-// every ten seconds
-export const pattern = '*/5 * * * * *'
+// on the fifth second
+export const pattern = '*/52 * * * * *'
