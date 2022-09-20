@@ -1,62 +1,40 @@
-const http = require("superagent");
+
+import axios from 'axios'
 
 let token = process.env.BLOCKCYPHER_TOKEN;
 
 import { log } from './log';
 
-export async function publishDASH(hex) {
-
-  return publish('dash', hex)
-
-}
+import { v4 as uuid } from 'uuid'
 
 export async function publish(currency, hex) {
 
+  const trace = uuid()
+
+  log.info('blockcypher.publish', { currency, hex, trace })
+  
   try {
 
-    let resp = await http.post(`https://api.blockcypher.com/v1/${currency}/main/txs/push?token=${token}`).send({
+    let { data } = await axios.post(`https://api.blockcypher.com/v1/${currency}/main/txs/push?token=${token}`, {
       tx: hex
     });
 
-    return resp.body.hash;
+    log.info('blockcypher.publish.response', { trace, data })
+
+    return data.hash;
 
   } catch(error) {
 
-    if (error.match('already exists..')) {
+    const message = error.response.data.error
 
-      let hash = error.split('Transaction with hash ')[1].split(' ')[0]
+    error = new Error(message)
 
-      return hash
+    error.trace = trace
 
-    } else {
-
-      log.error('blockcypher.error', error);
-
-      throw error;
-
-    }
-
-  }
-
-}
-
-export async function publishBTC(hex) {
-
-  try {
-
-    let resp = await http.post(`https://api.blockcypher.com/v1/btc/main/txs/push?token=${token}`).send({
-      tx: hex
-    });
-
-    return resp.body.hash;
-
-  } catch(error) {
-
-    log.error('blockcypher.error', error);
+    log.error('blockcypher.publish.error', error)
 
     throw error;
 
   }
 
 }
-

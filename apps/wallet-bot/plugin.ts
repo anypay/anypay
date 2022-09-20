@@ -213,7 +213,9 @@ export const plugin = (() => {
 
             const { app } = await findOrCreateWalletBot(req.app)
 
-            const { limit, offset } = req.query
+            let { limit, offset } = req.query
+
+            if (!limit) { limit = 100 }
 
             const where = {
               app_id: app.id,
@@ -280,7 +282,9 @@ export const plugin = (() => {
 
             const { app } = await findOrCreateWalletBot(req.account)
 
-            const { status, limit, offset } = req.query
+            let { status, limit, offset } = req.query
+
+            if (!limit) { limit = 100 }
 
             const where = {
               app_id: app.id,

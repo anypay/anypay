@@ -43,4 +43,4 @@ export default async function({ log, config }) {
 }
 
 // every five seconds
-export const pattern = '*/5 * * * * *'
+export const pattern = '*/52 * * * * *'

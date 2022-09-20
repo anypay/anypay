@@ -16,18 +16,18 @@ export default async function({ log, config }) {
     throw new Error('interval_wallet_bot_dash_address config variable required')
   }
 
-  const amount = Math.floor(Math.random() * 10) / 10; // between $0.10 and $1.00
+  const amount = 0.026
 
   // ask wallet bot to send payment with two outputs each to the same address
   const request = await anypay.request([{
     currency: 'DASH',
     to: [{
       currency: 'USD',
-      amount: amount / 2,
+      amount,
       address
     }, {
       currency: 'USD',
-      amount: amount / 2,
+      amount,
       address
     }]
   }])
@@ -36,6 +36,5 @@ export default async function({ log, config }) {
 
 }
 
-// every five seconds
-export const pattern = '*/5 * * * * *'
-
+// on the fifth second
+export const pattern = '52 * * * * *'

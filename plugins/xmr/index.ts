@@ -75,7 +75,7 @@ export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTra
     do_not_relay
   })
 
-  log.info('plugins.xmr.send_raw_transaction.result', data)
+  log.info('plugins.xmr.send_raw_transaction.result', Object.assign(data, {tx_as_hex}))
 
   return data
 

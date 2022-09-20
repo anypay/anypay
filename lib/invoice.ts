@@ -100,7 +100,9 @@ export async function refreshInvoice(uid: string): Promise<any> {
 
   await invoice.save()
 
-  log.info('invoice.refreshed', invoice.toJSON())
+  log.info('invoice.refreshed', {
+    invoice_uid: invoice.uid
+  })
 
   return invoice
 
