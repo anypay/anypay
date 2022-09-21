@@ -157,11 +157,11 @@ export async function create(req, h) {
 
   for (const tx of payment.transactions) {
 
-    let transaction = tx.toString('hex') 
+    let transaction: string = tx.toString('hex') 
 
     await pay.verifyPayment({
       payment_option,
-      hex: transaction,
+      transaction: {tx: transaction},
       protocol: 'BIP70'
     })
 
@@ -171,7 +171,7 @@ export async function create(req, h) {
 
     log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp })
 
-    let paymentRecord = await pay.completePayment(payment_option, transaction)
+    let paymentRecord = await pay.completePayment(payment_option, { tx: transaction})
 
     log.info(`bip70.${payment_option.currency}.payment.completed`, paymentRecord);
 

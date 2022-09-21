@@ -15,9 +15,15 @@ export interface PaymentOption {
   outputs?: PaymentOutput[];
 }
 
+interface Transaction {
+  tx: string;
+  tx_key?: string;
+  tx_id?: string;
+}
+
 export interface VerifyPayment {
   payment_option: PaymentOption;
-  hex: string;
+  transaction: Transaction;
   protocol: string; // BIP70, BIP270, JSONV2
 }
 
