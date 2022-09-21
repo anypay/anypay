@@ -107,8 +107,6 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       }
 
-      
-
       if (!verified) {
         
         log.info(`pay.jsonv2.${payment.currency.toLowerCase()}.verifyPayment.failed`, {
@@ -126,7 +124,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
-      let paymentRecord = await completePayment(payment_option, transaction.tx)
+      let paymentRecord = await completePayment(payment_option, transaction)
 
       if (payment.wallet) {
         paymentRecord.wallet = payment.wallet

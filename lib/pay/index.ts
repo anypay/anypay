@@ -307,11 +307,20 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 }
 
-export async function completePayment(paymentOption, hex: string) {
+interface Transaction {
+
+  tx: string;
+  tx_hash?: string;
+  tx_key?: string;
+}
+
+export async function completePayment(paymentOption, transaction: Transaction) {
+
+  const {tx: hex} = transaction
 
   const { currency, invoice_uid } = paymentOption
 
-  log.info('completePayment', {invoice_uid, currency, hex })
+  log.info('completePayment', {invoice_uid, currency, transaction })
 
   let bitcore = getBitcore(currency)
 
@@ -320,20 +329,19 @@ export async function completePayment(paymentOption, hex: string) {
   let invoice = await models.Invoice.findOne({ where: {
     uid: invoice_uid
   }})
+
+  const txid = transaction.tx_hash || tx.hash
   
-  let payment = {
-    txid: tx.hash,
+  let paymentRecord = await models.Payment.create({
+    txid,
     currency: currency,
     txjson: tx.toJSON(),
     txhex: hex,
+    tx_key: transaction.tx_key,
     payment_option_id: paymentOption.id,
     invoice_uid: invoice_uid,
     account_id: invoice.account_id
-  }
-
-  log.info('payment', payment)
-
-  let paymentRecord = await models.Payment.create(payment)
+  })
 
   await models.Invoice.update(
     {
@@ -344,7 +352,7 @@ export async function completePayment(paymentOption, hex: string) {
       denomination_amount_paid: invoice.denomination_amount,
       currency: paymentOption.currency,
       address: paymentOption.address,
-      hash: tx.hash,
+      hash: txid,
       status: 'paid',
       paidAt: new Date(),
       complete: true,
@@ -360,7 +368,6 @@ export async function completePayment(paymentOption, hex: string) {
   }})
 
   log.info('invoice.paid', invoice)
-  log.debug('invoice.payment', invoice.uid)
 
   let channel = await awaitChannel()
 

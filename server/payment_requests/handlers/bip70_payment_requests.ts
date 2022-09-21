@@ -171,7 +171,7 @@ export async function create(req, h) {
 
     log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp })
 
-    let paymentRecord = await pay.completePayment(payment_option, transaction)
+    let paymentRecord = await pay.completePayment(payment_option, { tx: transaction})
 
     log.info(`bip70.${payment_option.currency}.payment.completed`, paymentRecord);
 

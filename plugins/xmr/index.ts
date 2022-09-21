@@ -25,9 +25,9 @@ export async function validateUnsignedTx(): Promise<Boolean> {
 
 }
 
-export async function broadcastTx(tx_as_hex) {
+export async function broadcastTx({ tx }: { tx: string }): Promise<SendRawTransactionResult> {
 
-  let result = await send_raw_transaction({ tx_as_hex, do_not_relay: false })
+  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
   if (result.sanity_check_failed) {
     throw new Error(result.reason)
@@ -37,7 +37,15 @@ export async function broadcastTx(tx_as_hex) {
     throw new Error('double spend')
   }
 
+  if (result.too_big) {
+    throw new Error('too big')
+  }
+
   if (result.status === 'Failed') {
+    throw new Error(result.reason)
+  }
+
+  if (result.status !== 'OK') {
     throw new Error(result.reason)
   }
 
@@ -138,14 +146,16 @@ export async function verifyPayment({payment_option,tx,tx_key,tx_hash}: Verify):
 
   const { invoice_uid } = payment_option
 
-  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash })
+  const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
 
-  await verify({
-    url: `${config.get('api_base')}/i/${payment_option.invoice_uid}`,
+  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
+
+  /*await verify({
+    url,
     tx,
     tx_hash: String(tx_hash),
     tx_key: String(tx_key)
-  })
+  })*/
 
   return true
 
