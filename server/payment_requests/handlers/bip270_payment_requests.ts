@@ -39,7 +39,7 @@ export async function create(req, h) {
     let wallet = detectWallet(req.headers, req.params.uid)
 
     let submission = {
-      transactions: [req.payload.transaction],
+      transactions: [{tx: req.payload.transaction }],
       currency: 'BSV',
       invoice_uid: req.params.uid,
       wallet

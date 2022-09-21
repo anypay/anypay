@@ -17,10 +17,16 @@ import { models } from '../../models'
 
 import { verifyPayment, completePayment  } from '../'
 
+interface Tx {
+  tx: string;
+  tx_key?: string;
+  tx_hash?: string;
+}
+
 export interface SubmitPaymentRequest {
   currency: string;
   invoice_uid: string;
-  transactions: string[];
+  transactions: Tx[];
   wallet?: string;
 }
 
@@ -73,13 +79,35 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     for (const transaction of payment.transactions) {
 
+      var t: any = transaction
+
       const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
 
-      const verified: boolean = await verify({
-        payment_option,
-        hex: transaction,
-        protocol: 'JSONV2'
-      })
+      var verified;
+
+      if (payment_option.currency === 'XMR') {
+
+        const { tx, tx_hash, tx_key } = t
+
+        verified = await verify({
+          payment_option,
+          tx,
+          tx_hash,
+          tx_key,
+          protocol: 'JSONV2'
+        })
+
+      } else {
+
+        verified = await verify({
+          payment_option,
+          hex: transaction,
+          protocol: 'JSONV2'
+        })
+
+      }
+
+      
 
       if (!verified) {
         
@@ -98,7 +126,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
-      let paymentRecord = await completePayment(payment_option, transaction)
+      let paymentRecord = await completePayment(payment_option, transaction.tx)
 
       if (payment.wallet) {
         paymentRecord.wallet = payment.wallet
@@ -111,7 +139,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     return {
       success: true,
-      transactions: payment.transactions
+      transactions: payment.transactions.map(({tx}) => tx)
     }
 
   } catch(error) {
@@ -167,7 +195,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
         
         return {
           success: true,
-          transactions: payment.transactions
+          transactions: payment.transactions.map(({tx}) => tx)
         }
 
       } else {
@@ -191,7 +219,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
         await verifyPayment({
           payment_option,
-          hex: transaction,
+          transaction: transaction,
           protocol: 'JSONV2'
         })
 
@@ -203,7 +231,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     return {
       success: true,
-      transactions: payment.transactions
+      transactions: payment.transactions.map(({tx}) => tx)
     }
 
   } catch(error) {
@@ -442,7 +470,7 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   await verifyUnsigned({
     invoice_uid: invoice.uid,
-    transactions: params.transactions.map(({tx}) => tx),
+    transactions: params.transactions,
     currency: params.currency
   })
 
@@ -480,7 +508,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
     let response = await submitPayment({
       currency: params.currency,
-      transactions: params.transactions.map(({tx}) => tx),
+      transactions: params.transactions,
       invoice_uid: invoice.uid
     })
 

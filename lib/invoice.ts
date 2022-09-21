@@ -94,6 +94,8 @@ export async function refreshInvoice(uid: string): Promise<any> {
 
   let account = await models.Account.findOne({ where: { id: invoice.account_id }})
 
+
+  // TODO: Only create options from existing options coins if options exist
   await createPaymentOptions(account, invoice)
 
   invoice.expiry = moment().add(15, 'minutes').toDate();
@@ -125,6 +127,7 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
 }
 
+// TODO: Only create options from existing options coins if options exist
 export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
 
   let addresses = await listAvailableAddresses(new Account(account))
