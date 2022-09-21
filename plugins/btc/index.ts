@@ -3,26 +3,15 @@ const btc = require('bitcore-lib')
 
 export { btc as bitcore }
 
-import { publishBTC } from '../../lib/blockchair'
+import { oneSuccess } from 'promise-one-success'
 
-import {oneSuccess} from 'promise-one-success'
-
-import * as blockcypher from '../../lib/blockcypher'
-
-export async function submitTransaction(rawTx: string) {
-
-  return oneSuccess([
-    publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
-  ])
-
-}
+import { blockchair, blockcypher } from '../../lib'
 
 export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
-    publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
+    blockchair.publish('btc', rawTx),
+    blockcypher.publish('btc', rawTx)
   ])
 
 }
@@ -60,6 +49,4 @@ export async function getNewAddress(deprecatedParam){
   return deprecatedParam.value;
 
 }
-
-export const currency = 'BTC';
 

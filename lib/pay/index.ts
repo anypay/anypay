@@ -76,7 +76,7 @@ export function detectWallet(headers, invoice_uid): string {
 
 }
 
-export async function verifyPayment(v: VerifyPayment) {
+export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
 
   log.info(`payment.verify`, v)
 
@@ -136,6 +136,8 @@ export async function verifyPayment(v: VerifyPayment) {
 
     verifyOutput(txOutputs, address, output.amount);
   }
+
+  return true
 
 }
 
@@ -307,23 +309,25 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 export async function completePayment(paymentOption, hex: string) {
 
-  log.info('paymentoption', paymentOption.toJSON())
+  const { currency, invoice_uid } = paymentOption
 
-  let bitcore = getBitcore(paymentOption.currency)
+  log.info('completePayment', {invoice_uid, currency, hex })
+
+  let bitcore = getBitcore(currency)
 
   let tx = new bitcore.Transaction(hex)
 
   let invoice = await models.Invoice.findOne({ where: {
-    uid: paymentOption.invoice_uid
+    uid: invoice_uid
   }})
   
   let payment = {
     txid: tx.hash,
-    currency: paymentOption.currency,
+    currency: currency,
     txjson: tx.toJSON(),
     txhex: hex,
     payment_option_id: paymentOption.id,
-    invoice_uid: paymentOption.invoice_uid,
+    invoice_uid: invoice_uid,
     account_id: invoice.account_id
   }
 
@@ -336,7 +340,7 @@ export async function completePayment(paymentOption, hex: string) {
       amount_paid: invoice.amount,
       invoice_amount: paymentOption.amount,
       invoice_amount_paid: paymentOption.amount,
-      invoice_currency: paymentOption.currency,
+      invoice_currency: currency,
       denomination_amount_paid: invoice.denomination_amount,
       currency: paymentOption.currency,
       address: paymentOption.address,

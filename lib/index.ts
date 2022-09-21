@@ -6,6 +6,9 @@ import * as apps from './apps';
 import * as accounts from './accounts';
 import * as amqp from './amqp';
 import * as apikeys from './apikeys';
+import * as blockchair from './blockchair';
+import * as blockchain from './blockchain';
+import * as blockcypher from './blockcypher';
 import * as login from './account_login';
 import * as invoices from './invoice';
 import * as settings from './settings';
@@ -16,7 +19,6 @@ import * as addresses from './addresses';
 import * as coins from './coins';
 import { log } from './log';
 import { plugins } from './plugins';
-import * as blockcypher from './blockcypher';
 import * as email from './email';
 import * as password from './password';
 import * as auth from './auth';
@@ -44,6 +46,8 @@ export {
   apikeys,
   apps,
   auth,
+  blockchair,
+  blockchain,
   blockcypher,
   coins,
   config,

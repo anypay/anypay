@@ -11,12 +11,6 @@ export async function getNewAddress(record) {
   return record.value;
 }
 
-export async function submitTransaction(rawTx: string) {
-
-  return blockchair.publish('litecoin', rawTx)
-
-}
-
 export async function broadcastTx(rawTx: string) {
 
   return blockchair.publish('litecoin', rawTx)

@@ -2,21 +2,25 @@ import * as http from 'superagent'
 
 import { log } from '../log'
 
-interface BroadcastResult {
+export interface BroadcastResult {
+  provider: string,
   txid: string,
   hex: string,
-  metadata?: any
+  metadata?: any,
+  error?: Error
 }
 
 async function broadcastBlockchair(currency: string, hex: string): Promise<BroadcastResult> {
 
-  log.info('broadcast', {currency, hex})
+  log.info('blockchair.broadcast', {currency, hex})
 
   let resp = await http.get(`https://api.blockchair.com/${currency}/push/transaction?data=${hex}`)
 
-  log.info('blockchair.broadcast.response', resp)
+  log.info('blockchair.broadcast.response', Object.assign(resp, {
+    currency, hex
+  }))
 
-  return resp
+  return Object.assign(resp, { provider: 'blockchair' })
 }
 
 export async function broadcast(currency:string, hex:string): Promise<BroadcastResult> {
