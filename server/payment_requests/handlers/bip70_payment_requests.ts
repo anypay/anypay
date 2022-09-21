@@ -157,11 +157,11 @@ export async function create(req, h) {
 
   for (const tx of payment.transactions) {
 
-    let transaction = tx.toString('hex') 
+    let transaction: string = tx.toString('hex') 
 
     await pay.verifyPayment({
       payment_option,
-      hex: transaction,
+      transaction: {tx: transaction},
       protocol: 'BIP70'
     })
 
