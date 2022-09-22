@@ -11,6 +11,8 @@ import axios from 'axios'
 
 import { Client } from 'payment-protocol'
 
+import { config } from '../../lib/config'
+
 export async function validateAddress(): Promise<Boolean> {
 
   return true
@@ -23,9 +25,9 @@ export async function validateUnsignedTx(): Promise<Boolean> {
 
 }
 
-export async function broadcastTx(tx_as_hex) {
+export async function broadcastTx({ tx }: { tx: string }): Promise<SendRawTransactionResult> {
 
-  let result = await send_raw_transaction({ tx_as_hex, do_not_relay: false })
+  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
   if (result.sanity_check_failed) {
     throw new Error(result.reason)
@@ -35,7 +37,15 @@ export async function broadcastTx(tx_as_hex) {
     throw new Error('double spend')
   }
 
+  if (result.too_big) {
+    throw new Error('too big')
+  }
+
   if (result.status === 'Failed') {
+    throw new Error(result.reason)
+  }
+
+  if (result.status !== 'OK') {
     throw new Error(result.reason)
   }
 
@@ -120,21 +130,38 @@ export async function transfer(destinations: Destination[]) {
 
 interface VerifyPayment {
   url: string;
-  txid: string;
+  tx: string;
+  tx_hash: string;
   tx_key: string;
 }
 
-export async function verifyPayment({payment_option,tx_hex,tx_key,tx_id}: any): Promise<boolean> {
+interface Verify {
+  payment_option: any;
+  tx: string;
+  tx_key: string;
+  tx_hash: string;
+}
+
+export async function verifyPayment({payment_option,tx,tx_key,tx_hash}: Verify): Promise<boolean> {
 
   const { invoice_uid } = payment_option
 
-  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx_hex, tx_key, tx_id })
+  const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
 
-  return false
+  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
+
+  /*await verify({
+    url,
+    tx,
+    tx_hash: String(tx_hash),
+    tx_key: String(tx_key)
+  })*/
+
+  return true
 
 }
 
-export async function verify({url,txid,tx_key}: VerifyPayment) {
+export async function verify({url, tx, tx_hash,tx_key}: VerifyPayment) {
 
   let client = new Client(url)
 
@@ -145,10 +172,17 @@ export async function verify({url,txid,tx_key}: VerifyPayment) {
   let destinations = paymentRequest.instructions[0].outputs
 
   for (let { address, amount } of destinations) {
-    let result = await call('check_tx_key', { txid, tx_key, address })
+
+    log.info('xmr.check_tx_key', { txid: tx_hash, tx_key, address })
+
+    let result = await call('check_tx_key', { txid: tx_hash, tx_key, address })
+
+    log.info('xmr.check_tx_key.result', result)
 
     if (amount !== result.received) {
       throw new Error('Invalid XMR Payment')
     }
   }
+
+  return
 }
