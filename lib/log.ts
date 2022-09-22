@@ -24,7 +24,9 @@ interface LogQuery {
 
 import * as winston from 'winston';
 
-const transports = []
+const transports = [
+  new winston.transports.Console({ level: 'debug' })
+]
 
 if (config.get('loki_enabled') && config.get('loki_host')) {
 
@@ -48,6 +50,8 @@ if (config.get('loki_enabled') && config.get('loki_host')) {
   )
 
 }
+
+
 
 const loki = winston.createLogger({
   level: 'info',
