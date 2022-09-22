@@ -5,6 +5,7 @@
 import { app } from 'anypay'
 
 export default async function({ log, config }) {
+  return
 
   const token = config.get('interval_wallet_bot_access_token')
 

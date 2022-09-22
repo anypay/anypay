@@ -201,11 +201,57 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
 
 }
 
-export async function getPaymentCounts(walletBot: WalletBot): Promise<any> {
+interface PaymentsCounts {
+  cancelled: number;
+  paid: number;
+  unpaid: number;
+}
+
+export async function getPaymentCounts(walletBot: WalletBot): Promise<PaymentsCounts> {
 
   let results = await database.query(`select count(*), status from invoices where app_id = ${walletBot.get('app_id')} group by status`)
 
-  return results[0]
+  let cancelled = results[0].filter(({status}) => status === 'cancelled')[0]
+
+  if (!cancelled) {
+
+    cancelled = 0
+
+  } else {
+
+    cancelled = parseInt(cancelled['count'])
+
+  }
+
+  let paid = results[0].filter(({status}) => status === 'paid')[0]
+
+  if (!paid) {
+
+    paid = 0
+
+  } else {
+
+    paid = parseInt(paid['count'])
+
+  }
+
+  let unpaid = results[0].filter(({status}) => status === 'unpaid')[0]
+
+  if (!unpaid) {
+
+    unpaid = 0
+
+  } else {
+
+    unpaid = parseInt(unpaid['count'])
+
+  }
+
+  return {
+    cancelled,
+    paid,
+    unpaid
+  }
 
 }
 
