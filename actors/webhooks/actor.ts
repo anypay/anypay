@@ -23,7 +23,7 @@ export async function start() {
 
     try {
 
-      let webhook = await sendWebhookForInvoice(uid, 'actor_on_invoice_paid');
+       await sendWebhookForInvoice(uid, 'actor_on_invoice_paid');
       
     } catch(error) {
 

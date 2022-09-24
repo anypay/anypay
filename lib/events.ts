@@ -1,6 +1,4 @@
 
-const { models } = require('./models')
-
 import { findAll, Orm } from './orm'
 
 import { Invoice } from './invoices'
@@ -10,6 +8,8 @@ import { Account } from './account'
 import { events } from 'rabbi'
 
 import { log } from './log';
+
+import { models } from './models'
 
 interface EventData {
   type: string;

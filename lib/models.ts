@@ -4,7 +4,7 @@ import * as sequelize from './database';
 
 import { join } from 'path';
 
-import { bindAllModelsHooks } from './rabbi-sequelize';
+//import { bindAllModelsHooks } from './rabbi-sequelize';
 
 function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
@@ -23,9 +23,11 @@ var models: any = require('require-all')({
   resolve: (model) => model(sequelize, Sequelize)
 });
 
-const exchange = 'anypay.events';
+console.log('ALL MODELS', models)
 
-bindAllModelsHooks(models, exchange);
+//const exchange = 'anypay.events';
+
+//bindAllModelsHooks(models, exchange);
 
 models.Invoice.hasMany(models.PaymentOption, {
   foreignKey: 'invoice_uid',
