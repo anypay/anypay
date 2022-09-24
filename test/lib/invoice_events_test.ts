@@ -108,16 +108,8 @@ describe('Invoice Events', () => {
 
       await client.selectPaymentOption(paymentOptions[0])
  
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
-
-      console.log('__VENTS', events)
-
-      events.map(event => console.log(event.toJSON()))
+      listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
  
-      expect(events.length).to.be.equal(1)
-
-      expect(events[0].get('wallet')).to.be.equal('edge')
-
     })
 
     it('has an event for every payment verification request', async () => {

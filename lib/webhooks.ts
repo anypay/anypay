@@ -329,10 +329,6 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
 }
 
-export interface ApiClient {
-  identifier: string;
-}
-
 interface ListOptions {
   limit?: number;
   offset?: number;

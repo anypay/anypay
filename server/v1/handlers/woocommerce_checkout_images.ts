@@ -16,52 +16,32 @@ const files = {
 
 export async function image(request, hapi) {
 
-  try {
+  let image = await getAccountSetting(request.params.account_id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
 
-    let image = await getAccountSetting(request.params.account_id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
+  const url = files[image]
 
-    const url = files[image]
+  const { data } = await axios.get(url, {
+    responseType: 'arraybuffer'
+  })
 
-    const { data } = await axios.get(url, {
-      responseType: 'arraybuffer'
-    })
-
-    return hapi.response(data).header(
-      'Content-Type', 'image/png'
-    )
-
-  } catch(error) {
-
-    console.error(error)
-
-    return hapi.response({ error: error.message }).code(500)
-
-  }
+  return hapi.response(data).header(
+    'Content-Type', 'image/png'
+  )
 
 }
 
 export async function show(request, hapi) {
 
-  try {
+  let image = await getAccountSetting(request.account.id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
 
-    let image = await getAccountSetting(request.account.id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
+  const url = files[image]
 
-    const url = files[image]
-
-    return hapi.response({
-      image: {
-        name: image,
-        url
-      }
-    })
-
-  } catch(error) {
-
-    console.error(error)
-
-    return hapi.response({ error: error.message }).code(500)
-
-  }
+  return hapi.response({
+    image: {
+      name: image,
+      url
+    }
+  })
 
 }
 

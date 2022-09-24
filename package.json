@@ -24,7 +24,7 @@
     "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' servers/rest_api/server.ts",
     "runtest": "NODE_ENV=test nyc --reporter=lcov --reporter=text mocha --require=ts-node/register $TEST --timeout=20000 --exit",
     "start": "ts-node main.ts",
-    "test": "NODE_ENV=test nyc --reporter=lcov --reporter=text mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*.ts test/models/*_test.ts test/lib/*_test.ts lib/rabbi/test/*_test.ts --exit",
+    "test": "NODE_ENV=test nyc --reporter=lcov --reporter=text mocha --require=./node_modules/ts-node/register/ --timeout=20000 test/integration/*_test.ts test/integration/**/*_test.ts test/models/*_test.ts test/lib/*_test.ts lib/rabbi/test/*_test.ts --exit",
     "cover": "npm run cover:unit && npm run cover:integration && npm run cover:report",
     "cover:unit": "nyc --silent npm run test:unit",
     "cover:integration": "nyc --silent --no-clean npm run test:integration",

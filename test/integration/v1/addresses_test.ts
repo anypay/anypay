@@ -82,4 +82,23 @@ describe("Setting Addresses Via REST", async () => {
 
   })
 
+
+  it("DELETE /v1/api/account/addresses should remove an address", async () => {
+
+    await auth(account)({
+      method: 'POST',
+      url: '/v1/api/account/addresses',
+      payload: {
+        value: '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K',
+        currency: 'BSV'
+      }
+    })
+
+    await auth(account)({
+      method: 'DELETE',
+      url: `/v1/api/account/addresses/BSV`
+    })
+
+  })
+
 })

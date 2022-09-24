@@ -15,7 +15,7 @@ describe('lib/webhooks', () => {
 
   })
 
-  it('#findWEbhook should return the webhook by invoice_uid', async () => {
+  it('#findWebhook should return the webhook by invoice_uid', async () => {
 
     const invoice = await newInvoice()
 

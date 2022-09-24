@@ -26,4 +26,3 @@ export async function index(request, h) {
   })
 
 };
-

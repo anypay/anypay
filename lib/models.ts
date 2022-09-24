@@ -23,8 +23,6 @@ var models: any = require('require-all')({
   resolve: (model) => model(sequelize, Sequelize)
 });
 
-console.log('ALL MODELS', models)
-
 //const exchange = 'anypay.events';
 
 //bindAllModelsHooks(models, exchange);

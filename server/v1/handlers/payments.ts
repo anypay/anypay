@@ -1,71 +1,51 @@
 
 import * as Joi from 'joi'
 
-import { log } from '../../../lib/log'
-
 import { listPayments } from '../../../lib/payments'
 
 export async function index(req, h) {
 
-  try {
+  let payments: any = await listPayments(req.account, {
 
-    let payments: any = await listPayments(req.account, {
+    limit: req.query.limit || 1000,
 
-      limit: req.query.limit || 1000,
+    offset: req.query.offset || 0
 
-      offset: req.query.offset || 0
+  })
 
-    })
+  payments = payments.map(payment => {
 
-    payments = payments.map(payment => {
+    return {
 
-      try {
+      currency: payment.currency,
 
-        return {
+      txid: payment.txid,
 
-          currency: payment.currency,
+      createdAt: payment.createdAt,
 
-          txid: payment.txid,
+      outputs: payment.option.outputs,
 
-          createdAt: payment.createdAt,
+      invoice: {
 
-          outputs: payment.option.outputs,
+        uid: payment.invoice.uid,
 
-          invoice: {
+        amount: payment.invoice.denomination_amount,
 
-            uid: payment.invoice.uid,
-
-            amount: payment.invoice.denomination_amount,
-
-            currency: payment.invoice.denomination_currency
-
-          }
-
-        }
-
-      } catch(error) {
-
-        log.error('listpayments', error)
+        currency: payment.invoice.denomination_currency
 
       }
 
-    })
+    }
 
-    payments = payments.filter(payment => !!payment)
+  })
 
-    return h.response({
+  payments = payments.filter(payment => !!payment)
 
-      payments
+  return h.response({
 
-    })
+    payments
 
-  } catch(error) {
-
-    log.error('api.v1.payments.index', error)
-
-    return h.badRequest(error)
-
-  }
+  })
 
 }
 
@@ -104,5 +84,3 @@ export const Schema = {
   })
 
 }
-
-

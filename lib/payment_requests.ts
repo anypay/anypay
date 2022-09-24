@@ -69,6 +69,10 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
   const { currency, amount } = ensureConsistentCurrencyAmount(template)
 
+  console.log('__AMOUNT', amount)
+
+  console.log('__CURRENCY', currency)
+
   let { error } = schema.PaymentRequestTemplate.validate(template)
 
   if (error) {

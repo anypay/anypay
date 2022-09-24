@@ -9,39 +9,28 @@ import { index as list_account_payments_handler } from './payments'
 
 export async function index(request, h) {
 
-  try {
+  const source = request.params.account_id
 
-    const source = request.params.account_id
+  const target = request.account.id
 
-    const target = request.account.id
+  log.info('api.v1.linked_accounts.index', {
+    source,
+    target
+  })
 
-    log.info('api.v1.linked_accounts.index', {
-      source,
-      target
-    })
+  let link = await links.getLink({ source, target })
 
-    let link = await links.getLink({ source, target })
-
-    if (!link) {
-
-      return h.unauthorized()
-
-    }
-
-    request.account = await findAccount(source)
-
-    delete request.params['account_id']
-
-    return list_account_payments_handler(request, h)
-
-  }  catch(error) {
-
-    log.error('api.v1.linked_accounts.index', error)
+  if (!link) {
 
     return h.unauthorized()
-    //return h.badRequest(error)
 
   }
+
+  request.account = await findAccount(source)
+
+  delete request.params['account_id']
+
+  return list_account_payments_handler(request, h)
 
 }
 

@@ -3,8 +3,6 @@ import { getCoins } from '../../../lib/coins'
 
 import { convert } from '../../../lib/prices'
 
-import { log } from '../../../lib/log'
-
 export async function index(req, h) {
 
   let coins = await getCoins()
@@ -22,17 +20,9 @@ export async function index(req, h) {
       color: coin.color
     }
 
-    try {
+    let { value: price } = await convert({ currency: coin.code, value: 1 }, 'USD')
 
-      let { value: price } = await convert({ currency: coin.code, value: 1 }, 'USD')
-
-      result['price'] = price
-
-    } catch(error) {
-
-      log.debug('coin.price.convert.error', error)
-
-    }
+    result['price'] = price
 
     return result
 
@@ -41,4 +31,3 @@ export async function index(req, h) {
   return h.response({ coins }).code(200)
 
 }
-

@@ -23,18 +23,8 @@ export async function index(req, h) {
 
 export async function remove(req, h) {
 
-  try {
+  await removeAddress(req.account, req.params.currency)
 
-    await removeAddress(req.account, req.params.currency)
-
-    return h.response({ success: true }).code(200)
-
-  } catch(error) {
-
-    log.error('server.addresses.remove.error', error)
-
-    return h.response({ error: error.message }).code(500)
-
-  }
+  return h.response({ success: true }).code(200)
 
 }

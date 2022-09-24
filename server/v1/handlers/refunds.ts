@@ -3,11 +3,7 @@ import { getRefund } from '../../../lib/refunds'
 
 import { ensureInvoice } from '../../../lib/invoices'
 
-import { log } from '../../../lib'
-
 export async function show(req, h) {
-
-  try {
 
     let invoice = await ensureInvoice(req.params.invoice_uid)
 
@@ -16,7 +12,7 @@ export async function show(req, h) {
       return h.response({ error: 'unauthorized' }).code(401)
     }
    
-    let refund = await getRefund(invoice)
+    let refund = await getRefund(invoice, req.query.address)
 
     console.log('_REFF', refund)
 
@@ -27,15 +23,5 @@ export async function show(req, h) {
       original_invoice: invoice.toJSON(),
       refund_invoice: refund_invoice.toJSON()
     })
-
-  } catch(error) {
-
-    console.log('_RRR', error)    
-
-    log.error('servers.v1.handlers.Refunds.show', error)
-
-    return h.badRequest(error)
-
-  }
 
 }
