@@ -7,7 +7,7 @@ import * as geoip from 'geoip-lite'
 
 import * as slack from '../slack/notifier'
 
-import * as utils from '../utils'
+import { hash } from '../bcrypt'
 
 import { models } from '../models'
 
@@ -20,13 +20,28 @@ interface NewAccount {
   password: string;
 }
 
+function toKeyValueString(json: any): string {
+
+  let entries = Object.entries(json)
+
+  return entries.reduce((str, entry) => {
+
+    return `${str}${entry[0]}=${entry[1]} `
+
+  }, '')
+
+}
+
+
+
+
 export async function registerAccount(params: NewAccount): Promise<Account> {
 
   let { email, password } = params;
 
   log.info('account.register', {email});
 
-  let passwordHash = await utils.hash(password);
+  let passwordHash = await hash(password);
 
   log.debug('account.register.password.hash', { passwordHash })
 
@@ -63,7 +78,7 @@ export async function geolocateAccountFromRequest(account: Account, request: Req
 
   if (geoLocation) {
 
-    let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+    let userLocation = toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
     slack.notify(`${account.email} registerd from ${userLocation}`);
 

@@ -1,4 +1,5 @@
-const Sequelize = require("sequelize");
+
+import { Sequelize } from 'sequelize'
 
 import { join } from 'path'
 

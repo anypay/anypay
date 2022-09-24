@@ -1,5 +1,8 @@
 import { auth, expect, account, newInvoice } from '../../utils'
 
+import { search, SearchResult } from '../../../lib/search'
+import { recordPayment } from '../../../lib/payments'
+
 const tx = {
   currency: 'BSV',
   chain: 'BSV',
@@ -14,6 +17,19 @@ describe("Searching", async () => {
     let invoice = await newInvoice({ amount: 0.52 })
 
     await invoice.set('hash', tx.tx_id)
+    await recordPayment(invoice, {
+      txid: tx.tx_id,
+      currency: tx.currency,
+      txhex: tx.tx_hex
+    })
+
+    const result: SearchResult[] = await search(tx.tx_id, account)
+
+    expect(result).to.be.an('array')
+
+  })
+
+  it('should find an invoice by txid with the api', async () => {
 
     const { result } = await auth(account)({
       method: 'POST',

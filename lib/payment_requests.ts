@@ -95,31 +95,29 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount })
 
-    if (template.length === 1) {
+    const update: any = {}
 
-      invoice.currency = template[0].currency
-
-    }
+    update['currency'] = template[0].currency
 
     if (options) {
 
-      invoice.webhook_url = options.webhook_url
+      update['webhook_url'] = options.webhook_url
 
-      invoice.redirect_url = options.redirect_url
+      update['redirect_url'] = options.redirect_url
 
-      invoice.secret = options.secret
+      update['secret'] = options.secret
 
-      invoice.metadata = options.metadata
+      update['metadata'] = options.metadata
 
     }
 
-    await invoice.save()
+    await invoice.update(update)
 
     await paymentRequest.update({
 
       invoice_uid: invoice.uid,
 
-      uri: invoice.uri,
+      uri: invoice.get('uri'),
 
       uid: invoice.uid,
 

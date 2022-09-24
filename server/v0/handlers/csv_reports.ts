@@ -4,9 +4,12 @@ import * as Joi from 'joi';
 import * as Boom from 'boom';
 
 import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';
+
 import { models } from '../../../lib';
 
-import { findAccount } from '../../../lib/account';
+import { findOne } from '../../../lib/orm';
+
+import { Account } from '../../../lib/account';
 
 export async function accountCSVReports(server) {
 
@@ -75,7 +78,7 @@ export async function accountCSVReports(server) {
         return Boom.unauthorized('invalid access token');
       }
 
-      let account = await findAccount(token.account_id)
+      let account = await findOne<Account>(Account, { where: { id: token.account_id }})
 
       let content = await buildAccountCsvReport(account)
 

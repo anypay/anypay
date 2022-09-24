@@ -5,27 +5,23 @@ import {Op} from 'sequelize'
 
 import * as moment from 'moment'
 
-import { coins, models, accounts, slack, log, utils } from '../../../lib';
+import { coins, models, accounts, slack, log } from '../../../lib';
 
-import { near } from '../../../lib/accounts'
+import { hash } from '../../../lib/bcrypt'
 
-export async function nearby(req, h) {
+function toKeyValueString(json: any): string {
 
-  try {
+  let entries = Object.entries(json)
 
-    let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
+  return entries.reduce((str, entry) => {
 
-    return { accounts }
+    return `${str}${entry[0]}=${entry[1]} `
 
-  } catch(error) {
-
-    log.error('api.v0.Accounts.nearby', error)
-
-    return h.badRequest(error)
-
-  }
+  }, '')
 
 }
+
+
 
 export async function update(req, h) {
 
@@ -33,7 +29,7 @@ export async function update(req, h) {
 
     let account = await accounts.updateAccount(req.account, req.payload);
 
-    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
+    slack.notify(`${account.email} updated their profile ${toKeyValueString(req.payload)}`)
 
     return {
 
@@ -60,7 +56,7 @@ export async function create (request, h) {
 
     log.info('create.account', email);
 
-    let passwordHash = await utils.hash(request.payload.password);
+    let passwordHash = await hash(request.payload.password);
 
     let account = await models.Account.create({
       email: request.payload.email,
@@ -71,7 +67,7 @@ export async function create (request, h) {
 
     if (geoLocation) {
 
-      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+      let userLocation = toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
       slack.notify(`${account.email} registerd from ${userLocation}`);
 
@@ -218,26 +214,3 @@ export async function show (request, h) {
 
   }
 };
-
-export async function index(request, h) {
-
-  try {
-
-    let limit = parseInt(request.query.limit) || 100;
-    
-    let offset = parseInt(request.query.offset) || 0;
-
-    var accounts = await models.Account.findAll({ offset, limit });
-
-    return accounts;
-
-  } catch(error) {
-
-    log.error('api.v0.Accounts.nearby', error)
-
-    return h.badRequest(error)
-
-  }
-
-};
-

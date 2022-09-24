@@ -75,13 +75,15 @@ export async function getDecodedTransaction(chain: string, txid: string): Promis
 
   log.info('blockchair.getDecodedTransaction', { chain, txid })
 
-  let { data } = await axios.get(`https://api.blockchair.com/${chain}/raw/transaction/${txid}`)
+  let { data: result } = await axios.get(`https://api.blockchair.com/${chain}/raw/transaction/${txid}`)
 
-  log.info('blockchair.getDecodedTransaction.result', { chain, txid, data: data.data })
+  const { data } = result
 
-  console.log(data.data[txid].decoded_raw_transaction)
+  log.info('blockchair.getDecodedTransaction.result', { chain, txid, result })
 
-  return data.data[txid].decoded_raw_transaction
+  console.log(data[txid].decoded_raw_transaction)
+
+  return data[txid].decoded_raw_transaction
 }
 
 export async function getRawTransaction(chain: string, txid: string): Promise<GetRawTransactionResult> {

@@ -1,11 +1,10 @@
 require("dotenv").config();
 
-import * as assert from 'assert';
-import * as Chance from 'chance';
+
 import {withEmailPassword} from '../../lib/account_login';
 import {registerAccount} from '../../lib/accounts';
 
-const chance = new Chance();
+import { expect, chance } from '../utils'
 
 describe('Account Login', () => {
 
@@ -18,9 +17,11 @@ describe('Account Login', () => {
 
       let account = await registerAccount(email, password);
 
-      assert(account.id > 0);
-      assert.strictEqual(account.email, email);
-      assert(account.password != password );
+      expect(account.id).to.be.a('number');
+
+      expect(account.email).to.be.equal(email);
+
+      expect(account.get('password')).to.be.not.equal(password)
     });
     
   });
@@ -28,18 +29,51 @@ describe('Account Login', () => {
   it("#withEmailPassword should automatically downcase an email", async () => {
 
     let email = chance.email();
+
     let password = chance.word();
 
     let account = await registerAccount(email, password);
 
     let token = await withEmailPassword(email.toUpperCase(), password);
 
-    assert(token);
-    assert.strictEqual(token.account_id, account.id);
-    assert(token.id > 0);
+    expect(token.get('account_id')).to.be.equal(account.id)
+
+    expect(token.id).to.be.a('number')
   });
 
+  it("#withEmailPassword should fail with an invalid password", (done) => {
+
+    let email = chance.email();
+
+    let password = chance.word();
+
+    registerAccount(email, password).then(() => {
+
+      return withEmailPassword(email, 'invalidBADPASSword')
+
+    })
+    .catch(error => {
+
+      console.log('CAUGHT', error)
+
+      expect(error.message).to.be.a('string')
+
+      done()
+
+    })
+
+  });
+
+  it("#withEmailPassword should fail with an invalid email", (done) => {
+
+    withEmailPassword('bad email', 'invalidBADPASSword').catch(error => {
+
+      expect(error.message).to.be.a('string')
+
+      done()
+
+    })
+
+  });
 
 });
-
-

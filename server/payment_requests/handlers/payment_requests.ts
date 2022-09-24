@@ -85,24 +85,26 @@ export async function create(req, h) {
 
       let invoice = await invoices.createEmptyInvoice(req.app_id)
 
-      invoice.currency = req.payload.template[0].currency
+      const update: any = {}
+
+      update.currency = req.payload.template[0].currency
 
       if (req.payload.options) {
 
-        invoice.webhook_url = req.payload.options.webhook
+        update.webhook_url = req.payload.options.webhook
 
-        invoice.redirect_url = req.payload.options.redirect
+        update.redirect_url = req.payload.options.redirect
 
-        invoice.secret = req.payload.options.secret
+        update.secret = req.payload.options.secret
 
-        invoice.metadata = req.payload.options.metadata
+        update.metadata = req.payload.options.metadata
 
       }
 
-      await invoice.save()
+      await invoice.update(update)
 
       record.invoice_uid = invoice.uid
-      record.uri = invoice.uri
+      record.uri = invoice.get('uri')
       record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
       record.status = 'unpaid'
 
@@ -112,7 +114,7 @@ export async function create(req, h) {
 
       log.info('pay.request.created', record.toJSON())
 
-      createWebhook(new Invoice(invoice))
+      createWebhook(invoice)
 
       return {
 

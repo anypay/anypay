@@ -1,18 +1,13 @@
 
+import { assert, account, v0AuthRequest } from '../utils'
+
 import { setAddress} from '../../lib/core';
 
-import { coins, accounts } from "../../lib";
-
-import { assert, server, chance } from '../utils'
+import { coins } from "../../lib";
 
 describe("Account Coins over HTTP", async () => {
-  var accessToken, account;
   
   before(async () => {
-
-    account = await accounts.registerAccount(chance.email(), chance.word());
-
-    accessToken = await accounts.createAccessToken(account.id);
 
     await setAddress({
       account_id: account.id,
@@ -31,12 +26,9 @@ describe("Account Coins over HTTP", async () => {
   it("GET /coins should return list of coins", async () => {
     try {
 
-      let response = await server.inject({
+      let response = await v0AuthRequest(account, {
         method: 'GET',
-        url: '/coins',
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
+        url: '/coins'
       });
 
       assert(response.result.coins);
@@ -53,12 +45,9 @@ describe("Account Coins over HTTP", async () => {
 
       await coins.deactivateCoin('DASH');
 
-      let response = await server.inject({
+      let response = await v0AuthRequest(account, {
         method: 'GET',
-        url: '/coins',
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
+        url: '/coins'
       });
 
       let dash = response.result.coins.find(c => c.code === 'DASH');
@@ -72,12 +61,9 @@ describe("Account Coins over HTTP", async () => {
       await coins.deactivateCoin('DASH');
       await coins.activateCoin('DASH');
 
-      let response = await server.inject({
+      let response = await v0AuthRequest(account, {
         method: 'GET',
-        url: '/coins',
-        headers: {
-          'Authorization': auth(accessToken.uid, "")
-        }
+        url: '/coins'
       });
 
       let dash = response.result.coins.find(c => c.code === 'DASH');
@@ -89,8 +75,3 @@ describe("Account Coins over HTTP", async () => {
   });
 
 })
-
-function auth(username, password) {
-  return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
-}
-

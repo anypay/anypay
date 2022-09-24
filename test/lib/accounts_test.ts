@@ -1,45 +1,27 @@
-require('dotenv').config();
 
-import * as assert from 'assert';
+import { account, expect } from '../utils'
 
-import { accounts, models } from '../../lib';
-
-import * as Chance from 'chance';
-
-const chance = Chance();
+import { createAccessToken, updateAccount } from '../../lib/accounts';
 
 describe("Accounts library", () => {
 
-  it("#setName should set the business name for an account", async () => {
+  it("#createAccessToken should create an access token for an account id", async () => {
 
-    let email = chance.email();
+    const token = await createAccessToken(account.id)
 
-    let account = await accounts.registerAccount(email, chance.word());
+    expect(token.get('account_id')).to.be.equal(account.id)
+  })
 
-    var businessName = 'Some Nice Grocery';
+  it("#update account should set the business name", async () => {
 
-    await accounts.setName(account.email, businessName);
+    const updated = await updateAccount(account, {
+      business_name: 'Taco Deli'
+    })
 
-    account = await models.Account.findOne({ where: { email }});
+    expect(updated.get('id')).to.be.equal(account.id)
 
-    assert.strictEqual(account.business_name, businessName);
+    expect(updated.get('business_name')).to.be.equal('Taco Deli')
 
-  });
-
-  it("#setPhysicalAddress should set the business address for an account", async () => {
-
-    let email = chance.email();
-
-    let account = await accounts.registerAccount(email, chance.word());
-
-    let physicalAddress = chance.address();
-
-    await accounts.setPhysicalAddress(account.email, physicalAddress);
-
-    account = await models.Account.findOne({ where: { email }});
-
-    assert.strictEqual(account.physical_address, physicalAddress);
-
-  });
+  })
 
 });

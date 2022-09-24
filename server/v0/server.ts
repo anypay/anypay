@@ -3,11 +3,11 @@ require('dotenv').config();
 
 import * as Hapi from "@hapi/hapi";
 
-const Inert = require('@hapi/inert');
+import * as Inert from '@hapi/inert';
 
-const Vision = require('@hapi/vision');
+import * as Vision from '@hapi/vision';
 
-const HapiSwagger = require("hapi-swagger");
+import * as HapiSwagger from 'hapi-swagger'
 
 import { config } from '../../lib/config'
 
@@ -21,7 +21,7 @@ import { join } from 'path'
 
 const Pack = require('../../package.json')
 
-const AuthBearer = require('hapi-auth-bearer-token');
+import * as AuthBearer from 'hapi-auth-bearer-token';
 
 import { log } from '../../lib/log';
 
@@ -44,33 +44,6 @@ import { models } from '../../lib'
 import { register as merchant_app } from './plugins/merchant_app'
 
 import { schema } from 'anypay'
-
-const kBadRequestSchema = Joi.object({
-  statusCode: Joi.number().integer().required(),
-  error: Joi.string().required(),
-  message: Joi.string().required()
-}).label('BoomError')
-
-function responsesWithSuccess({ model }) {
-  return {
-    'hapi-swagger': {
-      responses: {
-        200: {
-          description: 'Success',
-          schema: model
-        },
-        400: {
-          description: 'Bad Request',
-          schema: kBadRequestSchema,
-        },
-        401: {
-          description: 'Unauthorized',
-          schema: kBadRequestSchema,
-        },
-      },
-    },
-  }
-}
 
 const server = new Hapi.Server({
   host: process.env.HOST || "localhost",
@@ -339,7 +312,6 @@ async function Server() {
     }
   })
 
-
   server.route({
     method: 'GET',
     path: '/merchants/{account_id}',
@@ -369,8 +341,7 @@ async function Server() {
           invoice_id: Joi.string().required()
         }),
         failAction
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+      }
     }
   });
 
@@ -379,8 +350,7 @@ async function Server() {
     path: "/accounts/{id}", // id or email
     handler: v0.Accounts.showPublic,
     options: {
-      tags: ['api', 'v0', 'accounts'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
+      tags: ['api', 'v0', 'accounts']
     },
   });
 
@@ -393,8 +363,7 @@ async function Server() {
       validate: {
         payload: models.Invoice.Request,
         failAction
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+      }
     }
   });
 
@@ -430,15 +399,6 @@ async function Server() {
       handler: v0.Apps.create
     }
   });
-
-  server.route({
-    method: 'GET',
-    path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: v0.Accounts.nearby,
-    options: {
-      tags: ['api', 'v0']
-    }
-  }); 
 
   await attachV1Routes(server)
 

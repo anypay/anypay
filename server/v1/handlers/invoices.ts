@@ -19,12 +19,6 @@ interface InvoiceAdditions {
   register_id?: string;
 }
 
-export async function setInvoiceAdditions(invoice: Invoice, additions: InvoiceAdditions): Promise<Invoice> {
-
-  return invoice;
-
-}
-
 export async function show(request, hapi) {
 
   try {
@@ -33,7 +27,7 @@ export async function show(request, hapi) {
 
     if (!invoice) {
 
-      return hapi.response({ error: 'invoice not found' }).code(404)
+      throw new Error('invoice not found')
 
     }
 
@@ -61,7 +55,7 @@ export async function show(request, hapi) {
 
   } catch(error) {
 
-    console.error('invoic.show.error', error)
+    log.error('api.v0.invoices.show.error', error)
 
     return hapi.response({ error: error.message }).code(500)
 

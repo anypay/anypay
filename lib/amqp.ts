@@ -3,6 +3,8 @@ import {connect, Connection, Channel} from 'amqplib';
 var connection: Connection;
 var channel: Channel;
 
+import { config } from './config'
+
 var channelIsConnected = false;
 
 function wait(ms) {
@@ -47,15 +49,8 @@ export async function publishJson(channel, exchange, routingkey, json) {
 
 (async function() {
 
-  if (process.env.NODE_ENV === 'test') {
+  connection = await connect(config.get('amqp_url'));
 
-    connection = await connect(process.env.TEST_AMQP_URL);
-
-  } else {
-
-    connection = await connect(process.env.AMQP_URL);
-  }
- 
   channel = await connection.createChannel();  
 
   await channel.assertExchange('anypay.events', 'direct')

@@ -28,7 +28,7 @@ export async function getTransaction(txid: string): Promise<any> {
 
 }
 
-export function transformHexToPayments(hex: string): Payment[]{
+export function transformHexToPayments(hex: string): Payment[] {
 
   let tx = new bsv.Transaction(hex)
 
@@ -51,7 +51,7 @@ export function transformHexToPayments(hex: string): Payment[]{
 
       }
       
-    }else{
+    } else {
 
       payments.push({
 

@@ -1,7 +1,9 @@
 
 import { models } from './models'
 
-import { Orm } from './orm'
+import { Orm, create } from './orm'
+
+import { AccessToken } from './access_tokens';
 
 import * as bsv from 'bsv'
 
@@ -11,6 +13,9 @@ interface NewApp {
 }
 
 export class App extends Orm {
+
+  static model = models.App
+
 }
 
 export async function findApp(id: number): Promise<App> {
@@ -27,7 +32,7 @@ export async function findOne(where: any): Promise<App> {
   return new App(record)
 }
 
-export async function createApp(params: NewApp) {
+export async function createApp(params: NewApp): Promise<App> {
 
   let privkey = new bsv.PrivateKey()
 
@@ -51,14 +56,10 @@ export async function createApp(params: NewApp) {
 
 }
 
-export async function createAppToken(id) {
+export async function createAppToken(app: App): Promise<AccessToken> {
 
-  let app = await models.App.findOne({ where: { id }})
-
-  let token = await models.AccessToken.create({
-    account_id: app.account_id,
+  return create<AccessToken>(AccessToken, {
+    account_id: app.get('account_id'),
     app_id: app.id
   })
-
-  return token
 }

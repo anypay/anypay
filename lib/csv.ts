@@ -46,52 +46,6 @@ export async function getInvoicesByDates(accountId, start, end) {
   return invoices;
 }
 
-export async function getInvoices(invoiceUID: string) {
-
-  let invoice = await models.Invoice.findOne({ where: { uid: invoiceUID }});
-
-  if (!invoice) {
-    throw new Error(`invoice ${invoiceUID} not found`);
-  }
-
-  let account = await models.Account.findOne({
-    where: { id: invoice.account_id }
-  });
-
-  let invoices = await models.Invoice.findAll({
-
-    where: {
-
-      account_id: account.id,
-
-      complete: true,
-
-      completed_at: {
-
-        [Op.gt]: invoice.completed_at
-
-      }
-
-    },
-
-    order: [['createdAt', 'DESC']]
-
-  });
-
-  invoices = invoices.map(invoice => {
-
-    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    return invoice;
-
-  });
-
-  return invoices;
-
-}
-
 interface ReportInvoice {
 
   invoice_uid: string;
@@ -198,45 +152,6 @@ export async function buildReportCsvFromDates(accountId, start, end) {
 
   let filepath = join(__dirname,
   `../../.tmp/account-${accountId}-${start}-${end}.csv`);
-
-  return buildReportCsv(invoices, filepath);
-
-}
-
-export async function buildAllTimeReport(accountId) {
-
-  let invoices = await models.Invoice.findAll({
-    where: {account_id: accountId },
-    include: [{
-      model: models.AchBatch,
-      attributes: ['batch_id'],
-      as: 'ach_batch'
-    }, {
-
-      model: models.BitpaySettlement,
-
-      as: 'bitpay_settlement'
-    
-    }]
-  });
-
-  invoices = invoices.map(invoice => {
-    var i = invoice.toJSON();
-    i.created_at = moment(i.createdAt).format("MM/DD/YYYY");
-    return i;
-  });
-
-  let filepath = join(__dirname, `../../.tmp/account-${accountId}-complete-history.csv`);
-
-  return buildReportCsv(invoices, filepath);
-
-}
-
-export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<string> {
-
-  let invoices = await getInvoices(invoiceUid);
-
-  let filepath = join(__dirname, `../../.tmp/${invoiceUid}.csv`);
 
   return buildReportCsv(invoices, filepath);
 

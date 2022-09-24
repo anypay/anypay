@@ -13,6 +13,18 @@ export interface Record {
 
 }
 
+interface FindOne {
+
+  where: any;
+
+  order: any;
+
+  limit: number;
+
+  offset: number;
+
+}
+
 interface FindOrCreate {
 
   where: any;
@@ -37,13 +49,30 @@ export class Orm {
 
   }
 
-  get id() {
-    return this.get('id')
+  get id () {
+
+    return this.record.dataValues.id
   }
 
   static findOrCreate(params: FindOrCreate) {
 
     return Orm.model.findOrCreate(params)
+
+  }
+
+  static async findOne(params: FindOne): Promise<Orm> {
+
+    var record = await Orm.model.findOne(params)
+
+    if (!record) { return }
+
+    return new this(record)
+
+  }
+
+  static async create(params: any) {
+
+    return Orm.model.create(params)
 
   }
 

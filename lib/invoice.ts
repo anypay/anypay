@@ -24,6 +24,8 @@ import { computeInvoiceURI } from './uri';
 
 import { PaymentOption } from './payment_option';
 
+import { Invoice } from './invoices'
+
 interface Address {
   currency: string,
   value: string
@@ -33,10 +35,6 @@ async function getNewInvoiceAddress(accountId: number, currency: string, amount)
   var address;
 
   address = await plugins.getNewAddress(currency, accountId, amount);
-
-  if (!address) {
-    throw new Error(`unable to generate address for ${currency}`);
-  }
 
   return {
     currency,
@@ -56,11 +54,13 @@ interface EmptyInvoiceOptions {
   redirect_url?: string;
 }
 
-export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}) {
+export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}): Promise<Invoice> {
 
   var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url } = options
 
   uid = !!uid ? uid : shortid.generate();
+
+  amount = amount || 0
 
   let app = await models.App.findOne({ where: { id: app_id }})
 
@@ -73,7 +73,7 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     uid
   })
 
-  let record = await models.Invoice.create({
+  const record = await models.Invoice.create({
     app_id,
     account_id: app.account_id,
     uid,
@@ -87,9 +87,7 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     redirect_url
   })
 
-  console.log('__EMPTY RECORD', record)
-
-  return record;
+  return new Invoice(record)
 
 }
 

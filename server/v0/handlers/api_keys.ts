@@ -3,9 +3,9 @@ import { apikeys } from '../../../lib'
 
 export async function index(req, h) {
 
-  let merchant_api_key = await apikeys.getMerchantApiKey(req.account.id)
+  let { uid: merchant_api_key } = await apikeys.getMerchantApiKey(req.account)
 
-  let platform_api_key = await apikeys.getPlatformApiKey(req.account.id)
+  let { uid: platform_api_key } = await apikeys.getPlatformApiKey(req.account)
 
   return {
 

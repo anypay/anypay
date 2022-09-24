@@ -75,11 +75,11 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
 
 }
 
-export async function lockAddress(accountId: number, currency: string) {
+export async function lockAddress(account: Account, currency: string) {
 
   let address = await models.Address.findOne({ where: {
 
-    account_id: accountId,
+    account_id: account.id,
 
     currency
 
@@ -97,11 +97,11 @@ export async function lockAddress(accountId: number, currency: string) {
 
 }
 
-export async function unlockAddress(accountId: number, currency: string) {
+export async function unlockAddress(account: Account, currency: string) {
 
   let address = await models.Address.findOne({ where: {
 
-    account_id: accountId,
+    account_id: account.id,
 
     currency
 
@@ -109,7 +109,7 @@ export async function unlockAddress(accountId: number, currency: string) {
 
   if (!address) { 
 
-    throw new Error('address not found');
+    throw new AddressNotFound(account, currency)
 
   }
 
@@ -119,7 +119,7 @@ export async function unlockAddress(accountId: number, currency: string) {
 
 }
 
-class AddressNotFound implements Error {
+export class AddressNotFound implements Error {
   name = 'AddressNotFound'
   message = 'address not found'
 
@@ -164,6 +164,7 @@ export async function removeAddress(account: Account, currency: string): Promise
   }})
 
   if (!record) {
+    
     throw new Error('attempted to remove address that does not exist')
   }
 
@@ -196,6 +197,8 @@ export async function findAddress(account: Account, currency: string): Promise<A
 }
 
 export class Address extends Orm {
+
+  static model = models.Address
 
 }
 

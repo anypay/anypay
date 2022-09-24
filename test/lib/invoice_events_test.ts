@@ -177,20 +177,11 @@ describe('Invoice Events', () => {
         }
       })
 
-      let { paymentOptions } = await client.getPaymentOptions()
-
+      await client.getPaymentOptions()
 
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
 
       expect(events[0].get('wallet')).to.be.equal('edge')
-
-      const originalLength = events.length
-
-      await client.selectPaymentOption(paymentOptions[0])
-
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
- 
-      expect(events.length).to.be.equal(originalLength + 1)
 
     })
 

@@ -1,18 +1,15 @@
-import * as assert from 'assert'
-import {email, accounts} from '../../lib';
+
+import { assert, account } from '../utils'
+
+import {email} from '../../lib';
 import {setAddress} from '../../lib/core';
 import {createInvoice} from '../../lib/invoices';
 
-import * as Chance from 'chance';
-const chance = new Chance();
-
 describe("Emails when invoice is paid", ()=>{
 
-  var account,invoice1;
+  var invoice1;
 
   before(async()=>{
-
-    account = await accounts.create(chance.email(), chance.word())
 
     await setAddress({
       account_id:account.id,

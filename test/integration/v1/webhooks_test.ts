@@ -17,6 +17,8 @@ describe("Webhooks Default Endpoint", async () => {
 
     config.set('rocketchat_webhook_url', config.get('DEFAULT_WEBHOOK_URL'))
 
+    log.info('test.account.created', account)
+
     var response = await server.inject({
       method: 'POST',
       url: `/v1/api/test/webhooks`,

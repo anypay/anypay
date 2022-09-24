@@ -8,6 +8,8 @@ import { computeInvoiceURI } from './uri'
 import {getCoin} from './coins';
 
 import { BigNumber } from 'bignumber.js'
+import { Invoice } from './invoices';
+import { PaymentOption } from './payment_option';
 
 import { PaymentRequest } from './payment_requests';
 
@@ -27,6 +29,27 @@ export function writePaymentOptions(options: NewPaymentOption[]) {
 
   }))
 
+}
+
+export class PaymenOptionNotFoundError extends Error {}
+
+export async function ensurePaymentOption(invoice: Invoice, currency: string): Promise<PaymentOption> {
+
+  const record = await models.PaymentOption.findOne({ where: {
+    invoice_uid: invoice.get("uid"),
+    currency
+  }})
+
+  console.log('OPTION ENSURED?', record)
+  
+  if (!record) {
+  
+    throw new PaymenOptionNotFoundError()
+  
+  }
+
+  return new PaymentOption(invoice, record)
+  
 }
 
 

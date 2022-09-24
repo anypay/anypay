@@ -1,7 +1,7 @@
 
 import { models } from './models'
 
-import { Orm } from './orm'
+import { Orm, findAll, findOne } from './orm'
 
 import { setAddress } from './core'
 
@@ -16,26 +16,7 @@ interface SetAddress {
 
 export class Account extends Orm {
 
-  static model = models.Account;
-
-  static async findOne(where: any): Promise<Account> {
-
-    let record = await models.Account.findOne({ where })
-
-    if (!record) {
-    
-      throw new Error('record not found');
-
-    }
-
-    return new Account(record)
-
-  }
-
-  get id () {
-
-    return this.record.dataValues.id
-  }
+  static model = models.Account
 
   get email () {
 
@@ -62,7 +43,7 @@ export class Account extends Orm {
 
   async listPaidInvoices(): Promise<Invoice[]> {
 
-    let records = await models.Invoice.findAll({
+    return findAll<Invoice>(Invoice, {
       where: {
         status: 'paid',
         account_id: this.get('id'),
@@ -79,36 +60,15 @@ export class Account extends Orm {
 
       order: [['paidAt', 'desc']]
     })
-
-    return records.map(record => {
-
-      if (record.refund) {
-        console.log(record.toJSON())
-      }
-      return new Invoice(record)
-    })
-
   }
 
 }
-
-export class AccountNotFound implements Error {
-  name = 'AccountNotFound'
-  message = 'Account Not Found'
-}
-
 
 export async function findAccount(id: number): Promise<Account> {
 
-  let record = await models.Account.findOne({ where: { id }})
-
-  if (!record) {
-  
-    throw new AccountNotFound();
-
-  }
-
-  return new Account(record)
-
+  return findOne<Account>(Account, {
+    where: {
+      id
+    }
+  })
 }
-

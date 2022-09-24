@@ -25,14 +25,13 @@ class Plugins {
     let pluginsConfig = configurePlugins();
 
     Object.keys(pluginsConfig).forEach(key => {
+      
       let plugin = pluginsConfig[key];
 
       if (plugin) {
 
-      // assert(
-      //    (typeof plugin.createInvoice) === 'function',
-      //    'plugin must implement createInvoice'
-      //  );
+        // validate plugin here
+
       }
 
     });

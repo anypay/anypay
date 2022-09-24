@@ -1,5 +1,5 @@
 
-import {models} from './models';
+const { models } = require('./models')
 
 import { findAll, Orm } from './orm'
 

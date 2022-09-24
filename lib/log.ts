@@ -1,11 +1,13 @@
 
-const riverpig = require('riverpig')
-
-import { models } from './models'
+import * as riverpig from 'riverpig'
 
 import { publish } from './amqp'
 
 import { config } from './config'
+
+import { Event } from './events'
+
+import { create } from './orm'
 
 const lokiEnabled = config.get('loki_enabled')
 
@@ -13,20 +15,9 @@ interface NewLogger {
   namespace: string;
 }
 
-interface LogQuery {
-  type?: string;
-  payload?: any;
-  limit?: number;
-  offset?: number;
-  order?: 'asc' | 'desc';
-  error?: boolean;
-}
-
 import * as winston from 'winston';
 
-const transports = [
-  new winston.transports.Console({ level: 'debug' })
-]
+const transports = []
 
 if (config.get('loki_enabled') && config.get('loki_host')) {
 
@@ -50,8 +41,6 @@ if (config.get('loki_enabled') && config.get('loki_host')) {
   )
 
 }
-
-
 
 const loki = winston.createLogger({
   level: 'info',
@@ -81,9 +70,11 @@ class Logger {
 
     }
 
+    this.log.info(type, payload)
+
+
     if (config.get('NODE_ENV') !== 'test') {
 
-      this.log.info(type, payload)
 
       if (lokiEnabled) {
         loki.info(type, payload)
@@ -108,7 +99,7 @@ class Logger {
 
     }
 
-    return models.Event.create({
+    return create<Event>(Event, {
       namespace: this.namespace,
       type,
       payload,
@@ -124,7 +115,7 @@ class Logger {
 
     loki.error(error_type, error.message)
 
-    let record = await models.Event.create({
+    let record = await create<Event>(Event, {
       namespace: this.namespace,
       type: error_type,
       payload: { error: error.message },
@@ -142,37 +133,6 @@ class Logger {
     if (lokiEnabled) {
       loki.debug(type, payload)
     }
-
-  }
-
-  async read(query: LogQuery = {}) {
-
-    this.log.debug('log.read', query)
-
-    const where = {
-      namespace: this.namespace,
-      error: query.error || false
-    }
-
-    if (query.type) { where['type'] = query.type }
-
-    if (query.payload) { where['payload'] = query.payload }
-
-    const findAll = {
-
-      where,
-
-      limit: query.limit || 100,
-
-      offset: query.offset || 0,
-
-      order: [['createdAt', query.order || 'asc']]
-
-    }
-
-    let records = await models.Event.findAll(findAll)
-
-    return records;
 
   }
 

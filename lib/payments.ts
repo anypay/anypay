@@ -7,6 +7,10 @@ import { PaymentOption } from './payment_option'
 
 import { Orm } from './orm'
 
+import { ensurePaymentOption } from './payment_options';
+
+import { log } from './log';
+
 interface PaymentDetails {
   txid: string;
   currency: string;
@@ -72,34 +76,50 @@ export class Payment extends Orm {
 
 }
 
+export class MultiplePaymentsError extends Error {}
+
+export { PaymenOptionNotFoundError } from './payment_options'
+
 export async function recordPayment(invoice: Invoice, details: PaymentDetails): Promise<Payment> {
+
+  log.info('payments.recordPayment', { invoice_uid: invoice.get('uid'), details })
 
   let payment = await getPayment(invoice)
 
   if (payment) {
 
-    throw new Error('Multiple payments for invoice not allowed')
+    throw new MultiplePaymentsError()
+    
+  }
+  console.log('__PAYMENT GOT', payment)
+
+  const option = await ensurePaymentOption(invoice, details.currency)
+
+  console.log('__OPTION', option)
+
+  console.log('__INVOICE', invoice)
+
+  var record;
+
+  try {
+
+
+    record = await models.Payment.create(Object.assign(details, {
+      invoice_uid: invoice.get('uid'),
+      payment_option_id: option.id,
+      account_id: invoice.get('account_id')
+    }))
+
+
+  } catch(error) {
+
+    console.log('ERROR__', error)
+
   }
 
-  let option = await models.PaymentOption.findOne({ where: {
+  console.log('__RECORD', record)
 
-    invoice_uid: invoice.uid,
-
-    currency: details.currency  
-
-  }})
-
-  if (!option) {
-
-    throw new Error(`Currency ${details.currency} was not a Payment Option for Invoice ${invoice.uid}`)
-
-  }
-
-  let record = await models.Payment.create(Object.assign(details, {
-    invoice_uid: invoice.uid,
-    payment_option_id: option.id,
-    account_id: invoice.get('account_id')
-  }))
+  log.info('payments.recordPayment.result', record.toJSON())
 
   return new Payment({ record, invoice, option })
 

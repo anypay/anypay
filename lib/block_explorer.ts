@@ -1,15 +1,27 @@
 
+interface Payment {
+  currency: string;
+  txid: string;
+}
 
-export function getBlockExplorerTxidUrl(reward) {
+export function getBlockExplorerTxidUrl(payment: Payment): string {
 
-  switch (reward.currency) {
+  switch (payment.currency) {
 
+  case 'DOGE':
+    return `https://blockchair.com/dogecoin/transaction/${payment.txid}`
+  case 'BTC':
+    return `https://blockchair.com/bitcoin/transaction/${payment.txid}`
+  case 'LTC':
+    return `https://blockchair.com/litecoin/transaction/${payment.txid}`  
+  case 'XMR':
+    return `https://blockchair.com/monero/transaction/${payment.txid}`
   case 'BCH':
-    return  `https://explorer.bitcoin.com/bch/tx/${reward.txid}`;
+    return `https://blockchair.com/bitcoincash/transaction/${payment.txid}`
   case 'DASH':
-    return `https://live.blockcypher.com/dash/tx/${reward.txid}/`;
+    return `https://blockchair.com/dash/transaction/${payment.txid}`
   case 'BSV':
-    return `https://whatsonchain.com/tx/${reward.txid}`;
+    return `https://whatsonchain.com/tx/${payment.txid}`;
   }
   
 }

@@ -1,11 +1,7 @@
 
 export const currency = 'XMR'
 
-import * as bitcore from './bitcore'
-
 import { log } from '../../lib'
-
-export { bitcore }
 
 import axios from 'axios'
 

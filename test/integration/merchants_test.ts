@@ -19,4 +19,3 @@ describe("Merchants REST API", async () => {
   })
 
 });
-

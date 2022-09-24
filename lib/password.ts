@@ -1,24 +1,15 @@
-const bcrypt = require('bcryptjs');
+
+import { hash } from './bcrypt'
 
 import { models } from './models';
 
-const log = require('winston');
+import { log } from './log'
 
 import { config } from './config'
 
 const sender = config.get('EMAIL_SENDER')
 
 import  { ses } from './email'
-
-export function hash(password) {
-  return new Promise((resolve, reject) => {
-
-    bcrypt.hash(password, 10, (error, hash) => {
-      if (error) { return reject(error) }
-      resolve(hash);
-    })
-  });
-}
 
 export async function resetPasswordByEmail(email, newPassword) {
 
@@ -53,6 +44,8 @@ async function resetPassword(accountId, newPassword): Promise<boolean> {
 }
 
 export async function sendPasswordResetEmail(email) {
+
+
   return new Promise(async (resolve, reject) => {
 
     let passwordReset = await createPasswordReset(email);
@@ -78,7 +71,7 @@ export async function sendPasswordResetEmail(email) {
     }, (error, response) => {
       if (error) {
         log.error('error sending password reset email', error);
-        return reject(error)
+        return resolve(false)
       }
       log.info(`successfully set password reset email to ${email}`);
       resolve(response)
@@ -90,10 +83,4 @@ function createPasswordReset(email) {
 
   return models.PasswordReset.create({ email })
 }
-
-module.exports.resetPasswordById = resetPassword;
-module.exports.resetPasswordByEmail = resetPasswordByEmail;
-module.exports.sendPasswordResetEmail = sendPasswordResetEmail;
-module.exports.createPasswordReset = createPasswordReset;
-module.exports.hash = hash;
 

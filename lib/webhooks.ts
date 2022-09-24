@@ -7,17 +7,11 @@ import { config } from './config'
 
 import { Invoice } from './invoices'
 
-import { PaymentRequired } from 'get402'
+import { Account } from './account'
 
-import { Account, findAccount } from './account'
+import { findOne, Orm } from './orm'
 
-import { email } from 'rabbi'
-
-import { Orm } from './orm'
-
-import { findClient, createClient, Client } from './get_402'
-
-import * as http from 'superagent';
+import axios from 'axios'
 
 export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
@@ -41,7 +35,7 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
       let json = invoice.toJSON();
 
-      resp = await http.post(invoice.webhook_url).send(json);
+      resp = await axios.post(invoice.webhook_url, json);
 
       response_code = resp.statusCode; 
 
@@ -108,7 +102,7 @@ interface FindWebhook {
   invoice_uid: string
 }
 
-class WebhookNotFound implements Error {
+export class WebhookNotFound implements Error {
   name = 'WebhookNotFound'
   message = 'webhook not found for invoice uid'
 }
@@ -116,11 +110,6 @@ class WebhookNotFound implements Error {
 export class WebhookAlreadySent implements Error {
   name = 'WebhookAlreadySent'
   message = 'webhook already sent for this invoice'
-}
-
-export class ApiKeyPaymentRequired implements Error {
-  name = 'ApiKeyPaymentRequired'
-  message = 'webhook may not be sent without api key credits'
 }
 
 interface NewAttempt {
@@ -150,6 +139,8 @@ interface NewWebhook {
 
 export class Webhook extends Orm {
 
+  static model = models.Webhook;
+
   attempts: Attempt[];
 
   invoice: Invoice;
@@ -177,7 +168,7 @@ export class Webhook extends Orm {
 
   async getAccount(): Promise<Account> {
 
-    return findAccount(this.invoice.account_id)
+    return findOne<Account>(Account, { where: { id: this.invoice.account_id }})
 
   }
 
@@ -263,16 +254,6 @@ export async function createWebhook(invoice: Invoice): Promise<Webhook> {
 
 }
 
-export class WebhookFailed implements Error {
-  name = 'WebhookFailed'
-  message = 'webhook failed'
-  attempt: Attempt;
-
-  constructor(attempt: Attempt) {
-    this.attempt = attempt
-  }
-}
-
 export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
   if (webhook.success) {
@@ -298,7 +279,7 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
   try {
 
-    resp = await http.post(webhook.url).send(json);
+    resp = await axios.post(webhook.url, json);
 
     record.response_code = resp.statusCode; 
 
@@ -350,74 +331,6 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
 export interface ApiClient {
   identifier: string;
-}
-
-
-
-export class PaidWebhook {
-
-  client: Client;
-
-  webhook: Webhook
-
-  constructor(params: NewPaidWebhook) {
-
-    this.client = createClient(params.client.identifier);
-
-    this.webhook = params.webhook;
-
-  }
-
-  async attemptWebhook(): Promise<Attempt> {
-
-    try {
-
-      await this.client.chargeCredit({ credits: 1 })
-
-      return attemptWebhook(this.webhook)
-
-    } catch(error) {
-
-      if (error instanceof PaymentRequired) {
-
-        let account = await this.webhook.getAccount()
-
-        await email.sendEmail('get402-insufficient-funds', account.email, config.get('EMAIL_SENDER'))
-
-      }
-
-      throw error
-
-    }
-
-  }
-
-}
-
-interface NewPaidWebhook {
-  webhook: Webhook,
-  client: ApiClient
-}
-
-export function makePaidWebhook(params: NewPaidWebhook): PaidWebhook {
-
-  return new PaidWebhook(params)
-
-}
-export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWebhook> {
-
-  let account = await invoice.getAccount()
-
-  let client = await findClient(account)
-
-  if (!client) {
-
-    return null
-  }
-
-  let webhook = await findWebhook({ invoice_uid: invoice.uid })
-
-  return makePaidWebhook({ webhook, client })
 }
 
 interface ListOptions {

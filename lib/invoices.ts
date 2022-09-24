@@ -20,17 +20,13 @@ import { createPaymentOptions } from './invoice'
 
 import { publish } from './amqp'
 
-export class InvoiceNotFound implements Error {
-  name = 'InvoiceNotFound'
-  message = 'Invoice Not Found'
-}
+export class InvoiceNotFound extends Error {}
 
 export async function ensureInvoice(uid: string) {
 
   let record = await models.Invoice.findOne({
     where: { uid }
   })
-
 
   if (!record) { throw new InvoiceNotFound() }
 
@@ -65,18 +61,6 @@ export async function cancelInvoice(invoice: Invoice) {
 
   return invoice
 
-}
-
-export class InvalidWebhookURL implements Error {
-
-  name = 'InvalidWebhookURL'
-
-  message = 'webhook_url parameter must be a valid HTTPS URL'
-
-  constructor(invalidURL: string) {
-
-    this.message = `${this.message}: received ${invalidURL}`
-  }
 }
 
 export class Invoice extends Orm {

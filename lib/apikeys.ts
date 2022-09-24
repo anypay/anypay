@@ -1,48 +1,28 @@
 
-import { models } from './models'
 
-import { createApp, createAppToken } from './apps'
+import { createApp } from './apps'
 
-export async function getMerchantApiKey(account_id) {
+import { AccessToken, ensureAccessToken, ensureAppAccessToken } from './access_tokens'
 
-  let token = await models.AccessToken.findOne({
-    where: {
-      account_id
-    },
-    order: [["createdAt", "asc"]]
-  })
+import { Account } from './account'
 
-  if (!token) {
+export async function getMerchantApiKey(account: Account): Promise<AccessToken> {
 
-    token = await models.AccessToken.create({
-      account_id
-    })
-
-  }
-
-  return token.uid
+  return ensureAccessToken(account)
 
 }
 
-export async function getPlatformApiKey(account_id) {
+export async function getPlatformApiKey(account: Account): Promise<AccessToken> {
 
-  let app = await createApp({account_id, name: 'platform'})
+  const name = '@platform'
 
-  let token = await models.AccessToken.findOne({
-    where: {
-      account_id,
-      app_id: app.id
-    },
-    order: [["createdAt", "asc"]]
+  const account_id = account.id
+
+  const app = await createApp({
+    account_id,
+    name
   })
 
-  if (!token) {
-
-    token = await createAppToken(app.id)
-
-  }
-
-  return token.uid
+  return ensureAppAccessToken(app, account)
 
 }
-

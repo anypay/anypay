@@ -1,8 +1,7 @@
-require('dotenv').config()
-
-import { getMerchantApiKey, getPlatformApiKey } from '../../lib/apikeys'
 
 import { createAccount } from '../utils'
+
+import { getMerchantApiKey, getPlatformApiKey } from '../../lib/apikeys'
 
 describe('API Keys', () => {
 
@@ -10,7 +9,7 @@ describe('API Keys', () => {
 
     let account = await createAccount()
 
-    let key = await getMerchantApiKey(account.id)
+    let key = await getMerchantApiKey(account)
 
     console.log(key)
 
@@ -20,7 +19,7 @@ describe('API Keys', () => {
 
     let account = await createAccount()
 
-    let key = await getPlatformApiKey(account.id)
+    let key = await getPlatformApiKey(account)
 
     console.log(key)
 

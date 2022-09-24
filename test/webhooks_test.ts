@@ -1,34 +1,27 @@
 
-require('dotenv').config()
+import { assert, expect, spy } from './utils'
 
 import { email } from 'rabbi'
-
-import { assert, expect, chai, spy } from './utils'
 
 import * as utils from './utils'
 
 import * as http from 'superagent'
 
-import * as get402 from 'get402'
-
-import { createInvoice, InvalidWebhookURL } from '../lib/invoices'
+import { createInvoice } from '../lib/invoices'
 
 import { setAddress } from '../lib/addresses'
 
 import { Account } from '../lib/account'
+
 import { Invoice } from '../lib/invoices'
 
 import {
 
-  findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent,
-  ApiKeyPaymentRequired, makePaidWebhook, PaidWebhook, ApiClient,
+  findWebhook, Webhook, attemptWebhook, WebhookAlreadySent, PaidWebhook,
   getPaidWebhookForInvoice
 
 } from '../lib/webhooks'
 
-import { createClient, loadClientForAccount } from '../lib/get_402'
-
-import { models } from '../lib/models'
 
 describe('Getting Prices', () => {
 
@@ -61,7 +54,7 @@ describe('Getting Prices', () => {
         webhook_url
       })
 
-    ).to.be.eventually.rejectedWith(new InvalidWebhookURL(webhook_url))
+    ).to.be.eventually.rejected
 
   })
 

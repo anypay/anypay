@@ -7,6 +7,8 @@ import { models } from './models'
 
 export class PaymentOption extends Orm {
 
+  static model = models.PaymentOption;
+
   invoice: Invoice;
 
   constructor(invoice: Invoice, record: any) {
@@ -26,7 +28,7 @@ export class PaymentOption extends Orm {
   }
 
   get amount() {
-    return parseInt(this.record.dataValues['amount'])
+    return parseInt(this.get('amount'))
   }
 
 }
