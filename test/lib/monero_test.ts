@@ -16,7 +16,9 @@ import * as utils from '../utils'
 
 import { expect, spy } from '../utils'
 
-import * as plugin from '../../plugins/xmr'
+import { plugins } from '../../lib'
+
+const plugin = plugins('XMR')
 
 describe("Monero XMR", () => {
 

@@ -1,46 +1,55 @@
 
-import * as blockchair from '../../lib/blockchair';
+import { Plugin } from '../../lib/plugins'
 
-var WAValidator = require('anypay-wallet-address-validator');
+import { blockchair } from '../../lib'
 
-const doge = require('bitcore-doge-lib');
+import * as doge from 'bitcore-doge-lib'
 
+class PluginDoge extends Plugin {
 
-export { doge as bitcore }
+  currency = 'DOGE'
 
-export function validateAddress(address: string){
+  bitcore = doge
 
-  let valid = WAValidator.validate( address, 'DOGE')
+  async broadcastTx({ tx_hex }) {
 
-  return valid;
+    return blockchair.broadcastTx('dogecoin', tx_hex)
+  
+  }
 
+  async getTransaction(txid: string): Promise<string> {
+
+    return blockchair.getTransaction('LTC', txid)
+  }
+  
+  transformAddress({ value: address }): string {
+
+    if (address.match(':')) {
+
+      address = address.split(':')[1]
+
+    }
+
+    return address;
+
+  }
+
+  validateAddress(address: string){
+
+    try {
+
+      new doge.Address(address)
+    
+      return true
+
+    } catch(error) {
+
+      throw new Error('Invalid DOGE address.')
+
+    }
+
+  }
+  
 }
 
-export async function getNewAddress(record) {
-  return record.value;
-}
-
-import { BroadcastTxResult } from '../../lib/plugins'
-
-import { oneSuccess } from 'promise-one-success'
-
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
-
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
-
-    blockchair.publish('dogecoin', rawTx)
-
-  ]
-
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
-
-}
-
-const currency = 'DOGE';
-
-export {
-
-  currency
-
-}
-
+export default new PluginDoge('')

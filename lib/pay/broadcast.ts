@@ -1,52 +1,22 @@
-import * as http from 'superagent'
+
+import { Trace } from '../trace'
 
 import { log } from '../log'
 
-export interface BroadcastResult {
-  provider: string,
-  txid: string,
-  hex: string,
-  metadata?: any,
-  error?: Error
-}
+import { BroadcastTransactionResult } from '../plugins'
 
-async function broadcastBlockchair(currency: string, hex: string): Promise<BroadcastResult> {
+import plugins from '../plugins'
 
-  log.info('blockchair.broadcast', {currency, hex})
+export async function broadcast(currency:string, hex:string): Promise<BroadcastTransactionResult> {
 
-  let resp = await http.get(`https://api.blockchair.com/${currency}/push/transaction?data=${hex}`)
+  const trace = Trace()
 
-  log.info('blockchair.broadcast.response', Object.assign(resp, {
-    currency, hex
-  }))
+  log.info('pay.broadcast', { currency, hex, trace})
 
-  return Object.assign(resp, { provider: 'blockchair' })
-}
+  const result = plugins(currency).broadcastTx(hex)
 
-export async function broadcast(currency:string, hex:string): Promise<BroadcastResult> {
-  var result;
+  log.info('pay.broadcast.result', { currency, hex, trace })
 
-  switch (currency) {
-  case 'BTC':
-
-    result = await broadcastBlockchair('bitcoin', hex) 
-
-    return result
-  case 'LTC':
-
-    result = await broadcastBlockchair('litecoin', hex) 
-
-    return result
-  case 'DOGE':
-
-    result = await broadcastBlockchair('dogecoin', hex) 
-
-    return result
-  case 'ZEC':
-
-    result = await broadcastBlockchair('zcash', hex) 
-
-    return result
-  }
+  return result 
 
 }

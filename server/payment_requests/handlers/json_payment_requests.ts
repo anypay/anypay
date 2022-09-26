@@ -1,9 +1,7 @@
 
-import { models, log } from '../../../lib'
+import { log } from '../../../lib'
 
-import { detectWallet, buildPaymentRequestForInvoice, getCurrency } from '../../../lib/pay';
-
-import { submitPayment } from '../../../lib/pay/json_v2/protocol'
+import { buildPaymentRequestForInvoice, getCurrency } from '../../../lib/pay';
 
 import * as Hapi from 'hapi';
 
@@ -34,48 +32,6 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
   response.header('Accept', 'application/payment');
 
   return response;
-
-}
-
-export async function create(req, h) {
-
-  try {
-
-    const currency = req.params.currency.toUpperCase()
-
-    let invoice_uid = req.params.uid
-
-    let transactions = req.payload.transactions;
-
-    let wallet = detectWallet(req.headers, req.params.uid)
-
-    for (let transaction of transactions) {
-
-      models.PaymentSubmission.create({
-        invoice_uid,
-        txhex: transaction,
-        headers: req.headers,
-        wallet,
-        currency
-      })
-    }
-
-    let response = await submitPayment({
-      currency,
-      invoice_uid,
-      transactions,
-      wallet
-    })
-
-    return response
-
-  } catch(error) {
-
-    log.error('http.payment_requests.JsonPaymentRequests.create', error)
-
-    return h.badRequest(error)
-
-  }
 
 }
 

@@ -67,9 +67,63 @@ describe("Setting Addresses Via REST", async () => {
       }
     })
 
+    console.log('__RESULT', response.result)
+
     expect(response.result['BTC']).to.be.equal(address)
 
   })
 
-})
+  it("GET /account_addresses should return a list of account addresses", async () => {
 
+    const account = await utils.generateAccount()
+
+    var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
+
+    await v0AuthRequest(account, {
+      method: 'PUT',
+      url: '/addresses/BTC',
+      payload: {
+        address
+      }
+    })
+
+    var response = await v0AuthRequest(account, {
+      method: 'GET',
+      url: '/account_addresses',
+      payload: {
+        address
+      }
+    })
+
+    console.log('__RESULT', response.result.addresses[0])
+
+    expect(response.result.addresses[0].value).to.be.equal(address)
+
+  })
+
+
+  it("DELETE /addresses/DASH should remove the DASH address", async () => {
+
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    await v0AuthRequest(account, {
+      method: 'PUT',
+      url: '/addresses/DASH',
+      payload: {
+        address: address
+      }
+    })
+
+    const response = await v0AuthRequest(account, {
+      method: 'DELETE',
+      url: '/addresses/DASH',
+      payload: {
+        address: address
+      }
+    })
+
+    expect(response.statusCode).to.be.equal(200)
+
+  })
+
+})

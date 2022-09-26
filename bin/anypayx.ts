@@ -6,7 +6,7 @@ import * as program from 'commander'
 
 const prompt = require("prompt-async");
 
-import { loginAccount } from '../lib/accounts/registration'
+import { loginAccount } from '../lib/registration'
 
 import { ensureAccessToken } from '../lib/access_tokens'
 

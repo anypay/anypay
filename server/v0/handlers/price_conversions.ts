@@ -11,9 +11,9 @@ export async function show(req, h) {
 
   };
 
-  let conversion = await createConversion(inputAmount, req.params.newcurrency);
+  let conversion = await createConversion(inputAmount, req.params.newcurrency)
 
-  return {conversion};
+  return {conversion}
 
 }
 

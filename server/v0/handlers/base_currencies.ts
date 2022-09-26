@@ -1,23 +1,11 @@
 
-const Fixer = require('../../../lib/prices/fixer');
+import { fetchCurrencies } from '../../../lib/prices/fixer'
 
-export async function index(req, h) {
+export async function index(h) {
 
-  var currencies = await Fixer.getCurrencies();
+  var currencies = await fetchCurrencies();
 
-  var rates = currencies.rates;
-
-  let sortedCurrencies = Object.keys(rates).sort();
-
-  currencies.rates = sortedCurrencies.reduce((map, key) => {
-
-    map[key] = rates[key];
-
-    return map;
-
-  }, {});
-
-  return currencies;
+  return currencies
 
 }
 

@@ -1,5 +1,5 @@
 
-import { geolocateAccountFromRequest, registerAccount } from '../../../lib/accounts/registration'
+import { geolocateAccountFromRequest, registerAccount } from '../../../lib/registration'
 
 import { ensureAccessToken } from '../../../lib/access_tokens'
 

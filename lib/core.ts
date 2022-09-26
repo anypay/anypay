@@ -1,8 +1,8 @@
 require('dotenv').config();
 
-import {plugins} from './plugins';
+import plugins from './plugins';
 
-import * as bsv from 'bsv';
+import { Plugin } from './plugins'
 
 import { log } from './log'
 
@@ -23,47 +23,21 @@ interface AddressChangeSet {
 
 import {models} from "./models";
 
-import {getPaymail as bsvGetPaymail} from '../plugins/bsv';
-
-async  function getPaymail(currency, address) {
-
-  if (currency !== 'BSV') {
-    return null;
-  }
-
-  let paymail = await bsvGetPaymail(address);
-
-  if (paymail) {
-
-    try {
-
-      new bsv.Address(address); 
-
-      return null;
-
-    } catch(error) {
-
-      return address;
-
-    }
-
-  }
-
-}
+import { getPaymail } from '../plugins/bsv'
 
 export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
-  let plugin = await plugins.findForCurrency(changeset.currency);
+  let plugin: Plugin = plugins(changeset.currency);
 
-  let paymail = await getPaymail(changeset.currency, changeset.address);
+  let paymail = await getPaymail(changeset.address);
 
   changeset.paymail = paymail;
 
   if (plugin.transformAddress) {
 
-    changeset.address = await plugin.transformAddress(changeset.address);
+    changeset.address = await plugin.transformAddress({ value: changeset.address });
 
   }
 
@@ -72,7 +46,6 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
     isValid = await plugin.validateAddress(changeset.address);
 
   }
-
 
   if(!isValid){
   

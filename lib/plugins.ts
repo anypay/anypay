@@ -1,111 +1,96 @@
-require("dotenv").config();
 require('bitcore-lib')
 
-import configurePlugins from "../config/plugins";
+import { join } from 'path'
 
-import { models } from './';
-
-export interface BroadcastTxResult {
-  txid: string;
-  txhex: string;
-  success: boolean;
-  result: any;
+interface BraodcastTransaction {
+  tx_hex: string;
+  tx_id?: string;
+  tx_key?: string;
 }
 
-class Plugins {
+export interface PluginImplementation {
 
-  plugins: any;
+  broadcastTx(params: BraodcastTransaction): Promise<BroadcastTransactionResult>;
 
-  constructor() {
-    this.load();
-  }
+  getTransaction?(txid: string): Promise<string>;
 
-  load() {
+  transformAddress?({ value }: { value: string }): string;
 
-    let pluginsConfig = configurePlugins();
-
-    Object.keys(pluginsConfig).forEach(key => {
-      
-      let plugin = pluginsConfig[key];
-
-      if (plugin) {
-
-        // validate plugin here
-
-      }
-
-    });
-
-    this.plugins = pluginsConfig;
-  }
-
-  find(currency: string): Plugin {
-    return this.findForCurrency(currency)
-  }
-
-  findForCurrency(currency: string) {
-
-    if (!this.plugins[currency]) {
-
-      throw new Error(`no plugin for currency ${currency}`);
-
-    }
-
-    let { plugin } = new Plugin(currency, this.plugins[currency]);
-
-    return plugin;
-
-  }
-
-  async getNewAddress(currency: string, accountId: number, amount) {
-
-    let address = await models.Address.findOne({ where: {
-
-      currency,
-
-      account_id: accountId 
-
-    }});
-
-    if (!address) {
-      throw new Error(`${currency} address not found for account ${accountId}`);
-    }
-
-    if(!this.plugins[currency].getNewAddress){
-
-      return address.value
-
-    } else {
-
-      return await this.plugins[currency].getNewAddress(address, amount);
-    }
-
-  }
-
-}
-
-class Plugin {
-  currency: string;
-  plugin: any;
-  database?: any;
-  env?: any;
-
-  constructor(currency: string, plugin?: any) {
-
-    this.currency = currency;
-    this.plugin = plugin;
-  }
-
-  getTransaction(txid) {
-    return this.plugin.getTransaction(txid)
-  }
+  validateAddress?(address: string): boolean;
   
 }
 
-const plugins = new Plugins();
+abstract class AbstructPlugin implements PluginImplementation {
+  
+  currency: string;
 
-plugins.load();
+  bitcore?: any;
 
+  abstract getTransaction(txid: string): Promise<string>;
 
-export {plugins};
+  abstract broadcastTx(params: BraodcastTransaction): Promise<BroadcastTransactionResult>;
 
+  abstract getNewAddress({ value }: { value: string }): Promise<string>;
+
+  abstract transformAddress({ value }: { value: string }): string;
+
+  abstract validateAddress(address: string): boolean;
+  
+}
+
+export abstract class Plugin extends AbstructPlugin {
+
+  constructor(currency?: string) {
+
+    super()
+
+    if (currency) {
+
+      this.currency = currency
+
+    }
+
+    plugins[this.currency] = this
+  }
+
+  getNewAddress({ value }) { return value }
+
+  transformAddress({ value }) { return value }
+
+}
+
+export interface BroadcastTransactionResult {
+
+  tx_hex: string;
+  
+  tx_id: string;
+
+  currency: string;
+
+  chain: string;
+
+  success: boolean;
+
+}
+
+type PluginsMap = {
+  [key: string]: Plugin | any;
+}
+
+const plugins: PluginsMap = {}
+
+export default function(currency: string) {
+
+  return plugins[currency]
+
+}
+
+require('require-all')({
+
+  dirname: join(__dirname, '../plugins'),
+
+  recursive: true,
+
+  filter:  /index.ts$/
+
+});

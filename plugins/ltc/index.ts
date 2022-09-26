@@ -1,28 +1,45 @@
 
 import * as blockchair from '../../lib/blockchair'
 
-const ltc = require('litecore-lib');
+import { Plugin } from '../../lib/plugins';
 
-export { ltc as bitcore }
+const bitcore = require('litecore-lib');
 
-export const currency = 'LTC'
 
-export async function getNewAddress(record) {
-  return record.value;
+class PluginLTC extends Plugin {
+
+  currency = 'LTC'
+
+  bitcore
+
+  async broadcastTx({ tx_hex }) {
+
+    return blockchair.broadcastTx('litecoin', tx_hex)
+  
+  }
+
+  async getTransaction(txid: string): Promise<string> {
+
+    return blockchair.getTransaction('LTC', txid)
+  }
+
+  validateAddress(address: string){
+
+    try {
+
+      new bitcore.Address(address)
+    
+      return true
+
+    } catch(error) {
+
+      throw new Error(`Invalid ${this.currency} address.`)
+
+    }
+
+  }
+  
 }
 
-import { BroadcastTxResult } from '../../lib/plugins'
+export default new PluginLTC('LTC')
 
-import { oneSuccess } from 'promise-one-success'
-
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
-
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
-
-    blockchair.publish('litecoin', rawTx)
-
-  ]
-
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
-
-}

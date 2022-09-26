@@ -4,6 +4,8 @@ import { detectWallet } from '../../../lib/pay'
 
 import { badRequest, notFound } from 'boom'
 
+
+
 import { getInvoice } from '../../../lib/invoices'
 import { log } from '../../../lib/log'
 

@@ -1,14 +1,11 @@
-const Boom = require('boom');
 
 const _ = require('lodash')
 
 import { Op } from 'sequelize';
 
-import {plugins} from '../../../lib/plugins';
+import { log, models, invoices } from '../../../lib';
 
-import { log, email, models, invoices } from '../../../lib';
-
-import { Account } from '../../../lib/account';
+import { findAccount } from '../../../lib/account';
 
 import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
 
@@ -29,7 +26,7 @@ export async function cancel(req, h) {
 
     log.error('invoice.notfound', new Error(JSON.stringify(where)))
 
-    return Boom.notFound()
+    return h.notFound()
 
   }
 
@@ -51,28 +48,13 @@ export async function cancel(req, h) {
 
 }
 
-export async function index (request, reply) {
-
-  /*
-
-    QUERY OPTIONS
-
-      - offset
-      - limit
-      - status
-      - complete
-      - start_date_created
-      - end_date_created
-      - start_date_completed
-      - end_date_completed
-
-  */
+export async function index (request, h) {
 
   let query = {
 
     where: {
 
-      account_id: request.auth.credentials.accessToken.account_id,
+      account_id: request.account.id
 
     },
 
@@ -140,13 +122,13 @@ export async function index (request, reply) {
 
   var invoices = await models.Invoice.findAll(query);
 
-  return { invoices };
+  return h.response({ invoices });
 
 };
 
 export async function create(request, h) {
 
-  const account = new Account(request.account)
+  const account = request.account
 
   try {
 
@@ -185,6 +167,8 @@ export async function create(request, h) {
 
   } catch(error) {
 
+    console.error('__ERROR', error)
+
     log.error('api.v0.invoices.create', error)
 
     return h.badRequest(error)
@@ -193,68 +177,6 @@ export async function create(request, h) {
 
 }
 
-export async function createPublicInvoice(account_id, payload) {
-  var currency;
-
-  if (!(payload.amount > 0)) {
-    throw new Error('amount must be greater than zero');
-  }
-
-  let addresses = await models.Address.findAll({ where: {
-
-    account_id
-
-  }});
- 
-  let addressesMap = addresses.reduce((set, record) => {
-
-    set[record.currency] = record.value;
-    return set;
-  }, {});
-
-  if (addressesMap['BCH']) {
-    currency = 'BCH';
-  } else if (addressesMap['DASH']) {
-    currency = 'DASH';
-  } else if (addressesMap['BSV']) {
-    currency = 'BSV';
-  } else {
-    currency = addresses[0].currency;
-  }
-
-  let plugin = await plugins.findForCurrency(currency);
-
-  let invoice = await plugin.createInvoice(account_id, payload.amount);
-
-  invoice.redirect_url = payload.redirect_url;
-
-  invoice.webhook_url = payload.webhook_url;
-
-  invoice.external_id = payload.external_id;
-
-  invoice.is_public_request = true;
-
-  invoice.email = payload.email;
-
-  await invoice.save();
-
-  if (invoice.email) {
-    await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.email}`,
-      invoice_uid: invoice.uid,
-    });
-  }
-
-  invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-  let sanitized = sanitizeInvoice(invoice);
-
-  return Object.assign({
-    invoice: sanitized,
-    payment_options: invoice.payment_options
-  }, sanitized);
-
-}
 
 async function getPaymentOptions(invoice_uid) { 
 
@@ -278,12 +200,13 @@ async function getPaymentOptions(invoice_uid) {
 
 }
 
-export async function createPublic (request, reply) {
+export async function createPublic (request, h) {
 
-  let response = await createPublicInvoice(
-    request.params.account_id, request.payload);
+  request.is_public_request = true
 
-  return response;
+  request.account = await findAccount(request.params.account_id)
+
+  return create(request, h)
 
 }
 
@@ -298,7 +221,7 @@ function sanitizeInvoice(invoice) {
   return resp;
 }
 
-export async function show(request, reply) {
+export async function show(request, h) {
 
   let invoiceId = request.params.invoice_id;
 
@@ -342,30 +265,3 @@ export async function show(request, reply) {
   }
 
 }
-
-export async function shareEmail(req, h) {
-
-  log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
-
-  let invoice = await models.Invoice.findOne({
-    where: {
-      uid: req.params.uid
-    }
-  });
-
-  if (!invoice) {
-
-    log.error('no invoice found', new Error(`invoice ${req.params.uid} not found`));
-
-    throw new Error('invoice not found')
-
-  } else {
-
-    await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
-
-    return { success: true }
-
-  }
-
-}
-

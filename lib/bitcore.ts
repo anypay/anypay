@@ -1,9 +1,9 @@
 
-import { plugins } from './plugins'
+import plugins from './plugins'
 
 export function getBitcore(currency) {
 
-  let plugin = plugins.findForCurrency(currency)
+  let plugin = plugins(currency)
 
   if (!plugin.bitcore) {
 

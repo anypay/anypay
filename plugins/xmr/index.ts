@@ -10,11 +10,8 @@ import { Client } from 'payment-protocol'
 import { config } from '../../lib/config'
 
 import { v4 as uuid } from 'uuid'
-import { Transaction, Tx } from '../../lib/pay/json_v2/protocol'
-import { other_rpc } from './json_rpc'
-import { Invoice } from '../../lib/invoices'
-import { getPayment, Payment } from '../../lib/payments'
-import get_block from './json_rpc/get_block'
+import { Transaction } from '../../lib/pay/json_v2/protocol'
+import { BroadcastTransactionResult, Plugin } from '../../lib/plugins'
 
 export async function validateAddress({ value }: { value: string }): Promise<Boolean> {
 
@@ -28,16 +25,74 @@ export async function validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promis
 
 }
 
+class PluginXMR extends Plugin {
 
+  async getTransaction(txid: string): Promise<string> {
 
+    const result = await call('gettransaction', [txid])
 
-export async function broadcastTx({ tx, tx_hash, tx_key }: Tx): Promise<SendRawTransactionResult> {
+    return result
+  
+  }
 
-  return send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
+  async broadcastTx({ tx_hex, tx_hash, tx_key }): Promise<BroadcastTransactionResult> {
+
+    let result = await send_raw_transaction({ tx_as_hex: tx_hex, do_not_relay: false })
+
+    if (result.sanity_check_failed) {
+      throw new Error(result.reason)
+    }
+  
+    if (result.double_spend) {
+      throw new Error('double spend')
+    }
+  
+    if (result.too_big) {
+      throw new Error('too big')
+    }
+  
+    if (result.status === 'Failed') {
+      throw new Error(result.reason)
+    }
+  
+    if (result.status !== 'OK') {
+      throw new Error(result.reason)
+    }
+  
+    return {
+      
+      tx_id: tx_hash,
+
+      success: true,
+
+      chain: 'XMR',
+
+      currency: 'XMR',
+
+      tx_hex
+    }
+
+  }
+
+  validateAddress(address: string): boolean {
+
+    return true
+  }
 
 }
 
-import { default as pool_send_raw_transaction, Outputs as SendRawTransactionResult, Inputs as SendRawTransaction } from './other_rpc/send_raw_transaction'
+export default new PluginXMR('XMR')
+
+interface SendRawTransaction {
+  tx_as_hex,
+  do_not_relay
+}
+
+import { default as pool_send_raw_transaction, Outputs as SendRawTransactionResult } from './other_rpc/send_raw_transaction'
+import { Invoice } from '../../lib/invoices'
+import { getPayment, Payment } from '../../lib/payments'
+import get_block from './json_rpc/get_block'
+import { other_rpc } from './json_rpc'
 
 export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<SendRawTransactionResult> {
 

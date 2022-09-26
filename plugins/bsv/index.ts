@@ -1,8 +1,5 @@
-require('dotenv').config()
 
-import * as  bchaddr from 'bchaddrjs';
-
-import * as bsv from 'bsv';
+import * as bitcore from 'bsv';
 
 import { fromSatoshis } from '../../lib/pay'
 
@@ -20,17 +17,9 @@ interface Payment {
   invoice_uid?: string;
 }
 
-export async function getTransaction(txid: string): Promise<any> {
-
-  let tx_hex = await whatsonchain.getTransaction(txid)
-
-  return new bsv.Transaction(tx_hex)
-
-}
-
 export function transformHexToPayments(hex: string): Payment[] {
 
-  let tx = new bsv.Transaction(hex)
+  let tx = new bitcore.Transaction(hex)
 
   let payments = [];
 
@@ -71,34 +60,13 @@ export function transformHexToPayments(hex: string): Payment[] {
 }
 
 
-import { BroadcastTxResult } from '../../lib/plugins'
+import { BroadcastTransactionResult } from '../../lib/plugins'
 
 import { oneSuccess } from 'promise-one-success'
 import { blockchair } from '../../lib';
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
-
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
-
-    taal.broadcastTransaction(rawTx),
-
-    blockchair.publish('bitcoin-sv', rawTx),
-
-    run.broadcastTx(rawTx)
-
-  ]
-
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
-
-}
-
-
-var toLegacyAddress = bchaddr.toLegacyAddress;
-var isCashAddress = bchaddr.isCashAddress;
 
 const polynym = require('polynym');
-
-var WAValidator = require('anypay-wallet-address-validator');
 
 export async function getPaymail(alias: string) {
 
@@ -122,63 +90,66 @@ export async function getPaymail(alias: string) {
 
 }
 
+import { Plugin } from '../../lib/plugins'
 
-export async function transformAddress(alias: string){
+class PluginBSV extends Plugin {
 
-  try {
+  currency = 'BSV'
 
-    try{
-            
-      if( isCashAddress(alias) ){
-      
-        return toLegacyAddress(alias)
+  bitcore = bitcore
 
-      }
+  async broadcastTx({ tx_hex }) {
 
+    const broadcastProviders: Promise<BroadcastTransactionResult>[] = [
 
-    }catch(err){
+      taal.broadcastTransaction(tx_hex),
+  
+      blockchair.broadcastTx('bitcoin-sv', tx_hex),
+  
+      run.broadcastTx(tx_hex)
+  
+    ]
+  
+    return oneSuccess<BroadcastTransactionResult>(broadcastProviders)
+  
+  
+  }
+  async getTransaction(txid: string): Promise<any> {
+
+    let tx_hex = await whatsonchain.getTransaction(txid)
+  
+    return new bitcore.Transaction(tx_hex)
+  
+  }
+  
+  transformAddress({ value: address }): string {
+
+    if (address.match(':')) {
+
+      address = address.split(':')[1]
 
     }
 
-    if (alias.match(':')) {
+    return address;
 
-      alias = alias.split(':')[1];
+  }
+
+  validateAddress(address: string){
+
+    try {
+
+      new bitcore.Address(address)
+    
+      return true
+
+    } catch(error) {
+
+      throw new Error('Invalid PluginBSV address.')
 
     }
 
-    alias = alias.split('?')[0];
-
-    return (await polynym.resolveAddress(alias)).address;
-
-  } catch(error) {
-    throw new Error('invalid BSV address');
   }
-
+  
 }
 
-
-export async function getNewAddress(params){
-
-  if (params.paymail && params.paymail.match('handcash.io')) {
-
-    let resolved = await polynym.resolveAddress(params.paymail)
-
-    return resolved.address
-
-  } else {
-
-    return params.value;
-
-  }
-
-}
-
-export function validateAddress(address: string){
-
-  let valid = WAValidator.validate( address, 'bitcoin')
-
-  return valid;
-
-}
-
-export { bsv as bitcore }
+export default new PluginBSV('BSV')

@@ -1,10 +1,14 @@
-require('dotenv').config()
 
 import axios from 'axios'
 import { log } from '../../../lib'
 import { BroadcastTxResult } from '../../../lib/plugins'
 
 class TaalBroadcastTransactionError extends Error {}
+
+import { log } from '../../../lib/log'
+import { BroadcastTransactionResult } from '../../../lib/plugins'
+
+import { Trace } from '../../../lib/trace'
 
 export async function getTransaction(txid: string): Promise<string> {
 
@@ -24,12 +28,14 @@ export async function getTransaction(txid: string): Promise<string> {
 
 }
 
-export async function broadcastTransaction(rawTx: string): Promise<BroadcastTxResult> {
+export async function broadcastTransaction(tx_hex: string): Promise<BroadcastTransactionResult> {
 
-  log.info('bsv.taal.broadcastTransaction', { rawTx })
+  const trace = Trace()
 
-  let response = await axios.post(`https://api.taal.com/api/v1/broadcast`, {
-    rawTx
+  log.info('bsv.taal.broadcastTransaction', { tx_hex, trace })
+
+  let { data } = await axios.post(`https://api.taal.com/api/v1/broadcast`, {
+    tx_hex
   }, {
     headers: {
       'Authorization': process.env.TAAL_API_KEY,
@@ -37,25 +43,8 @@ export async function broadcastTransaction(rawTx: string): Promise<BroadcastTxRe
     }
   })
 
-  const { data } = response
+  log.info('bsv.taal.broadcastTransaction.result', { tx_hex, data, trace })
 
-  log.info('bsv.taal.broadcastTransaction.result', { rawTx, data })
-
-  if (response.status > 300) {
-
-    const error = new TaalBroadcastTransactionError(response.data)
-
-    log.error('bsv.taal.broadcastTransaction.error', error)
-
-    throw error
-  }
-
-  return {
-    success: true,
-    result: data,
-    txid: data,
-    txhex: rawTx
-  }
+  return data
 
 }
-

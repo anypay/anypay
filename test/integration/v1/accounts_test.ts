@@ -38,6 +38,8 @@ describe('Integration | Accounts', () => {
         url: `/v1/api/account/events?order=${order}`
       })
 
+      console.log(response)
+
       var [event1, event2] = response.result.events
 
       expect(event2.id).to.be.greaterThan(event1.id)
@@ -48,6 +50,8 @@ describe('Integration | Accounts', () => {
         method: 'GET',
         url: `/v1/api/account/events?order=${order}`
       })
+
+      console.log(response)
 
       var [event3, event4] = response.result.events
 

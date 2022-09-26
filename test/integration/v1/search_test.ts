@@ -1,8 +1,5 @@
 import { auth, expect, account, newInvoice } from '../../utils'
 
-import { search, SearchResult } from '../../../lib/search'
-import { recordPayment } from '../../../lib/payments'
-
 const tx = {
   currency: 'BSV',
   chain: 'BSV',
@@ -39,7 +36,6 @@ describe("Searching", async () => {
       }
     })
 
-    console.log(result)
 
     expect(result.result.length).to.be.equal(1)
 

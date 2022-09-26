@@ -11,7 +11,7 @@ import { log } from '../../log'
 
 import { Protocol } from './schema'
 
-import { plugins } from '../../plugins'
+import plugins from '../../plugins'
 
 import { models } from '../../models'
 
@@ -75,7 +75,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    let plugin = await plugins.findForCurrency(payment.currency)
+    let plugin = plugins(payment.currency)
 
     for (const transaction of payment.transactions) {
 
@@ -174,7 +174,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    let plugin = await plugins.findForCurrency(payment.currency)
+    let plugin = plugins(payment.currency)
 
     if (plugin.validateUnsignedTx) {
 

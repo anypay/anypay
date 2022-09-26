@@ -10,6 +10,10 @@ import { join } from 'path'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
+import { failAction } from '../handlers'
+
+import * as Joi from 'joi'
+
 export function attach(server: Hapi.Server) {
 
   /* Set Alternate Headers To Avoid BIP70 Binary vs JSON Data Type Conflict */
@@ -104,6 +108,72 @@ export function attach(server: Hapi.Server) {
     handler: handlers.PaymentRequests.show 
   })
 
+  
+  server.route({
+    method: "GET",
+    path: "/i/{uid}",
+    handler: handlers.Jsonv2Protocol.listPaymentOptions,
+    options: {
+      tags: ['api', 'platform', 'jsonv2'],
+      validate: {
+        headers: Joi.object({
+          'x-paypro-version': Joi.number().integer().required(),
+          'accept': Joi.string().pattern(/application\/payment-options/).required()
+        }).unknown(),
+        params: Joi.object({
+          uid: Joi.string().required()
+        }),
+        failAction
+      }
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/i/{uid}",
+    handler: handlers.Jsonv2Protocol.handlePost,
+    options: {
+      tags: ['api', 'platform', 'jsonv2'],
+      validate: {
+        headers: Joi.object({
+          'x-paypro-version': Joi.number().integer().required(),
+          'x-content-type': Joi.alternatives([
+            Joi.string().pattern(/application\/payment-request/).required(),
+            Joi.string().pattern(/application\/payment-verification/).required(),
+            Joi.string().pattern(/application\/payment/).required(),
+          ]).required()
+        }).unknown(),
+        params: Joi.object({
+          uid: Joi.string().required()
+        }),
+        failAction
+      }
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/r/{uid}",
+    handler: handlers.Jsonv2Protocol.handlePost,
+    options: {
+      tags: ['api', 'platform', 'jsonv2'],
+      validate: {
+        headers: Joi.object({
+          'x-paypro-version': Joi.number().integer().required(),
+          'x-content-type': Joi.alternatives([
+            Joi.string().pattern(/application\/payment-request/).required(),
+            Joi.string().pattern(/application\/payment-verification/).required(),
+            Joi.string().pattern(/application\/payment/).required(),
+          ]).required()
+        }),
+        params: Joi.object({
+          uid: Joi.string().required()
+        }),
+        failAction
+      }
+    },
+  });
+
   /* PAYMENT SUBMISSION */
 
   server.route({
@@ -129,44 +199,4 @@ export function attach(server: Hapi.Server) {
   return server
 
 }
-
-async function Server() {
-
-  var server = new Hapi.Server({
-    host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8000,
-    routes: {
-      cors: true,
-      validate: {
-        options: {
-          stripUnknown: true
-        }
-      },
-    }
-  })
-
-  attach(server)
-
-  return server
-
-}
-
-async function start(): Promise<Hapi.Server> {
-
-  let server = await Server()
-
-  await server.start()
-
-  log.info(`hapi.server.started`, server.info)
-
-  return server
-
-}
-
-if (require.main === module) {
-
-  start()
-}
-
-export { Server, start }
 

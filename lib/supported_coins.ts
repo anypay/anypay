@@ -1,6 +1,6 @@
-import {models} from '../models';
+import {models} from './models';
 
-import { getCoins } from '../coins';
+import { getCoins } from './coins';
 
 export async function getSupportedCoins(accountId: number): Promise<any> {
 

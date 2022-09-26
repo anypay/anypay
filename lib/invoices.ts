@@ -247,7 +247,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   await createWebhook(invoice)
 
-  await createPaymentOptions(account.record, invoice)
+  await createPaymentOptions(account, invoice)
 
   log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 

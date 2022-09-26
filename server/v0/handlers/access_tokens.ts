@@ -7,55 +7,45 @@ var geoip = require('geoip-lite');
 
 export async function create(request, h) {
 
-  try {
+  let token = request.auth.credentials.accessToken;
 
-    let token = request.auth.credentials.accessToken;
+  token.account = request.auth.credentials.account;
 
-    token.account = request.auth.credentials.account;
+  const ip = request.info.remoteAddress
 
-    const ip = request.info.remoteAddress
+  let login = {
+    account_id: token.account_id,
+    ip_address: request.info.remoteAddress,
+    user_agent: request.headers['User-Agent'] || request.headers['user-agent']
+  }
 
-    let login = {
-      account_id: token.account_id,
-      ip_address: request.info.remoteAddress,
-      user_agent: request.headers['User-Agent'] || request.headers['user-agent']
-    }
+  let geolocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
 
-    let geolocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+  if (geolocation) {
 
-    if (geolocation) {
-
-      login = Object.assign(login, { geolocation })
-
-    }
-
-    await models.Login.create(login)
-
-    log.info('user.login', {
-      payload: {
-        ip,
-        token: token.uid
-      },
-      account_id: token.account.id
-    })
-
-    return h.response({
-
-      uid: token.uid,
-
-      account_id: token.account_id,
-
-      email: request.auth.credentials.account.email
-
-    })
-
-  } catch(error) {
-
-    log.error('api.v0.AccessTokens.create', error)
-
-    return h.badRequest(error)
+    login = Object.assign(login, { geolocation })
 
   }
+
+  await models.Login.create(login)
+
+  log.info('user.login', {
+    payload: {
+      ip,
+      token: token.uid
+    },
+    account_id: token.account.id
+  })
+
+  return h.response({
+
+    uid: token.uid,
+
+    account_id: token.account_id,
+
+    email: request.auth.credentials.account.email
+
+  })
 
 }
 

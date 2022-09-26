@@ -79,7 +79,7 @@ export async function sendPasswordResetEmail(email) {
   })
 }
 
-function createPasswordReset(email) {
+export function createPasswordReset(email) {
 
   return models.PasswordReset.create({ email })
 }

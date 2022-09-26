@@ -1,8 +1,9 @@
+
 import { models } from '../../../lib';
 
 export async function index(req, h) {
 
-  let grab_and_go_items = await models.Product.findAll({
+  let products = await models.Product.findAll({
 
     where: {
 
@@ -12,7 +13,7 @@ export async function index(req, h) {
 
   });
 
-  return { grab_and_go_items }
+  return { products }
 
 }
 

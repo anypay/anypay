@@ -15,8 +15,6 @@ import { HealthPlugin } from 'hapi-k8s-health'
 
 import { attachV1Routes } from '../v1/routes';
 
-import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
-
 import { join } from 'path'
 
 const Pack = require('../../package.json')
@@ -33,13 +31,11 @@ const auth = requireDirectory('../auth')
 
 import { accountCSVReports } from './handlers/csv_reports';
 
-import * as payreq from '../payment_requests/server'
+import * as payreq from '../payment_requests/plugin'
 
 import { v0, failAction } from '../handlers'
 
 import * as Joi from 'joi';
-
-import { models } from '../../lib'
 
 import { register as merchant_app } from './plugins/merchant_app'
 
@@ -209,8 +205,6 @@ async function Server() {
   })
 
   payreq.attach(server)
-
-  attachJsonV2(server)
   
   await merchant_app(server)
 
@@ -345,14 +339,7 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: "GET",
-    path: "/accounts/{id}", // id or email
-    handler: v0.Accounts.showPublic,
-    options: {
-      tags: ['api', 'v0', 'accounts']
-    },
-  });
+
 
   server.route({
     method: "POST",
@@ -361,7 +348,9 @@ async function Server() {
     options: {
       tags: ['api', 'v0', 'invoices'],
       validate: {
-        payload: models.Invoice.Request,
+        payload: Joi.object({
+
+        }),
         failAction
       }
     }
@@ -412,14 +401,32 @@ async function Server() {
     }
   }); 
 
-  server.route({
-    method: 'GET',
-    path: '/_metrics',
-    handler: v0.Prometheus.show,
-    options: {
-      auth: "prometheus"
-    }
-});
+  const prometheus_auth_required = config.get('prometheus_auth_required')
+
+  console.log('_PAUTH', {prometheus_auth_required})
+
+  if (prometheus_auth_required) {
+
+    server.route({
+      method: 'GET',
+      path: '/_metrics',
+      handler: v0.Prometheus.show,
+      options: {
+        auth: "prometheus"
+      }
+    });
+
+  } else {
+
+    server.route({
+      method: 'GET',
+      path: '/_metrics',
+      handler: v0.Prometheus.show
+    });
+
+  }
+
+
 
   return server;
 

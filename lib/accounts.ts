@@ -2,7 +2,7 @@
 
 import { log } from './log';
 
-import { getAddress, getSupportedCoins } from './accounts/supported_coins';
+import { getAddress, getSupportedCoins } from './supported_coins';
 
 import { Account } from './account';
 

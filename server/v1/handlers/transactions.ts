@@ -1,17 +1,15 @@
 
-import { plugins } from '../../../lib/plugins'
+import plugins from '../../../lib/plugins'
 
 import { log } from '../../../lib'
 
 import { badRequest } from 'boom'
 
-// broadcast transaction
-
 export async function create(req, h) {
 
   try {
 
-    let plugin = plugins.findForCurrency(req.payload.chain)
+    let plugin = plugins(req.payload.chain)
 
     let result = await plugin.broadcast(req.payload.transaction)
 

@@ -14,7 +14,7 @@ export async function create(req, h: ResponseToolkit) {
     }
   })
 
-  if (!invoice) { throw new Error('invoice not found') }
+  if (!invoice) { return h.badRequest(new Error('invoice not found')) }
 
   let note = await models.InvoiceNote.create({
     invoice_uid: invoice.uid,

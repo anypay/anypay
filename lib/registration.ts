@@ -1,19 +1,19 @@
 
 import { Request } from 'hapi'
 
-import { Account } from '../account'
+import { Account } from './account'
 
 import * as geoip from 'geoip-lite'
 
-import * as slack from '../slack/notifier'
+import * as slack from './slack'
 
-import { hash } from '../bcrypt'
+import { hash } from './bcrypt'
 
-import { models } from '../models'
+import { models } from './models'
 
-import { log } from '../log'
+import { log } from './log'
 
-import { compare } from '../bcrypt'
+import { compare } from './bcrypt'
 
 interface NewAccount {
   email: string;
@@ -128,7 +128,13 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   try {
 
-    await compare(params.password, account.password_hash);
+    let valid = await compare(params.password, account.password_hash);
+
+    if (!valid) {
+      
+      throw new Error('invalid login')
+
+    }
 
   } catch(error) {
 

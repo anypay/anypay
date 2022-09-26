@@ -1,76 +1,87 @@
 
-require('dotenv').config();
-
 import * as blockchair from '../../lib/blockchair'
 
 import {log} from '../../lib';
 
-const bch: any = require('bitcore-lib-cash');
-
-export { bch as bitcore }
+const bitcore: any = require('bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');
 
-import { BroadcastTxResult } from '../../lib/plugins'
+import { BroadcastTransactionResult } from '../../lib/plugins'
 
 import { oneSuccess } from 'promise-one-success'
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+import { Plugin } from '../../lib/plugins'
 
-    blockchair.publish('bitcoin-cash', rawTx)
+class PluginBCH extends Plugin {
 
-  ]
+  currency = 'BCH'
 
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
+  bitcore = bitcore
 
-}
+  async broadcastTx({ tx_hex }): Promise<BroadcastTransactionResult> {
 
-function validateAddress(address: string) {
+    const broadcastProviders: Promise<BroadcastTransactionResult>[] = [
 
-  try {
+      blockchair.broadcastTx('bitcoin-cash', tx_hex)
+  
+    ]
+  
+    return oneSuccess<BroadcastTransactionResult>(broadcastProviders)
+  
+  }
 
-    new bch.HDPublicKey(address);
+  async getTransaction(txid: string) {
 
-    log.debug('plugins.bch.hdpublickey.valid', address)
+    return blockchair.getTransaction('BCH', txid)
+  
+  }
+  
+  transformAddress({ value: address }): string {
 
-    return true;
+    if (address.match(':')) {
 
-  } catch(error) {
+      address = address.split(':')[1]
 
-    log.debug('plugins.bch.hdpublickey.invalid', error)
+    }
+
+    return address;
 
   }
 
-  try {
+  validateAddress(address: string){
 
-    var isCashAddress = bchaddr.isCashAddress
+    try {
 
-    let valid = isCashAddress(address)
-
-    return valid;
-
-  } catch(error) {
-
-    return false;
-
+      new bitcore.HDPublicKey(address);
+  
+      log.debug('plugins.bch.hdpublickey.valid', address)
+  
+      return true;
+  
+    } catch(error) {
+  
+      log.debug('plugins.bch.hdpublickey.invalid', error)
+  
+    }
+  
+    try {
+  
+      var isCashAddress = bchaddr.isCashAddress
+  
+      let valid = isCashAddress(address)
+  
+      return valid;
+  
+    } catch(error) {
+  
+      return false;
+  
+    }
+  
   }
-
+  
 }
 
-export async function getNewAddress(record: any) {
-
-  return record.value;
-
-}
-
-const currency = 'BCH';
-
-export {
-
-  currency,
-
-  validateAddress
-
-};
+export default new PluginBCH('BCH')

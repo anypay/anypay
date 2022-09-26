@@ -1,5 +1,5 @@
 
-import { loginAccount, geolocateAccountFromRequest } from '../../../lib/accounts/registration'
+import { loginAccount, geolocateAccountFromRequest } from '../../../lib/registration'
 
 import { ensureAccessToken } from '../../../lib/access_tokens'
 
@@ -12,6 +12,8 @@ export async function create(request, h) {
   try {
 
     account = await loginAccount(request.payload)
+
+    console.log("__LOGIN", account)
 
   } catch(error) {
 

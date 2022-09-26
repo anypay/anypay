@@ -1,6 +1,8 @@
 
 import { Server } from '@hapi/hapi'
 
+import * as Joi from 'joi'
+
 import { create, show, destroy } from '../handlers/kraken_api_keys'
 
 export async function register(server: Server) {
@@ -10,7 +12,14 @@ export async function register(server: Server) {
     path: '/kraken_api_keys',
     handler: create,
     options: {
-      auth: "token"
+      auth: "token",
+      validate: {
+        payload: Joi.object({
+          api_key: Joi.string().required(),
+          api_secret: Joi.string().required()
+        })
+        .required()
+      }
     }
   }); 
 

@@ -5,15 +5,13 @@ import { cancelInvoice, Invoice } from '../../../lib/invoices'
 
 import { show as handleBIP70 } from './bip70_payment_requests'
 
-import { show as handleJsonV2 } from './json_payment_requests'
-
 import { show as handleBIP270 } from './bip270_payment_requests'
 
 import { detectWallet } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
-import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
+import { listPaymentOptions } from './jsonv2_protocol'
 
 import { createWebhook } from '../../../lib/webhooks'
 
@@ -165,8 +163,6 @@ export async function show(req, h) {
 
     let isBIP270 = /bitcoinsv-paymentrequest$/
 
-    let isJsonV2 = /application\/payment-request$/
-
     let accept = req.headers['accept']
 
     if (accept && accept.match(/payment-options/)) {
@@ -180,10 +176,6 @@ export async function show(req, h) {
     } else if (accept && accept.match(isBIP70)) {
 
       return handleBIP70(req, h)
-
-    } else if (accept && accept.match(isJsonV2)) {
-
-      return handleJsonV2(req, h)
 
     } else {
 

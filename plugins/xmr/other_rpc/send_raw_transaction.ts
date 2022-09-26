@@ -11,6 +11,7 @@ export interface Inputs {
 }
 
 export interface Outputs {
+    sanity_check_failed?: boolean;
     double_spend: boolean;
     fee_too_low:boolean;
     invalid_input: boolean;

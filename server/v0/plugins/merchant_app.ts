@@ -30,7 +30,7 @@ export async function register(server: Server) {
       tags: ['api', 'v0', 'wordpress']
     }
   });
-
+  
 
   server.route({
     method: "POST",
@@ -39,7 +39,12 @@ export async function register(server: Server) {
     options: {
       auth: "password",
       tags: ['api', 'v0', 'sessions'],
-      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
+      validate: {
+        payload: Joi.object({
+          email: Joi.string().required(),
+          password: Joi.string().required()
+        })
+      }
     }
   });
 
@@ -188,6 +193,16 @@ export async function register(server: Server) {
       }
     }
   });
+
+  server.route({
+    method: "GET",
+    path: "/accounts/{id}", // id or email
+    handler: v0.Accounts.showPublic,
+    options: {
+      tags: ['api', 'v0', 'accounts']
+    },
+  });
+
   server.route({
     method: "GET",
     path: "/account",
@@ -210,6 +225,20 @@ export async function register(server: Server) {
   });
 
   server.route({
+    method: "POST",
+    path: "/accounts",
+    handler: v0.Accounts.create,
+    options: {
+      tags: ['api', 'v0', 'accounts'],
+      validate: {
+        payload: models.Account.Credentials,
+        failAction
+      },
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
+    },
+  });
+
+  server.route({
     method: "GET",
     path: "/coins",
     handler: v0.Coins.list,
@@ -225,12 +254,7 @@ export async function register(server: Server) {
     path: "/password-resets",
     handler: v0.Passwords.reset,
     options: {
-      tags: ['api', 'v0', 'accounts'],
-      validate: {
-        payload: v0.Passwords.PasswordReset,
-        failAction
-      },
-      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
+      tags: ['api', 'v0', 'accounts']
     }
   });
 
@@ -239,12 +263,7 @@ export async function register(server: Server) {
     path: "/password-resets/{uid}",
     handler: v0.Passwords.claim,
     options: {
-      tags: ['api', 'v0', 'accounts'],
-      validate: {
-        payload: v0.Passwords.PasswordResetClaim,
-        failAction
-      },
-      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
+      tags: ['api', 'v0', 'accounts']
     }
   });
 
@@ -254,7 +273,12 @@ export async function register(server: Server) {
     handler: v0.Denominations.update,
     options: {
       tags: ['api', 'v0', 'accounts'],
-      auth: "token"
+      auth: "token",
+      validate: {
+        payload: Joi.object({
+          denomination: Joi.string().required()
+        })
+      }
     }
   });
 
@@ -274,7 +298,12 @@ export async function register(server: Server) {
     options: {
       auth: "token",
       tags: ['api', 'v0', 'firebase'],
-      handler: v0.FirebaseTokens.create
+      handler: v0.FirebaseTokens.create,
+      validate: {
+        payload: Joi.object({
+          firebase_token: Joi.string().required()
+        })
+      }
     }
   });
 
@@ -284,7 +313,12 @@ export async function register(server: Server) {
     options: {
       auth: "token",
       tags: ['api', 'v0', 'firebase'],
-      handler: v0.FirebaseTokens.update
+      handler: v0.FirebaseTokens.update,
+      validate: {
+        payload: Joi.object({
+          firebase_token: Joi.string().required()
+        })
+      }
     }
   });
 
@@ -306,43 +340,14 @@ export async function register(server: Server) {
     }
   });
 
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/share/email",
-    handler: v0.Invoices.shareEmail,
-    options: {
-      tags: ['api', 'v0', 'invoices'],
-      validate: {
-        payload: Joi.object({
-          email: Joi.string().email().required()
-        }),
-        failAction
-      }
-    }
-  });
-
   server.route({
     method: "GET",
-    path: "/grab_and_go_items",
+    path: "/products",
     handler: v0.Products.index,
     options: {
+      auth: "token",
       tags: ['api', 'v0', 'grab-and-go']
     }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/accounts",
-    handler: v0.Accounts.create,
-    options: {
-      tags: ['api', 'v0', 'accounts'],
-      validate: {
-        payload: models.Account.Credentials,
-        failAction
-      },
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
-    },
   });
 
   server.route({
@@ -361,7 +366,13 @@ export async function register(server: Server) {
     handler: v0.BittrexApiKeys.create,
     options: {
       tags: ['api', 'v0', 'bittrex'],
-      auth: "token"
+      auth: "token",
+      validate: {
+        payload: Joi.object({
+          api_key: Joi.string().required(),
+          api_secret: Joi.string().required()
+        })
+      }
     }
   }); 
 

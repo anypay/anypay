@@ -3,13 +3,59 @@
 import { models } from '../../lib/models'
 
 import { log } from '../../lib/log'
+import { config } from '../../lib/config'
 
 export async function auth(request, username, password, hapi) {
+
+  const authRequired = config.get('prometheus_auth_required')
+
+  console.log('__AUTH REQUIRED', authRequired)
+
+  if (!authRequired) {
+
+    return {
+      isValid: true,
+
+      credentials: {
+
+        public: true
+      }
+    }
+
+  }
 
   if (username.toLowerCase() !== 'prometheus') {
     return {
       isValid: false
     }
+  }
+
+  if (config.get('prometheus_password')) {
+
+    if (password === config.get('prometheus_password')) {
+
+      return {
+
+        isValid: true,
+
+        credentials: {
+
+          public: true
+
+        }
+
+      }
+
+    } else {
+
+      return {
+
+        isValid: false
+        
+      }
+
+    }
+
   }
 
   let prometheusApp = await models.App.findOne({

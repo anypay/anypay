@@ -1,17 +1,22 @@
-require("dotenv").config();
 
-import {plugins} from '../../lib/plugins';
-import * as assert from 'assert';
+import { expect } from '../utils'
+
+import plugins from '../../lib/plugins'
 
 describe("Plugins", () => {
 
   it('should load all the plugins', async () => {
 
-    let plugin = await plugins.findForCurrency('BCH');
+    let plugin = plugins('LTC')
 
-    assert.strictEqual(plugin.currency, 'BCH');
+    expect(plugin.currency).to.be.equal('LTC')
 
-  });
+    const address = '123455'
+
+    expect(plugin.transformAddress({value: address})).to.be.equal(address)
+
+    expect(plugin.getNewAddress({value: address})).to.be.equal(address)
+
+  })
 
 })
-

@@ -263,7 +263,9 @@ export function authHeaders(username:string, password:string, headers: any = {})
 }
 
 import { Wallet } from 'anypay-simple-wallet'
+
 import { getBitcore } from '../lib/bitcore';
+
 import { Payment, recordPayment } from '../lib/payments';
 import { createHash } from 'crypto';
 import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';

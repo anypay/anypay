@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { notify } from '../../lib/slack/notifier';
+import { notify } from '../../lib/slack';
 
 import { Actor } from 'rabbi';
 

@@ -13,7 +13,7 @@ import {
   AccountAlreadyRegisteredError,
 
 
-} from '../lib/accounts/registration'
+} from '../lib/registration'
 
 import { passwordResetEmail } from '../lib/password_reset'
 

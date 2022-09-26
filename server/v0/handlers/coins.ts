@@ -35,16 +35,8 @@ export async function list(request, h) {
 
   let coins = Object.values(accountCoins);
 
-  return h.response({
-    'coins': sortBCHFirst(coins)
-  })
-}
-
-function sortBCHFirst(data) {
-
-  data.sort(function(x,y){ return x.code == 'BCH' ? -1 : y.code == 'BCH' ? 1 : 0; });
-
-  return data
+  return h.response({ coins })
+  
 }
 
 const Coin = Joi.object({

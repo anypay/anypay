@@ -7,6 +7,8 @@ import axios from 'axios'
 import { getBitcore } from './bitcore'
 import { BroadcastTxResult } from './plugins'
 
+import { BroadcastTransactionResult } from './plugins'
+
 const COIN_MAP = {
   'LTC': 'litecoin',
   'BTC': 'bitcoin',
@@ -24,31 +26,34 @@ export const CURRENCIES = {
   'BCH': 'bitcoin-cash',
   'DASH': 'dash',
   'ZEC': 'zcash',
-  'DOGE': 'doge'
+  'DOGE': 'doge' 
 }
 
-export async function publish(coin, hex): Promise<BroadcastTxResult> {
+export async function broadcastTx(currency:string, tx_hex: string): Promise<BroadcastTransactionResult> {
 
   /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
 
   try {
 
-    let resp = await http.post(`https://api.blockchair.com/${coin}/push/transaction`).send({
-      data: hex
+    let resp = await http.post(`https://api.blockchair.com/${currency}/push/transaction`).send({
+      data: tx_hex
     });
 
-    log.info(`blockchair.push.transaction.${coin}`, resp);
+    log.info(`blockchair.push.transaction.${currency}`, resp);
+
+    const tx_id = resp.body.data.transaction_hash;
 
     return {
-      txhex: hex,
-      txid: resp.body.data.transaction_hash,
-      success: true,
-      result: resp.body
+      tx_id,
+      tx_hex,
+      currency,
+      chain: currency,
+      success: true
     }
 
   } catch(error) {
 
-    log.error(`blockchair.push.transaction.${coin}.error`, error);
+    log.error(`blockchair.push.transaction.${currency}.error`, error);
 
     console.log(error)
 

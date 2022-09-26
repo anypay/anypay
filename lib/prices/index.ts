@@ -49,14 +49,11 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
   };
 };
 
-export class PriceNotFoundError implements Error {
+export class PriceNotFoundError extends Error {
 
   name = "PriceNotFoundError"
   message = "price not found for pair"
 
-  constructor(input, output) {
-    this.message = `price not found to convert ${input} to ${output}`
-  }
 }
 
 async function convert(inputAmount: Amount, outputCurrency: string, precision: number = 2): Promise<Amount> {
@@ -96,7 +93,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
 
     if (!inverse) {
 
-      throw new PriceNotFoundError(inputAmount.currency, outputCurrency)
+      throw new PriceNotFoundError()
 
     }
 

@@ -1,7 +1,5 @@
 const password = require("../../../lib/password")
 
-import * as Joi from 'joi'
-
 import { models } from '../../../lib';
 
 export async function reset (request, h) {
@@ -19,7 +17,7 @@ export async function claim(request, h) {
   })
 
   if (!passwordReset) {
-    return { success: false }
+    return h.notFound()
   }
 
   await password.resetPasswordByEmail(passwordReset.email, request.payload.password);
@@ -27,17 +25,3 @@ export async function claim(request, h) {
   return { success: true };
 
 }
-
-export const PasswordReset = Joi.object({
-  email: Joi.string().required(),
-}).label('PasswordReset');
-
-export const PasswordResetClaim = Joi.object({
-  password: Joi.string().min(1).required(),
-}).label('PasswordResetClaim');
-
-export const PasswordResetResponse = Joi.object({
-  success: Joi.boolean().required(),
-  error: Joi.string(),
-}).label('PasswordResetResponse');
-

@@ -7,11 +7,26 @@ describe('lib/webhooks', () => {
 
   it('#webhookForInvoice should return the webhook for an invoice', async () => {
 
+    try {
+
     const invoice = await newInvoice()
+
+    console.log('new invoice', invoice)
 
     const webhook = await webhookForInvoice(invoice)
 
+    console.log('webhook', webhook)
+
+
     expect(webhook).to.be.not.equal(null)
+
+
+    } catch(error) {
+
+      console.error('NIV_', error)
+
+      throw error
+    }
 
   })
 

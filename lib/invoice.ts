@@ -1,5 +1,3 @@
-import {plugins} from './plugins';
-
 import { BigNumber } from 'bignumber.js';
 
 import { Account } from './account'
@@ -30,18 +28,6 @@ interface Address {
   currency: string,
   value: string
 }
-
-async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<Address> {
-  var address;
-
-  address = await plugins.getNewAddress(currency, accountId, amount);
-
-  return {
-    currency,
-    value: address
-  }
-
-};
 
 interface EmptyInvoiceOptions {
   uid?: string;
@@ -139,10 +125,35 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
 }
 
-// TODO: Only create options from existing options coins if options exist
-export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
+interface GetAddressResult {
+  address: string;
+  tag?: number;
+  payment_id?: string;
+}
 
-  let addresses = await listAvailableAddresses(new Account(account))
+async function getAddress(account: Account, currency: string): Promise<GetAddressResult> {
+
+  let address = await models.Address.findOne({ where: {
+    account_id: account.id,
+    currency
+  }});
+
+  if (!address) {
+    throw new Error('address not found')
+  }
+
+  return {
+
+    address: address.value
+    
+  }
+
+}
+
+// TODO: Only create options from existing options coins if options exist
+export async function createPaymentOptions(account: Account, invoice: Invoice): Promise<PaymentOption[]> {
+
+  let addresses = await listAvailableAddresses(account)
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
 
@@ -157,7 +168,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       value
     }, currency, coin.precision);
 
-    let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
+    let { address } = await getAddress(account, currency)
 
     let paymentCoin = getCoin(currency);
 

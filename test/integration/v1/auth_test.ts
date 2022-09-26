@@ -88,17 +88,15 @@ describe("Listing Available Webhooks", async () => {
     response = await request
       .get('/v1/api/account/my-account')
 
-    expect(response.statusCode).to.be.equal(401);
+    console.log(response)
 
-    expect(response.body.error).to.be.equal('Unauthorized');
+    expect(response.statusCode).to.be.equal(401);
 
     response = await request
       .get('/v1/api/account/my-account')
       .set('Authorization', `Bearer invalidAccessToken`)
 
     expect(response.statusCode).to.be.equal(401);
-
-    expect(response.body.error).to.be.equal('Unauthorized');
 
     response = await request
       .get('/v1/api/account/my-account')
