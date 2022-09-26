@@ -308,7 +308,6 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 }
 
 interface Transaction {
-
   tx: string;
   tx_hash?: string;
   tx_key?: string;

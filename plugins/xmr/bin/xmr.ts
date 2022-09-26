@@ -6,7 +6,7 @@ import * as program from 'commander'
 
 import { Client } from 'payment-protocol'
 
-import { transfer, call, send_raw_transaction, verifyPayment } from '../'
+import { transfer, call, callWalletRpc, send_raw_transaction, verify } from '../'
 
 program
   .command('payment-request <url>')
@@ -83,7 +83,7 @@ program
   .command('check-tx-key <txid> <tx_key> <address>')
   .action(async (txid, tx_key, address) => {
 
-    let result = await call('check_tx_key', { txid, tx_key, address })
+    let result = await callWalletRpc('check_tx_key', { txid, tx_key, address })
 
     console.log(result)
 
@@ -91,9 +91,9 @@ program
 
 program
   .command('verify-payment <url> <txid> <tx_key>')
-  .action(async (url, txid, tx_key) => {
+  .action(async (url, tx_hash, tx_key) => {
 
-    let result = await verifyPayment({ url, txid, tx_key })
+    let result = await verify({ url, tx_hash, tx_key })
 
     console.log(result)
 

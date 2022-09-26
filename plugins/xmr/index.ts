@@ -13,6 +13,9 @@ import { Client } from 'payment-protocol'
 
 import { config } from '../../lib/config'
 
+import { v4 as uuid } from 'uuid'
+import { Transaction, Tx } from '../../lib/pay/json_v2/protocol'
+
 export async function validateAddress(): Promise<Boolean> {
 
   return true
@@ -25,7 +28,8 @@ export async function validateUnsignedTx(): Promise<Boolean> {
 
 }
 
-export async function broadcastTx({ tx }: { tx: string }): Promise<SendRawTransactionResult> {
+
+export async function broadcastTx({ tx, tx_hash, tx_key }: Tx): Promise<SendRawTransactionResult> {
 
   let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
@@ -93,7 +97,13 @@ export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTra
 
 export async function call(method: string, params: any): Promise<any> {
 
-  let { data } = await axios.post(process.env.XMR_RPC_URL, {
+  const trace = uuid()
+
+  const url = config.get('XMR_RPC_URL')
+
+  log.info('xmr.rpc.call', { url, method, params, trace })
+
+  let { data } = await axios.post(url, {
     jsonrpc:"2.0",
     id:"0",
     method,
@@ -105,7 +115,32 @@ export async function call(method: string, params: any): Promise<any> {
     }
   })
 
-  log.info('xmr.rpc.call.result', { method, params, data })
+  log.info('xmr.rpc.call.result', { method, params, data, trace })
+
+  return data.result
+
+}
+
+export async function callWalletRpc(method: string, params: any): Promise<any> {
+
+  const trace = uuid()
+
+  log.info('xmr.monero_wallet_rpc.call', { method, params, trace })
+
+  let response = await axios.post(config.get('monero_wallet_rpc_url'), {
+    jsonrpc:"2.0",
+    id:"0",
+    method,
+    params
+  })
+
+  const { data } = response
+
+  log.info('xmr.monero_wallet_rpc.result', data)
+  
+  const { result } = data
+
+  log.info('xmr.monero_wallet_rpc.response', { method, params, result, trace })
 
   return data.result
 
@@ -130,19 +165,36 @@ export async function transfer(destinations: Destination[]) {
 
 interface VerifyPayment {
   url: string;
-  tx: string;
   tx_hash: string;
   tx_key: string;
 }
 
 interface Verify {
   payment_option: any;
-  tx: string;
-  tx_key: string;
-  tx_hash: string;
+  transaction: Transaction;
 }
 
-export async function verifyPayment({payment_option,tx,tx_key,tx_hash}: Verify): Promise<boolean> {
+export async function verifyPayment({payment_option, transaction}: Verify): Promise<boolean> {
+
+  const { tx, tx_key, tx_hash } = transaction
+
+  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: true })
+
+  if (result.double_spend) {
+    throw new Error('double spend')
+  }
+
+  if (result.too_big) {
+    throw new Error('too big')
+  }
+
+  if (result.status === 'Failed') {
+    throw new Error(result.reason)
+  }
+
+  if (result.status !== 'OK') {
+    throw new Error(result.reason)
+  }
 
   const { invoice_uid } = payment_option
 
@@ -150,18 +202,37 @@ export async function verifyPayment({payment_option,tx,tx_key,tx_hash}: Verify):
 
   log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
 
-  /*await verify({
+  await verify({
     url,
-    tx,
     tx_hash: String(tx_hash),
     tx_key: String(tx_key)
-  })*/
+  })
 
   return true
 
 }
 
-export async function verify({url, tx, tx_hash,tx_key}: VerifyPayment) {
+interface CheckTxKey {
+  tx_hash: string;
+  tx_key: string;
+  address: string;
+}
+
+interface CheckTxKeyResult {
+  confirmations: number;
+  in_pool: boolean;
+  received: number;
+}
+
+export async function check_tx_key(params: CheckTxKey): Promise<CheckTxKeyResult> {
+
+  const result = await callWalletRpc('check_tx_key', params)
+
+  return result
+  
+}
+
+export async function verify({url, tx_hash, tx_key}: VerifyPayment) {
 
   let client = new Client(url)
 
@@ -169,13 +240,14 @@ export async function verify({url, tx, tx_hash,tx_key}: VerifyPayment) {
     chain: 'XMR',
     currency: 'XMR'
   })
+
   let destinations = paymentRequest.instructions[0].outputs
 
   for (let { address, amount } of destinations) {
 
     log.info('xmr.check_tx_key', { txid: tx_hash, tx_key, address })
 
-    let result = await call('check_tx_key', { txid: tx_hash, tx_key, address })
+    let result = await callWalletRpc('check_tx_key', { txid: tx_hash, tx_key, address })
 
     log.info('xmr.check_tx_key.result', result)
 

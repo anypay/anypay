@@ -17,7 +17,7 @@ import { models } from '../../models'
 
 import { verifyPayment, completePayment  } from '../'
 
-interface Tx {
+export interface Tx {
   tx: string;
   tx_key?: string;
   tx_hash?: string;
@@ -79,21 +79,15 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     for (const transaction of payment.transactions) {
 
-      var t: any = transaction
-
       const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
 
       var verified;
 
       if (payment_option.currency === 'XMR') {
 
-        const { tx, tx_hash, tx_key } = t
-
         verified = await verify({
           payment_option,
-          tx,
-          tx_hash,
-          tx_key,
+          transaction,
           protocol: 'JSONV2'
         })
 
@@ -101,7 +95,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
         verified = await verify({
           payment_option,
-          hex: transaction,
+          transaction,
           protocol: 'JSONV2'
         })
 
@@ -111,7 +105,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
         
         log.info(`pay.jsonv2.${payment.currency.toLowerCase()}.verifyPayment.failed`, {
           invoice_uid: invoice.uid,
-          hex: transaction,
+          transaction,
           protocol: 'JSONV2'
         })
 
@@ -120,7 +114,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit`, {invoice_uid, transaction })
 
-      const response = await plugin.broadcastTx(transaction)
+      const response = await plugin.broadcastTx(transaction.tx)
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
@@ -322,7 +316,7 @@ interface PaymentVerification {
   memo: string;
 }
 
-interface Transaction {
+export interface Transaction {
   tx: string;
   weightedSize?: number;
   tx_key?: string;

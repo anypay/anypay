@@ -19,7 +19,7 @@ import { hapi as kraken } from './plugins/kraken'
 
 import { start as refunds } from './actors/refunds/actor'
 
-import { startDirectory as startCronDirectory } from './lib/rabbi/cron'
+import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
 
 import { init } from 'rabbi'
 
@@ -66,6 +66,8 @@ import * as core from './lib'
     startCronDirectory(join(__dirname, 'cron'))
 
   }
+
+  startTask('wallet_bot_send_xmr_on_interval')
 
 })()
 
