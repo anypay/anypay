@@ -7,6 +7,88 @@ import * as program from 'commander'
 import { Client } from 'payment-protocol'
 
 import { transfer, call, callWalletRpc, send_raw_transaction, verify } from '../'
+import { log } from '../../../lib'
+import { monero_wallet_rpc } from '../wallet_rpc'
+import { json_rpc, other_rpc } from '../json_rpc'
+
+program
+  .command('monero_wallet_rpc <method> [params]')
+  .action(async (method, params) => {
+
+    try {
+
+      if (params) {
+        params = JSON.parse(params)
+      }
+  
+      const response = await monero_wallet_rpc.call<any>(method, params)
+
+      console.log('FIRST', response)
+
+      process.exit(0)
+
+    } catch(error) {
+
+      log.error('xmr.bin.monero_wallet_cli.error', error)
+
+      process.exit(1)
+    }
+
+
+  })
+
+  program
+    .command('json_rpc <method> [params]')
+    .action(async (method, params) => {
+
+      try {
+
+        if (params) {
+
+          try {
+
+            params = JSON.parse(params)
+
+          } catch(error) {
+
+            log.debug('error', error)
+
+          }
+          
+        }
+
+        if (method.match(/^\//)) {
+
+          const response = await other_rpc.call<any>(method, params)
+  
+          console.log(response)
+
+
+          // "other" rpc method
+  
+        } else {
+  
+          // json rpc method
+
+      
+          const response = await json_rpc.call<any>(method, params)
+
+          console.log('FIRST', response)
+
+          process.exit(0)
+
+  
+        }
+
+
+      } catch(error) {
+
+        log.error('xmr.bin.monero_wallet_cli.error', error)
+
+        process.exit(1)
+      }
+
+    })
 
 program
   .command('payment-request <url>')
