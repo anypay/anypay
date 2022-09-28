@@ -14,3 +14,4 @@ import { ensureInvoice } from '../../../lib/invoices';
     process.exit(0);
 
 })()
+    
