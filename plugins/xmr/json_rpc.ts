@@ -151,7 +151,7 @@ export class MonerodOtherRPCPool {
 
           error.params = params
 
-          log.error('xmr.rpc.other.pool.result', error)
+          log.error('xmr.rpc.other.pool.result.error', error)
 
           throw error;
 

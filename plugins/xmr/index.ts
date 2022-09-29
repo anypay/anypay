@@ -33,69 +33,28 @@ export async function validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promis
 }
 
 
+
+
 export async function broadcastTx({ tx, tx_hash, tx_key }: Tx): Promise<SendRawTransactionResult> {
-
-  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: true })
-
-  if (result.sanity_check_failed) {
-    throw new Error(result.reason)
-  }
-
-  if (result.double_spend) {
-    throw new Error('double spend')
-  }
-
-  if (result.too_big) {
-    throw new Error('too big')
-  }
-
-  if (result.status === 'Failed') {
-    throw new Error(result.reason)
-  }
-
-  if (result.status !== 'OK') {
-    throw new Error(result.reason)
-  }
 
   return send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
 }
 
-interface SendRawTransaction {
-  tx_as_hex,
-  do_not_relay
-}
-
-interface SendRawTransactionResult {
-  credits: number;
-  double_spend: boolean;
-  fee_too_low: boolean;
-  invalid_input: boolean;
-  invalid_output: boolean;
-  low_mixin: boolean;
-  not_relayed: boolean;
-  overspend: boolean;
-  reason: string;
-  sanity_check_failed: boolean,
-  status: string;
-  too_big: boolean;
-  too_few_outputs: boolean;
-  top_hash: string;
-  untrusted: boolean;
-}
+import { default as pool_send_raw_transaction, Outputs as SendRawTransactionResult, Inputs as SendRawTransaction } from './other_rpc/send_raw_transaction'
 
 export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<SendRawTransactionResult> {
 
   log.info('plugins.xmr.send_raw_transaction', { tx_as_hex, do_not_relay })
 
-  let { data } = await axios.post(`${process.env.XMR_RPC_URL}/send_raw_transaction`, {
+  const result = await pool_send_raw_transaction({
     tx_as_hex,
     do_not_relay
   })
 
-  log.info('plugins.xmr.send_raw_transaction.result', Object.assign(data, {tx_as_hex}))
+  log.info('plugins.xmr.send_raw_transaction.result', result)
 
-  return data
+  return result
 
 }
 
