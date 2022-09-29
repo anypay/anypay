@@ -10,7 +10,7 @@ import { blockchair } from '../../lib'
 export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
-    blockchair.publish('btc', rawTx)
+    blockchair.publish('bitcoin', rawTx)
   ])
 
 }
