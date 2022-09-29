@@ -5,13 +5,12 @@ export { btc as bitcore }
 
 import { oneSuccess } from 'promise-one-success'
 
-import { blockchair, blockcypher } from '../../lib'
+import { blockchair } from '../../lib'
 
 export async function broadcastTx(rawTx: string) {
 
   return oneSuccess([
-    blockchair.publish('btc', rawTx),
-    blockcypher.publish('btc', rawTx)
+    blockchair.publish('btc', rawTx)
   ])
 
 }
