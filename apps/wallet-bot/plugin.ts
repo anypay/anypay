@@ -259,6 +259,7 @@ export const plugin = (() => {
         handler: handlers.Invoices.create,
         options: {
           auth: "app",
+          tags: ['api', 'wallet-bot'],
           validate: {
             payload: handlers.Invoices.schema.payload,
             failAction
