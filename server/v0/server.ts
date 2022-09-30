@@ -13,8 +13,6 @@ import { config } from '../../lib/config'
 
 import { HealthPlugin } from 'hapi-k8s-health'
 
-import { register as registerWalletBotRoutes } from '../../plugins/wallet-bot'
-
 import { attachV1Routes } from '../v1/routes';
 
 import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
@@ -469,8 +467,6 @@ async function Server() {
   }); 
 
   await attachV1Routes(server)
-
-  await registerWalletBotRoutes(server)
 
   accountCSVReports(server);
 

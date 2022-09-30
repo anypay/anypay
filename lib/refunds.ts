@@ -41,17 +41,13 @@ export async function getRefund(invoice: Invoice): Promise<Refund> {
       }]
     }]
 
-    console.log('template', JSON.stringify(template))
-
     let payment_request = await createPaymentRequest(
       REFUND_APP_ID,
       template,
       {}
     )
 
-    console.log({ payment_request })
-
-    let refund_invoice_uid = payment_request.uid
+    let refund_invoice_uid = payment_request.get('uid')
 
     record = await models.Refund.create({
       original_invoice_uid,
