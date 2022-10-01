@@ -244,7 +244,7 @@ export const plugin = (() => {
         path: `${base}/invoices`,
         method: 'GET',
         options: {
-          auth: "jwt",
+          auth: "app",
           tags: ['api', 'wallet-bot']
         },
         handler: handlers.V1Invoices.index
