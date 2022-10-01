@@ -88,6 +88,12 @@ export class Invoice extends Orm {
     return this.get('account_id')
   }
 
+  get app_id(): any {
+
+    return this.get('app_id')
+  }
+
+
   get denomination(): string {
 
     return this.get('denomination_currency')
@@ -96,6 +102,10 @@ export class Invoice extends Orm {
 
   get payment(): any {
     return this.record['payment']
+  }
+
+  get currency(): string {
+    return this.record['currency']
   }
 
   get refund(): any {
