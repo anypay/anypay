@@ -20,7 +20,9 @@ interface NewPayment {
   option: PaymentOption;
 }
 
-class Payment extends Orm {
+export class Payment extends Orm {
+
+  static model = models.Payment;
 
   invoice: Invoice
 
