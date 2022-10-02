@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/anypay/anypay/compare/v1.5.0...v1.6.0) (2022-10-02)
+
+
+### Features
+
+* **check-confirmations:** check XMR payments for confirmations and r… ([#1087](https://github.com/anypay/anypay/issues/1087)) ([c551da6](https://github.com/anypay/anypay/commit/c551da6696691293287058265ef78a8d01e39257))
+
 # [1.5.0](https://github.com/anypay/anypay/compare/v1.4.0...v1.5.0) (2022-09-06)
 
 
