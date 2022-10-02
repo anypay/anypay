@@ -9,6 +9,7 @@ import * as apikeys from './apikeys';
 import * as blockchair from './blockchair';
 import * as blockchain from './blockchain';
 import * as blockcypher from './blockcypher';
+import * as chain_so from './chain_so';
 import * as login from './account_login';
 import * as invoices from './invoice';
 import * as settings from './settings';
@@ -49,6 +50,7 @@ export {
   blockchair,
   blockchain,
   blockcypher,
+  chain_so,
   coins,
   config,
   database,

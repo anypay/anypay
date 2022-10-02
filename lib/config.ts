@@ -28,7 +28,13 @@ config.defaults({
   'rocketchat_webhook_url': false,
 
   // Enable Websockets Server and API for Wallet Bot
-  'wallet_bot_app_enabled': true
+  'wallet_bot_app_enabled': true,
+
+  'blockchair_broadcast_provider_btc_enabled': true,
+
+  'blockchain_broadcast_provider_enabled': true,
+
+  'chain_so_broadcast_provider_enabled': true
 })
 
 export { config } 
