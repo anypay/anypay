@@ -48,12 +48,17 @@ async function getNewInvoiceAddress(accountId: number, currency: string, amount)
 interface EmptyInvoiceOptions {
   uid?: string;
   currency?: string;
-  amount?: number
+  amount?: number;
+  webhook_url?: string;
+  secret?: string;
+  metadata?: any;
+  memo?: string;
+  redirect_url?: string;
 }
 
 export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}) {
 
-  var { uid, currency, amount } = options
+  var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url } = options
 
   uid = !!uid ? uid : shortid.generate();
 
@@ -68,14 +73,23 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     uid
   })
 
-  return models.Invoice.create({
+  let record = await models.Invoice.create({
     app_id,
     account_id: app.account_id,
     uid,
     uri,
     currency,
-    amount
+    amount,
+    webhook_url,
+    memo,
+    secret,
+    metadata,
+    redirect_url
   })
+
+  console.log('__EMPTY RECORD', record)
+
+  return record;
 
 }
 

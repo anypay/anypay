@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import * as Chance from 'chance';
+
 import * as uuid from 'uuid';
 
 const chance = new Chance();
@@ -16,6 +17,8 @@ import { Account } from '../lib/account'
 import { Address } from '../lib/addresses'
 
 import { Invoice, createInvoice } from '../lib/invoices'
+
+import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
 
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
@@ -171,28 +174,15 @@ export {
 
 export { log } from '../lib'
 
-var request, account;
+var request, account, walletBot: WalletBot;
 
 import {Server, server } from '../server/v0/server';
 import * as supertest from 'supertest'
 
-export { server, request, account }
+export { server, request, account, walletBot }
 
-beforeEach(() => {
 
-  spy.restore()
 
-})
-
-before(async () => {
-
-  await Server();
-
-  request = supertest(server.listener)
-
-  account = await createAccountWithAddresses()
-
-})
 
 export async function authRequest(account: Account, params) {
 
@@ -253,3 +243,20 @@ const wallet = Wallet.fromWIF(WIF)
 
 export { wallet } 
 
+beforeEach(() => {
+
+  spy.restore()
+
+})
+
+before(async () => {
+
+  await Server();
+
+  request = supertest(server.listener)
+
+  account = await createAccountWithAddresses()
+
+  walletBot = (await findOrCreateWalletBot(account)).walletBot
+
+})

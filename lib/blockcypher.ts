@@ -6,8 +6,9 @@ let token = process.env.BLOCKCYPHER_TOKEN;
 import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
+import { BroadcastTxResult } from './plugins';
 
-export async function publish(currency, hex) {
+export async function publish(currency, hex): Promise<BroadcastTxResult> {
 
   const trace = uuid()
 
@@ -15,13 +16,20 @@ export async function publish(currency, hex) {
   
   try {
 
-    let { data } = await axios.post(`https://api.blockcypher.com/v1/${currency}/main/txs/push?token=${token}`, {
+    let response = await axios.post(`https://api.blockcypher.com/v1/${currency}/main/txs/push?token=${token}`, {
       tx: hex
     });
 
+    const { data } = response
+
     log.info('blockcypher.publish.response', { trace, data })
 
-    return data.hash;
+    return {
+      result: data,
+      success: true,
+      txid: data.tx.hash,
+      txhex: hex
+    }
 
   } catch(error) {
 

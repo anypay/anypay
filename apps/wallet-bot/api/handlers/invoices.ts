@@ -5,11 +5,17 @@ import { log } from '../../../../lib/log'
 
 import { badRequest } from 'boom'
 
-import { createPaymentRequest } from '../../../../lib/payment_requests'
+import { findOrCreateWalletBot } from '../..'
+
+import { findAll } from '../../../../lib/orm'
+
+import { Invoice } from '../../../../lib/invoices'
 
 export async function create(req, h) {
 
     try {
+
+        const {walletBot} = await findOrCreateWalletBot(req.app)
 
         const template = [{
             currency: req.payload.currency,
@@ -22,13 +28,12 @@ export async function create(req, h) {
 
         const options = req.payload.options
 
-        let result = await createPaymentRequest(
-            req.app_id,
+        let result = await walletBot.createPaymentRequest({
             template,
             options
-        )
+        })
 
-        return h.response(result).code(201)
+        return h.response(result.toJSON()).code(201)
 
     } catch(error) {
 
@@ -36,6 +41,48 @@ export async function create(req, h) {
 
         return badRequest(error)
 
+    }
+
+}
+
+export async function index(req, h) {
+
+    const { app } = await findOrCreateWalletBot(req.app)
+
+    let { limit, offset, currency } = req.query
+
+    if (!limit) { limit = 100 }
+
+    const where = {
+        app_id: app.id,
+        status: 'unpaid'
+    }
+
+    if (currency) {
+
+        where['currency'] = currency
+
+    }
+
+    const query = { where }
+
+    if (limit) {
+        query['limit'] = limit || 100
+    }
+
+    if (offset) {
+        query['offset'] = offset
+    }
+
+    log.info('wallet-bot.invoices.list', query)
+
+    const invoices = await findAll<Invoice>(Invoice, query)
+
+    log.info('wallet-bot.invoices.list.response')
+
+    return {
+        app: '@wallet-bot',
+        invoices: invoices.map(invoice => invoice.toJSON())
     }
 
 }
