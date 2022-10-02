@@ -5,6 +5,13 @@ import configurePlugins from "../config/plugins";
 
 import { models } from './';
 
+export interface BroadcastTxResult {
+  txid: string;
+  txhex: string;
+  success: boolean;
+  result: any;
+}
+
 class Plugins {
 
   plugins: any;

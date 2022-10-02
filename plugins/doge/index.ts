@@ -5,6 +5,7 @@ var WAValidator = require('anypay-wallet-address-validator');
 
 const doge = require('bitcore-doge-lib');
 
+
 export { doge as bitcore }
 
 export function validateAddress(address: string){
@@ -19,9 +20,19 @@ export async function getNewAddress(record) {
   return record.value;
 }
 
-export async function broadcastTx(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return blockchair.publish('dogecoin', rawTx)
+import { oneSuccess } from 'promise-one-success'
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+    blockchair.publish('dogecoin', rawTx)
+
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 

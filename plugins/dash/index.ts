@@ -9,23 +9,25 @@ import * as dash from '@dashevo/dashcore-lib';
 
 export { dash as bitcore }
 
+import * as insight from './lib/insight'
+
 var WAValidator = require('anypay-wallet-address-validator');
 
-export async function submitTransaction(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return oneSuccess([
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
     blockchair.publish('dash', rawTx),
-    blockcypher.publish('dash', rawTx)
-  ])
 
-}
+    blockcypher.publish('dash', rawTx),
 
-export async function broadcastTx(rawTx: string) {
+    insight.broadcastTx(rawTx)
 
-  return oneSuccess([
-    blockchair.publish('dash', rawTx),
-    blockcypher.publish('dash', rawTx)
-  ])
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 

@@ -11,9 +11,19 @@ export { bch as bitcore }
 
 var bchaddr: any = require('bchaddrjs');
 
-export async function broadcastTx(hex: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return blockchair.publish('bitcoin-cash', hex)
+import { oneSuccess } from 'promise-one-success'
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+    blockchair.publish('bitcoin-cash', rawTx)
+
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 

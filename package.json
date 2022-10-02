@@ -127,6 +127,7 @@
     "reconnecting-websocket": "^4.4.0",
     "require-all": "^3.0.0",
     "riverpig": "^1.1.4",
+    "run-sdk": "^0.6.41",
     "sequelize": "^6.17.0",
     "sequelize-cli": "^6.4.1",
     "shortid": "^2.2.15",
