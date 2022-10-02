@@ -11,9 +11,18 @@ export async function getNewAddress(record) {
   return record.value;
 }
 
-export async function broadcastTx(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return blockchair.publish('litecoin', rawTx)
+import { oneSuccess } from 'promise-one-success'
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+    blockchair.publish('litecoin', rawTx)
+
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
-

@@ -8,6 +8,8 @@ import { fromSatoshis } from '../../lib/pay'
 
 import * as taal from './lib/taal'
 
+import * as run from './lib/run'
+
 import * as whatsonchain from './lib/whatsonchain'
 
 interface Payment {
@@ -23,7 +25,6 @@ export async function getTransaction(txid: string): Promise<any> {
   let tx_hex = await whatsonchain.getTransaction(txid)
 
   return new bsv.Transaction(tx_hex)
-
 
 }
 
@@ -70,11 +71,27 @@ export function transformHexToPayments(hex: string): Payment[]{
 }
 
 
-export async function broadcastTx(hex): Promise<string> { // returns txid
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return taal.broadcastTransaction(hex)
+import { oneSuccess } from 'promise-one-success'
+import { blockchair } from '../../lib';
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+    taal.broadcastTransaction(rawTx),
+
+    blockchair.publish('bitcoin-sv', rawTx),
+
+    run.broadcastTx(rawTx)
+
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
+
 
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;

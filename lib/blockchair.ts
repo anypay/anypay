@@ -5,6 +5,7 @@ import { log } from './log'
 import axios from 'axios'
 
 import { getBitcore } from './bitcore'
+import { BroadcastTxResult } from './plugins'
 
 const COIN_MAP = {
   'LTC': 'litecoin',
@@ -26,7 +27,7 @@ export const CURRENCIES = {
   'DOGE': 'doge'
 }
 
-export async function publish(coin, hex) {
+export async function publish(coin, hex): Promise<BroadcastTxResult> {
 
   /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
 
@@ -38,7 +39,12 @@ export async function publish(coin, hex) {
 
     log.info(`blockchair.push.transaction.${coin}`, resp);
 
-    return resp.body.data.transaction_hash;
+    return {
+      txhex: hex,
+      txid: resp.body.data.transaction_hash,
+      success: true,
+      result: resp.body
+    }
 
   } catch(error) {
 

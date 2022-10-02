@@ -5,13 +5,43 @@ export { btc as bitcore }
 
 import { oneSuccess } from 'promise-one-success'
 
-import { blockchair } from '../../lib'
+import { blockchair, config, chain_so } from '../../lib'
 
-export async function broadcastTx(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return oneSuccess([
-    blockchair.publish('bitcoin', rawTx)
-  ])
+import * as bitcoind_rpc from './bitcoind_rpc'
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = []
+
+  if (config.get('blockchair_broadcast_provider_btc_enabled')) {
+
+    broadcastProviders.push(
+
+      blockchair.publish('bitcoin', rawTx)
+    )
+
+  }
+
+  if (config.get('chain_so_broadcast_provider_enabled')) {
+
+    broadcastProviders.push(
+
+      chain_so.broadcastTx('BTC', rawTx)
+    )
+
+  }
+
+  if (config.get('bitcoind_rpc_host')) {
+
+    broadcastProviders.push(
+      
+      bitcoind_rpc.broadcastTx(rawTx)
+    )
+  }
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 
