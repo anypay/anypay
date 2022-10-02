@@ -1,4 +1,5 @@
 
+
 export const url = 'https://monerodocs.org/interacting/monero-wallet-rpc-reference/#get_address_index'
 
 export const method = 'get_address_index'
