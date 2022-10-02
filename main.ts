@@ -1,13 +1,25 @@
 
 require('dotenv').config()
 
+import { join } from 'path'
+
+import { config } from './lib/config'
+
+import { log } from './lib'
+
+import { startActorsDirectory } from 'rabbi';
+
 import { server, start } from './server/v0/server'
 
 import { start as startPrices } from './lib/prices/cron'
 
-import { plugin as websockets } from './ws/plugin'
+import { start as startFees } from './actors/detect_fees/actor'
 
 import { hapi as kraken } from './plugins/kraken'
+
+import { start as refunds } from './actors/refunds/actor'
+
+import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
 
 import { init } from 'rabbi'
 
@@ -19,15 +31,19 @@ import * as core from './lib'
 
   startPrices()
 
-  if (process.env.WEBSOCKETS_SERVER) {
+  startFees()
 
-    await server.register(websockets)
+  try {
+
+    await start()
+
+  } catch(error) {
+
+    console.error(error)
 
   }
 
-  await start()
-
-  if (process.env.KRAKEN_PLUGIN) {
+  if (config.get('KRAKEN_PLUGIN')) {
 
     await server.register({
 
@@ -36,8 +52,29 @@ import * as core from './lib'
       options: { core }
 
     })
+
+    startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
+
+    refunds()
+
+    log.info('rabbi.kraken.actors.start')
     
   }
 
+  if (config.get('rabbi_start_cron')) {
+
+    startCronDirectory(join(__dirname, 'cron'))
+
+  }
+
+  startTask('wallet_bot_send_xmr_on_interval')
+
 })()
 
+process.on('uncaughtException', (error) => {
+  log.error('uncuaghtException', error)
+})
+
+process.on('unhandledRejected', (error) => {
+  log.error('uncuaghtException', error)
+})

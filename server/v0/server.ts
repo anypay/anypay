@@ -9,106 +9,41 @@ const Vision = require('@hapi/vision');
 
 const HapiSwagger = require("hapi-swagger");
 
+import { config } from '../../lib/config'
+
+import { HealthPlugin } from 'hapi-k8s-health'
+
 import { attachV1Routes } from '../v1/routes';
 
 import { attachRoutes as attachJsonV2 } from '../jsonV2/routes';
 
 import { join } from 'path'
 
+const Pack = require('../../package.json')
+
+const AuthBearer = require('hapi-auth-bearer-token');
+
 import { log } from '../../lib/log';
 
-import { validateToken, validateAdminToken, validateAppToken } from '../auth/hapi_validate_token';
+import { getHistogram } from '../../lib/prometheus'
 
-import { bcryptCompare } from '../../lib/password';
+import { requireDirectory } from 'rabbi'
+
+const auth = requireDirectory('../auth')
 
 import { accountCSVReports } from './handlers/csv_reports';
 
 import * as payreq from '../payment_requests/server'
 
-import { v0 } from '../handlers'
+import { v0, failAction } from '../handlers'
 
-const AccountLogin = require("../../lib/account_login");
-
-const sequelize = require("../../lib/database");
-
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 
 import { models } from '../../lib'
 
-const validatePassword = async function(request, username, password, h) {
+import { register as merchant_app } from './plugins/merchant_app'
 
-  try {
-
-    if (!username || !password) {
-
-      return {
-        isValid: false
-      };
-    }
-
-    var account = await models.Account.findOne({
-      where: {
-        email: username.toLowerCase()
-      }
-    });
-
-    if (!account) {
-
-      return {
-        isValid: false
-      }
-    }
-
-
-    var accessToken = await AccountLogin.withEmailPassword(username, password);
-
-    if (accessToken) {
-
-      return {
-        isValid: true,
-        credentials: { accessToken, account }
-      };
-
-    } else {
-
-
-    }
-  } catch(error) {
-
-
-    log.error(error.message);
-
-  }
-
-  // check for sudo password
-  try {
-
-    await bcryptCompare(password, process.env.SUDO_PASSWORD_HASH);
-
-  } catch(error) {
-
-    return {
-      isValid: false
-    }
-
-  }
-
-  var isNew;
-  [accessToken, isNew] = await models.AccessToken.findOrCreate({
-    where: {
-      account_id: account.id
-    },
-    defaults: {
-      account_id: account.id
-    }
-  });
-
-  return {
-    isValid: true,
-    credentials: { accessToken, account }
-  }
-
-};
+import { schema } from 'anypay'
 
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
@@ -137,10 +72,10 @@ function responsesWithSuccess({ model }) {
   }
 }
 
-
 const server = new Hapi.Server({
   host: process.env.HOST || "localhost",
   port: process.env.PORT || 8000,
+  //debug: { 'request': ['error', 'uncaught'] },
   routes: {
     cors: true,
     validate: {
@@ -154,443 +89,183 @@ const server = new Hapi.Server({
   }
 });
 
+import { useJWT } from '../auth/jwt'
+
 async function Server() {
 
-  server.ext('onRequest', function(request, h) {
+  server.ext('onRequest', (request, h) => {
 
-    log.debug('server.request', { id: request.info.id, headers: request.headers })
+    request.startTimer = function({ method, path }) {
 
-    if ('application/payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment';
-    }
+      try {
 
-    if ('application/payment-request' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment-request';
-    }
+        const histogram = getHistogram({ method, path })
 
-    if ('application/payment-verification' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment-verification';
-    }
+        request.endTimer = histogram.startTimer();
 
-    if ('application/payment' === request.headers['accept']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment';
-    }
+      } catch(error) {
 
-    if ('application/bitcoinsv-payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
-    }
+        log.debug('prometheus.histogram.error', error)
 
-    if ('application/dash-payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/dash-payment';
-    }
+      }
 
-    if ('application/dash-payment' === request.headers['accept']) {
-      request.headers['accept'] = 'application/json';
-      request.headers['x-accept'] = 'application/dash-payment';
-    }
-
-    if ('application/dash-paymentack' === request.headers['accept']) {
-      request.headers['accept'] = 'application/json';
-      request.headers['x-accept'] = 'application/dash-paymentack';
-    }
-
-    if ('application/bitcoinsv-paymentack' === request.headers['accept']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/bitcoinsv-payment';
-      request.headers['x-accept'] = 'application/bitcoinsv-paymentack';
-    }
-
-    if ('application/verify-payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/verify-payment';
-    }
-
-    if ('application/verify-payment' === request.headers['accept']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/verify-payment';
     }
 
     return h.continue;
-  });
 
-  server.ext('onRequest', function(request, h) {
+  })
 
-    if ('application/payment' === request.headers['content-type']) {
-      request.headers['content-type'] = 'application/json';
-      request.headers['x-content-type'] = 'application/payment';
+  server.ext('onPreResponse', (request, h) => {
+
+    try {
+
+      if (request.endTimer) {
+
+        request.endTimer()
+
+      }
+
+    } catch(error) {
+
+      console.error(error)
+
     }
 
     return h.continue;
-  });
+  })
 
-  await server.register(require('hapi-auth-basic'));
+  // Transform non-boom errors into boom ones
+  server.ext('onPreResponse', (request, h) => {
+    // Transform only server errors 
+    if (request.response.isBoom) {
+
+      log.error('hapi.error.response', request.response)
+
+      const statusCode = request.response.output.statusCode || 500
+
+      log.error('hapi.error.response', request.response)
+
+      if (statusCode === 500) {
+
+        const response = {
+          statusCode,
+          error: request.response.error || request.response.message,
+          message: request.response.message
+        }
+  
+        return h.response(response).code(statusCode)
+
+      } else {
+    
+        return h.response(request.response.output).code(statusCode)
+
+      }
+
+    } else {
+      // Otherwise just continue with previous response
+      return h.continue
+
+    }
+  })
+
+  await server.register(require('@hapi/basic'));
+
   await server.register(Inert);
+
   await server.register(Vision);
+
   await server.register(require('hapi-boom-decorators'))
 
-  const swaggerOptions = server.register({
+  await server.register({
     plugin: HapiSwagger,
     options: {
       info: {
-        title: 'Anypay API Documentation',
-        version: '1.0.1',
+        title: 'Anypay API Reference',
+        version: Pack.version,
       },
+      grouping: 'tags',
+      tags: [
+        {
+          name: 'platform',
+          description: 'Base Payments Platform'
+        },
+        {
+          name: 'v1',
+          description: 'Version 1 (Current)'
+        },
+        {
+          name: 'wordpress',
+          description: 'Woocommerce Wordpress App'
+        },
+        {
+          name: 'v0',
+          description: 'Version 0 (Deprecated)'
+        }
+      ],
       securityDefinitions: {
         simple: {
           type: 'basic',
         },
       },
+      host: 'api.anypayx.com',
+      schemes: ['https'],
+      documentationPath: '/api',
       security: [{
         simple: [],
       }],
     }
   })
 
-  server.auth.strategy("token", "basic", { validate: validateToken });
-  server.auth.strategy("app", "basic", { validate: validateAppToken });
-  server.auth.strategy("password", "basic", { validate: validatePassword });
-  server.auth.strategy("adminwebtoken", "basic", { validate: validateAdminToken });
+  server.auth.strategy("token", "basic", { validate: auth.Token.validateToken });
+
+  server.auth.strategy("app", "basic", { validate: auth.Token.validateAppToken });
+
+  server.auth.strategy("password", "basic", { validate: auth.Password.validate });
+
+  server.auth.strategy("prometheus", "basic", { validate: auth.Prometheus.auth });
+
+  await server.register(AuthBearer)
+
+  server.auth.strategy("jwt", "bearer-access-token", useJWT());
+
+  await server.register({
+    plugin: HealthPlugin,
+    options: {
+      auth: 'prometheus'
+    }
+  })
 
   payreq.attach(server)
 
   attachJsonV2(server)
+  
+  await merchant_app(server)
+
+  // BEGIN PUBLIC ROUTES
+
+  if (config.get('wallet_bot_app_enabled')) {
+
+    log.debug('apps.wallet-bot.enabled')
+
+    await server.register(require('../../apps/wallet-bot/plugin'))
+
+    log.debug('apps.wallet-bot.plugin.registered')
+
+  }
 
   server.route({
     method: "GET",
-    path: "/api/accounts-by-email/{email}",
-    handler: v0.Anypaycity.show
-  });
-
-  server.route({
-    method: "GET",
-    path: "/invoices/{invoice_id}",
-    handler: v0.Invoices.show,
-    options: {
-      tags: ['api'],
-      validate: {
-        params: Joi.object({
-          invoice_id: Joi.string().required()
-        })
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
-    }
-  });
-
-
-
-  server.route({
-    method: "GET",
-    path: "/woocommerce",
-    handler: v0.Woocommerce.index,
-    options: {
-      auth: "token",
-      tags: ['api']
+    path: "/throws",
+    handler: () => {
+      throw new Error('big bad wolf')
     }
   });
 
   server.route({
     method: "GET",
-    path: "/invoices/{invoice_uid}/payment_options",
-    handler: v0.InvoicePaymentOptions.show,
-    options: {
-      tags: ['api']
-    }
-  });
-
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/share/email",
-    handler: v0.Invoices.shareEmail,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: Joi.object({
-          email: Joi.string().email().required()
-        })
-      }
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/grab_and_go_items",
-    handler: v0.Products.index,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-
-  server.route({
-    method: "GET",
-    path: "/invoices",
-    handler: v0.Invoices.index,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/accounts",
-    handler: v0.Accounts.create,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: models.Account.Credentials,
-      },
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
-    },
-  });
-  server.route({
-    method: "GET",
-    path: "/accounts/{id}", // id or email
-    handler: v0.Accounts.showPublic,
-    options: {
-      tags: ['api'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
-    },
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/anonymous-accounts",
-    handler: v0.Accounts.registerAnonymous,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        payload: models.Account.Credentials,
-      },
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
-    },
-  });
-
-  server.route({
-    method: "POST",
-    path: "/anonymous-accounts",
-    handler: v0.Accounts.createAnonymous,
-    options: {
-      tags: ['api']
-    },
-  });
-
-  server.route({
-    method: "POST",
-    path: "/access_tokens",
-    handler: v0.AccessTokens.create,
-    options: {
-      auth: "password",
-      tags: ['api'],
-      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/addresses",
-    handler: v0.Addresses.list,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      plugins: responsesWithSuccess({ model: v0.Addresses.PayoutAddresses }),
-    }
-  });
-
-  server.route({
-    method: "DELETE",
-    path: "/addresses/{currency}",
-    handler: v0.Addresses.destroy,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/account_addresses",
-    handler: v0.Addresses.index,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/addresses/{id}/notes",
-    handler: v0.AddressNotes.update,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        params: Joi.object({
-          id: Joi.number().required()
-        }),
-        payload: Joi.object({
-          note: Joi.string().required()
-        })
-      }
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/addresses/{currency}",
-    handler: v0.Addresses.update,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        params: Joi.object({
-          currency: Joi.string().required()
-        }),
-        payload: Joi.object({
-          address: Joi.string().required()
-        })
-      }
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/account",
-    handler: v0.Accounts.show,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/account",
-    handler: v0.Accounts.update,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{invoice_uid}/notes",
-    handler: v0.InvoiceNotes.create,
-    options: {
-      validate: {
-        payload: Joi.object({
-          note: Joi.string().required()
-        })
-      },
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-
-  server.route({
-    method: "GET",
-    path: "/coins",
-    handler: v0.Coins.list,
-    options: {
-      tags: ['api'],
-      auth: "token",
-      plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
-    }
-  });
-
-
-  server.route({
-    method: "POST",
-    path: "/invoices",
-    handler: v0.Invoices.create,
-    options: {
-      auth: "token",
-      tags: ['api'],
-      validate: {
-        payload: models.Invoice.Request,
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
-    }
-  });
-
-  server.route({
-    method: "DELETE",
-    path: "/invoices/{uid}",
-    handler: v0.Invoices.cancel,
-    options: {
-      auth: "token",
-      tags: ['api']
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/accounts/{account_id}/invoices",
-    handler: v0.Invoices.createPublic,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: models.Invoice.Request,
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/password-resets",
-    handler: v0.Passwords.reset,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: v0.Passwords.PasswordReset,
-      },
-      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
-    }
-  });
-
-  server.route({
-    method: "POST",
-    path: "/password-resets/{uid}",
-    handler: v0.Passwords.claim,
-    options: {
-      tags: ['api'],
-      validate: {
-        payload: v0.Passwords.PasswordResetClaim,
-      },
-      plugins: responsesWithSuccess({ model: v0.Passwords.Success }),
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/settings/denomination",
-    handler: v0.Denominations.update,
-    options: {
-      tags: ['api'],
-      auth: "token"
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/settings/denomination",
-    handler: v0.Denominations.show,
-    options: {
-      tags: ['api'],
-      auth: "token"
+    path: "/bad-request",
+    handler: (req, h) => {
+      return h.badRequest('unexpected hurricane')
     }
   });
 
@@ -599,7 +274,7 @@ async function Server() {
     path: "/base_currencies",
     handler: v0.BaseCurrencies.index,
     options: {
-      tags: ['api']
+      tags: ['api', 'v0']
     }
   });
 
@@ -608,55 +283,156 @@ async function Server() {
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
     handler: v0.PriceConversions.show,
     options: {
-      tags: ['api']
+      tags: ['api', 'v0']
     }
   });
 
-    server.route({
-      method: "POST",
-      path: "/r",
-      handler: v0.PaymentRequests.create,
-      options: {
-        auth: "app"
+  server.route({
+    method: "POST",
+    path: "/r",
+    handler: v0.PaymentRequests.create,
+    options: {
+      auth: "app",
+      tags: ['api', 'v0'],
+      validate: {
+        payload: Joi.object({
+          template: schema.PaymentRequestTemplate.required(),
+          options: Joi.object({
+            webhook: Joi.string().optional(),
+            redirect: Joi.string().optional(),
+            secret: Joi.string().optional(),
+            metadata: Joi.object().optional()
+          }).optional()
+        })
       }
-    })
+    }
+  })
 
   server.route({
-    method: 'POST',
-    path: '/moneybutton/webhooks',
-    handler: v0.MoneybuttonWebhooks.create
-  });
+    method: "DELETE",
+    path: "/r/{uid}",
+    handler: v0.PaymentRequests.cancel,
+    options: {
+      auth: "app",
+      tags: ['api', 'v0', 'platform'],
+    }
+  })
+
+  server.route({
+    method: "POST",
+    path: "/payment-requests",
+    handler: v0.PaymentRequests.create,
+    options: {
+      auth: "app",
+      tags: ['api', 'platform'],
+      validate: {
+        payload: Joi.object({
+          template: schema.PaymentRequestTemplate.required(),
+          options: Joi.object({
+            webhook: Joi.string().optional(),
+            redirect: Joi.string().optional(),
+            secret: Joi.string().optional(),
+            metadata: Joi.object().optional()
+          }).optional()
+        })
+      }
+    }
+  })
 
   server.route({
     method: 'GET',
     path: '/merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/merchants/{account_id}',
-    handler: v0.Merchants.show
+    handler: v0.Merchants.show,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchants',
-    handler: v0.Merchants.listActiveSince
+    handler: v0.Merchants.listActiveSince,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
 
   server.route({
     method: 'GET',
     path: '/active-merchant-coins',
-    handler: v0.Merchants.listMerchantCoins
+    handler: v0.Merchants.listMerchantCoins,
+    options: {
+      tags: ['api', 'v0']
+    }
   });
+
+  server.route({
+    method: "GET",
+    path: "/api/accounts-by-email/{email}",
+    handler: v0.Anypaycity.show,
+    options: {
+      tags: ['api', 'v0']
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/invoices/{invoice_id}",
+    handler: v0.Invoices.show,
+    options: {
+      tags: ['api', 'v0'],
+      validate: {
+        params: Joi.object({
+          invoice_id: Joi.string().required()
+        }),
+        failAction
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/accounts/{id}", // id or email
+    handler: v0.Accounts.showPublic,
+    options: {
+      tags: ['api', 'v0', 'accounts'],
+      plugins: responsesWithSuccess({ model: models.Account.Response }),
+    },
+  });
+
+  server.route({
+    method: "POST",
+    path: "/accounts/{account_id}/invoices",
+    handler: v0.Invoices.createPublic,
+    options: {
+      tags: ['api', 'v0', 'invoices'],
+      validate: {
+        payload: models.Invoice.Request,
+        failAction
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+    }
+  });
+
+
+  // END PUBLIC ROUTES
 
   server.route({
     method: "GET",
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.index
     }
   });
@@ -666,7 +442,7 @@ async function Server() {
     path: "/apps/{id}",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.show
     }
   });
@@ -676,109 +452,19 @@ async function Server() {
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api'],
+      tags: ['api', 'v0'],
       handler: v0.Apps.create
     }
   });
 
   server.route({
-    method: "POST",
-    path: "/firebase_token",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: v0.FirebaseTokens.create
-    }
-  });
-
-  server.route({
-    method: "PUT",
-    path: "/firebase_token",
-    options: {
-      auth: "token",
-      tags: ['api'],
-      handler: v0.FirebaseTokens.update
-    }
-  });
-
-  server.route({
-    method: 'GET',
-    path: '/support/{token}',
-    handler: v0.SupportProxy.show
-  }); 
-
-  server.route({
-    method: 'GET',
-    path: '/api_keys',
-    handler: v0.ApiKeys.index,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'POST',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.create,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'GET',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.show,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'DELETE',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.destroy,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'POST',
-    path: '/kraken_api_keys',
-    handler: v0.KrakenApiKeys.create,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'GET',
-    path: '/kraken_api_keys',
-    handler: v0.KrakenApiKeys.show,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'DELETE',
-    path: '/kraken_api_keys',
-    handler: v0.KrakenApiKeys.destroy,
-    options: {
-      auth: "token"
-    }
-  }); 
-
-
-
-  server.route({
     method: 'GET',
     path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: v0.Accounts.nearby
+    handler: v0.Accounts.nearby,
+    options: {
+      tags: ['api', 'v0']
+    }
   }); 
-
-
 
   await attachV1Routes(server)
 
@@ -788,9 +474,18 @@ async function Server() {
     method: 'GET',
     path: '/',
     handler: (req, h) => {
-      return h.redirect('/documentation')
+      return h.redirect('/api')
     }
   }); 
+
+  server.route({
+    method: 'GET',
+    path: '/_metrics',
+    handler: v0.Prometheus.show,
+    options: {
+      auth: "prometheus"
+    }
+});
 
   return server;
 

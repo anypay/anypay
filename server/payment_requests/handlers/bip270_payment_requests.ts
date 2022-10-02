@@ -1,12 +1,9 @@
-import * as Hapi from 'hapi';
 
-import { verifyPayment, buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
+import { buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
-import { amqp, log, models } from '../../../lib';
+import { log, models } from '../../../lib';
 
-import { submitPayment, SubmitPaymentResponse } from './json_payment_requests';
-
-import * as Boom from 'boom';
+import { submitPayment, SubmitPaymentResponse } from '../../../lib/pay/json_v2/protocol';
 
 export async function show(req, h) {
 
@@ -42,7 +39,7 @@ export async function create(req, h) {
     let wallet = detectWallet(req.headers, req.params.uid)
 
     let submission = {
-      transactions: [req.payload.transaction],
+      transactions: [{tx: req.payload.transaction }],
       currency: 'BSV',
       invoice_uid: req.params.uid,
       wallet
@@ -50,7 +47,7 @@ export async function create(req, h) {
 
     if (invoice.cancelled) {
 
-      log.error('payment.error.invoicecancelled', submission)
+      log.error('payment.error.invoicecancelled', new Error('Invoice Already Cancelled'))
 
       throw new Error('Invoice Already Cancelled')
 

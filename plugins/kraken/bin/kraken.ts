@@ -4,9 +4,29 @@ require('dotenv').config();
 
 import * as program from 'commander';
 
-import { KrakenAccount, listAll, fromAccount } from '../lib/kraken_account'
+import { listAll, fromAccount } from '../lib/kraken_account'
 
 import { Account } from '../../../lib/account'
+
+import { syncDeposits, syncTrades } from '../'
+
+program
+  .command('trades <account_id> [start]')
+  .action(async (id, start) => {
+
+    try {
+
+      let account = await Account.findOne({ id })
+
+      await syncTrades(account, { start })
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  })
 
 program
   .command('listaccounts')
@@ -18,7 +38,9 @@ program
 
       for (let account of accounts) {
 
-        console.log(account.toJSON())
+        console.log(account)
+
+        console.log(Object.assign(account.toJSON(), { email: account.get('email') }))
 
       }
 
@@ -105,11 +127,7 @@ program
 
       let account = await Account.findOne({ id })
 
-      let kraken = await fromAccount(account)
-
-      let deposits = await kraken.api('DepositStatus', {
-        asset: 'BTC'
-      })
+      let deposits = await syncDeposits(account)
 
       console.log(deposits)
 
@@ -118,6 +136,8 @@ program
       console.error(error)
 
     }
+
+    process.exit(0)
 
   })
 

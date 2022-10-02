@@ -12,18 +12,6 @@ import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types'
 
 import { codeFromName } from './currencies'
 
-import { getFee, Fee } from './fees'
-
-/*
-
-  BIP70 Protocol In The Context Of the Anypay Pay Protocol
-
-*/
-
-interface Bip70PaymentRequest {
-
-}
-
 export function getCurrency(params: GetCurrency): Currency {
 
   let headers = params.headers
@@ -108,7 +96,11 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
 const BASE_URL = getBaseURL();
 
-export async function buildPaymentRequest(paymentOption) {
+import { PaymentRequest, PaymentRequestOptions } from './'
+
+export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
+
+  console.log('BIP70 BUILD PR')
 
   // build outputs
   let outputs = await buildOutputs(paymentOption);
@@ -122,10 +114,14 @@ export async function buildPaymentRequest(paymentOption) {
 
   var now = Date.now() / 1000 | 0;
 
-  pd.set('time', now);
-  pd.set('expires', now + 60 * 60 * 24);
+  pd.set('time', options.time || now);
+  pd.set('expires', options.expires || now + 60 * 60 * 24);
 
-  pd.set('memo', `Anypay® Payment Request ${paymentOption.invoice_uid}`);
+  if (options.memo) {
+
+    pd.set('memo', options.memo)
+
+  }
 
   pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
@@ -144,27 +140,39 @@ export async function buildPaymentRequest(paymentOption) {
   paypro.set('serialized_payment_details', pd.toBuffer());
 
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+    try {
 
-    let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
-    let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
-    let keyPath = process.env.X509_PRIVATE_KEY_PATH;
+      let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
+      let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
+      let keyPath = process.env.X509_PRIVATE_KEY_PATH;
 
-    const file_with_x509_private_key = fs.readFileSync(keyPath);
+      console.log({ keyPath })
 
-    const certificates = new PaymentProtocol().makeX509Certificates();
+      const file_with_x509_private_key = fs.readFileSync(keyPath);
 
-    certificates.set('certificate', [
-      fs.readFileSync(domainDerPath),
-      fs.readFileSync(rootDerPath)
-    ]);
+      console.log({ file: file_with_x509_private_key })
 
-    paypro.set('payment_details_version', 1);
+      const certificates = new PaymentProtocol().makeX509Certificates();
 
-    paypro.set('pki_type', 'x509+sha256');
+      certificates.set('certificate', [
+        fs.readFileSync(domainDerPath),
+        fs.readFileSync(rootDerPath)
+      ]);
 
-    paypro.set('pki_data', certificates.serialize());
+      paypro.set('payment_details_version', 1);
 
-    paypro.sign(file_with_x509_private_key);
+      paypro.set('pki_type', 'x509+sha256');
+
+      paypro.set('pki_data', certificates.serialize());
+
+      paypro.sign(file_with_x509_private_key);
+
+    } catch(error) {
+
+      console.log(error)
+      log.error('paypro.bip70.error', error)
+
+    }
 
   }
 

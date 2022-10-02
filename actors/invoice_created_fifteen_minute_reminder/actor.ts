@@ -2,7 +2,7 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, email } from 'rabbi';
+import { Actor, email } from 'rabbi';
 
 import { models, log } from '../../lib'
 

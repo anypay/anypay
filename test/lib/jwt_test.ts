@@ -2,6 +2,8 @@
 import * as assert from 'assert';
 import { generateAdminToken, verifyToken } from '../../lib/jwt';
 
+import { config } from '../../lib/config' 
+
 describe("JWT Authentication", () => {
 
   it('#generateAdminToken should sign a token with admin=true', async () => {
@@ -11,14 +13,13 @@ describe("JWT Authentication", () => {
     let legit = await verifyToken(token);
 
     assert.strictEqual(legit.admin, true);
-    assert.strictEqual(legit.aud, 'https://anypayx.com');
-    assert.strictEqual(legit.iss, 'anypayx.com');
-    assert.strictEqual(legit.sub, 'auth@anypayx.com');
+    assert.strictEqual(legit.aud, `https://${config.get('DOMAIN')}`);
+    assert.strictEqual(legit.iss, config.get('DOMAIN'));
     assert(legit.iat);
     assert(legit.exp);
   });
 
-  it('#verifyToken should fail on an invalid token', async () => {;
+  it('#verifyToken should fail on an invalid token', async () => {
 
     let token = await generateAdminToken();
 
@@ -26,7 +27,7 @@ describe("JWT Authentication", () => {
 
     try {
 
-      let legit = await verifyToken(invalidToken);
+      await verifyToken(invalidToken);
 
       assert(false, 'token should not be verified');
 

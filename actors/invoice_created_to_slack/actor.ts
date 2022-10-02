@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor } from 'rabbi';
 
-import { accounts, models, slack } from '../../lib';
+import { models, slack } from '../../lib';
 
 export async function start() {
 
@@ -18,8 +18,6 @@ export async function start() {
 
   })
   .start(async (channel, msg, json) => {
-
-    console.log(json);
 
     let account = await models.Account.findOne({ where: { id: json.account_id }})
 

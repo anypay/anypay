@@ -37,6 +37,10 @@ export class Orm {
 
   }
 
+  get id() {
+    return this.get('id')
+  }
+
   static findOrCreate(params: FindOrCreate) {
 
     return Orm.model.findOrCreate(params)
@@ -79,6 +83,44 @@ export class Orm {
     return this.record.save()
 
   }
+
+}
+
+export async function findOrCreate<T>(constructor: any, params: any): Promise<[T, boolean]> {
+
+  let [record, isNew] = await constructor.model.findOrCreate(params)
+
+  let instance = new constructor(record)
+
+  return [instance, isNew]
+
+}
+
+export async function create<T>(constructor: any, params: any): Promise<T> {
+
+  let record = await constructor.model.create(params)
+
+  let instance = new constructor(record)
+
+  return instance
+
+}
+
+export async function findAll<T>(constructor: any, params: any): Promise<T[]> {
+
+  let records = await constructor.model.findAll(params)
+
+  return records.map(record => new constructor(record))
+
+}
+
+export async function findOne<T>(constructor: any, params: any): Promise<T | null> {
+
+  let record = await constructor.model.findOne(params)
+
+  if (!record) { return null }
+
+  return new constructor(record)
 
 }
 

@@ -2,10 +2,13 @@ const bcrypt = require('bcryptjs');
 
 import { models } from './models';
 
-const uuid = require('uuid');
 const log = require('winston');
 
-import  { ses } from './email/ses'
+import { config } from './config'
+
+const sender = config.get('EMAIL_SENDER')
+
+import  { ses } from './email'
 
 export function hash(password) {
   return new Promise((resolve, reject) => {
@@ -15,18 +18,6 @@ export function hash(password) {
       resolve(hash);
     })
   });
-}
-
-export async function bcryptCompare(password, hash) {
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(password, hash, (error, res) => {
-      if (res) {
-        resolve(null);
-      } else {
-        reject(new Error("invalid password"));
-      }
-    })
-  })
 }
 
 export async function resetPasswordByEmail(email, newPassword) {
@@ -75,7 +66,7 @@ export async function sendPasswordResetEmail(email) {
           Text: {
             Charset: "UTF-8",
             Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link
-            below:\n\nhttps://anypayx.com/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            below:\n\nhttps://legacy.${config.get('DOMAIN')}/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
@@ -83,10 +74,10 @@ export async function sendPasswordResetEmail(email) {
           Data: "Forgotten Password Reset"
         }
       },
-      Source: 'no-reply@anypayx.com'
+      Source: sender
     }, (error, response) => {
       if (error) {
-        log.error('error sending password reset email', error.message);
+        log.error('error sending password reset email', error);
         return reject(error)
       }
       log.info(`successfully set password reset email to ${email}`);

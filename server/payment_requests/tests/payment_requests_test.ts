@@ -1,7 +1,7 @@
 
 import * as assert from 'assert';
 
-import { server, generateAccount, generateInvoice } from './utils'
+import { server, generateAccount, createInvoice } from './utils'
 
 describe("Payment Requests", async () => {
 
@@ -17,7 +17,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return DASH BIP70 request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'DASH')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -33,7 +37,12 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BCH BIP70 request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BCH')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
+
 
       let response = await server.inject({
         method: 'GET',
@@ -49,7 +58,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BTC BIP70 request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BTC')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -69,7 +82,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BIP270 request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BSV')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -86,7 +103,12 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with no header should return BIP270 request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BSV')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
+
 
       let response = await server.inject({
         method: 'GET',
@@ -103,7 +125,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return DASH JSON request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'DASH')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -120,7 +146,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BSV JSON request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BSV')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -137,7 +167,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BTC JSON request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BTC')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -154,7 +188,11 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return LTC JSON request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'LTC')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
 
       let response = await server.inject({
         method: 'GET',
@@ -171,7 +209,12 @@ describe("Payment Requests", async () => {
 
     it('#GET /r/{invoice.uid} with proper header should return BCH JSON request', async () => {
 
-      let invoice = await generateInvoice(account.id, 0.1, 'BCH')
+      let invoice = await createInvoice({
+        account,
+        amount: 0.1,
+        currency: account.get('denomination')
+      })
+
 
       let response = await server.inject({
         method: 'GET',

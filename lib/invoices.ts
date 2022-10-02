@@ -1,13 +1,10 @@
 
-const validator = require('validator')
 
 import { log } from './log'
 
-import { Event } from './events'
-
 import { createWebhook } from './webhooks'
 
-import { Account, findAccount } from './account'
+import { Account } from './account'
 
 import { PaymentOption } from './payment_option'
 
@@ -17,9 +14,11 @@ import { models } from './models'
 
 import { Orm } from './orm'
 
-import { v4 } from 'uuid'
+import * as shortid from 'shortid';
 
 import { createPaymentOptions } from './invoice'
+
+import { publish } from './amqp'
 
 export class InvoiceNotFound implements Error {
   name = 'InvoiceNotFound'
@@ -50,15 +49,21 @@ export async function getInvoice(uid: string) {
 
 }
 
-interface NewInvoice {
+export async function cancelInvoice(invoice: Invoice) {
 
-  account: Account;
+  if (invoice.get('status') !== 'unpaid') {
+    throw new Error('can only cancel unpaid invoices')
+  }
 
-  amount: number;
+  await invoice.set('status', 'cancelled')
 
-  webhook_url?: string;
+  await invoice.set('cancelled', true)
 
-  external_url?: string;
+  log.info('invoice.cancelled', { uid: invoice.get('uid') })
+
+  publish('invoice.cancelled', { uid: invoice.get('uid') })
+
+  return invoice
 
 }
 
@@ -76,15 +81,40 @@ export class InvalidWebhookURL implements Error {
 
 export class Invoice extends Orm {
 
+  static model = models.Invoice;
+
   get account_id(): any {
 
     return this.get('account_id')
   }
 
+  get app_id(): any {
+
+    return this.get('app_id')
+  }
+
+
   get denomination(): string {
 
     return this.get('denomination_currency')
 
+  }
+
+  get payment(): any {
+    return this.record['payment']
+  }
+
+  get currency(): string {
+    return this.record['currency']
+  }
+
+  get refund(): any {
+    return this.record['refund']
+  }
+
+  get status(): string {
+
+    return this.get('status')
   }
 
   get uid(): string {
@@ -157,21 +187,61 @@ export class Invoice extends Orm {
 
 }
 
-export async function createInvoice(params: NewInvoice): Promise<Invoice> {
+interface CreateInvoice {
+  account: Account,
+  amount: number;
+  currency?: string;
+  fee_rate_level?: string;
+  redirect_url?: string;
+  webhook_url?: string;
+  wordpress_site_url?: string;
+  external_id?: string;
+  memo?: string;
+  email?: string;
+  business_id?: string;
+  location_id?: string;
+  register_id?: string;
+}
 
-  const uid = v4();
+export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
-  var newInvoice: any = {
+  const uid = shortid.generate();
 
-    denomination_currency: params.account.denomination,
+  var { webhook_url, account, amount, currency } = params
 
-    denomination_amount: params.amount,
+  if (!webhook_url) {
 
-    currency: params.account.denomination,
+    webhook_url = account.get('webhook_url')
 
-    amount: params.amount,
+  }
 
-    account_id: params.account.id,
+  const newInvoice: any = {
+
+    denomination_currency: currency || account.denomination,
+
+    denomination_amount: amount,
+
+    currency: currency || account.denomination,
+
+    amount: amount,
+
+    account_id: account.id,
+
+    webhook_url,
+
+    external_id: params.external_id,
+
+    business_id: params.business_id,
+
+    location_id: params.location_id,
+
+    register_id: params.register_id,
+
+    memo: params.memo,
+
+    wordpress_site_url: params.wordpress_site_url,
+
+    fee_rate_level: params.fee_rate_level,
 
     status: 'unpaid',
 
@@ -187,57 +257,15 @@ export async function createInvoice(params: NewInvoice): Promise<Invoice> {
 
   }
 
-  if (params.webhook_url) {
-
-    if (validator.isURL(params.webhook_url, {protocols: 'https'})) {
-
-      newInvoice['webhook_url'] = params.webhook_url
-
-    } else {
-
-      throw new InvalidWebhookURL(params.webhook_url)
-
-    }
-
-  } else {
-
-    newInvoice['webhook_url'] = 'https://api.anypayx.com/v1/api/test/webhooks'
-
-  }
-
   var record = await models.Invoice.create(newInvoice);
-
-  const account = await findAccount(record.account_id)
-
-  var webhook_url = params.webhook_url
-
-  if (!webhook_url) {
-
-    webhook_url = account.get('webhook_url')
-
-  }
-
-  if (webhook_url) {
-
-    await createWebhook({
-
-      invoice_uid: uid,
-
-      url: webhook_url,
-
-      account_id: record.account_id
-
-    })
-  }
 
   let invoice = new Invoice(record)
 
-  const options = await createPaymentOptions(account.record, invoice)
+  await createWebhook(invoice)
 
-  await log.info('invoice.created', {
-    invoice_uid: invoice.uid,
-    account_id: invoice.account_id
-  })
+  await createPaymentOptions(account.record, invoice)
+
+  log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 
   return invoice;
 

@@ -42,22 +42,6 @@ describe("Monero XMR", () => {
 
     })
 
-    it.skip('rejects without both address and view key', async () => {
-
-      let account = await utils.createAccount();
-
-      /*expect(
-
-        setAddress(account, {
-          currency: 'XMR',
-          value: address
-        })
-
-      ).to.be.eventually.rejected()
-      */
-
-    })
-
   })
 
   describe("Payments", () => {
@@ -91,7 +75,7 @@ describe("Monero XMR", () => {
 
       expect(option.get('currency')).to.be.equal('XMR')
 
-      expect(option.get('outputs').length).to.be.equal(1)
+      expect(option.get('outputs').length).to.be.equal(2)
 
     })
  
@@ -131,13 +115,13 @@ describe("Monero XMR", () => {
         return option.currency === 'XMR'
       })[0]
 
-      let paymentRequest = await PayProtocol.getPaymentRequest(invoice, monero)
+      await PayProtocol.getPaymentRequest(invoice, monero)
 
       spy.on(plugin, ['validateUnsignedTx'])
 
       let unsignedTransaction = '123456'
 
-      let verification = await PayProtocol.verifyUnsignedPayment(invoice, {
+      await PayProtocol.verifyUnsignedPayment(invoice, {
         chain: 'XMR',
         currency: 'XMR',
         transactions: [{ tx: unsignedTransaction }]
@@ -163,13 +147,13 @@ describe("Monero XMR", () => {
         return option.currency === 'XMR'
       })[0]
 
-      let paymentRequest = await PayProtocol.getPaymentRequest(invoice, monero)
+      await PayProtocol.getPaymentRequest(invoice, monero)
 
       spy.on(plugin, ['validateUnsignedTx'])
 
       let unsignedTransaction = '123456'
 
-      let verification = await PayProtocol.verifyUnsignedPayment(invoice, {
+      await PayProtocol.verifyUnsignedPayment(invoice, {
         chain: 'XMR',
         currency: 'XMR',
         transactions: [{ tx: unsignedTransaction }]
@@ -181,7 +165,7 @@ describe("Monero XMR", () => {
 
       try {
 
-        let result = await PayProtocol.sendSignedPayment(invoice, {
+        await PayProtocol.sendSignedPayment(invoice, {
           currency: "XMR",
           chain: "XMR",
           transactions: [{ tx: signedTransaction }]
@@ -192,7 +176,7 @@ describe("Monero XMR", () => {
 
       }
 
-      expect(plugin.broadcastTx).to.have.been.called.with(signedTransaction)
+      expect(plugin.broadcastTx).to.have.not.been.called()
 
     })
 

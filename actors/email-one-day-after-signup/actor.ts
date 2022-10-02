@@ -2,7 +2,11 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, getChannel, log, email } from 'rabbi';
+import { Actor, email } from 'rabbi';
+
+import { config } from '../../lib/config'
+
+const sender = config.get('EMAIL_SENDER')
 
 export async function start() {
 
@@ -22,7 +26,7 @@ export async function start() {
 
     // TODO: send one day after sign up email
 
-    await email.sendEmail('one_day_after_signup', json.email, 'Anypay<support@anypayx.com>', json)
+    await email.sendEmail('one_day_after_signup', json.email, sender, json)
 
     channel.ack(msg);
 

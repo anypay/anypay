@@ -1,7 +1,5 @@
 import { database, models } from '../../../lib';
 
-import * as moment from 'moment';
-
 import { Request, ResponseToolkit } from 'hapi';
 
 import { listAll, listActiveSince as listActiveMerchantsSince } from '../../../lib/merchants'
@@ -67,9 +65,7 @@ export async function show(req, h) {
 };
 
 async function getMerchantInfo(accountId: any): Promise<MerchantInfo> {
-
-  console.log("get merchant info", accountId);
-
+  
   let account = await models.Account.findOne({where: {
     stub: accountId
   }})

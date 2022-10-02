@@ -1,6 +1,4 @@
 
-import { badRequest } from 'boom'
-
 const Fixer = require('../../../lib/prices/fixer');
 
 export async function index(req, h) {

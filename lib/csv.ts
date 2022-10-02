@@ -3,15 +3,11 @@ import { models } from './models';
 
 import * as moment from 'moment';
 
-import { readFileSync } from 'fs';
-
-import * as mustache from 'mustache';
-
 import { Op } from 'sequelize';
 
-import * as Handlebars from 'handlebars';
-
 import { join } from 'path';
+
+import { Account } from './account'
 
 export async function getInvoicesByDates(accountId, start, end) {
 
@@ -96,62 +92,99 @@ export async function getInvoices(invoiceUID: string) {
 
 }
 
-export async function buildReportCsv(invoices: any[], filepath: string): Promise<string> {
+interface ReportInvoice {
+
+  invoice_uid: string;
+  invoice_date: Date;
+  invoice_amount: number;
+  invoice_currency: string;
+  invoice_external_id?: string;
+
+  payment_date?: Date;
+  payment_amount?: number;
+  payment_currency?: string;
+  payment_txid?: string;
+
+  refund_txid?: string;
+}
+
+export async function buildAccountCsvReport(account: Account): Promise<string> {
+
+  let paidInvoices = await models.Invoice.findAll({
+    where: {
+      status: 'paid',
+      account_id: account.get('id'),
+      app_id: null
+    },
+
+    include: [{
+      model: models.Payment,
+      as: 'payment'
+    }, {
+      model: models.Refund,
+      as: 'refund'
+    }],
+
+    order: [['paidAt', 'desc']]
+  })
+
+  let invoices = paidInvoices.map(invoice => {
+
+    let data = {
+      invoice_uid: invoice.uid,
+      invoice_date: invoice.createdAt,
+      invoice_amount: invoice.denomination_amount,
+      invoice_currency: invoice.denomination_currency,
+      invoice_external_id: invoice.external_id
+    }
+
+    data['payment_date'] = invoice.paidAt
+    data['payment_currency'] = invoice.invoice_currency
+    data['payment_amount'] = invoice.invoice_amount
+    data['payment_txid'] = invoice.hash
+
+    if (invoice.refund) {
+      data['refund_address'] = invoice.refund.address
+      data['refund_txid'] = invoice.refund.txid
+      data['refund_address'] = invoice.refund.address
+    }
+
+    return data
+
+  })
+
+  return buildReportCsv(invoices, '')
+
+}
+
+export async function buildReportCsv(invoices: ReportInvoice[], filepath: string): Promise<string> {
 
   const createCsvStringifier = require('csv-writer').createObjectCsvStringifier;
   const csvStringifier = createCsvStringifier({
     path: filepath,
     header: [
-      {id: 'completed_at', title: 'Paid at'},
-      {id: 'denomination_amount', title: 'Amount Invoiced'},
-      {id: 'denomination_amount_paid', title: 'Amount Paid (USD)'},
-      {id: 'settlement_amount', title: 'Account Gets (USD)'},
-      {id: 'external_id', title: 'Reference'},
-      {id: 'currency', title: 'Currency'},
-      {id: 'amount', title: 'Amount Paid (Crypto)'},
-      {id: 'uid', title: 'Invoice ID'},
-      {id: 'settlement_type', title: 'Settlement Type'},
-      {id: 'settlement_uid', title: 'Settlement UID'},
-      {id: 'settlement_date', title: 'Settlement Date'}
+      {id: 'invoice_date', title: 'Date Invoiced'},
+      {id: 'invoice_amount', title: 'Amount Invoiced'},
+      {id: 'invoice_currency', title: 'Currency Invoiced'},
+      {id: 'invoice_uid', title: 'Invoice ID'},
+      {id: 'payment_currency', title: 'Payment Currency'},
+      {id: 'payment_amount', title: 'Payment Amount'},
+      {id: 'payment_date', title: 'Payment Date'},
+      {id: 'payment_txid', title: 'Payment Txid'},
+      {id: 'external_id', title: 'External Reference ID'},
+      {id: 'refund_address', title: 'Refund Address'},
+      {id: 'refund_txid', title: 'Refund Txid'}
     ]
   });
 
   let header = await csvStringifier.getHeaderString();
 
-  let records = await csvStringifier.stringifyRecords(invoices.map((invoice: any = {}) => {
+  let records = await csvStringifier.stringifyRecords(invoices.map((invoice: ReportInvoice) => {
 
-    var newInvoice = invoice.toJSON()
-
-    newInvoice.paid_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-    newInvoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-    newInvoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    if (invoice.ach_batch) {
-      newInvoice.ach_batch = invoice.ach_batch.batch_id
-    } else if (invoice.bitpay_settlement) {
-      newInvoice.ach_batch = invoice.bitpay_settlement.url
-    } else {
-      newInvoice.ach_batch = null
-    }
-
-    if (invoice.bitpay_settlement) {
-      newInvoice.settlement_type = 'Bitpay'
-      newInvoice.settlement_uid = invoice.bitpay_settlement.url
-      newInvoice.settlement_date = moment(invoice.bitpay_settlement.createdAt).format('MM/DD/YYYY')
-    } else if (invoice.ach_batch_id) {
-
-      newInvoice.settlement_type = 'ACH'
-      if (invoice.ach_batch) {
-        newInvoice.settlement_uid = invoice.ach_batch.batch_id
-        newInvoice.settlement_date = moment(invoice.ach_batch.effective_date).format('MM/DD/YYYY')
-      }
-    } else if (invoice.wire_id) {
-      newInvoice.settlement_type = 'WIRE'
-      newInvoice.settlement_uid = invoice.wire.uid
-      newInvoice.settlement_date = moment(invoice.wire.effective_date).format('MM/DD/YYYY')
-    }
-
-    return newInvoice
+    return Object.assign(invoice, {
+      invoice_date: moment(invoice.invoice_date).format('YYYY-MM-DD hh:mm:ss'),
+      payment_date: moment(invoice.payment_date).format('YYYY-MM-DD hh:mm:ss')
+    })
     
   }));
 

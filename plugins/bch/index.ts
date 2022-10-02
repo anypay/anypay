@@ -1,12 +1,9 @@
-require('dotenv').config();
 
-import * as http from 'superagent';
+require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
-import {generateInvoice} from '../../lib/invoice';
-
-import {log, models} from '../../lib';
+import {log} from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -14,23 +11,19 @@ export { bch as bitcore }
 
 var bchaddr: any = require('bchaddrjs');
 
-export async function submitTransaction(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return broadcastTx(rawTx)
+import { oneSuccess } from 'promise-one-success'
 
-}
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
-export async function broadcastTx(hex: string) {
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-  return blockchair.publish('bitcoin-cash', hex)
+    blockchair.publish('bitcoin-cash', rawTx)
 
-}
+  ]
 
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BCH');
-
-  return invoice;
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 
@@ -40,11 +33,13 @@ function validateAddress(address: string) {
 
     new bch.HDPublicKey(address);
 
+    log.debug('plugins.bch.hdpublickey.valid', address)
+
     return true;
 
   } catch(error) {
 
-    log.info('plugins.bch.address.invalid', error)
+    log.debug('plugins.bch.hdpublickey.invalid', error)
 
   }
 
@@ -75,8 +70,6 @@ const currency = 'BCH';
 export {
 
   currency,
-
-  createInvoice,
 
   validateAddress
 

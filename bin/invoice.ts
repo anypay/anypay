@@ -11,6 +11,10 @@ import { invoicePaidEmail } from '../lib/email';
 
 import { email } from 'rabbi';
 
+import { listInvoiceEvents } from '../lib/events'
+
+import { ensureInvoice } from '../lib/invoices'
+
 program
   .command('generate <email> <denomination_amount> <currency>')
   .action(async (email, denominationAmount, currency) => {
@@ -31,7 +35,35 @@ program
 
     } catch(error) {
 
-      log.error(error);
+      log.error('invoice.generate.error', error);
+
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('events <invoice_uid>')
+  .action(async (invoice_uid) => {
+
+    try {
+      
+      let invoice = await ensureInvoice(invoice_uid)
+
+      let events = await listInvoiceEvents(invoice)
+
+      for (let event of events) {
+
+        console.log(event.toJSON())
+
+      }
+
+    } catch(error) {
+
+      console.log(error)
+
+      log.error('events.error', error);
 
     }
 
@@ -52,7 +84,6 @@ program
     } catch(error) {
 
       console.log(error)
-      log.error(error)
 
     }
 
@@ -71,6 +102,36 @@ program
       }});
 
       let resp = await invoicePaidEmail(invoice);
+
+    } catch(error) {
+
+      console.log(error);
+    }
+
+    process.exit(0);
+
+  });
+
+program
+  .command('info <invoice_uid>')
+  .action(async (uid) => {
+
+    try {
+
+      let invoice = await models.Invoice.findOne({
+        where: {
+          uid
+        },
+        include: [{
+          model: models.Payment,
+          as: 'payment'
+        }, {
+          model: models.Refund,
+          as: 'refund'
+        }]
+      });
+
+      console.log(invoice.toJSON())
 
     } catch(error) {
 

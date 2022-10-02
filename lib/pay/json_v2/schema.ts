@@ -1,5 +1,5 @@
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 const PaymentOptionsHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).required(),
@@ -20,7 +20,7 @@ const PaymentOption = Joi.object({
 const PaymentOptions = Joi.object({
   time: Joi.date().timestamp().required(),
   expires: Joi.date().timestamp().required(),
-  memo: Joi.string().required(),
+  memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
   paymentOptions: Joi.array().required().items(PaymentOption)
@@ -36,10 +36,6 @@ const PaymentRequestReq = Joi.object({
   currency: Joi.string().required()
 })
 
-const Instruction = Joi.object({
-  type: Joi.string().required()
-})
-
 const AuthHeaders = Joi.object({
   'digest': Joi.string().required(),
   'x-identity': Joi.string().required(),
@@ -50,7 +46,7 @@ const AuthHeaders = Joi.object({
 const PaymentRequest = Joi.object({
   time: Joi.date().timestamp(),
   expires: Joi.date().timestamp(),
-  memo: Joi.string().required(),
+  memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
   chain: Joi.string().required(),
@@ -80,7 +76,7 @@ const PaymentVerification = Joi.object({
       tx: Joi.string().required()
     }))
   }),
-  memo: Joi.string().required()
+  memo: Joi.string().optional().allow('', null)
 })
 
 const PaymentHeaders = Joi.object({
@@ -93,27 +89,17 @@ const Payment = Joi.object({
     chain: Joi.string().required(),
     transactions: Joi.array().required().items(Joi.object({
       tx: Joi.string().required(),
-      weightedSize: Joi.number().optional()
+      weightedSize: Joi.number().optional(),
+      tx_key: Joi.string().custom((value) => {
+        return Buffer.byteLength(value, 'hex') === 32
+      }).optional(),
+      tx_hash: Joi.string().custom((value) => {
+        return Buffer.byteLength(value, 'hex') === 32
+      }).optional()
     })),
     currency: Joi.string().required()
   }).required(),
-  memo: Joi.string().required()
-})
-
-const SigningKeys = Joi.object({
-  owner: Joi.string().required(),
-  expirationDate: Joi.date().timestamp().required(),
-  validDomains: Joi.array().required().items(Joi.string()),
-  publicKeys: Joi.array().required().items(Joi.string())
-})
-
-const KeySignatures = Joi.object({
-  keyHash: Joi.string().required(),
-  signatures: Joi.array().required().items(Joi.object({
-    created: Joi.date().timestamp().required(),
-    identifier: Joi.string().required(),
-    signature: Joi.string().required()
-  }))
+  memo: Joi.string().optional().allow('', null)
 })
 
 export const Protocol = {

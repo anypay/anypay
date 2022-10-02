@@ -3,6 +3,8 @@ import { models } from './models';
 
 import { log } from './log';
 
+import { config } from './config'
+
 import { Invoice } from './invoices'
 
 import { PaymentRequired } from 'get402'
@@ -17,7 +19,7 @@ import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
 
-export const DEFAULT_WEBHOOK_URL = 'https://api.anypayx.com/v1/api/test/webhooks'
+export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
@@ -57,13 +59,21 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
     } catch(e) {
 
-      response_code = e.response.statusCode;
+      log.debug('webhook.error', e)
+      log.debug('webhook.error', e.message)
 
-      if (typeof e.response.body !== 'string') {
-        response_body = JSON.stringify(e.response.text); 
-      } else {
-        response_body = e.response.body; 
+      if (e.response) {
+
+        response_code = e.response.statusCode;
+
+        if (typeof e.response.body !== 'string') {
+          response_body = JSON.stringify(e.response.text); 
+        } else {
+          response_body = e.response.body; 
+        }
+
       }
+
       error = e.message;
 
       ended_at = new Date();
@@ -71,8 +81,6 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
       status = 'failed'
 
     }
-
-
 
     let webhook = await models.Webhook.create({
       account_id: invoice.account_id,
@@ -91,10 +99,9 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
   } else {
 
-    throw new Error('no webhook_url set for invoice');
+    log.debug('invoice.webhook_url.empty', { invoice_uid: invoiceUid });
 
   }
-
 }
 
 interface FindWebhook { 
@@ -237,15 +244,18 @@ export async function findWebhook(where: FindWebhook) {
   return new Webhook({ record, attempts, invoice })
 }
 
-interface CreateWebhook {
-  invoice_uid: string;
-  url: string;
-  account_id: number;
-}
+export async function createWebhook(invoice: Invoice): Promise<Webhook> {
 
-export async function createWebhook(where: CreateWebhook): Promise<Webhook> {
+  const where = {
+    invoice_uid: invoice.uid,
+    url: invoice.get('webhook_url') || DEFAULT_WEBHOOK_URL,
+    account_id: invoice.get('account_id')
+  }
 
-  let [webhook] = await models.Webhook.findOrCreate({where, defaults: where})
+  let [webhook] = await models.Webhook.findOrCreate({
+    where,
+    defaults: where
+  })
 
   if (!webhook) { throw new WebhookNotFound() }
 
@@ -278,7 +288,6 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
   record.started_at = new Date();
 
-  var response_code, response_body, ended_at, error;
   var resp;
 
   let attemp = new Attempt({record, webhook})
@@ -373,7 +382,7 @@ export class PaidWebhook {
 
         let account = await this.webhook.getAccount()
 
-        await email.sendEmail('get402-insufficient-funds', account.email, 'noreply@anypayx.com')
+        await email.sendEmail('get402-insufficient-funds', account.email, config.get('EMAIL_SENDER'))
 
       }
 

@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-import * as Hapi from 'hapi'
+import * as Hapi from '@hapi/hapi'
 
 import { log } from '../../lib/log'
 
@@ -9,9 +9,6 @@ import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 import { join } from 'path'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
-
-import * as jsonV2 from '../jsonV2/handlers/protocol'
-
 
 export function attach(server: Hapi.Server) {
 
@@ -23,6 +20,16 @@ export function attach(server: Hapi.Server) {
     if ('application/payment' === request.headers['content-type']) {
       request.headers['content-type'] = 'application/json';
       request.headers['x-content-type'] = 'application/payment';
+    }
+
+    if ('application/payment-request' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-request';
+    }
+
+    if ('application/payment-verification' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment-verification';
     }
 
     if ('application/payment' === request.headers['accept']) {
@@ -69,13 +76,18 @@ export function attach(server: Hapi.Server) {
     return h.continue;
   });
 
-  /* PAYMENT PROTOCOLS */
+  server.ext('onRequest', function(request, h) {
 
-  server.route({
-    method: "POST",
-    path: "/r/beta",
-    handler: handlers.PaymentRequests.createBeta
-  })
+    if ('application/payment' === request.headers['content-type']) {
+      request.headers['content-type'] = 'application/json';
+      request.headers['x-content-type'] = 'application/payment';
+    }
+
+    return h.continue;
+  });
+
+
+  /* PAYMENT PROTOCOLS */
 
   /* PAYMENT REQUESTS
    *
@@ -93,11 +105,6 @@ export function attach(server: Hapi.Server) {
   })
 
   /* PAYMENT SUBMISSION */
-  server.route({
-    method: "POST",
-    path: "/r/{uid}/pay/{currency}/jsonv2",
-    handler: handlers.JsonPaymentRequests.create
-  })
 
   server.route({
     method: "POST",

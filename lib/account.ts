@@ -1,11 +1,13 @@
 
 import { models } from './models'
 
-import { Orm, Record } from './orm'
+import { Orm } from './orm'
 
 import { setAddress } from './core'
 
 import { Address, findAddress } from './addresses'
+
+import { Invoice } from './invoices'
 
 interface SetAddress {
   currency: string;
@@ -53,6 +55,36 @@ export class Account extends Orm {
     })
 
     return findAddress(this, params.currency)
+
+  }
+
+  async listPaidInvoices(): Promise<Invoice[]> {
+
+    let records = await models.Invoice.findAll({
+      where: {
+        status: 'paid',
+        account_id: this.get('id'),
+        app_id: null
+      },
+
+      include: [{
+        model: models.Payment,
+        as: 'payment'
+      }, {
+        model: models.Refund,
+        as: 'refund'
+      }],
+
+      order: [['paidAt', 'desc']]
+    })
+
+    return records.map(record => {
+
+      if (record.refund) {
+        console.log(record.toJSON())
+      }
+      return new Invoice(record)
+    })
 
   }
 

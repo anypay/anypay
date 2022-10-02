@@ -8,7 +8,11 @@ require('dotenv').config();
 
 import * as moment from 'moment';
 
-import { PaymentOutput, PaymentOption, GetCurrency, Currency } from '../types';
+import { config } from '../../config'
+
+import * as mempool from '../../mempool.space'
+
+import { PaymentOption, GetCurrency, Currency } from '../types';
 import { nameFromCode } from '../currencies';
 import { BigNumber } from 'bignumber.js';
 
@@ -50,29 +54,69 @@ export interface JsonV2PaymentRequest {
 
 const BASE_URL = getBaseURL();
 
-export async function buildPaymentRequest(paymentOption: PaymentOption): Promise<JsonV2PaymentRequest> {
+import { PaymentRequestOptions } from '../'
+
+export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<JsonV2PaymentRequest> {
   var outputs;
 
+  const { currency, invoice_uid } = paymentOption
+
   if (paymentOption.outputs) {
+
     outputs = paymentOption.outputs
+
   } else {
+
     outputs = await buildOutputs(paymentOption)
+
   }
+
+  var requiredFeeRate = 1
+
+  const rate_env_variable = `REQUIRED_FEE_RATE_${currency}`
+
+  const feeFromEnv = process.env[rate_env_variable]
+
+  if (feeFromEnv) {
+
+    requiredFeeRate = parseInt(feeFromEnv)
+
+  }
+
+  if (paymentOption.currency === 'BTC') {
+
+    if (config.get('mempool_space_fees_enabled')) {
+
+      const level = mempool.FeeLevels[options.fee_rate_level]
+
+      requiredFeeRate = await mempool.getFeeRate(level || mempool.FeeLevels.fastestFee)
+
+    }
+
+  }
+
+  const network = "main"
+
+  const time = moment(paymentOption.createdAt).toDate()
+
+  const expires = moment(paymentOption.createdAt).add(15, 'minutes').toDate()
+
+  const { memo } = options
+
+  const paymentUrl = `${BASE_URL}/r/${invoice_uid}/pay/${currency}/jsonv2`
+
+  const paymentId = invoice_uid
 
   const paymentRequest = {
-    "network": "main",
-    "currency": paymentOption.currency,
-    "requiredFeeRate": 1,
-    "outputs": outputs,
-    "time": moment(paymentOption.createdAt).toDate(),
-    "expires": moment(paymentOption.createdAt).add(15, 'minutes').toDate(),
-    "memo": `Anypay Payment Request ${paymentOption.invoice_uid}`,
-    "paymentUrl": `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/jsonv2`,
-    "paymentId": paymentOption.invoice_uid
-  }
-
-  if (process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]) {
-    paymentRequest.requiredFeeRate = parseInt(process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`])
+    network,
+    currency,
+    requiredFeeRate,
+    outputs,
+    time, 
+    expires,
+    memo,
+    paymentUrl,
+    paymentId
   }
 
   return paymentRequest;
@@ -113,6 +157,7 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 }
 
 import * as schema from './schema'
+
 import * as protocol from './protocol'
 
 export { schema, protocol }

@@ -1,12 +1,10 @@
-const http = require("superagent");
-
-import {generateInvoice} from '../../lib/invoice';
 
 import * as blockchair from '../../lib/blockchair';
 
 var WAValidator = require('anypay-wallet-address-validator');
 
 const doge = require('bitcore-doge-lib');
+
 
 export { doge as bitcore }
 
@@ -22,22 +20,19 @@ export async function getNewAddress(record) {
   return record.value;
 }
 
-export async function createInvoice(accountId: number, amount: number) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  let invoice = await generateInvoice(accountId, amount, 'DOGE');
+import { oneSuccess } from 'promise-one-success'
 
-  return invoice;
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
-}
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-export async function submitTransaction(rawTx: string) {
+    blockchair.publish('dogecoin', rawTx)
 
-  return blockchair.publish('dogecoin', rawTx)
+  ]
 
-}
-export async function broadcastTx(rawTx: string) {
-
-  return blockchair.publish('dogecoin', rawTx)
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 

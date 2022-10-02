@@ -9,183 +9,186 @@ import { coins, models, accounts, slack, log, utils } from '../../../lib';
 
 import { near } from '../../../lib/accounts'
 
-function sanitize(account) {
-  let json = account.toJSON()
-  delete json['authenticator_secret']
-  delete json['password_hash']
-  delete json['is_admin']
-}
-
 export async function nearby(req, h) {
 
-  let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
+  try {
 
-  return { accounts }
+    let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
+
+    return { accounts }
+
+  } catch(error) {
+
+    log.error('api.v0.Accounts.nearby', error)
+
+    return h.badRequest(error)
+
+  }
 
 }
 
 export async function update(req, h) {
 
-  let account = await accounts.updateAccount(req.account, req.payload);
+  try {
 
-  slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
+    let account = await accounts.updateAccount(req.account, req.payload);
 
-  return {
+    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
 
-    success: true,
+    return {
 
-    account
+      success: true,
+
+      account
+
+    }
+
+  } catch(error) {
+
+    log.error('api.v0.Accounts.update', error)
+
+    return h.badRequest(error)
 
   }
-
-}
-
-export async function createAnonymous(request, h) {
-
-  let account = await models.Account.create();
-
-  log.info(`anonymous account ${account.uid} created`);
-
-  let access_token = await models.AccessToken.create({ account_id: account.id });
-
-  return { account, access_token }
-
-}
-
-export async function registerAnonymous(request, h) {
-  let email = request.payload.email;
-
-  log.info('create.account', email);
-
-  let passwordHash = await utils.hash(request.payload.password);
-
-  request.account.email = request.payload.email;
-  request.account.password_hash = passwordHash;
-
-  request.account.save();
-
-  slack.notify(`account:registered | ${request.account.email}`);
-  
-  return request.account;
 
 }
 
 export async function create (request, h) {
-  let email = request.payload.email;
 
-  log.info('create.account', email);
+  try {
+    let email = request.payload.email;
 
-  let passwordHash = await utils.hash(request.payload.password);
+    log.info('create.account', email);
 
-  let account = await models.Account.create({
-    email: request.payload.email,
-    password_hash: passwordHash
-  });
+    let passwordHash = await utils.hash(request.payload.password);
 
-  let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
+    let account = await models.Account.create({
+      email: request.payload.email,
+      password_hash: passwordHash
+    });
 
-  if (geoLocation) {
+    let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
 
-    let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
+    if (geoLocation) {
 
-    slack.notify(`${account.email} registerd from ${userLocation}`);
+      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
-    account.registration_geolocation = geoLocation
+      slack.notify(`${account.email} registerd from ${userLocation}`);
 
-  } else {
+      account.registration_geolocation = geoLocation
 
-    slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+    } else {
+
+      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+
+    }
+
+    account.registration_ip_address = request.info.remoteAddress
+
+    account.save()
+    
+    return account;
+
+  } catch(error) {
+
+    log.error('api.v0.Accounts.create', error)
+
+    return h.badRequest(error)
 
   }
-
-  account.registration_ip_address = request.info.remoteAddress
-
-  account.save()
-  
-  return account;
 
 }
 
 export async function showPublic (req, h) {
 
-  let account = await models.Account.findOne({
-    where: {
-      email: req.params.id
-    }
-  });
+  try {
 
-  if (!account) {
-
-    account = await models.Account.findOne({
+    let account = await models.Account.findOne({
       where: {
-        id: req.params.id
+        email: req.params.id
       }
     });
-  }
 
-  if (!account) {
+    if (!account) {
 
-    return Boom.notFound();
-  }
-
-  let addresses = await models.Address.findAll({
-
-    where: {
-      account_id: account.id
+      account = await models.Account.findOne({
+        where: {
+          id: req.params.id
+        }
+      });
     }
 
-  });
+    if (!account) {
 
-  let payments = await models.Invoice.findAll({
+      return Boom.notFound();
+    }
 
-    where: {
-      account_id: account.id,
-      status: 'paid',
-      createdAt: {
-        [Op.gte]: moment().subtract(1, 'month')
+    let addresses = await models.Address.findAll({
+
+      where: {
+        account_id: account.id
       }
-    },
 
-    order: [["createdAt", "desc"]]
-  
-  })
+    });
 
-  let latest = await models.Invoice.findOne({
+    let payments = await models.Invoice.findAll({
 
-    where: {
-      account_id: account.id,
-      status: 'paid'
-    },
+      where: {
+        account_id: account.id,
+        status: 'paid',
+        createdAt: {
+          [Op.gte]: moment().subtract(1, 'month')
+        }
+      },
 
-    order: [["createdAt", "desc"]]
-  
-  })
+      order: [["createdAt", "desc"]]
+    
+    })
 
-  if (latest) {
-    latest = {
-      time: latest.paidAt,
-      denomination_amount: latest.denomination_amount,
-      denomination_currency: latest.denomination_currency,
-      currency: latest.currency
+    let latest = await models.Invoice.findOne({
+
+      where: {
+        account_id: account.id,
+        status: 'paid'
+      },
+
+      order: [["createdAt", "desc"]]
+    
+    })
+
+    if (latest) {
+      latest = {
+        time: latest.paidAt,
+        denomination_amount: latest.denomination_amount,
+        denomination_currency: latest.denomination_currency,
+        currency: latest.currency
+      }
     }
-  }
 
-  return {
-    id: account.id,
-    name: account.business_name,
-    physical_address: account.physical_address,
-    coordinates: {
-      latitude: account.latitude,
-      longitude: account.longitude
-    },
-    coins: addresses.filter(a => {
-      let coin = coins.getCoin(a.currency)
-      return !!coin && !coin.unavailable
-    }).map(a => a.currency),
-    payments: {
-      last_30_days: payments.length,
-      latest: latest
+    return {
+      id: account.id,
+      name: account.business_name,
+      physical_address: account.physical_address,
+      coordinates: {
+        latitude: account.latitude,
+        longitude: account.longitude
+      },
+      coins: addresses.filter(a => {
+        let coin = coins.getCoin(a.currency)
+        return !!coin && !coin.unavailable
+      }).map(a => a.currency),
+      payments: {
+        last_30_days: payments.length,
+        latest: latest
+      }
+
     }
+
+  } catch(error) {
+
+    log.error('api.v0.Accounts.showPublic', error)
+
+    return h.badRequest(error)
 
   }
 
@@ -193,27 +196,48 @@ export async function showPublic (req, h) {
 
 export async function show (request, h) {
 
-  var account = request.account,
+    try {
+
+    var account = request.account,
+        addresses
+
+    addresses = await models.Address.findAll({ where: {
+      account_id: account.id
+    }});
+
+    return  {
+      account,
       addresses
+    }
+    
+  } catch(error) {
 
-  addresses = await models.Address.findAll({ where: {
-    account_id: account.id
-  }});
+    log.error('api.v0.Accounts.show', error)
 
-  return  {
-    account,
-    addresses
+    return h.badRequest(error)
+
   }
-
 };
 
 export async function index(request, h) {
 
-  let limit = parseInt(request.query.limit) || 100;
-  let offset = parseInt(request.query.offset) || 0;
+  try {
 
-  var accounts = await models.Account.findAll({ offset, limit });
+    let limit = parseInt(request.query.limit) || 100;
+    
+    let offset = parseInt(request.query.offset) || 0;
 
-  return accounts;
+    var accounts = await models.Account.findAll({ offset, limit });
+
+    return accounts;
+
+  } catch(error) {
+
+    log.error('api.v0.Accounts.nearby', error)
+
+    return h.badRequest(error)
+
+  }
+
 };
 

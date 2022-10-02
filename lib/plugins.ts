@@ -2,13 +2,15 @@ require("dotenv").config();
 require('bitcore-lib')
 
 import configurePlugins from "../config/plugins";
-import * as assert from 'assert';
-
-import { channel } from './amqp';
 
 import { models } from './';
 
-import { log } from './';
+export interface BroadcastTxResult {
+  txid: string;
+  txhex: string;
+  success: boolean;
+  result: any;
+}
 
 class Plugins {
 
@@ -36,6 +38,10 @@ class Plugins {
     });
 
     this.plugins = pluginsConfig;
+  }
+
+  find(currency: string): Plugin {
+    return this.findForCurrency(currency)
   }
 
   findForCurrency(currency: string) {
@@ -66,8 +72,6 @@ class Plugins {
       throw new Error(`${currency} address not found for account ${accountId}`);
     }
 
-    log.info(`global.getNewAddress.account:${address.account_id}.currency:${address.currency}`);
-
     if(!this.plugins[currency].getNewAddress){
 
       return address.value
@@ -78,30 +82,6 @@ class Plugins {
     }
 
   }
-
-  async checkAddressForPayments(address: string, currency: string) {
-
-    log.info(`global.checkaddressforpayments.${address}.${currency}`);
-
-    if(!this.plugins[currency].checkAddressForPayments){
-      throw new Error('plugin does not implement checkAddressForPayments')
-    }
-
-    let payments = await this.plugins[currency].checkAddressForPayments(address, currency);
-
-    log.info(`checkaddressforpayments.found`, payments);
-
-    payments.forEach(async payment => {
-
-      let message = Buffer.from(JSON.stringify(payment));
-
-      await channel.publish('anypay.payments', 'payment', message);
-
-      log.info(`amqp.message.published`, `anypay.payments.${JSON.stringify(payment)}`);
-
-    });
-
- }
 
 }
 
@@ -115,6 +95,10 @@ class Plugin {
 
     this.currency = currency;
     this.plugin = plugin;
+  }
+
+  getTransaction(txid) {
+    return this.plugin.getTransaction(txid)
   }
   
 }

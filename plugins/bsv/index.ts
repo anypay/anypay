@@ -2,21 +2,30 @@ require('dotenv').config()
 
 import * as  bchaddr from 'bchaddrjs';
 
-import * as Minercraft from 'minercraft';
-
-import { log } from '../../lib/log'
+import * as bsv from 'bsv';
 
 import { fromSatoshis } from '../../lib/pay'
 
-import * as Bluebird from 'bluebird'
+import * as taal from './lib/taal'
 
+import * as run from './lib/run'
 
-interface Payment{
+import * as whatsonchain from './lib/whatsonchain'
+
+interface Payment {
   amount: number;
   hash: string;
   currency: string;
   address: string;
   invoice_uid?: string;
+}
+
+export async function getTransaction(txid: string): Promise<any> {
+
+  let tx_hex = await whatsonchain.getTransaction(txid)
+
+  return new bsv.Transaction(tx_hex)
+
 }
 
 export function transformHexToPayments(hex: string): Payment[]{
@@ -62,72 +71,34 @@ export function transformHexToPayments(hex: string): Payment[]{
 }
 
 
-export async function broadcastTx(hex) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  let miners = [
-    new Minercraft({
-      url: "https://merchantapi.matterpool.io"
-    }),
-    new Minercraft({
-      url: "https://merchantapi.taal.com"
-    })
+import { oneSuccess } from 'promise-one-success'
+import { blockchair } from '../../lib';
+
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+    taal.broadcastTransaction(rawTx),
+
+    blockchair.publish('bitcoin-sv', rawTx),
+
+    run.broadcastTx(rawTx)
+
   ]
 
-  return Bluebird.any(miners.map(async miner => {
-
-    let result = await  miner.tx.push(hex); 
-
-    log.info(`miner.tx.push.result`, {
-      result,
-      hex
-    })
-
-    if (result.returnResult === 'success') {
-
-      return result
-
-    } else if (result.resultDescription.match('Transaction already in the mempool')) {
-
-      return result
-
-    } else {
-
-      throw new Error(result.resultDescription)
-
-    }
-
-  }))
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
+
 
 var toLegacyAddress = bchaddr.toLegacyAddress;
 var isCashAddress = bchaddr.isCashAddress;
 
-import * as bsv from 'bsv';
-
-import { rpc } from './lib/jsonrpc';
-
-import {generateInvoice} from '../../lib/invoice';
-
-import {models} from '../../lib/models';
-
 const polynym = require('polynym');
 
 var WAValidator = require('anypay-wallet-address-validator');
-
-export async function submitTransaction(rawTx: string) {
-
-  return rpc.call('sendrawtransaction', [rawTx]);
-
-}
-
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BSV');
-
-  return invoice;
-
-}
 
 export async function getPaymail(alias: string) {
 
@@ -200,33 +171,6 @@ export async function getNewAddress(params){
 
   }
 
-  /*
-  //Create a new HDKeyAddress 
-  let record = await models.Hdkeyaddresses.create({
-
-    currency:'BSV',
-
-    xpub_key:process.env.BSV_HD_PUBLIC_KEY
-
-  })
-
-  record.address = deriveAddress(process.env.BSV_HD_PUBLIC_KEY, record.id)
-
-  await record.save()
-
-  rpc.call('importaddress', [record.address, "", false, false])
-
-  return record.address;
-  */
-
-}
-
-function deriveAddress(xkey, nonce){
-
-  let address = new bsv.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
-
 }
 
 export function validateAddress(address: string){
@@ -237,23 +181,4 @@ export function validateAddress(address: string){
 
 }
 
-const name = 'Bitcoin Satoshi Vision';
-
-const currency = 'BSV';
-
-const icon = "https://upload.wikimedia.org/wikipedia/commons/c/c1/Bsv-icon-small.png";
-
-export {
-
-  name,
-
-  currency,
-
-  icon,
-
-  createInvoice
-
-}
-
 export { bsv as bitcore }
-

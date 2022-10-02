@@ -1,8 +1,6 @@
 
 import { apikeys } from '../../../lib'
 
-import { log } from '../../../lib/log'
-
 export async function index(req, h) {
 
   let merchant_api_key = await apikeys.getMerchantApiKey(req.account.id)

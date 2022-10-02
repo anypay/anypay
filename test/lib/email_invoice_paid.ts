@@ -1,14 +1,14 @@
 import * as assert from 'assert'
 import {email, accounts} from '../../lib';
 import {setAddress} from '../../lib/core';
-import {generateInvoice} from '../../lib/invoice';
-import {handlePayment} from '../../lib/payment_processor';
+import {createInvoice} from '../../lib/invoices';
+
 import * as Chance from 'chance';
 const chance = new Chance();
 
 describe("Emails when invoice is paid", ()=>{
 
-  var account,invoice1, invoice2;
+  var account,invoice1;
 
   before(async()=>{
 
@@ -20,7 +20,10 @@ describe("Emails when invoice is paid", ()=>{
       address:"rEdid5kDsz8U4jGqkkvrPgRHpsKQ8gESsG"
     })
 
-    invoice1 = await generateInvoice(account.id, 10, 'XRP');
+    invoice1 = await createInvoice({
+      account,
+      amount: 10
+    })
 
   })
 

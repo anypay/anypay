@@ -1,46 +1,33 @@
 
 require('dotenv').config();
 
-import {createWebhook} from './lib/blockcypher';
-
 import { fromSatoshis, Payment } from '../../lib/pay'
 
-import { any } from 'bluebird'
-
-import {generateInvoice} from '../../lib/invoice';
-
-import {log, models} from '../../lib'
-
-import { rpc } from './lib/jsonrpc';
-
-import * as blockcypher from '../../lib/blockcypher'
-import * as blockchair from '../../lib/blockchair'
-
-import * as http from 'superagent';
+import { blockchair, blockcypher } from '../../lib'
 
 import * as dash from '@dashevo/dashcore-lib';
 
 export { dash as bitcore }
 
-import {oneSuccess} from 'promise-one-success'
+import * as insight from './lib/insight'
 
 var WAValidator = require('anypay-wallet-address-validator');
 
-export async function submitTransaction(rawTx: string) {
+import { BroadcastTxResult } from '../../lib/plugins'
 
-  return oneSuccess([
-    //blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
-  ])
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
-}
+  const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-export async function broadcastTx(rawTx: string) {
+    blockchair.publish('dash', rawTx),
 
-  return oneSuccess([
-    //blockchair.publish(rawTx, 'dash'),
-    blockcypher.publishDASH(rawTx)
-  ])
+    blockcypher.publish('dash', rawTx),
+
+    insight.broadcastTx(rawTx)
+
+  ]
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 
@@ -80,15 +67,6 @@ export function transformAddress(address: string){
 
 }
 
-
-export async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'DASH');
-
-  return invoice;
-
-}
-
 export async function getNewAddress(record: any) {
 
   return record.value;
@@ -102,3 +80,20 @@ export {
   currency
 
 };
+
+function oneSuccess<T>(promises): Promise<T> {
+  return Promise.all(promises.map(p => {
+    // If a request fails, count that as a resolution so it will keep
+    // waiting for other possible successes. If a request succeeds,
+    // treat it as a rejection so Promise.all immediately bails out.
+    return p.then(
+      val => Promise.reject(val),
+      err => Promise.resolve(err)
+    );
+  })).then(
+    // If '.all' resolved, we've just got an array of errors.
+    errors => Promise.reject(errors),
+    // If '.all' rejected, we've got the result we wanted.
+    val => Promise.resolve(val)
+  );
+}

@@ -1,5 +1,4 @@
 const Boom = require('boom');
-const uuid = require('uuid')
 
 const _ = require('lodash')
 
@@ -7,9 +6,11 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, prices, email, models, invoices, coins } from '../../../lib';
+import { log, email, models, invoices } from '../../../lib';
 
-import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
+import { Account } from '../../../lib/account';
+
+import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
 
 import * as moment from 'moment';
 
@@ -26,7 +27,7 @@ export async function cancel(req, h) {
 
   if (!invoice) {
 
-    log.error('invoice.notfound', where)
+    log.error('invoice.notfound', new Error(JSON.stringify(where)))
 
     return Boom.notFound()
 
@@ -34,12 +35,7 @@ export async function cancel(req, h) {
 
   if (invoice && !invoice.cancelled) {
 
-    invoice.cancelled = true;
-    invoice.status = 'cancelled';
-
-    await invoice.save()
-
-    log.info('invoice.cancelled', where)
+    await cancelInvoice(invoice)
 
     where['status'] = 'cancelled'
 
@@ -47,7 +43,7 @@ export async function cancel(req, h) {
 
   } else {
 
-    log.error('invoice.cancel.error.alreadycancelled', where)
+    log.error('invoice.cancel.error.alreadycancelled', new Error(JSON.stringify(where)))
 
     throw new Error('invoice already cancelled')
 
@@ -71,8 +67,6 @@ export async function index (request, reply) {
       - end_date_completed
 
   */
-
-  log.info(`controller:invoices,action:index`);
 
   let query = {
 
@@ -150,164 +144,52 @@ export async function index (request, reply) {
 
 };
 
-function selectCurrency(addresses) {
+export async function create(request, h) {
 
-  let currency = addresses.reduce((c, address) => {
+  const account = new Account(request.account)
 
-    if (c) {
+  try {
 
-      return c;
+    let invoice: Invoice = await createInvoice({
+      account,
+      ...request.payload
+    })
 
-    } else {
+    if (request.is_public_request) {
 
-      if (!coins.getCoin(address.currency).unavailable) {
-
-        c = address.currency
-
-      }
+      invoice.set('is_public_request', true);
 
     }
 
-    return c;
+    invoice.set('headers', request.headers)
 
-  }, null);
+    const json = invoice.toJSON();
 
-  if (!currency) {
+    const payment_options = await getPaymentOptions(invoice.uid)
 
-    throw new Error('no address set for any active coins');
-
-  }
-
-  return currency;
-
-}
-
-export async function create (request, h) {
-
-  var currency_specified = false;
-
-  /*
-    Dynamicallly look up coin and corresponding plugin given the currency
-    provided.
-  */
-
-  log.info(`controller:invoices,action:create`);
-
-  log.info('invoices.create', Object.assign({
-
-    account_id: request.account.id
-
-  }, request.payload))
-
-	if (request.payload.currency) {
-
-    log.info('currency parameter provided')
-
-    currency_specified = true;
-
-  } else {
-
-    log.info('no currency parameter provided')
-
-    /*
-      Find the first address that is from a coin that is currently active
-      and set that as the invoice currency. This is a hack because the
-      invoice currency actually does not matter any more since moving to
-      payment options.
-    */
-
-    let addresses = await models.Address.findAll({
-      where: { account_id: request.account.id }
-    });
-
-
-    request.payload.currency = selectCurrency(addresses);
-	}
-
-
-	if (!(request.payload.amount > 0)) {
-		throw Boom.badRequest('amount must be greater than zero')	
-	}
-
-	log.info('amount is greater than zero')
-
-  let plugin = await plugins.findForCurrency(request.payload.currency);
-
-  log.info('plugin.createInvoice');
-
-  let invoice = await plugin.createInvoice(request.account.id, request.payload.amount);
-
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
-
-  }
-
-  invoice.currency_specified = currency_specified;
-
-  if (request.payload.redirect_url) {
-
-    invoice.redirect_url = request.payload.redirect_url;
-
-  }
-
-  if (request.payload.wordpress_site_url) {
-
-    invoice.wordpress_site_url = request.payload.wordpress_site_url;
-
-    invoice.tags = ['wordpress']
-
-  }
-
-  if (request.payload.webhook_url) {
-
-    invoice.webhook_url = request.payload.webhook_url;
-
-  }
-
-  if (request.payload.external_id) {
-
-    invoice.external_id = request.payload.external_id;
-
-  }
-
-  if (request.is_public_request) {
-
-    invoice.is_public_request = true;
-
-  }
-
-  invoice.headers = request.headers
-
-  invoice.email = request.payload.email;
-  invoice.business_id = request.payload.business_id;
-  invoice.location_id = request.payload.location_id;
-  invoice.register_id = request.payload.register_id;
-
-  await invoice.save();
-
-  if (invoice.email) {
-    let note = await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.email}`,
-      invoice_uid: invoice.uid,
-    });
-  }
-
-  invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-  let sanitized = sanitizeInvoice(invoice);
-
-  sanitized.webhook_url = invoice.webhook_url
-
-  return h.response(
-
-    Object.assign({
+    return h.response({
       success: true,
-      invoice: sanitized,
-      payment_options: invoice.payment_options
-    }, sanitized)
+      invoice: {
+        amount: json['amount'],
+        currency: json['denomination'],
+        status: json['status'],
+        uid: json['uid'],
+        uri: json['uri'],
+        createdAt: json['createdAt'],
+        expiresAt: json['expiry'],
+        payment_options
+      },
+      uid: json['uid']
+    })
+    .code(200)
 
-  ).code(200)
+  } catch(error) {
+
+    log.error('api.v0.invoices.create', error)
+
+    return h.badRequest(error)
+
+  }
 
 }
 
@@ -342,15 +224,7 @@ export async function createPublicInvoice(account_id, payload) {
 
   let plugin = await plugins.findForCurrency(currency);
 
-  log.info('plugin.createInvoice');
-
   let invoice = await plugin.createInvoice(account_id, payload.amount);
-
-  if(invoice){
- 
-    log.info('invoice.created', invoice.toJSON());
-
-  }
 
   invoice.redirect_url = payload.redirect_url;
 
@@ -365,7 +239,7 @@ export async function createPublicInvoice(account_id, payload) {
   await invoice.save();
 
   if (invoice.email) {
-    let note = await models.InvoiceNote.create({
+    await models.InvoiceNote.create({
       content: `Customer Email: ${invoice.email}`,
       invoice_uid: invoice.uid,
     });
@@ -388,13 +262,19 @@ async function getPaymentOptions(invoice_uid) {
     invoice_uid
   }});
 
-  return payment_options.map(option => _.pick(option,
-    'uri',
-    'currency',
-    'currency_name',
-    'currency_logo_url',
-    'amount'
-  ))
+  return payment_options.map(option => {
+
+    option = _.pick(option,
+      'uri',
+      'currency',
+      'amount'
+    )
+
+    option['chain'] = option['currency']
+
+    return option
+
+  })
 
 }
 
@@ -422,8 +302,6 @@ export async function show(request, reply) {
 
   let invoiceId = request.params.invoice_id;
 
-  log.info(`controller:invoices,action:show,invoice_id:${invoiceId}`);
-
   let invoice = await models.Invoice.findOne({
     where: {
       uid: invoiceId
@@ -434,14 +312,11 @@ export async function show(request, reply) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.info('invoice not yet expired');
   }
 
   if (invoice) {
 
-    log.info('invoice.requested', invoice.toJSON());
+    log.debug('invoice.requested', invoice.toJSON());
 
     invoice.payment_options = await getPaymentOptions(invoice.uid)
 
@@ -461,7 +336,7 @@ export async function show(request, reply) {
 
   } else {
 
-    log.error('no invoice found', invoiceId);
+    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
 
     throw new Error('invoice not found')
   }
@@ -470,7 +345,7 @@ export async function show(request, reply) {
 
 export async function shareEmail(req, h) {
 
-  log.info(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
+  log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
 
   let invoice = await models.Invoice.findOne({
     where: {
@@ -480,7 +355,7 @@ export async function shareEmail(req, h) {
 
   if (!invoice) {
 
-    log.error('no invoice found', req.params.uid);
+    log.error('no invoice found', new Error(`invoice ${req.params.uid} not found`));
 
     throw new Error('invoice not found')
 

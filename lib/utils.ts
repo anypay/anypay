@@ -1,27 +1,6 @@
 
 const bcrypt = require('bcryptjs');
 
-export async function bcryptCompare(password, hash) {
-
-  return new Promise((resolve, reject) => {
-
-    bcrypt.compare(password, hash, (error, res) => {
-
-      if (res) {
-
-        resolve();
-
-      } else {
-
-        reject(new Error("invalid email or password"));
-
-      }
-    })
-  })
-}
-
-
-
 export async function hash(password) {
 
   return new Promise((resolve, reject) => {

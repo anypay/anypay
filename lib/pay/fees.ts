@@ -3,6 +3,8 @@ import { convert } from '../prices';
 
 import { BigNumber } from 'bignumber.js';
 
+import { toSatoshis } from './'
+
 const fees = { }
 
 const feesFiat = {
@@ -20,19 +22,19 @@ const feesFiat = {
   },
   'LTC': {
     currency: 'USD',
-    value: 0.05
+    value: 0.01
   },
   'DOGE': {
     currency: 'USD',
-    value: 0.50
+    value: 0.01
   },
   'BTC': {
     currency: 'USD',
-    value: 1.00
+    value: 0.10
   },
   'XMR': {
     currency: 'USD',
-    value: 0.05
+    value: 0.01
   }
 }
 
@@ -41,60 +43,67 @@ export interface Fee {
   amount: number;
 }
 
-export async function getFee(currency:string): Promise<Fee> {
+const feeAddresses = {
+  'BTC': '3PSFeZrEj1eSeFKs6cwYiU9Y4frfKati8L',
+  'ETH': '0x8a3fe74311084e6f71ef9fc04bc6481e257a7325',
+  'LTC': 'MGzgGYeni8WZ6Hc2iqd3vWwQRKa7wkf4GG',
+  'BCH': 'qravv0seavret7g3mpfpx9yupuzff0nhjvc506v2z2',
+  'DASH': 'XjPLAKYmLtHNmWiKhy3vSHFn3Yh9NaRnvu',
+  'BSV': '12XdPcmqkJCLFhEZccTw2xP33vqYh8mhfu',
+  'DOGE': 'DSrL49Fo6qD3GwAHeBDvmZMa4g27YpMyz8',
+  'XMR': '42DxjbzjtQtFo59BwvjSjbA3FXAwV9ESn3zbkuU8fJYoPzQW7dGdZ3sAzyvz8Zcc1p9MZkLyMUU8EiU7xWJyYcURUaswNrQ',
+  'XRP': 'rasrvYBgXKEopSrkhmiZ97zk2DkTKo1pgK',
+  'SOL': 'CN8Hchkypid7g55B3fTBZMxyN73Z656RGQQt9YJmcUiA',
+  'AVAX': '0x8881c5306fec0a4f6b829e39f0ffbb6c4a9faa05'
+}
+
+export async function getFee(currency:string, amount?: number): Promise<Fee> {
 
   if (!fees[currency]) {
+  
     await updateFees();
+
+  } else {
+
+    updateFees();
+
   }
 
-  updateFees();
+  var fee = fees[currency];
 
-  switch(currency) {
-  case 'BCH':
-    return {
-      address: 'qrggz7d0sgv4v3d0jl7lj4mv2vdnv0vqjsq48qtvt6',
-      amount: fees[currency]
+  if (amount) {
+
+    let feeAmount = new BigNumber(amount).times(0.001).toNumber()
+
+    if (feeAmount > fee) {
+
+      fee = feeAmount
     }
-  case 'DASH':
-    return {
-      address: 'Xwh247FF6SWymYLiJsMjM1BfrqVkzya6wh',
-      amount: fees[currency]
+
+    if (currency === 'BTC' && fee < 546) { // 546 is the dust limit
+
+      fee = 546
+
     }
-  case 'BTC':
-    return {
-      address: '17JiDrmEBftkPKtHojcJXAB8RSiv5nY6gc',
-      amount: fees[currency]
-    }
-  case 'LTC':
-    return {
-      address: 'MLEV4eQfHvtkUGFXvQJE9gCtFwW7zNq1NJ',
-      amount: fees[currency]
-    }
-  case 'DOGE':
-    return {
-      address: 'DRe5AjffdiLjtq9QSXW9RHGTMnm2hCQrRp',
-      amount: fees[currency]
-    }
-  case 'BSV':
-    return {
-      address: '1Q9Z2y3Jhq6xbxD6AU34StgmUjfpbZgxqA',
-      amount: fees[currency]
-    }
-  case 'XMR':
-    return {
-      address: '43iJfB8tYGFCBNEc8rjJnWHfrXzUapbeifsmS5S9wBEPEzGBCgogtCZSkHaU68UBMWG5pRXk56g7CekSZo7bYkyuNq52Dtn',
-      amount: fees[currency]
-    }
+
   }
+
+  return {
+
+    address: feeAddresses[currency],
+
+    amount: fee
+  }
+
 }
 
 async function updateFees() {
   
   for (let key of Object.keys(feesFiat)) {
 
-    let fee = await convert(feesFiat[key], key);
+    const fee = await convert(feesFiat[key], key);
 
-    fees[key] = new BigNumber(fee.value).times(100000000).toNumber();
+    fees[key] = toSatoshis(fee.value)
 
   }
 

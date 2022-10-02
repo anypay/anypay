@@ -4,10 +4,6 @@ import * as sequelize from './database';
 
 import { join } from 'path';
 
-import { awaitChannel } from './amqp';
-
-import { log } from './log';
-
 import { bindAllModelsHooks } from './rabbi-sequelize';
 
 function capitalizeFirstLetter(string) {
@@ -37,6 +33,18 @@ models.Invoice.hasMany(models.PaymentOption, {
   as: 'payment_options'
 });
 
+models.Invoice.hasOne(models.Payment, {
+  foreignKey: 'invoice_uid',
+  sourceKey: 'uid',
+  as: 'payment'
+})
+
+models.Invoice.hasOne(models.Refund, {
+  foreignKey: 'original_invoice_uid',
+  sourceKey: 'uid',
+  as: 'refund'
+})
+
 models.Account.hasMany(models.Address, {
   foreignKey: 'account_id',
   sourceKey: 'id',
@@ -46,6 +54,16 @@ models.Account.hasMany(models.Address, {
 models.Address.belongsTo(models.Account, {
   as: 'address',
   foreignKey: 'account_id'
+})
+
+models.LinkedAccount.belongsTo(models.Account, {
+  as: 'source_account',
+  foreignKey: 'source',
+})
+
+models.LinkedAccount.belongsTo(models.Account, {
+  as: 'target_account',
+  foreignKey: 'target'
 })
 
 models.Account.hasMany(models.Invoice, {

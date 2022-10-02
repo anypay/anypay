@@ -1,93 +1,92 @@
 
 import { models } from './models'
 
+import { Account } from './account'
+
+import { log } from './log'
+
 import * as _ from 'underscore'
 
 export interface SearchResult {
   type: string; // invoice, account, etc
   value: any;
+  where?: any; // original query
 };
 
-export async function search(query: string): Promise<SearchResult[]> {
+export async function search(query: string, account?: Account): Promise<SearchResult[]> {
+
+  if (account) {
+    log.info('search', { query, account_id: account.id })
+  } else {
+    log.info('search', { query })
+  }
 
   let result = await Promise.all([
-    searchInvoiceUid(query),
-    searchInvoiceHash(query),
-    searchInvoiceAddress(query),
-    searchInvoiceExternalId(query),
-    searchAccountEmail(query)
+    searchInvoiceUid(query, account),
+    searchInvoiceHash(query, account),
+    searchInvoiceExternalId(query, account),
+    searchAccountEmail(query, account)
   ])
 
   return _.flatten(result.filter(r => !!r))
 
 }
 
-async function searchInvoiceUid(query: string): Promise<SearchResult[]> {
+export async function searchInvoiceUid(uid: string, account?: Account): Promise<SearchResult[]>{
 
-  let value = await models.Invoice.findOne({
-    where: {
-      uid: query
-    } 
-  });
+  const where = { uid }
+
+  if (account) {
+    where['account_id'] = account.id
+  }
+
+  let value = await models.Invoice.findOne({ where })
 
   if (value) {
-    return [{ type: 'invoice', value }]
+    return [{ type: 'invoice', value, where }]
+  }
+  return []
+
+}
+
+export async function searchAccountEmail(email: string, account?: Account): Promise<SearchResult[]> {
+
+  const where = { email }
+
+  if (account) { where['id'] = account.id }
+
+  let value = await models.Account.findOne({ where })
+
+  if (value) {
+    return [{ type: 'account', value, where }]
   }
 
 }
 
-async function searchAccountEmail(query: string): Promise<SearchResult[]> {
+export async function searchInvoiceHash(hash: string, account?: Account): Promise<SearchResult[]> {
 
-  let value = await models.Account.findOne({
-    where: {
-      email: query
-    } 
-  });
+  const where = { hash }
+
+  if (account) { where['account_id'] = account.id }
+
+  let value = await models.Invoice.findOne({ where })
 
   if (value) {
-    return [{ type: 'account', value }]
+    return [{ type: 'invoice', value, where }]
   }
 
 }
 
-async function searchInvoiceHash(query: string): Promise<SearchResult[]> {
+export async function searchInvoiceExternalId(external_id: string, account?: Account): Promise<SearchResult[]> {
 
-  let value = await models.Invoice.findOne({
-    where: {
-      address: query
-    } 
-  });
+  const where = { external_id }
 
-  if (value) {
-    return [{ type: 'invoice', value }]
-  }
+  if (account) { where['account_id'] = account.id }
 
-}
-
-async function searchInvoiceAddress(query: string): Promise<SearchResult[]> {
-
-  let value = await models.Invoice.findOne({
-    where: {
-      external_id: query
-    } 
-  });
+  let value = await  models.Invoice.findOne({ where })
 
   if (value) {
-    return [{ type: 'invoice', value }]
-  }
-
-}
-
-async function searchInvoiceExternalId(query: string): Promise<SearchResult[]> {
-
-  let value = await  models.Invoice.findOne({
-    where: {
-      hash: query
-    } 
-  });
-
-  if (value) {
-    return [{ type: 'invoice', value }]
+    return [{ type: 'invoice', value, where }]
   }
 
 }

@@ -1,70 +1,55 @@
 
 import { log, models, invoices } from '../../../lib';
 
-import * as Boom from 'boom';
+import { cancelInvoice, Invoice } from '../../../lib/invoices'
 
 import { show as handleBIP70 } from './bip70_payment_requests'
+
 import { show as handleJsonV2 } from './json_payment_requests'
+
 import { show as handleBIP270 } from './bip270_payment_requests'
 
-import { detectWallet, Wallets } from '../../../lib/pay'
+import { detectWallet } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
 import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 
+import { createWebhook } from '../../../lib/webhooks'
+
 import { schema } from 'anypay'
 
-import { recordEvent } from '../../../lib/events'
+import { findOne } from '../../../lib/orm';
 
-function upcase(str) {
+export async function cancel(req, h) {
 
-  if (!str) {
-    return null
-  }
+  try {
 
-  return str.toUpperCase()
-
-}
-
-export async function createBeta(req, h) {
-
-  /* 
-
-    Create payment request. Does not require access token. Will accept either a single Payment struct or an Array of
-    Payment structs.
-
-    [{
-      coin: 'BSV',
-      currency: 'CAD',
-      amount: 15.99,
-      address: '1Dn4dU42sjV5UXQPfHwxY187DoQAwRkyga'
-    }]
-
-  */
-
-  if (req.payload.template) {
-    return create(req, h)
-  }
-
-  var template;
-
-  if (Array.isArray(req.payload)) {
-
-    template = {
-      currency: upcase(req.params.currency) || 'BSV',
-
-      to: req.payload
+    const invoice: Invoice = await findOne<Invoice>(Invoice, {
+      where: {
+        uid: req.params.uid
+      }
+    })
+  
+    if (!invoice) {
+  
+      return h.notFound()
     }
-
-
-  } else {
-
-    template = {
-      currency: upcase(req.params.currency) || 'BSV',
-
-      to: [req.payload]
+  
+    if (invoice.get('app_id') !== req.app.id) {
+  
+      return h.notAuthorized()
     }
+  
+    await cancelInvoice(invoice)
+  
+    return h.response({ success: true })
+
+  } catch(error) {
+
+    log.error('api.payment-requests.cancel', error)
+
+    return h.badRequest(error)
 
   }
 
@@ -80,7 +65,7 @@ export async function create(req, h) {
 
     if (error) {
 
-      log.error('pay.request.create.error', { error })
+      log.error('pay.request.create.error', error)
 
       throw error
 
@@ -105,8 +90,11 @@ export async function create(req, h) {
       if (req.payload.options) {
 
         invoice.webhook_url = req.payload.options.webhook
+
         invoice.redirect_url = req.payload.options.redirect
+
         invoice.secret = req.payload.options.secret
+
         invoice.metadata = req.payload.options.metadata
 
       }
@@ -123,6 +111,8 @@ export async function create(req, h) {
       await paymentRequestToPaymentOptions(record)
 
       log.info('pay.request.created', record.toJSON())
+
+      createWebhook(new Invoice(invoice))
 
       return {
 
@@ -142,7 +132,7 @@ export async function create(req, h) {
 
   } catch(error) {
 
-    return Boom.badRequest(error.message);
+    return h.badRequest(error.message);
 
   }
 
@@ -152,35 +142,27 @@ export async function show(req, h) {
 
   log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
-  let wallet = detectWallet(req.headers, req.params.uid)
-
-  await recordEvent({
-
-    wallet,
-
-    invoice_uid: req.params.uid
-
-  }, 'invoice.requested')
+  detectWallet(req.headers, req.params.uid)
 
   let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
 
   if (invoice.cancelled) {
-    return Boom.badRequest('invoice cancelled')
+    
+    return h.badRequest('invoice cancelled')
   }
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
     invoice = await invoices.refreshInvoice(invoice.uid)
 
-  } else {
-
-    log.info('invoice not yet expired');
   }
 
   try {
 
     let isBIP70 = /paymentrequest$/
+
     let isBIP270 = /bitcoinsv-paymentrequest$/
+
     let isJsonV2 = /application\/payment-request$/
 
     let accept = req.headers['accept']
@@ -209,9 +191,9 @@ export async function show(req, h) {
 
   } catch(error) {
 
-    log.error('pay.request.error', { error: error.message });
+    log.error('pay.request.error', error);
 
-    return Boom.badRequest(error.message);
+    return h.badRequest(error.message);
 
   }
 

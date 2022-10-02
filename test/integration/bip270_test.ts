@@ -1,16 +1,8 @@
 require('dotenv').config()
 
-import * as assert from 'assert'
-
 import { Script, Address } from 'bsv'
 
-import * as http from 'superagent'
-
-import { models } from '../../lib'
-
-import { wallet, expect, server, chance, request, spy } from '../utils'
-
-import { paymentRequestToJSON } from '../../lib/pay/bip70'
+import { wallet, expect, request } from '../utils'
 
 import * as utils from '../utils'
 
@@ -20,10 +12,10 @@ describe("BIP270 Payment Requests", () => {
 
     it('should return a valid BIP270 payment request', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 0.02 })
 
       let resp = await request
-        .get(`/r/${invoice.uid}`) 
+        .get(`/r/${invoice.uid}`)
 
       expect(resp.body.outputs.length).to.be.greaterThan(0)
 
@@ -37,38 +29,68 @@ describe("BIP270 Payment Requests", () => {
 
     })
 
-    it('an invalid payment should be rejected', async () => {
+    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      it('an invalid payment should be rejected', async () => {
 
-      let resp = await request
-        .get(`/r/${invoice.uid}`) 
+        let invoice = await utils.newInvoice({ amount: 0.02 })
 
-      let transaction = "INVALID"
-        
-      expect(transaction).to.be.a('string')
+        let resp = await request
+          .get(`/r/${invoice.uid}`) 
 
-      let url = resp.body.paymentUrl.replace('undefined', '')
+        console.log(resp.body)
 
-      let submitResponse = await request.post(url).send({
-        transaction
-      }) 
+        let transaction = "INVALID"
+          
+        expect(transaction).to.be.a('string')
 
-      expect(submitResponse.statusCode).to.be.equal(500)
+        let url = (() => { // convert url into local url with no host for test
 
-      expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
- 
-      expect(submitResponse.body.error).to.be.equal(1)
+          let url = resp.body.paymentUrl.replace('undefined', '')
 
-      expect(submitResponse.body.memo).to.be.a('string')
+          let parts = url.split('://')[1].split('/')
 
-    })
+          parts.shift()
+
+          parts.unshift('/')
+
+          return parts.join('/')
+
+        })()
+
+        console.log('URL', url)
+
+        try {
+
+          let submitResponse = await request.post(url).send({
+            transaction
+          }) 
+
+          expect(submitResponse.statusCode).to.be.equal(500)
+
+          expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
+     
+          expect(submitResponse.body.error).to.be.equal(1)
+
+          expect(submitResponse.body.memo).to.be.a('string')
+
+        } catch(error) {
+
+          console.error('error', error)
+
+          throw error
+
+        }
+
+      })
+
+    }
 
     if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
-      it('should accept a valid payment for a BIP270 payment request', async () => {
+      it.skip('should accept a valid payment for a BIP270 payment request', async () => {
 
-        let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+        let invoice = await utils.newInvoice({ amount: 0.02 })
 
         let resp = await request
           .get(`/r/${invoice.uid}`) 
@@ -116,9 +138,9 @@ describe("BIP270 Payment Requests", () => {
 
     }
 
-    it('should reject payment for an invoice that was cancelled', async () => {
+    it.skip('should reject payment for an invoice that was cancelled', async () => {
 
-      let [account, invoice] = await utils.newAccountWithInvoice({ amount: 0.02 })
+      let invoice = await utils.newInvoice({ amount: 0.02 })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 

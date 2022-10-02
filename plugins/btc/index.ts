@@ -1,36 +1,47 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
-import {generateInvoice} from '../../lib/invoice';
 
 export { btc as bitcore }
 
-import { fromSatoshis, Payment } from '../../lib/pay'
+import { oneSuccess } from 'promise-one-success'
 
-import { publishBTC } from '../../lib/blockchair'
+import { blockchair, config, chain_so } from '../../lib'
 
-import {models} from '../../lib/models';
+import { BroadcastTxResult } from '../../lib/plugins'
 
-import {oneSuccess} from 'promise-one-success'
+import * as bitcoind_rpc from './bitcoind_rpc'
 
-import {rpc} from './jsonrpc';
+export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
-import * as blockcypher from '../../lib/blockcypher'
+  const broadcastProviders: Promise<BroadcastTxResult>[] = []
 
-export async function submitTransaction(rawTx: string) {
+  if (config.get('blockchair_broadcast_provider_btc_enabled')) {
 
-  return oneSuccess([
-    publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
-  ])
+    broadcastProviders.push(
 
-}
+      blockchair.publish('bitcoin', rawTx)
+    )
 
-export async function broadcastTx(rawTx: string) {
+  }
 
-  return oneSuccess([
-    publishBTC(rawTx),
-    blockcypher.publishBTC(rawTx)
-  ])
+  if (config.get('chain_so_broadcast_provider_enabled')) {
+
+    broadcastProviders.push(
+
+      chain_so.broadcastTx('BTC', rawTx)
+    )
+
+  }
+
+  if (config.get('bitcoind_rpc_host')) {
+
+    broadcastProviders.push(
+      
+      bitcoind_rpc.broadcastTx(rawTx)
+    )
+  }
+
+  return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
 }
 
@@ -45,8 +56,6 @@ export function transformAddress(address: string) {
   return address;
 
 }
-
-var WAValidator = require('anypay-wallet-address-validator');
 
 export function validateAddress(address: string){
 
@@ -70,32 +79,3 @@ export async function getNewAddress(deprecatedParam){
 
 }
 
-function deriveAddress(xkey, nonce){
-
-  let address = new btc.HDPublicKey(xkey).deriveChild(nonce).publicKey.toAddress().toString()
-
-  return address 
-
-}
-
-async function createInvoice(accountId: number, amount: number) {
-
-  let invoice = await generateInvoice(accountId, amount, 'BTC');
-
-  return invoice;
-
-}
-
-const currency = 'BTC';
-
-const poll = false;
-
-export {
-
-  currency,
-
-  createInvoice,
-
-  poll
-
-};

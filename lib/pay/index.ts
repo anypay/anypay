@@ -7,6 +7,8 @@ export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
 import { log } from '../log'
 
+import { Invoice, ensureInvoice } from '../invoices'
+
 import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
@@ -74,13 +76,13 @@ export function detectWallet(headers, invoice_uid): string {
 
 }
 
-export async function verifyPayment(v: VerifyPayment) {
+export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
 
-  log.info(`verifypayment`, v)
+  log.info(`payment.verify`, v)
 
   let bitcore = getBitcore(v.payment_option.currency)
 
-  let tx = new bitcore.Transaction(v.hex);
+  let tx = new bitcore.Transaction(v.transaction.tx);
 
   let txOutputs = tx.outputs.map(output => {
 
@@ -99,7 +101,7 @@ export async function verifyPayment(v: VerifyPayment) {
 
     } catch(error) {
 
-      log.error(`verifypayment.error`, error)
+      log.error(`payment.verify.error`, error)
 
       return null
 
@@ -108,7 +110,7 @@ export async function verifyPayment(v: VerifyPayment) {
   })
   .filter(n => n != null)
 
-  log.info("verifypayment.txoutputs", txOutputs);
+  log.info("payment.verify.txoutputs", txOutputs);
 
   let outputs: PaymentOutput[] = await buildOutputs(v.payment_option, 'JSONV2');
 
@@ -135,6 +137,8 @@ export async function verifyPayment(v: VerifyPayment) {
     verifyOutput(txOutputs, address, output.amount);
   }
 
+  return true
+
 }
 
 export async function buildPaymentRequestForInvoice(params: PaymentRequestForInvoice): Promise<PaymentRequest> {
@@ -148,9 +152,25 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     }
   });
 
-  log.info('paymentrequest.paymentoption', paymentOption.toJSON())
+  if (!paymentOption) {
 
-  let paymentRequest = await  buildPaymentRequest(Object.assign(paymentOption, { protocol: params.protocol}));
+    const error = new Error('payment option not found')
+
+    log.error('payment-option.missing', error)
+
+    throw error
+  }
+  
+  let invoice = await ensureInvoice(params.uid)
+
+  paymentOption = Object.assign(paymentOption, {
+    protocol: params.protocol
+  })
+
+  let paymentRequest = await buildPaymentRequest({
+    paymentOption,
+    invoice
+  });
 
   log.info('paymentrequest', paymentRequest)
 
@@ -158,7 +178,21 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
 
 }
 
-export async function buildPaymentRequest(paymentOption): Promise<PaymentRequest> {
+interface BuildPaymentRequest {
+  paymentOption: any;
+  invoice: Invoice;
+}
+
+export interface PaymentRequestOptions {
+  memo?: string;
+  time?: number;
+  expires?: number;
+  payment_url?: string;
+  fee_rate_level?: string;
+}
+
+
+export async function buildPaymentRequest({paymentOption, invoice}: BuildPaymentRequest): Promise<PaymentRequest> {
 
   var content;
 
@@ -166,17 +200,24 @@ export async function buildPaymentRequest(paymentOption): Promise<PaymentRequest
 
   case 'BIP70':
 
-    content = await  bip70.buildPaymentRequest(paymentOption);
+    content = await  bip70.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
+
     break;
 
   case 'BIP270':
 
-    content = await bip270.buildPaymentRequest(paymentOption);
+    content = await bip270.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
     break;
 
   case 'JSONV2':
 
-    content = await jsonV2.buildPaymentRequest(paymentOption);
+    content = await jsonV2.buildPaymentRequest(paymentOption, {
+      memo: invoice.get('memo')
+    });
     break;
 
   default:
@@ -266,42 +307,51 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 }
 
-export async function completePayment(paymentOption, hex: string) {
+interface Transaction {
+  tx: string;
+  tx_hash?: string;
+  tx_key?: string;
+}
 
-  log.info('paymentoption', paymentOption.toJSON())
+export async function completePayment(paymentOption, transaction: Transaction) {
 
-  let bitcore = getBitcore(paymentOption.currency)
+  const {tx: hex} = transaction
+
+  const { currency, invoice_uid } = paymentOption
+
+  log.info('completePayment', {invoice_uid, currency, transaction })
+
+  let bitcore = getBitcore(currency)
 
   let tx = new bitcore.Transaction(hex)
 
   let invoice = await models.Invoice.findOne({ where: {
-    uid: paymentOption.invoice_uid
+    uid: invoice_uid
   }})
+
+  const txid = transaction.tx_hash || tx.hash
   
-  let payment = {
-    txid: tx.hash,
-    currency: paymentOption.currency,
+  let paymentRecord = await models.Payment.create({
+    txid,
+    currency: currency,
     txjson: tx.toJSON(),
     txhex: hex,
+    tx_key: transaction.tx_key,
     payment_option_id: paymentOption.id,
-    invoice_uid: paymentOption.invoice_uid,
+    invoice_uid: invoice_uid,
     account_id: invoice.account_id
-  }
+  })
 
-  log.info('payment', payment)
-
-  let paymentRecord = await models.Payment.create(payment)
-
-  var result = await models.Invoice.update(
+  await models.Invoice.update(
     {
       amount_paid: invoice.amount,
       invoice_amount: paymentOption.amount,
       invoice_amount_paid: paymentOption.amount,
-      invoice_currency: paymentOption.currency,
+      invoice_currency: currency,
       denomination_amount_paid: invoice.denomination_amount,
       currency: paymentOption.currency,
       address: paymentOption.address,
-      hash: tx.hash,
+      hash: txid,
       status: 'paid',
       paidAt: new Date(),
       complete: true,
@@ -317,62 +367,6 @@ export async function completePayment(paymentOption, hex: string) {
   }})
 
   log.info('invoice.paid', invoice)
-  log.debug('invoice.payment', invoice.uid)
-
-  let channel = await awaitChannel()
-
-  channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
-
-  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
-
-  return paymentRecord
-
-}
-
-export async function completeLNPayment(paymentOption, r_hash: string) {
-  log.info('paymentoption', paymentOption.toJSON())
-
-  let payment = {
-    txid: r_hash,
-    currency: paymentOption.currency,
-    payment_option_id: paymentOption.id,
-    invoice_uid: paymentOption.invoice_uid
-  }
-
-  log.info('payment', payment)
-
-  let paymentRecord = await models.Payment.create(payment)
-
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: paymentOption.invoice_uid
-  }})
-
-  var result = await models.Invoice.update(
-    {
-      amount_paid: invoice.amount,
-      invoice_amount: paymentOption.amount,
-      invoice_amount_paid: paymentOption.amount,
-      invoice_currency: paymentOption.currency,
-      denomination_amount_paid: invoice.denomination_amount,
-      currency: paymentOption.currency,
-      address: paymentOption.address,
-      hash: r_hash,
-      status: 'paid',
-      paidAt: new Date(),
-      complete: true,
-      completed_at: new Date()
-    },
-    {
-      where: { uid: paymentOption.invoice_uid }
-    }
-  );
-
-  invoice = await models.Invoice.findOne({ where: {
-    id: invoice.id
-  }})
-
-  log.info('invoice.paid', invoice)
-  log.debug('invoice.payment', invoice.uid)
 
   let channel = await awaitChannel()
 
@@ -386,9 +380,19 @@ export async function completeLNPayment(paymentOption, r_hash: string) {
 
 const SATOSHIS = 100000000
 
-export function toSatoshis(decimal: number): number {
+export function toSatoshis(decimal: number, currency?: string): number {
 
-  return (new BigNumber(decimal)).times(SATOSHIS).toNumber()
+  const satoshis = new BigNumber(decimal).times(SATOSHIS)
+  
+  if (currency === 'XMR') {
+
+    return satoshis.times(10000).toNumber()
+
+  } else {
+
+    return satoshis.toNumber()
+
+  }
 
 }
 

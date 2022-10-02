@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 import * as Chance from 'chance';
+
 import * as uuid from 'uuid';
 
 const chance = new Chance();
@@ -9,15 +10,15 @@ import * as assert from 'assert';
 
 import { registerAccount } from '../lib/accounts';
 
-import { setAddress } from '../lib/core';
-
-import { AccessTokenV1, ensureAccessToken } from '../lib/access_tokens'
+import { ensureAccessToken } from '../lib/access_tokens'
 
 import { Account } from '../lib/account'
 
 import { Address } from '../lib/addresses'
 
 import { Invoice, createInvoice } from '../lib/invoices'
+
+import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
 
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
@@ -45,6 +46,50 @@ interface NewAccountInvoice {
   amount?: number;
 }
 
+interface NewInvoice {
+  amount?: number;
+  account?: Account;
+}
+
+export async function createAccountWithAddresses(): Promise<Account> {
+
+  let record = await registerAccount(chance.email(), chance.word());
+
+  let account = new Account(record)
+
+  let { address } = await generateKeypair()
+
+  await account.setAddress({ currency: 'BSV', address })
+
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
+  
+  await account.setAddress({ currency: 'DASH', address: dash_address })
+
+  return account
+}
+
+export async function setAddresses(account: Account): Promise<Account> {
+
+  let { address } = await generateKeypair()
+
+  console.log(account)
+
+  await account.setAddress({ currency: 'BSV', address })
+
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
+  
+  await account.setAddress({ currency: 'DASH', address: dash_address })
+
+  return account
+}
 
 export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Promise<[Account, Invoice]> {
 
@@ -54,9 +99,13 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   await account.setAddress({ currency: 'BSV', address })
 
-  await account.setAddress({ currency: 'BCH', address: 'qrhqkz3mavm3s58qf3znajgpghf96p7xdgtdj404hy' }) // steven bittrex
-  await account.setAddress({ currency: 'DASH', address: 'XpwZpy6RH4LmkMSHNBeQds7ypSGznExQHd' })  // steven somewhere
-  //await account.setAddress({ currency: 'BTC', address: '19T4miK5CUSLcYQDYSUK9T2jkLUipLhh8g' })  // steven somewhere
+  let { address: bch_address } = await generateKeypair('BCH')
+
+  await account.setAddress({ currency: 'BCH', address: bch_address })
+
+  let { address: dash_address } = await generateKeypair('DASH')
+  
+  await account.setAddress({ currency: 'DASH', address: dash_address })
 
   let invoice = await createInvoice({
     account,
@@ -67,10 +116,24 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
 }
 
-import * as bsv from 'bsv'
-export async function generateKeypair() {
+export async function newInvoice(params: NewInvoice = {}): Promise<Invoice> {
 
-  let privateKey = new bsv.PrivateKey()
+  let invoice = await createInvoice({
+    account: params.account || account,
+    amount: params.amount || 52.00
+  })
+
+  return invoice
+
+}
+
+import * as bsv from 'bsv'
+
+export async function generateKeypair(currency: string = 'BSV') {
+
+  var bitcore = getBitcore(currency)
+
+  let privateKey = new bitcore.PrivateKey()
 
   let address = privateKey.toAddress()
 
@@ -109,29 +172,17 @@ export {
   expect
 }
 
+export { log } from '../lib'
 
-var request, account;
+var request, account, walletBot: WalletBot;
 
 import {Server, server } from '../server/v0/server';
 import * as supertest from 'supertest'
 
-export { server, request, account }
+export { server, request, account, walletBot }
 
-beforeEach(() => {
 
-  spy.restore()
 
-})
-
-before(async () => {
-
-  await Server();
-
-  request = supertest(server.listener)
-
-  account = await createAccount()
-
-})
 
 export async function authRequest(account: Account, params) {
 
@@ -178,8 +229,9 @@ export function auth(account, version=1) {
 }
 
 import { Wallet } from 'anypay-simple-wallet'
+import { getBitcore } from '../lib/bitcore';
 
-const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF
+const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 
 if (!WIF) {
 
@@ -191,3 +243,20 @@ const wallet = Wallet.fromWIF(WIF)
 
 export { wallet } 
 
+beforeEach(() => {
+
+  spy.restore()
+
+})
+
+before(async () => {
+
+  await Server();
+
+  request = supertest(server.listener)
+
+  account = await createAccountWithAddresses()
+
+  walletBot = (await findOrCreateWalletBot(account)).walletBot
+
+})

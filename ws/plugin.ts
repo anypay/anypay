@@ -24,7 +24,7 @@ export const plugin = (() => {
 
       })
 
-      const wss = start(server.listener)
+      start(server.listener)
 
     }
 

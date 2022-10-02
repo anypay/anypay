@@ -2,9 +2,9 @@
 
 require('dotenv').config();
 
-import { Actor, Joi, log } from 'rabbi';
+import { Actor, log } from 'rabbi';
 
-import { models, accounts } from '../../lib';
+import { models } from '../../lib';
 
 import { sendMessage } from '../../lib/push_notifications';
 
@@ -40,13 +40,11 @@ export async function start() {
         path: `/payments/${invoiceUid}`,
       });
 
-      console.log('firebase.notification.sent', resp);
-
       return channel.ack(msg);
 
     } catch(error) {
 
-      console.log(error);
+      log.error('actors.payment_push_notification', error);
 
     }
 

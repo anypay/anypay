@@ -1,5 +1,4 @@
 import {awaitChannel} from '../../../lib/amqp';
-import * as Hapi from 'hapi';
 import * as Boom from 'boom';
 
 import { log, models, plugins } from '../../../lib'
@@ -112,7 +111,8 @@ export async function create(req, h) {
   })
 
   if (invoice.cancelled) {
-    log.error('payment.error.invoicecancelled', { uid: req.params.uid, payment })
+
+    log.error('payment.error.invoice.cancelled', new Error('invoice cancelled'))
     return Boom.badRequest('invoice cancelled')
   }
 
@@ -122,25 +122,46 @@ export async function create(req, h) {
 
   for (let transaction of payment.transactions) {
 
-    models.PaymentSubmission.create({
-      invoice_uid: invoice.uid,
-      txhex: transaction,
-      headers: req.headers,
-      wallet: null,
-      protocol: 'bip70',
-      currency: payment_option.currency
-    })
+    ;(async () => {
+
+      try {
+
+        await models.PaymentSubmission.create({
+          invoice_uid: invoice.uid,
+          txhex: transaction.toString('hex'),
+          headers: req.headers,
+          wallet: null,
+          protocol: 'bip70',
+          currency: payment_option.currency
+        })
+  
+      } catch(error) {
+
+        log.info('models.PaymentSubmission.create.error', {
+          invoice_uid: invoice.uid,
+          txhex: transaction.toString('hex'),
+          headers: req.headers,
+          wallet: null,
+          protocol: 'bip70',
+          currency: payment_option.currency,
+          error
+        })
+        
+        log.error('models.PaymentSubmission.create', error)
+  
+      }
+
+    })();
+ 
   }
-
-
 
   for (const tx of payment.transactions) {
 
-    let transaction = tx.toString('hex') 
+    let transaction: string = tx.toString('hex') 
 
     await pay.verifyPayment({
       payment_option,
-      hex: transaction,
+      transaction: {tx: transaction},
       protocol: 'BIP70'
     })
 
@@ -150,7 +171,7 @@ export async function create(req, h) {
 
     log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp })
 
-    let paymentRecord = await pay.completePayment(payment_option, transaction)
+    let paymentRecord = await pay.completePayment(payment_option, { tx: transaction})
 
     log.info(`bip70.${payment_option.currency}.payment.completed`, paymentRecord);
 

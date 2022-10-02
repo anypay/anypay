@@ -1,10 +1,12 @@
 
 import * as moment from 'moment';
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import * as Boom from 'boom';
 
-import { buildReportCsvFromDates, buildAllTimeReport } from '../../../lib/csv';
+import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';
 import { models } from '../../../lib';
+
+import { findAccount } from '../../../lib/account';
 
 export async function accountCSVReports(server) {
 
@@ -46,7 +48,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           start_date: Joi.date().required(),
@@ -59,7 +61,7 @@ export async function accountCSVReports(server) {
 
   server.route({
     method: 'GET',
-    path: '/complete_history.csv',
+    path: '/reports/csv/payments.csv',
     handler: async (req, h) => {
 
       let token = await models.AccessToken.findOne({ where: {
@@ -73,9 +75,11 @@ export async function accountCSVReports(server) {
         return Boom.unauthorized('invalid access token');
       }
 
-      let content = await buildAllTimeReport(token.account_id);
+      let account = await findAccount(token.account_id)
 
-      let filename = `anypay_report_complete.csv`
+      let content = await buildAccountCsvReport(account)
+
+      let filename = `anypay_payments_report_complete.csv`
 
       let response = h.response(content)
         .header("Content-Disposition", `attachment;filename="${filename}"`)
@@ -85,7 +89,7 @@ export async function accountCSVReports(server) {
 
     },
     options: {
-      tags: ['api'],
+      tags: ['api', 'v0', 'csv'],
       validate: {
         query: Joi.object({
           token: Joi.string().required()
