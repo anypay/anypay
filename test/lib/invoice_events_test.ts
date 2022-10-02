@@ -1,13 +1,14 @@
 
+import * as utils from '../utils'
+
+import { expect, server, log } from '../utils'
+
 import { listInvoiceEvents } from '../../lib/events'
 
 import { createInvoice } from '../../lib/invoices'
 
 import { TestClient } from 'payment-protocol'
 
-import * as utils from '../utils'
-
-import { expect, server, log } from '../utils'
 import { Transaction } from 'bsv'
 
 describe('Invoice Events', () => {

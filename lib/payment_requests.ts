@@ -11,6 +11,20 @@ import { schema } from 'anypay'
 
 import BigNumber from 'bignumber.js'
 
+import { create, Orm } from './orm'
+
+export class PaymentRequest extends Orm {
+
+  static model = models.PaymentRequest
+
+  get invoice_uid() {
+
+    return this.get('invoice_uid')
+
+  }
+
+}
+
 function ensureConsistentCurrencyAmount(template: any): {currency: string, amount: number} {
 
   var currency, amount = new BigNumber(0);
@@ -41,7 +55,15 @@ function ensureConsistentCurrencyAmount(template: any): {currency: string, amoun
 
 }
 
-export async function createPaymentRequest(app_id: number, template: any, options: any) {
+interface PaymentRequestOptions {
+  webhook_url?: string;
+  redirect_url?: string;
+  memo?: string;
+  secret?: string;
+  metadata?: any;
+}
+
+export async function createPaymentRequest(app_id: number, template: any, options: PaymentRequestOptions = {}): Promise<PaymentRequest> {
 
   log.info('pay.request.create', { template, options })
 
@@ -59,11 +81,13 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     log.info('pay.request.create.template.valid', template)
 
-    let record = await models.PaymentRequest.create({
+    let paymentRequest = await create<PaymentRequest>(PaymentRequest, {
 
       app_id,
 
       template: template,
+
+      options,
 
       status: 'unpaid'
 
@@ -71,46 +95,46 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount })
 
-    invoice.currency = template[0].currency
+    if (template.length === 1) {
+
+      invoice.currency = template[0].currency
+
+    }
 
     if (options) {
 
-      invoice.webhook_url = options.webhook
-      invoice.redirect_url = options.redirect
+      invoice.webhook_url = options.webhook_url
+
+      invoice.redirect_url = options.redirect_url
+
       invoice.secret = options.secret
+
       invoice.metadata = options.metadata
 
     }
 
     await invoice.save()
 
-    record.invoice_uid = invoice.uid
-    record.uri = invoice.uri
-    record.uid = invoice.uid
-    record.webpage_url = `https://anypay.sv/invoices/${invoice.uid}`
-    record.status = 'unpaid'
+    await paymentRequest.update({
 
-    await record.save()
+      invoice_uid: invoice.uid,
 
-    await paymentRequestToPaymentOptions(record)
+      uri: invoice.uri,
 
-    log.info('pay.request.created', record.toJSON())
+      uid: invoice.uid,
 
-    return {
+      webpage_url: `https://anypay.sv/invoices/${invoice.uid}`,
 
-      uid: record.uid,
+      status: 'unpaid'
+      
+    })
 
-      uri: record.uri,
+    await paymentRequestToPaymentOptions(paymentRequest)
 
-      url: record.webpage_url,
+    log.info('pay.request.created', paymentRequest.toJSON())
 
-      payment_request: record.toJSON(),
-
-      options: options
-
-    } 
+    return paymentRequest;
 
   }
 
 }
-

@@ -1,6 +1,6 @@
 
 import { models } from '../../lib/models'
-import { Orm, findOrCreate, findOne, create } from '../../lib/orm';
+import { Orm, findOrCreate, findOne, create, findAll } from '../../lib/orm';
 
 import { App } from  '../../lib/apps'
 import { Account } from  '../../lib/account'
@@ -9,7 +9,12 @@ import { AccessTokenV0 as AccessToken } from  '../../lib/access_tokens'
 import { log } from '../../lib/log'
 
 import * as uuid from 'uuid'
+
 import { apps, database } from '../../lib';
+
+import { createPaymentRequest, PaymentRequest } from '../../lib/payment_requests';
+
+import { cancelInvoice, ensureInvoice, Invoice } from '../../lib/invoices';
 
 // Wallet Bot Events
 // It should receive the following events:
@@ -42,9 +47,53 @@ import { apps, database } from '../../lib';
 
 const APP_NAME = '@wallet-bot'
 
+interface PaymentRequestOutput {
+  amount: number;
+  currency: string;
+  address: string;
+  script?: string;
+}
+
+/*interface PaymentRequestTemplate {
+  currency: string;
+  to: PaymentRequestOutput[];
+}*/
+
+interface InvoiceTemplate {
+  currency: string;
+  to: PaymentRequestOutput | PaymentRequestOutput[];
+}
+
+
+interface PaymentRequestOptions {
+  webhook_url?: string;
+  memo?: string;
+}
+
+/*
+interface CreatePaymentRequest {
+  template: PaymentRequestTemplate;
+  options?: PaymentRequestOptions;
+}
+*/
+
+interface CreateInvoice {
+  template: InvoiceTemplate;
+  options?: PaymentRequestOptions;
+}
+
+interface ListInvoices {
+  status?: string;
+  currency?: string;
+  offset?: number;
+  limit?: number;
+}
+
 export class WalletBot extends Orm {
 
   static model = models.WalletBot;
+
+  app_id: number;
 
   static async find(query: any): Promise<WalletBot[]> {
 
@@ -58,6 +107,98 @@ export class WalletBot extends Orm {
 
     return findOrCreate<WalletBot>(WalletBot, params)
 
+  }
+
+  async getInvoice(uid: string): Promise<Invoice> {
+
+    let invoice = await ensureInvoice(uid)
+
+
+    if (invoice.get('app_id') !== this.get('app_id')) {
+
+      throw new Error("WalletBotGetInvoiceNotAuthorized")
+    }
+
+    return invoice
+
+  }
+
+  async createInvoice({ template: invoiceTemplate, options}: CreateInvoice): Promise<PaymentRequest> {
+
+    log.info('wallet-bot.createInvoice', { template: invoiceTemplate, options })
+
+    const to = Array.isArray(invoiceTemplate.to) ? invoiceTemplate.to : [invoiceTemplate.to]
+
+    let result = await createPaymentRequest(
+      this.get('app_id'),
+      [{
+        currency: invoiceTemplate.currency,
+        to
+      }],
+      options
+    )
+
+    log.info('wallet-bot.createInvoice.result', { template: invoiceTemplate, options, result })
+  
+    return result
+
+  }
+
+  async listInvoices({ status, currency, offset, limit }: ListInvoices = {}): Promise<Invoice[]> {
+
+    const where = {}
+
+    if (status) {
+      where['status'] = status
+    }
+
+    if (currency) {
+      where['currency'] = currency
+    }
+
+    const query = {
+      where
+    }
+
+    if (offset) {
+      query['offset'] = offset
+    }
+
+    if (limit) {
+      query['limit'] = limit
+    }
+
+    return findAll<Invoice>(Invoice, query)
+
+  }
+
+  async createPaymentRequest({ template, options}: any): Promise<PaymentRequest> {
+
+    log.info('wallet-bot.createPaymentRequest', { template, options })
+
+    let result = await createPaymentRequest(
+        this.get('app_id'),
+        template,
+        options   
+    )
+
+    log.info('wallet-bot.createPaymentRequest.result', { template, options })
+
+    return result
+  }
+
+
+  async cancelInvoice(uid): Promise<Invoice> {
+
+    let invoice = await ensureInvoice(uid)
+
+    if (invoice.get('app_id') !== this.get('app_id')) {
+
+      throw new Error("WalletBotCancelInvoiceNotAuthorized")
+      
+    }
+
+    return cancelInvoice(invoice)
   }
 
 }
@@ -192,8 +333,7 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
     },
     defaults: {
       account_id: walletBot.get('account_id'),
-      app_id: walletBot.get('app_id'),
-      name: APP_NAME
+      app_id: walletBot.get('app_id')
     }
   })
 

@@ -18,15 +18,9 @@ import { config } from '../../lib/config'
 
 import { findOrCreateWalletBot, getAccessToken, getPaymentCounts } from './'
 
-import { badImplementation, badRequest } from '@hapi/boom'
-
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
 import { listSockets, setSocket, removeSocket, getSocket } from './sockets'
-
-import { Invoice } from '../../lib/invoices'
-
-import { findAll } from '../../lib/orm'
 
 import { failAction } from '../../server/handlers'
 
@@ -181,7 +175,7 @@ export const plugin = (() => {
 
             log.error('apps.wallet-bot.api', error)
 
-            return badImplementation(error)
+            return h.badImplementation(error)
 
           }
 
@@ -199,56 +193,6 @@ export const plugin = (() => {
           }
           */
         }
-      })
-
-      server.route({
-        path: `${base}/unpaid`,
-        method: 'GET',
-        options: {
-          auth: "app"
-        },
-        handler: async (req, h) => {
-
-          try {
-
-            const { app } = await findOrCreateWalletBot(req.app)
-
-            let { limit, offset } = req.query
-
-            if (!limit) { limit = 100 }
-
-            const where = {
-              app_id: app.id,
-              status: 'unpaid'
-            }
-
-            const query = { where }
-
-            if (limit) {
-              query['limit'] = limit || 100
-            }
-
-            if (offset) {
-              query['offset'] = offset
-            }
-
-            const invoices = await findAll<Invoice>(Invoice, query)
-
-            return {
-              app: '@wallet-bot',
-              invoices: invoices.map(invoice => invoice.toJSON())
-            }
-
-          } catch(error) {
-
-            log.error('wallet-bot.handlers.invoices.list', error)
-
-            return badRequest(error)
-
-          }
-
-        }
-
       })
 
       var handlers = requireHandlersDirectory(`${__dirname}/api/handlers`)
@@ -272,54 +216,38 @@ export const plugin = (() => {
       })
 
       server.route({
+        method: 'GET',
+        path: '/v0/api/apps/wallet-bot/invoices',
+        handler: handlers.Invoices.index,
+        options: {
+          auth: 'app'
+        }
+      }); 
+
+
+      server.route({
+        method: 'DELETE',
+        path: '/v1/api/apps/wallet-bot/invoices/{invoice_uid}',
+        handler: handlers.V1Invoices.cancel,
+        options: {
+          validate: {
+            params: Joi.object({
+              invoice_uid: Joi.string().required()
+            }).required()
+          },
+          auth: 'app',
+          tags: ['api', 'wallet-bot'],
+        }
+      }); 
+
+      server.route({
         path: `${base}/invoices`,
         method: 'GET',
         options: {
-          auth: "jwt"
+          auth: "app",
+          tags: ['api', 'wallet-bot']
         },
-        handler: async (req, h) => {
-
-          try {
-
-            const { app } = await findOrCreateWalletBot(req.account)
-
-            let { status, limit, offset } = req.query
-
-            if (!limit) { limit = 100 }
-
-            const where = {
-              app_id: app.id,
-              status: status || 'unpaid'
-            }
-
-            const query = { where }
-
-            if (limit) {
-              query['limit'] = limit || 100
-            }
-
-            if (offset) {
-              query['offset'] = offset
-            }
-
-            const invoices = await findAll<Invoice>(Invoice, query)
-
-            return {
-              app: '@wallet-bot',
-              invoices: invoices.map(invoice => invoice.toJSON())
-            }
-
-          } catch(error) {
-
-            log.error('wallet-bot.handlers.invoices.list', error)
-
-            return badRequest(error)
-
-          }
-
-        }
-
-      
+        handler: handlers.V1Invoices.index
       })
 
     }
@@ -329,6 +257,7 @@ export const plugin = (() => {
 })()
 
 import { requireDirectory } from 'rabbi'
+import Joi = require('joi');
 
 const auth = requireDirectory('../../server/auth')
 
