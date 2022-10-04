@@ -14,22 +14,6 @@ describe('lib/blockcypher', () => {
 
   })
 
-  it('#publish should reject an invalid BTC transaction', async () => {
-
-    try {
-
-        const result = await publish('BTC', 'a1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d')
-
-        console.log(result)
-
-    } catch(error) {
-
-        console.error(error)
-    }
-
-  })
-
-
   it('#getTransaction for BSV should use whatsonchain', async () => {
 
     expect(
