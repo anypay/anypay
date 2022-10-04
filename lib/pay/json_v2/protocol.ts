@@ -85,8 +85,10 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       if (payment_option.currency === 'XMR') {
 
+        const { invoice_uid } = payment_option
+
         verified = await verify({
-          payment_option,
+          invoice_uid,
           transaction,
           protocol: 'JSONV2'
         })
@@ -114,7 +116,17 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit`, {invoice_uid, transaction })
 
-      const response = await plugin.broadcastTx(transaction.tx)
+      var response;
+
+      if (payment_option.currency === 'XMR') {
+
+        response = await plugin.broadcastTx(transaction)
+
+      } else {
+
+        response = await plugin.broadcastTx(transaction.tx)
+
+      }
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
@@ -235,7 +247,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
   }
 
 }
-
 
 interface ProtocolMessage {}
 

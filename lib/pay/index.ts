@@ -191,7 +191,6 @@ export interface PaymentRequestOptions {
   fee_rate_level?: string;
 }
 
-
 export async function buildPaymentRequest({paymentOption, invoice}: BuildPaymentRequest): Promise<PaymentRequest> {
 
   var content;

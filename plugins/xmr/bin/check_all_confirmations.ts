@@ -5,7 +5,7 @@ import { models } from '../../../lib'
 
 import { ensureInvoice } from '../../../lib/invoices';
 
-(async () => {
+export async function check_all_confirmations() {
 
   const payments = await models.Payment.findAll({
     where: {
@@ -25,6 +25,16 @@ import { ensureInvoice } from '../../../lib/invoices';
     console.log(result)
   }
 
-  process.exit(0);
+}
 
-})()
+if (require.main === module) {
+
+  (async () => {
+
+    await check_all_confirmations();
+  
+    process.exit(0);
+  
+  })()
+  
+}

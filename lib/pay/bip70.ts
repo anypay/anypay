@@ -100,8 +100,6 @@ import { PaymentRequest, PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
-  console.log('BIP70 BUILD PR')
-
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
