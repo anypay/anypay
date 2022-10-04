@@ -4,7 +4,7 @@ import { Orm, findOrCreate, findOne, create, findAll } from '../../lib/orm';
 
 import { App } from  '../../lib/apps'
 import { Account } from  '../../lib/account'
-import { AccessTokenV0 as AccessToken } from  '../../lib/access_tokens'
+import { AccessToken } from  '../../lib/access_tokens'
 
 import { log } from '../../lib/log'
 

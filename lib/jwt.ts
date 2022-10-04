@@ -1,23 +1,15 @@
 
-import { Account } from './account'
+import { log } from './log'
 
-const fs   = require('fs');
-const jwt  = require('jsonwebtoken');
-const path = require("path");
+import { readFileSync } from 'fs'
+
+import { sign, verify } from 'jsonwebtoken'
 
 import { config } from './config'
 
-const privateKey = fs.readFileSync(
-  process.env.JSONWEBTOKEN_PRIVATE_KEY_PATH ||
-  path.join(__dirname, '../config/jwt/jwtRS512.key'),
-  'utf8'
-);
+const privateKey = readFileSync(config.get('JSONWEBTOKEN_PRIVATE_KEY_PATH'), 'utf8')
 
-const publicKey = fs.readFileSync(
-  process.env.JSONWEBTOKEN_PUBLIC_KEY_PATH ||
-  path.join(__dirname, '../config/jwt/jwtRS512.key.pub'),
-  'utf8'
-);
+const publicKey = readFileSync(config.get('JSONWEBTOKEN_PUBLIC_KEY_PATH'), 'utf8')
 
 const issuer  = config.get('DOMAIN');          // Issuer 
 const subject  = `auth@${config.get('DOMAIN')}`;        // Subject 
@@ -37,16 +29,23 @@ export async function generateAdminToken() {
      algorithm:  "RS512"
   };
 
-  var token = jwt.sign(payload, privateKey, signOptions);
+  log.info('jwt.generateAdminToken', { payload, signOptions })
+
+  var token = sign(payload, privateKey, signOptions);
 
   return token;
 
 }
 
-export function generateAccountToken(account: Account, uid: string) {
+interface GenerateAccountToken {
+  account_id: number;
+  uid: string;
+}
+
+export function generateAccountToken({account_id, uid}: GenerateAccountToken): string {
 
   var payload = {
-    account_id: account.id,
+    account_id,
     uid
   };
 
@@ -58,13 +57,15 @@ export function generateAccountToken(account: Account, uid: string) {
      algorithm:  "RS512"
   };
 
-  var token = jwt.sign(payload, privateKey, signOptions);
+  log.info('jwt.generateAccountToken', { payload, signOptions })
+
+  var token = sign(payload, privateKey, signOptions);
 
   return token;
 
 }
 
-export async function verifyToken(token: string) {
+export async function verifyToken(token: string): Promise<any> {
 
   var verifyOptions = {
      issuer,
@@ -74,9 +75,13 @@ export async function verifyToken(token: string) {
      algorithm:  ["RS512"]
   };
 
-  var legit = jwt.verify(token, publicKey, verifyOptions);
+  log.info('jwt.verifyToken', {verifyOptions})
 
-  return legit;
+  var decoded = verify(token, publicKey, verifyOptions);
+
+  log.info('jwt.verifyToken.result', {verifyOptions, decoded})
+
+  return decoded;
 }
 
 export {
@@ -86,4 +91,3 @@ export {
   privateKey
 
 };
-

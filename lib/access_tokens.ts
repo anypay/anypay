@@ -1,25 +1,15 @@
 
-import { Orm, findOrCreate } from './orm'
+import { Orm } from './orm'
 
 import { Account } from './account'
 
-import { models } from './models'
-
 import { generateAccountToken } from './jwt'
 
-export class AccessTokenV0 extends Orm {
+import { models } from './models'
 
-  static model: any = models.AccessToken;
+import { App } from './apps'
 
-  static findOrCreate(params: any): Promise<[AccessTokenV0, boolean]> {
-
-    return findOrCreate<AccessTokenV0>(AccessTokenV0, params)
-
-  }
-
-}
-
-export class AccessTokenV1 extends Orm {
+export class AccessToken extends Orm {
 
   static model = models.AccessToken
 
@@ -31,28 +21,28 @@ export class AccessTokenV1 extends Orm {
 
     super(record)
 
-    this.jwt = generateAccountToken(account, record.uid)
+    this.jwt = generateAccountToken({
+      account_id: account.id, 
+      uid: record.uid
+    })
 
     this.account = account
   }
 
-
   get accessToken() {
 
-    if (this.jwt) { return this.jwt }
+    return this.jwt
 
+  }
+
+  get uid() {
+    
     return this.get('uid')
   }
 
 }
 
-export enum Versions {
-
-  AccessTokenV1
-
-}
-
-export async function ensureAccessToken(account: Account, version: Versions = Versions.AccessTokenV1): Promise<AccessTokenV1> {
+export async function ensureAccessToken(account: Account): Promise<AccessToken> {
 
   let [record] = await models.AccessToken.findOrCreate({
 
@@ -65,8 +55,25 @@ export async function ensureAccessToken(account: Account, version: Versions = Ve
     }
   })
 
-  return new AccessTokenV1({ record, account })
+  return new AccessToken({ account, record })
 
 }
 
+export async function ensureAppAccessToken(app: App, account: Account): Promise<AccessToken> {
 
+  let [record] = await models.AccessToken.findOrCreate({
+
+    where: {
+      account_id: app.get('account_id'),
+      app_id: app.id
+    },
+
+    defaults: {
+      account_id: app.get('account_id'),
+      app_id: app.id
+    }
+  })
+
+  return new AccessToken({ account, record })
+
+}
