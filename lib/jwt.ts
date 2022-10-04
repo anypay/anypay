@@ -3,7 +3,7 @@ import { log } from './log'
 
 import { readFileSync } from 'fs'
 
-import { sign, verify } from 'jsonwebtoken'
+import { sign, verify, Algorithm } from 'jsonwebtoken'
 
 import { config } from './config'
 
@@ -15,18 +15,21 @@ const issuer  = config.get('DOMAIN');          // Issuer
 const subject  = `auth@${config.get('DOMAIN')}`;        // Subject 
 const audience  = `https://${config.get('DOMAIN')}`; // Audience/ PRIVATE and PUBLIC key
 
+const algorithm: Algorithm = 'RS512'
+
 export async function generateAdminToken() {
 
   var payload = {
     admin: true
   };
 
+
   var signOptions = {
      issuer,
      subject,
      audience,
      expiresIn: "12h",
-     algorithm:  "RS512"
+     algorithm
   };
 
   log.info('jwt.generateAdminToken', { payload, signOptions })
@@ -54,7 +57,7 @@ export function generateAccountToken({account_id, uid}: GenerateAccountToken): s
      subject,
      audience,
      expiresIn: "30d",
-     algorithm:  "RS512"
+     algorithm
   };
 
   log.info('jwt.generateAccountToken', { payload, signOptions })
