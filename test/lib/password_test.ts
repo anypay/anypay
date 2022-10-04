@@ -20,11 +20,10 @@ describe("Passwords", () => {
 
       let token = await login.withEmailPassword(email, newPassword);
 
-      assert.strictEqual(token.account_id, account.id);
+      assert.strictEqual(token.get('account_id'), account.id);
 
     });
 
   });
 
 });
-
