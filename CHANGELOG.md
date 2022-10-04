@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/anypay/anypay/compare/v1.6.1...v1.6.2) (2022-10-04)
+
+
+### Bug Fixes
+
+* **types:** use Algorithm type instead of string, explicitly ([#1102](https://github.com/anypay/anypay/issues/1102)) ([7b3053a](https://github.com/anypay/anypay/commit/7b3053a4ef398d1152c7fe278d55b95f40e8cbce))
+
 ## [1.6.1](https://github.com/anypay/anypay/compare/v1.6.0...v1.6.1) (2022-10-04)
 
 
