@@ -73,6 +73,7 @@
     "@hapi/vision": "^6.1.0",
     "@mempool/mempool.js": "^2.3.0",
     "@types/axios": "^0.14.0",
+    "@types/jsonwebtoken": "^8.5.9",
     "amqplib": "^0.5.6",
     "anypay": "^0.1.0",
     "anypay-simple-wallet": "^0.0.2",
