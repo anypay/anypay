@@ -1,12 +1,29 @@
 
-import { Invoice } from './invoices'
-import { Refund } from './refund'
-
 import { models } from './models'
 
 import { createPaymentRequest } from './payment_requests'
 
 import { getDecodedTransaction, CURRENCIES } from './blockchair'
+
+import { Invoice } from './invoices'
+
+import { Orm } from './orm'
+
+import { createApp } from './apps'
+
+export class Refund extends Orm {
+
+  original_invoice: Invoice;
+
+  constructor(original_invoice: Invoice, record: any) {
+
+    super(record);
+
+    this.original_invoice = original_invoice;
+
+  }
+
+}
 
 interface RefundAddress {
   currency: string;
@@ -14,9 +31,9 @@ interface RefundAddress {
   invoice: Invoice;
 }
 
-const REFUND_APP_ID = 130;
+export class RefundErrorInvoiceNotPaid extends Error {}
 
-export async function getRefund(invoice: Invoice): Promise<Refund> {
+export async function getRefund(invoice: Invoice, address?: string): Promise<Refund> {
 
   const original_invoice_uid = invoice.uid
 
@@ -28,26 +45,35 @@ export async function getRefund(invoice: Invoice): Promise<Refund> {
 
   if (!record) {
 
-    let { value: address } = await getAddressForInvoice(invoice)
+    if (!address) {
 
-    console.log(invoice.toJSON())
+      let result = await getAddressForInvoice(invoice)
+
+      address = result.value 
+    }
 
     const template = [{
       currency: invoice.get('invoice_currency'),
       to: [{
         address,
         amount: parseFloat(invoice.get('denomination_amount_paid')),
-        currency: invoice.denomination
+        currency: invoice.get('denomination') || invoice.get('invoice_currency')
       }]
     }]
 
+    const app = await createApp({
+      account_id: invoice.get('account_id'),
+      name: '@refunds'
+    })
+
     let payment_request = await createPaymentRequest(
-      REFUND_APP_ID,
+      app.id,
       template,
       {}
     )
 
-    let refund_invoice_uid = payment_request.get('uid')
+
+    let refund_invoice_uid = payment_request.get('invoice_uid')
 
     record = await models.Refund.create({
       original_invoice_uid,
@@ -64,11 +90,12 @@ export async function getRefund(invoice: Invoice): Promise<Refund> {
 
 export async function getAddressForInvoice(invoice: Invoice): Promise<RefundAddress> {
 
-  if (invoice.status === 'unpaid') {
-    throw new Error('cannot refund unpaid invoice')
+  if (invoice.get('status') === 'unpaid') {
+
+    throw new RefundErrorInvoiceNotPaid()
   }
-  
-  const currency = CURRENCIES[invoice.get('currency')]
+
+  const currency = CURRENCIES[invoice.get('currency') || invoice.get('payment_currency')]
 
   let rawtx = await getDecodedTransaction(currency, invoice.get('hash'))
 

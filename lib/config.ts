@@ -30,12 +30,15 @@ config.defaults({
   // Enable Websockets Server and API for Wallet Bot
   'wallet_bot_app_enabled': true,
 
-  'blockchair_broadcast_provider_btc_enabled': true,
+  prometheus_auth_required: true,
+  
+  prometheus_password: '',
+  
+  amqp_url: process.env.AMQP_URL,
 
-  'blockchain_broadcast_provider_enabled': true,
+  JSONWEBTOKEN_PRIVATE_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key'),
 
-  'chain_so_broadcast_provider_enabled': true
+  JSONWEBTOKEN_PUBLIC_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key.pub')
 })
 
 export { config } 
-
