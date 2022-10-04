@@ -6,7 +6,7 @@ import axios from 'axios'
 import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
-import { BroadcastTxResult } from './plugins';
+import { BroadcastTransactionResult } from './plugins';
 
 export interface SendTxResponse {
     status: "success";
@@ -37,7 +37,7 @@ export enum Networks {
     LTCTEST = 'LTCTEST'
 }
 
-export async function broadcastTx(currency: string, tx_hex: string): Promise<BroadcastTxResult> {
+export async function broadcastTx(currency: string, tx_hex: string): Promise<BroadcastTransactionResult> {
 
     const result = await send_tx(currency, tx_hex)
 
@@ -47,11 +47,13 @@ export async function broadcastTx(currency: string, tx_hex: string): Promise<Bro
         
         success: true,
 
-        txhex: tx_hex,
+        tx_hex: tx_hex,
 
-        txid: data.txid,
+        tx_id: data.txid,
 
-        result: data
+        result: data,
+        
+        currency
     }
 }
 

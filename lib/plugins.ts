@@ -67,7 +67,9 @@ export interface BroadcastTransactionResult {
 
   currency: string;
 
-  chain: string;
+  chain?: string;
+
+  result?: any;
 
   success: boolean;
 

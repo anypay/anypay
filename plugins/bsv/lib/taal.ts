@@ -1,9 +1,5 @@
 
 import axios from 'axios'
-import { log } from '../../../lib'
-import { BroadcastTxResult } from '../../../lib/plugins'
-
-class TaalBroadcastTransactionError extends Error {}
 
 import { log } from '../../../lib/log'
 import { BroadcastTransactionResult } from '../../../lib/plugins'

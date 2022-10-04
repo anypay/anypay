@@ -2,15 +2,10 @@
 import axios from 'axios'
 
 import { config, log } from '../../lib';
+import { BroadcastTransactionResult } from '../../lib/plugins';
 
-export interface BroadcastTxResult {
-    success: boolean;
-    txid: string;
-    txhex: string;
-    result: any;
-}
 
-export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+export async function broadcastTx(txhex: string): Promise<BroadcastTransactionResult> {
 
     log.info('btc.bitcoind.broadcastTx', { txhex })
 
@@ -35,9 +30,10 @@ export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
     return {
         success: true,
-        txid: response.data.txid,
+        tx_id: response.data.txid,
         result: response.data,
-        txhex
+        tx_hex: txhex,
+        currency: 'BTC'
     }
 
 }

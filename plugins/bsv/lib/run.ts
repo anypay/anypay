@@ -1,5 +1,5 @@
 import { log } from "../../../lib"
-import { BroadcastTxResult } from "../../../lib/plugins"
+import { BroadcastTransactionResult } from "../../../lib/plugins"
 
 const Run = require('run-sdk')
 
@@ -7,7 +7,7 @@ const blockchain = new Run.plugins.WhatsOnChain({ network: 'main' })
 
 export const run = new Run({ blockchain })
 
-export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+export async function broadcastTx(txhex: string): Promise<BroadcastTransactionResult> {
 
     try {
 
@@ -18,10 +18,11 @@ export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
         log.info('bsv.run.broadcastTx.result', { txhex, txid })
 
         return {
-            txid,
-            txhex,
+            tx_id: txid,
+            tx_hex: txhex,
             result: txid,
-            success: true
+            success: true,
+            currency: 'BSV'
         }
 
     } catch(error) {

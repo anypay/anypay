@@ -1,9 +1,9 @@
 
 import axios from 'axios'
 import { log } from '../../../lib'
-import { BroadcastTxResult } from '../../../lib/plugins'
+import { BroadcastTransactionResult } from '../../../lib/plugins'
 
-export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+export async function broadcastTx(txhex: string): Promise<BroadcastTransactionResult> {
 
   try {
 
@@ -28,10 +28,11 @@ export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
     log.info('dash.insight.broadcastTx.result', { txhex, data })
   
     return {
-      txhex,
-      txid: data.txid,
+      tx_hex: txhex,
+      tx_id: data.txid,
       result: data,
-      success: true
+      success: true,
+      currency: 'DASH'
     }
     
   } catch(error) {

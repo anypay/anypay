@@ -6,9 +6,9 @@ let token = process.env.BLOCKCYPHER_TOKEN;
 import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
-import { BroadcastTxResult } from './plugins';
+import { BroadcastTransactionResult } from './plugins';
 
-export async function publish(currency, hex): Promise<BroadcastTxResult> {
+export async function publish(currency, hex): Promise<BroadcastTransactionResult> {
 
   const trace = uuid()
 
@@ -25,10 +25,11 @@ export async function publish(currency, hex): Promise<BroadcastTxResult> {
     log.info('blockcypher.publish.response', { trace, data })
 
     return {
+      currency,
       result: data,
       success: true,
-      txid: data.tx.hash,
-      txhex: hex
+      tx_id: data.tx.hash,
+      tx_hex: hex
     }
 
   } catch(error) {
