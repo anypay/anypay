@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/anypay/anypay/compare/v1.6.0...v1.6.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* **update-jsonwebtoken-version:** v8.3.0 apparently did not work on linux node v16 ([#1101](https://github.com/anypay/anypay/issues/1101)) ([891e4c8](https://github.com/anypay/anypay/commit/891e4c867adf76db9fdbd3e2171ea10143e25d02))
+
 # [1.6.0](https://github.com/anypay/anypay/compare/v1.5.0...v1.6.0) (2022-10-02)
 
 
