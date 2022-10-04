@@ -120,7 +120,8 @@ export async function newInvoice(params: NewInvoice = {}): Promise<Invoice> {
 
   let invoice = await createInvoice({
     account: params.account || account,
-    amount: params.amount || 52.00
+    amount: params.amount || 52.00,
+    webhook_url: 'https://anypayx.com/api/v1/test/webhooks'
   })
 
   return invoice
