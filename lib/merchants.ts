@@ -1,63 +1,57 @@
 
-import { Account } from './account'
+import { models } from './models';
 
-import * as moment from 'moment'
+import { log } from './log'
 
-import { database } from './'
-
-export enum timespans {
-
-  OneWeek = 'one-week',
-
-  OneMonth = 'one-month',
-
-  ThreeMonths = 'three-months',
-
-  Inactive = 'inactive'
-
-}
-
-class Merchant {
-
-  active_since: Date;
-
+interface MerchantInfo {
+  business_address: string;
   business_name: string;
-
-  physical_address: string;
-
-  website_url: string;
-
-  account: Account;
-
+  latitude: number;
+  longitude: number;
+  image_url: boolean;
+  account_id: number;
+  denomination: string;
 }
 
-export async function listActiveSince(units: any, span: string): Promise<Merchant[]> {
+export async function getMerchantInfo(identifier: any): Promise<MerchantInfo> {
 
-  let date = moment().subtract(units, span).format('MM-DD-YYYY');
+  log.info('merchants.getMerchantInfo', { identifier })
 
-  let query = `select accounts.id from accounts inner join invoices on accounts.id = invoices.account_id where invoices."createdAt" > '${date}' and status='paid' and accounts.physical_address is not null and accounts.business_name is not null group by accounts.id`;
+  var account;
 
-  let [ids] = await database.query(query);
+  try {
+  
+    await models.Account.findOne({where: {
+      stub: identifier.toString()
+    }})
 
-  ids = ids.map(record => record.id)
+  } catch(error) {
 
-  if (ids.length === 0) { return [] }
+    log.error('merchants.getMerchantInfo.error', error)
 
-  let [merchants] = await database.query(`select physical_address, business_name, id, latitude, longitude, image_url from accounts where id in (${ids.join(', ')});`)
+  }
 
+  if (!account) {
 
-  return merchants
+    account = await models.Account.findOne({where: {
+
+      id: parseInt(identifier)
+    }})
+
+  }
+
+  if (!account) {
+    throw new Error('no account found');
+  }
+
+  return {
+    business_name: account.business_name,
+    business_address: account.business_address,
+    latitude: parseFloat(account.latitude),
+    longitude: parseFloat(account.longitude),
+    image_url: account.image_url,
+    account_id: account.id,
+    denomination: account.denomination
+  }
 
 }
-
-export async function listAll(): Promise<Merchant[]> {
-
-  let [merchants] = await database.query(`select physical_address, business_name, id,
-    latitude, longitude, image_url from accounts where physical_address is not null and
-    business_name is not null`);
-
-  return merchants
-}
-
-
-
