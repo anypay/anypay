@@ -25,7 +25,7 @@ export async function show(req, h) {
 
   if (!app) {
 
-    return req.boom.notFound(`app ${req.params.id} not found`)
+    return h.notFound(`app ${req.params.id} not found`)
   }
 
   return  { app }
