@@ -13,7 +13,7 @@ export interface Price {
   source: string;
 }
 
-export async function fetchCurrencies(base_currency): Promise<Price[]> {
+export async function fetchCurrencies(base_currency='USD'): Promise<Price[]> {
 
   base_currency = base_currency.toLowerCase();
 

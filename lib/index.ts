@@ -27,8 +27,8 @@ import * as slack from './slack/notifier';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
+import * as access from './access_tokens';
 import * as mempool from './mempool.space'
-
 
 var initialized = false;
 
@@ -41,6 +41,7 @@ var initialized = false;
 })();
 
 export {
+  access,
   accounts,
   addresses,
   amqp,

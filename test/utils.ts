@@ -229,6 +229,16 @@ export function auth(account, version=1) {
 
 }
 
+export function authHeaders(username:string, password:string, headers: any = {}): any {
+
+  let token = new Buffer(`${username}:${password}`).toString('base64');
+
+  headers['Authorization'] = `Basic ${token}`
+
+  return headers
+
+}
+
 import { Wallet } from 'anypay-simple-wallet'
 import { getBitcore } from '../lib/bitcore';
 
