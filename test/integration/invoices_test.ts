@@ -47,26 +47,6 @@ describe('Integration | Invoices', () => {
 
     })
 
-    it.skip('fails to create invoice with invalid access token', async () => {
-
-    })
-
-    it.skip('fails to create invoice when address not set', async () => {
-
-    })
-
-    it.skip('creates an invoice for a specific coin only', async () => {
-
-    })
-
-    it.skip('creates an invoice for a specific coin only', async () => {
-
-    })
-
-    it.skip('creates an invoice specifying the denomination', async () => {
-
-    })
-
   })
 
   describe("Listing Events Related To Invoice", () => {
@@ -89,16 +69,6 @@ describe('Integration | Invoices', () => {
       expect(response.result.events[0].account_id).to.be.equal(account.id)
 
     })
-
-  })
-
-  describe("Getting Invoice Data", () => {
-
-    it.skip("should have notes attached once they are created")
-
-  })
-
-  describe("Managing, Cancelling Invoice", () => {
 
   })
 

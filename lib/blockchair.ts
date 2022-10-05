@@ -71,7 +71,11 @@ interface GetRawTransactionResult {
 
 export async function getDecodedTransaction(chain: string, txid: string): Promise<DecodedRawTransaction> {
 
+  log.info('blockchair.getDecodedTransaction', { chain, txid })
+
   let { data } = await axios.get(`https://api.blockchair.com/${chain}/raw/transaction/${txid}`)
+
+  log.info('blockchair.getDecodedTransaction.result', { chain, txid, data: data.data })
 
   console.log(data.data[txid].decoded_raw_transaction)
 

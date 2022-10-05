@@ -10,6 +10,7 @@ import { Invoice } from './invoices'
 import { Orm } from './orm'
 
 import { createApp } from './apps'
+import { log } from './log'
 
 export class Refund extends Orm {
 
@@ -90,12 +91,14 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
 
 export async function getAddressForInvoice(invoice: Invoice): Promise<RefundAddress> {
 
+  log.info('refunds.getAddressForInvoice', invoice.record.dataValues)
+
   if (invoice.get('status') === 'unpaid') {
 
     throw new RefundErrorInvoiceNotPaid()
   }
 
-  const currency = CURRENCIES[invoice.get('currency') || invoice.get('payment_currency')]
+  const currency = CURRENCIES[invoice.get('payment_currency') || invoice.get('invoice_currency') || invoice.get('currency')]
 
   let rawtx = await getDecodedTransaction(currency, invoice.get('hash'))
 
