@@ -109,6 +109,10 @@ describe('Invoice Events', () => {
       await client.selectPaymentOption(paymentOptions[0])
  
       events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
+
+      console.log('__VENTS', events)
+
+      events.map(event => console.log(event.toJSON()))
  
       expect(events.length).to.be.equal(1)
 

@@ -8,6 +8,7 @@ import { Invoice } from './invoices'
 import { Account } from './account'
 
 import { events } from 'rabbi'
+
 import { log } from './log';
 
 interface EventData {
@@ -33,6 +34,17 @@ export async function recordEvent(payload: any, type: string): Promise<Event> {
 export class Event extends Orm {
 
   static model = models.Event;
+
+  // Override base class default getter to search for payload json if column key not found
+  get(key) {
+
+    let value = this.record.dataValues[key]
+
+    if (value) return value
+
+    return this.record.dataValues.payload[key]
+
+  }
 
 }
 
