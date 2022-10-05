@@ -1,14 +1,14 @@
-require('dotenv').config();
 
 import {models} from './models';
 
-import { Orm } from './orm'
+import { findAll, Orm } from './orm'
 
 import { Invoice } from './invoices'
 
 import { Account } from './account'
 
 import { events } from 'rabbi'
+import { log } from './log';
 
 interface EventData {
   type: string;
@@ -32,29 +32,13 @@ export async function recordEvent(payload: any, type: string): Promise<Event> {
 
 export class Event extends Orm {
 
-  get(key) {
-
-    let value = this.record.dataValues[key]
-
-    if (value) return value
-
-    return this.record.dataValues.payload[key]
-
-  }
-
-  toJSON() {
-
-    let json = this.record.toJSON()
-
-    return json
-
-  }
+  static model = models.Event;
 
 }
 
 export async function listEvents(type: string, payload: any): Promise<Event[]> {
 
-  let records = await models.Event.findAll({
+  let records = await findAll<Event>(Event, {
 
     where: {
 
@@ -66,7 +50,7 @@ export async function listEvents(type: string, payload: any): Promise<Event[]> {
 
   })
 
-  return records.map(record => new Event(record))
+  return records
 
 }
 
@@ -84,15 +68,17 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
   }
 
-  let records = await models.Event.findAll({ where, order: [['createdAt', 'desc']] })
+  let records = await findAll<Event>(Event, { where, order: [['createdAt', 'desc']] })
 
-  return records.map(record => new Event(record))
+  return records;
 
 }
 
 interface EventLogOptions {
   type?: string;
   order?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export async function listAccountEvents(account: Account, options: EventLogOptions={}): Promise<Event[]> {
@@ -121,9 +107,13 @@ export async function listAccountEvents(account: Account, options: EventLogOptio
 
   }
 
-  let records = await models.Event.findAll(query)
+  query['limit'] = options.limit || 100;
 
-  return records.map(record => new Event(record))
+  query['offset'] = options.offset || 0;
+
+  log.info('events.listAccountEvents', { query })
+
+  return findAll<Event>(Event, query)
 
 }
 

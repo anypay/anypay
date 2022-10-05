@@ -264,7 +264,7 @@ export async function attachV1Routes(server) {
             updatedAt: Joi.date().required()
           }))
         }),
-        failAction: 'log'
+        failAction
       }
     },
   });
@@ -277,10 +277,12 @@ export async function attachV1Routes(server) {
       tags: ['api', 'v1', 'events'],
       auth: "jwt",
       response: {
+        failAction,
         schema: Joi.object({
           account_id: Joi.number().required(),
           events: Joi.array().items(Joi.object({
             id: Joi.number().required(),
+            invoice_uid: Joi.any().optional(),
             account_id: Joi.number().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
@@ -307,7 +309,7 @@ export async function attachV1Routes(server) {
         failAction
       },
       response: {
-        failAction: 'log',
+        failAction,
         schema: Joi.object({
           address: Joi.object({
             currency: Joi.string().required(),
@@ -333,7 +335,7 @@ export async function attachV1Routes(server) {
         failAction
       },
       response: {
-        failAction: 'log',
+        failAction,
         schema: Joi.object({
           address: Joi.object({
             success: Joi.boolean()
