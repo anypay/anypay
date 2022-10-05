@@ -5,6 +5,10 @@ import { log } from '../../lib/log'
 
 import { getRefund, Refund, RefundErrorInvoiceNotPaid } from '../../lib/refunds'
 
+import * as uuid from 'uuid'
+
+import { createHash } from 'crypto'
+
 describe('lib/refunds', () => {
 
   it('#getRefund should return a Refund for an Invoice given explicit refund address', async () => {
@@ -35,31 +39,35 @@ describe('lib/refunds', () => {
 
   })
 
-  it('#getRefund should detect the refund address if not explicitly provided', async () => {
+  it.skip('#getRefund should detect the refund address if not explicitly provided', async () => {
 
-    const txid = '8813c43a2e8f98e0c206481119be11700d1e23077b8b041a60e4cd5f5dbd236e'
+    const txid = createHash('sha256').update(uuid.v4(), 'utf8').digest()
 
     const [account, invoice] = await newAccountWithInvoice()
 
     log.debug('test.account.created', account)
 
-    await invoice.set('status', 'paid')
+    console.log('__UPDATE PARAMS', {
+      status: 'paid',
+      currency: 'BCH',
+      invoice_currency: 'BCH',
+      denomination_currency: 'USD',
+      denomination: 'USD',
+      denomination_amount_paid: '52.00',
+      hash: txid
+    })
 
-    await invoice.set('currency', 'BCH')
-
-    await invoice.set('invoice_currency', 'BCH')
-
-    await invoice.set('denomination_currency', 'USD')
-
-    await invoice.set('denomination', 'USD')
-
-    await invoice.set('denomination_amount_paid', 52.00)
-
-    await invoice.set('hash', txid)
+    await invoice.update({
+      status: 'paid',
+      currency: 'BCH',
+      invoice_currency: 'BCH',
+      denomination_currency: 'USD',
+      denomination: 'USD',
+      denomination_amount_paid: '52.00',
+      hash: txid
+    })
 
     const refund: Refund = await getRefund(invoice) // Omit explicit refund address
-
-    console.log(refund)
 
     expect(refund.get('refund_invoice_uid')).to.be.a('string')
 

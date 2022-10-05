@@ -11,12 +11,14 @@ export async function show(req, h) {
 
     let invoice = await ensureInvoice(req.params.invoice_uid)
 
-    if (invoice.account_id !== req.account.id) {
+    if (invoice.get('account_id') !== req.account.id) {
 
       return h.response({ error: 'unauthorized' }).code(401)
     }
    
     let refund = await getRefund(invoice)
+
+    console.log('_REFF', refund)
 
     let refund_invoice = await ensureInvoice(refund.get('refund_invoice_uid'))
 
@@ -27,6 +29,8 @@ export async function show(req, h) {
     })
 
   } catch(error) {
+
+    console.log('_RRR', error)    
 
     log.error('servers.v1.handlers.Refunds.show', error)
 

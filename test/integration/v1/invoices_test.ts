@@ -1,131 +1,134 @@
+import { expect, chance, request, spy } from '../../utils'
 
-import { auth, expect, server } from '../../utils'
+import { verifyToken } from '../../../lib/jwt'
 
-import { DEFAULT_WEBHOOK_URL } from '../../../lib/webhooks'
+import * as passwords from '../../../lib/password'
 
-import * as utils from '../../utils'
+describe("Listing Available Webhooks", async () => {
 
-import { buildPayment }  from '../../../plugins/bsv/lib/wallet'
+  it("POST /v1/api/account/register should register an account", async () => {
 
-import { TestClient } from 'anypay-simple-wallet'
+    let email = chance.email()
+    let password = chance.word()
 
-describe("Invoices V1", async () => {
-
-  it("POST /invoices should use default webhook url", async () => {
-
-    let [account] = await utils.createAccountWithAddress()
-
-    let response = await auth(account)({
-      method: 'POST',
-      url: `/v1/api/invoices`,
-      payload: {
-        amount: 10 
-      }
-    })
+    let response = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
 
     expect(response.statusCode).to.be.equal(201)
 
-    expect(response.result.invoice.webhook_url).to.be.equal(DEFAULT_WEBHOOK_URL)
+    expect(response.body.user.id).to.be.greaterThan(0)
+
+    expect(response.body.accessToken).to.be.a("string")
+
+    const decodedToken = await verifyToken(response.body.accessToken);
+
+    expect(decodedToken.account_id).to.be.equal(response.body.user.id)
 
   })
 
-  it.skip("GET /v1/api/invoices/{uid} includes payment for a paid invoice", async () => {
+  it("POST /v1/api/account/login should return an accessToken and user", async () => {
 
-    // create invoice
-    // send payment
-    // get invoice
-    // assert payment txid
-    // assert payment outputs
-    // assert invoice paid
+    let email = chance.email()
+    let password = chance.word()
 
-    let [account] = await utils.createAccountWithAddress()
+    let { body } = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
 
-    var response = await auth(account)({
-      method: 'POST',
-      url: `/v1/api/invoices`,
-      payload: {
-        amount: 0.02 
-      }
-    })
+    let response = await request
+      .post('/v1/api/account/login')
+      .send({ email, password })
 
-    let invoice = response.result.invoice
+    expect(response.statusCode).to.be.equal(200)
 
-    response = await auth(account)({
-      method: 'GET',
-      url: `/v1/api/invoices/${invoice.uid}`,
-    })
+    expect(response.body.user.id).to.be.greaterThan(0)
 
-    expect(response.result.invoice.status).to.be.equal('unpaid')
+    let { accessToken } = response.body
 
-    let client = new TestClient(server, `/i/${invoice.uid}`)
+    expect(accessToken).to.be.a("string")
 
-    let { paymentOptions } = await client.getPaymentOptions()
+    const decodedToken = await verifyToken(accessToken);
 
-    let paymentOption = paymentOptions.filter(option => {
-      return option.currency === 'BSV'
-    })[0]
-
-    let paymentRequest = await client.selectPaymentOption(paymentOption)
-
-    let payment = await buildPayment(paymentRequest)
-
-    response = await server.inject({
-      method: 'POST',
-      url: `/i/${invoice.uid}`,
-      headers: {
-        'x-paypro-version': 2,
-        'Content-Type': 'application/payment'
-      },
-      payload: {
-        transactions: [{ tx: payment }],
-        chain: 'BSV',
-        currency: 'BSV'
-      }
-    })
-
-    response = await auth(account)({
-      method: 'GET',
-      url: `/v1/api/invoices/${invoice.uid}`,
-    })
-
-    expect(response.result.invoice.currency).to.be.equal('USD')
-
-    expect(response.result.invoice.amount).to.be.equal(0.02)
-
-    expect(response.result.invoice.status).to.be.equal('paid')
-
-    expect(response.result.payment.currency).to.be.equal('BSV')
-
-    expect(response.result.payment.txid).to.be.a('string')
-
-    expect(response.result.payment.txhex).to.be.a('string')
+    expect(decodedToken.account_id).to.be.equal(body.user.id)
 
   })
 
-  it("GET /v1/api/invoices/{uid}/events should show event log for invoice", async () => {
+  it("POST /v1/api/account/login with invalid creds should return a 401", async () => {
 
-    let [account] = await utils.createAccountWithAddress()
+    let email = chance.email()
+    let password = chance.word()
 
-    var response = await auth(account)({
-      method: 'POST',
-      url: `/v1/api/invoices`,
-      payload: {
-        amount: 10 
-      }
-    })
+    await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
 
-    let invoice = response.result.invoice
+    let response = await request
+      .post('/v1/api/account/login')
+      .send({ email, password: 'inv@lid' })
 
-    response = await auth(account)({
-      method: 'GET',
-      url: `/v1/api/invoices/${invoice.uid}/events`,
-    })
+    expect(response.statusCode).to.be.equal(401)
 
-    console.log('response', response.result.events[0])
+    expect(response.body.error).to.be.a('string')
 
-    expect(response.result.events[0].type).to.be.equal('invoice.created')
+  })
+
+  it("GET /v1/api/account/my-account should require an access token", async () => {
+
+    let email = chance.email()
+    let password = chance.word()
+
+    var response = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
+
+    const { accessToken } = response.body
+
+    response = await request
+      .get('/v1/api/account/my-account')
+
+    console.log(response)
+
+    expect(response.statusCode).to.be.equal(401);
+
+    response = await request
+      .get('/v1/api/account/my-account')
+      .set('Authorization', `Bearer invalidAccessToken`)
+
+    expect(response.statusCode).to.be.equal(401);
+
+    response = await request
+      .get('/v1/api/account/my-account')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ email, password });
+
+    expect(response.statusCode).to.be.equal(200);
+
+    expect(response.body.user.id).to.be.greaterThan(0);
+
+    expect(response.body.user.email).to.be.equal(email);
+
+  })
+
+  it("POST /v1/api/account/password-reset should send an email", async () => {
+
+    let email = chance.email()
+    let password = chance.word()
+
+    var response = await request
+      .post('/v1/api/account/register')
+      .send({ email, password })
+
+    spy.on(passwords, ['sendPasswordResetEmail'])
+
+    response = await request
+      .post('/v1/api/account/password-reset')
+      .send({ email });
+
+    expect(passwords.sendPasswordResetEmail).to.have.been.called.with(email)
+
+    expect(response.statusCode).to.be.equal(200)
 
   })
 
 })
-
