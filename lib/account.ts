@@ -16,6 +16,8 @@ interface SetAddress {
 
 export class Account extends Orm {
 
+  static model = models.Account;
+
   static async findOne(where: any): Promise<Account> {
 
     let record = await models.Account.findOne({ where })
