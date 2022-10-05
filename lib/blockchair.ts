@@ -50,6 +50,8 @@ export async function publish(coin, hex): Promise<BroadcastTxResult> {
 
     log.error(`blockchair.push.transaction.${coin}.error`, error);
 
+    console.log(error)
+
     throw error;
 
   }

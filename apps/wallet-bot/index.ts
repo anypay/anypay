@@ -325,7 +325,7 @@ export async function findOrCreateWalletBot(account: Account): Promise<{walletBo
 
 export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken> {
 
-  let [accessToken] = await findOrCreate<AccessToken>(AccessToken, {
+  let [record] = await models.AccessToken.findOrCreate({
 
     where: {
       account_id: walletBot.get('account_id'),
@@ -337,7 +337,14 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
     }
   })
 
-  return accessToken
+  const account = await findOne<Account>(Account, {
+    where: {
+      id: walletBot.get('account_id')
+    }
+
+  })
+
+  return new AccessToken({record, account})
 
 }
 
