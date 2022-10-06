@@ -284,14 +284,12 @@ export async function attachV1Routes(server) {
             id: Joi.number().required(),
             invoice_uid: Joi.any().optional(),
             account_id: Joi.number().optional(),
-            invoice_uid: Joi.string().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required()
           }))
-        }),
-        failAction: 'log'
+        })
       }
     },
   });
