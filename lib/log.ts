@@ -10,7 +10,8 @@ import { config } from './config'
 const lokiEnabled = config.get('loki_enabled')
 
 interface NewLogger {
-  namespace: string;
+  namespace?: string;
+  env?: string; 
 }
 
 interface LogQuery {
@@ -51,25 +52,27 @@ if (config.get('loki_enabled') && config.get('loki_host')) {
 
 }
 
-
-
 const loki = winston.createLogger({
   level: 'info',
   transports,
   format: winston.format.json()
 });
 
-class Logger {
+export class Logger {
 
   namespace: string;
 
   log: any;
 
-  constructor(params: NewLogger = {namespace: ''}) {
+  env: string;
+
+  constructor(params: NewLogger = {namespace: 'anypay'}) {
 
     this.log = riverpig('anypay')
 
-    this.namespace = params.namespace
+    this.namespace = params.namespace || 'anypay'
+
+    this.env = params.env || process.env.NODE_ENV
 
   }
 
@@ -81,7 +84,7 @@ class Logger {
 
     }
 
-    if (config.get('NODE_ENV') !== 'test') {
+    if (this.env !== 'test') {
 
       this.log.info(type, payload)
 
@@ -113,7 +116,8 @@ class Logger {
       type,
       payload,
       account_id: payload.account_id,
-      invoice_uid: payload.invoice_uid
+      invoice_uid: payload.invoice_uid,
+      error: false
     })
 
   }
@@ -145,7 +149,7 @@ class Logger {
 
   }
 
-  async read(query: LogQuery = {}) {
+  async read(query: LogQuery = {}): Promise<any[]> {
 
     this.log.debug('log.read', query)
 
@@ -181,12 +185,3 @@ class Logger {
 const log = new Logger({ namespace: 'anypay' })
 
 export { log }
-
-if (config.get('loki_host')) {
-
-  log.info('loki.enabled')
-
-}
-
-
-
