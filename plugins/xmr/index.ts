@@ -262,7 +262,7 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
 
   const { tx, tx_key, tx_hash } = transaction
 
-  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: true })
+  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
   if (result.double_spend) {
     throw new Error('double spend')
@@ -280,17 +280,29 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
     throw new Error(result.reason)
   }
 
-  const { invoice_uid } = payment_option
+  ;(async () => {
 
-  const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
+    try {
 
-  log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
+      const { invoice_uid } = payment_option
 
-  await verify({
-    url,
-    tx_hash: String(tx_hash),
-    tx_key: String(tx_key)
-  })
+      const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
+    
+      log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
+    
+      await verify({
+        url,
+        tx_hash: String(tx_hash),
+        tx_key: String(tx_key)
+      })
+      
+    } catch(error) {
+
+      log.error('xmr.verifyPayment.error', error)
+
+    }
+
+  })();
 
   return true
 

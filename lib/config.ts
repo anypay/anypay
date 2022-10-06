@@ -16,6 +16,7 @@ config.defaults({
   'PORT': '5200',
   'HOST': '127.0.0.1',
   'API_BASE': 'https://api.anypayx.com',
+  'api_base': 'https://api.anypayx.com',
   'AMQP_URL': 'amqp://guest:guest@localhost:5672/',
   'DATABASE_URL': 'postgres://postgres@localhost:5432/anypay',
   'EMAIL_SENDER': 'support@anypayx.com',
