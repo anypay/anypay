@@ -32,16 +32,32 @@ export async function validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promis
 
 }
 
-
-
-
 export async function broadcastTx({ tx, tx_hash, tx_key }: Tx): Promise<SendRawTransactionResult> {
 
+  const result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: true })
+
+  if (result['sanity_check_failed']) {
+    throw new Error(result.reason)
+  }
+
+  if (result.double_spend) {
+    throw new Error('double spend')
+  }
+
+  if (result.too_big) {
+    throw new Error('too big')
+  }
+
+  if (result.status === 'Failed') {
+    throw new Error(result.reason)
+  }
+  
   return send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
 }
 
 import { default as pool_send_raw_transaction, Outputs as SendRawTransactionResult, Inputs as SendRawTransaction } from './other_rpc/send_raw_transaction'
+import submit_transfer from './wallet_rpc/submit_transfer'
 
 export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<SendRawTransactionResult> {
 
@@ -116,11 +132,14 @@ interface Destination {
 
 export async function transfer(destinations: Destination[]) {
 
+  log.info('xmr.transfer', { destinations })
+
   return call('transfer', {
     get_tx_hex: true,
     get_tx_key: true,
     get_tx_metadata: true,
-    do_not_relay: true,
+    //TODO: switch back -> do_not_relay: true,
+    do_not_relay: false,
     destinations
   })
 
@@ -262,7 +281,7 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
 
   const { tx, tx_key, tx_hash } = transaction
 
-  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: true })
+  let result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
 
   if (result.double_spend) {
     throw new Error('double spend')
@@ -285,6 +304,10 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
   const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
 
   log.info('xmr.verifyPayment', {invoice_uid, payment_option, tx, tx_key, tx_hash, url })
+
+  let walletRpcTransferResult = await submit_transfer({ tx_data_hex: tx })
+
+  log.info('xmr.wallet_rpc.submit_transfer.result', walletRpcTransferResult)
 
   await verify({
     url,
@@ -333,10 +356,12 @@ export async function verify({url, tx_hash, tx_key}: VerifyPayment) {
 
     let result = await callWalletRpc('check_tx_key', { txid: tx_hash, tx_key, address })
 
-    log.info('xmr.check_tx_key.result', result)
+    log.info('xmr.check_tx_key.result', Object.assign(result, { expected: amount }))
 
-    if (amount !== result.received) {
-      throw new Error('Invalid XMR Payment')
+    console.log(`received=${result.received} expected=${amount}`)
+
+    if (amount > result.received) {
+      throw new Error(`Invalid XMR Payment received=${result.received} expected=${amount}`)
     }
   }
 
