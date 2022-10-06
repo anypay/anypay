@@ -1,7 +1,6 @@
 
-import {models} from './models';
 
-import { findAll, Orm } from './orm'
+import { create, findAll, Orm } from './orm'
 
 import { Invoice } from './invoices'
 
@@ -11,6 +10,8 @@ import { events } from 'rabbi'
 
 import { log } from './log';
 
+import {models} from './models';
+
 interface EventData {
   type: string;
   payload: any;
@@ -19,15 +20,13 @@ interface EventData {
 
 export async function record(data: EventData) {
 
-  return models.Event.create(data);
+  return create<Event>(Event, data);
 
 }
 
 export async function recordEvent(payload: any, type: string): Promise<Event> {
 
-  let record = await models.Event.create({ payload, type });
-
-  return new Event(record)
+  return create<Event>(Event, { payload, type });
 
 }
 

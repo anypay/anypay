@@ -261,7 +261,8 @@ export async function attachV1Routes(server) {
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
-            updatedAt: Joi.date().required()
+            updatedAt: Joi.date().required(),
+            namespace: Joi.string().optional()
           }))
         }),
         failAction
@@ -287,7 +288,8 @@ export async function attachV1Routes(server) {
             type: Joi.string().required(),
             payload: Joi.object().optional(),
             createdAt: Joi.date().required(),
-            updatedAt: Joi.date().required()
+            updatedAt: Joi.date().required(),
+            namespace: Joi.string().optional()
           }))
         })
       }
