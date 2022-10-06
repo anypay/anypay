@@ -256,7 +256,7 @@ export async function attachV1Routes(server) {
           invoice_uid: Joi.string().required(),
           events: Joi.array().items(Joi.object({
             id: Joi.number().required(),
-            account_id: Joi.number().optional(),
+            account_id: Joi.any().optional(),
             invoice_uid: Joi.string().optional(),
             type: Joi.string().required(),
             payload: Joi.object().optional(),
