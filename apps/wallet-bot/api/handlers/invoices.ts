@@ -15,7 +15,7 @@ export async function create(req, h) {
 
     try {
 
-        const {walletBot} = await findOrCreateWalletBot(req.app)
+        const {walletBot} = await findOrCreateWalletBot(req.account)
 
         const template = [{
             currency: req.payload.currency,
@@ -47,7 +47,7 @@ export async function create(req, h) {
 
 export async function index(req, h) {
 
-    const { app } = await findOrCreateWalletBot(req.app)
+    const { app } = await findOrCreateWalletBot(req.account)
 
     let { limit, offset, currency } = req.query
 
