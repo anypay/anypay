@@ -4,6 +4,7 @@ import * as Boom from 'boom';
 import { log, models, plugins } from '../../../lib'
 
 import * as pay from '../../../lib/pay'
+import { Trace } from '../../../lib/trace';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
@@ -167,9 +168,24 @@ export async function create(req, h) {
 
     log.info(`bip70.${payment_option.currency}.transaction`, { hex: transaction });
 
-    let resp = await plugin.broadcastTx(transaction);
+    const trace = Trace()
 
-    log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp })
+    try {
+
+      log.info(`bip70.${payment_option.currency}.broadcast`, { transaction, trace })
+
+      let resp = await plugin.broadcastTx(transaction);
+
+      log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp, trace })
+
+      
+    } catch(error) {
+
+      log.error(`bip70.${payment_option.currency}.broadcast.error`, error)
+
+      throw error
+
+    }
 
     let paymentRecord = await pay.completePayment(payment_option, { tx: transaction})
 
