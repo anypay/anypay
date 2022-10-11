@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/anypay/anypay/compare/v1.6.2...v1.7.0) (2022-10-11)
+
+
+### Features
+
+* **broadcast-nownodes:** broadcast BTC transactions to nownodes api $20/mo ([#1109](https://github.com/anypay/anypay/issues/1109)) ([f0af986](https://github.com/anypay/anypay/commit/f0af98610b37ff65056d7aab8bb2cda7503172c5))
+
 ## [1.6.2](https://github.com/anypay/anypay/compare/v1.6.1...v1.6.2) (2022-10-04)
 
 
