@@ -5,7 +5,7 @@ export { btc as bitcore }
 
 import { oneSuccess } from 'promise-one-success'
 
-import { blockchair, config, chain_so } from '../../lib'
+import { blockchair, config, chain_so, nownodes } from '../../lib'
 
 import { BroadcastTxResult } from '../../lib/plugins'
 
@@ -38,6 +38,15 @@ export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
     broadcastProviders.push(
       
       bitcoind_rpc.broadcastTx(rawTx)
+    )
+  }
+
+  
+  if (config.get('nownodes_enabled')) {
+
+    broadcastProviders.push(
+      
+      nownodes.broadcastTx('BTC', rawTx)
     )
   }
 

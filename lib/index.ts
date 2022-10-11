@@ -29,6 +29,7 @@ import * as utils from './utils';
 import * as pay from './pay';
 import * as access from './access_tokens';
 import * as mempool from './mempool.space'
+import * as nownodes from './nownodes'
 
 var initialized = false;
 
@@ -61,6 +62,7 @@ export {
   log,
   login,
   models,
+  nownodes,
   password,
   pay,
   plugins,
