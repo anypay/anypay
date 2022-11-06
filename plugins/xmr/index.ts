@@ -115,6 +115,8 @@ export async function callWalletRpc(method: string, params: any): Promise<any> {
 
   const { data } = response
 
+  console.log('xmr.monero_wallet_rpc.result', data)
+
   log.info('xmr.monero_wallet_rpc.result', data)
   
   const { result } = data
