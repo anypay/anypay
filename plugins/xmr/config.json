@@ -19,5 +19,9 @@
         "host": "172.104.38.113",
         "port": 18081,
         "labels": ["cake"]
+    }, {
+        "host": "xmr-node.cakewallet.com",
+        "port": 18081,
+        "labels": ["cake"]
     }]
 }
