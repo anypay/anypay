@@ -23,5 +23,9 @@
         "host": "xmr-node.cakewallet.com",
         "port": 18081,
         "labels": ["cake"]
+    }, {
+        "host": "162.0.211.127",
+        "port": 18081,
+        "labels": ["anypay"]
     }]
 }
