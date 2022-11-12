@@ -1,29 +1,5 @@
 {
     "monerod_rpcs": [{
-        "host": "node.supportxmr.com",
-        "port": 18081,
-        "labels": ["miner"]
-    }, {
-        "host": "nodes.hashvault.pro",
-        "port": 18081,
-        "labels": ["miner"]
-    }, {
-        "host": "node.c3pool.com",
-        "port": 18081,
-        "labels": ["miner"]
-    }, {
-        "host": "151.115.41.75",
-        "port": 18081,
-        "labels": ["cake", "full-logging"]
-    }, {
-        "host": "172.104.38.113",
-        "port": 18081,
-        "labels": ["cake"]
-    }, {
-        "host": "xmr-node.cakewallet.com",
-        "port": 18081,
-        "labels": ["cake"]
-    }, {
         "host": "162.0.211.127",
         "port": 18081,
         "labels": ["anypay"]
