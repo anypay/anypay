@@ -195,6 +195,72 @@ export const plugin = (() => {
         }
       })
 
+
+      server.route({
+        path: `${base}/dashboard`,
+        method: 'GET',
+        handler: async (req, h) => {
+
+          try {
+
+            const {walletBot} = await findOrCreateWalletBot(req.account)
+
+            const accessToken = await getAccessToken(walletBot)
+
+            const counts = await getPaymentCounts(walletBot)
+
+            const socket = getSocket(walletBot)
+
+            const status = socket ? 'connected' : 'disconnected'
+
+            const wallet_bot = {
+
+              id: walletBot.get('id'),
+
+              status
+
+            }
+
+            const balances = socket ? socket.data.balances : null
+
+            const access_token = accessToken.get('uid')
+
+            return {
+
+              wallet_bot,
+
+              access_token,
+
+              balances,
+
+              counts
+
+            }
+           
+          } catch(error) {
+
+            log.error('apps.wallet-bot.api', error)
+
+            return h.badImplementation(error)
+
+          }
+
+        },
+        options: {
+
+          auth: "app",
+
+          /*response: {
+            failAction,
+            schema: Joi.object({
+              wallet_bot: Joi.object().required(),
+              access_token: Joi.string().required()
+            })
+          }
+          */
+        }
+      })
+
       var handlers = requireHandlersDirectory(`${__dirname}/api/handlers`)
 
       server.route({
@@ -223,7 +289,6 @@ export const plugin = (() => {
           auth: 'app'
         }
       }); 
-
 
       server.route({
         method: 'DELETE',
