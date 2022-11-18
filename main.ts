@@ -21,8 +21,6 @@ import { start as refunds } from './actors/refunds/actor'
 
 import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
 
-import xmr_zmq_subscriber from './plugins/xmr/bin/zeromq_transactions'
-
 import { init } from 'rabbi'
 
 import * as core from './lib'
@@ -70,12 +68,6 @@ import * as core from './lib'
   }
 
   startTask('wallet_bot_send_xmr_on_interval')
-
-  if (config.get('xmr_zmq_url')) {
-
-    xmr_zmq_subscriber({ config, log })
-
-  }
 
 })()
 
