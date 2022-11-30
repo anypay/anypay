@@ -23,6 +23,9 @@ import * as shortid from 'shortid'
 import { computeInvoiceURI } from './uri';
 
 import { PaymentOption } from './payment_option';
+import { findAll, findOne } from './orm';
+import { PaymentRequest } from './payment_requests';
+import { Invoice } from './invoices';
 
 interface Address {
   currency: string,
@@ -93,28 +96,51 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
 
 }
 
-export async function refreshInvoice(uid: string): Promise<any> {
+export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   let invoice = await models.Invoice.findOne({ where: { uid }})
 
-  let paymentOptions = await models.PaymentOption.findAll({
+  const paymentOptions: PaymentOption[] = await findAll<PaymentOption>(PaymentOption, {
     where: {
       invoice_uid: uid
     }
   })
 
-  // delete all payment options and re-generate invoice
-  await Promise.all(paymentOptions.map(option => option.destroy()))
+  const paymentRequest: PaymentRequest = await findOne<PaymentRequest>(PaymentRequest, {
 
-  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+    where: {
 
+      invoice_uid: invoice.uid
+    }
+  })
 
-  // TODO: Only create options from existing options coins if options exist
-  await createPaymentOptions(account, invoice)
+  for (let option of paymentOptions) {
 
-  invoice.expiry = moment().add(15, 'minutes').toDate();
+    const template = paymentRequest.get('template').find(template => template.currency === option.currency)[0]
 
-  await invoice.save()
+    const outputs = await Promise.all(template.to.map(async (to) => {
+
+      const { currency, value } = to
+
+      const conversion = await convert({ currency, value }, option.currency)
+
+      const amount = pay.toSatoshis(conversion.value, option.currency)
+
+      return {
+
+        address: to.address,
+
+        amount
+
+      }
+
+    }))
+
+    await option.set('outputs', outputs)
+
+  }
+
+  await invoice.set('expiry', moment().add(15, 'minutes').toDate())
 
   log.info('invoice.refreshed', {
     invoice_uid: invoice.uid
