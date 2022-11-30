@@ -90,8 +90,6 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     redirect_url
   })
 
-  console.log('__EMPTY RECORD', record)
-
   return record;
 
 }
@@ -116,11 +114,11 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   for (let option of paymentOptions) {
 
-    const template = paymentRequest.get('template').find(template => template.currency === option.currency)[0]
+    const template = paymentRequest.get('template').find(template => template.currency === option.currency)
 
     const outputs = await Promise.all(template.to.map(async (to) => {
 
-      const { currency, value } = to
+      const { currency, amount: value } = to
 
       const conversion = await convert({ currency, value }, option.currency)
 
@@ -136,14 +134,24 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     }))
 
-    await option.set('outputs', outputs)
+    const record = await models.PaymentOption.findOne({
+      where: {
+        invoice_uid: invoice.uid,
+        currency: option.currency
+      }
+    })
+
+    record.outputs = outputs
+
+    await record.save()
 
   }
 
   await invoice.set('expiry', moment().add(15, 'minutes').toDate())
 
   log.info('invoice.refreshed', {
-    invoice_uid: invoice.uid
+    invoice_uid: invoice.uid,
+    expiry: invoice.expiry
   })
 
   return invoice
