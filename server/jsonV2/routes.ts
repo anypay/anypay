@@ -14,7 +14,7 @@ export async function attachRoutes(server) {
       tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
-          'x-paypro-version': Joi.number().integer().required(),
+          'x-paypro-version': Joi.number().integer().optional(),
           'accept': Joi.string().pattern(/application\/payment-options/).required()
         }).unknown(),
         params: Joi.object({
@@ -33,7 +33,7 @@ export async function attachRoutes(server) {
       tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
-          'x-paypro-version': Joi.number().integer().required(),
+          'x-paypro-version': Joi.number().integer().optional(),
           'x-content-type': Joi.alternatives([
             Joi.string().pattern(/application\/payment-request/).required(),
             Joi.string().pattern(/application\/payment-verification/).required(),
@@ -56,7 +56,7 @@ export async function attachRoutes(server) {
       tags: ['api', 'platform', 'jsonv2'],
       validate: {
         headers: Joi.object({
-          'x-paypro-version': Joi.number().integer().required(),
+          'x-paypro-version': Joi.number().integer().optional(),
           'x-content-type': Joi.alternatives([
             Joi.string().pattern(/application\/payment-request/).required(),
             Joi.string().pattern(/application\/payment-verification/).required(),

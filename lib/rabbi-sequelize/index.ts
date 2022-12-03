@@ -1,6 +1,6 @@
 
 import { awaitChannel } from '../amqp';
-import { log } from '../log';
+//import { log } from '../log';
 
 // https://sequelize.readthedocs.io/en/2.0/docs/hooks/
 
@@ -73,7 +73,7 @@ export function bindHook(model, hookName, exchange) {
 
     let data = instance.toJSON()
 
-    log.debug(event, data);
+    //log.debug(event, data);
 
     await channel.publish(exchange, event, Buffer.from(JSON.stringify(data)));
 

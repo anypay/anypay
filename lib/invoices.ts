@@ -93,7 +93,6 @@ export class Invoice extends Orm {
     return this.get('app_id')
   }
 
-
   get denomination(): string {
 
     return this.get('denomination_currency')
@@ -141,7 +140,7 @@ export class Invoice extends Orm {
         delete json[key];
       }
 
-      if (json[key] === NaN) {
+      if (Number.isNaN(json[key])) {
         delete json[key];
       }
     });
@@ -263,7 +262,31 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   await createWebhook(invoice)
 
-  await createPaymentOptions(account.record, invoice)
+  const paymentOptions = await createPaymentOptions(account.record, invoice)
+
+  let paymentRequest = await models.PaymentRequest.create({
+
+    app_id: 1,
+
+    account_id: account.id,
+
+    template: paymentOptions.map(option => {
+      return {
+        currency: currency || account.denomination,
+        to: [{
+          currency: option.currency,
+          amount: amount,
+          address: option.address
+        }]
+        
+      }
+    }),
+
+    status: 'unpaid'
+
+  })
+
+  log.info('paymentrequest.created', paymentRequest)
 
   log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
 
