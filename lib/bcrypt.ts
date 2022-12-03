@@ -5,13 +5,17 @@ import { log } from './log'
 
 export async function compare(password: string, hash: string): Promise<any> {
 
+    console.log('compare', {password, hash})
+
     return new Promise((resolve, reject) => {
 
         try {
 
-            bcrypt.compare(password, hash, (err) => {
+            bcrypt.compare(password, hash, (err, isMatch) => {
 
                 if (err) { reject(err); return }
+
+                if (!isMatch) { reject(false) }
 
                 resolve(true)
 

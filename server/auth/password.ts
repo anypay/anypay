@@ -5,8 +5,6 @@ import { log } from '../../lib/log'
 
 import * as AccountLogin from '../../lib/account_login'
 
-import { compare } from '../../lib/bcrypt';
-
 export async function validate(request, username, password, h) {
 
   try {
@@ -43,40 +41,16 @@ export async function validate(request, username, password, h) {
 
     } else {
 
+      return {isValid: false}
 
     }
+
   } catch(error) {
 
     log.error('auth.passwords.validate.error', error);
 
-  }
+    return {isValid: false}
 
-  // check for sudo password
-  try {
-
-    await compare(password, process.env.SUDO_PASSWORD_HASH);
-
-  } catch(error) {
-
-    return {
-      isValid: false
-    }
-
-  }
-
-  var isNew;
-  [accessToken, isNew] = await models.AccessToken.findOrCreate({
-    where: {
-      account_id: account.id
-    },
-    defaults: {
-      account_id: account.id
-    }
-  });
-
-  return {
-    isValid: true,
-    credentials: { accessToken, account }
   }
 
 };
