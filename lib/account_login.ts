@@ -1,7 +1,8 @@
 
-const AccessToken = require("./models/access_token");
-const log = require("winston");
-import { models } from './models';
+
+import { models } from './models'
+
+import { log } from './log'
 
 import { compare } from './bcrypt'
 
@@ -19,13 +20,11 @@ export async function withEmailPassword (email, password) {
     log.info('no account found for email', email);
     throw new Error('account with email not found');
   }
-
-  log.info('found account with email', account.toJSON());
-
-
   try {
 
-    await compare(password, account.password_hash);
+    const result = await compare(password, account.password_hash);
+
+    console.log('COMPARE RESULT', result)
 
   } catch(error) {
 

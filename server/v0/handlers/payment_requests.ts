@@ -21,7 +21,7 @@ export async function create(req, h) {
 
     log.error('pay.request.create.error', error)
 
-    return h.response({ error: error.message }).status(500)
+    return h.badRequest(error)
 
   }
 
