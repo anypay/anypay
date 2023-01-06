@@ -521,4 +521,14 @@ export async function attachV1Routes(server) {
       }
     },
   });
+
+  server.route({
+    method: 'POST',
+    path: '/api/v1/blockcypher/webhooks',
+    handler: v1.BlockcypherWebhooks.create,
+    options: {
+      tags: ['api', 'v1', 'blockcypher', 'webhooks']
+    },
+  })
+
 }
