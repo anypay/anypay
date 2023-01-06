@@ -1,5 +1,4 @@
 
-
 require('dotenv').config()
 
 import { deleteNewBlockWebhook } from "../../lib/blockcypher"
@@ -12,4 +11,3 @@ async function main() {
 }
 
 main()
-

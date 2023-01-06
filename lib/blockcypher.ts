@@ -6,11 +6,16 @@ let token = process.env.blockcypher_token;
 import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
+
 import { BroadcastTxResult } from './plugins';
+
 import { config } from './config';
+
 import {models} from './models';
 
 import { publish as publishAMQP } from 'rabbi'
+
+import { Op } from 'sequelize'
 
 export async function publish(currency, hex): Promise<BroadcastTxResult> {
 
@@ -91,18 +96,34 @@ export async function deleteNewBlockWebhook() {
 
 }
 
-export async function getBlockchain() {
+interface BlockchainStatus {
+  name: string;
+  height: number;
+  hash: string;
+  time: string;
+  latest_url: string;
+  previous_hash: string;
+  previous_url: string;
+  peer_count: number;
+  unconfirmed_count: number;
+  high_fee_per_kb: number;
+  medium_fee_per_kb: number;
+  low_fee_per_kb: number;
+  last_fork_height: number;
+  last_fork_hash: string;
+}
+
+export async function getBlockchain(): Promise<BlockchainStatus> {
 
   const { data } = await axios.get('https://api.blockcypher.com/v1/btc/main')
 
   return data
+
 }
 
 interface GetTransactionResult { 
   block_hash: string;
   block_height: number;
-  block_index: number;
-  hash: string;
   confirmed: Date;
 }
 
@@ -116,15 +137,19 @@ export async function getTransaction(txid: string): Promise<GetTransactionResult
 
 }
 
-export async function confirmTransaction(payment) {
+export async function confirmTransaction(payment, transaction?: GetTransactionResult) {
 
-  const result: GetTransactionResult = await getTransaction(payment.txid)
+  if (!transaction) {
 
-  payment.confirmation_date = result.confirmed
+    transaction = await getTransaction(payment.txid)
 
-  payment.confirmation_height = result.block_height
+  }
 
-  payment.confirmation_hash = result.block_hash
+  payment.confirmation_date = transaction.confirmed
+
+  payment.confirmation_height = transaction.block_height
+
+  payment.confirmation_hash = transaction.block_hash
 
   payment.status = 'confirmed'
 
@@ -155,5 +180,29 @@ export async function confirmTransaction(payment) {
   await invoice.save()
 
   return payment
+  
+}
+
+export async function confirmTransactionsFromBlockWebhook(webhook) {
+  
+    const { txids } = webhook
+  
+    const payments = await models.Payment.findAll({
+      where: {
+        txid: {
+          [Op.in]: txids
+        }
+      }
+    })
+  
+    for (let payment of payments) {
+  
+      await confirmTransaction(payment, {
+        confirmed: webhook.time,
+        block_height: webhook.height,
+        block_hash: webhook.hash
+      })
+  
+    }
   
 }
