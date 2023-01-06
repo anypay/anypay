@@ -8,6 +8,9 @@ import { log } from './log';
 import { v4 as uuid } from 'uuid'
 import { BroadcastTxResult } from './plugins';
 import { config } from './config';
+import {models} from './models';
+
+import { publish as publishAMQP } from 'rabbi'
 
 export async function publish(currency, hex): Promise<BroadcastTxResult> {
 
@@ -76,12 +79,81 @@ export async function deleteNewBlockWebhook() {
 
   const webhook = await getNewBlockWebhook()
 
+  console.log(webhook)
+
   if (!webhook) return
 
-  let { data } = await axios.delete(`https://api.blockcypher.com/v1/btc/main/hooks?token=${token}`)
+  let { data } = await axios.delete(`https://api.blockcypher.com/v1/btc/main/hooks/${webhook.id}?token=${token}`)
 
   console.log('blockcypher.createNewBlockWebhook.response', data)
 
   return data
 
+}
+
+export async function getBlockchain() {
+
+  const { data } = await axios.get('https://api.blockcypher.com/v1/btc/main')
+
+  return data
+}
+
+interface GetTransactionResult { 
+  block_hash: string;
+  block_height: number;
+  block_index: number;
+  hash: string;
+  confirmed: Date;
+}
+
+export async function getTransaction(txid: string): Promise<GetTransactionResult > {
+
+  let { data } = await axios.get(`https://api.blockcypher.com/v1/btc/main/txs/${txid}`)
+
+  log.info('blockcypher.getTransaction.response', data)
+
+  return data
+
+}
+
+export async function confirmTransaction(payment) {
+
+  const result: GetTransactionResult = await getTransaction(payment.txid)
+
+  payment.confirmation_date = result.confirmed
+
+  payment.confirmation_height = result.block_height
+
+  payment.confirmation_hash = result.block_hash
+
+  payment.status = 'confirmed'
+
+  await payment.save()
+
+  publishAMQP('anypay', 'payment.confirmed', payment.toJSON())
+
+  const invoice = await models.Invoice.findOne({
+    where: {
+      uid: payment.invoice_uid
+    }
+  })
+
+  const originalStatus = invoice.status
+
+  if (originalStatus === 'confirming') {
+
+    invoice.status = 'paid'
+
+    await invoice.save()
+
+    publishAMQP('anypay', 'invoice.paid', invoice.toJSON())
+
+  }
+
+  invoice.status = 'paid'
+
+  await invoice.save()
+
+  return payment
+  
 }
