@@ -60,4 +60,26 @@ describe('lib/webhooks', () => {
 
   })
 
+  describe("Webhooks for Confirming / Confirmed State", () => {
+
+    it('should send the invoice uid, uri, and status', () => {
+
+
+
+    })
+
+    it('should prevent sending a webhook twice if it is already sent', () => {
+
+
+    })
+
+    it('should specify the type of webhook in the database', () => {
+    })
+
+    it('paid webhooks should have type=paid', () => {
+      
+
+    })
+  })
+
 })

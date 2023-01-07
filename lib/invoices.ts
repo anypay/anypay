@@ -2,7 +2,7 @@
 
 import { log } from './log'
 
-import { createWebhook } from './webhooks'
+import { createWebhookForInvoice } from './webhooks'
 
 import { Account } from './account'
 
@@ -260,7 +260,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   let invoice = new Invoice(record)
 
-  await createWebhook(invoice)
+  await createWebhookForInvoice(invoice)
 
   const paymentOptions = await createPaymentOptions(account.record, invoice)
 

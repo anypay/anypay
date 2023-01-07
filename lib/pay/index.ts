@@ -25,6 +25,8 @@ import * as jsonV2 from './json_v2';
 
 import * as fees from './fees';
 
+import { publish } from 'rabbi'
+
 export { fees, bip70, bip270, jsonV2 }
 
 export interface Payment{
@@ -311,6 +313,67 @@ interface Transaction {
   tx: string;
   tx_hash?: string;
   tx_key?: string;
+}
+
+export async function handleUnconfirmedPayment(paymentOption, transaction: Transaction) {
+
+  const {tx: hex} = transaction
+
+  const { currency, invoice_uid } = paymentOption
+
+  log.info('handleUnconfirmedPayment', {invoice_uid, currency, transaction })
+
+  let bitcore = getBitcore(currency)
+
+  let tx = new bitcore.Transaction(hex)
+
+  let invoice = await models.Invoice.findOne({ where: {
+    uid: invoice_uid
+  }})
+
+  const txid = transaction.tx_hash || tx.hash
+  
+  let paymentRecord = await models.Payment.create({
+    txid,
+    currency: currency,
+    txjson: tx.toJSON(),
+    txhex: hex,
+    tx_key: transaction.tx_key,
+    payment_option_id: paymentOption.id,
+    invoice_uid: invoice_uid,
+    account_id: invoice.account_id
+  })
+
+  await models.Invoice.update(
+    {
+      amount_paid: invoice.amount,
+      invoice_amount: paymentOption.amount,
+      invoice_amount_paid: paymentOption.amount,
+      invoice_currency: currency,
+      denomination_amount_paid: invoice.denomination_amount,
+      currency: paymentOption.currency,
+      address: paymentOption.address,
+      hash: txid,
+      status: 'confirming',
+      paidAt: new Date(),
+      complete: true,
+      completed_at: new Date()
+    },
+    {
+      where: { uid: paymentOption.invoice_uid }
+    }
+  );
+
+  invoice = await models.Invoice.findOne({ where: {
+    id: invoice.id
+  }})
+
+  log.info('payment.confirming', paymentRecord.toJSON())
+
+  publish('anypay', 'payment.confirming', paymentRecord.toJSON())
+
+  return paymentRecord
+
 }
 
 export async function completePayment(paymentOption, transaction: Transaction) {

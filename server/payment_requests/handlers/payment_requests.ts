@@ -15,7 +15,7 @@ import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
 import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 
-import { createWebhook } from '../../../lib/webhooks'
+import { createWebhookForInvoice } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
 
@@ -112,7 +112,7 @@ export async function create(req, h) {
 
       log.info('pay.request.created', record.toJSON())
 
-      createWebhook(new Invoice(invoice))
+      createWebhookForInvoice(new Invoice(invoice))
 
       return {
 
