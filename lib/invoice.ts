@@ -114,15 +114,15 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   for (let option of paymentOptions) {
 
-    const template = paymentRequest.get('template').find(template => template.currency === option.currency)
+    const template = paymentRequest.get('template').find(template => template.currency === option.get('currency'))
 
     const outputs = await Promise.all(template.to.map(async (to) => {
 
       const { currency, amount: value } = to
 
-      const conversion = await convert({ currency, value }, option.currency)
+      const conversion = await convert({ currency, value }, option.get('currency'))
 
-      const amount = pay.toSatoshis(conversion.value, option.currency)
+      const amount = pay.toSatoshis(conversion.value, option.get('currency'))
 
       return {
 
@@ -137,7 +137,7 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
     const record = await models.PaymentOption.findOne({
       where: {
         invoice_uid: invoice.uid,
-        currency: option.currency
+        currency: option.get('currency')
       }
     })
 
@@ -241,7 +241,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       fee: fee.amount
     })
 
-    return new PaymentOption(invoice, optionRecord)
+    return new PaymentOption(optionRecord)
 
   }));
 

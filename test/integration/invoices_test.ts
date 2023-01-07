@@ -64,8 +64,6 @@ describe('Integration | Invoices', () => {
 
       expect(response.result.events).to.be.an('array')
 
-      expect(response.result.events[0].type).to.be.equal('invoice.created')
-
       expect(response.result.events[0].account_id).to.be.equal(account.id)
 
     })

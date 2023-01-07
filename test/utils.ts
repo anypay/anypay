@@ -104,8 +104,6 @@ export async function setAddresses(account: Account): Promise<Account> {
 
   let { address } = await generateKeypair()
 
-  console.log(account)
-
   await account.setAddress({ currency: 'BSV', address })
 
   let { address: bch_address } = await generateKeypair('BCH')

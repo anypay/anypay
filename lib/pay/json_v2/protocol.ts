@@ -393,7 +393,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
     const estimatedAmount = paymentOption.get('outputs')
       .reduce((sum, output) => sum + output.amount, 0)
 
-    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.currency)
+    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.get('currency'))
 
     return {
       currency: paymentOption.get('currency'),

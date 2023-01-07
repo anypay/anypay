@@ -11,34 +11,10 @@ export class PaymentOption extends Orm {
 
   invoice: Invoice;
 
-  constructor(invoice: Invoice, record: any) {
-
-    super(record);
-
-    this.invoice = invoice;
-
-  }
-
-  get invoice_uid() {
-    return this.invoice.get('uid')
-  }
-
-  get currency() {
-    return this.invoice.get('currency')
-  }
-
   get amount() {
-    return parseInt(this.record.dataValues['amount'])
+    return parseFloat(this.get('amount'))
   }
 
-  get address() {
-    return this.get('address')
-  }
-
-  get outputs() {
-    return this.get('outputs')
-  }
-  
 }
 
 export async function findPaymentOption(invoice: Invoice, currency: string): Promise<PaymentOption> {
@@ -55,7 +31,7 @@ export async function findPaymentOption(invoice: Invoice, currency: string): Pro
 
   }
 
-  return new PaymentOption(invoice, record)
+  return new PaymentOption(record)
 
 }
 

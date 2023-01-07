@@ -60,7 +60,7 @@ describe('lib/invoices', () => {
 
   })
 
-  it('#refreshInvoice should update the invoice options', async () => {
+  it('#refreshInvoice should update the invoice options',  async () => {
 
     let invoice = await newInvoice()
 

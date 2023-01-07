@@ -94,9 +94,7 @@ export class Invoice extends Orm {
   }
 
   get denomination(): string {
-
     return this.get('denomination_currency')
-
   }
 
   get payment(): any {
@@ -180,7 +178,7 @@ export class Invoice extends Orm {
       where: { invoice_uid: this.get('uid') }
     })
 
-    return records.map(record => new PaymentOption(this, record))
+    return records.map(record => new PaymentOption(record))
 
   }
 
@@ -271,18 +269,21 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
     account_id: account.id,
 
     template: paymentOptions.map(option => {
+
       return {
-        currency: currency || account.denomination,
+        currency: option.get('currency'),
         to: [{
-          currency: option.currency,
-          amount: amount,
-          address: option.address
+          currency: record.denomination_currency,
+          amount: record.denomination_amount,
+          address: option.get('address')
         }]
         
       }
     }),
 
-    status: 'unpaid'
+    status: 'unpaid',
+
+    invoice_uid: record.uid
 
   })
 
@@ -293,4 +294,3 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
   return invoice;
 
 }
-
