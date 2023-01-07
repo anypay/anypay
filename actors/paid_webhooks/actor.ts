@@ -4,7 +4,7 @@ import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
 
-import { getPaidWebhookForInvoice, sendWebhookForInvoice } from '../../lib/webhooks';
+import { getPaidWebhookForInvoice, createWebhookForInvoice } from '../../lib/webhooks';
 
 import { ensureInvoice, Invoice } from '../../lib/invoices'
 
@@ -41,21 +41,15 @@ export async function start() {
 
       log.info('webhook', webhook)
 
-      if (webhook) {
+      if (!webhook) {
 
-        let attempt = await webhook.attemptWebhook()
-
-        log.info('webhook.attempt', attempt.record.toJSON());
-
-      } else {
-
-        log.info('webhook.sendforinvoice')
-
-        let result = await sendWebhookForInvoice(invoice.uid, 'actor_onpaid')
-
-        log.info('webhook.sendforinvoice.result', result)
+        await createWebhookForInvoice(invoice)
 
       }
+
+      let attempt = await webhook.attemptWebhook()
+
+      log.info('webhook.attempt', attempt.record.toJSON());
 
     } catch(error) {
 

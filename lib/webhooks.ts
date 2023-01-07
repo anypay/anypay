@@ -21,6 +21,7 @@ import * as http from 'superagent';
 
 export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
+
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
   let invoice = await models.Invoice.findOne({ where: {
@@ -37,11 +38,13 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
   if (invoice.webhook_url) {
 
+    let payload = invoice.toJSON();
+
     try {
 
-      let json = invoice.toJSON();
+      let payload = invoice.toJSON();
 
-      resp = await http.post(invoice.webhook_url).send(json);
+      resp = await http.post(invoice.webhook_url).send(payload);
 
       response_code = resp.statusCode; 
 
@@ -92,7 +95,8 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
       error,
       ended_at,
       url,
-      status
+      status,
+      payload
     })
 
     return webhook;
@@ -244,7 +248,7 @@ export async function findWebhook(where: FindWebhook) {
   return new Webhook({ record, attempts, invoice })
 }
 
-export async function createWebhook(invoice: Invoice): Promise<Webhook> {
+export async function createWebhookForInvoice(invoice: Invoice): Promise<Webhook> {
 
   const where = {
     invoice_uid: invoice.uid,

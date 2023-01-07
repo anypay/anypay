@@ -31,6 +31,9 @@ config.defaults({
   // Enable Websockets Server and API for Wallet Bot
   'wallet_bot_app_enabled': true,
 
+  // Optionally require a confirmation for BTC payments -- eventually this will default to true
+  require_btc_confirmations: false,
+
   prometheus_auth_required: true,
   
   prometheus_password: '',

@@ -15,7 +15,7 @@ import { plugins } from '../../plugins'
 
 import { models } from '../../models'
 
-import { verifyPayment, completePayment  } from '../'
+import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 export interface Tx {
   tx: string;
@@ -124,14 +124,29 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
-      let paymentRecord = await completePayment(payment_option, transaction)
+      if (payment_option.currency === 'BTC' && config.get('require_btc_confirmations')) {
 
-      if (payment.wallet) {
-        paymentRecord.wallet = payment.wallet
-        await paymentRecord.save()
+        let paymentRecord = await handleUnconfirmedPayment(payment_option, transaction)
+
+        if (payment.wallet) {
+          paymentRecord.wallet = payment.wallet
+          await paymentRecord.save()
+        }
+  
+        log.info('payment.confirming', paymentRecord);
+         
+      } else {
+
+        let paymentRecord = await completePayment(payment_option, transaction)
+
+        if (payment.wallet) {
+          paymentRecord.wallet = payment.wallet
+          await paymentRecord.save()
+        }
+  
+        log.info('payment.completed', paymentRecord);
+        
       }
-
-      log.info('payment.completed', paymentRecord);
 
     }
 
@@ -378,7 +393,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
     const estimatedAmount = paymentOption.get('outputs')
       .reduce((sum, output) => sum + output.amount, 0)
 
-    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.currency)
+    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.get('currency'))
 
     return {
       currency: paymentOption.get('currency'),
