@@ -193,15 +193,21 @@ export async function confirmTransactionsFromBlockWebhook(webhook) {
         }
       }
     })
+
+    const confirmed = []
   
     for (let payment of payments) {
   
-      await confirmTransaction(payment, {
+      const updated = await confirmTransaction(payment, {
         confirmed: webhook.time,
         block_height: webhook.height,
         block_hash: webhook.hash
       })
+
+      confirmed.push(updated)
   
     }
+
+    return confirmed
   
 }
