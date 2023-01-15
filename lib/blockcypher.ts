@@ -182,9 +182,25 @@ export async function confirmTransaction(payment, transaction?: GetTransactionRe
   
 }
 
-export async function confirmTransactionsFromBlockWebhook(webhook) {
+export async function confirmTransactionsFromBlock(hash: string) {
+
+  var newTransactions: string[];
+
+  var offset = 0
+
+  const confirmed = []
+
+  while (!newTransactions || newTransactions.length > 0) {
+
+    const { data } = await axios.get(`https://api.blockcypher.com/v1/btc/main/blocks/${hash}?txstart=${offset}&limit=500`)
+
+    offset += 500
+
+    const { txids } = data
+
+    newTransactions = txids
   
-    const { txids } = webhook
+    console.log(`${txids.length} transactions in block ${hash}`)
   
     const payments = await models.Payment.findAll({
       where: {
@@ -193,21 +209,27 @@ export async function confirmTransactionsFromBlockWebhook(webhook) {
         }
       }
     })
-
-    const confirmed = []
   
     for (let payment of payments) {
   
       const updated = await confirmTransaction(payment, {
-        confirmed: webhook.time,
-        block_height: webhook.height,
-        block_hash: webhook.hash
+        confirmed: data.time,
+        block_height: data.height,
+        block_hash: data.hash
       })
-
+  
       confirmed.push(updated)
   
     }
+  
+  }
 
-    return confirmed
+  return confirmed
+
+}
+
+export async function confirmTransactionsFromBlockWebhook(webhook) {
+
+  return confirmTransactionsFromBlock(webhook.hash)
   
 }
