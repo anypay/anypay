@@ -1,9 +1,9 @@
 
-import * as coins from './coins';
+import coins from './coins';
+import rabbi from './rabbi';
 
 export async function initialize() {
-
-  await coins.initialize();
-
+  await coins();
+  await rabbi()
 }
 

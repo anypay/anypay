@@ -3,7 +3,7 @@ import { coins } from '../lib';
 
 let coinsConfig = require('../config/coins')['coins'];
 
-export async function initialize() {
+export default async function initialize() {
 
   await coins.initFromConfig(coinsConfig);
 

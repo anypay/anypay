@@ -12,7 +12,7 @@ import { models } from '../../lib'
 
 describe("Confirming Transactions", () => {
 
-    it('should change from unpaid to confirming when BTC payment received', async () => {
+    it.skip('should change from unpaid to confirming when BTC payment received', async () => {
 
     })
 
@@ -41,7 +41,6 @@ describe("Confirming Transactions", () => {
         await invoice.set('hash', fixtures.BTC_Confirmation_Test.txid)
 
         await confirmTransactionsFromBlockWebhook(fixtures.BTC_Confirmation_Test.blockcpher_webhook_payload)        
-
         payment = await models.Payment.findOne({
             where: {
                 invoice_uid: invoice.uid
