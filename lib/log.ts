@@ -3,7 +3,7 @@ const riverpig = require('riverpig')
 
 import { models } from './models'
 
-import { publish } from './amqp'
+import { publish } from 'rabbi'
 
 import { config } from './config'
 
@@ -92,26 +92,29 @@ export class Logger {
         loki.info(type, payload)
       }
       
-      await publish(type, payload, 'anypay.topic')
+      await publish('anypay.topic', type, payload)
 
       if (payload.account_id) {
 
         const routing_key = `accounts.${payload.account_id}.events`
 
-        await publish(routing_key, { payload, type }, 'anypay.topic')
+        await publish('anypay.events', routing_key, { payload, type })
+        
+        await publish('anypay.topic', routing_key, { payload, type })
+
       }
 
       if (payload.invoice_uid) {
 
         const routing_key = `invoices.${payload.invoice_uid}.events`
 
-        await publish(routing_key, { payload, type }, 'anypay.events')
+        await publish( 'anypay.events', routing_key, { payload, type })
 
       }
 
     }
 
-    return models.Event.create({
+    const record = await models.Event.create({
       namespace: this.namespace,
       type,
       payload,
@@ -119,6 +122,10 @@ export class Logger {
       invoice_uid: payload.invoice_uid,
       error: false
     })
+
+    publish('anypay.events', 'event.created', record.toJSON())
+
+    return record
 
   }
 

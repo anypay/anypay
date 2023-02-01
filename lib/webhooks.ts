@@ -13,7 +13,7 @@ import { Account, findAccount } from './account'
 
 import { email } from 'rabbi'
 
-import { Orm } from './orm'
+import { Orm, findOrCreate } from './orm'
 
 import { findClient, createClient, Client } from './get_402'
 
@@ -21,34 +21,17 @@ import * as http from 'superagent';
 
 export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
+export async function sendWebhook(webhook: Webhook) {
 
-export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
-
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: invoiceUid
-  }});
-
-  var started_at = new Date();
-  var invoice_uid = invoice.uid;
-  var url = invoice.webhook_url;
-  var response_code, response_body, ended_at, error;
-  var resp;
-
-  var status = 'pending'
-
-  if (invoice.webhook_url) {
-
-    let payload = invoice.toJSON();
+  if (webhook.url) {
 
     try {
 
-      let payload = invoice.toJSON();
+      let resp = await http.post(webhook.url).send(webhook.payload);
 
-      resp = await http.post(invoice.webhook_url).send(payload);
+      let response_code = resp.statusCode; 
 
-      response_code = resp.statusCode; 
-
-      response_body = resp.body; 
+      let response_body = resp.body; 
 
       if (typeof resp.body !== 'string') {
         response_body = JSON.stringify(resp.body); 
@@ -56,14 +39,26 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
         response_body = resp.body; 
       }
 
-      ended_at = new Date();
+      await webhook.update({
+        response_body,
+        status: 'success',
+        ended_at: new Date(),
+        response_code
+      })
 
-      status = 'success'
+      const event = webhook.toJSON()
+
+      delete event.account_id
+      delete event.invoice_uid
+
+      log.info('webhook.sent', event)
 
     } catch(e) {
 
       log.debug('webhook.error', e)
       log.debug('webhook.error', e.message)
+
+      var response_code, response_body;
 
       if (e.response) {
 
@@ -77,35 +72,64 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
       }
 
-      error = e.message;
+      await webhook.update({
+        'status': 'failed',
+        error: e.message,
+        ended_at: new Date(),
+        response_body,
+        response_code
+      })
 
-      ended_at = new Date();
+      const event = webhook.toJSON()
 
-      status = 'failed'
+      delete event.account_id
+      delete event.invoice_uid
+
+      log.info('webhook.failed', webhook)
 
     }
 
-    let webhook = await models.Webhook.create({
-      account_id: invoice.account_id,
-      started_at,
-      invoice_uid,
-      type,
-      response_code,
-      response_body,
-      error,
-      ended_at,
-      url,
-      status,
-      payload
-    })
-
     return webhook;
 
-  } else {
+  }
+}
 
-    log.debug('invoice.webhook_url.empty', { invoice_uid: invoiceUid });
+
+export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
+
+  let invoice = await models.Invoice.findOne({ where: {
+    uid: invoiceUid
+  }});;
+
+  const payload = invoice.toJSON();
+
+  let [webhook] = await findOrCreate<Webhook>(Webhook, {
+    where: {
+      invoice_uid: invoice.uid
+    },
+    defaults: {
+      account_id: invoice.account_id,
+      invoice_uid: invoice.uid,
+      type,
+      url: invoice.webhook_url,
+      status: 'pending',
+      payload
+    }
+  })
+
+  console.log("WEBHOOK", webhook.payload)
+
+  if (JSON.stringify(webhook.payload) == '{}') {
+
+    await webhook.update({
+      payload: invoice.toJSON()
+    })
+
+    log.info('webhook.emptyPayload.updated', webhook.toJSON())
 
   }
+
+  return sendWebhook(webhook)
 }
 
 interface FindWebhook { 
@@ -146,26 +170,18 @@ export class Attempt extends Orm {
   }
 }
 
-interface NewWebhook {
-  invoice: Invoice;
-  record: any;
-  attempts?: Attempt[];
-}
-
 export class Webhook extends Orm {
+
+  static model = models.Webhook;
 
   attempts: Attempt[];
 
   invoice: Invoice;
 
-  constructor(params: NewWebhook) {
+  constructor(record) {
+    super(record)
 
-    super(params.record)
-
-    this.attempts = params.attempts;
-
-    this.invoice = params.invoice;
-
+    this.attempts = []
   }
 
   toJSON() {
@@ -197,12 +213,24 @@ export class Webhook extends Orm {
     return this.get('url')
   }
 
+  get payload(): string {
+    return this.get('payload')
+  }
+
   get success(): boolean {
     return this.get('status') === 'success'
   }
 
   get status(): boolean {
     return this.get('status')
+  }
+
+  setAttempts(attempts: Attempt[]) {
+    this.attempts = attempts
+  }
+
+  setInvoice(invoice: Invoice) {
+    this.invoice = invoice
   }
 
   invoiceToJSON() {
@@ -213,7 +241,7 @@ export class Webhook extends Orm {
 
 }
 
-export async function webhookForInvoice(invoice: Invoice) {
+export async function webhookForInvoice(invoice: Invoice): Promise<Webhook> {
 
   let record = await models.Webhook.findOne({
     where: { invoice_uid: invoice.uid }
@@ -227,8 +255,12 @@ export async function webhookForInvoice(invoice: Invoice) {
 
   })
 
-  return new Webhook({ record, attempts, invoice })
+  const webhook = new Webhook(record)
 
+  webhook.setInvoice(invoice)
+  webhook.setAttempts(attempts.map(attempt => new Attempt({record: attempt, webhook})))
+
+  return webhook
 }
 
 export async function findWebhook(where: FindWebhook) {
@@ -245,7 +277,12 @@ export async function findWebhook(where: FindWebhook) {
 
   })
 
-  return new Webhook({ record, attempts, invoice })
+  const webhook = new Webhook(record)
+
+  webhook.setInvoice(new Invoice(invoice))
+  webhook.setAttempts(attempts.map(attempt => new Attempt({record: attempt, webhook})))
+
+  return webhook
 }
 
 export async function createWebhookForInvoice(invoice: Invoice): Promise<Webhook> {
@@ -342,6 +379,14 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
     record.ended_at = new Date();
 
+    await record.update({
+      status: 'failed',
+      error: e.message,
+      response_code: e.response ? e.response.statusCode : null,
+      response_body: e.response ? e.response.body : null,
+      ended_at: new Date()
+    })
+
     await record.set('status', 'failed')
 
   }
@@ -408,6 +453,7 @@ export function makePaidWebhook(params: NewPaidWebhook): PaidWebhook {
   return new PaidWebhook(params)
 
 }
+
 export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWebhook> {
 
   let account = await invoice.getAccount()
@@ -422,6 +468,7 @@ export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWe
   let webhook = await findWebhook({ invoice_uid: invoice.uid })
 
   return makePaidWebhook({ webhook, client })
+
 }
 
 interface ListOptions {
