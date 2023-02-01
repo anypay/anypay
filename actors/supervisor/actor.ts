@@ -8,6 +8,7 @@ export async function start() {
 
   startActors([
     'webhooks',
+    'webhooks-events',
     'paid_webhooks',
     'payment_push_notification',
     'grab_and_go_push_notification',
