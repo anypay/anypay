@@ -122,6 +122,7 @@
     "polynym": "^1.0.7",
     "prom-client": "^14.0.1",
     "promise-one-success": "^1.0.0",
+    "promise.any": "^2.0.5",
     "prompt-async": "^0.9.9",
     "protobufjs": "^5.0.3",
     "qr": "^0.2.4",

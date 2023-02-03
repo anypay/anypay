@@ -104,6 +104,14 @@ export class Logger {
 
       }
 
+      if (payload.app_id) {
+
+        const routing_key = `apps.${payload.app_id}.events`
+
+        await publish('anypay.events', routing_key, { payload, type })
+
+      }
+
       if (payload.invoice_uid) {
 
         const routing_key = `invoices.${payload.invoice_uid}.events`
