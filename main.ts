@@ -3,6 +3,8 @@ require('dotenv').config()
 
 import { join } from 'path'
 
+import { initialize } from './initializers'
+
 import { config } from './lib/config'
 
 import { log } from './lib'
@@ -28,6 +30,8 @@ import { init } from 'rabbi'
 import * as core from './lib'
 
 (async () => {
+
+  await initialize()
 
   await init()
 

@@ -140,6 +140,7 @@
     "typescript": "^2.7.2",
     "underscore": "^1.9.0",
     "uuid": "^3.2.1",
+    "wait-port": "^1.0.4",
     "websocket": "^1.0.34",
     "winston": "^3.3.3",
     "winston-loki": "^6.0.6",

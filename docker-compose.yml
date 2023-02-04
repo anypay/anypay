@@ -8,7 +8,10 @@ services:
       - "5200:5200"
     environment:  
       DATABASE_URL: postgres://user:password@postgres_database:5432/anypay_dev
+      DEV_DATABASE_URL: postgres://user:password@postgres_database:5432/anypay_dev
       AMQP_URL: amqp://guest:guest@message_exchange:5672/
+      HOST: 0.0.0.0
+      PORT: 5200
     depends_on:
       - postgres_database
       - message_exchange
@@ -17,12 +20,16 @@ services:
     image: "anypay/anypayx.com:master"
     ports:
       - "3200:8081"
+    environment:
+      NEXT_PUBLIC_API_BASE: ""
+      API_BASE: "/v1/api"
     volumes:
       - type: bind
         source: .devops/webapp
         target: /opt/anypay
     command: npm run dev
     env_file: .devops/webapp/.env
+
     depends_on:
       - typescript_backend
 
