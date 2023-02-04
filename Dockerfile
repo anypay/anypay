@@ -14,4 +14,4 @@ RUN npm install
 # Bundle app source
 COPY . /usr/src/app
 
-CMD ts-node main.ts
+ENTRYPOINT ["./entrypoint.sh"]

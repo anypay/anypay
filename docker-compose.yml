@@ -9,6 +9,9 @@ services:
     environment:  
       DATABASE_URL: postgres://user:password@postgres_database:5432/anypay_dev
       AMQP_URL: amqp://guest:guest@message_exchange:5672/
+    depends_on:
+      - postgres_database
+      - message_exchange
 
   frontend_webapp:
     image: "anypay/anypayx.com:master"
@@ -20,9 +23,11 @@ services:
         target: /opt/anypay
     command: npm run dev
     env_file: .devops/webapp/.env
+    depends_on:
+      - typescript_backend
 
   postgres_database:
-    image: "postgres"
+    image: "postgis/postgis"
     ports:
       - "5432:5432"
     environment:
@@ -50,4 +55,6 @@ services:
     environment:
       - api_base=http://typescript_backend:5200
     env_file: .devops/walletbot/.env
+    depends_on:
+      - typescript_backend
     
