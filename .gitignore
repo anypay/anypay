@@ -9,3 +9,6 @@ production.env
 dist/
 coverage/
 coverage
+.devops/webapp/.env
+.devops/walletbot/.env
+.devops/postgresql/data
