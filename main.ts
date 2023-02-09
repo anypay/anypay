@@ -17,6 +17,8 @@ import { start as startFees } from './actors/detect_fees/actor'
 
 import { hapi as kraken } from './plugins/kraken'
 
+import { plugin as websockets } from './server/ws/plugin'
+
 import { start as refunds } from './actors/refunds/actor'
 
 import eventWebhooks from './actors/webhooks-events/actor'
@@ -44,6 +46,12 @@ import * as core from './lib'
     console.error(error)
 
   }
+
+  server.register({
+
+    plugin: websockets
+
+  })
 
   if (config.get('KRAKEN_PLUGIN')) {
 
