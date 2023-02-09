@@ -60,8 +60,8 @@ services:
     ports:
       - "5201:5200"
     environment:
-      - api_base=http://typescript_backend:5200
+      - api_base=http://69.57.160.78:5200
+      - socket_io_host=ws://typescript_backend:5200
     env_file: .devops/walletbot/.env
     depends_on:
       - typescript_backend
-    
