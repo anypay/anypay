@@ -2,11 +2,10 @@
 
 require('dotenv').config();
 
-import * as program from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 
 import { sendWebhookForInvoice } from '../lib/webhooks';
-
-import * as http from 'superagent';
 
 program
   .command('sendwebhook <invoice_uid>')
@@ -31,3 +30,4 @@ program
   });
 
 program.parse(process.argv);
+

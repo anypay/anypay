@@ -2,13 +2,14 @@
 
 require('dotenv').config();
 
-import * as program from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 
 import { getAddressForInvoice, getRefund } from '../lib/refunds'
 
 import { ensureInvoice } from '../lib/invoices'
 
-import { findAccount } from '../lib/account'
+//import { findAccount } from '../lib/account'
 
 program
   .command('getrefund <invoice_uid>')
@@ -35,15 +36,17 @@ program
 
     try {
 
-      let account = await findAccount(account_id)
 
-      let refunds = await account.listRefunds()
+      throw new Error('not implemented')
+      //let account = await findAccount(account_id)
+      //let refunds = await account.listRefunds()
 
-      for (let refund of refunds) {
+      /*for (let refund of refunds) {
 
         console.log(refund)
 
       }
+      */
 
     } catch(e) {
 

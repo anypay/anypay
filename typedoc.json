@@ -1,0 +1,13 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "main.ts",
+        "lib/index.ts",
+        "actors/**/actor.ts",
+        "server/v0/server.ts",
+        "server/v1/plugin.ts",
+        "server/**/*.ts"
+    ],
+    "out": "typedoc",
+    "exclude": ["test/**/*", "node_modules", "bin/*", "plugins/**/*"]
+}

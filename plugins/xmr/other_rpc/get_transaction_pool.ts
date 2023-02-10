@@ -8,7 +8,7 @@ export interface Inputs {
 
 }
 
-interface TxJson {
+export interface TxJson {
     version: number;
     unlock_time: number;
     vin: any[];

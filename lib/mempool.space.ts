@@ -1,19 +1,15 @@
 
-import mempoolJS from "@mempool/mempool.js";
-
 import { log } from './log'
 
 export var feesRecommended = {}
 
-const { bitcoin: { fees } } = mempoolJS({
-  hostname: 'mempool.space'
-});
+import axios from 'axios'
 
 async function updateFeesRecommended() {
 
   try {
 
-    feesRecommended = await fees.getFeesRecommended();
+    feesRecommended = await getFeesRecommended();
 
     log.debug('mempool.space.feesRecommended.updated', feesRecommended)
 
@@ -24,6 +20,14 @@ async function updateFeesRecommended() {
   }
 
 };
+
+export async function getFeesRecommended() {
+
+  const { data } = await axios.get('https://mempool.space/api/v1/fees/recommended')
+
+  return data
+
+}
 
 export enum FeeLevels {
   fastestFee = 'fastestFee',

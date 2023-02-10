@@ -2,9 +2,10 @@
 
 require("dotenv").config()
 
-import * as program from 'commander';
-
 import * as http from 'superagent'
+
+import { Command } from 'commander';
+const program = new Command();
 
 program
   .command('utxos <address>')

@@ -2,7 +2,9 @@
 
 require('dotenv').config()
 
-import * as program from 'commander'
+import { Command } from 'commander';
+
+const program = new Command();
 
 import { publish } from '../lib/blockchair'
 
