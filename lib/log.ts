@@ -91,36 +91,9 @@ export class Logger {
       if (lokiEnabled) {
         loki.info(type, payload)
       }
-      
-      await publish('anypay.topic', type, payload)
-
-      if (payload.account_id) {
-
-        const routing_key = `accounts.${payload.account_id}.events`
-
-        await publish('anypay.events', routing_key, { payload, type })
-        
-        await publish('anypay.topic', routing_key, { payload, type })
-
-      }
-
-      if (payload.app_id) {
-
-        const routing_key = `apps.${payload.app_id}.events`
-
-        await publish('anypay.events', routing_key, { payload, type })
-
-      }
-
-      if (payload.invoice_uid) {
-
-        const routing_key = `invoices.${payload.invoice_uid}.events`
-
-        await publish( 'anypay.events', routing_key, { payload, type })
-
-      }
-
     }
+      
+
 
     const record = await models.Event.create({
       namespace: this.namespace,
@@ -130,6 +103,32 @@ export class Logger {
       invoice_uid: payload.invoice_uid,
       error: false
     })
+
+    await publish('anypay.events', type, payload)
+
+    if (payload.account_id) {
+
+      const routing_key = `accounts.${payload.account_id}.events`
+
+      await publish('anypay.events', routing_key, record.toJSON())    
+
+    }
+
+    if (payload.app_id) {
+
+      const routing_key = `apps.${payload.app_id}.events`
+
+      await publish('anypay.events', routing_key, record.toJSON())
+
+    }
+
+    if (payload.invoice_uid) {
+
+      const routing_key = `invoices.${payload.invoice_uid}.events`
+
+      await publish( 'anypay.events', routing_key, record.toJSON())
+
+    }
 
     publish('anypay.events', 'event.created', record.toJSON())
 

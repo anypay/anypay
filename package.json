@@ -126,7 +126,7 @@
     "prompt-async": "^0.9.9",
     "protobufjs": "^5.0.3",
     "qr": "^0.2.4",
-    "rabbi": "^1.21.3",
+    "rabbi": "^1.21.4",
     "reconnecting-websocket": "^4.4.0",
     "require-all": "^3.0.0",
     "riverpig": "^1.1.4",

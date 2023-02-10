@@ -8,6 +8,7 @@ import { log } from '../../lib/log'
 
 //import { Actor } from 'rabbi'
 import { Actor } from '/Users/zyler/github/rabbijs/rabbi'
+import { models } from "../../lib";
 
 export const plugin = (() => {
 
@@ -23,17 +24,47 @@ export const plugin = (() => {
 
       log.info('websockets.server.started', { port })
 
-      wsServer.on("connection", async (socket) => {
+      wsServer.on("connection", async (socket, req) => {
 
-        const account_id = 1177
+        const headers = req.headers
+
+        console.log('ws.connection.headers', headers)
+
+        const accessToken = await models.AccessToken.findOne({
+          where: {
+            uid: req.headers['anypay-access-token']
+          }
+        });
+      
+        if (!accessToken) {
+
+          log.error('websocket.auth.error', new Error('access token not found'))
+
+          socket.close(1008, 'Unauthorized') // 1008: policy violation
+
+        }
+
+        const account = await models.Account.findOne({
+          where: {
+            id: accessToken.account_id
+          }
+        })
+
+        if (!account) {
+
+          log.error('websocket.auth.error', new Error('account not found'))
+
+          socket.close(1008, 'Unauthorized') // 1008: policy violation
+          
+        }
     
         const actor = await Actor.create({
 
           exchange: 'anypay.events',
 
-          routingkey: `accounts.${account_id}.events`,
+          routingkey: `accounts.${account.id}.events`,
 
-          queue: `websocket_events_account_${account_id}`,
+          queue: `websocket_events_account_${account.id}`,
 
         })
 

@@ -1,18 +1,24 @@
 
 import * as WebSocket from 'ws';
 
+import { config }  from '../../lib'
+
 export default async function main() {
 
-  const ws = new WebSocket('ws://localhost:5201/');
+  const ws = new WebSocket(config.get('anypay_websockets_url'), {
+    headers: {
+      'anypay-access-token': config.get('anypay_access_token')
+    }
+  });
 
   ws.on('error', console.error);
 
   ws.on('open', function open() {
-    console.log('connected');
+    console.log('websocket.client.connected');
   });
 
   ws.on('close', function close() {
-    console.log('disconnected');
+    console.log('websocket.client.disconnected');
   });
 
   ws.on('message', function message(data) {
@@ -21,13 +27,13 @@ export default async function main() {
 
       const { type, payload } = JSON.parse(data.toString())
 
-      console.log('message.received', { type, payload })
+      console.log('websocket.client.message.received', { type, payload })
 
       console.log(type, payload)
 
     } catch(error) {
 
-      console.error('ws.client.error', error)
+      console.error('websocket.client.message.received.error', error)
 
     }
 
