@@ -6,8 +6,11 @@
         "actors/**/actor.ts",
         "server/v0/server.ts",
         "server/v1/plugin.ts",
-        "server/**/*.ts"
+        "server/**/*.ts",
+        "plugins/**/*.ts",
+        "bin/*.ts",
+        "bin/**/*.ts"
     ],
     "out": "typedoc",
-    "exclude": ["test/**/*", "node_modules", "bin/*", "plugins/**/*"]
+    "exclude": ["test/**/*", "node_modules", "bin/*"]
 }
