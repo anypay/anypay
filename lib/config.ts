@@ -42,7 +42,9 @@ config.defaults({
 
   JSONWEBTOKEN_PRIVATE_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key'),
 
-  JSONWEBTOKEN_PUBLIC_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key.pub')
+  JSONWEBTOKEN_PUBLIC_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key.pub'),
+
+  anypay_websockets_url: 'wss://wss.anypayx.com',
 })
 
 export { config } 

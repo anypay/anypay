@@ -126,7 +126,7 @@
     "prompt-async": "^0.9.9",
     "protobufjs": "^5.0.3",
     "qr": "^0.2.4",
-    "rabbi": "^1.21.3",
+    "rabbi": "^1.21.4",
     "reconnecting-websocket": "^4.4.0",
     "require-all": "^3.0.0",
     "riverpig": "^1.1.4",
@@ -143,7 +143,7 @@
     "websocket": "^1.0.34",
     "winston": "^3.3.3",
     "winston-loki": "^6.0.6",
-    "ws": "^8.5.0",
+    "ws": "^8.12.0",
     "yargs": "^12.0.5"
   },
   "devDependencies": {
