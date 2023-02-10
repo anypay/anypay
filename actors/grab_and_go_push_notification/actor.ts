@@ -55,7 +55,7 @@ export async function start() {
           return channel.ack(msg);
         }
 
-        let resp = await sendMessage(account.email, "Grab & Go Cashier-Less Payment", `$${invoice.denomination_amount_paid} | ${item.name}`, {
+        await sendMessage(account.email, "Grab & Go Cashier-Less Payment", `$${invoice.denomination_amount_paid} | ${item.name}`, {
           path: `/payments/${invoiceUid}`,
         })
 

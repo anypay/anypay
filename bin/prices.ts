@@ -2,11 +2,12 @@
 
 require('dotenv').config();
 
-const program = require('commander')
+import { Command } from 'commander';
+const program = new Command();
 
 import { log } from '../lib/log';
 
-import { getCryptoPrices, updateCryptoUSDPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
+import { getCryptoPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../lib/prices';
 
 program
   .command('seed_prices')
@@ -19,7 +20,7 @@ program
 
       log.info('updating crypto prices');
 
-      await updateCryptoUSDPrices();
+      await updateCryptoUSDPrice('BSV');
 
       log.info('updated crypto prices');
 
@@ -39,7 +40,8 @@ program
 
       log.info('updating crypto prices');
 
-      await updateCryptoUSDPrices();
+      //await updateCryptoUSDPrices();
+      throw new Error('not implemented')
 
       log.info('updated crypto prices');
 

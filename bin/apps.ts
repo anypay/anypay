@@ -2,7 +2,8 @@
 
 require("dotenv").config()
 
-import * as program from 'commander'
+import { Command } from 'commander';
+const program = new Command();
 
 import { createApp, createAppToken } from '../lib/apps';
 

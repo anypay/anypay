@@ -1,16 +1,17 @@
 
-import { models } from '../models'
+//import { models } from '../models'
 
-interface AccountWebsocket {
+/*interface AccountWebsocket {
   socket: any;
   account_id: number;
 }
+*/
 
 const sockets = {}
 
 export async function connectWebsocket(account_id) {
 
-  let { api_key, api_secret } = await models.BittrexAccount.findOne({ where: { account_id }}) 
+  //let { api_key, api_secret } = await models.BittrexAccount.findOne({ where: { account_id }}) 
 
   /* 
    * 1) First connect a websocket

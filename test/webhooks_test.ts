@@ -3,7 +3,7 @@ require('dotenv').config()
 
 import { email } from 'rabbi'
 
-import { assert, expect, chai, spy } from './utils'
+import { account, assert, expect, spy } from './utils'
 
 import * as utils from './utils'
 
@@ -13,42 +13,22 @@ import * as get402 from 'get402'
 
 import { createInvoice, InvalidWebhookURL } from '../lib/invoices'
 
-import { setAddress } from '../lib/addresses'
-
 import { Account } from '../lib/account'
 import { Invoice } from '../lib/invoices'
 
 import {
 
-  findWebhook, Webhook, attemptWebhook, WebhookFailed, WebhookAlreadySent,
-  ApiKeyPaymentRequired, makePaidWebhook, PaidWebhook, ApiClient,
+  findWebhook, Webhook, attemptWebhook, WebhookAlreadySent,
+  PaidWebhook, 
   getPaidWebhookForInvoice
 
 } from '../lib/webhooks'
 
 import { createClient, loadClientForAccount } from '../lib/get_402'
 
-import { models } from '../lib/models'
-
 describe('Getting Prices', () => {
 
-  var account;
-
   beforeEach(() => spy.restore())
-
-  before(async () => {
-
-    account = await utils.createAccount()
-
-    let { address } = await utils.generateKeypair()
-
-    await setAddress({
-      account_id: account.id,
-      currency: 'BSV',
-      address: address
-    })
-
-  })
 
   it('should require that a webhook URL is a valid URL', async () => {
     var webhook_url = "notavalidurl"
@@ -105,7 +85,7 @@ describe('Getting Prices', () => {
 
     spy.on(webhook, ['invoiceToJSON'])
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(http.post).to.have.been.called()
 
@@ -135,7 +115,7 @@ describe('Getting Prices', () => {
 
     spy.on(http, ['get', 'post'])
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(http.post).to.have.been.called()
 
@@ -161,7 +141,7 @@ describe('Getting Prices', () => {
 
     expect(webhook.attempts.length).to.be.equal(0)
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(webhook.attempts.length).to.be.equal(1)
 
@@ -199,7 +179,7 @@ describe('Getting Prices', () => {
 
     let account = await utils.createAccount()
 
-    let result = await account.set('webhook_url', webhook_url)
+    await account.set('webhook_url', webhook_url)
 
     let invoice: Invoice = await createInvoice({
       account,
@@ -231,7 +211,7 @@ describe('Getting Prices', () => {
 
     spy.on(webhook, ['invoiceToJSON'])
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(http.post).to.have.been.called()
 
@@ -261,7 +241,7 @@ describe('Getting Prices', () => {
 
     spy.on(http, ['get', 'post'])
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(http.post).to.have.been.called()
 
@@ -287,7 +267,7 @@ describe('Getting Prices', () => {
 
     expect(webhook.attempts.length).to.be.equal(0)
 
-    let attempt = await attemptWebhook(webhook)
+    await attemptWebhook(webhook)
 
     expect(webhook.attempts.length).to.be.equal(1)
 
@@ -307,7 +287,7 @@ describe('Getting Prices', () => {
 
     var webhook_url = "https://reqbin.com/echo/post/json"
 
-    let invoice: Invoice = await createInvoice({
+    await createInvoice({
       account,
       amount: 10,
       webhook_url

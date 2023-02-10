@@ -2,7 +2,8 @@
 
 require('dotenv').config();
 
-import * as program from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 
 import { listAll, fromAccount } from '../lib/kraken_account'
 

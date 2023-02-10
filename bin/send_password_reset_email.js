@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 const password = require('../lib/password');
-const program = require('commander');
+import { Command } from 'commander';
+const program = new Command();
 
 program
   .version('0.1.0')

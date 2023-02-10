@@ -326,7 +326,7 @@ interface PaymentRequest extends ProtocolMessage {
   instructions: Instruction[];
 }
 
-interface PaymentVerificationRequest {
+export interface PaymentVerificationRequest {
   chain: string;
   currency: string;
   transactions: Transaction[];
@@ -355,7 +355,7 @@ interface PaymentResponse {
   memo: string;
 }
 
-interface LogOptions {
+export interface LogOptions {
   wallet?: string;
 }
 
