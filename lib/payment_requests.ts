@@ -123,7 +123,7 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
       uid: invoice.uid,
 
-      webpage_url: `https://anypay.sv/invoices/${invoice.uid}`,
+      webpage_url: `https://anypayx.com/i/${invoice.uid}`,
 
       status: 'unpaid'
       
