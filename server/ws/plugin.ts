@@ -1,13 +1,13 @@
 require('dotenv').config()
 
-import { WebSocketServer } from "ws";
+import { WebSocketServer } from 'ws'
 
 import { Server } from '@hapi/hapi'
 
 import { log } from '../../lib/log'
 
-//import { Actor } from 'rabbi'
-import { Actor } from '/Users/zyler/github/rabbijs/rabbi'
+import { Actor } from 'rabbi'
+
 import { models } from "../../lib";
 
 export const plugin = (() => {
@@ -18,7 +18,7 @@ export const plugin = (() => {
 
     register: function(server?: Server) {
 
-      const port = process.env.websockets_port || 5201
+      const port = Number(process.env.websockets_port) || 5201
       
       const wsServer = new WebSocketServer({ port });
 

@@ -451,6 +451,10 @@ export function toSatoshis(decimal: number, currency?: string): number {
 
     return satoshis.times(10000).toNumber()
 
+  } else if (['ETH', 'AVAX', 'BNB', 'MATIC'].includes(currency)){
+
+    return new BigNumber(decimal).times(Math.pow(10, 18)).toNumber()
+
   } else {
 
     return satoshis.toNumber()

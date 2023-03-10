@@ -203,21 +203,32 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     var paymentAmount = pay.toSatoshis(amount, currency)
 
-    let fee = await pay.fees.getFee(currency, paymentAmount)
-
-    paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
-
     let outputs = []
 
-    outputs.push({
-      address,
-      amount: paymentAmount
-    })
+    let fee = await pay.fees.getFee(currency, paymentAmount)
 
-    outputs.push({
-      address: fee.address,
-      amount: fee.amount
-    })
+    if (currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
+
+      paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
+
+      outputs.push({
+        address,
+        amount: paymentAmount
+      })
+
+      outputs.push({
+        address: fee.address,
+        amount: fee.amount
+      })
+
+    } else {
+
+      outputs.push({
+        address,
+        amount: paymentAmount
+      })
+
+    }
 
     let uri = computeInvoiceURI({
       currency: currency,
