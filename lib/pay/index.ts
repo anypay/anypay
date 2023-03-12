@@ -133,7 +133,7 @@ export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
     }
 
     if (address.match(':')) {
-      address = output.address.split(':')[1]
+      address = output && output.address ? output.address.split(':')[1] : null
     }
 
     verifyOutput(txOutputs, address, output.amount);
@@ -181,7 +181,7 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
 }
 
 interface BuildPaymentRequest {
-  paymentOption: any;
+  paymentOption: PaymentOption;
   invoice: Invoice;
 }
 
@@ -192,7 +192,6 @@ export interface PaymentRequestOptions {
   payment_url?: string;
   fee_rate_level?: string;
 }
-
 
 export async function buildPaymentRequest({paymentOption, invoice}: BuildPaymentRequest): Promise<PaymentRequest> {
 
@@ -319,7 +318,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
   const {tx: hex} = transaction
 
-  const { currency, invoice_uid } = paymentOption
+  const { currency, chain, invoice_uid } = paymentOption
 
   log.info('handleUnconfirmedPayment', {invoice_uid, currency, transaction })
 
@@ -336,6 +335,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
   let paymentRecord = await models.Payment.create({
     txid,
     currency: currency,
+    chain: chain || currency,
     txjson: tx.toJSON(),
     txhex: hex,
     tx_key: transaction.tx_key,
@@ -380,7 +380,7 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
   const {tx: hex} = transaction
 
-  const { currency, invoice_uid } = paymentOption
+  const { currency, chain, invoice_uid } = paymentOption
 
   log.info('completePayment', {invoice_uid, currency, transaction })
 
@@ -396,7 +396,8 @@ export async function completePayment(paymentOption, transaction: Transaction) {
   
   let paymentRecord = await models.Payment.create({
     txid,
-    currency: currency,
+    currency,
+    chain: chain || currency,
     txjson: tx.toJSON(),
     txhex: hex,
     tx_key: transaction.tx_key,
@@ -451,7 +452,7 @@ export function toSatoshis(decimal: number, currency?: string): number {
 
     return satoshis.times(10000).toNumber()
 
-  } else if (['ETH', 'AVAX', 'BNB', 'MATIC'].includes(currency)){
+  } else if (['ETH', 'AVAX', 'BNB', 'MATIC'].includes(String(currency))){
 
     return new BigNumber(decimal).times(Math.pow(10, 18)).toNumber()
 

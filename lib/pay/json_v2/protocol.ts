@@ -438,7 +438,11 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
-  let paymentOption = await findPaymentOption(invoice, option.currency)
+  let paymentOption = await findPaymentOption({
+    invoice,
+    currency: option.currency,
+    chain: option.chain || option.currency
+  })
 
   const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
 
