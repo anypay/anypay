@@ -211,6 +211,8 @@ export const plugin = (() => {
 
             const socket = getSocket(walletBot)
 
+            const balances = await walletBot.listLatestBalances()
+
             const status = socket ? 'connected' : 'disconnected'
 
             const wallet_bot = {
@@ -220,8 +222,6 @@ export const plugin = (() => {
               status
 
             }
-
-            const balances = socket ? socket.data.balances : null
 
             const access_token = accessToken.get('uid')
 
