@@ -291,6 +291,51 @@ export const plugin = (() => {
       }); 
 
       server.route({
+        method: 'PUT',
+        path: '/v1/api/apps/wallet-bot/address-balances',
+        handler: handlers.AddressBalances.update,
+        options: {
+          auth: 'app',
+          tags: ['api', 'wallet-bot'],
+          validate: {
+            payload: Joi.object({
+              chain: Joi.string(),
+              currency: Joi.string(),
+              address: Joi.string(),
+              balance: Joi.number()
+            })
+          }
+        }
+      }); 
+
+      server.route({
+        method: 'GET',
+        path: '/v1/api/apps/wallet-bot/address-balances',
+        handler: handlers.AddressBalances.index,
+        options: {
+          auth: 'app',
+          tags: ['api', 'wallet-bot']
+        }
+      }); 
+
+      server.route({
+        method: 'GET',
+        path: '/v1/api/apps/wallet-bot/address-balances/{chain}/{currency}/{address}',
+        handler: handlers.AddressBalances.show,
+        options: {
+          auth: 'app',
+          tags: ['api', 'wallet-bot'],
+          validate: {
+            params: Joi.object({
+              chain: Joi.string(),
+              currency: Joi.string(),
+              address: Joi.string()
+            })
+          }
+        }
+      }); 
+
+      server.route({
         method: 'DELETE',
         path: '/v1/api/apps/wallet-bot/invoices/{invoice_uid}',
         handler: handlers.V1Invoices.cancel,
