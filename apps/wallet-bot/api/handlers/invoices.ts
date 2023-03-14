@@ -53,9 +53,11 @@ export async function index(req, h) {
 
     if (!limit) { limit = 100 }
 
+    const status = req.query.status || 'unpaid'
+
     const where = {
         app_id: app.id,
-        status: 'unpaid'
+        status
     }
 
     if (currency) {
@@ -73,6 +75,8 @@ export async function index(req, h) {
     if (offset) {
         query['offset'] = offset
     }
+
+    query['order'] = [['createdAt', 'desc']]
 
     log.info('wallet-bot.invoices.list', query)
 
