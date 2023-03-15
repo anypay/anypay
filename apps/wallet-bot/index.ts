@@ -16,6 +16,8 @@ import { createPaymentRequest, PaymentRequest } from '../../lib/payment_requests
 
 import { cancelInvoice, ensureInvoice, Invoice } from '../../lib/invoices';
 
+import { BigNumber } from 'bignumber.js'
+
 // Wallet Bot Events
 // It should receive the following events:
 // - wallet-bot.connected
@@ -144,6 +146,33 @@ export class WalletBot extends Orm {
 
   }
 
+  async listLatestBalances(): Promise<AddressBalanceUpdate[]> {
+
+    const updates = await models.AddressBalanceUpdate.findAll({
+      where: {
+        wallet_bot_id: this.get('id')
+      },
+      attributes: ['chain', 'currency'],
+      group: ['chain', 'currency']
+    })
+
+    const balances = await Promise.all(updates.map(update => {
+
+      return findOne<AddressBalanceUpdate>(AddressBalanceUpdate, {
+        where: {
+          chain: update.chain,
+          currency: update.currency,
+          wallet_bot_id: this.get('id')
+        },
+        order: [['createdAt', 'desc']]
+      })
+
+    }))
+
+    return balances
+    
+  }
+
   async listInvoices({ status, currency, offset, limit }: ListInvoices = {}): Promise<Invoice[]> {
 
     const where = {}
@@ -201,6 +230,91 @@ export class WalletBot extends Orm {
     return cancelInvoice(invoice)
   }
 
+  async getAddressHistory({
+    address,
+    currency,
+    chain,
+    limit=100,
+    offset=0,
+    order='desc'
+  }: {
+    address: string,
+    chain: string,
+    currency: string,
+    limit?: number;
+    offset?: number;
+    order?: string;
+  }): Promise<AddressBalanceUpdate[]> {
+
+    const updates = await findAll<AddressBalanceUpdate>(AddressBalanceUpdate, {
+      where: {
+        address,
+        currency,
+        chain,
+        wallet_bot_id: this.get('id')
+      },
+      limit,
+      offset,
+      order: [['createdAt', order]]
+    })
+
+    return updates
+
+  }
+
+  async setAddressBalance(params: SetAddressBalance): Promise<[AddressBalanceUpdate, boolean]> {
+
+    const { chain, currency, balance, address } = params
+
+    const latest = await findOne<AddressBalanceUpdate>(AddressBalanceUpdate, {
+      where: {
+        chain,
+        currency,
+        address,
+        wallet_bot_id: this.get('id')
+      }
+    })
+
+    if (latest) {
+
+      let difference = new BigNumber(balance).minus(latest.balance).toNumber()
+
+      if (difference === 0) {
+
+        return [latest, false]
+
+      }
+
+    }
+
+    const update = await create<AddressBalanceUpdate>(AddressBalanceUpdate, {
+      chain,
+      currency,
+      address,
+      balance,
+      wallet_bot_id: this.get('id')
+    })
+
+    return [update, true]
+
+  }
+
+}
+
+export async function loadFromApp({ app }: { app: App }): Promise<WalletBot> {
+
+  if (app.get('name') !== APP_NAME) {
+    throw new Error('Invalid Access Token')
+  }
+
+  let record = await models.WalletBot.findOne({
+      where: { app_id: app.id }
+  })
+
+  log.debug('debug.record', record.toJSON())
+
+  return new WalletBot(record);
+
 }
 
 export async function getWalletBot({ token }: {token: string}): Promise<WalletBot> {
@@ -228,18 +342,7 @@ export async function getWalletBot({ token }: {token: string}): Promise<WalletBo
     throw new Error('Invalid Access Token')
   }
 
-  if (app.name !== APP_NAME) {
-    throw new Error('Invalid Access Token')
-  }
-
-  let record = await models.WalletBot.findOne({
-      where: { app_id: app.id }
-  })
-
-  log.debug('debug.record', record.toJSON())
-
-  return new WalletBot(record);
-
+  return loadFromApp({ app })
 }
 
 export async function listWalletBots(account: Account): Promise<WalletBot[]> {
@@ -401,4 +504,50 @@ export async function getPaymentCounts(walletBot: WalletBot): Promise<PaymentsCo
   }
 
 }
+
+interface SetAddressBalance {
+  chain: string;
+  currency: string;
+  address: string;
+  balance: number;
+}
+
+export class AddressBalanceUpdate extends Orm {
+
+  static model = models.AddressBalanceUpdate
+
+  get difference(): number {
+
+    return this.get('difference')
+
+  }
+
+  get chain(): string {
+
+    return this.get('chain')
+
+  }
+
+  get currency(): string {
+
+    return this.get('currency')
+
+  }
+
+  get address(): string {
+
+    return this.get('address')
+
+  }
+
+  get balance(): number {
+
+    return this.get('balance')
+
+  }
+
+
+}
+
+
 

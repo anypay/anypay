@@ -252,6 +252,12 @@ export async function setAllCryptoPrices() {
     'DOGE',
     'ZEC',
     'ZEC',
+    'MATIC',
+    'ETH',
+    'SOL',
+    'TRON',
+    'BNB',
+    'XLM'
   ];
 
   prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))

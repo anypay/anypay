@@ -98,6 +98,8 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
   let record = await models.Payment.create(Object.assign(details, {
     invoice_uid: invoice.uid,
     payment_option_id: option.id,
+    currency: option.currency,
+    chain: option.chain || option.currency,
     account_id: invoice.get('account_id')
   }))
 
