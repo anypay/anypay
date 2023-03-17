@@ -1,5 +1,6 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
+const bitcoin = require('bitcoinjs-lib')
 
 export { btc as bitcore }
 
@@ -36,16 +37,16 @@ export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
   if (config.get('bitcoind_rpc_host')) {
 
     broadcastProviders.push(
-      
+
       bitcoind_rpc.broadcastTx(rawTx)
     )
   }
 
-  
+
   if (config.get('nownodes_enabled')) {
 
     broadcastProviders.push(
-      
+
       nownodes.broadcastTx('BTC', rawTx)
     )
   }
@@ -69,14 +70,13 @@ export function transformAddress(address: string) {
 export function validateAddress(address: string){
 
   try {
+    bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin)
 
-    new btc.Address(address)
-  
     return true
 
   } catch(error) {
 
-    throw new Error('Invalid BTC address. SegWit addresses not supported. Use 1 or 3-style addresses.')
+    throw new Error('Invalid BTC address')
 
   }
 
