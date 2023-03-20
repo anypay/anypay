@@ -17,7 +17,11 @@ import { start as startFees } from './actors/detect_fees/actor'
 
 import { hapi as kraken } from './plugins/kraken'
 
+import { plugin as websockets } from './server/ws/plugin'
+
 import { start as refunds } from './actors/refunds/actor'
+
+import eventWebhooks from './actors/webhooks-events/actor'
 
 import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
 
@@ -43,6 +47,12 @@ import * as core from './lib'
 
   }
 
+  server.register({
+
+    plugin: websockets
+
+  })
+
   if (config.get('KRAKEN_PLUGIN')) {
 
     await server.register({
@@ -56,10 +66,12 @@ import * as core from './lib'
     startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
 
     refunds()
-
+    
     log.info('rabbi.kraken.actors.start')
     
   }
+
+  eventWebhooks()
 
   if (config.get('rabbi_start_cron')) {
 

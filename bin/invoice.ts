@@ -1,47 +1,17 @@
 #!/usr/bin/env ts-node
 
 require('dotenv').config(); 
-import * as program from 'commander';
-
-import { generateInvoice } from '../lib/invoice';
+import { Command } from 'commander';
+const program = new Command();
 
 import { coins, log, models, invoices } from '../lib';
 
 import { invoicePaidEmail } from '../lib/email';
 
-import { email } from 'rabbi';
-
 import { listInvoiceEvents } from '../lib/events'
 
 import { ensureInvoice } from '../lib/invoices'
 
-program
-  .command('generate <email> <denomination_amount> <currency>')
-  .action(async (email, denominationAmount, currency) => {
-
-    try {
-
-      var amount = parseFloat(denominationAmount);
-
-      console.log('generate invoice', {email, denominationAmount, currency })
-
-      let account = await models.Account.findOne({ where: { email }});
-
-      console.log('account', account.toJSON())
-
-      let invoice = await generateInvoice(account.id, amount, currency);
-
-      log.info('invoice.generated', invoice.toJSON());
-
-    } catch(error) {
-
-      log.error('invoice.generate.error', error);
-
-    }
-
-    process.exit(0);
-
-  });
 
 program
   .command('events <invoice_uid>')
@@ -101,7 +71,7 @@ program
         uid
       }});
 
-      let resp = await invoicePaidEmail(invoice);
+      await invoicePaidEmail(invoice);
 
     } catch(error) {
 

@@ -17,11 +17,17 @@ export class PaymentOption extends Orm {
 
 }
 
-export async function findPaymentOption(invoice: Invoice, currency: string): Promise<PaymentOption> {
+export async function findPaymentOption({
+  invoice, currency, chain
+}: {
+  invoice: Invoice,
+  currency: string
+  chain? : string
+}): Promise<PaymentOption> {
 
   let record = await models.PaymentOption.findOne({
 
-    where: { invoice_uid: invoice.uid, currency }
+    where: { invoice_uid: invoice.uid, currency, chain }
 
   })
 

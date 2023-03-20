@@ -4,13 +4,18 @@ const bitcoin = require('bitcoinjs-lib')
 
 export { btc as bitcore }
 
-import { oneSuccess } from 'promise-one-success'
-
-import { blockchair, config, chain_so, nownodes } from '../../lib'
+import {
+  blockchair,
+  config,
+  chain_so,
+  nownodes
+} from '../../lib'
 
 import { BroadcastTxResult } from '../../lib/plugins'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
+
+const promiseAny = require('promise.any');
 
 export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
@@ -27,10 +32,21 @@ export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
   if (config.get('chain_so_broadcast_provider_enabled')) {
 
-    broadcastProviders.push(
+    broadcastProviders.push((async () => {
 
-      chain_so.broadcastTx('BTC', rawTx)
-    )
+      try {
+
+        console.log('CHAIN SO BTC', { rawTx })
+        const result = await chain_so.broadcastTx('BTC', rawTx)
+
+        return result
+      } catch(error) {
+
+        console.log('plugin-btc: chain_so broadcast failed, trying next provider')
+
+      }
+
+    })())
 
   }
 
@@ -51,7 +67,9 @@ export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
     )
   }
 
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
+  const result: any = promiseAny(broadcastProviders)
+
+  return result
 
 }
 

@@ -6,6 +6,7 @@ export interface Currency {
 
 export interface PaymentOption {
   invoice_uid: string;
+  chain: string;
   currency: string;
   address: string;
   amount: number;

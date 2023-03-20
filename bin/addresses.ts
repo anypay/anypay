@@ -1,6 +1,8 @@
 #!/usr/bin/env ts-node
 
-import * as program from 'commander';
+import { Command } from 'commander';
+
+const program = new Command();
 
 import { models, addresses } from '../lib';
 

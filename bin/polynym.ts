@@ -2,9 +2,8 @@
 
 import * as polynym from 'polynym';
 
-  const address = '$zyler';
-
-import * as program from 'commander';
+import { Command } from 'commander';
+const program = new Command();
 
 program
   .command('resolve <address>')

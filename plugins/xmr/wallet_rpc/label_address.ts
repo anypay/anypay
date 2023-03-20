@@ -6,11 +6,6 @@ export const method = 'label_address'
 
 export const description = 'Label an address.'
 
-interface Index {
-    major: number;
-    minjor: number;
-}
-
 export interface Inputs {
     index: IndexAttachment;
     label: string;

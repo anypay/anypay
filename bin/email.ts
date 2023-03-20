@@ -1,6 +1,8 @@
 #!/usr/bin/env ts-node
 
-import * as program from 'commander';
+import { Command } from 'commander';
+const program = new Command();
+
 import { sendInvoiceToEmail, firstAddressSetEmail, firstInvoiceCreatedEmail } from '../lib/email';
 import { models } from '../lib/models';
 import { email as rabbiEmail } from 'rabbi';

@@ -326,7 +326,7 @@ interface PaymentRequest extends ProtocolMessage {
   instructions: Instruction[];
 }
 
-interface PaymentVerificationRequest {
+export interface PaymentVerificationRequest {
   chain: string;
   currency: string;
   transactions: Transaction[];
@@ -355,7 +355,7 @@ interface PaymentResponse {
   memo: string;
 }
 
-interface LogOptions {
+export interface LogOptions {
   wallet?: string;
 }
 
@@ -438,7 +438,11 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
-  let paymentOption = await findPaymentOption(invoice, option.currency)
+  let paymentOption = await findPaymentOption({
+    invoice,
+    currency: option.currency,
+    chain: option.chain || option.currency
+  })
 
   const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
 

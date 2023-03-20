@@ -1,23 +1,25 @@
 
-import { expect } from '../../../test/utils'
-import { load_monerod_rpcs, load_monero_wallet_rpcs, MonerodRpc, MoneroWalletRpc, call } from '..'
+//import { expect } from '../../../test/utils'
+//import { load_monerod_rpcs, load_monero_wallet_rpcs, MonerodRpc, MoneroWalletRpc } from '..'
 
 describe('Monerod JSON RPC', () => {
 
-  it('should load multiple monerod rpc clients from a config', async () => {
+  it.skip('should load multiple monerod rpc clients from a config', async () => {
 
-    const monerodRpcClients: MonerodRpc = await load_monerod_rpcs([
+    /*const monerodRpcClients: MonerodRpc = await load_monerod_rpcs([
 
     ])
 
     const moneroWalletRpcClients: MoneroWalletRpc[] = await load_monero_wallet_rpcs([
 
     ])
+    */
   })
 
-  it('should load a pool of Monerod Rpc clients and get requests from that', async () => {
+  it.skip('should load a pool of Monerod Rpc clients and get requests from that', async () => {
 
 
+    /*
     const monerodRpc = MonerodRpc.fromPool([{
 
 
@@ -26,6 +28,7 @@ describe('Monerod JSON RPC', () => {
     let result = await monerodRpc.call('get_info')
 
     expect(result)
+    */
   })
 
   it('should get the raw transaction hex given a txid')

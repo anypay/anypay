@@ -8,7 +8,9 @@ import { getSupportedCoins, near } from '../lib/accounts';
 import { registerAccount, setPositionFromLatLng } from '../lib/accounts';
 import { setAddress } from '../lib/core';
 
-var program = require("commander");
+import { Command } from 'commander';
+
+const program = new Command();
 
 program
   .command('near [limit]')
