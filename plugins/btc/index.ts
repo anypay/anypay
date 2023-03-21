@@ -1,6 +1,6 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
-const bitcoin = require('bitcoinjs-lib')
+const bitcoinJsLib = require('bitcoinjs-lib')
 
 export { btc as bitcore }
 
@@ -88,7 +88,7 @@ export function transformAddress(address: string) {
 export function validateAddress(address: string){
 
   try {
-    bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin)
+    bitcoinJsLib.address.toOutputScript(address, bitcoinJsLib.networks.bitcoin)
 
     return true
 
