@@ -50,7 +50,7 @@ describe("Monero XMR", () => {
 
     before(async () => {
 
-      account = await utils.createAccount() 
+      account = await utils.createAccount()
 
       await setAddress(account, {
         currency: 'XMR',
@@ -67,7 +67,7 @@ describe("Monero XMR", () => {
         amount: 10
       })
 
-      let option = await findPaymentOption(invoice, 'XMR')
+      let option = await findPaymentOption({invoice, currency:'XMR'})
 
       expect(option.get('id')).to.be.greaterThan(0)
 
@@ -78,7 +78,7 @@ describe("Monero XMR", () => {
       expect(option.get('outputs').length).to.be.equal(2)
 
     })
- 
+
     it('a wallet chooses xmr on the "payment-option" call', async () => {
 
       let invoice = await createInvoice({
