@@ -60,10 +60,12 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
     }
 
 
-    let payment_option = await models.PaymentOption.findOne({ where: {
+    const where = {
       invoice_uid,
       currency: payment.currency
-    }})
+    }
+
+    let payment_option = await models.PaymentOption.findOne({ where })
 
     if (!payment_option) {
 
