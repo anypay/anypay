@@ -30,9 +30,11 @@ export const plugin = (() => {
 
         console.log('ws.connection.headers', headers)
 
+        const uid = req.headers['anypay-access-token']
+
         const accessToken = await models.AccessToken.findOne({
           where: {
-            uid: req.headers['anypay-access-token']
+            uid
           }
         });
       
@@ -57,7 +59,7 @@ export const plugin = (() => {
           socket.close(1008, 'Unauthorized') // 1008: policy violation
           
         }
-    
+
         const actor = await Actor.create({
 
           exchange: 'anypay.events',
