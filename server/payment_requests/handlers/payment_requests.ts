@@ -140,7 +140,7 @@ export async function create(req, h) {
 
 export async function show(req, h) {
 
-  log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
+  //log.debug('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
   detectWallet(req.headers, req.params.uid)
 
