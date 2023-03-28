@@ -71,6 +71,19 @@ export async function index(req, h) {
 
 }
 
+interface Confirmation {
+  
+  chain: string;
+
+  block_hash: number;
+
+  block_height: number;
+
+  block_index?: number;
+
+  timestamp: number;
+}
+
 export async function show(req, h) {
 
   const { invoice_uid } = req.params
@@ -79,7 +92,22 @@ export async function show(req, h) {
     invoice_uid
   }})
 
-  return { payment }
+  const response: any = { payment }
+
+  if (payment.confirmation_hash) {
+
+    const confirmation: Confirmation = {
+      block_hash: payment.confirmation_hash,
+      block_height: payment.confirmation_height,
+      chain: payment.chain || payment.currency,
+      timestamp: payment.createdAt
+    };
+
+    response.confirmation = confirmation
+
+  }
+
+  return response
 
 }
 
