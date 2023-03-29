@@ -16,6 +16,7 @@ import {models} from './models';
 import { publish as publishAMQP } from 'rabbi'
 
 import { Op } from 'sequelize'
+import { sendWebhookForInvoice } from './webhooks';
 
 export async function publish(currency, hex): Promise<BroadcastTxResult> {
 
@@ -177,6 +178,8 @@ export async function confirmTransaction(payment, transaction?: GetTransactionRe
   invoice.status = 'paid'
 
   await invoice.save()
+
+  sendWebhookForInvoice(invoice.uid, 'confirmTransaction')
 
   return payment
   
