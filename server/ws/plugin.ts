@@ -14,6 +14,67 @@ class AliveSocket extends WebSocket {
   isAlive: boolean;
 }
 
+import { v4 } from 'uuid'
+
+async function handleInvoiceWebsocket(socket, req) {
+
+  const invoice_uid = req.headers['anypay-invoice-uid']
+
+  const invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
+
+  console.log("WS --- FOUND INVOICE", { uid: invoice.uid })
+
+  if (!invoice) { return socket.close(1008, "InvoiceNotFound") }
+
+  const socket_uid = v4()
+
+  const actor = await Actor.create({
+
+    exchange: 'anypay.events',
+
+    routingkey: `apps.${invoice_uid}.events`,
+    //routingkey: `invoices.${invoice_uid}.events`,
+
+    queue: `websocket_invoice_events_${socket_uid}`,
+
+    queueOptions: {
+
+      autoDelete: true
+
+    }
+
+  })
+
+  actor.start(async (channel, msg, json) => {
+
+    socket.send(JSON.stringify(json))
+
+  });
+
+  log.info('websocket.connection', { socket })
+
+  socket.on('close', () => {            
+
+      console.log('Socket Close')
+
+      console.log(actor)
+
+      console.log(Object.keys(actor))
+
+      actor.stop()
+
+      log.info('websocket.close', { socket })
+
+  })
+
+  socket.on('error', () => {            
+
+      log.info('websocket.error', { socket })
+
+  })
+   
+}
+
 export const plugin = (() => {
 
   return {
@@ -37,6 +98,12 @@ export const plugin = (() => {
         const headers = req.headers
 
         console.log('ws.connection.headers', headers)
+
+        if (req.headers['anypay-invoice-uid']) {
+
+          return handleInvoiceWebsocket(socket, req)
+
+        }
 
         const uid = req.headers['anypay-access-token']
 
