@@ -8,6 +8,8 @@ import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
 
+import { awaitChannel, channel } from '../../lib/amqp'
+
 import { models } from "../../lib";
 
 class AliveSocket extends WebSocket {
@@ -17,6 +19,8 @@ class AliveSocket extends WebSocket {
 import { v4 } from 'uuid'
 
 async function handleInvoiceWebsocket(socket, req) {
+
+  await awaitChannel()
 
   const invoice_uid = req.headers['anypay-invoice-uid']
 
@@ -51,6 +55,8 @@ async function handleInvoiceWebsocket(socket, req) {
   socket.on('close', () => {            
 
       actor.stop()
+
+      channel.deleteQueue(queue)
 
       log.info('websocket.close', { socket })
 
