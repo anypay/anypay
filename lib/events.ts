@@ -148,7 +148,7 @@ export async function republishEventToRoutingKeys(event: Event): Promise<void> {
 
   if (event.get('invoice_uid')) {
 
-    publish('anypay.events', `apps.${event.get('invoice_uid')}.events`, event.toJSON())
+    publish('anypay.events', `invoices.${event.get('invoice_uid')}.events`, event.toJSON())
 
   }
 
