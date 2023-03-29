@@ -103,7 +103,7 @@ export async function create(req, h) {
 
       record.invoice_uid = invoice.uid
       record.uri = invoice.uri
-      record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
+      record.webpage_url = `https://anypayx.com/i/${invoice.uid}`
       record.status = 'unpaid'
 
       await record.save()

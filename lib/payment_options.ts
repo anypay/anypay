@@ -68,6 +68,7 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
     return {
       invoice_uid: paymentRequest.get('invoice_uid'),
       currency: option.currency,
+      chain: option.chain || option.currency,
       outputs,
       currency_name: coin.name,
       currency_logo_url: coin.logo_url,

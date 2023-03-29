@@ -6,6 +6,16 @@
       "name": "DASH",
       "icon_url": ""
     },
+    {
+      "code": "USDC",
+      "name": "USD Coin",
+      "icon_url": ""
+    },
+    {
+      "code": "USDT",
+      "name": "Tether USD",
+      "icon_url": ""
+    },
 
     {
       "code": "XMR",

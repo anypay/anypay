@@ -237,11 +237,23 @@ export async function attachV1Routes(server) {
 
   server.route({
     method: "GET",
-    path: "/v1/api/invoices/{invoice_uid}/events",
-    handler: v1.InvoiceEvents.index,
+    path: "/v1/api/invoices/{invoice_uid}/payment",
+    handler: v1.Payments.show,
     options: {
-      tags: ['api', 'v1', 'invoices'],
+      tags: ['api', 'v1', 'payments'],
       auth: "jwt",
+      validate: {
+        failAction
+      }
+    },
+  });
+
+
+
+  const ListEventsOptions = (auth: string) => {
+    return {
+      tags: ['api', 'v1', 'invoices'],
+      auth,
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
@@ -268,7 +280,19 @@ export async function attachV1Routes(server) {
         }),
         failAction
       }
-    },
+    }
+  }
+  server.route({
+    method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}/events",
+    handler: v1.InvoiceEvents.index,
+    options: ListEventsOptions('jwt'),
+  });
+  server.route({
+    method: "GET",
+    path: "/api/v1/invoices/{invoice_uid}/events",
+    handler: v1.InvoiceEvents.index,
+    options: ListEventsOptions('token')
   });
 
   server.route({

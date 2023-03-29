@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-import { WebSocketServer } from 'ws'
+import { WebSocketServer, WebSocket } from 'ws'
 
 import { Server } from '@hapi/hapi'
 
@@ -10,6 +10,10 @@ import { Actor } from 'rabbi'
 
 import { models } from "../../lib";
 
+class AliveSocket extends WebSocket {
+  isAlive: boolean;
+}
+
 export const plugin = (() => {
 
   return {
@@ -17,6 +21,10 @@ export const plugin = (() => {
     name: 'websockets',
 
     register: function(server?: Server) {
+
+      function heartbeat() {
+        this.isAlive = true;
+      }
 
       const port = Number(process.env.websockets_port) || 5201
       
@@ -30,9 +38,11 @@ export const plugin = (() => {
 
         console.log('ws.connection.headers', headers)
 
+        const uid = req.headers['anypay-access-token']
+
         const accessToken = await models.AccessToken.findOne({
           where: {
-            uid: req.headers['anypay-access-token']
+            uid
           }
         });
       
@@ -57,7 +67,7 @@ export const plugin = (() => {
           socket.close(1008, 'Unauthorized') // 1008: policy violation
           
         }
-    
+
         const actor = await Actor.create({
 
           exchange: 'anypay.events',
@@ -110,6 +120,25 @@ export const plugin = (() => {
           }
         });
 
+      });
+
+      wsServer.on('connection', function connection(socket: AliveSocket) {
+        socket.isAlive = true;
+        socket.on('error', console.error);
+        socket.on('pong', heartbeat);
+      });
+
+      const interval = setInterval(function ping() {
+        wsServer.clients.forEach(function each(socket: AliveSocket) {
+          if (socket.isAlive === false) return socket.terminate();
+
+          socket.isAlive = false;
+          socket.ping();
+        });
+      }, 30000);
+
+      wsServer.on('close', function close() {
+        clearInterval(interval);
       });
 
     }
