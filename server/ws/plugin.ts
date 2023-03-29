@@ -22,26 +22,21 @@ async function handleInvoiceWebsocket(socket, req) {
 
   const invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
-  console.log("WS --- FOUND INVOICE", { uid: invoice.uid })
-
   if (!invoice) { return socket.close(1008, "InvoiceNotFound") }
 
   const socket_uid = v4()
+
+  const queue = `websocket_invoice_events_${socket_uid}`
+
+  console.log("amqp.bind.invoice.queue", { queue })
 
   const actor = await Actor.create({
 
     exchange: 'anypay.events',
 
-    routingkey: `apps.${invoice_uid}.events`,
-    //routingkey: `invoices.${invoice_uid}.events`,
+    routingkey: `invoices.${invoice_uid}.events`,
 
-    queue: `websocket_invoice_events_${socket_uid}`,
-
-    queueOptions: {
-
-      autoDelete: true
-
-    }
+    queue
 
   })
 
@@ -54,12 +49,6 @@ async function handleInvoiceWebsocket(socket, req) {
   log.info('websocket.connection', { socket })
 
   socket.on('close', () => {            
-
-      console.log('Socket Close')
-
-      console.log(actor)
-
-      console.log(Object.keys(actor))
 
       actor.stop()
 
