@@ -67,7 +67,7 @@ describe("Monero XMR", () => {
         amount: 10
       })
 
-      let option = await findPaymentOption(invoice, 'XMR')
+      let option = await findPaymentOption({invoice, currency: 'XMR', chain: 'XMR' })
 
       expect(option.get('id')).to.be.greaterThan(0)
 
