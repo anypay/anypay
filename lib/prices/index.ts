@@ -257,7 +257,9 @@ export async function setAllCryptoPrices() {
     'SOL',
     'TRON',
     'BNB',
-    'XLM'
+    'XLM',
+    'USDC',
+    'USDT'
   ];
 
   prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
