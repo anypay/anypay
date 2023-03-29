@@ -8,10 +8,66 @@ import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
 
+import { awaitChannel, channel } from '../../lib/amqp'
+
 import { models } from "../../lib";
 
 class AliveSocket extends WebSocket {
   isAlive: boolean;
+}
+
+import { v4 } from 'uuid'
+
+async function handleInvoiceWebsocket(socket, req) {
+
+  await awaitChannel()
+
+  const invoice_uid = req.headers['anypay-invoice-uid']
+
+  const invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
+
+  if (!invoice) { return socket.close(1008, "InvoiceNotFound") }
+
+  const socket_uid = v4()
+
+  const queue = `websocket_invoice_events_${socket_uid}`
+
+  console.log("amqp.bind.invoice.queue", { queue })
+
+  const actor = await Actor.create({
+
+    exchange: 'anypay.events',
+
+    routingkey: `invoices.${invoice_uid}.events`,
+
+    queue
+
+  })
+
+  actor.start(async (channel, msg, json) => {
+
+    socket.send(JSON.stringify(json))
+
+  });
+
+  log.info('websocket.connection', { socket })
+
+  socket.on('close', () => {            
+
+      actor.stop()
+
+      channel.deleteQueue(queue)
+
+      log.info('websocket.close', { socket })
+
+  })
+
+  socket.on('error', () => {            
+
+      log.info('websocket.error', { socket })
+
+  })
+   
 }
 
 export const plugin = (() => {
@@ -37,6 +93,12 @@ export const plugin = (() => {
         const headers = req.headers
 
         console.log('ws.connection.headers', headers)
+
+        if (req.headers['anypay-invoice-uid']) {
+
+          return handleInvoiceWebsocket(socket, req)
+
+        }
 
         const uid = req.headers['anypay-access-token']
 
