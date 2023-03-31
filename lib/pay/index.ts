@@ -322,7 +322,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
   log.info('handleUnconfirmedPayment', {invoice_uid, currency, transaction })
 
-  let bitcore = getBitcore(currency)
+  let bitcore = getBitcore(chain)
 
   let tx = new bitcore.Transaction(hex)
 
@@ -380,11 +380,13 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
   const {tx: hex} = transaction
 
-  const { currency, chain, invoice_uid } = paymentOption
+  var { currency, chain, invoice_uid } = paymentOption
 
   log.info('completePayment', {invoice_uid, currency, transaction })
 
-  let bitcore = getBitcore(currency)
+  if (!chain) { chain = currency }
+
+  let bitcore = getBitcore(chain)
 
   let tx = new bitcore.Transaction(hex)
 

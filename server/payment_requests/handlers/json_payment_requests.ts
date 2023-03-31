@@ -43,6 +43,8 @@ export async function create(req, h) {
 
     const currency = req.params.currency.toUpperCase()
 
+    const chain = req.payload.chain.toUpperCase()
+
     let invoice_uid = req.params.uid
 
     let transactions = req.payload.transactions;
@@ -56,12 +58,14 @@ export async function create(req, h) {
         txhex: transaction,
         headers: req.headers,
         wallet,
-        currency
+        currency,
+        chain
       })
     }
 
     let response = await submitPayment({
       currency,
+      chain,
       invoice_uid,
       transactions,
       wallet
