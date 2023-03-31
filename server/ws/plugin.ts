@@ -18,11 +18,10 @@ class AliveSocket extends WebSocket {
 
 import { v4 } from 'uuid'
 
-async function handleInvoiceWebsocket(socket, req) {
+async function handleInvoiceWebsocket(invoice_uid, socket, req) {
 
   await awaitChannel()
 
-  const invoice_uid = req.headers['anypay-invoice-uid']
 
   const invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
@@ -45,6 +44,8 @@ async function handleInvoiceWebsocket(socket, req) {
   })
 
   actor.start(async (channel, msg, json) => {
+
+    console.log("AMQP MESSAGE RECEIVED", json)
 
     socket.send(JSON.stringify(json))
 
@@ -96,75 +97,94 @@ export const plugin = (() => {
 
         if (req.headers['anypay-invoice-uid']) {
 
-          return handleInvoiceWebsocket(socket, req)
+          const invoice_uid = req.headers['anypay-invoice-uid']
+
+          return handleInvoiceWebsocket(invoice_uid, socket, req)
 
         }
 
-        const uid = req.headers['anypay-access-token']
+        const uid = req.headers['anypay-access-token']     
+        
+        if (uid) {
 
-        const accessToken = await models.AccessToken.findOne({
-          where: {
-            uid
+          const accessToken = await models.AccessToken.findOne({
+            where: {
+              uid
+            }
+          });
+        
+          if (!accessToken) {
+
+            log.error('websocket.auth.error', new Error('access token not found'))
+
           }
-        });
-      
-        if (!accessToken) {
 
-          log.error('websocket.auth.error', new Error('access token not found'))
+          const account = await models.Account.findOne({
+            where: {
+              id: accessToken.account_id
+            }
+          })
 
-          socket.close(1008, 'Unauthorized') // 1008: policy violation
+          if (!account) {
 
-        }
-
-        const account = await models.Account.findOne({
-          where: {
-            id: accessToken.account_id
+            log.error('websocket.auth.error', new Error('account not found'))
+            
           }
-        })
 
-        if (!account) {
+          const actor = await Actor.create({
 
-          log.error('websocket.auth.error', new Error('account not found'))
+            exchange: 'anypay.events',
 
-          socket.close(1008, 'Unauthorized') // 1008: policy violation
-          
+            routingkey: `accounts.${account.id}.events`,
+
+            queue: `websocket_events_account_${account.id}`,
+
+          })
+
+          actor.start(async (channel, msg, json) => {
+
+            socket.send(JSON.stringify(json))
+
+          });
+
+          log.info('websocket.connection', { socket })
+
+          socket.on('close', () => {            
+
+              console.log('Socket Close')
+
+              console.log(actor)
+
+              console.log(Object.keys(actor))
+
+              actor.stop()
+
+              log.info('websocket.close', { socket })
+
+          })
+
+          socket.on('error', () => {            
+
+              log.info('websocket.error', { socket })
+
+          })
+
+
         }
 
-        const actor = await Actor.create({
+        socket.on('message', (message) => {
 
-          exchange: 'anypay.events',
+          console.log(message.toString())
 
-          routingkey: `accounts.${account.id}.events`,
+          const json = JSON.parse(message.toString())
 
-          queue: `websocket_events_account_${account.id}`,
+          console.log('JSON MESSAGED RECEIVED', json)
 
-        })
+          if (json.type === 'invoice.subscribe' && json.payload.uid) {
 
-        actor.start(async (channel, msg, json) => {
+            handleInvoiceWebsocket(json.payload.uid, socket, req)
 
-          socket.send(JSON.stringify(json))
-
-        });
-
-        log.info('websocket.connection', { socket })
-
-        socket.on('close', () => {            
-
-            console.log('Socket Close')
-
-            console.log(actor)
-
-            console.log(Object.keys(actor))
-
-            actor.stop()
-
-            log.info('websocket.close', { socket })
-
-        })
-
-        socket.on('error', () => {            
-
-            log.info('websocket.error', { socket })
+          }
 
         })
       
