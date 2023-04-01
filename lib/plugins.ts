@@ -40,19 +40,32 @@ class Plugins {
     this.plugins = pluginsConfig;
   }
 
-  find(currency: string): Plugin {
-    return this.findForCurrency(currency)
-  }
+  find({currency, chain }: {currency: string, chain: string}): Plugin {
 
-  findForCurrency(currency: string) {
+    console.log('--find plugin--', { chain, currency})
 
-    if (!this.plugins[currency]) {
+    let plugin = this.findForChain(chain)
 
-      throw new Error(`no plugin for currency ${currency}`);
+    if (!plugin) { return }
+
+    if (typeof plugin.forCurrency === 'function') {
+
+      plugin = plugin.forCurrency(currency)
 
     }
 
-    let { plugin } = new Plugin(currency, this.plugins[currency]);
+    return plugin
+  }
+
+  findForChain(chain: string) {
+
+    if (!this.plugins[chain]) {
+
+      throw new Error(`no plugin for currency ${chain}`);
+
+    }
+
+    let { plugin } = new Plugin(chain, this.plugins[chain]);
 
     return plugin;
 
@@ -87,6 +100,7 @@ class Plugins {
 
 class Plugin {
   currency: string;
+  chain: string;
   plugin: any;
   database?: any;
   env?: any;
@@ -97,8 +111,16 @@ class Plugin {
     this.plugin = plugin;
   }
 
+  async verifyPayment() {
+    return this.plugin.verifyPayment(...arguments)
+  }
+
   getTransaction(txid) {
     return this.plugin.getTransaction(txid)
+  }
+
+  broadcastTx(txhex) {
+    return this.plugin.broadcastTx(txhex)
   }
   
 }

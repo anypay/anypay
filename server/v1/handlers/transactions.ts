@@ -11,7 +11,7 @@ export async function create(req, h) {
 
   try {
 
-    let plugin = plugins.findForCurrency(req.payload.chain)
+    let plugin = plugins.findForChain(req.payload.chain)
 
     let result = await plugin.broadcast(req.payload.transaction)
 
