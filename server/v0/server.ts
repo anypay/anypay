@@ -73,7 +73,7 @@ function responsesWithSuccess({ model }) {
 }
 
 const server = new Hapi.Server({
-  host: process.env.HOST || "localhost",
+  host: process.env.HOST || "0.0.0.0",
   port: process.env.PORT || 8000,
   //debug: { 'request': ['error', 'uncaught'] },
   routes: {

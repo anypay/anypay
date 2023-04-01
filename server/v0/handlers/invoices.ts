@@ -222,7 +222,7 @@ export async function createPublicInvoice(account_id, payload) {
     currency = addresses[0].currency;
   }
 
-  let plugin = await plugins.findForCurrency(currency);
+  let plugin = await plugins.findForChain(currency);
 
   let invoice = await plugin.createInvoice(account_id, payload.amount);
 

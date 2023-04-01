@@ -5,7 +5,7 @@ import { plugins } from './plugins'
 
 export function getBitcore(currency) {
 
-  let plugin = plugins.findForCurrency(currency)
+  let plugin = plugins.findForChain(currency)
 
   if (!plugin.bitcore) {
 
