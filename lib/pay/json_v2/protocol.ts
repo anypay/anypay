@@ -101,7 +101,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       } else {
 
-        if (payment_option.chain === 'SOL') {
+        if ((['SOL', 'MATIC'].includes(payment_option.chain))) {
 
           verified = await verify({
             payment_option,
