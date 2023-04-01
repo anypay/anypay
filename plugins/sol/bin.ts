@@ -25,7 +25,7 @@ program
 
     const amount = 1_000_000 * 0.05
 
-    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/zQCP8Bt8cAq63ToBYunRGWyag8HdzWp-');
+    const connection = new Connection(process.env.alchemy_url_solana)
 
     const fromWallet = Keypair.fromSeed(Uint8Array.from(
       JSON.parse(process.env.solana_phantom_seed).slice(0, 32)
