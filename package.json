@@ -86,6 +86,7 @@
     "bcryptjs": "^2.4.3",
     "bignumber.js": "^8.0.2",
     "bip70-payment-protocol": "^1.8.0",
+    "bitcoinjs-lib": "^6.1.0",
     "bitcore-doge-lib": "^8.25.8",
     "bitcore-lib": "^0.16.0",
     "bitcore-lib-cash": "^0.19.0",
