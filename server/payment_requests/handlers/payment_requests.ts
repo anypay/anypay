@@ -103,7 +103,7 @@ export async function create(req, h) {
 
       record.invoice_uid = invoice.uid
       record.uri = invoice.uri
-      record.webpage_url = `https://app.anypayinc.com/invoices/${invoice.uid}`
+      record.webpage_url = `https://anypayx.com/i/${invoice.uid}`
       record.status = 'unpaid'
 
       await record.save()
@@ -140,7 +140,7 @@ export async function create(req, h) {
 
 export async function show(req, h) {
 
-  log.info('pay.request.show', { uid: req.params.uid, headers: req.headers })
+  //log.debug('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
   detectWallet(req.headers, req.params.uid)
 

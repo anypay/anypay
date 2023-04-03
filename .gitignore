@@ -9,3 +9,4 @@ production.env
 dist/
 coverage/
 coverage
+phantom_wallet.json

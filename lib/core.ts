@@ -55,7 +55,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
-  let plugin = await plugins.findForCurrency(changeset.currency);
+  let plugin = await plugins.findForChain(changeset.currency);
 
   let paymail = await getPaymail(changeset.currency, changeset.address);
 
