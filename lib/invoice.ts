@@ -4,7 +4,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { Account } from './account'
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import * as pay from './pay';
 

@@ -3,7 +3,7 @@ import { PaymentOutput, PaymentOption, GetCurrency, Currency } from './types';
 
 import { getBitcore } from '../bitcore';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { models } from '../models'
 

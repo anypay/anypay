@@ -12,7 +12,7 @@ import { Account } from '../../../lib/account';
 
 import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 export async function cancel(req, h) {
 

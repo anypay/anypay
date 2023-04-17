@@ -3,7 +3,7 @@ var geoip = require('geoip-lite');
 
 import {Op} from 'sequelize'
 
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { coins, models, accounts, slack, log, utils } from '../../../lib';
 
