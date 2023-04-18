@@ -114,7 +114,12 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   for (let option of paymentOptions) {
 
-    const template = paymentRequest.get('template').find(template => template.currency === option.get('currency'))
+    const template = paymentRequest.get('template').find(template => {
+
+      return template.currency === option.get('currency') &&
+             template.chain === option.get('chain')
+
+    })
 
     const outputs = await Promise.all(template.to.map(async (to) => {
 
@@ -137,7 +142,8 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
     const record = await models.PaymentOption.findOne({
       where: {
         invoice_uid: invoice.uid,
-        currency: option.get('currency')
+        currency: option.get('currency'),
+        chain: option.get('chain')
       }
     })
 
@@ -182,7 +188,15 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
 
-    const currency = record.currency
+    let { currency, chain } = record
+
+    if (!chain) { chain = currency }
+
+    if (currency === 'MATIC') {
+
+      currency = 'USDC'
+
+    }
 
     let coin = getCoin(record.currency)
 
@@ -194,8 +208,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
     }, currency, coin.precision);
 
     let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
-
-    let paymentCoin = getCoin(currency);
 
     if (address.match(':')) {
       address = address.split(':')[1]
@@ -242,7 +254,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
     }, new BigNumber(0)).toNumber()
 
     let optionRecord = await models.PaymentOption.create({
-      currency_name: paymentCoin.name,
       invoice_uid: invoice.uid,
       currency,
       amount,
@@ -258,7 +269,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   return paymentOptions
 }
-
 
 export function isExpired(invoice) {
   let expiry = moment(invoice.expiry);  

@@ -1,10 +1,14 @@
 
 import { models } from './models';
+
 import {  } from './log';
 
 import { convert } from './prices'
+
 import { toSatoshis } from './pay'
+
 import { computeInvoiceURI } from './uri'
+
 import {getCoin} from './coins';
 
 import { BigNumber } from 'bignumber.js'
@@ -20,14 +24,9 @@ export interface NewPaymentOption {
 
 export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequest) {
 
-
-  console.log(paymentRequest, '--paymentRequestToPaymentOptions')
-
   let options = await Promise.all(paymentRequest.get('template').map(async (option) => {
 
     let outputs = await Promise.all(option.to.map(async (to) => {
-
-      console.log(to, 'to')
 
       let conversion = await convert({
         currency: to.currency,
@@ -42,11 +41,10 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
       }
 
-      console.log({ option }, '--option--')
-
       if (option.chain === 'MATIC' && option.currency === 'USDC') {
 
         amount = new BigNumber(conversion.value).times(1_000_000).toNumber()
+
       }
 
       return {
