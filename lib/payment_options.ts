@@ -41,12 +41,6 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
       }
 
-      if (option.chain === 'MATIC' && option.currency === 'USDC') {
-
-        amount = new BigNumber(conversion.value).times(1_000_000).toNumber()
-
-      }
-
       return {
         address: to.address,
         amount

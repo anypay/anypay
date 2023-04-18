@@ -28,8 +28,9 @@ import { PaymentRequest } from './payment_requests';
 import { Invoice } from './invoices';
 
 interface Address {
-  currency: string,
-  value: string
+  currency: string;
+  value: string;
+  chain?: string;
 }
 
 async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<Address> {
@@ -196,6 +197,8 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       currency = 'USDC'
 
+      chain = 'MATIC'
+
     }
 
     let coin = getCoin(record.currency)
@@ -219,7 +222,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     let fee = await pay.fees.getFee(currency, paymentAmount)
 
-    if (currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
+    if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
 
       paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
 
@@ -256,6 +259,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
     let optionRecord = await models.PaymentOption.create({
       invoice_uid: invoice.uid,
       currency,
+      chain,
       amount,
       address,
       outputs,

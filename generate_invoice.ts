@@ -10,6 +10,8 @@ import { Account } from './lib/account'
 
 import { findOne } from './lib/orm'
 
+import { listPaymentOptions } from './lib/pay/json_v2/protocol'
+
 async function  main() {
 
   const account = await findOne<Account>(Account, {
@@ -27,7 +29,15 @@ async function  main() {
     amount: 100
   })
 
-  console.log(invoice, '--invoice--')
+  console.log(invoice.toJSON(), '--invoice--')
+
+  const { paymentOptions } = await listPaymentOptions(invoice)
+
+  for (let option of paymentOptions) {
+
+    console.log(option)
+
+  }
 
 }
 

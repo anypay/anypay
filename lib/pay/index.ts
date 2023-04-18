@@ -444,23 +444,24 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
 }
 
-const SATOSHIS = 100000000
-
 export function toSatoshis(decimal: number, currency?: string): number {
 
-  const satoshis = new BigNumber(decimal).times(SATOSHIS)
-  
   if (currency === 'XMR') {
 
-    return satoshis.times(10000).toNumber()
+    return new BigNumber(decimal).times(Math.pow(10, 12)).toNumber()
 
   } else if (['ETH', 'AVAX', 'BNB', 'MATIC'].includes(String(currency))){
 
     return new BigNumber(decimal).times(Math.pow(10, 18)).toNumber()
 
+  } else if (currency === 'USDC') {
+
+    return new BigNumber(decimal).times(Math.pow(10, 6)).toNumber()
+
   } else {
 
-    return satoshis.toNumber()
+    // BSV, BCH, BTC, DASH, LTC, DOGE
+    return new BigNumber(decimal).times(Math.pow(10, 8)).toNumber()
 
   }
 
@@ -470,7 +471,7 @@ export { broadcast }
 
 export function fromSatoshis(integer: number): number {
 
-  return (new BigNumber(integer)).dividedBy(SATOSHIS).toNumber()
+  return (new BigNumber(integer)).dividedBy(Math.pow(10, 8)).toNumber()
 
 }
 

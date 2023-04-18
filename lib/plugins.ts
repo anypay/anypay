@@ -73,6 +73,8 @@ class Plugins {
 
   async getNewAddress(currency: string, accountId: number, amount) {
 
+    if (currency === 'USDC') { currency = 'MATIC' }
+
     let address = await models.Address.findOne({ where: {
 
       currency,
