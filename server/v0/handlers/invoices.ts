@@ -161,8 +161,6 @@ export async function create(request, h) {
 
     }
 
-    invoice.set('headers', request.headers)
-
     const json = invoice.toJSON();
 
     const payment_options = await getPaymentOptions(invoice.uid)

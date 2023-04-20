@@ -428,7 +428,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     return {
       currency: paymentOption.get('currency'),
-      chain: paymentOption.get('currency'),
+      chain: paymentOption.get('chain'),
       network: 'main',
       estimatedAmount,
       requiredFeeRate,
