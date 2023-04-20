@@ -12,6 +12,8 @@ import { findOne } from './lib/orm'
 
 import { listPaymentOptions } from './lib/pay/json_v2/protocol'
 
+import anypay from 'anypay'
+
 async function  main() {
 
   const account = await findOne<Account>(Account, {
@@ -37,8 +39,15 @@ async function  main() {
 
     console.log(option)
 
-  }
+    const paymentOption = await anypay.getPaymentOption({
+      uid: invoice.uid,
+      chain: option.chain,
+      currency: option.currency
+    })
 
+    console.log({ paymentOption })
+
+  }
 }
 
 main()

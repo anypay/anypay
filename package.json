@@ -76,7 +76,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/ws": "^8.5.4",
     "amqplib": "^0.5.6",
-    "anypay": "^0.6.2",
+    "anypay": "^0.7.0",
     "anypay-simple-wallet": "^0.0.2",
     "anypay-wallet-address-validator": "^0.2.6",
     "asn1.js-rfc5280": "^3.0.0",

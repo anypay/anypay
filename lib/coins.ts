@@ -59,9 +59,12 @@ export async function activateCoin(code) {
 
 }
 
-export function getCoin(code: string) {
+export function getCoin(currency: string) {
 
-  return coins.find(coin => coin.code === code);
+  return coins.find(coin => {
+    console.log({ coin, currency })
+    return coin.code === currency
+  });
 
 }
 
