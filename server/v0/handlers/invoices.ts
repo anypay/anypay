@@ -295,7 +295,7 @@ function sanitizeInvoice(invoice) {
   return resp;
 }
 
-export async function show(request, reply) {
+export async function show(request, h) {
 
   let invoiceId = request.params.invoice_id;
 
@@ -315,21 +315,25 @@ export async function show(request, reply) {
 
     log.debug('invoice.requested', invoice.toJSON());
 
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
+    const payment_options = await getPaymentOptions(invoice.uid)
 
     let notes = await models.InvoiceNote.findAll({where: {
       invoice_uid: invoice.uid
     }});
 
-    let sanitized = sanitizeInvoice(invoice);
-
-    let resp = Object.assign({
-      invoice: sanitized,
-      payment_options: invoice.payment_options,
-      notes
-    }, sanitized)
-
-    return resp;
+    return h.response({
+      invoice: {
+        amount: invoice.amount,
+        currency: invoice.denomination,
+        status: invoice.status,
+        uid: invoice.uid,
+        uri: invoice.uri,
+        createdAt: invoice.createdAt,
+        expiresAt: invoice.expiry,
+        payment_options,
+        notes
+      }
+    })
 
   } else {
 
