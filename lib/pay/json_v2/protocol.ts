@@ -353,6 +353,7 @@ interface PaymentRequest extends ProtocolMessage {
   paymentUrl: string;
   paymentId: string;
   chain: string;
+  currency: string;
   network: string;
   instructions: Instruction[];
 }
@@ -465,6 +466,8 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
   if (!option.chain && option.currency) { option.chain = option.currency }
   if (!option.currency && option.chain) { option.currency = option.chain }
 
+  if (option.chain === 'USDC') { option.chain = 'MATIC' }
+
   log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
     account_id: invoice.get('account_id'),
     invoice_uid: invoice.uid
@@ -493,6 +496,8 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
     paymentId: invoice.uid,
 
     chain: option.chain,
+
+    currency: option.currency,
 
     network: 'main',
 

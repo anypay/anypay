@@ -1,7 +1,5 @@
 const Boom = require('boom');
 
-const _ = require('lodash')
-
 import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
@@ -10,7 +8,9 @@ import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
-import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
+import { Invoice, getInvoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
+
+import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
 import * as moment from 'moment';
 
@@ -256,23 +256,22 @@ export async function createPublicInvoice(account_id, payload) {
 
 async function getPaymentOptions(invoice_uid) { 
 
+  let invoice: Invoice = await getInvoice(invoice_uid)
+
   let payment_options = await models.PaymentOption.findAll({where: {
     invoice_uid
   }});
 
-  return payment_options.map(option => {
+  return Promise.all(payment_options.map(async option => {
 
-    option = _.pick(option,
-      'uri',
-      'currency',
-      'amount'
-    )
+    const request = await getPaymentRequest(invoice, { chain: option.chain, currency: option.currency })
 
-    option['chain'] = option['currency']
+    request.currency = request.currency || option.currency
+    request.chain = request.chain || option.chain
 
-    return option
+    return request
 
-  })
+  }))
 
 }
 
