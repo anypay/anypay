@@ -297,49 +297,59 @@ function sanitizeInvoice(invoice) {
 
 export async function show(request, h) {
 
-  let invoiceId = request.params.invoice_id;
+  try {
 
-  let invoice = await models.Invoice.findOne({
-    where: {
-      uid: invoiceId
-    }
-  });
+    let invoiceId = request.params.invoice_id;
 
-  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
-
-    invoice = await invoices.refreshInvoice(invoice.uid)
-
-  }
-
-  if (invoice) {
-
-    log.debug('invoice.requested', invoice.toJSON());
-
-    const payment_options = await getPaymentOptions(invoice.uid)
-
-    let notes = await models.InvoiceNote.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
-
-    return h.response({
-      invoice: {
-        amount: invoice.amount,
-        currency: invoice.denomination,
-        status: invoice.status,
-        uid: invoice.uid,
-        uri: invoice.uri,
-        createdAt: invoice.createdAt,
-        expiresAt: invoice.expiry,
-        payment_options,
-        notes
+    let invoice = await models.Invoice.findOne({
+      where: {
+        uid: invoiceId
       }
-    })
+    });
 
-  } else {
+    if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
+      invoice = await invoices.refreshInvoice(invoice.uid)
 
-    throw new Error('invoice not found')
+    }
+
+    if (invoice) {
+
+      console.log('invoice.requested', invoice.toJSON());
+
+      const payment_options = await getPaymentOptions(invoice.uid)
+
+      let notes = await models.InvoiceNote.findAll({where: {
+        invoice_uid: invoice.uid
+      }});
+
+      return h.response({
+        invoice: {
+          amount: invoice.amount,
+          currency: invoice.denomination,
+          status: invoice.status,
+          uid: invoice.uid,
+          uri: invoice.uri,
+          createdAt: invoice.createdAt,
+          expiresAt: invoice.expiry,
+          payment_options,
+          notes
+        }
+      })
+
+    } else {
+
+      log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
+
+      throw new Error('invoice not found')
+    }
+
+  } catch(error) {
+
+    console.log('invoices.show.error', error)
+
+    return h.badRequest(error)
+
   }
 
 }
