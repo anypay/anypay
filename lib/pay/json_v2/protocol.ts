@@ -462,6 +462,9 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
     throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
   }
 
+  if (!option.chain && option.currency) { option.chain = option.currency }
+  if (!option.currency && option.chain) { option.currency = option.chain }
+
   log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
     account_id: invoice.get('account_id'),
     invoice_uid: invoice.uid
@@ -472,7 +475,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
   let paymentOption = await findPaymentOption({
     invoice,
     currency: option.currency,
-    chain: option.chain || option.currency
+    chain: option.chain
   })
 
   const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
@@ -516,6 +519,9 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
     account_id: invoice.get('account_id')
   }, Object.assign(params, options)))
 
+  if (!params.chain && params.currency) { params.chain = params.currency }
+  if (!params.currency && params.chain) { params.currency = params.chain }
+
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
   await verifyUnsigned({
@@ -537,6 +543,9 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
   }, Object.assign(params, options)))
+
+  if (!params.chain && params.currency) { params.chain = params.currency }
+  if (!params.currency && params.chain) { params.currency = params.chain }
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 
