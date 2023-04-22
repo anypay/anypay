@@ -21,8 +21,6 @@ export async function create(req, h) {
 
     } catch (err) {
 
-        console.log('blockcypher.webhook.received.error', err)
-
         return { success: false }
 
     }

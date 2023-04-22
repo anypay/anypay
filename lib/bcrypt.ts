@@ -5,8 +5,6 @@ import { log } from './log'
 
 export async function compare(password: string, hash: string): Promise<any> {
 
-    console.log('compare', {password, hash})
-
     return new Promise((resolve, reject) => {
 
         try {

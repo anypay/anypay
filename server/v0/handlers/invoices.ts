@@ -165,18 +165,20 @@ export async function create(request, h) {
 
     const payment_options = await getPaymentOptions(invoice.uid)
 
+    const responseInvoice = {
+      amount: json['amount'],
+      currency: json['denomination'],
+      status: json['status'],
+      uid: json['uid'],
+      uri: json['uri'],
+      createdAt: json['createdAt'],
+      expiresAt: json['expiry'],
+      payment_options
+    }
+
     return h.response({
       success: true,
-      invoice: {
-        amount: json['amount'],
-        currency: json['denomination'],
-        status: json['status'],
-        uid: json['uid'],
-        uri: json['uri'],
-        createdAt: json['createdAt'],
-        expiresAt: json['expiry'],
-        payment_options
-      },
+      invoice: responseInvoice,
       uid: json['uid']
     })
     .code(200)
@@ -315,27 +317,34 @@ export async function show(request, h) {
 
     if (invoice) {
 
-      console.log('invoice.requested', invoice.toJSON());
-
       const payment_options = await getPaymentOptions(invoice.uid)
 
       let notes = await models.InvoiceNote.findAll({where: {
         invoice_uid: invoice.uid
       }});
 
+      const responseInvoice = {
+        amount: invoice.amount,
+        currency: invoice.denomination,
+        status: invoice.status,
+        uid: invoice.uid,
+        uri: invoice.uri,
+        createdAt: invoice.createdAt,
+        expiresAt: invoice.expiry
+      }
+
+      if (invoice.hash) {
+        responseInvoice['hash'] = invoice.hash
+      }
+
+      responseInvoice['payment_options'] = payment_options
+      responseInvoice['notes'] = notes
+
       return h.response({
-        invoice: {
-          amount: invoice.amount,
-          currency: invoice.denomination,
-          status: invoice.status,
-          uid: invoice.uid,
-          uri: invoice.uri,
-          createdAt: invoice.createdAt,
-          expiresAt: invoice.expiry,
-          payment_options,
-          notes
-        }
+        success: true,
+        invoice: responseInvoice
       })
+      .code(200)
 
     } else {
 
@@ -346,7 +355,7 @@ export async function show(request, h) {
 
   } catch(error) {
 
-    console.log('invoices.show.error', error)
+    log.error('invoices.show.error', error)
 
     return h.badRequest(error)
 

@@ -153,8 +153,6 @@ export async function removeAddress(account: Account, currency: string): Promise
 
   const account_id = account.id
 
-  console.log('remove_address', { account_id, currency }) 
-
   let record = await models.Address.findOne({ where: {
 
     account_id,

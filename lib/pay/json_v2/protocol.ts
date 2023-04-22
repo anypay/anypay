@@ -456,11 +456,6 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   if (option.chain === 'USDC') { option.chain = 'MATIC' }
 
-  log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
-    account_id: invoice.get('account_id'),
-    invoice_uid: invoice.uid
-  }))
-
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
   let paymentOption = await findPaymentOption({

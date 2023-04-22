@@ -100,8 +100,6 @@ import { PaymentRequest, PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
-  console.log('BIP70 BUILD PR')
-
   // build outputs
   let outputs = await buildOutputs(paymentOption);
 
@@ -146,11 +144,7 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
       let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
       let keyPath = process.env.X509_PRIVATE_KEY_PATH;
 
-      console.log({ keyPath })
-
       const file_with_x509_private_key = fs.readFileSync(keyPath);
-
-      console.log({ file: file_with_x509_private_key })
 
       const certificates = new PaymentProtocol().makeX509Certificates();
 
@@ -169,7 +163,6 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
 
     } catch(error) {
 
-      console.log(error)
       log.error('paypro.bip70.error', error)
 
     }

@@ -42,8 +42,6 @@ class Plugins {
 
   find({currency, chain }: {currency: string, chain: string}): Plugin {
 
-    console.log('--find plugin--', { chain, currency})
-
     let plugin = this.findForChain(chain)
 
     if (!plugin) { return }

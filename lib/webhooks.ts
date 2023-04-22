@@ -117,8 +117,6 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
     }
   })
 
-  console.log("WEBHOOK", webhook.payload)
-
   if (JSON.stringify(webhook.payload) == '{}') {
 
     await webhook.update({

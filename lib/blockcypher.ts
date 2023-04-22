@@ -65,8 +65,6 @@ export async function createNewBlockWebhook() {
     secret: process.env.blockcypher_webhook_secret
   })
 
-  console.log('blockcypher.createNewBlockWebhook.response', data)
-
   return data
 
 }
@@ -74,8 +72,6 @@ export async function createNewBlockWebhook() {
 export async function getNewBlockWebhook() {  
 
   let { data } = await axios.get(`https://api.blockcypher.com/v1/btc/main/hooks?token=${token}`)
-
-  console.log('blockcypher.createNewBlockWebhook.response', data)
 
   return data.filter(hook => hook.event === 'new-block')[0]
 
@@ -85,13 +81,9 @@ export async function deleteNewBlockWebhook() {
 
   const webhook = await getNewBlockWebhook()
 
-  console.log(webhook)
-
   if (!webhook) return
 
   let { data } = await axios.delete(`https://api.blockcypher.com/v1/btc/main/hooks/${webhook.id}?token=${token}`)
-
-  console.log('blockcypher.createNewBlockWebhook.response', data)
 
   return data
 
@@ -202,8 +194,6 @@ export async function confirmTransactionsFromBlock(hash: string) {
     const { txids } = data
 
     newTransactions = txids
-  
-    console.log(`${txids.length} transactions in block ${hash}`)
   
     const payments = await models.Payment.findAll({
       where: {

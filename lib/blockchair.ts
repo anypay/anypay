@@ -50,8 +50,6 @@ export async function publish(coin, hex): Promise<BroadcastTxResult> {
 
     log.error(`blockchair.push.transaction.${coin}.error`, error);
 
-    console.log(error)
-
     throw error;
 
   }
@@ -78,8 +76,6 @@ export async function getDecodedTransaction(chain: string, txid: string): Promis
   let { data } = await axios.get(`https://api.blockchair.com/${chain}/raw/transaction/${txid}`)
 
   log.info('blockchair.getDecodedTransaction.result', { chain, txid, data: data.data })
-
-  console.log(data.data[txid].decoded_raw_transaction)
 
   return data.data[txid].decoded_raw_transaction
 }

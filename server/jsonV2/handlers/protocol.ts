@@ -92,8 +92,6 @@ async function getPaymentRequest(req, h) {
 
   try {
 
-    console.log('pay.jsonv2.payment-request', { headers: req.headers, payload: req.payload })
-
     await ensureInvoice(req)
 
     await schema.Protocol.PaymentRequest.headers.validateAsync(req.headers, { allowUnknown: true })

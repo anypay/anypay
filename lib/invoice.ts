@@ -119,10 +119,6 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
       if (template.currency === 'USDC' && !template.chain) { template.chain = 'MATIC' }
 
-      console.log('option', { currency: option.get('currency'), chain: option.get('chain') })
-
-      console.log('template', { currency: template.currency, chain: template.chain })
-
       return template.currency === option.get('currency') &&
              (!template.chain || template.chain === option.get('chain'))
 
