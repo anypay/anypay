@@ -31,8 +31,6 @@ async function handleInvoiceWebsocket(invoice_uid, socket, req) {
 
   const queue = `websocket_invoice_events_${socket_uid}`
 
-  console.log("amqp.bind.invoice.queue", { queue })
-
   const actor = await Actor.create({
 
     exchange: 'anypay.events',
@@ -44,8 +42,6 @@ async function handleInvoiceWebsocket(invoice_uid, socket, req) {
   })
 
   actor.start(async (channel, msg, json) => {
-
-    console.log("AMQP MESSAGE RECEIVED", json)
 
     socket.send(JSON.stringify(json))
 
@@ -92,8 +88,6 @@ export const plugin = (() => {
       wsServer.on("connection", async (socket, req) => {
 
         const headers = req.headers
-
-        console.log('ws.connection.headers', headers)
 
         if (req.headers['anypay-invoice-uid']) {
 
@@ -151,12 +145,6 @@ export const plugin = (() => {
 
           socket.on('close', () => {            
 
-              console.log('Socket Close')
-
-              console.log(actor)
-
-              console.log(Object.keys(actor))
-
               actor.stop()
 
               log.info('websocket.close', { socket })
@@ -174,11 +162,7 @@ export const plugin = (() => {
 
         socket.on('message', (message) => {
 
-          console.log(message.toString())
-
           const json = JSON.parse(message.toString())
-
-          console.log('JSON MESSAGED RECEIVED', json)
 
           if (json.type === 'invoice.subscribe' && json.payload.uid) {
 
@@ -206,7 +190,6 @@ export const plugin = (() => {
 
       wsServer.on('connection', function connection(socket: AliveSocket) {
         socket.isAlive = true;
-        socket.on('error', console.error);
         socket.on('pong', heartbeat);
       });
 
