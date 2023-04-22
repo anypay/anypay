@@ -87,8 +87,6 @@ export const plugin = (() => {
 
       wsServer.on("connection", async (socket, req) => {
 
-        const headers = req.headers
-
         if (req.headers['anypay-invoice-uid']) {
 
           const invoice_uid = req.headers['anypay-invoice-uid']
