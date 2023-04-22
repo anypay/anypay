@@ -48,21 +48,13 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
-    if (invoice.cancelled) {
-
-      const error = new Error('invoice cancelled')
-
-      log.error('payment.error.invoicecancelled', error)
-
-      throw error
-      
-    }
-
     if (!invoice) {
       throw new Error(`invoice ${payment.invoice_uid} not found`)
     }
 
-
+    if (invoice.status !== 'unpaid') {
+      throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
+    }
     const where = {
       invoice_uid,
       currency: payment.currency,
@@ -458,10 +450,6 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 }
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
-
-  if (invoice.status !== 'unpaid') {
-    throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
-  }
 
   if (!option.chain && option.currency) { option.chain = option.currency }
   if (!option.currency && option.chain) { option.currency = option.chain }
