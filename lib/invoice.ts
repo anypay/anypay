@@ -117,8 +117,10 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     const template = paymentRequest.get('template').find(template => {
 
+      if (template.currency === 'USDC' && !template.chain) { template.chain = 'MATIC' }
+
       return template.currency === option.get('currency') &&
-             template.chain === option.get('chain')
+             (!template.chain || template.chain === option.get('chain'))
 
     })
 

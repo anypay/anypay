@@ -12,9 +12,19 @@ import { findOne } from './lib/orm'
 
 import { listPaymentOptions } from './lib/pay/json_v2/protocol'
 
-import anypay from 'anypay'
+import { refreshCoins } from './lib/coins'
+
+import { app } from 'anypay'
 
 async function  main() {
+
+  await refreshCoins()
+
+  const anypay = app({
+
+    apiBase: 'https://api.next.anypayx.com'
+
+  })
 
   const account = await findOne<Account>(Account, {
 
@@ -46,6 +56,8 @@ async function  main() {
     })
 
     console.log({ paymentOption })
+
+    console.log(JSON.stringify({ paymentOption }))
 
   }
 }

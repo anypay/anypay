@@ -1,7 +1,5 @@
 const Boom = require('boom');
 
-const _ = require('lodash')
-
 import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
@@ -10,7 +8,9 @@ import { log, email, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
-import { Invoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
+import { Invoice, getInvoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
+
+import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
 import * as moment from 'moment';
 
@@ -165,18 +165,20 @@ export async function create(request, h) {
 
     const payment_options = await getPaymentOptions(invoice.uid)
 
+    const responseInvoice = {
+      amount: json['amount'],
+      currency: json['denomination'],
+      status: json['status'],
+      uid: json['uid'],
+      uri: json['uri'],
+      createdAt: json['createdAt'],
+      expiresAt: json['expiry'],
+      payment_options
+    }
+
     return h.response({
       success: true,
-      invoice: {
-        amount: json['amount'],
-        currency: json['denomination'],
-        status: json['status'],
-        uid: json['uid'],
-        uri: json['uri'],
-        createdAt: json['createdAt'],
-        expiresAt: json['expiry'],
-        payment_options
-      },
+      invoice: responseInvoice,
       uid: json['uid']
     })
     .code(200)
@@ -256,23 +258,22 @@ export async function createPublicInvoice(account_id, payload) {
 
 async function getPaymentOptions(invoice_uid) { 
 
+  let invoice: Invoice = await getInvoice(invoice_uid)
+
   let payment_options = await models.PaymentOption.findAll({where: {
     invoice_uid
   }});
 
-  return payment_options.map(option => {
+  return Promise.all(payment_options.map(async option => {
 
-    option = _.pick(option,
-      'uri',
-      'currency',
-      'amount'
-    )
+    const request = await getPaymentRequest(invoice, { chain: option.chain, currency: option.currency })
 
-    option['chain'] = option['currency']
+    request.currency = request.currency || option.currency
+    request.chain = request.chain || option.chain
 
-    return option
+    return request
 
-  })
+  }))
 
 }
 
@@ -296,47 +297,68 @@ function sanitizeInvoice(invoice) {
   return resp;
 }
 
-export async function show(request, reply) {
+export async function show(request, h) {
 
-  let invoiceId = request.params.invoice_id;
+  try {
 
-  let invoice = await models.Invoice.findOne({
-    where: {
-      uid: invoiceId
+    let invoiceId = request.params.invoice_id;
+
+    let invoice = await models.Invoice.findOne({
+      where: {
+        uid: invoiceId
+      }
+    });
+
+    if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
+
+      invoice = await invoices.refreshInvoice(invoice.uid)
+
     }
-  });
 
-  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
+    if (invoice) {
 
-    invoice = await invoices.refreshInvoice(invoice.uid)
+      const payment_options = await getPaymentOptions(invoice.uid)
 
-  }
+      let notes = await models.InvoiceNote.findAll({where: {
+        invoice_uid: invoice.uid
+      }});
 
-  if (invoice) {
+      const responseInvoice = {
+        amount: invoice.amount,
+        currency: invoice.denomination,
+        status: invoice.status,
+        uid: invoice.uid,
+        uri: invoice.uri,
+        createdAt: invoice.createdAt,
+        expiresAt: invoice.expiry
+      }
 
-    log.debug('invoice.requested', invoice.toJSON());
+      if (invoice.hash) {
+        responseInvoice['hash'] = invoice.hash
+      }
 
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
+      responseInvoice['payment_options'] = payment_options
+      responseInvoice['notes'] = notes
 
-    let notes = await models.InvoiceNote.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
+      return h.response({
+        success: true,
+        invoice: responseInvoice
+      })
+      .code(200)
 
-    let sanitized = sanitizeInvoice(invoice);
+    } else {
 
-    let resp = Object.assign({
-      invoice: sanitized,
-      payment_options: invoice.payment_options,
-      notes
-    }, sanitized)
+      log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
 
-    return resp;
+      throw new Error('invoice not found')
+    }
 
-  } else {
+  } catch(error) {
 
-    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
+    log.error('invoices.show.error', error)
 
-    throw new Error('invoice not found')
+    return h.badRequest(error)
+
   }
 
 }

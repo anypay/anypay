@@ -82,9 +82,6 @@ export class Account extends Orm {
 
     return records.map(record => {
 
-      if (record.refund) {
-        console.log(record.toJSON())
-      }
       return new Invoice(record)
     })
 

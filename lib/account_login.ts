@@ -7,8 +7,6 @@ import { log } from './log'
 import { compare } from './bcrypt'
 
 export async function withEmailPassword (email, password) {
-  log.info("lookup email for login", email);
-
 
   var account = await models.Account.findOne({
     where: {
@@ -22,13 +20,9 @@ export async function withEmailPassword (email, password) {
   }
   try {
 
-    const result = await compare(password, account.password_hash);
-
-    console.log('COMPARE RESULT', result)
+    await compare(password, account.password_hash);
 
   } catch(error) {
-
-    log.info(`password for email ${email} is incorrect`);
 
     return;
   }

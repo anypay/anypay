@@ -48,21 +48,13 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
 
-    if (invoice.cancelled) {
-
-      const error = new Error('invoice cancelled')
-
-      log.error('payment.error.invoicecancelled', error)
-
-      throw error
-      
-    }
-
     if (!invoice) {
       throw new Error(`invoice ${payment.invoice_uid} not found`)
     }
 
-
+    if (invoice.status !== 'unpaid') {
+      throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
+    }
     const where = {
       invoice_uid,
       currency: payment.currency,
@@ -353,6 +345,7 @@ interface PaymentRequest extends ProtocolMessage {
   paymentUrl: string;
   paymentId: string;
   chain: string;
+  currency: string;
   network: string;
   instructions: Instruction[];
 }
@@ -458,21 +451,17 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
 
-  if (invoice.status !== 'unpaid') {
-    throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
-  }
+  if (!option.chain && option.currency) { option.chain = option.currency }
+  if (!option.currency && option.chain) { option.currency = option.chain }
 
-  log.info('pay.jsonv2.payment-request', Object.assign(Object.assign(option, options), {
-    account_id: invoice.get('account_id'),
-    invoice_uid: invoice.uid
-  }))
+  if (option.chain === 'USDC') { option.chain = 'MATIC' }
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
   let paymentOption = await findPaymentOption({
     invoice,
     currency: option.currency,
-    chain: option.chain || option.currency
+    chain: option.chain
   })
 
   const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
@@ -490,6 +479,8 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
     paymentId: invoice.uid,
 
     chain: option.chain,
+
+    currency: option.currency,
 
     network: 'main',
 
@@ -516,6 +507,9 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
     account_id: invoice.get('account_id')
   }, Object.assign(params, options)))
 
+  if (!params.chain && params.currency) { params.chain = params.currency }
+  if (!params.currency && params.chain) { params.currency = params.chain }
+
   await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
 
   await verifyUnsigned({
@@ -537,6 +531,9 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
   }, Object.assign(params, options)))
+
+  if (!params.chain && params.currency) { params.chain = params.currency }
+  if (!params.currency && params.chain) { params.currency = params.chain }
 
   await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 

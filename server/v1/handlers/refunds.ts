@@ -18,8 +18,6 @@ export async function show(req, h) {
    
     let refund = await getRefund(invoice)
 
-    console.log('_REFF', refund)
-
     let refund_invoice = await ensureInvoice(refund.get('refund_invoice_uid'))
 
     return h.response({
@@ -29,8 +27,6 @@ export async function show(req, h) {
     })
 
   } catch(error) {
-
-    console.log('_RRR', error)    
 
     log.error('servers.v1.handlers.Refunds.show', error)
 

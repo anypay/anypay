@@ -189,6 +189,7 @@ async function Server() {
           name: 'platform',
           description: 'Base Payments Platform'
         },
+        /*
         {
           name: 'v1',
           description: 'Version 1 (Current)'
@@ -199,8 +200,9 @@ async function Server() {
         },
         {
           name: 'v0',
-          description: 'Version 0 (Deprecated)'
+          description: 'Version 0'
         }
+        */
       ],
       securityDefinitions: {
         simple: {
@@ -274,7 +276,7 @@ async function Server() {
     path: "/base_currencies",
     handler: v0.BaseCurrencies.index,
     options: {
-      tags: ['api', 'v0']
+      tags: ['v0']
     }
   });
 
@@ -283,7 +285,7 @@ async function Server() {
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
     handler: v0.PriceConversions.show,
     options: {
-      tags: ['api', 'v0']
+      tags: ['v0']
     }
   });
 
@@ -345,7 +347,7 @@ async function Server() {
     path: '/merchants/{account_id}',
     handler: v0.Merchants.show,
     options: {
-      tags: ['api', 'v0']
+      tags: ['v0']
     }
   });
 
@@ -354,7 +356,7 @@ async function Server() {
     path: "/api/accounts-by-email/{email}",
     handler: v0.Anypaycity.show,
     options: {
-      tags: ['api', 'v0']
+      tags: ['v0']
     }
   });
 
@@ -370,6 +372,39 @@ async function Server() {
         }),
         failAction
       },
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          invoice: Joi.object({
+            uid: Joi.string().required(),
+            uri: Joi.string().required(),
+            status: Joi.string().required(),
+            currency: Joi.string().required(),
+            amount: Joi.number().required(),
+            hash: Joi.string().optional(),
+            payment_options: Joi.array().items(Joi.object({
+              time: Joi.string().required(),
+              expires: Joi.string().required(),
+              memo: Joi.string().optional(),
+              paymentUrl: Joi.string().required(),
+              paymentId: Joi.string().required(),
+              chain: Joi.string().required(),
+              currency: Joi.string().required(),
+              network: Joi.string().required(),
+              instructions: Joi.array().items(Joi.object({
+                type: Joi.string().optional(),
+                requiredFeeRate: Joi.number().optional(),
+                outputs: Joi.array().items(Joi.object({
+                  address: Joi.string(),
+                  script: Joi.string(),
+                  amount: Joi.number().required() 
+                }).or('address', 'script').required()),
+              })).required(),
+            })).required(),
+            notes: Joi.array().optional()
+          }).required()
+        }).required()
+      },
       plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
@@ -379,7 +414,7 @@ async function Server() {
     path: "/accounts/{id}", // id or email
     handler: v0.Accounts.showPublic,
     options: {
-      tags: ['api', 'v0', 'accounts'],
+      tags: ['v0', 'accounts'],
       plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
@@ -389,7 +424,7 @@ async function Server() {
     path: "/accounts/{account_id}/invoices",
     handler: v0.Invoices.createPublic,
     options: {
-      tags: ['api', 'v0', 'invoices'],
+      tags: ['v0', 'invoices'],
       validate: {
         payload: models.Invoice.Request,
         failAction
@@ -406,7 +441,7 @@ async function Server() {
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api', 'v0'],
+      tags: ['v0'],
       handler: v0.Apps.index
     }
   });
@@ -416,7 +451,7 @@ async function Server() {
     path: "/apps/{id}",
     options: {
       auth: "token",
-      tags: ['api', 'v0'],
+      tags: ['v0'],
       handler: v0.Apps.show
     }
   });
@@ -426,7 +461,7 @@ async function Server() {
     path: "/apps",
     options: {
       auth: "token",
-      tags: ['api', 'v0'],
+      tags: ['v0'],
       handler: v0.Apps.create
     }
   });
@@ -436,7 +471,7 @@ async function Server() {
     path: '/search/accounts/near/{latitude}/{longitude}',
     handler: v0.Accounts.nearby,
     options: {
-      tags: ['api', 'v0']
+      tags: ['v0']
     }
   }); 
 
