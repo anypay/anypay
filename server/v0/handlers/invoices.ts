@@ -165,7 +165,7 @@ export async function create(request, h) {
 
     const payment_options = await getPaymentOptions(invoice.uid)
 
-    const responseInvoice = {
+    /*const responseInvoice = {
       amount: json['amount'],
       currency: json['denomination'],
       status: json['status'],
@@ -174,20 +174,32 @@ export async function create(request, h) {
       createdAt: json['createdAt'],
       expiresAt: json['expiry'],
       payment_options
-    }
+    }*/
 
 
     let response = {
       success: true,
-      invoice: responseInvoice,
-      uid: json['uid']
+      amount: json['amount'],
+      currency: json['denomination'],
+      status: json['status'],
+      uid: json['uid'],
+      uri: json['uri'],
+      createdAt: json['createdAt'],
+      expiresAt: json['expiry'],
+      invoice: {
+        amount: json['amount'],
+        currency: json['denomination'],
+        status: json['status'],
+        uid: json['uid'],
+        uri: json['uri'],
+        createdAt: json['createdAt'],
+        expiresAt: json['expiry'],
+        payment_options
+      },
+      payment_options
     }
 
-    console.log('--response1--', response)
-
-    //response = Object.assign(responseInvoice, response)
-
-    //console.log('--response2--', response)
+    console.log('--response--', response)
 
     return h.response(response).code(200)
 

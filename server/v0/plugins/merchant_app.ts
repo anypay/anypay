@@ -89,7 +89,7 @@ export async function register(server: Server) {
         }).label('InvoiceRequest'),
         failAction: 'log'
       },
-      response: {
+      /*response: {
         failAction: 'log',
         schema: Joi.object({
           uid: Joi.string().required(),
@@ -122,7 +122,7 @@ export async function register(server: Server) {
             notes: Joi.array().optional()
           }).required()
         }).required()
-      }
+      }*/
     }
   });
 
