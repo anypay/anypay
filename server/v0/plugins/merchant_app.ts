@@ -87,9 +87,41 @@ export async function register(server: Server) {
             'minimumFee'
           ).optional()
         }).label('InvoiceRequest'),
-        failAction
+        failAction: 'log'
       },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response }),
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          invoice: Joi.object({
+            uid: Joi.string().required(),
+            uri: Joi.string().required(),
+            status: Joi.string().required(),
+            currency: Joi.string().required(),
+            amount: Joi.number().required(),
+            hash: Joi.string().optional(),
+            payment_options: Joi.array().items(Joi.object({
+              time: Joi.string().optional(),
+              expires: Joi.string().required(),
+              memo: Joi.string().optional(),
+              paymentUrl: Joi.string().required(),
+              paymentId: Joi.string().required(),
+              chain: Joi.string().required(),
+              currency: Joi.string().required(),
+              network: Joi.string().required(),
+              instructions: Joi.array().items(Joi.object({
+                type: Joi.string().optional(),
+                requiredFeeRate: Joi.number().optional(),
+                outputs: Joi.array().items(Joi.object({
+                  address: Joi.string(),
+                  script: Joi.string(),
+                  amount: Joi.number().required() 
+                }).or('address', 'script').required()),
+              })).required(),
+            })).required(),
+            notes: Joi.array().optional()
+          }).required()
+        }).required()
+      }
     }
   });
 
@@ -118,7 +150,7 @@ export async function register(server: Server) {
         payload: Joi.object({
           address: Joi.string().required()
         }),
-        failAction
+        failAction: 'log'
       }
     }
   });
@@ -168,7 +200,7 @@ export async function register(server: Server) {
         payload: Joi.object({
           note: Joi.string().required()
         }),
-        failAction
+        failAction: 'log'
       }
     }
   });
@@ -184,7 +216,7 @@ export async function register(server: Server) {
         payload: Joi.object({
           search: Joi.string().required()
         }),
-        failAction
+        failAction: 'log'
       }
     }
   });

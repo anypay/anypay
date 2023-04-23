@@ -405,7 +405,6 @@ async function Server() {
           }).required()
         }).required()
       },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
 
