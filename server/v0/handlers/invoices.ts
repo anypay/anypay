@@ -176,12 +176,16 @@ export async function create(request, h) {
       payment_options
     }
 
-    return h.response({
+
+    let response = {
       success: true,
       invoice: responseInvoice,
       uid: json['uid']
-    })
-    .code(200)
+    }
+
+    response = Object.assign(response, responseInvoice)
+
+    return h.response(response).code(200)
 
   } catch(error) {
 
