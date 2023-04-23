@@ -343,7 +343,19 @@ export async function show(request, h) {
         invoice_uid: invoice.uid
       }});
 
-      const responseInvoice = {
+      let sanitized = sanitizeInvoice(invoice);
+
+      let resp = Object.assign({
+        invoice: Object.assign(sanitized, {
+          payment_options
+        }),
+        payment_options: invoice.payment_options,
+        notes
+      }, sanitized)
+
+      return resp;
+
+      /*const responseInvoice = {
         amount: invoice.amount,
         currency: invoice.denomination,
         status: invoice.status,
@@ -365,6 +377,7 @@ export async function show(request, h) {
         invoice: responseInvoice
       })
       .code(200)
+      */
 
     } else {
 
