@@ -183,7 +183,11 @@ export async function create(request, h) {
       uid: json['uid']
     }
 
-    response = Object.assign(response, responseInvoice)
+    console.log('--response1--', response)
+
+    //response = Object.assign(responseInvoice, response)
+
+    //console.log('--response2--', response)
 
     return h.response(response).code(200)
 

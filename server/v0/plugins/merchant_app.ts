@@ -92,6 +92,7 @@ export async function register(server: Server) {
       response: {
         failAction: 'log',
         schema: Joi.object({
+          uid: Joi.string().required(),
           invoice: Joi.object({
             uid: Joi.string().required(),
             uri: Joi.string().required(),
