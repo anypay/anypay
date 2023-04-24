@@ -9,8 +9,8 @@ services:
     ports:
       - '8000:8000'
     environment:
-    - DATABASE_URL=postgres://anypay_db_user:anypay_db_password@postgres:5432/anypay_db_dev
-    - AMQP_URL=amqp://guest:guest@amqp:5672/
+    - DATABASE_URL=postgres://anypay_db_user:anypay_db_password@postgres:5442/anypay_db_dev
+    - AMQP_URL=amqp://guest:guest@amqp:5682/
     - amqp_enabled=true
     - PGUSER=anypay_db_user
     - PGPASSWORD=anypay_db_password
@@ -22,9 +22,9 @@ services:
 
   postgres:
     container_name: postgres
-    image: 'postgres:12'
+    image: 'postgis/postgis:12-3.3'
     ports:
-      - '5432:5432'
+      - '5442:5432'
     environment:
       - POSTGRES_USER=anypay_db_user
       - POSTGRES_PASSWORD=anypay_db_password
@@ -36,7 +36,7 @@ services:
     container_name: amqp
     image: 'rabbitmq:3-management'
     ports:
-      - '5672:5672'
+      - '5682:5672'
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest

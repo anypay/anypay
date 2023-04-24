@@ -10,3 +10,4 @@ dist/
 coverage/
 coverage
 phantom_wallet.json
+anypay_db_data/
