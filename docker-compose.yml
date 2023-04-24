@@ -1,0 +1,44 @@
+version: '3.8'
+
+services: 
+  server: 
+    container_name: server
+    image: node:16
+    build:
+      context: .
+    ports:
+      - '8000:8000'
+    environment:
+    - DATABASE_URL=postgres://anypay_db_user:anypay_db_password@postgres:5432/anypay_db_dev
+    - AMQP_URL=amqp://guest:guest@amqp:5672/
+    - amqp_enabled=true
+    - PGUSER=anypay_db_user
+    - PGPASSWORD=anypay_db_password
+    - PGDATABASE=anypay_db_dev
+    - PGHOST=postgres # NAME OF THE SERVICE
+    depends_on: 
+      - postgres
+      - amqp
+
+  postgres:
+    container_name: postgres
+    image: 'postgres:12'
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_USER=anypay_db_user
+      - POSTGRES_PASSWORD=anypay_db_password
+      - POSTGRES_DB=anypay_db_dev
+    volumes:
+      - ./anypay_db_data:/var/lib/postgresql/data  
+      
+  amqp:
+    container_name: amqp
+    image: 'rabbitmq:3-management'
+    ports:
+      - '5672:5672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=/
+      
