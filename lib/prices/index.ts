@@ -244,22 +244,22 @@ export async function setAllCryptoPrices() {
   var prices: Price[];
  
   const bittrexCoins = [
+    'AVAX',
     'BSV',
     'BCH',
+    'BNB',
     'BTC',
-    'LTC',
     'DASH',
     'DOGE',
-    'ZEC',
-    'ZEC',
-    'MATIC',
     'ETH',
+    'LTC',
+    'MATIC',
     'SOL',
     'TRON',
-    'BNB',
-    'XLM',
     'USDC',
-    'USDT'
+    'USDT',
+    'XLM',
+    'ZEC'
   ];
 
   prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
