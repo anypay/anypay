@@ -333,10 +333,10 @@ export async function attachV1Routes(server) {
           value: Joi.string().required(),
           label: Joi.string().optional()
         }),
-        failAction
+        failAction: 'log'
       },
       response: {
-        failAction,
+        failAction: 'log',
         schema: Joi.object({
           address: Joi.object({
             currency: Joi.string().required(),

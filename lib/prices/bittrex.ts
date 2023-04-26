@@ -17,7 +17,13 @@ class InvalidPricePair implements Error {
 
 export async function getPrice(currency: string): Promise<Price> {
 
-  const pair = `${currency}-USDT`
+  let pair = `${currency}-USDT`
+
+  if (currency === 'USDT') {
+
+    pair = `USDT-USD`
+
+  }
 
   try {
 

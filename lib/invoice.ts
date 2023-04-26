@@ -168,14 +168,65 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
     account_id: account.id
   }});
 
-  addresses = _.reject(addresses, (address) => {
+  let availableAddresses = _.reject(addresses, (address) => {
     let coin = getCoin(address.currency);
     if (!coin) { return true }
 
     return coin.unavailable;
   });
 
-  return addresses
+  availableAddresses = availableAddresses.map(address => {
+    if (!address.chain) { address.chain = address.currency }
+    if (!address.currency) { address.currency = address.chain }
+    return address
+  })
+
+  for (let address of availableAddresses) {
+
+    console.log(address, 'address')
+
+    if (address.currency == 'ETH') {
+
+      let usdc_address: any = address.toJSON()
+      usdc_address.chain = 'ETH'
+      usdc_address.currency = 'USDC'
+      availableAddresses.push(usdc_address)
+
+      let usdt_address: any = address.toJSON()
+      usdt_address.chain = 'ETH'
+      usdt_address.currency = 'USDT'
+      availableAddresses.push(usdt_address)
+
+    } else if (address.currency == 'AVAX') {
+      console.log(address, 'ADDRESS--')
+
+      let usdc_address: any = address.toJSON()
+      usdc_address.chain = 'AVAX'
+      usdc_address.currency = 'USDC'
+      availableAddresses.push(usdc_address)
+
+      let usdt_address: any = address.toJSON()
+      usdt_address.chain = 'AVAX'
+      usdt_address.currency = 'USDT'
+      availableAddresses.push(usdt_address)
+
+    } else if (address.currency == 'MATIC') {
+
+      let usdc_address: any = address.toJSON()
+      usdc_address.chain = 'MATIC'
+      usdc_address.currency = 'USDC'
+      availableAddresses.push(usdc_address)
+
+      let usdt_address: any = address.toJSON()
+      usdt_address.chain = 'MATIC'
+      usdt_address.currency = 'USDT'
+      availableAddresses.push(usdt_address)
+
+    }
+
+  }
+
+  return availableAddresses
 
 }
 
@@ -191,17 +242,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     try {
 
-      let { currency, chain } = record
-
       if (!chain) { chain = currency }
-
-      if (currency === 'MATIC') {
-
-        currency = 'USDC'
-
-        chain = 'MATIC'
-
-      }
 
       let coin = getCoin(record.currency)
 
