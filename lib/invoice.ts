@@ -39,7 +39,8 @@ async function getNewInvoiceAddress(accountId: number, currency: string, amount)
   address = await plugins.getNewAddress(currency, accountId, amount);
 
   if (!address) {
-    throw new Error(`unable to generate address for ${currency}`);
+    return null
+    //throw new Error(`unable to generate address for ${currency}`);
   }
 
   return {
@@ -197,10 +198,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'ETH'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'ETH'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     } else if (address.currency == 'AVAX') {
       console.log(address, 'ADDRESS--')
@@ -210,10 +211,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'AVAX'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'AVAX'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     } else if (address.currency == 'MATIC') {
 
@@ -222,10 +223,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'MATIC'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'MATIC'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     }
 
@@ -257,7 +258,12 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       value
     }, currency, coin.precision);
 
-    let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
+
+    let newAddress = await getNewInvoiceAddress(account.id, currency, amount)
+
+    if (!newAddress) { return }
+
+    let address = newAddress.value;
 
     if (address.match(':')) {
       address = address.split(':')[1]
@@ -318,7 +324,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  return paymentOptions
+  return paymentOptions.filter(o => !o)
 }
 
 export function isExpired(invoice) {
