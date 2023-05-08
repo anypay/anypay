@@ -12,7 +12,7 @@ import * as run from './lib/run'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { Address } from '../../lib/addresses'
+//import { Address } from '../../lib/addresses'
 
 interface Payment {
   amount: number;
@@ -159,6 +159,8 @@ export async function transformAddress(alias: string){
 }
 
 
+/*
+  TODO: Re-implement once it is known to be working through tests
 export async function getNewAddress(address: Address): Promise<string>{
 
   const paymail = address.get('paymail')
@@ -176,6 +178,7 @@ export async function getNewAddress(address: Address): Promise<string>{
   }
 
 }
+*/
 
 export function validateAddress(address: string){
 

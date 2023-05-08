@@ -192,10 +192,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'ETH'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'ETH'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     } else if (address.currency == 'AVAX') {
       console.log(address, 'ADDRESS--')
@@ -205,10 +205,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'AVAX'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'AVAX'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     } else if (address.currency == 'MATIC') {
 
@@ -217,10 +217,10 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       usdc_address.currency = 'USDC'
       availableAddresses.push(usdc_address)
 
-      let usdt_address: any = address.toJSON()
-      usdt_address.chain = 'MATIC'
-      usdt_address.currency = 'USDT'
-      availableAddresses.push(usdt_address)
+      //let usdt_address: any = address.toJSON()
+      //usdt_address.chain = 'MATIC'
+      //usdt_address.currency = 'USDT'
+      //availableAddresses.push(usdt_address)
 
     }
 
@@ -255,7 +255,11 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       console.log('get new invoice address', {currency, record})
 
-      let address = (await getNewInvoiceAddress(record, currency, amount)).value;
+      let newAddress = await getNewInvoiceAddress(account.id, currency, amount)
+
+      if (!newAddress) { return }
+
+      let address = newAddress.value;
 
       console.log({ address })
 
