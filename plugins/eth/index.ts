@@ -7,6 +7,8 @@ import { Transaction } from 'ethers'
 
 const Web3 = require('web3')
 
+import * as ethers from 'ethers'
+
 export async function validateAddress(address: string): Promise<boolean> {
 
   return ethereum.isAddress({ address })
@@ -59,42 +61,36 @@ export async function verifyPayment({ payment_option, transaction: {tx: hex}, pr
     If it is a txid, fetch the transaction details from the blockchain
 
   */
-  /*
 
   const expectedOutput = payment_option.outputs[0]
 
+
   try {
 
-    const output: any = ethereum.parseUSDCOutput({ transactionHex: hex })
+    const transaction: ethers.Transaction = ethers.utils.parseTransaction(hex)
 
-    const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
-
-    const correctAmount = expectedOutput.amount === parseInt(output.amount)
-
-    return correctAmount && correctAddress
+    console.log('eth.transaction.parsed', transaction)
 
   } catch(error) {
 
-    const { parsed, full } = await ethereum.fetchERC20Transfer({ txid: hex })
-
-    log.info('usdc.ethereum.fetchERC20Transfer.result', { parsed, full })
-
-    if (parsed.token !== '0x2791bca1f2de4661ed88a30c99a7a9449aa84174') {
-
-      console.log('Not USDC Transfer')
-
-      throw new Error('Not USDC Transfer')
-
-    }
-
-    const correctAddress = parsed.address.toLowerCase() === expectedOutput.address.toLowerCase()
-
-    const correctAmount = expectedOutput.amount === parsed.amount
-
-    return correctAmount && correctAddress
 
   }
-  */
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_ethereum_url))
+
+  const result: any = await web3.eth.getTransaction(hex)
+
+  console.log('web3.eth.getTransaction.result', {hex, result})
+
+  const correctAddress = expectedOutput.address == result.to
+
+  if (!correctAddress) { console.log('incorrect address', { expected: expectedOutput.address, actual: result.to }) }
+
+  const correctAmount = expectedOutput.amount == parseInt(result.value)
+
+  if (!correctAmount) { console.log('incorrect amount', { expected: expectedOutput.amount, actual: result.value }) }
+
+  return correctAddress && correctAmount
 
 }
 
@@ -102,7 +98,7 @@ export async function broadcastTx(txhex: string) {
 
   if (txhex.length === 66) {
 
-    console.log('skip USDC ethereum broadcast of txid', { txid: txhex })
+    console.log('skip ethereum broadcast of txid', { txid: txhex })
 
     return txhex
 
