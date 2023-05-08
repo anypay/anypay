@@ -100,6 +100,7 @@
     "csv-writer": "^1.2.0",
     "dotenv": "^8.1.0",
     "email-validator": "^2.0.4",
+    "ethers": "^5.7.2",
     "fcm-node": "^1.5.2",
     "filepay": "^2.2.12",
     "geoip-lite": "^1.4.2",
