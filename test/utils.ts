@@ -2,6 +2,8 @@ require('dotenv').config();
 
 import * as Chance from 'chance';
 
+import { setAllFiatPrices, setAllCryptoPrices } from '../lib/prices'
+
 import * as uuid from 'uuid';
 
 const chance = new Chance();
@@ -297,5 +299,11 @@ before(async () => {
   account = await createAccountWithAddresses()
 
   walletBot = (await findOrCreateWalletBot(account)).walletBot
+
+  //TODO: sync prices
+  console.log('SET ALL FIAT PRICES')
+  await setAllFiatPrices()
+  await setAllCryptoPrices()
+
 
 })

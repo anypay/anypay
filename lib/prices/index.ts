@@ -15,6 +15,8 @@ import * as bittrex from './bittrex'
 
 import * as kraken from './kraken'
 
+import * as kucoin from './kucoin'
+
 export { bittrex, kraken }
 
 export interface Price {
@@ -268,6 +270,8 @@ export async function setAllCryptoPrices() {
 
   prices.push(await kraken.getPrice('XMR'))
   //prices.push(await kraken.getPrice('SOL'))
+
+  prices.push(await kucoin.getPrice('BSV'))
 
   await Promise.all(prices.map(setPrice))
 

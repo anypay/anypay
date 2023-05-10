@@ -31,12 +31,10 @@ export async function sendWebhook(webhook: Webhook) {
 
       let response_code = resp.statusCode; 
 
-      let response_body = resp.body; 
+      let response_body = resp.text || resp.body; 
 
-      if (typeof resp.body !== 'string') {
+      if (typeof response_body !== 'string') {
         response_body = JSON.stringify(resp.body); 
-      } else {
-        response_body = resp.body; 
       }
 
       await webhook.update({
@@ -358,34 +356,29 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
   } catch(e) {
 
+    var response_body
+
     if (e.response) {
 
       record.response_code = e.response.statusCode;
 
-      if (typeof e.response.body !== 'string') {
+      response_body = e.response.text
 
-        record.response_body = JSON.stringify(e.response.text); 
+      if (!response_body) {
 
-      } else {
-
-        record.response_body = e.response.body; 
+        response_body = JSON.stringify(e.response.body); 
 
       }
 
     }
-    record.error = e.message;
-
-    record.ended_at = new Date();
 
     await record.update({
       status: 'failed',
       error: e.message,
       response_code: e.response ? e.response.statusCode : null,
-      response_body: e.response ? e.response.body : null,
+      response_body,
       ended_at: new Date()
     })
-
-    await record.set('status', 'failed')
 
   }
 

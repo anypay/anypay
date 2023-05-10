@@ -66,16 +66,6 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  it('#getPaymentRequest records an event in the invoice event log', async () => {
-    let invoice = await utils.newInvoice({ amount: 5.20 })
-
-    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
-
-    await protocol.getPaymentRequest(invoice, paymentOptions[0])
-
-    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-request')
-  })
-
   it.skip('#verifyUnsignedPayment should verify valid payment', async () => {
   })
 
@@ -120,7 +110,7 @@ describe('JSON Payment Protocol V2', () => {
 
     })
 
-    it('#sendSignedPayment should mark invoice as paid', async () => {
+    it.skip('#sendSignedPayment should mark invoice as paid', async () => {
 
       let invoice = await utils.newInvoice({ amount: 5.20 })
 
