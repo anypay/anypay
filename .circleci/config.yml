@@ -25,13 +25,13 @@ jobs:
 
       - run:
           name: Run Model Tests
-          command: NODE_ENV=test mocha --require=ts-node/register test/models/*_test.ts --timeout=20000 --exit
+          command: NODE_ENV=test npx mocha --require=ts-node/register test/models/*_test.ts --timeout=20000 --exit
       - run:
           name: Run Lib Tests
-          command: NODE_ENV=test mocha --require=ts-node/register test/lib/*_test.ts --timeout=20000 --exit
+          command: NODE_ENV=test npx mocha --require=ts-node/register test/lib/*_test.ts --timeout=20000 --exit
       - run:
           name: Run Integration Tests
-          command: NODE_ENV=test mocha --require=ts-node/register test/integration/*_test.ts --timeout=20000 --exit
+          command: NODE_ENV=test npx mocha --require=ts-node/register test/integration/*_test.ts --timeout=20000 --exit
       - run:
           name: Report Code Coverage
           command: |
