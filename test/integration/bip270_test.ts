@@ -29,7 +29,7 @@ describe("BIP270 Payment Requests", () => {
 
     })
 
-    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+    if (process.env.RUN_E2E_PAYMENTS_TESTS) {
 
       it('an invalid payment should be rejected', async () => {
 

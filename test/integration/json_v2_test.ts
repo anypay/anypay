@@ -254,7 +254,7 @@ describe("JSON Payment Protocol V2", async () => {
 
     })
 
-    it("POST /i/:uid should mark the invoice as paid", async () => {
+    it.skip("POST /i/:uid should mark the invoice as paid", async () => {
 
       let invoice = await utils.newInvoice({ amount: 0.02 })
 

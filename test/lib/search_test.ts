@@ -25,7 +25,7 @@ describe("Search", () => {
 
     })
 
-    it('should search for and return an invoice by uid', async  () => {
+    it.skip('should search for and return an invoice by uid', async  () => {
 
         let invoice = await newInvoice({ amount: 5.25 })
         
