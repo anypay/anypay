@@ -1,5 +1,17 @@
 
 
+const exampleTransaction = {
+
+  txid: '0xd2fe6e48eb27516dd58ccbba672c6276daf84d1efc0afbfb7d28ce5cd277bc99',
+
+  amount: 0.03345448,
+
+  address: '0x99298b3724c97b3fc8dabc3363f6a25447dcc9f7',
+
+  date: 'May-10-2023 09:46:11 PM +UTC'
+
+}
+
 describe('Payments with Ethereum', () => {
 
   /*
@@ -7,9 +19,37 @@ describe('Payments with Ethereum', () => {
   */
 
   it('should reject payments that were broadcast before the invoice was created')
-  it('should reject payments with the incorrect address')
-  it('should reject payments with the incorrect amount')
-  it('should accept a valid payment and mark the invoice as paid')
+  it('should reject payments with the incorrect address', async () => {
+
+    // Generate a payment request with the correct amount but different address
+    // Call submitPayment with the example transaction id 
+    // Assert that the error contains reference to incorrect address
+
+  })
+  it('should reject payments with the incorrect amount', async () => {
+
+    // Generate a payment request with the correct address but different amount
+    // Call submitPayment with the example transaction id 
+    // Assert that the error contains reference to incorrect amount
+
+  })
+  it('should accept a valid payment and mark the invoice as paid', () => {
+
+    // Generate a payment request with the correct address and amount
+    // Manually update the invoice data to be before the transaction 
+    // Call submitPayment with the example transaction id:
+  })
+
+  it('should reject a transaction if that has already been used to pay another invoice', async () => {
+
+    // Generate a payment request with the correct address and amount
+    // Manually update the invoice data to be before the transaction 
+    // Call submitPayment with the example transaction id:
+    // Generate another payment request with the correct address and amount
+    // Manually update the invoice data to be before the transaction 
+    // Call submitPayment with the example transaction id:
+    // Assert that the new transaction is rejected with error referencing duplicate payment
+  })
 
   /*
     We also must test confirmations of blocks and webhooks for when ETH payments confirm
