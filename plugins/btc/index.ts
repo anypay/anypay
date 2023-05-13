@@ -1,6 +1,6 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
-const bitcoinJsLib = require('bitcoinjs-lib')
+
 
 export { btc as bitcore }
 
@@ -11,98 +11,104 @@ import {
   nownodes
 } from '../../lib'
 
-import { BroadcastTxResult } from '../../lib/plugins'
+import { BroadcastTxResult, Transaction, Plugin, VerifyPayment } from '../../lib/plugin'
+
+import { log } from '../../lib/log'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
-const promiseAny = require('promise.any');
+import { oneSuccess } from 'promise-one-success'
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+export default class BTC extends Plugin {
 
-  const broadcastProviders: Promise<BroadcastTxResult>[] = []
+  currency: string = 'BTC'
 
-  if (config.get('blockchair_broadcast_provider_btc_enabled')) {
+  chain: string = 'BTC'
 
-    broadcastProviders.push(
+  decimals: number = 8;
 
-      blockchair.publish('bitcoin', rawTx)
-    )
+  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
-  }
+    const broadcastProviders: Promise<BroadcastTxResult>[] = []
 
-  if (config.get('chain_so_broadcast_provider_enabled')) {
+    if (config.get('blockchair_broadcast_provider_btc_enabled')) {
 
-    broadcastProviders.push((async () => {
+      broadcastProviders.push(
 
-      try {
+        blockchair.publish('bitcoin', txhex)
+      )
 
-        console.log('CHAIN SO BTC', { rawTx })
-        const result = await chain_so.broadcastTx('BTC', rawTx)
+    }
 
-        return result
-      } catch(error) {
+    if (config.get('chain_so_broadcast_provider_enabled')) {
 
-        console.log('plugin-btc: chain_so broadcast failed, trying next provider')
+      broadcastProviders.push((async () => {
 
-      }
+        try {
 
-    })())
+          console.log('CHAIN SO BTC', { txhex })
+          const result = await chain_so.broadcastTx('BTC', txhex)
 
-  }
+          return result
+        } catch(error) {
 
-  if (config.get('bitcoind_rpc_host')) {
+          console.log('plugin-btc: chain_so broadcast failed, trying next provider')
 
-    broadcastProviders.push(
+        }
 
-      bitcoind_rpc.broadcastTx(rawTx)
-    )
-  }
+      })())
+
+    }
+
+    if (config.get('bitcoind_rpc_host')) {
+
+      broadcastProviders.push(
+
+        bitcoind_rpc.broadcastTx(txhex)
+      )
+    }
 
 
-  if (config.get('nownodes_enabled')) {
+    if (config.get('nownodes_enabled')) {
 
-    broadcastProviders.push(
+      broadcastProviders.push(
 
-      nownodes.broadcastTx('BTC', rawTx)
-    )
-  }
+        nownodes.broadcastTx('BTC', txhex)
+      )
+    }
 
-  const result: any = promiseAny(broadcastProviders)
+    return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
-  return result
-
-}
-
-export function transformAddress(address: string) {
-
-  if (address.match(':')) {
-
-    address = address.split(':')[1]
-
-  }
-
-  return address;
-
-}
-
-export function validateAddress(address: string){
-
-  try {
-    bitcoinJsLib.address.toOutputScript(address, bitcoinJsLib.networks.bitcoin)
-
-    return true
-
-  } catch(error) {
-
-    throw new Error('Invalid BTC address')
 
   }
 
-}
+  async validateAddress(address: string) {
 
-export async function getNewAddress(deprecatedParam){
+    try {
 
-  return deprecatedParam.value;
+      new btc.Address(address);
+
+      return true;
+
+    } catch(error) {
+
+      log.debug('plugins.btc.validateAddress.error', error)
+
+      return false
+
+    }
+
+  }
+
+  async getTransaction(txid: string): Promise<Transaction> {
+
+    return { hex: '' }
+  }
+
+  async verifyPayment(params: VerifyPayment): Promise<boolean> {
+
+    return false
+  }
 
 }
 

@@ -7,22 +7,55 @@ export { ltc as bitcore }
 
 export const currency = 'LTC'
 
-export async function getNewAddress(record) {
-  return record.value;
-}
-
-import { BroadcastTxResult } from '../../lib/plugins'
+import { BroadcastTxResult, Plugin, VerifyPayment, Transaction } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+export default class LTC extends Plugin {
 
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+  currency: string = 'LTC'
 
-    blockchair.publish('litecoin', rawTx)
+  chain: string = 'LTC'
 
-  ]
+  decimals: number = 8;
 
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
+  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+
+    const broadcastProviders: Promise<BroadcastTxResult>[] = [
+
+      blockchair.publish('litecoin', txhex)
+
+    ]
+
+    return oneSuccess<BroadcastTxResult>(broadcastProviders)
+
+  }
+
+  async validateAddress(address: string) {
+
+    try {
+
+      new ltc.Address(address);
+
+      return true;
+
+    } catch(error) {
+
+      return false
+
+    }
+
+  }
+
+  async getTransaction(txid: string): Promise<Transaction> {
+
+    return { hex: '' }
+  }
+
+  async verifyPayment(params: VerifyPayment): Promise<boolean> {
+
+    return false
+  }
 
 }
+

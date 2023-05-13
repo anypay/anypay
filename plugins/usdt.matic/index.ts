@@ -1,11 +1,11 @@
 
+import { log } from '../../lib/log'
+
 import { polygon } from 'usdc'
 
 import { Transaction } from 'ethers'
 
 const Web3 = require('web3')
-
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
 
 export async function validateAddress(address: string): Promise<boolean> {
 
@@ -42,7 +42,6 @@ class BitcoreTransaction {
       }
   }
 }
-
 interface VerifyPayment {
   payment_option: any;
   transaction: {
@@ -63,25 +62,35 @@ export async function verifyPayment({ payment_option, transaction: {tx: hex}, pr
 
   const expectedOutput = payment_option.outputs[0]
 
-  console.log(expectedOutput)
-
   try {
 
-    return false
+    const output: any = polygon.parseUSDCOutput({ transactionHex: hex })
+
+    const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
+
+    const correctAmount = expectedOutput.amount === parseInt(output.amount)
+
+    return correctAmount && correctAddress
 
   } catch(error) {
 
-    const txid = hex
+    const { parsed, full } = await polygon.fetchERC20Transfer({ txid: hex })
 
-    const { parsed, full } = await polygon.fetchERC20Transfer({ txid })
+    log.info('usdc.polygon.fetchERC20Transfer.result', { parsed, full })
 
-    console.log({ parsed, full })
+    if (parsed.token !== '0x2791bca1f2de4661ed88a30c99a7a9449aa84174') {
 
-    const result: any = await web3.eth.getTransaction(txid)
+      console.log('Not USDC Transfer')
 
-    console.log(result)
+      throw new Error('Not USDC Transfer')
 
-    return false
+    }
+
+    const correctAddress = parsed.address.toLowerCase() === expectedOutput.address.toLowerCase()
+
+    const correctAmount = expectedOutput.amount === parsed.amount
+
+    return correctAmount && correctAddress
 
   }
 
@@ -91,7 +100,7 @@ export async function broadcastTx(txhex: string) {
 
   if (txhex.length === 66) {
 
-    console.log('skip MATIC broadcast of txid', { txid: txhex })
+    console.log('skip USDC polygon broadcast of txid', { txid: txhex })
 
     return txhex
 
@@ -115,8 +124,6 @@ class Bitcore {
 
 }
 
-
 const bitcore = new Bitcore()
 
 export { bitcore }
-

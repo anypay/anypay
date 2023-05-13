@@ -1,8 +1,10 @@
 require('dotenv').config()
 
 import axios from 'axios'
+
 import { log } from '../../../lib'
-import { BroadcastTxResult } from '../../../lib/plugins'
+
+import { BroadcastTxResult } from '../../../lib/plugin'
 
 class TaalBroadcastTransactionError extends Error {}
 

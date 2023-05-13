@@ -2,8 +2,6 @@
 
 require('dotenv').config()
 
-//import { broadcastTx } from './plugins/btc'
-
 import { submitPayment } from './lib/pay/json_v2/protocol'
 
 ;(async () => {
@@ -23,8 +21,6 @@ import { submitPayment } from './lib/pay/json_v2/protocol'
         tx: txhex
       }]
     })
-
-    //const result = await broadcastTx(tx)
 
     console.log(result)
 

@@ -1,15 +1,17 @@
 
-import { polygon } from 'usdc'
+//import { log } from '../../lib/log'
+
+import { ethereum } from 'usdc'
 
 import { Transaction } from 'ethers'
 
 const Web3 = require('web3')
 
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+import * as ethers from 'ethers'
 
 export async function validateAddress(address: string): Promise<boolean> {
 
-  return polygon.isAddress({ address })
+  return ethereum.isAddress({ address })
 
 }
 
@@ -26,7 +28,7 @@ class BitcoreTransaction {
 
       } else {
 
-        this.transaction = polygon.decodeTransactionHex({ transactionHex: hex })
+        //this.transaction = ethereum.decodeTransactionHex({ transactionHex: hex })
 
       }
 
@@ -42,7 +44,6 @@ class BitcoreTransaction {
       }
   }
 }
-
 interface VerifyPayment {
   payment_option: any;
   transaction: {
@@ -63,27 +64,33 @@ export async function verifyPayment({ payment_option, transaction: {tx: hex}, pr
 
   const expectedOutput = payment_option.outputs[0]
 
-  console.log(expectedOutput)
 
   try {
 
-    return false
+    const transaction: ethers.Transaction = ethers.utils.parseTransaction(hex)
+
+    console.log('eth.transaction.parsed', transaction)
 
   } catch(error) {
 
-    const txid = hex
-
-    const { parsed, full } = await polygon.fetchERC20Transfer({ txid })
-
-    console.log({ parsed, full })
-
-    const result: any = await web3.eth.getTransaction(txid)
-
-    console.log(result)
-
-    return false
 
   }
+
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_ethereum_url))
+
+  const result: any = await web3.eth.getTransaction(hex)
+
+  console.log('web3.eth.getTransaction.result', {hex, result})
+
+  const correctAddress = expectedOutput.address == result.to
+
+  if (!correctAddress) { console.log('incorrect address', { expected: expectedOutput.address, actual: result.to }) }
+
+  const correctAmount = expectedOutput.amount == parseInt(result.value)
+
+  if (!correctAmount) { console.log('incorrect amount', { expected: expectedOutput.amount, actual: result.value }) }
+
+  return correctAddress && correctAmount
 
 }
 
@@ -91,17 +98,17 @@ export async function broadcastTx(txhex: string) {
 
   if (txhex.length === 66) {
 
-    console.log('skip MATIC broadcast of txid', { txid: txhex })
+    console.log('skip ethereum broadcast of txid', { txid: txhex })
 
     return txhex
 
   }
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_ethereum_url))
 
   const transmitResult: any = await web3.eth.sendSignedTransaction(txhex)
 
-  console.log('polygon.provider.sendTransaction.result', transmitResult)
+  console.log('ethereum.provider.sendTransaction.result', transmitResult)
 
   return transmitResult
 
@@ -115,8 +122,6 @@ class Bitcore {
 
 }
 
-
 const bitcore = new Bitcore()
 
 export { bitcore }
-

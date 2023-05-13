@@ -2,8 +2,6 @@ require('dotenv').config();
 
 import {plugins} from './plugins';
 
-import * as bsv from 'bsv';
-
 import { log } from './log'
 
 interface DenominationChangeset {
@@ -23,43 +21,17 @@ interface AddressChangeSet {
 
 import {models} from "./models";
 
-import {getPaymail as bsvGetPaymail} from '../plugins/bsv';
-
-async  function getPaymail(currency, address) {
-
-  if (currency !== 'BSV') {
-    return null;
-  }
-
-  let paymail = await bsvGetPaymail(address);
-
-  if (paymail) {
-
-    try {
-
-      new bsv.Address(address); 
-
-      return null;
-
-    } catch(error) {
-
-      return address;
-
-    }
-
-  }
-
-}
-
 export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
   let plugin = await plugins.findForChain(changeset.currency);
 
-  let paymail = await getPaymail(changeset.currency, changeset.address);
+  if (changeset.address.match('@')) {
 
-  changeset.paymail = paymail;
+    changeset.paymail = changeset.address;
+
+  }
 
   if (plugin.transformAddress) {
 
