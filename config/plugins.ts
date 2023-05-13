@@ -18,7 +18,7 @@ export default function() {
 
     let plugin = require(`../plugins/${currency}`);
 
-    map[currency.toUpperCase()] = plugin;
+    map[currency.toUpperCase()] = plugin.default;
 
     return map;
 
