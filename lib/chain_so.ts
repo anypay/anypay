@@ -6,7 +6,8 @@ import axios from 'axios'
 import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
-import { BroadcastTxResult } from './plugins';
+
+import { BroadcastTxResult } from './plugin';
 
 export interface SendTxResponse {
     status: "success";

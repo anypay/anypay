@@ -7,7 +7,7 @@ import { log } from './log';
 
 import { v4 as uuid } from 'uuid'
 
-import { BroadcastTxResult } from './plugins';
+import { BroadcastTxResult } from './plugin';
 
 import { config } from './config';
 
@@ -16,6 +16,7 @@ import {models} from './models';
 import { publish as publishAMQP } from 'rabbi'
 
 import { Op } from 'sequelize'
+
 import { sendWebhookForInvoice } from './webhooks';
 
 export async function publish(currency, hex): Promise<BroadcastTxResult> {

@@ -1,5 +1,6 @@
 import { log } from "../../../lib"
-import { BroadcastTxResult } from "../../../lib/plugins"
+
+import { BroadcastTxResult } from "../../../lib/plugin"
 
 const Run = require('run-sdk')
 

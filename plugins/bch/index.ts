@@ -3,15 +3,9 @@ require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
-import { Plugin, Transaction, BroadcastTxResult, VerifyPayment } from '../../lib/plugins'
+import { Plugin, Transaction, BroadcastTxResult, VerifyPayment } from '../../lib/plugin'
 
-import {log} from '../../lib';
-
-import { Account } from '../../lib/account'
-
-import { Address } from '../../lib/addresses'
-
-import { findOne } from '../../lib/orm'
+import { log } from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -81,20 +75,6 @@ export default class BCH extends Plugin {
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
     return false
-  }
-
-  async getNewAddress(account: Account): Promise<Address> {
-
-    let address = await findOne<Address>(Address, {
-      where: {
-        account_id: account.get('id'),
-        currency: 'BCH',
-        chain: 'BCH'
-      }
-    })
-
-    return address
-
   }
 
 }

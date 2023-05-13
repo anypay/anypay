@@ -5,7 +5,8 @@ import { log } from './log'
 import axios from 'axios'
 
 import { getBitcore } from './bitcore'
-import { BroadcastTxResult } from './plugins'
+
+import { BroadcastTxResult } from './plugin'
 
 const COIN_MAP = {
   'LTC': 'litecoin',

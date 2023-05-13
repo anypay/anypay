@@ -4,7 +4,8 @@ import axios from 'axios'
 import { config } from './config'
 
 import { log } from './log'
-import { BroadcastTxResult } from './plugins'
+
+import { BroadcastTxResult } from './plugin'
 
 import { Trace } from './trace'
 
