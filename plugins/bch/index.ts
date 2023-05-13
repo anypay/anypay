@@ -3,7 +3,15 @@ require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
+import { Plugin, Transaction, BroadcastTxResult, VerifyPayment } from '../../lib/plugins'
+
 import {log} from '../../lib';
+
+import { Account } from '../../lib/account'
+
+import { Address } from '../../lib/addresses'
+
+import { findOne } from '../../lib/orm'
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -11,60 +19,83 @@ export { bch as bitcore }
 
 var bchaddr: any = require('bchaddrjs');
 
-import { BroadcastTxResult } from '../../lib/plugins'
-
 import { oneSuccess } from 'promise-one-success'
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+export default class BCH extends Plugin {
 
-  const broadcastProviders: Promise<BroadcastTxResult>[] = [
+  currency: string = 'BCH'
 
-    blockchair.publish('bitcoin-cash', rawTx)
+  chain: string = 'BCH'
 
-  ]
+  decimals: number = 8;
 
-  return oneSuccess<BroadcastTxResult>(broadcastProviders)
+  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
-}
+    const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-function validateAddress(address: string) {
+      blockchair.publish('bitcoin-cash', txhex)
 
-  try {
+    ]
 
-    new bch.HDPublicKey(address);
-
-    log.debug('plugins.bch.hdpublickey.valid', address)
-
-    return true;
-
-  } catch(error) {
-
-    log.debug('plugins.bch.hdpublickey.invalid', error)
+    return oneSuccess<BroadcastTxResult>(broadcastProviders)
 
   }
 
-  try {
+  async validateAddress(address: string) {
 
-    var isCashAddress = bchaddr.isCashAddress
+    try {
 
-    let valid = isCashAddress(address)
+      new bch.HDPublicKey(address);
 
-    return valid;
+      log.debug('plugins.bch.hdpublickey.valid', address)
 
-  } catch(error) {
+      return true;
 
-    return false;
+    } catch(error) {
+
+      log.debug('plugins.bch.hdpublickey.invalid', error)
+
+    }
+
+    try {
+
+      var isCashAddress = bchaddr.isCashAddress
+
+      let valid = isCashAddress(address)
+
+      return valid;
+
+    } catch(error) {
+
+      return false;
+
+    }
+
+  }
+
+  async getTransaction(txid: string): Promise<Transaction> {
+
+    return { hex: '' }
+  }
+
+  async verifyPayment(params: VerifyPayment): Promise<boolean> {
+
+    return false
+  }
+
+  async getNewAddress(account: Account): Promise<Address> {
+
+    let address = await findOne<Address>(Address, {
+      where: {
+        account_id: account.get('id'),
+        currency: 'BCH',
+        chain: 'BCH'
+      }
+    })
+
+    return address
 
   }
 
 }
 
-const currency = 'BCH';
-
-export {
-
-  currency,
-
-  validateAddress
-
-};

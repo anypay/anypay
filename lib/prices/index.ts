@@ -245,9 +245,7 @@ export async function setAllCryptoPrices() {
  
   const bittrexCoins = [
     'AVAX',
-    'BSV',
     'BCH',
-    'BNB',
     'BTC',
     'DASH',
     'DOGE',
@@ -255,7 +253,6 @@ export async function setAllCryptoPrices() {
     'LTC',
     'MATIC',
     'SOL',
-    'TRON',
     'USDC',
     'USDT',
     'XLM',
@@ -267,6 +264,7 @@ export async function setAllCryptoPrices() {
   prices = prices.filter(p => !!p)
 
   prices.push(await kraken.getPrice('XMR'))
+  prices.push(await kraken.getPrice('TRON'))
   //prices.push(await kraken.getPrice('SOL'))
 
   await Promise.all(prices.map(setPrice))
