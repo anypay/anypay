@@ -7,9 +7,13 @@ export { dash as bitcore }
 
 import * as insight from './lib/insight'
 
-import { BroadcastTxResult, VerifyPayment, Transaction, Plugin } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, VerifyPayment, Transaction, Plugin, Confirmation } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
+
+import { getTransaction } from '../../lib/blockcypher'
+
+import * as moment from 'moment'
 
 export default class DASH extends Plugin {
 
@@ -19,7 +23,24 @@ export default class DASH extends Plugin {
 
   decimals: number = 8;
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await getTransaction('DASH', txid)
+
+    if (!transaction) { return }
+
+    if (!transaction.block_hash) { return }
+
+    return {
+      height: transaction.block_height,
+      hash: transaction.block_hash, 
+      timestamp: moment(transaction.confirmed).toDate(),
+      depth: transaction.confirmations
+    }
+
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = [
 

@@ -7,9 +7,13 @@ export { ltc as bitcore }
 
 export const currency = 'LTC'
 
-import { BroadcastTxResult, Plugin, VerifyPayment, Transaction } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation, VerifyPayment, Transaction } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
+
+import { getTransaction } from '../../lib/blockcypher'
+
+import * as moment from 'moment'
 
 export default class LTC extends Plugin {
 
@@ -19,7 +23,24 @@ export default class LTC extends Plugin {
 
   decimals: number = 8;
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await getTransaction('LTC', txid)
+
+    if (!transaction) { return }
+
+    if (!transaction.block_hash) { return }
+
+    return {
+      height: transaction.block_height,
+      hash: transaction.block_hash, 
+      timestamp: moment(transaction.confirmed).toDate(),
+      depth: transaction.confirmations
+    }
+
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
