@@ -7,16 +7,46 @@ import { Transaction } from 'ethers'
 
 const Web3 = require('web3')
 
-import { VerifyPayment, Plugin, Transaction as AnypayTransaction } from '../../lib/plugin'
+import { VerifyPayment, Plugin, Transaction as AnypayTransaction, Confirmation, BroadcastTx, BroadcastTxResult } from '../../lib/plugin'
 
-
-export default class USD_MATIC extends Plugin {
+export default class USDC_MATIC extends Plugin {
 
   currency = 'USDC'
 
   chain = 'MATIC'
 
   token = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
+
+  decimals = 6
+
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+
+    const receipt: any = await web3.eth.getTransactionReceipt(txid)
+
+    if (!receipt) { return }
+
+    const { blockHash: hash, blockNumber: height } = receipt
+
+    if (!hash) { return }
+
+    const block = await web3.eth.getBlock(hash)
+
+    const latestBlock = await web3.eth.getBlock('latest')
+
+    const depth = latestBlock.number - height + 1
+
+    const timestamp = new Date(block.timestamp * 1000)
+
+    return {
+      hash,
+      height,
+      depth,
+      timestamp
+    }
+
+  }
 
   async validateAddress(address: string): Promise<boolean> {
 
@@ -36,13 +66,18 @@ export default class USD_MATIC extends Plugin {
 
   }
 
-  async broadcastTx(txhex: string) {
+  async broadcastTx({txhex}: BroadcastTx): Promise<BroadcastTxResult> {
 
     if (txhex.length === 66) {
 
       console.log('skip USDC polygon broadcast of txid', { txid: txhex })
 
-      return txhex
+      return {
+        txhex,
+        txid: '', //TODO
+        result: txhex,
+        success: true 
+      }
 
     }
 

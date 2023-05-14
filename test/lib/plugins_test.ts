@@ -75,6 +75,26 @@ describe("Plugins", () => {
 
     });
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'DASH', currency: 'DASH' });
+
+      let txid = '1eb4e53d410c4a7e44e6d80484756791052a0c79c35151bffb1bed970323a6b1'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('0000000000000008dc00e5b8eba00897b0b3e50ab0e6fe1d16818d13fe8232a1')
+
+      expect(height).to.be.equal(1870467)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
+
+
   })
 
   describe('LTC', () => {
@@ -91,6 +111,26 @@ describe("Plugins", () => {
 
     });
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'LTC', currency: 'LTC' });
+
+      let txid = '6bab5b587ce5ea0938c1477c1f6c6cd38dc2cc58f9b52e7d93c24320ad1f0388'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('98a2a60c30e30960296b454d69d85d1905953d571f90f2befa0f0dd7c7631d3e')
+
+      expect(height).to.be.equal(2473321)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
+
+
   })
 
   describe('DOGE', () => {
@@ -106,6 +146,24 @@ describe("Plugins", () => {
       assert.strictEqual(plugin.decimals, 8);
 
     });
+
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'DOGE', currency: 'DOGE' });
+
+      let txid = '4c8adb87aa5d2c3c16880afea9b7c34040e064463f3a19341d838386bc859bd3'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('d52fc7ea1b838c4ed9d9ad30c123cd18e25f842129c21a887736d3f2eef8439f')
+
+      expect(height).to.be.equal(4716421)
+
+      expect(timestamp).to.be.a('date')
+
+    })
 
   })
 
@@ -155,6 +213,24 @@ describe("Plugins", () => {
 
     })
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'ETH', currency: 'ETH' });
+
+      let txid = '0xcd43123eea81e3b9e2227d6468f6f6ad174e90e6f793b2302c7b03f04604381b'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
+
+      expect(height).to.be.equal(17255716)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
   })
 
   describe('MATIC', () => {
@@ -168,6 +244,24 @@ describe("Plugins", () => {
       assert.strictEqual(plugin.chain, 'MATIC')
 
       assert.strictEqual(plugin.decimals, 18)
+
+    })
+
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'MATIC', currency: 'MATIC' });
+
+      let txid = '0x494011badb5faf691bc11027c96e154da6d8ee3ab2dd70ce346900b8153b4d1c'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('0xde5a4703ca10f3176be78ee832881bfc3bae5600f06924f82ab4951b29271573')
+
+      expect(height).to.be.equal(42680415)
+
+      expect(timestamp).to.be.a('date')
 
     })
 
@@ -275,99 +369,185 @@ describe("Plugins", () => {
 
   describe('USDC', () => {
 
-    it('should find the plugin for USDC.ETH', async () => {
+    describe('USDC.ETH', () => {
 
-      let plugin = await find({ chain: 'ETH', currency: 'USDC' })
+      it('should find the plugin for USDC.ETH', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ chain: 'ETH', currency: 'USDC' })
 
-      assert.strictEqual(plugin.chain, 'ETH')
+        assert.strictEqual(plugin.currency, 'USDC')
 
-      assert.strictEqual(plugin.token, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
+        assert.strictEqual(plugin.chain, 'ETH')
 
-    })
+        assert.strictEqual(plugin.token, '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48')
 
-    it('should find the plugin for USDC.MATIC', async () => {
+      })
 
-      let plugin = await find({ currency: 'USDC', chain: 'MATIC' })
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ chain: 'ETH', currency: 'USDC' });
 
-      assert.strictEqual(plugin.chain, 'MATIC')
+        let txid = '0x49bfaf3135b1b8c1a45e334706ca089826e7043d7feb7326d3d02206e1eae5a6'
 
-      assert.strictEqual(plugin.token, '0x2791bca1f2de4661ed88a30c99a7a9449aa84174')
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
 
-    })
+        expect(depth).to.be.greaterThan(0)
 
-    it('should find the plugin for USDC.AVAX', async () => {
+        expect(hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
 
-      let plugin = await find({ chain: 'AVAX', currency: 'USDC' })
+        expect(height).to.be.equal(17255716)
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        expect(timestamp).to.be.a('date')
 
-      assert.strictEqual(plugin.chain, 'AVAX')
-
-      assert.strictEqual(plugin.token, '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e')
+      })
 
     })
 
-    it('should find the plugin for USDC.SOL', async () => {
+    describe('USDC.MATIC', () => {
 
-      let plugin = await find({ chain: 'SOL', currency: 'USDC' })
+      it('should find the plugin for USDC.MATIC', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ currency: 'USDC', chain: 'MATIC' })
 
-      assert.strictEqual(plugin.chain, 'SOL')
+        assert.strictEqual(plugin.currency, 'USDC')
 
-      assert.strictEqual(plugin.token, 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+        assert.strictEqual(plugin.chain, 'MATIC')
 
-    })
+        assert.strictEqual(plugin.token, '0x2791bca1f2de4661ed88a30c99a7a9449aa84174')
 
-    it('should find the plugin for USDC.TRON', async () => {
+      })
 
-      let plugin = await find({ chain: 'TRON', currency: 'USDC' })
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ chain: 'MATIC', currency: 'USDC' });
 
-      assert.strictEqual(plugin.chain, 'TRON')
+        let txid = '0x7fa214be78f449b5c2ce854688a4244bfa6039971edea30f46ee535636fed0a0'
 
-      assert.strictEqual(plugin.token, 'TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8')
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
 
-    })
+        expect(depth).to.be.greaterThan(0)
 
-    it('should find the plugin for USDC.FLOW', async () => {
+        expect(hash).to.be.equal('0x01a9acc2827368254847ff96169257db4c756e08647db003c808e99306382df3')
 
-      let plugin = await find({ chain: 'FLOW', currency: 'USDC' })
+        expect(height).to.be.equal(42679642)
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        expect(timestamp).to.be.a('date')
 
-      assert.strictEqual(plugin.chain, 'FLOW')
-
-      assert.strictEqual(plugin.token, 'A.b19436aae4d94622.FiatToken')
+      })
 
     })
 
-    it('should find the plugin for USDC.HBAR', async () => {
+    describe('USDC.AVAX', () => {
 
-      let plugin = await find({ chain: 'HBAR', currency: 'USDC' })
+      it('should find the plugin for USDC.AVAX', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ chain: 'AVAX', currency: 'USDC' })
 
-      assert.strictEqual(plugin.chain, 'HBAR')
+        assert.strictEqual(plugin.currency, 'USDC')
 
-      assert.strictEqual(plugin.token, '0.0.456858')
+        assert.strictEqual(plugin.chain, 'AVAX')
+
+        assert.strictEqual(plugin.token, '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e')
+
+      })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'AVAX', currency: 'USDC' });
+
+        let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
+
+        expect(height).to.be.equal(29994194)
+
+        expect(timestamp).to.be.a('date')
+
+      })
 
     })
 
-    it('should find the plugin for USDC.XLM', async () => {
+    describe('USDC.SOL', () => {
 
-      let plugin = await find({ chain: 'XLM', currency: 'USDC' })
+      it('should find the plugin for USDC.SOL', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDC')
+        let plugin = await find({ chain: 'SOL', currency: 'USDC' })
 
-      assert.strictEqual(plugin.chain, 'XLM')
+        assert.strictEqual(plugin.currency, 'USDC')
 
-      assert.strictEqual(plugin.token, 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN')
+        assert.strictEqual(plugin.chain, 'SOL')
+
+        assert.strictEqual(plugin.token, 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
+
+      })
+
+    })
+
+    describe('USDC.TRON', () => {
+
+      it('should find the plugin for USDC.TRON', async () => {
+
+        let plugin = await find({ chain: 'TRON', currency: 'USDC' })
+
+        assert.strictEqual(plugin.currency, 'USDC')
+
+        assert.strictEqual(plugin.chain, 'TRON')
+
+        assert.strictEqual(plugin.token, 'TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8')
+
+      })
+
+    })
+
+    describe('USDC.FLOW', () => {
+
+      it('should find the plugin for USDC.FLOW', async () => {
+
+        let plugin = await find({ chain: 'FLOW', currency: 'USDC' })
+
+        assert.strictEqual(plugin.currency, 'USDC')
+
+        assert.strictEqual(plugin.chain, 'FLOW')
+
+        assert.strictEqual(plugin.token, 'A.b19436aae4d94622.FiatToken')
+
+      })
+
+    })
+
+    describe('USDC.HBAR', () => {
+
+      it('should find the plugin for USDC.HBAR', async () => {
+
+        let plugin = await find({ chain: 'HBAR', currency: 'USDC' })
+
+        assert.strictEqual(plugin.currency, 'USDC')
+
+        assert.strictEqual(plugin.chain, 'HBAR')
+
+        assert.strictEqual(plugin.token, '0.0.456858')
+
+      })
+
+    })
+
+    describe('USDC.XLM', () => {
+
+      it('should find the plugin for USDC.XLM', async () => {
+
+        let plugin = await find({ chain: 'XLM', currency: 'USDC' })
+
+        assert.strictEqual(plugin.currency, 'USDC')
+
+        assert.strictEqual(plugin.chain, 'XLM')
+
+        assert.strictEqual(plugin.token, 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN')
+
+      })
 
     })
 
@@ -375,65 +555,143 @@ describe("Plugins", () => {
 
   describe('USDT', () => {
 
-    it('should find the plugin for USDT.ETH', async () => {
+    describe('USDT.ETH', () => {
 
-      let plugin = await find({ chain: 'ETH', currency: 'USDT' })
+      it('should find the plugin for USDT.ETH', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDT')
+        let plugin = await find({ chain: 'ETH', currency: 'USDT' })
 
-      assert.strictEqual(plugin.chain, 'ETH')
+        assert.strictEqual(plugin.currency, 'USDT')
 
-      assert.strictEqual(plugin.token, '0xdac17f958d2ee523a2206206994597c13d831ec7')
+        assert.strictEqual(plugin.chain, 'ETH')
 
-      assert.strictEqual(plugin.decimals, 6)
+        assert.strictEqual(plugin.token, '0xdac17f958d2ee523a2206206994597c13d831ec7')
 
-    })
+        assert.strictEqual(plugin.decimals, 6)
 
-    it('should find the plugin for USDT.MATIC', async () => {
+      })
 
-      let plugin = await find({ chain: 'MATIC', currency: 'USDT' })
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDT')
+        let plugin = await find({ chain: 'ETH', currency: 'USDT' });
 
-      assert.strictEqual(plugin.chain, 'MATIC')
+        let txid = '0xf24f352490d539085f2114ed1f35fe8a664f1a27f4587429cbcf7e56926b0eeb'
 
-      assert.strictEqual(plugin.token, '0xc2132d05d31c914a87c6611c10748aeb04b58e8f')
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
 
-    })
+        expect(depth).to.be.greaterThan(0)
 
-    it('should find the plugin for USDT.AVAX', async () => {
+        expect(hash).to.be.equal('0x444e405425339f6a17cba63c822af4a72f6337542db5642592fbb31cfd8d801d')
 
-      let plugin = await find({chain: 'AVAX', currency: 'USDT' })
+        expect(height).to.be.equal(17247170)
 
-      assert.strictEqual(plugin.currency, 'USDT')
+        expect(timestamp).to.be.a('date')
 
-      assert.strictEqual(plugin.chain, 'AVAX')
-
-      assert.strictEqual(plugin.token, '0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7')
+      })
 
     })
 
-    it('should find the plugin for USDT.SOL', async () => {
+    describe('USDT.MATIC', () => {
 
-      let plugin = await find({ chain: 'SOL', currency: 'USDT' })
+      it('should find the plugin for USDT.MATIC', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDT')
+        let plugin = await find({ chain: 'MATIC', currency: 'USDT' })
 
-      assert.strictEqual(plugin.chain, 'SOL')
+        assert.strictEqual(plugin.currency, 'USDT')
 
-      assert.strictEqual(plugin.token, 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB')
+        assert.strictEqual(plugin.chain, 'MATIC')
+
+        assert.strictEqual(plugin.token, '0xc2132d05d31c914a87c6611c10748aeb04b58e8f')
+
+      })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'MATIC', currency: 'USDT' });
+
+        let txid = '0x0d66c0c4a13e2c525fe9fa3929078e55df7d17cb3d58ad419f05449d0b56ec2c'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('0xd51998fb091e2cce9e3684f5f45cc56a2deb09bd0f51514b426abd04be2f85d4')
+
+        expect(height).to.be.equal(42680347)
+
+        expect(timestamp).to.be.a('date')
+
+      })
+
+
 
     })
 
-    it('should find the plugin for USDT.TRON', async () => {
+    describe('USDT.AVAX', () => {
 
-      let plugin = await find({ chain: 'TRON', currency: 'USDT' })
+      it('should find the plugin for USDT.AVAX', async () => {
 
-      assert.strictEqual(plugin.currency, 'USDT')
+        let plugin = await find({chain: 'AVAX', currency: 'USDT' })
 
-      assert.strictEqual(plugin.chain, 'TRON')
+        assert.strictEqual(plugin.currency, 'USDT')
 
-      assert.strictEqual(plugin.token, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')
+        assert.strictEqual(plugin.chain, 'AVAX')
+
+        assert.strictEqual(plugin.token, '0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7')
+
+      })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'AVAX', currency: 'USDT' });
+
+        let txid = '0x8cf9a0048f4536a6eec4f277ae4aa61e6569d7c3c3eb9d28a9d153ebe90683a2'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('0x91fffe943de27a50c45c09fe6d90418af26fab4904f09cd497475f123ee877df')
+
+        expect(height).to.be.equal(29994293)
+
+        expect(timestamp).to.be.a('date')
+
+      })
+
+
+
+    })
+
+    describe('USDT.SOL', () => {
+
+      it('should find the plugin for USDT.SOL', async () => {
+
+        let plugin = await find({ chain: 'SOL', currency: 'USDT' })
+
+        assert.strictEqual(plugin.currency, 'USDT')
+
+        assert.strictEqual(plugin.chain, 'SOL')
+
+        assert.strictEqual(plugin.token, 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB')
+
+      })
+
+    })
+
+    describe('USDT.TRON', () => {
+
+      it('should find the plugin for USDT.TRON', async () => {
+
+        let plugin = await find({ chain: 'TRON', currency: 'USDT' })
+
+        assert.strictEqual(plugin.currency, 'USDT')
+
+        assert.strictEqual(plugin.chain, 'TRON')
+
+        assert.strictEqual(plugin.token, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')
+
+      })
 
     })
 

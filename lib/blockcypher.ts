@@ -121,9 +121,11 @@ interface GetTransactionResult {
   confirmations?: number;
 }
 
-export async function getTransaction(txid: string): Promise<GetTransactionResult > {
+export async function getTransaction(chain: string, txid: string): Promise<GetTransactionResult > {
 
-  let { data } = await axios.get(`https://api.blockcypher.com/v1/btc/main/txs/${txid}`)
+  if (chain === 'BCH') { chain = 'bitcoin-cash' }
+
+  let { data } = await axios.get(`https://api.blockcypher.com/v1/${chain.toLowerCase()}/main/txs/${txid}`)
 
   log.info('blockcypher.getTransaction.response', data)
 
@@ -135,7 +137,7 @@ export async function confirmTransaction(payment, transaction?: GetTransactionRe
 
   if (!transaction) {
 
-    transaction = await getTransaction(payment.txid)
+    transaction = await getTransaction(payment.currency, payment.txid)
 
   }
 

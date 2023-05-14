@@ -32,7 +32,7 @@ export default class BTC extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    const transaction = await getTransaction(txid)
+    const transaction = await getTransaction('BTC', txid)
 
     if (!transaction) { return }
 

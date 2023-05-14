@@ -3,7 +3,7 @@ require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
-import { Plugin, Transaction, BroadcastTxResult, VerifyPayment } from '../../lib/plugin'
+import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, VerifyPayment } from '../../lib/plugin'
 
 import { log } from '../../lib';
 
@@ -15,6 +15,10 @@ var bchaddr: any = require('bchaddrjs');
 
 import { oneSuccess } from 'promise-one-success'
 
+import { getDecodedTransaction } from '../../lib/blockchair'
+
+import * as moment from 'moment'
+
 export default class BCH extends Plugin {
 
   currency: string = 'BCH'
@@ -23,7 +27,28 @@ export default class BCH extends Plugin {
 
   decimals: number = 8;
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction: any = await getDecodedTransaction('BCH', txid)
+
+    console.log('decoded', transaction)
+
+    if (!transaction) { return }
+
+    if (!transaction.block_hash) { return }
+
+    return {
+      height: transaction.block_height,
+      hash: transaction.block_hash, 
+      timestamp: moment(transaction.confirmed).toDate(),
+      depth: transaction.confirmations
+    }
+
+  }
+
+
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
