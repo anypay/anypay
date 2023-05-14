@@ -3,13 +3,13 @@ import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
-export default class USDC_SOL extends Plugin {
+export default class USDT_TRON extends Plugin {
 
-  chain = 'SOL'
+  chain = 'TRON'
 
-  currency = 'USDC'
+  currency = 'USDT'
 
-  token = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+  token = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'
 
   async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 

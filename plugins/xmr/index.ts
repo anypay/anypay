@@ -1,6 +1,15 @@
 
 export const currency = 'XMR'
 
+import {
+  Plugin,
+  VerifyPayment,
+  Confirmation,
+  BroadcastTx,
+  BroadcastTxResult,
+  Transaction as AnypayTransaction
+} from '../../lib/plugin'
+
 import * as bitcore from './bitcore'
 
 import { log } from '../../lib'
@@ -14,45 +23,95 @@ import { Client } from 'payment-protocol'
 import { config } from '../../lib/config'
 
 import { v4 as uuid } from 'uuid'
-import { Transaction, Tx } from '../../lib/pay/json_v2/protocol'
+
+import { Transaction } from '../../lib/pay/json_v2/protocol'
+
 import { other_rpc } from './json_rpc'
+
 import { Invoice } from '../../lib/invoices'
+
 import { getPayment, Payment } from '../../lib/payments'
+
 import get_block from './json_rpc/get_block'
 
-export async function validateAddress({ value }: { value: string }): Promise<Boolean> {
+export default class XMR extends Plugin {
 
-  return true
+  chain = 'XMR'
 
-}
+  currency = 'XMR'
 
-export async function validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promise<Boolean> {
+  decimals = 12
 
-  return true
+  async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
-}
+    //TODO
+    throw new Error()
 
-export async function broadcastTx({ tx, tx_hash, tx_key }: Tx): Promise<SendRawTransactionResult> {
+    return false
 
-  const result = await send_raw_transaction({ tx_as_hex: tx, do_not_relay: false })
-
-  if (result['sanity_check_failed']) {
-    throw new Error(result.reason)
   }
 
-  if (result.double_spend) {
-    throw new Error('double spend')
+  async getTransaction(txid: string): Promise<AnypayTransaction> {
+
+    //TODO
+    throw new Error()
+
+    return null
+
   }
 
-  if (result.too_big) {
-    throw new Error('too big')
+
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    //TODO
+    throw new Error()
+
+    return null
+
   }
 
-  if (result.status === 'Failed') {
-    throw new Error(result.reason)
+  async validateAddress(address: string): Promise<boolean> {
+
+    // TODO
+    return true
+
   }
-  
-  return result
+
+  async validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promise<Boolean> {
+
+    //TODO
+    return true
+
+  }
+
+  async broadcastTx({ txhex, txid, txkey }: BroadcastTx): Promise<BroadcastTxResult> {
+
+    const result = await send_raw_transaction({ tx_as_hex: txhex, do_not_relay: false })
+
+    if (result['sanity_check_failed']) {
+      throw new Error(result.reason)
+    }
+
+    if (result.double_spend) {
+      throw new Error('double spend')
+    }
+
+    if (result.too_big) {
+      throw new Error('too big')
+    }
+
+    if (result.status === 'Failed') {
+      throw new Error(result.reason)
+    }
+    
+    return {
+      txhex,
+      txid,
+      success: true,
+      result
+    }
+
+  }
 
 }
 
@@ -147,7 +206,7 @@ export async function transfer(destinations: Destination[]) {
 
 }
 
-interface VerifyPayment {
+interface XMRVerifyPayment {
   url: string;
   tx_hash: string;
   tx_key: string;
@@ -360,7 +419,7 @@ export async function check_tx_key(params: CheckTxKey): Promise<CheckTxKeyResult
   
 }
 
-export async function verify({url, tx_hash, tx_key}: VerifyPayment) {
+export async function verify({url, tx_hash, tx_key}: XMRVerifyPayment) {
 
   let client = new Client(url)
 

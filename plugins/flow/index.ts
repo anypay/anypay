@@ -3,13 +3,11 @@ import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
-export default class USDC_SOL extends Plugin {
+export default class FLOW extends Plugin {
 
-  chain = 'SOL'
+  chain = 'FLOW'
 
-  currency = 'USDC'
-
-  token = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+  currency = 'FLOW'
 
   async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 

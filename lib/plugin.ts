@@ -7,11 +7,11 @@ import { findOne } from './orm'
 
 abstract class AbstractPlugin {
 
-  currency: string;
+  abstract readonly currency: string;
 
-  chain: string;
+  abstract readonly chain: string;
 
-  decimals: number;
+  abstract readonly decimals: number;
 
   token: string;
 
@@ -21,13 +21,30 @@ abstract class AbstractPlugin {
 
   abstract getTransaction(txid: string): Promise<Transaction>;
 
-  abstract broadcastTx(txhex: string): Promise<BroadcastTxResult>;
+  abstract broadcastTx(params: BroadcastTx): Promise<BroadcastTxResult>;
 
   abstract getNewAddress(account: Account): Promise<string>;
 
   abstract transformAddress(address: string): Promise<string>;
 
+  abstract getConfirmation(txid: string): Promise<Confirmation | null>;
+
 }
+
+export interface BroadcastTx {
+  txhex: string;
+  txid?: string;
+  txkey?: string;
+}
+
+interface iConfirmation {
+  hash: string;
+  height: number;
+  timestamp: Date;
+  depth: number;
+}
+
+export type Confirmation = iConfirmation | null
 
 export abstract class Plugin extends AbstractPlugin {
 

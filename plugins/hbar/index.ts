@@ -3,13 +3,13 @@ import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
-export default class USDC_SOL extends Plugin {
+export default class HBAR extends Plugin {
 
-  chain = 'SOL'
+  chain = 'HBAR'
 
-  currency = 'USDC'
+  currency = 'HBAR'
 
-  token = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+  decimals = 0 //TODO
 
   async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
