@@ -5,7 +5,7 @@ import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransacti
 
 import { decodeTransferInstruction } from '@solana/spl-token';
 
-import { Plugin, VerifyPayment, BroadcastTxResult, Transaction as AnypayTransaction } from '../../lib/plugin'
+import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Confirmation, Transaction as AnypayTransaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
@@ -14,6 +14,14 @@ export default class SOL extends Plugin {
   currency = 'SOL'
 
   chain = 'SOL'
+
+  decimals = 0 //TODO
+
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    throw new Error() //TODO
+
+  }
 
   async verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment): Promise<boolean> {
 
@@ -41,7 +49,7 @@ export default class SOL extends Plugin {
 
   }
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/zQCP8Bt8cAq63ToBYunRGWyag8HdzWp-');    
 

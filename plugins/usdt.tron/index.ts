@@ -1,5 +1,9 @@
 
-import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Transaction, Confirmation } from '../../lib/plugin'
+
+import * as trongrid from '../../lib/trongrid'
+
+//const apikey = process.env.trongrid_api_key
 
 //TODO: FinishPluginImplementation
 
@@ -11,7 +15,34 @@ export default class USDT_TRON extends Plugin {
 
   token = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  decimals = 6
+
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await trongrid.getTransaction(txid)
+
+    const height = transaction.blockNumber
+
+    const timestamp = new Date(transaction.blockTimestamp)
+
+    const block = await trongrid.getBlock(height)
+
+    const hash = block.blockID
+
+    const nowBlock = await trongrid.getLatestBlock()
+
+    const currentHeight = nowBlock.block_header.raw_data.number
+
+    return {
+      hash,
+      height,
+      timestamp,
+      depth: currentHeight - height + 1
+    }
+  
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     throw new Error()
 

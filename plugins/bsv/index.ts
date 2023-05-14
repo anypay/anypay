@@ -10,7 +10,7 @@ import * as run from './lib/run'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTxResult, VerifyPayment, Transaction, Plugin } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -32,15 +32,21 @@ export default class BSV extends Plugin {
 
   decimals: number = 8
 
-  async broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    throw new Error() //TODO
+
+  }
+
+  async broadcastTx({txhex}: BroadcastTx): Promise<BroadcastTxResult> {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-      taal.broadcastTransaction(rawTx),
+      taal.broadcastTransaction(txhex),
 
-      blockchair.publish('bitcoin-sv', rawTx),
+      blockchair.publish('bitcoin-sv', txhex),
 
-      run.broadcastTx(rawTx)
+      run.broadcastTx(txhex)
 
     ]
 

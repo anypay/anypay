@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
@@ -11,9 +11,15 @@ export default class HBAR extends Plugin {
 
   decimals = 0 //TODO
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
 
-    throw new Error()
+    throw new Error() //TODO
+
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
+
+    throw new Error() //TODO
 
   }
 
