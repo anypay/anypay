@@ -1,127 +1,41 @@
 
-//import { log } from '../../lib/log'
+import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
 
-import { ethereum } from 'usdc'
+//TODO: FinishPluginImplementation
 
-import { Transaction } from 'ethers'
+export default class USDC_ETH extends Plugin {
 
-const Web3 = require('web3')
+  chain = 'ETH'
 
-import * as ethers from 'ethers'
+  currency = 'USDC'
 
-export async function validateAddress(address: string): Promise<boolean> {
+  token = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
 
-  return ethereum.isAddress({ address })
+  decimals = 6
 
-}
+  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
-class BitcoreTransaction {
-  hex: string;
-  transaction: Transaction | { hash: string };
-  constructor(hex) {
-
-      this.hex = hex
-
-      if (hex.length === 66) {
-
-        this.transaction = { hash: hex }
-
-      } else {
-
-        //this.transaction = ethereum.decodeTransactionHex({ transactionHex: hex })
-
-      }
+    throw new Error()
 
   }
 
-  get hash() {
-      return this.transaction.hash
-  }
-  toJSON() {
-      return {
-          hash: this.hash,
-          hex: this.hex
-      }
-  }
-}
-interface VerifyPayment {
-  payment_option: any;
-  transaction: {
-      tx: string;
-  };
-  protocol: string;
-}
+  async getTransaction(txid: string): Promise<Transaction> {
 
-export async function verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment) {
-
-  /*
-
-    Determine whether "hex" is a full raw transaction or a txid
-
-    If it is a txid, fetch the transaction details from the blockchain
-
-  */
-
-  const expectedOutput = payment_option.outputs[0]
-
-
-  try {
-
-    const transaction: ethers.Transaction = ethers.utils.parseTransaction(hex)
-
-    console.log('eth.transaction.parsed', transaction)
-
-  } catch(error) {
-
+    throw new Error()
 
   }
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_ethereum_url))
+  async validateAddress(address: string) {
 
-  const result: any = await web3.eth.getTransaction(hex)
-
-  console.log('web3.eth.getTransaction.result', {hex, result})
-
-  const correctAddress = expectedOutput.address == result.to
-
-  if (!correctAddress) { console.log('incorrect address', { expected: expectedOutput.address, actual: result.to }) }
-
-  const correctAmount = expectedOutput.amount == parseInt(result.value)
-
-  if (!correctAmount) { console.log('incorrect amount', { expected: expectedOutput.amount, actual: result.value }) }
-
-  return correctAddress && correctAmount
-
-}
-
-export async function broadcastTx(txhex: string) {
-
-  if (txhex.length === 66) {
-
-    console.log('skip ethereum broadcast of txid', { txid: txhex })
-
-    return txhex
+    return false
 
   }
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_ethereum_url))
+  async verifyPayment(params) {
 
-  const transmitResult: any = await web3.eth.sendSignedTransaction(txhex)
+    return false
 
-  console.log('ethereum.provider.sendTransaction.result', transmitResult)
-
-  return transmitResult
-
-}
-
-class Bitcore {
-
-  get Transaction() {
-      return BitcoreTransaction
   }
 
 }
 
-const bitcore = new Bitcore()
-
-export { bitcore }

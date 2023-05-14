@@ -9,7 +9,7 @@ import { Plugin } from './plugin'
 
 export function find({currency, chain }: {currency: string, chain: string}): Plugin {
 
-  let plugin = plugins[`${currency}.${chain}`]
+  let plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
 
   if (!plugin) {
 
@@ -17,6 +17,6 @@ export function find({currency, chain }: {currency: string, chain: string}): Plu
 
   }
 
-  return plugin
+  return new plugin()
 }
 

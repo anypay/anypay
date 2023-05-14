@@ -1,6 +1,7 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
 
+import * as moment from 'moment'
 
 export { btc as bitcore }
 
@@ -11,13 +12,15 @@ import {
   nownodes
 } from '../../lib'
 
-import { BroadcastTxResult, Transaction, Plugin, VerifyPayment } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation } from '../../lib/plugin'
 
 import { log } from '../../lib/log'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
 import { oneSuccess } from 'promise-one-success'
+
+import { getTransaction } from '../../lib/blockcypher'
 
 export default class BTC extends Plugin {
 
@@ -27,7 +30,24 @@ export default class BTC extends Plugin {
 
   decimals: number = 8;
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await getTransaction(txid)
+
+    if (!transaction) { return }
+
+    if (!transaction.block_hash) { return }
+
+    return {
+      height: transaction.block_height,
+      hash: transaction.block_hash, 
+      timestamp: moment(transaction.confirmed).toDate(),
+      depth: transaction.confirmations
+    }
+
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = []
 
@@ -46,7 +66,6 @@ export default class BTC extends Plugin {
 
         try {
 
-          console.log('CHAIN SO BTC', { txhex })
           const result = await chain_so.broadcastTx('BTC', txhex)
 
           return result

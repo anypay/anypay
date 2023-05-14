@@ -1,28 +1,21 @@
 
+
+
 import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransaction} from '@solana/web3.js'
 
 import { decodeTransferInstruction } from '@solana/spl-token';
 
-interface ValidateUnsignedTx {
-    payment_option; any;
-    transactions: any[];
-}
+import { Plugin, VerifyPayment, BroadcastTxResult, Transaction as AnypayTransaction } from '../../lib/plugin'
 
-export async function validateUnsignedTx(params: ValidateUnsignedTx) {
+//TODO: FinishPluginImplementation
 
-    console.log('SOLANA VALIDATE UNSIGNED TX', params)
+export default class SOL extends Plugin {
 
-}
+  currency = 'SOL'
 
-interface VerifyPayment {
-    payment_option: any;
-    transaction: {
-        tx: string;
-    };
-    protocol: string;
-}
+  chain = 'SOL'
 
-export async function verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment) {
+  async verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment): Promise<boolean> {
 
     const transaction = Transaction.from(Buffer.from(hex, 'hex'))
 
@@ -34,9 +27,21 @@ export async function verifyPayment({ payment_option, transaction: {tx: hex}, pr
 
     return true
 
-}
+  }
 
-export async function broadcastTx(txhex: string) {
+  async validateAddress(address: string): Promise<boolean> {
+
+    throw new Error() //TODO
+
+  }
+
+  async getTransaction(txid: string): Promise<AnypayTransaction> {
+
+    throw new Error() //TODO
+
+  }
+
+  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
     const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/zQCP8Bt8cAq63ToBYunRGWyag8HdzWp-');    
 
@@ -44,8 +49,28 @@ export async function broadcastTx(txhex: string) {
 
     console.log('solana.broadcast.response.signature', signature)
 
-    return signature
+    return {
+      txid: signature,
+      txhex,
+      success: true,
+      result: signature
+    }
 
+  }
+
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
+
+    console.log('SOLANA VALIDATE UNSIGNED TX', params)
+
+    throw new Error() // TODO
+
+  }
+
+}
+
+interface ValidateUnsignedTx {
+    payment_option; any;
+    transactions: any[];
 }
 
 interface Output {
@@ -183,6 +208,7 @@ export async function getTokenAddress(accountAddress: string, token: PublicKey):
 
   return toTokenAccount.address.toBase58()
 }
+
 function getOrCreateAssociatedTokenAccount(connection: any, provider: Keypair, token: PublicKey, arg3: any) {
     throw new Error('Function not implemented.');
 }

@@ -118,6 +118,7 @@ interface GetTransactionResult {
   block_hash: string;
   block_height: number;
   confirmed: Date;
+  confirmations?: number;
 }
 
 export async function getTransaction(txid: string): Promise<GetTransactionResult > {

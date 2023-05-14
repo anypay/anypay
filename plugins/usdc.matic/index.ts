@@ -12,6 +12,12 @@ import { VerifyPayment, Plugin, Transaction as AnypayTransaction } from '../../l
 
 export default class USD_MATIC extends Plugin {
 
+  currency = 'USDC'
+
+  chain = 'MATIC'
+
+  token = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
+
   async validateAddress(address: string): Promise<boolean> {
 
     return polygon.isAddress({ address })
