@@ -309,6 +309,24 @@ describe("Plugins", () => {
 
     })
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'TRON', currency: 'TRON' });
+
+      let txid = 'f6fe081a567701931e01555e20cc8f00bcfdef056df92d262480620568d6f9cb'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('00000000030c5eb3e4e7d51c0ed80a2456b9142f41426a94daf601779dca2777')
+
+      expect(height).to.be.equal(51142323)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
   })
 
   describe('XRP', () => {
@@ -501,6 +519,24 @@ describe("Plugins", () => {
 
       })
 
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'TRON', currency: 'USDT' });
+
+        let txid = '96ca9572aad4c23a7545ea02661d6d1f3def87cc6bfe604529a9c85f59afe097'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('00000000030c5c3a40dec96e91cb370d9ad63f8140c5428e515ab419fdba309d')
+
+        expect(height).to.be.equal(51141690)
+
+        expect(timestamp).to.be.a('date')
+
+      })
+
     })
 
     describe('USDC.FLOW', () => {
@@ -690,6 +726,24 @@ describe("Plugins", () => {
         assert.strictEqual(plugin.chain, 'TRON')
 
         assert.strictEqual(plugin.token, 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t')
+
+      })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'TRON', currency: 'USDT' });
+
+        let txid = '56e33d3633e6756cd66d630b9cdae3ebce2dd78e419c9e820fc982becca2a1a4'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('00000000030c5bfbd0ed1ced5f70d9b6941bb5b210c2b406500e542134140373')
+
+        expect(height).to.be.equal(51141627)
+
+        expect(timestamp).to.be.a('date')
 
       })
 

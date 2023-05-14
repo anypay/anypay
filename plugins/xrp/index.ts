@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTxResult, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
@@ -9,9 +9,17 @@ export default class XRP extends Plugin {
 
   currency = 'XRP'
 
-  async broadcastTx(txhex: string): Promise<BroadcastTxResult> {
+  decimals = 0 //TODO
 
-    throw new Error()
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    throw new Error() // TODO
+
+  }
+
+  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
+
+    throw new Error()//TODO
 
   }
 
