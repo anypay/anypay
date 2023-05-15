@@ -1,7 +1,11 @@
 
-import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Transaction, Confirmation } from '../../lib/plugin'
+import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Transaction, Confirmation, Payment } from '../../lib/plugin'
+
+import BigNumber from 'bignumber.js'
 
 const Web3 = require('web3')
+
+import { ethers } from 'ethers'
 
 //TODO: FinishPluginImplementation
 
@@ -12,6 +16,34 @@ export default class AVAX extends Plugin {
   currency = 'AVAX'
 
   decimals = 18
+
+  async getPayments(txid: string): Promise<Payment[]> {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_avalanche_url))
+
+    const result: any = await web3.eth.getTransaction(txid)
+
+    const address = result.to.toLowerCase()
+
+    const amount = new BigNumber(parseInt(result.value)).times(Math.pow(10, this.decimals * -1)).toNumber()
+
+    return [{ address, amount, txid, chain: 'AVAX', currency: 'AVAX' }]
+
+  }
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+
+    const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
+
+    const address = transaction.to.toLowerCase()
+
+    const amount = parseFloat(ethers.utils.formatEther(transaction.value))
+
+    const txid = transaction.hash
+
+    return [{ address, amount, txid, chain: 'AVAX', currency: 'AVAX' }]
+
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

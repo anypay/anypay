@@ -29,6 +29,10 @@ abstract class AbstractPlugin {
 
   abstract getConfirmation(txid: string): Promise<Confirmation | null>;
 
+  abstract getPayments(txid: string): Promise<Payment[]>;
+
+  abstract parsePayments(txhex: string): Promise<Payment[]>;
+
 }
 
 export interface BroadcastTx {
@@ -109,5 +113,13 @@ export interface VerifyPayment {
 export interface Transaction {
   hex: string;
   txid?: string;
+}
+
+export interface Payment {
+  chain: string;
+  currency: string;
+  address: string;
+  amount: number;
+  txid: string;
 }
 
