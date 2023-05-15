@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '../../lib/plugin'
 
 import { Connection, clusterApiUrl } from '@solana/web3.js'
 
@@ -14,6 +14,16 @@ export default class USDC_SOL extends Plugin {
   token = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
 
   decimals = 6
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

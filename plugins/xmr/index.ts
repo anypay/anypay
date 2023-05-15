@@ -7,7 +7,8 @@ import {
   Confirmation,
   BroadcastTx,
   BroadcastTxResult,
-  Transaction as AnypayTransaction
+  Transaction as AnypayTransaction,
+  Payment as AnypayPayment
 } from '../../lib/plugin'
 
 import * as bitcore from './bitcore'
@@ -43,6 +44,15 @@ export default class XMR extends Plugin {
   currency = 'XMR'
 
   decimals = 12
+
+  async parsePayments(txhex: string): Promise<AnypayPayment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<AnypayPayment[]> {
+    throw new Error() //TODO
+  }
+
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

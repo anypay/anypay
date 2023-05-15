@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
@@ -12,6 +12,16 @@ export default class USDC_XLM extends Plugin {
   token = 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'
 
   decimals = 6
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

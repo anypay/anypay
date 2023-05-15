@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTx, BroadcastTxResult, Transaction, Confirmation } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Transaction, Confirmation, Payment } from '../../lib/plugin'
 
 import * as trongrid from '../../lib/trongrid'
 
@@ -16,6 +16,16 @@ export default class USDT_TRON extends Plugin {
   token = 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t'
 
   decimals = 6
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

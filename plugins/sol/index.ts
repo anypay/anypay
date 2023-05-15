@@ -5,7 +5,7 @@ import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransacti
 
 import { decodeTransferInstruction } from '@solana/spl-token';
 
-import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Confirmation, Transaction as AnypayTransaction } from '../../lib/plugin'
+import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Confirmation, Transaction as AnypayTransaction, Payment } from '../../lib/plugin'
 
 import axios from 'axios'
 
@@ -18,6 +18,14 @@ export default class SOL extends Plugin {
   chain = 'SOL'
 
   decimals = 0 //TODO
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

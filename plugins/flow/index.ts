@@ -1,5 +1,5 @@
 
-import { Plugin, BroadcastTxResult, BroadcastTx, Confirmation, Transaction } from '../../lib/plugin'
+import { Plugin, BroadcastTxResult, BroadcastTx, Confirmation, Transaction, Payment } from '../../lib/plugin'
 
 //TODO: FinishPluginImplementation
 
@@ -10,6 +10,16 @@ export default class FLOW extends Plugin {
   currency = 'FLOW'
 
   decimals = 0 //TODO
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

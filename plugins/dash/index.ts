@@ -8,7 +8,7 @@ export { dash as bitcore }
 
 import * as insight from './lib/insight'
 
-import { BroadcastTx, BroadcastTxResult, VerifyPayment, Transaction, Plugin, Confirmation } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, VerifyPayment, Transaction, Plugin, Confirmation, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -23,6 +23,14 @@ export default class DASH extends Plugin {
   chain: string = 'DASH'
 
   decimals: number = 8;
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

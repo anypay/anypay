@@ -10,7 +10,7 @@ import * as run from './lib/run'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -31,6 +31,14 @@ export default class BSV extends Plugin {
   chain: string = 'BSV'
 
   decimals: number = 8
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
@@ -207,8 +215,4 @@ export function validateAddress(address: string){
   return valid;
 
 }
-
-=======
->>>>>>> 7726fbcc (Frame New Plugins, Rework Existing Plugins)
-export { bsv as bitcore }
 
