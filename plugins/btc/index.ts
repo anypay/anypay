@@ -12,7 +12,7 @@ import {
   nownodes
 } from '../../lib'
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
 
 import { log } from '../../lib/log'
 
@@ -29,6 +29,14 @@ export default class BTC extends Plugin {
   chain: string = 'BTC'
 
   decimals: number = 8;
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

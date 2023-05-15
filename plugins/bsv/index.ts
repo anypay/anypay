@@ -10,7 +10,7 @@ import * as run from './lib/run'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -31,6 +31,14 @@ export default class BSV extends Plugin {
   chain: string = 'BSV'
 
   decimals: number = 8
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
@@ -145,14 +153,6 @@ export default class BSV extends Plugin {
 
 }
 
-interface Payment {
-  amount: number;
-  hash: string;
-  currency: string;
-  address: string;
-  invoice_uid?: string;
-}
-
 export function transformHexToPayments(hex: string): Payment[]{
 
   let tx = new bsv.Transaction(hex)
@@ -168,9 +168,9 @@ export function transformHexToPayments(hex: string): Payment[]{
     if( paymentIndex > -1 ){
 
       payments[paymentIndex] = {
-
+        chain: 'BSV',
         currency: 'BSV',
-        hash: tx.hash.toString(),
+        txid: tx.hash.toString(),
         amount: fromSatoshis(tx.outputs[i].satoshis) + payments[paymentIndex].amount,
         address: tx.outputs[i].script.toAddress().toString()
 
@@ -180,7 +180,7 @@ export function transformHexToPayments(hex: string): Payment[]{
 
       payments.push({
         currency: 'BSV',
-        hash: tx.hash.toString(),
+        txid: tx.hash.toString(),
         amount: fromSatoshis(tx.outputs[i].satoshis),
         address: tx.outputs[i].script.toAddress().toString()
 

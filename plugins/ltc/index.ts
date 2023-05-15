@@ -7,7 +7,7 @@ export { ltc as bitcore }
 
 export const currency = 'LTC'
 
-import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation, VerifyPayment, Transaction } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation, VerifyPayment, Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -22,6 +22,14 @@ export default class LTC extends Plugin {
   chain: string = 'LTC'
 
   decimals: number = 8;
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

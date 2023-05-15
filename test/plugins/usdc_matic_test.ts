@@ -62,13 +62,13 @@ describe('USDC on MATIC', () => {
 
   })
 
-  it.skip('#parsePayments should accept a raw transaction and return a parsed USDC payment', async () => {
+  it('#parsePayments should accept a raw transaction and return a parsed USDC payment', async () => {
 
     let plugin = await find({ chain: 'MATIC', currency: 'USDC' });
 
-    let txid = '0x38a1215e511ba5983fcfb5cb2ec2734777bec4cdfce0081f6d59ba9717eff648'
+    let txid = '0x7e9989da83c3ee7b44e157a51dd1d384eaebb8109c81de78cec6ede10eec986f'
 
-    let txhex = ''
+    let txhex = '0x02f8b28189808522bfb85e118522bfb85e1182d20e942791bca1f2de4661ed88a30c99a7a9449aa8417480b844a9059cbb0000000000000000000000004dc29377f2ae10bec4c956296aa5ca7de47692a20000000000000000000000000000000000000000000000000000000000002710c001a092522ee630e5bd3aa82c5be3d2bd35050c2b91b2d7fe40f86558e1794e5a114fa06a23a77fb76a758c8b8bc6fda5d507fff14fc16583fe86dde6e246328b0a77bf'
 
     let payments: Payment[] = await plugin.parsePayments(txhex)
 
@@ -78,7 +78,7 @@ describe('USDC on MATIC', () => {
 
     expect(payment.address).to.be.equal('0x4dc29377f2ae10bec4c956296aa5ca7de47692a2') 
 
-    expect(payment.amount).to.be.equal(0.4)
+    expect(payment.amount).to.be.equal(0.01)
 
     expect(payment.chain).to.be.equal('MATIC') 
 

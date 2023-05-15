@@ -3,7 +3,7 @@ require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
-import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, VerifyPayment } from '../../lib/plugin'
+import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, VerifyPayment, Payment } from '../../lib/plugin'
 
 import { log } from '../../lib';
 
@@ -31,6 +31,14 @@ export default class BCH extends Plugin {
   chain: string = 'BCH'
 
   decimals: number = 8;
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

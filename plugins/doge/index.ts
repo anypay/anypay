@@ -5,7 +5,7 @@ const doge = require('bitcore-doge-lib');
 
 export { doge as bitcore }
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -20,6 +20,14 @@ export default class DOGE extends Plugin {
   chain: string = 'DOGE'
 
   decimals: number = 8;
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
+
+  async getPayments(txid: string): Promise<Payment[]> {
+    throw new Error() //TODO
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
