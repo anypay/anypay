@@ -34,7 +34,19 @@ export default class BSV extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    throw new Error() //TODO
+    const transaction = await whatsonchain.getTransactionJSON(txid)
+
+    const height = transaction.blockheight 
+    const hash = transaction.blockhash 
+    const timestamp = new Date(transaction.blocktime * 1000)
+    const depth = transaction.confirmations
+
+    return {
+      hash,
+      height,
+      depth,
+      timestamp
+    }
 
   }
 

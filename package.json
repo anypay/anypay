@@ -141,6 +141,7 @@
     "shortid": "^2.2.15",
     "socket.io": "^4.5.1",
     "socket.io-client": "^4.4.1",
+    "stellar-sdk": "^10.4.1",
     "superagent": "^3.5.2",
     "underscore": "^1.9.0",
     "usdc": "^0.1.4",
@@ -150,6 +151,7 @@
     "winston": "^3.3.3",
     "winston-loki": "^6.0.6",
     "ws": "^8.12.0",
+    "xrpl": "^2.7.0",
     "yargs": "^12.0.5"
   },
   "devDependencies": {

@@ -1,11 +1,13 @@
 
 
 
-import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransaction} from '@solana/web3.js'
+import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransaction, clusterApiUrl } from '@solana/web3.js'
 
 import { decodeTransferInstruction } from '@solana/spl-token';
 
 import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Confirmation, Transaction as AnypayTransaction } from '../../lib/plugin'
+
+import axios from 'axios'
 
 //TODO: FinishPluginImplementation
 
@@ -19,7 +21,29 @@ export default class SOL extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    throw new Error() //TODO
+    let connection = new Connection(clusterApiUrl("mainnet-beta"), "finalized");
+
+    let signatureStatus = await connection.getSignatureStatus(txid, {
+      searchTransactionHistory: true
+    })
+
+    const slot = signatureStatus.value.slot
+
+    if (!slot) { return }
+
+    let block: any = await connection.getBlock(slot, {
+      maxSupportedTransactionVersion: 2
+    });
+
+    if (!block || !block.blockhash) { return }
+
+    return {
+
+      hash: block.blockhash,
+      height: slot,
+      timestamp: new Date(block.blockTime * 1000),
+      depth: signatureStatus.context.slot - slot + 1
+    }
 
   }
 
@@ -45,7 +69,19 @@ export default class SOL extends Plugin {
 
   async getTransaction(txid: string): Promise<AnypayTransaction> {
 
-    throw new Error() //TODO
+    const { data } = await axios.post(`https://api.mainnet-beta.solana.com`, {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "getTransaction",
+      "params": [txid, "base64"]
+    })
+
+    const hex = Buffer.from(data.result.transaction[0], 'base64').toString('hex')
+
+    return {
+      hex,
+      txid
+    }
 
   }
 

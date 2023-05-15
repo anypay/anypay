@@ -15,9 +15,14 @@ var bchaddr: any = require('bchaddrjs');
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getDecodedTransaction } from '../../lib/blockchair'
+//import { getDecodedTransaction } from '../../lib/blockchair'
 
-import * as moment from 'moment'
+//import * as moment from 'moment'
+
+//TODO: FinalizePlugin
+
+import axios from 'axios'
+
 
 export default class BCH extends Plugin {
 
@@ -29,21 +34,27 @@ export default class BCH extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    const transaction: any = await getDecodedTransaction('BCH', txid)
+    const transaction = await getRawTransaction(txid)
 
-    console.log('decoded', transaction)
+    if (!transaction.blockhash) { return }
 
-    if (!transaction) { return }
+    const hash = transaction.blockhash
 
-    if (!transaction.block_hash) { return }
+    const timestamp = new Date(transaction.blocktime * 1000)
+
+    const depth = transaction.confirmations
+
+    const block = await getBlock(hash)
+
+    const height = block.height
 
     return {
-      height: transaction.block_height,
-      hash: transaction.block_hash, 
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
+      hash,
+      height,
+      depth,
+      timestamp
     }
-
+    
   }
 
 
@@ -101,6 +112,49 @@ export default class BCH extends Plugin {
 
     return false
   }
+
+}
+
+interface GetRawTransactionResult {
+  txid: string;
+  hash: string;
+  version: number;
+  size: number;
+  locktime: number;
+  vin: any[];
+  vout: any[];
+  hex: string;
+  blockhash: string;
+  confirmations: number;
+  time: number;
+  blocktime: number;
+}
+
+async function getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
+
+  const { data } = await axios.post(process.env.getblock_bch_url, {
+    method: 'getrawtransaction',
+    params: [txid, true]
+  })
+
+  return data.result
+
+}
+
+interface GetBlockResult {
+  hash: string;
+  height: number;
+  time: number; 
+}
+
+async function getBlock(hash: string): Promise<GetBlockResult> {
+
+  const { data } = await axios.post(process.env.getblock_bch_url, {
+    method: 'getblock',
+    params: [hash, 1]
+  })
+
+  return data.result
 
 }
 

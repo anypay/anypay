@@ -23,6 +23,24 @@ describe("Plugins", () => {
 
     });
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'BCH', currency: 'BCH' });
+
+      let txid = '4e51acd9be7d61955838cf4ec20a294465d612f485c6615c5777b7b52320ba4f'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('000000000000000002a18e30eb35e7c9d12a5daa9d5ebe840d39e39ca4ac29ce')
+
+      expect(height).to.be.equal(792678)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
   })
 
   describe('BTC', () => {
@@ -181,6 +199,26 @@ describe("Plugins", () => {
 
     });
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'BSV', currency: 'BSV' });
+
+      let txid = 'de2b352e1849392a7fce7a8fa2f6295d922307303b007d3804f9589b66624028'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('0000000000000000003a7c1fa88eb6134c0f8b4027e1b1e753079181a462d99a')
+
+      expect(height).to.be.equal(791940)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
+
+
   })
 
   describe('XMR', () => {
@@ -196,6 +234,24 @@ describe("Plugins", () => {
       assert.strictEqual(plugin.decimals, 12);
 
     });
+
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'XMR', currency: 'XMR' });
+
+      let txid = '58f8df857270cfc783c7dfb5e58c69e8dee5b9113242b52cefc62b4296fbcec3'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('cc3d8eace4332c99e13aa915c1f7521490c3f91054cfc7500fce6ec58f66c98a')
+
+      expect(height).to.be.equal(2885963)
+
+      expect(timestamp).to.be.a('date')
+
+    })
 
   })
 
@@ -281,6 +337,24 @@ describe("Plugins", () => {
 
     })
 
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'AVAX', currency: 'USDC' });
+
+      let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
+
+      expect(height).to.be.equal(29994194)
+
+      expect(timestamp).to.be.a('date')
+
+    })
+
   })
 
   describe('SOL', () => {
@@ -292,6 +366,24 @@ describe("Plugins", () => {
       assert.strictEqual(plugin.currency, 'SOL')
 
       assert.strictEqual(plugin.chain, 'SOL')
+
+    })
+
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'SOL', currency: 'SOL' });
+
+      let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
+
+      expect(height).to.be.equal(193936012)
+
+      expect(timestamp).to.be.a('date')
 
     })
 
@@ -338,6 +430,24 @@ describe("Plugins", () => {
       assert.strictEqual(plugin.currency, 'XRP')
 
       assert.strictEqual(plugin.chain, 'XRP')
+
+    })
+
+    it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+      let plugin = await find({ chain: 'XRP', currency: 'XRP' });
+
+      let txid = '8F3A872BA256DAEAB6634E6CFE346DD0F02347C28DF37A3B4D26FB6D29CA9C2D'
+
+      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+      expect(depth).to.be.greaterThan(0)
+
+      expect(hash).to.be.equal('13B9FFF7C1A0D5C36DA1442130F2AA3D2537C414CDDB9A2FFEEE918D89CC458D')
+
+      expect(height).to.be.equal(79781368)
+
+      expect(timestamp).to.be.a('date')
 
     })
 
@@ -502,6 +612,25 @@ describe("Plugins", () => {
         assert.strictEqual(plugin.token, 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v')
 
       })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'SOL', currency: 'USDC' });
+
+        let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
+
+        expect(height).to.be.equal(193936012)
+
+        expect(timestamp).to.be.a('date')
+
+      })
+
 
     })
 
@@ -712,6 +841,26 @@ describe("Plugins", () => {
         assert.strictEqual(plugin.token, 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB')
 
       })
+
+      it('#getConfirmation should return block data for confirmed transaction', async () => {
+
+        let plugin = await find({ chain: 'SOL', currency: 'USDT' });
+
+        let txid = '3saePwvDwQZxUk4XMmRL3Taw23fRNmv2auQUxCGvWCeqvTBff9nWAepAU7UHMmuQWemrKB2edWbY7LXg9Uwp8U46'
+
+        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+
+        expect(depth).to.be.greaterThan(0)
+
+        expect(hash).to.be.equal('FNhzxG5N5XQCGqnYK7coTJAoUEqLuN7Mo6ttcPHaoq2D')
+
+        expect(height).to.be.equal(193945797)
+
+        expect(timestamp).to.be.a('date')
+
+      })
+
+
 
     })
 

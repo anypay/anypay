@@ -107,6 +107,7 @@ export interface VerifyPayment {
 }
 
 export interface Transaction {
-  hex: string
+  hex: string;
+  txid?: string;
 }
 

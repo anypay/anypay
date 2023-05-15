@@ -11,8 +11,6 @@ export default async function(inputs: Inputs): Promise<Outputs> {
 
     const result = await json_rpc.call<Outputs>('get_block', inputs)
 
-    console.log('RESULT', result)
-
     return result
 }
 

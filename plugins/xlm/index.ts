@@ -3,6 +3,8 @@ import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } fro
 
 //TODO: FinishPluginImplementation
 
+import axios from 'axios'
+
 export default class XLM extends Plugin {
 
   chain = 'XLM'
@@ -12,6 +14,12 @@ export default class XLM extends Plugin {
   decimals = 0 //TODO
 
   async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await getTransaction(txid)
+
+    console.log(transaction)
+
+    console.log(getLedger)
 
     throw new Error() // TODO
 
@@ -40,6 +48,22 @@ export default class XLM extends Plugin {
     return false
 
   }
+
+}
+
+async function getTransaction(txid: string): Promise<any> {
+
+  const { data } = await axios.get(`https://horizon.stellar.org/transactions/${txid}`)
+
+  return data
+
+}
+
+async function getLedger(index: number): Promise<any> {
+
+  const { data } = await axios.get(`https://horizon.stellar.org/ledgers/${index}`)
+
+  return data
 
 }
 

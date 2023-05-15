@@ -1,6 +1,8 @@
 
 import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
 
+import { Connection, clusterApiUrl } from '@solana/web3.js'
+
 //TODO: FinishPluginImplementation
 
 export default class USDC_SOL extends Plugin {
@@ -15,7 +17,29 @@ export default class USDC_SOL extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    throw new Error()//TODO
+    let connection = new Connection(clusterApiUrl("mainnet-beta"), "finalized");
+
+    let signatureStatus = await connection.getSignatureStatus(txid, {
+      searchTransactionHistory: true
+    })
+
+    const slot = signatureStatus.value.slot
+
+    if (!slot) { return }
+
+    let block: any = await connection.getBlock(slot, {
+      maxSupportedTransactionVersion: 2
+    });
+
+    if (!block || !block.blockhash) { return }
+
+    return {
+
+      hash: block.blockhash,
+      height: slot,
+      timestamp: new Date(block.blockTime * 1000),
+      depth: signatureStatus.context.slot - slot + 1
+    }
 
   }
 
