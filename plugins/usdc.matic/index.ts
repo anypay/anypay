@@ -7,7 +7,14 @@ import { Transaction } from 'ethers'
 
 const Web3 = require('web3')
 
-import { VerifyPayment, Plugin, Transaction as AnypayTransaction, Confirmation, BroadcastTx, BroadcastTxResult } from '../../lib/plugin'
+import { VerifyPayment, Plugin, Transaction as AnypayTransaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment } from '../../lib/plugin'
+
+import { hexToDec } from 'hex2dec'
+
+import BigNumber from 'bignumber.js'
+
+import { ethers } from 'ethers'
+
 
 export default class USDC_MATIC extends Plugin {
 
@@ -18,6 +25,79 @@ export default class USDC_MATIC extends Plugin {
   token = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
 
   decimals = 6
+
+  async getPayments(txid: string): Promise<Payment[]> {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+
+    const result: any = await web3.eth.getTransaction(txid)
+
+    if (result.to.toLowerCase() != this.token) {
+
+      return []
+
+    }
+
+    const input = result.input
+
+    if (
+      input.length !== 138 ||
+      input.slice(2, 10) !== "a9059cbb"
+    ) {
+      throw "NO ERC20 TRANSFER";
+    }
+    const address = `0x${input.slice(34, 74)}`;
+
+    let amount = parseInt(hexToDec(input.slice(74)));
+
+    amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
+
+    return [{
+      chain: 'MATIC',
+      currency: 'USDC',
+      address,
+      amount,
+      txid 
+    }]
+
+  }
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+
+    const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
+
+    if (transaction.to.toLowerCase() != this.token) {
+
+      return []
+
+    }
+
+    const input = transaction.data
+
+    if (
+      input.length !== 138 ||
+      input.slice(2, 10) !== "a9059cbb"
+    ) {
+      return []
+    }
+
+    const address = `0x${input.slice(34, 74)}`.toLowerCase();
+
+    let amount = parseInt(hexToDec(input.slice(74)));
+
+    amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
+
+    const txid = transaction.hash
+
+    return [{
+      chain: 'MATIC',
+      currency: 'USDC',
+      address,
+      amount,
+      txid 
+    }]
+
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 

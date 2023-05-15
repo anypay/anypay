@@ -1,7 +1,13 @@
 
-import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, VerifyPayment} from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, VerifyPayment, Payment } from '../../lib/plugin'
 
 const Web3 = require('web3')
+
+import { hexToDec } from 'hex2dec'
+
+import BigNumber from 'bignumber.js'
+
+import { ethers } from 'ethers'
 
 //TODO: FinishPluginImplementation
 
@@ -14,6 +20,79 @@ export default class USDC_AVAX extends Plugin {
   decimals = 6
 
   token = '0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e'
+
+  async getPayments(txid: string): Promise<Payment[]> {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_avalanche_url))
+
+    const result: any = await web3.eth.getTransaction(txid)
+
+    if (result.to.toLowerCase() != this.token) {
+
+      return []
+
+    }
+
+    const input = result.input
+
+    if (
+      input.length !== 138 ||
+      input.slice(2, 10) !== "a9059cbb"
+    ) {
+      throw "NO ERC20 TRANSFER";
+    }
+    const address = `0x${input.slice(34, 74)}`;
+
+    let amount = parseInt(hexToDec(input.slice(74)));
+
+    amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
+
+    return [{
+      chain: 'AVAX',
+      currency: 'USDC',
+      address,
+      amount,
+      txid 
+    }]
+
+  }
+
+  async parsePayments(txhex: string): Promise<Payment[]> {
+
+    const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
+
+    if (transaction.to.toLowerCase() != this.token) {
+
+      return []
+
+    }
+
+    const input = transaction.data
+
+    if (
+      input.length !== 138 ||
+      input.slice(2, 10) !== "a9059cbb"
+    ) {
+      return []
+    }
+
+    const address = `0x${input.slice(34, 74)}`.toLowerCase();
+
+    let amount = parseInt(hexToDec(input.slice(74)));
+
+    amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
+
+    const txid = transaction.hash
+
+    return [{
+      chain: 'AVAX',
+      currency: 'USDC',
+      address,
+      amount,
+      txid 
+    }]
+
+  }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
