@@ -34,6 +34,8 @@ import { getPayment, Payment } from '../../lib/payments'
 
 import get_block from './json_rpc/get_block'
 
+import get_block_count from './json_rpc/get_block_count'
+
 export default class XMR extends Plugin {
 
   chain = 'XMR'
@@ -41,6 +43,33 @@ export default class XMR extends Plugin {
   currency = 'XMR'
 
   decimals = 12
+
+  async getConfirmation(txid: string): Promise<Confirmation> {
+
+    const transaction = await getTransaction(txid)
+
+    if (!transaction.block_height) { return }
+
+    const height = transaction.block_height
+
+    const timestamp = new Date(transaction.block_timestamp * 1000)
+
+    const block = await get_block({ height: transaction.block_height })
+
+    if (!block) { return }
+
+    const hash = block.block_header.hash
+
+    const { count } = await get_block_count()
+
+    return {
+      hash,
+      height,
+      timestamp,
+      depth: count - height + 1
+    }
+
+  }
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
@@ -52,16 +81,6 @@ export default class XMR extends Plugin {
   }
 
   async getTransaction(txid: string): Promise<AnypayTransaction> {
-
-    //TODO
-    throw new Error()
-
-    return null
-
-  }
-
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
 
     //TODO
     throw new Error()
@@ -173,8 +192,6 @@ export async function callWalletRpc(method: string, params: any): Promise<any> {
   })
 
   const { data } = response
-
-  console.log('xmr.monero_wallet_rpc.result', data)
 
   log.info('xmr.monero_wallet_rpc.result', data)
   
@@ -437,8 +454,6 @@ export async function verify({url, tx_hash, tx_key}: XMRVerifyPayment) {
     let result = await callWalletRpc('check_tx_key', { txid: tx_hash, tx_key, address })
 
     log.info('xmr.check_tx_key.result', Object.assign(result, { expected: amount }))
-
-    console.log(`received=${result.received} expected=${amount}`)
 
     if (amount > result.received) {
       throw new Error(`Invalid XMR Payment received=${result.received} expected=${amount}`)
