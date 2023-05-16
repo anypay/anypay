@@ -86,7 +86,7 @@ export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
 
   let bitcore = getBitcore(v.payment_option.chain || v.payment_option.currency)
 
-  let tx = new bitcore.Transaction(v.transaction.tx);
+  let tx = new bitcore.Transaction(v.transaction.txhex);
 
   let txOutputs = tx.outputs.map(output => {
 

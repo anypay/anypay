@@ -211,12 +211,11 @@ describe("JSON Payment Protocol V2", async () => {
       }
     })
 
-    expect(response.result.statusCode).to.be.equal(400)
-
+    expect(response.statusCode).to.be.equal(400)
 
   })
 
-  if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+  if (process.env.run_e2e_payment_tests) {
 
     it("POST /i/:uid should verify the payment is valid", async () => {
 

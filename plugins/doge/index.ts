@@ -80,12 +80,12 @@ export default class DOGE extends Plugin {
 
   async getTransaction(txid: string): Promise<Transaction> {
 
-    return { hex: '' }
+    return { txhex: '' } //TODO
   }
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
-    return false
+    return false //TODO
   }
 
 }

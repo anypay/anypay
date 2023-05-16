@@ -264,8 +264,7 @@ export async function setAllCryptoPrices() {
   prices = prices.filter(p => !!p)
 
   prices.push(await kraken.getPrice('XMR'))
-  prices.push(await kraken.getPrice('TRON'))
-  //prices.push(await kraken.getPrice('SOL'))
+  prices.push(await kraken.getPrice('TRX'))
 
   await Promise.all(prices.map(setPrice))
 

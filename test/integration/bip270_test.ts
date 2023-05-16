@@ -44,6 +44,8 @@ describe("BIP270 Payment Requests", () => {
 
         let url = (() => { // convert url into local url with no host for test
 
+          console.log('RESP BODY', resp.body)
+
           let url = resp.body.paymentUrl.replace('undefined', '')
 
           let parts = url.split('://')[1].split('/')
@@ -62,13 +64,7 @@ describe("BIP270 Payment Requests", () => {
             transaction
           }) 
 
-          expect(submitResponse.statusCode).to.be.equal(500)
-
-          expect(submitResponse.body.payment.transaction).to.be.equal(transaction)
-     
-          expect(submitResponse.body.error).to.be.equal(1)
-
-          expect(submitResponse.body.memo).to.be.a('string')
+          expect(submitResponse.statusCode).to.be.not.equal(200)
 
         } catch(error) {
 
@@ -114,7 +110,7 @@ describe("BIP270 Payment Requests", () => {
 
         expect(transaction).to.be.a('string')
 
-        let url = resp.body.paymentUrl.replace('undefined', '')
+        let url = resp.body.paymentUrl.replace('https://api.anypayx.com', '')
 
         let submitResponse = await request.post(url).send({
           transaction

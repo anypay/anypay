@@ -15,6 +15,22 @@ export class PaymentOption extends Orm {
     return parseFloat(this.get('amount'))
   }
 
+  get currency() {
+    return this.get('currency')
+  }
+
+  get chain() {
+    return this.get('chain')
+  }
+
+  get invoice_uid() {
+    return this.get('invoice_uid')
+  }
+
+  get address() {
+    return this.get('address')
+  }
+
 }
 
 export async function findPaymentOption({

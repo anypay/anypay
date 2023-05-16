@@ -32,3 +32,15 @@ export async function getTransactionJSON(txid: string): Promise<TransactionJSON>
   return data
 
 }
+
+export async function broadcastTx(txhex: string): Promise<any> {
+
+  const { data } = await axios.post(`https://api.whatsonchain.com/v1/bsv/main/tx/raw`, {
+
+    txhex
+
+  })
+
+  return data
+
+}

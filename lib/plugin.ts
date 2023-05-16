@@ -3,6 +3,8 @@ import { Account } from './account'
 
 import { Address } from './addresses'
 
+import { PaymentOption } from './payment_option'
+
 import { findOne } from './orm'
 
 abstract class AbstractPlugin {
@@ -100,7 +102,7 @@ export interface BroadcastTxResult {
 }
 
 export interface VerifyPayment {
-  payment_option: any;
+  payment_option: PaymentOption;
   transaction: Transaction;
   protocol: string;
 }
@@ -120,7 +122,9 @@ export interface Payment {
 }
 
 export interface ValidateUnsignedTx {
-    payment_option: any;
+    payment_option: PaymentOption;
     transactions: Transaction[];
 }
+
+export { PaymentOption }
 

@@ -75,40 +75,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
 
-      var verified;
-
-      if (payment_option.currency === 'XMR') {
-
-        verified = await verify({
-          payment_option,
-          transaction,
-          protocol: 'JSONV2'
-        })
-
-      } else {
-
-        if ((['SOL', 'MATIC'].includes(payment_option.chain))) {
-
-          verified = await verify({
-            payment_option,
-            transaction,
-            protocol: 'JSONV2'
-          })
-
-
-        } else {
-
-          verified = await verify({
-            payment_option,
-            transaction,
-            protocol: 'JSONV2'
-          })
-
-        }
-
-
-
-      }
+      const verified = await verify({
+        payment_option,
+        transaction,
+        protocol: 'JSONV2'
+      })
 
       if (!verified) {
 
@@ -243,25 +214,17 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     for (const transaction of payment.transactions) {
 
-      if (plugin.verifyPayment) {
+      const verified = await plugin.verifyPayment({
+        payment_option,
+        transaction,
+        protocol: 'JSONV2'
+      })
 
-        await plugin.verifyPayment({
-          payment_option,
-          transaction,
-          protocol: 'JSONV2'
-        })
+      if (!verified) {
 
-      } else {
-
-        await verifyPayment({
-          payment_option,
-          transaction,
-          protocol: 'JSONV2'
-        })
+        throw new Error('Invalid unsigned transaction')
 
       }
-
-      log.debug('payment.unsigned.verified', payment);
 
     }
 

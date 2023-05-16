@@ -6,8 +6,6 @@ import { fromSatoshis } from '../../lib/pay'
 
 import * as taal from './lib/taal'
 
-import * as run from './lib/run'
-
 import * as whatsonchain from './lib/whatsonchain'
 
 import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin, Payment } from '../../lib/plugin'
@@ -72,7 +70,7 @@ export default class BSV extends Plugin {
 
       blockchair.publish('bitcoin-sv', txhex),
 
-      run.broadcastTx(txhex)
+      whatsonchain.broadcastTx(txhex)
 
     ]
 
@@ -82,9 +80,9 @@ export default class BSV extends Plugin {
 
   async getTransaction(txid: string): Promise<Transaction> {
 
-    let hex = await whatsonchain.getTransaction(txid)
+    let txhex = await whatsonchain.getTransaction(txid)
 
-    return { hex }
+    return { txhex }
 
   }
 
