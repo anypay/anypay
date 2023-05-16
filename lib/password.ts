@@ -2,7 +2,11 @@ const bcrypt = require('bcryptjs');
 
 import { models } from './models';
 
-//import { config } from './config'
+import { config } from './config'
+
+import  { ses } from './email'
+
+import { log } from './log'
 
 export function hash(password) {
   return new Promise((resolve, reject) => {
@@ -49,8 +53,9 @@ async function resetPassword(accountId, newPassword): Promise<boolean> {
 export async function sendPasswordResetEmail(email) {
   return new Promise(async (resolve, reject) => {
 
-    //let passwordReset = await createPasswordReset(email);
-    /*
+    let passwordReset = await createPasswordReset(email);
+
+    const sender = 'no-reply@anypayx.com'
 
     ses.sendEmail({
       Destination: {
@@ -61,7 +66,7 @@ export async function sendPasswordResetEmail(email) {
           Text: {
             Charset: "UTF-8",
             Data: `We got a request to reset your Anypay password.\n\nYou can reset your password by clicking the link
-            below:\n\nhttps://legacy.${config.get('DOMAIN')}/password-reset/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
+            below:\n\nhttps://${config.get('DOMAIN')}/auth/reset-password/${passwordReset.uid}.\n\nIf you ignore this message, your password will not be reset.`
           }
         },
         Subject: {
@@ -78,7 +83,6 @@ export async function sendPasswordResetEmail(email) {
       log.info(`successfully set password reset email to ${email}`);
       resolve(response)
     })
-  */
   })
 }
 

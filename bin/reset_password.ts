@@ -24,5 +24,23 @@ program
 
   });
 
+program
+  .command('send-email <email>')
+  .action(async function(email) {
+
+    try {
+
+      await password.sendPasswordResetEmail(email);
+
+      console.log('password reset successfully!');
+
+    } catch(e) {
+      console.log("error", e.message);
+    }
+
+  });
+
+
+
 program.parse(process.argv);
 
