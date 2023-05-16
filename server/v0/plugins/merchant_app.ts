@@ -338,22 +338,6 @@ export async function register(server: Server) {
     }
   });
 
-
-  server.route({
-    method: "POST",
-    path: "/invoices/{uid}/share/email",
-    handler: v0.Invoices.shareEmail,
-    options: {
-      tags: ['v0', 'invoices'],
-      validate: {
-        payload: Joi.object({
-          email: Joi.string().email().required()
-        }),
-        failAction
-      }
-    }
-  });
-
   server.route({
     method: "GET",
     path: "/grab_and_go_items",

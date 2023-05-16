@@ -5,6 +5,8 @@ export { BIP70Protocol }
 import { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest, GetCurrency } from './types';
 export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
+import { Transaction } from '../plugin'
+
 import { log } from '../log'
 
 import { Invoice, ensureInvoice } from '../invoices'
@@ -308,15 +310,9 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 }
 
-interface Transaction {
-  tx: string;
-  tx_hash?: string;
-  tx_key?: string;
-}
-
 export async function handleUnconfirmedPayment(paymentOption, transaction: Transaction) {
 
-  const {tx: hex} = transaction
+  const { txhex } = transaction
 
   const { currency, chain, invoice_uid } = paymentOption
 
@@ -324,21 +320,21 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
   let bitcore = getBitcore(chain)
 
-  let tx = new bitcore.Transaction(hex)
+  let tx = new bitcore.Transaction(txhex)
 
   let invoice = await models.Invoice.findOne({ where: {
     uid: invoice_uid
   }})
 
-  const txid = transaction.tx_hash || tx.hash
+  const txid = transaction.txid || tx.hash
   
   let paymentRecord = await models.Payment.create({
     txid,
     currency: currency,
     chain: chain || currency,
     txjson: tx.toJSON(),
-    txhex: hex,
-    tx_key: transaction.tx_key,
+    txhex: txhex,
+    tx_key: transaction.txkey,
     payment_option_id: paymentOption.id,
     invoice_uid: invoice_uid,
     account_id: invoice.account_id
@@ -378,7 +374,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
 export async function completePayment(paymentOption, transaction: Transaction) {
 
-  const {tx: hex} = transaction
+  const { txhex } = transaction
 
   var { currency, chain, invoice_uid } = paymentOption
 
@@ -388,21 +384,21 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
   let bitcore = getBitcore(chain)
 
-  let tx = new bitcore.Transaction(hex)
+  let tx = new bitcore.Transaction(txhex)
 
   let invoice = await models.Invoice.findOne({ where: {
     uid: invoice_uid
   }})
 
-  const txid = transaction.tx_hash || tx.hash
+  const txid = transaction.txid || tx.hash
   
   let paymentRecord = await models.Payment.create({
     txid,
     currency,
     chain: chain || currency,
     txjson: tx.toJSON(),
-    txhex: hex,
-    tx_key: transaction.tx_key,
+    txhex: txhex,
+    tx_key: transaction.txkey,
     payment_option_id: paymentOption.id,
     invoice_uid: invoice_uid,
     account_id: invoice.account_id

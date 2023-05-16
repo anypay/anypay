@@ -38,8 +38,6 @@ describe("BIP270 Payment Requests", () => {
         let resp = await request
           .get(`/r/${invoice.uid}`) 
 
-        console.log(resp.body)
-
         let transaction = "INVALID"
           
         expect(transaction).to.be.a('string')
@@ -58,8 +56,6 @@ describe("BIP270 Payment Requests", () => {
 
         })()
 
-        console.log('URL', url)
-
         try {
 
           let submitResponse = await request.post(url).send({
@@ -75,8 +71,6 @@ describe("BIP270 Payment Requests", () => {
           expect(submitResponse.body.memo).to.be.a('string')
 
         } catch(error) {
-
-          console.error('error', error)
 
           throw error
 

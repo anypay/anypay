@@ -72,7 +72,7 @@ describe('lib/invoices', () => {
 
     let invoice = await newInvoice()
 
-    const expired = await isExpired(invoice.uid)
+    const expired = await isExpired(invoice)
 
     expect(expired).to.be.false
 

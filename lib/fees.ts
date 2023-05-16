@@ -1,16 +1,6 @@
 
 import { getBitcore } from './bitcore' 
 
-import { getTransaction } from './blockchain'
-
-export async function getTxOutputSatoshis(currency: string, txid: string, index: number): Promise<number> {
-
-  const tx = await getTransaction(currency, txid)
-
-  return tx.outputs[index].satoshis
-
-}
-
 export interface FeeResult {
   total_input: number;
   total_output: number;
@@ -27,15 +17,20 @@ export async function getMiningFee(currency: string, txhex: string): Promise<Fee
 
   for (let input of tx.inputs) {
 
-    let txid = input.prevTxId.toString('hex')
+    console.log('INPUT', input)
+    //TODO: Get the previous transaction to discover the satoshis contained
 
-    let satoshis: number = await getTxOutputSatoshis(currency, txid, input.outputIndex)
+    let satoshis: number = tx.outputs[input.outputIndex].satoshis
 
     total_input += satoshis
 
   }
 
+  console.log('total input', total_input)
+
   const total_output = tx.outputs.reduce((sum, output) => sum + output.satoshis, 0)
+
+  console.log('total output', total_output)
 
   const network_fee = total_input - total_output
 

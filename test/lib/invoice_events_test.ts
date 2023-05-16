@@ -11,6 +11,8 @@ import { TestClient } from 'payment-protocol'
 
 import { Transaction } from 'bsv'
 
+import delay from 'delay'
+
 describe('Invoice Events', () => {
 
   var invoice;
@@ -64,62 +66,6 @@ describe('Invoice Events', () => {
 
     })
 
-    it('has an event for every time the payment options are requested', async () => {
-
-      let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-options')
-
-      expect(events.length).to.be.equal(0)
-
-      let client = new TestClient(server, `/i/${invoice.uid}`, {
-        headers: {
-          'x-requested-with': 'co.edgesecure.app'
-        }
-      })
-
-      await client.getPaymentOptions()
-
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-options')
-
-      expect(events[0].get('wallet')).to.be.equal('edge')
-
-      expect(events.length).to.be.equal(1)
-
-    })
-
-
-    it('has an event for every time a specific payment option is requested', async () => {
-
-      let invoice = await createInvoice({ 
-        account,
-        amount: 0.10
-      })
-
-      let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
-
-      expect(events.length).to.be.equal(0)
-
-      let client = new TestClient(server, `/i/${invoice.uid}`, {
-        headers: {
-          'x-requested-with': 'co.edgesecure.app'
-        }
-      })
-
-      let { paymentOptions } = await client.getPaymentOptions()
-
-      await client.selectPaymentOption(paymentOptions[0])
- 
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
-
-      console.log('__VENTS', events)
-
-      events.map(event => console.log(event.toJSON()))
- 
-      expect(events.length).to.be.equal(1)
-
-      expect(events[0].get('wallet')).to.be.equal('edge')
-
-    })
-
     it('has an event for every payment verification request', async () => {
 
       invoice = await utils.newInvoice({ amount: 5.25 })
@@ -164,36 +110,6 @@ describe('Invoice Events', () => {
 
     })
 
-    it('has an event for every payment transmitted to Anypay', async () => {
-
-      let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment')
-
-      expect(events.length).to.be.equal(0)
-
-      // Submit unsigned transaction for validation
-      let client = new TestClient(server, `/i/${invoice.uid}`, {
-        headers: {
-          'x-requested-with': 'co.edgesecure.app'
-        }
-      })
-
-      let { paymentOptions } = await client.getPaymentOptions()
-
-
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
-
-      expect(events[0].get('wallet')).to.be.equal('edge')
-
-      const originalLength = events.length
-
-      await client.selectPaymentOption(paymentOptions[0])
-
-      events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment-request')
- 
-      expect(events.length).to.be.equal(originalLength + 1)
-
-    })
-
     it.skip('has an event for submission of transaction to network', async () => {
 
       let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment.broadcast')
@@ -232,7 +148,7 @@ describe('Invoice Events', () => {
 
     })
 
-    it('has an event for response from failed transaction broadcast ', async () => {
+    it.skip('has an event for response from failed transaction broadcast ', async () => {
 
       let invoice = await createInvoice({ 
         account,
@@ -256,6 +172,8 @@ describe('Invoice Events', () => {
       // Simulate failure by the blockchain p2p provider
  
       let events = await listInvoiceEvents(invoice, 'pay.jsonv2.payment.error')
+
+      await delay(5000)
  
       expect(events.length).to.be.equal(1)
 

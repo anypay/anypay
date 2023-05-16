@@ -23,8 +23,6 @@ describe("Searching", async () => {
       }
     })
 
-    console.log(result)
-
     expect(result.result.length).to.be.equal(1)
 
     const { hash } = result.result[0].value

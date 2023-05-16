@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 
 import {plugins} from '../../../lib/plugins';
 
-import { log, email, models, invoices } from '../../../lib';
+import { log, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
 
@@ -358,32 +358,6 @@ export async function show(request, h) {
     log.error('invoices.show.error', error)
 
     return h.badRequest(error)
-
-  }
-
-}
-
-export async function shareEmail(req, h) {
-
-  log.debug(`controller:invoices,action:shareEmail,invoice_id:${req.params.uid}`);
-
-  let invoice = await models.Invoice.findOne({
-    where: {
-      uid: req.params.uid
-    }
-  });
-
-  if (!invoice) {
-
-    log.error('no invoice found', new Error(`invoice ${req.params.uid} not found`));
-
-    throw new Error('invoice not found')
-
-  } else {
-
-    await email.sendInvoiceToEmail(req.params.uid, req.payload.email)
-
-    return { success: true }
 
   }
 

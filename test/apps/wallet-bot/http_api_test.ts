@@ -111,8 +111,6 @@ describe('Wallet Bot API', () => {
 
       const token = await accessToken.get('uid')
 
-      console.log('APP ID', walletBot.get('app_id'))
-
       await walletBotServer.inject({
         url: '/v1/api/apps/wallet-bot/invoices',
         method: 'POST',
@@ -139,8 +137,6 @@ describe('Wallet Bot API', () => {
           'Authorization': `Basic ${Buffer.from(`${token}:`).toString('base64')}`
         },
       })
-
-      console.log(dashResponse)
 
       expect(dashResponse.result.invoices).to.be.an('array')
 
@@ -205,8 +201,6 @@ describe('Wallet Bot API', () => {
           'Authorization': `Basic ${Buffer.from(`${token}:`).toString('base64')}`
         }
       })
-
-      console.log('__CANCEL RESP', cancelResponse)
 
       const cancelled = await ensureInvoice(response.result.invoice_uid)
 

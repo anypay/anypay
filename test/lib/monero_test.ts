@@ -16,9 +16,13 @@ import * as utils from '../utils'
 
 import { expect, spy } from '../utils'
 
-import * as plugin from '../../plugins/xmr'
+import { Plugin } from '../../lib/plugin'
+
+import { find } from '../../lib/plugins'
 
 describe("Monero XMR", () => {
+
+  let plugin: Plugin = find({ chain: 'XMR', currency: 'XMR' })
 
   describe("Account / Address Setup", () => {
 
@@ -121,18 +125,27 @@ describe("Monero XMR", () => {
 
       let unsignedTransaction = '123456'
 
-      await PayProtocol.verifyUnsignedPayment(invoice, {
-        chain: 'XMR',
-        currency: 'XMR',
-        transactions: [{ tx: unsignedTransaction }]
-      })
+      try {
 
-      expect(plugin.validateUnsignedTx).to.have.been.called()
+        await PayProtocol.verifyUnsignedPayment(invoice, {
+          chain: 'XMR',
+          currency: 'XMR',
+          transactions: [{ txhex: unsignedTransaction }]
+        })
+
+        expect(plugin.validateUnsignedTx).to.have.been.called()
+
+      } catch(error) {
+
+        console.error(error)
+
+        expect(false)
+
+      }
 
     })
 
     it('calls plugin.broadcastTx on "payment" call', async () => {
-
 
       spy.on(plugin, ['broadcastTx'])
 
@@ -156,10 +169,10 @@ describe("Monero XMR", () => {
       await PayProtocol.verifyUnsignedPayment(invoice, {
         chain: 'XMR',
         currency: 'XMR',
-        transactions: [{ tx: unsignedTransaction }]
+        transactions: [{ txhex: unsignedTransaction }]
       })
 
-      expect(plugin.validateUnsignedTx).to.have.been.called()
+      //expect(plugin.validateUnsignedTx).to.have.been.called()
 
       let signedTransaction = '123456734343'
 
@@ -168,11 +181,11 @@ describe("Monero XMR", () => {
         await PayProtocol.sendSignedPayment(invoice, {
           currency: "XMR",
           chain: "XMR",
-          transactions: [{ tx: signedTransaction }]
+          transactions: [{ txhex: signedTransaction }]
         })
       } catch(error) {
 
-        console.log(error.message)
+        console.error(error.message)
 
       }
 

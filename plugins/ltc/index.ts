@@ -3,8 +3,6 @@ import * as blockchair from '../../lib/blockchair'
 
 const ltc = require('litecore-lib');
 
-export { ltc as bitcore }
-
 export const currency = 'LTC'
 
 import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation, VerifyPayment, Transaction, Payment } from '../../lib/plugin'
@@ -22,6 +20,12 @@ export default class LTC extends Plugin {
   chain: string = 'LTC'
 
   decimals: number = 8;
+
+  get bitcore() {
+
+    return ltc
+
+  }
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO

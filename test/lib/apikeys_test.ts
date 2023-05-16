@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { getMerchantApiKey, getPlatformApiKey } from '../../lib/apikeys'
 
-import { createAccount } from '../utils'
+import { createAccount, expect } from '../utils'
 
 describe('API Keys', () => {
 
@@ -12,7 +12,7 @@ describe('API Keys', () => {
 
     let key = await getMerchantApiKey(account.id)
 
-    console.log(key)
+    expect(key).to.be.a('string')
 
   })
 
@@ -22,7 +22,7 @@ describe('API Keys', () => {
 
     let key = await getPlatformApiKey(account.id)
 
-    console.log(key)
+    expect(key).to.be.a('string')
 
   })
 

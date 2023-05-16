@@ -32,6 +32,12 @@ export default class BSV extends Plugin {
 
   decimals: number = 8
 
+  get bitcore() {
+
+    return bsv
+
+  }
+
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO
   }
@@ -97,7 +103,9 @@ export default class BSV extends Plugin {
       }
     })
 
-    if (address.get('paymail') && address.get('paymail').match('@')) {
+    if (!address) { throw new Error('address not found') }
+
+    if (address && address.get('paymail') && address.get('paymail').match('@')) {
 
       let resolved = await polynym.resolveAddress(address.get('paymail'))
 
@@ -215,6 +223,4 @@ export async function getPaymail(alias: string) {
   }
 
 }
-
-export { bsv as bitcore }
 

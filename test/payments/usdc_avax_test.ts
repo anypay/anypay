@@ -17,8 +17,6 @@ describe("Sending USDC Payments on AVAX", () => {
 
     let address = avalanche.getAddressFromMnemonic({ mnemonic })
 
-    console.log({ address })
-
     expect(address).to.be.a('string')
 
   })
@@ -45,8 +43,6 @@ describe("Sending USDC Payments on AVAX", () => {
     expect(txhex).to.be.a('string')
 
     expect(txid).to.be.a('string')
-
-    console.log({ txhex, txid })
 
     let result = await erc20.broadcastSignedTransaction({ txhex, providerURL })
 

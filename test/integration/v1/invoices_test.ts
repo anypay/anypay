@@ -87,8 +87,6 @@ describe("Listing Available Webhooks", async () => {
     response = await request
       .get('/v1/api/account/my-account')
 
-    console.log(response)
-
     expect(response.statusCode).to.be.equal(401);
 
     response = await request

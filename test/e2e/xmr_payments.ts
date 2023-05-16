@@ -77,8 +77,6 @@ describe("XMR End To End Payments", async () => {
       return option.currency === 'XMR'
     })[0]
 
-    console.log('OPTION', paymentOption)
-
     expect(paymentOption.currency).to.be.equal('XMR')
 
   })

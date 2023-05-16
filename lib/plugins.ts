@@ -5,7 +5,9 @@ import configurePlugins from "../config/plugins";
 
 export const plugins = configurePlugins()
 
-import { Plugin } from './plugin'
+import { Plugin, Transaction } from './plugin'
+
+import { Account } from './account'
 
 export function find({currency, chain }: {currency: string, chain: string}): Plugin {
 
@@ -20,3 +22,19 @@ export function find({currency, chain }: {currency: string, chain: string}): Plu
   return new plugin()
 }
 
+
+export async function getTransaction({ txid, chain, currency }: { txid: string, chain: string, currency: string }): Promise<Transaction> {
+
+  let plugin = await find({ chain, currency }) 
+
+  return plugin.getTransaction(txid)
+
+}
+
+export async function getNewAddress({ account, chain, currency }: { account: Account, chain: string, currency: string }): Promise<string> {
+
+  let plugin = await find({ chain, currency }) 
+
+  return plugin.getNewAddress(account)
+
+}

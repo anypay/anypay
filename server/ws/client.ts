@@ -14,11 +14,11 @@ export default async function main() {
   ws.on('error', console.error);
 
   ws.on('open', function open() {
-    console.log('websocket.client.connected');
+
   });
 
   ws.on('close', function close() {
-    console.log('websocket.client.disconnected');
+
   });
 
   ws.on('message', function message(data) {

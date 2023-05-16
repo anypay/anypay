@@ -45,5 +45,55 @@ describe('SOL', () => {
 
   })
 
+  it('#getPayments should accept a txid and return a parsed SOL payment', async () => {
+
+    let plugin = await find({ chain: 'SOL', currency: 'SOL' });
+
+    let txid = '4No4pAMHJECHpCqhjUbxsNniaaVmE9mqPek7APhjDWM1XMSozUcsrzm5UTwPBR3XhJX87NQsfr8awZK2SGfq5X6F'
+
+    let payments = await plugin.getPayments(txid)
+
+    expect(payments.length).to.be.equal(1)
+
+    let payment = payments[0]
+
+    expect(payment.address).to.be.equal('8tWSZr2qCUNDtkHbHg1wDiYSAHJSY5pP7f6Vnav7cQDP') 
+
+    expect(payment.amount).to.be.equal(0.000995)
+
+    expect(payment.chain).to.be.equal('SOL') 
+
+    expect(payment.currency).to.be.equal('SOL') 
+
+    expect(payment.txid).to.be.equal(txid)
+
+  })
+
+  it.skip('#parsePayments should accept a raw transaction and return a parsed SOL payment', async () => {
+
+    let plugin = await find({ chain: 'SOL', currency: 'SOL' });
+
+    let txid = '4No4pAMHJECHpCqhjUbxsNniaaVmE9mqPek7APhjDWM1XMSozUcsrzm5UTwPBR3XhJX87NQsfr8awZK2SGfq5X6F'
+
+    let txhex = ''
+
+    let payments: Payment[] = await plugin.parsePayments(txhex)
+
+    expect(payments.length).to.be.equal(1)
+
+    let payment = payments[0]
+
+    expect(payment.address).to.be.equal('') 
+
+    expect(payment.amount).to.be.equal(0.000995)
+
+    expect(payment.chain).to.be.equal('SOL') 
+
+    expect(payment.currency).to.be.equal('SOL') 
+
+    expect(payment.txid).to.be.equal(txid)
+
+  })
+
 })
 

@@ -3,8 +3,6 @@ const btc = require('bitcore-lib')
 
 import * as moment from 'moment'
 
-export { btc as bitcore }
-
 import {
   blockchair,
   config,
@@ -29,6 +27,12 @@ export default class BTC extends Plugin {
   chain: string = 'BTC'
 
   decimals: number = 8;
+
+  get bitcore() {
+
+    return btc
+
+  }
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO

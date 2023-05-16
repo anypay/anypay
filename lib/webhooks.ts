@@ -345,9 +345,12 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
     if (typeof resp.body !== 'string') {
 
+      console.log('RESP 1', resp.body)
+
       record.response_body = JSON.stringify(resp.body); 
 
     } else {
+      console.log('RESP 2', resp.body)
 
       record.response_body = resp.body; 
     }
@@ -362,30 +365,16 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
       record.response_code = e.response.statusCode;
 
-      if (typeof e.response.body !== 'string') {
-
-        record.response_body = JSON.stringify(e.response.text); 
-
-      } else {
-
-        record.response_body = e.response.body; 
-
-      }
+      record.response_body = e.response.text
 
     }
     record.error = e.message;
 
     record.ended_at = new Date();
 
-    await record.update({
-      status: 'failed',
-      error: e.message,
-      response_code: e.response ? e.response.statusCode : null,
-      response_body: e.response ? e.response.body : null,
-      ended_at: new Date()
-    })
+    record.status = 'failed'
 
-    await record.set('status', 'failed')
+    record.ended_at = new Date()
 
   }
 
