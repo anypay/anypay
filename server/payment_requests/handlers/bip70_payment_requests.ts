@@ -162,7 +162,7 @@ export async function create(req, h) {
 
     await pay.verifyPayment({
       payment_option,
-      transaction: {tx: transaction},
+      transaction: {txhex: transaction},
       protocol: 'BIP70'
     })
 
@@ -187,7 +187,7 @@ export async function create(req, h) {
 
     }
 
-    let paymentRecord = await pay.completePayment(payment_option, { tx: transaction})
+    let paymentRecord = await pay.completePayment(payment_option, { txhex: transaction})
 
     log.info(`bip70.${payment_option.currency}.payment.completed`, paymentRecord);
 

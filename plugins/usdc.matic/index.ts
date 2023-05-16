@@ -171,7 +171,7 @@ export default class USDC_MATIC extends Plugin {
 
   }
 
-  async verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment) {
+  async verifyPayment({ payment_option, transaction: {txhex, txid}, protocol }: VerifyPayment) {
 
     /*
 
@@ -185,7 +185,7 @@ export default class USDC_MATIC extends Plugin {
 
     try {
 
-      const output: any = polygon.parseUSDCOutput({ transactionHex: hex })
+      const output: any = polygon.parseUSDCOutput({ transactionHex: txhex })
 
       const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
 
@@ -195,7 +195,7 @@ export default class USDC_MATIC extends Plugin {
 
     } catch(error) {
 
-      const { parsed, full } = await polygon.fetchERC20Transfer({ txid: hex })
+      const { parsed, full } = await polygon.fetchERC20Transfer({ txid })
 
       log.info('usdc.polygon.fetchERC20Transfer.result', { parsed, full })
 

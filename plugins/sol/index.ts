@@ -55,13 +55,13 @@ export default class SOL extends Plugin {
 
   }
 
-  async verifyPayment({ payment_option, transaction: {tx: hex}, protocol }: VerifyPayment): Promise<boolean> {
+  async verifyPayment({ payment_option, transaction: {txhex}, protocol }: VerifyPayment): Promise<boolean> {
 
-    const transaction = Transaction.from(Buffer.from(hex, 'hex'))
+    const transaction = Transaction.from(Buffer.from(txhex, 'hex'))
 
     console.log(transaction)
 
-    const validateResult = await validateTransaction({ template: [], txhex: hex })
+    const validateResult = await validateTransaction({ template: [], txhex: txhex }) //TODO
 
     console.log(validateResult, 'validateResult')
 
@@ -84,10 +84,10 @@ export default class SOL extends Plugin {
       "params": [txid, "base64"]
     })
 
-    const hex = Buffer.from(data.result.transaction[0], 'base64').toString('hex')
+    const txhex = Buffer.from(data.result.transaction[0], 'base64').toString('hex')
 
     return {
-      hex,
+      txhex,
       txid
     }
 

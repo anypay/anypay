@@ -3,7 +3,9 @@ require('dotenv').config();
 
 import * as blockchair from '../../lib/blockchair'
 
-import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, VerifyPayment, Payment } from '../../lib/plugin'
+import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, VerifyPayment, Payment, ValidateUnsignedTx } from '../../lib/plugin'
+
+import { buildOutputs, verifyOutput } from '../../lib/pay'
 
 import { log } from '../../lib';
 
@@ -69,7 +71,68 @@ export default class BCH extends Plugin {
     
   }
 
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> { 
 
+    log.info(`payment.verify`, params)
+
+    let tx = new this.bitcore.Transaction(params.transactions[0].txhex);
+
+    let txOutputs = tx.outputs.map(output => {
+
+      try {
+
+        let address = new this.bitcore.Address(output.script).toString()
+
+        if (address.match(':')) {
+          address = address.split(':')[1]
+        }
+
+        return {
+          address,
+          amount: output.satoshis
+        }
+
+      } catch(error) {
+
+        log.error(`payment.verify.error`, error)
+
+        return null
+
+      }
+
+    })
+    .filter(n => n != null)
+
+    log.info("payment.verify.txoutputs", txOutputs);
+
+    let outputs = await buildOutputs(params.payment_option, 'JSONV2');
+
+    for (let output of outputs) {
+
+      log.info('output', output)
+
+      var address;
+
+      if (output.script) {
+
+        address = new this.bitcore.Address(output.script).toString()
+
+      } else {
+
+        address = output.address
+
+      }
+
+      if (address.match(':')) {
+        address = output && output.address ? output.address.split(':')[1] : null
+      }
+
+      verifyOutput(txOutputs, address, output.amount);
+    }
+
+    return true
+
+  }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
@@ -117,7 +180,7 @@ export default class BCH extends Plugin {
 
   async getTransaction(txid: string): Promise<Transaction> {
 
-    return { hex: '' }
+    return { txhex: '' }
   }
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {

@@ -7,6 +7,8 @@ import * as moment from 'moment';
 
 import { models } from '../models'
 
+import { config } from '../config'
+
 export function getCurrency(params: GetCurrency): Currency {
 
   return {
@@ -78,7 +80,7 @@ import { PaymentRequestOptions } from './'
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<Bip270PaymentRequest> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }});
+  let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }})
 
   let merchantData = await getMerchantData(invoice.uid, invoice.account_id)
 
@@ -92,7 +94,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
     creationTimestamp: moment(invoice.createdAt).unix(),
     expirationTimestamp: moment(invoice.expiry).unix(),
     memo,
-    paymentUrl: `${process.env.API_BASE}/r/${invoice.uid}/pay/BSV/bip270`,
+    paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}/pay/BSV/bip270`,
     merchantData
   }
 
