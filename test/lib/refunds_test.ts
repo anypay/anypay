@@ -47,16 +47,6 @@ describe('lib/refunds', () => {
 
     log.debug('test.account.created', account)
 
-    console.log('__UPDATE PARAMS', {
-      status: 'paid',
-      currency: 'BCH',
-      invoice_currency: 'BCH',
-      denomination_currency: 'USD',
-      denomination: 'USD',
-      denomination_amount_paid: '52.00',
-      hash: txid
-    })
-
     await invoice.update({
       status: 'paid',
       currency: 'BCH',

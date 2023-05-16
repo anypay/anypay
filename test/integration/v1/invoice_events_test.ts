@@ -11,8 +11,6 @@ describe("Invoice Events", async () => {
       url: `/v1/api/invoices/${invoice.uid}/events`,
     })
 
-    console.log(response)
-
     expect(response.statusCode).to.be.equal(200)
 
     expect(response.result.events).to.be.an('array')
@@ -30,8 +28,6 @@ describe("Invoice Events", async () => {
       method: 'GET',
       url: `/v1/api/invoices/${invoice.uid}/events`,
     })
-
-    console.log(response)
 
     expect(response.statusCode).to.be.equal(401)
     

@@ -57,8 +57,6 @@ describe("API V0", async () => {
       url: '/apps/777777'
     })
 
-    console.log('__RESPONSE', response)
-
     expect(response.statusCode).to.be.equal(404)
     
   })

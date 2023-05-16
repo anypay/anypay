@@ -13,8 +13,6 @@ describe("Sending USDC Payments on MATIC", () => {
 
     let address = polygon.getAddressFromMnemonic({ mnemonic })
 
-    console.log({ address })
-
     expect(address).to.be.a('string')
 
   })
@@ -34,8 +32,6 @@ describe("Sending USDC Payments on MATIC", () => {
     expect(txhex).to.be.a('string')
 
     expect(txid).to.be.a('string')
-
-    console.log({ txhex, txid })
 
     let result = await polygon.broadcastSignedTransaction({ txhex })
 

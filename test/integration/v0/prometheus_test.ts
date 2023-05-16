@@ -14,8 +14,6 @@ describe('Scraping Metrics from Prometheus', () => {
 
     expect(response.statusCode).to.be.equal(404)
 
-    console.log(response)
-
   })
 
   it('should have a /metrics enpdoint with the PROMETHEUS_ENABLED flag', async () => {
@@ -26,8 +24,6 @@ describe('Scraping Metrics from Prometheus', () => {
     })
 
     expect(response.statusCode).to.be.equal(401)
-
-    console.log(response)
 
   })
 
@@ -40,8 +36,6 @@ describe('Scraping Metrics from Prometheus', () => {
 
     expect(response.statusCode).to.be.equal(401)
 
-    console.log(response)
-
   })
 
   it('GET /metrics should grant access with prometheus app credential', async () => {
@@ -50,8 +44,6 @@ describe('Scraping Metrics from Prometheus', () => {
       path: '/metrics',
       method: 'GET'
     })
-
-    console.log(response)
 
   })
 

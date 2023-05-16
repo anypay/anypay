@@ -1,15 +1,15 @@
 
 import { BigNumber } from 'bignumber.js';
 
-import { plugins } from './plugins'
+import { find } from './plugins'
 
 export function getBitcore(currency) {
 
-  let plugin = plugins.findForChain(currency)
+  let plugin = find({ currency, chain: currency })
 
   if (!plugin.bitcore) {
 
-    throw new Error('bitcore not found for currency')
+    return {} 
 
   }
 

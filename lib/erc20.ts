@@ -73,15 +73,11 @@ interface TransmitResult {
 
 export async function broadcastSignedTransaction({ txhex, providerURL }: {txhex: string, providerURL: string}): Promise<TransmitResult> {
 
-  console.log("broadcastSignedTransaction", txhex)
-
   //const provider = new ethers.providers.JsonRpcProvider(providerURL)
 
   const web3 = new Web3(new Web3.providers.HttpProvider(providerURL))
 
   const transmitResult: any = await web3.eth.sendSignedTransaction(txhex)
-
-  console.log('polygon.provider.sendTransaction.result', transmitResult)
 
   return transmitResult
 

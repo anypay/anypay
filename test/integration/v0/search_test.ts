@@ -14,8 +14,6 @@ describe("API V0 - Search", async () => {
       }
     })
 
-    console.log(response.result)
-
     expect(response.statusCode).to.be.equal(200)
     
   })

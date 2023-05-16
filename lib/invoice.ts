@@ -1,4 +1,4 @@
-import {plugins} from './plugins';
+import { getNewAddress } from './plugins';
 
 import { BigNumber } from 'bignumber.js';
 
@@ -28,21 +28,6 @@ import { PaymentRequest } from './payment_requests';
 import { Invoice } from './invoices';
 
 import { Address } from './addresses';
-
-async function getNewInvoiceAddress(address: Address, currency: string, amount): Promise<{currency:string, value:string}> {
-
-  const value = await plugins.getNewAddress(currency, address, amount);
-
-  if (!value) {
-    throw new Error(`unable to generate address for ${currency}`);
-  }
-
-  return {
-    currency,
-    value
-  }
-
-};
 
 interface EmptyInvoiceOptions {
   uid?: string;
@@ -112,12 +97,16 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     const template = paymentRequest.get('template').find(template => {
 
-      if (template.currency === 'USDC' && !template.chain) { template.chain = 'MATIC' }
+      if (template.currency === 'USDC' && !template.chain) { template.chain = 'MATIC' } //TODO: Refactor to remove coin-specific logic
 
       return template.currency === option.get('currency') &&
              (!template.chain || template.chain === option.get('chain'))
 
     })
+
+    if (!template) {
+      return
+    }
 
     const outputs = await Promise.all(template.to.map(async (to) => {
 
@@ -183,8 +172,6 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
   for (let address of availableAddresses) {
 
-    console.log(address, 'address')
-
     if (address.currency == 'ETH') {
 
       let usdc_address: any = address.toJSON()
@@ -198,7 +185,6 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
       //availableAddresses.push(usdt_address)
 
     } else if (address.currency == 'AVAX') {
-      console.log(address, 'ADDRESS--')
 
       let usdc_address: any = address.toJSON()
       usdc_address.chain = 'AVAX'
@@ -244,8 +230,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       if (!chain) { chain = currency }
 
-      let coin = getCoin(record.currency)
-
       const value = invoice.get('amount')
 
       let { value: amount } = await convert({
@@ -257,11 +241,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       let newAddress = await getNewInvoiceAddress(account.id, currency, amount)
 
-      if (!newAddress) { return }
+      let address = await getNewAddress({ account, currency, chain })
 
-      let address = newAddress.value;
-
-      console.log({ address })
+      if (!address) { return }
 
       if (address.match(':')) {
         address = address.split(':')[1]
@@ -334,8 +316,12 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 }
 
 export function isExpired(invoice) {
+  console.log('invoice.expiry', invoice.expiry)
+
   let expiry = moment(invoice.expiry);  
   let now = moment()
+
+  console.log('now', now.toDate())
 
   return now > expiry;
 }

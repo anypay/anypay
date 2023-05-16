@@ -3,8 +3,6 @@ import * as blockchair from '../../lib/blockchair';
 
 const doge = require('bitcore-doge-lib');
 
-export { doge as bitcore }
-
 import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
@@ -20,6 +18,12 @@ export default class DOGE extends Plugin {
   chain: string = 'DOGE'
 
   decimals: number = 8;
+
+  get bitcore() {
+
+    return doge
+
+  }
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO

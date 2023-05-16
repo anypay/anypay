@@ -52,6 +52,18 @@ export type Confirmation = iConfirmation | null
 
 export abstract class Plugin extends AbstractPlugin {
 
+  get bitcore(): any {
+    return {
+
+    }
+  }
+
+  // should override if you want this to work properly
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
+
+    return true
+  }
+
   async getNewAddress(account: Account): Promise<string> {
 
     let address = await findOne<Address>(Address, {
@@ -89,30 +101,14 @@ export interface BroadcastTxResult {
 
 export interface VerifyPayment {
   payment_option: any;
-  transaction: {
-      tx: string;
-  };
-  protocol: string;
-}
-
-export interface BroadcastTxResult {
-  txid: string;
-  txhex: string;
-  success: boolean;
-  result: any;
-}
-
-export interface VerifyPayment {
-  payment_option: any;
-  transaction: {
-      tx: string;
-  };
+  transaction: Transaction;
   protocol: string;
 }
 
 export interface Transaction {
-  hex: string;
+  txhex: string;
   txid?: string;
+  txkey?: string;
 }
 
 export interface Payment {
@@ -121,5 +117,10 @@ export interface Payment {
   address: string;
   amount: number;
   txid: string;
+}
+
+export interface ValidateUnsignedTx {
+    payment_option: any;
+    transactions: Transaction[];
 }
 

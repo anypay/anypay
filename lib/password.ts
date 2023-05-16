@@ -2,13 +2,7 @@ const bcrypt = require('bcryptjs');
 
 import { models } from './models';
 
-const log = require('winston');
-
-import { config } from './config'
-
-const sender = config.get('EMAIL_SENDER')
-
-import  { ses } from './email'
+//import { config } from './config'
 
 export function hash(password) {
   return new Promise((resolve, reject) => {
@@ -55,7 +49,8 @@ async function resetPassword(accountId, newPassword): Promise<boolean> {
 export async function sendPasswordResetEmail(email) {
   return new Promise(async (resolve, reject) => {
 
-    let passwordReset = await createPasswordReset(email);
+    //let passwordReset = await createPasswordReset(email);
+    /*
 
     ses.sendEmail({
       Destination: {
@@ -83,6 +78,7 @@ export async function sendPasswordResetEmail(email) {
       log.info(`successfully set password reset email to ${email}`);
       resolve(response)
     })
+  */
   })
 }
 

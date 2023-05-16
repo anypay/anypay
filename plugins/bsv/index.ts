@@ -32,6 +32,12 @@ export default class BSV extends Plugin {
 
   decimals: number = 8
 
+  get bitcore() {
+
+    return bsv
+
+  }
+
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO
   }
@@ -97,7 +103,9 @@ export default class BSV extends Plugin {
       }
     })
 
-    if (address.get('paymail') && address.get('paymail').match('@')) {
+    if (!address) { throw new Error('address not found') }
+
+    if (address && address.get('paymail') && address.get('paymail').match('@')) {
 
       let resolved = await polynym.resolveAddress(address.get('paymail'))
 
@@ -186,33 +194,4 @@ export async function transformAddress(alias: string){
 
 }
 
-
-/*
-  TODO: Re-implement once it is known to be working through tests
-export async function getNewAddress(address: Address): Promise<string>{
-
-  const paymail = address.get('paymail')
-
-  if (paymail) {
-
-    let resolved = await polynym.resolveAddress(paymail)
-
-    return resolved.address
-
-  } else {
-
-    return address.get('value');
-
-  }
-
-}
-*/
-
-export function validateAddress(address: string){
-
-  let valid = WAValidator.validate( address, 'bitcoin')
-
-  return valid;
-
-}
 

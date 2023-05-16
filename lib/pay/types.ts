@@ -1,4 +1,6 @@
 
+import { Transaction } from '../plugin'
+
 export interface Currency {
   name: string;
   code: string;
@@ -14,12 +16,6 @@ export interface PaymentOption {
   fee?: number;
   createdAt?: Date;
   outputs?: PaymentOutput[];
-}
-
-interface Transaction {
-  tx: string;
-  tx_key?: string;
-  tx_id?: string;
 }
 
 export interface VerifyPayment {

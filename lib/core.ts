@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import {plugins} from './plugins';
+import { find } from './plugins';
 
 import { log } from './log'
 
@@ -25,7 +25,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
-  let plugin = await plugins.findForChain(changeset.currency);
+  let plugin = find({ chain: changeset.currency, currency: changeset.currency });
 
   if (changeset.address.match('@')) {
 
@@ -77,6 +77,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
     address = await models.Address.create({
       account_id: changeset.account_id,
       currency: changeset.currency,
+      chain: changeset.currency,
       value: changeset.address,
       view_key: changeset.view_key,
       paymail: changeset.paymail

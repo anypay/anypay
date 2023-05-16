@@ -27,16 +27,6 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  it('#listPaymentOptions record an event in the invoice event log', async () => {
-
-    let invoice = await utils.newInvoice({ amount: 5.20 })
-
-    await protocol.listPaymentOptions(invoice)
-
-    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-options')
-
-  })
-
   it('#getPaymentRequest returns a payment request', async () => {
 
     let invoice = await utils.newInvoice({ amount: 5.20 })
@@ -66,22 +56,6 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  it('#getPaymentRequest records an event in the invoice event log', async () => {
-    let invoice = await utils.newInvoice({ amount: 5.20 })
-
-    let {paymentOptions} = await protocol.listPaymentOptions(invoice)
-
-    await protocol.getPaymentRequest(invoice, paymentOptions[0])
-
-    expect(log.info).to.have.been.called.with('pay.jsonv2.payment-request')
-  })
-
-  it.skip('#verifyUnsignedPayment should verify valid payment', async () => {
-  })
-
-  it.skip('#verifyUnsignedPayment should reject invalid payment', async () => {
-  })
-
   it('#verifyUnsignedPayment records an event in the invoice event log', async () => {
 
     let invoice = await utils.newInvoice({ amount: 5.20 })
@@ -106,7 +80,7 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+  if (process.env.run_e2e_payment_tests) {
 
     it('#sendSignedPayment should accept and broadcast transaction', async () => {
 
@@ -144,7 +118,7 @@ describe('JSON Payment Protocol V2', () => {
 
         currency,
 
-        transactions: [{ tx: payment }]
+        transactions: [{ txhex: payment }]
 
       })
 

@@ -4,8 +4,6 @@ import { blockchair, blockcypher } from '../../lib'
 
 import * as dash from '@dashevo/dashcore-lib';
 
-export { dash as bitcore }
-
 import * as insight from './lib/insight'
 
 import { BroadcastTx, BroadcastTxResult, VerifyPayment, Transaction, Plugin, Confirmation, Payment } from '../../lib/plugin'
@@ -23,6 +21,12 @@ export default class DASH extends Plugin {
   chain: string = 'DASH'
 
   decimals: number = 8;
+
+  get bitcore() {
+
+    return dash
+
+  }
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO

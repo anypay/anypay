@@ -195,8 +195,6 @@ describe("JSON Payment Protocol V2", async () => {
 
     const transaction = new bch.Transaction()
 
-    console.log('TRANS', transaction.serialize())
-
     let response = await server.inject({
       method: 'POST',
       url: `/i/${invoice.uid}`,

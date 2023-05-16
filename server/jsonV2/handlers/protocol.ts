@@ -124,7 +124,17 @@ async function verifyUnsignedPayment(req, h) {
 
     let wallet = detectWallet(req.headers, req.invoice.uid)
 
-    let response = await protocol.verifyUnsignedPayment(req.invoice, req.payload, { wallet })
+    var params = req.payload
+
+    params.transactions = req.payload.transactions.map(transaction => {
+      return {
+        txhex: transaction.tx,
+        txkey: transaction.tx_key,
+        txid: transaction.txid
+      }
+    })
+
+    let response = await protocol.verifyUnsignedPayment(req.invoice, params, { wallet })
 
     await schema.Protocol.PaymentVerification.response.validate(response)
 
@@ -154,6 +164,16 @@ async function submitPayment(req, h) {
     let wallet = detectWallet(req.headers, req.invoice.uid)
 
     await ensureInvoice(req)
+
+    var params = req.payload
+
+    params.transactions = req.payload.transactions.map(transaction => {
+      return {
+        txhex: transaction.tx,
+        txkey: transaction.tx_key,
+        txid: transaction.txid
+      }
+    })
 
     let response = await protocol.sendSignedPayment(req.invoice, req.payload, { wallet })
 

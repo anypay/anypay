@@ -50,6 +50,7 @@ const PaymentRequest = Joi.object({
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
   chain: Joi.string().required(),
+  currency: Joi.string().required(),
   network: Joi.string().required(),
   instructions: Joi.array()
 })

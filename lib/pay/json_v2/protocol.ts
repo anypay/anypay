@@ -9,7 +9,9 @@ import { log } from '../../log'
 
 import { Protocol } from './schema'
 
-import { plugins } from '../../plugins'
+import { find } from '../../plugins'
+
+import { Transaction } from '../../plugin'
 
 import { models } from '../../models'
 
@@ -17,17 +19,11 @@ import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 import { getRequiredFeeRate } from '../required_fee_rate'
 
-export interface Tx {
-  tx: string;
-  tx_key?: string;
-  tx_hash?: string;
-}
-
 export interface SubmitPaymentRequest {
   currency: string;
   chain?: string;
   invoice_uid: string;
-  transactions: Tx[];
+  transactions: Transaction[];
   wallet?: string;
 }
 
@@ -73,9 +69,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    let plugin = plugins.find({ chain, currency })
-
-    //let plugin = await plugins.findForChain(payment.currency)
+    let plugin = find({ chain, currency })
 
     for (const transaction of payment.transactions) {
 
@@ -118,8 +112,6 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       if (!verified) {
 
-        console.log('payment not verified', payment)
-        
         log.info(`pay.jsonv2.${chain}.${payment.currency}.verifyPayment.failed`, {
           invoice_uid: invoice.uid,
           transaction,
@@ -134,17 +126,20 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       var response;
 
       if (payment_option.currency === 'XMR') {
+
         response = await plugin.broadcastTx(transaction)
 
       } else if (payment_option.chain === 'SOL') {
 
-        response = await plugin.broadcastTx(transaction.tx)
+        response = await plugin.broadcastTx(transaction)
 
         invoice.hash = response
+
         await invoice.save()
+
       } else {
 
-        response = await plugin.broadcastTx(transaction.tx)
+        response = await plugin.broadcastTx(transaction)
       }
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
@@ -177,7 +172,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     return {
       success: true,
-      transactions: payment.transactions.map(({tx}) => tx)
+      transactions: payment.transactions.map(({txhex}) => txhex)
     }
 
   } catch(error) {
@@ -191,6 +186,8 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 }
 
 export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
+
+  const { chain, currency } = payment
 
   try {
 
@@ -213,14 +210,15 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     let payment_option = await models.PaymentOption.findOne({ where: {
       invoice_uid: invoice.uid,
-      currency: payment.currency
+      currency,
+      chain
     }})
 
     if (!payment_option) {
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    let plugin = await plugins.findForChain(payment.currency)
+    let plugin = find({ chain, currency })
 
     if (plugin.validateUnsignedTx) {
 
@@ -233,7 +231,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
         
         return {
           success: true,
-          transactions: payment.transactions.map(({tx}) => tx)
+          transactions: payment.transactions.map(({txhex}) => txhex)
         }
 
       } else {
@@ -249,7 +247,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
         await plugin.verifyPayment({
           payment_option,
-          hex: transaction.tx,
+          transaction,
           protocol: 'JSONV2'
         })
 
@@ -257,7 +255,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
         await verifyPayment({
           payment_option,
-          transaction: transaction,
+          transaction,
           protocol: 'JSONV2'
         })
 
@@ -269,7 +267,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     return {
       success: true,
-      transactions: payment.transactions.map(({tx}) => tx)
+      transactions: payment.transactions.map(({txhex}) => txhex)
     }
 
   } catch(error) {
@@ -361,13 +359,6 @@ export interface PaymentVerificationRequest {
 interface PaymentVerification {
   payment: Payment;
   memo: string;
-}
-
-export interface Transaction {
-  tx: string;
-  weightedSize?: number;
-  tx_key?: string;
-  tx_hash?: string;
 }
 
 interface Payment {
@@ -494,12 +485,22 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
   if (!params.chain && params.currency) { params.chain = params.currency }
   if (!params.currency && params.chain) { params.currency = params.chain }
 
-  await Protocol.PaymentVerification.request.validateAsync(params, { allowUnknown: true })
+  let verifyParams: any = params
+
+  verifyParams.transactions = params.transactions.map(transaction => {
+    return {
+      tx: transaction.txhex,
+      tx_key: transaction.txkey
+    }
+  })
+
+  await Protocol.PaymentVerification.request.validateAsync(verifyParams, { allowUnknown: true })
 
   await verifyUnsigned({
     invoice_uid: invoice.uid,
     transactions: params.transactions,
-    currency: params.currency
+    currency: params.currency,
+    chain: params.chain
   })
 
   return {
@@ -525,7 +526,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
     for (let tx of params.transactions) {
 
-      if (!tx.tx_key || !tx.tx_hash) {
+      if (!tx.txkey || !tx.txid) {
 
         throw new Error('tx_key and tx_hash required for all XMR transactions')
 

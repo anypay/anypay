@@ -7,8 +7,9 @@ import {
   Confirmation,
   BroadcastTx,
   BroadcastTxResult,
-  Transaction as AnypayTransaction,
-  Payment as AnypayPayment
+  Transaction,
+  Payment as AnypayPayment,
+  ValidateUnsignedTx
 } from '../../lib/plugin'
 
 import * as bitcore from './bitcore'
@@ -24,8 +25,6 @@ import { Client } from 'payment-protocol'
 import { config } from '../../lib/config'
 
 import { v4 as uuid } from 'uuid'
-
-import { Transaction } from '../../lib/pay/json_v2/protocol'
 
 import { other_rpc } from './json_rpc'
 
@@ -83,6 +82,8 @@ export default class XMR extends Plugin {
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
+    console.log("XMR VERIFY UNSIGNED", params)
+
     //TODO
     throw new Error()
 
@@ -90,7 +91,7 @@ export default class XMR extends Plugin {
 
   }
 
-  async getTransaction(txid: string): Promise<AnypayTransaction> {
+  async getTransaction(txid: string): Promise<Transaction> {
 
     //TODO
     throw new Error()
@@ -106,7 +107,9 @@ export default class XMR extends Plugin {
 
   }
 
-  async validateUnsignedTx({ tx_hex }: { tx_hex: string }): Promise<Boolean> {
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
+
+    console.log('VALIDATE UNSIGNED', params)
 
     //TODO
     return true
@@ -114,6 +117,8 @@ export default class XMR extends Plugin {
   }
 
   async broadcastTx({ txhex, txid, txkey }: BroadcastTx): Promise<BroadcastTxResult> {
+
+    console.log('BROADCAST TX', { txhex, txid, txkey })
 
     const result = await send_raw_transaction({ tx_as_hex: txhex, do_not_relay: false })
 
@@ -402,16 +407,16 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
       log.info('xmr.verifyPayment', {
         invoice_uid, 
         payment_option, 
-        tx: transaction.tx,
-        tx_key: transaction.tx_key,
-        t_hash: transaction.tx_hash,
+        txhex: transaction.txhex,
+        txkey: transaction.txkey,
+        txid: transaction.txid,
         url
       })
     
       await verify({
         url,
-        tx_hash: String(transaction.tx_hash),
-        tx_key: String(transaction.tx_key)
+        tx_hash: String(transaction.txid),
+        tx_key: String(transaction.txkey)
       })
       
     } catch(error) {

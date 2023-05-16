@@ -9,8 +9,6 @@ import { log } from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
-export { bch as bitcore }
-
 var bchaddr: any = require('bchaddrjs');
 
 import { oneSuccess } from 'promise-one-success'
@@ -31,6 +29,12 @@ export default class BCH extends Plugin {
   chain: string = 'BCH'
 
   decimals: number = 8;
+
+  get bitcore() {
+
+    return bch
+
+  }
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO
