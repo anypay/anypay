@@ -1,6 +1,8 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
 
+const bitcoinJsLib = require('bitcoinjs-lib')
+
 import * as moment from 'moment'
 
 import {
@@ -11,8 +13,6 @@ import {
 } from '../../lib'
 
 import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
-
-import { log } from '../../lib/log'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
@@ -117,13 +117,11 @@ export default class BTC extends Plugin {
 
     try {
 
-      new btc.Address(address);
+      bitcoinJsLib.address.toOutputScript(address, bitcoinJsLib.networks.bitcoin)
 
-      return true;
+      return true
 
     } catch(error) {
-
-      log.debug('plugins.btc.validateAddress.error', error)
 
       return false
 
