@@ -17,7 +17,7 @@ export async function register(server: Server) {
     handler: v0.Invoices.index,
     options: {
       auth: "token",
-      tags: ['api', 'v0', 'invoices']
+      tags: ['v0', 'invoices']
     }
   });
 
@@ -61,11 +61,12 @@ export async function register(server: Server) {
 
   server.route({
     method: "POST",
-    path: "/invoices",
+    path: "/api/v1/invoices",
     handler: v0.Invoices.create,
     options: {
       auth: "token",
-      tags: ['api', 'v0', 'invoices'],
+      tags: ['api', 'invoices'],
+      notes: 'Create an invoice payable by any of the coins enabled on your Anypay merchant account',
       validate: {
         payload:  Joi.object({
           amount: Joi.number().required(),
@@ -86,7 +87,73 @@ export async function register(server: Server) {
             'economyFee',
             'minimumFee'
           ).optional()
-        }).label('InvoiceRequest'),
+        }).label('CreateInvoice'),
+        failAction: 'log'
+      },
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          invoice: Joi.object({
+            uid: Joi.string().required(),
+            uri: Joi.string().required(),
+            status: Joi.string().required(),
+            currency: Joi.string().required(),
+            amount: Joi.number().required(),
+            hash: Joi.string().optional(),
+            payment_options: Joi.array().items(Joi.object({
+              time: Joi.string().optional(),
+              expires: Joi.string().required(),
+              memo: Joi.string().optional(),
+              paymentUrl: Joi.string().required(),
+              paymentId: Joi.string().required(),
+              chain: Joi.string().required(),
+              currency: Joi.string().required(),
+              network: Joi.string().required(),
+              instructions: Joi.array().items(Joi.object({
+                type: Joi.string().optional(),
+                requiredFeeRate: Joi.number().optional(),
+                outputs: Joi.array().items(Joi.object({
+                  address: Joi.string(),
+                  script: Joi.string(),
+                  amount: Joi.number().required() 
+                }).or('address', 'script').required()),
+              })).required(),
+            })).required(),
+            notes: Joi.array().optional()
+          }).required()
+        }).required()
+      }
+    }
+  });
+
+  server.route({
+    method: "POST",
+    path: "/invoices",
+    handler: v0.Invoices.create,
+    options: {
+      auth: "token",
+      tags: ['deprecated', 'invoices'],
+      validate: {
+        payload:  Joi.object({
+          amount: Joi.number().required(),
+          currency: Joi.string().optional(),
+          redirect_url: Joi.string().optional().allow(''),
+          webhook_url: Joi.string().optional().allow(''),
+          wordpress_site_url: Joi.string().optional().allow(''),
+          memo: Joi.string().optional().allow(''),
+          email: Joi.string().optional().allow(''),
+          external_id: Joi.string().optional().allow(''),
+          business_id: Joi.string().optional().allow(''),
+          location_id: Joi.string().optional().allow(''),
+          register_id: Joi.string().optional().allow(''),
+          required_fee_rate: Joi.string().allow(
+            'fastestFee',
+            'halfHourFee',
+            'hourFee',
+            'economyFee',
+            'minimumFee'
+          ).optional()
+        }).label('CreateInvoice'),
         failAction: 'log'
       },
       response: {
@@ -131,7 +198,8 @@ export async function register(server: Server) {
     handler: v0.Invoices.cancel,
     options: {
       auth: "token",
-      tags: ['api', 'v0', 'invoices']
+      tags: ['api', 'invoices'],
+      notes: 'Cancels an invoice and prevents new payments from being submitted'
     }
   });
 

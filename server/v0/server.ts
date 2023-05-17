@@ -276,7 +276,7 @@ async function Server() {
     path: "/base_currencies",
     handler: v0.BaseCurrencies.index,
     options: {
-      tags: ['v0']
+      tags: []
     }
   });
 
@@ -285,7 +285,7 @@ async function Server() {
     path: "/convert/{oldamount}-{oldcurrency}/to-{newcurrency}",
     handler: v0.PriceConversions.show,
     options: {
-      tags: ['v0']
+      tags: []
     }
   });
 
@@ -295,7 +295,7 @@ async function Server() {
     handler: v0.PaymentRequests.create,
     options: {
       auth: "app",
-      tags: ['api', 'v0'],
+      tags: ['api', 'platform'],
       validate: {
         payload: Joi.object({
           template: schema.PaymentRequestTemplate.required(),
@@ -316,7 +316,7 @@ async function Server() {
     handler: v0.PaymentRequests.cancel,
     options: {
       auth: "app",
-      tags: ['api', 'v0', 'platform'],
+      tags: ['api', 'platform'],
     }
   })
 
@@ -336,7 +336,7 @@ async function Server() {
             secret: Joi.string().optional(),
             metadata: Joi.object().optional()
           }).optional()
-        })
+        }).label('CreatePaymentRequest')
       }
     }
   })
@@ -347,7 +347,7 @@ async function Server() {
     path: '/merchants/{account_id}',
     handler: v0.Merchants.show,
     options: {
-      tags: ['v0']
+      tags: []
     }
   });
 
@@ -363,9 +363,25 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
+    handler: v0.Invoices.showLegacy,
+    options: {
+      tags: ['depreacted'],
+      validate: {
+        params: Joi.object({
+          invoice_id: Joi.string().required()
+        }),
+        failAction
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/api/v1/invoices/{invoice_id}",
     handler: v0.Invoices.show,
     options: {
-      tags: ['api', 'v0'],
+      tags: ['api', 'invoices'],
       validate: {
         params: Joi.object({
           invoice_id: Joi.string().required()
@@ -402,7 +418,7 @@ async function Server() {
               })).required(),
             })).required(),
             notes: Joi.array().optional()
-          }).required()
+          }).required().label('Invoice')
         }).required()
       },
     }

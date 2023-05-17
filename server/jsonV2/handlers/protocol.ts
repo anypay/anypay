@@ -136,6 +136,8 @@ async function verifyUnsignedPayment(req, h) {
 
     let response = await protocol.verifyUnsignedPayment(req.invoice, params, { wallet })
 
+    console.log('RESPONSE', response)
+
     await schema.Protocol.PaymentVerification.response.validate(response)
 
     return h.response(response)
