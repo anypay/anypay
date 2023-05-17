@@ -29,7 +29,7 @@ export interface SubmitPaymentRequest {
 
 export interface SubmitPaymentResponse {
   success: boolean;
-  transactions: string[];
+  transactions: {tx: string}[];
 }
 
 export async function submitPayment(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
@@ -143,7 +143,9 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     return {
       success: true,
-      transactions: payment.transactions.map(({txhex}) => txhex)
+      transactions: payment.transactions.map(({txhex}) => {
+        return { tx: txhex }
+      })
     }
 
   } catch(error) {
@@ -189,6 +191,8 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
+    console.log("HERE 1")
+
     let plugin = find({ chain, currency })
 
     if (plugin.validateUnsignedTx) {
@@ -198,11 +202,17 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
         transactions: payment.transactions
       })
 
+      console.log("HERE 1")
+
       if (valid) {
         
         return {
           success: true,
-          transactions: payment.transactions.map(({txhex}) => txhex)
+          transactions: payment.transactions.map(({txhex}) => {
+            return {
+              tx: txhex
+            }
+          })
         }
 
       } else {
@@ -230,7 +240,11 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     return {
       success: true,
-      transactions: payment.transactions.map(({txhex}) => txhex)
+      transactions: payment.transactions.map(({txhex}) => {
+        return {
+          tx: txhex
+        }
+      })
     }
 
   } catch(error) {

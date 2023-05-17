@@ -72,7 +72,7 @@ describe('JSON Payment Protocol V2', () => {
 
       currency,
 
-      transactions: []
+      transactions: [{ txhex: '' }]
 
     })
 
