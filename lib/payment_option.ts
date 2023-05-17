@@ -31,6 +31,10 @@ export class PaymentOption extends Orm {
     return this.get('address')
   }
 
+  get outputs() {
+    return this.get('outputs')
+  }
+
 }
 
 export async function findPaymentOption({
