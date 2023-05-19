@@ -68,7 +68,7 @@ export async function listUnspent(address): Promise<UTXO[]> {
 
 import { Balance } from '../../wallet'
 
-import { getBalance as blockchair_getBalance } from '../../../../blockchair'
+import { getBalance as blockchair_getBalance } from '../../../blockchair'
 
 export async function getBalance(address): Promise<Balance> {
 

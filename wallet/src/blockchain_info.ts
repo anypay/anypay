@@ -1,6 +1,6 @@
 
 
-import { Utxo } from './simple-wallet/src/wallet'
+import { UTXO } from './utxo'
 
 import config from './config'
 
@@ -10,7 +10,7 @@ import { log } from './log'
 
 class BlockchainInfoError extends Error {}
 
-interface BlockchainInfoUtxo {
+interface BlockchainInfoUTXO {
     tx_hash_big_endian: string;
     tx_hash: string;
     tx_output_n: number;
@@ -21,7 +21,7 @@ interface BlockchainInfoUtxo {
     tx_index: number;
 }
 
-export async function listUnspent(coin: string, address: string): Promise<Utxo[]> {
+export async function listUnspent(coin: string, address: string): Promise<UTXO[]> {
 
     if (coin !== 'BTC') {
 
@@ -33,7 +33,7 @@ export async function listUnspent(coin: string, address: string): Promise<Utxo[]
 
         const { data } = await axios.get(`https://blockchain.info/unspent?active=${address}`)
 
-        return data.unspent_outputs.map((output: BlockchainInfoUtxo) => {
+        return data.unspent_outputs.map((output: BlockchainInfoUTXO) => {
 
             return {
                 txid: output.tx_hash_big_endian,

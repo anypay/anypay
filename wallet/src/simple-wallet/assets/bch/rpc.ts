@@ -1,18 +1,7 @@
 
 import axios from 'axios'
 
-export interface UTXO {
-  txid: string;
-  vout: number;
-  address: string;
-  account: string;
-  scriptPubKey: string;
-  amount: number;
-  confirmations: number;
-  spendable: boolean;
-  solvable: boolean;
-  safe: boolean;
-}
+import { UTXO } from '../../../utxo'
 
 interface RpcOptions {
   url: string;
@@ -27,7 +16,7 @@ import {
   getBalance as blockchair_getBalance,
   listUnspent as blockchair_listUnspent,
   BlockchairUtxo
-} from '../../../../blockchair'
+} from '../../../blockchair'
 
 export class RpcClient {
 

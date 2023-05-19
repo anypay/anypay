@@ -5,7 +5,7 @@ import { listUnpaid } from './invoices'
 
 import * as delay from 'delay'
 
-import { loadWallet } from './simple-wallet/src'
+import { loadWallet } from './simple-wallet'
 
 import { shuffle } from './utils'
 

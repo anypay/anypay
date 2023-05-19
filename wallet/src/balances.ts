@@ -10,11 +10,12 @@ interface Unspent {
 }
 
 export interface Balance {
-  asset: string;
+  chain: string;
+  currency: string;
   value: number;
-  usd_value?: number;
-  last_updated?: Date;
+  decimals?: number; //TODO: Resolve why this is optional
   address?: string;
+  last_updated?: Date;
   unspent?: Unspent[];
 }
 

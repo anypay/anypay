@@ -10,9 +10,11 @@ import { log } from './log'
 
 export { log } from './log'
 
-import { loadWallet, Wallet } from './simple-wallet/src'
+import { loadWallet, Wallet } from './wallet'
 
-export { Card } from './wallet'
+import { Card } from './card'
+
+export { Card } from './card'
 
 export { config }
 
@@ -32,10 +34,11 @@ export async function initWalletFromMnemonic(): Promise<Wallet> {
 
   }
 
-  const { wallets } = MnemonicWallet.init(mnemonic)
+  const { cards }: { cards: Card[] } = MnemonicWallet.init(mnemonic)
 
-  const wallet: Wallet = await loadWallet(wallets)
+  const wallet: Wallet = new Wallet({ cards })
 
   return wallet
 
 }
+

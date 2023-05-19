@@ -47,7 +47,7 @@ export class RpcClient {
 
 }
 
-import { getBalance as blockchair_getBalance, listUnspent as blockchair_listUnspent, BlockchairUtxo } from '../../../../blockchair'
+import { getBalance as blockchair_getBalance, listUnspent as blockchair_listUnspent, BlockchairUtxo } from '../../../blockchair'
 
 import { run, RunUtxo } from '../../run'
 

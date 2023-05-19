@@ -7,7 +7,7 @@ import config from './config'
 
 import BigNumber from 'bignumber.js'
 
-export interface Balance {
+export interface Amount {
 
   currency: Currency;
 
@@ -15,7 +15,7 @@ export interface Balance {
 
 }
 
-export async function convertBalance(balance: Balance, currency: Currency): Promise<Balance> {
+export async function convertBalance(balance: Balance, currency: Currency): Promise<Amount> {
 
   const api = config.get('api_base')
 

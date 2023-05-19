@@ -5,7 +5,9 @@ import { v4 as uuid } from 'uuid'
 
 import log from './log'
 
-import { Balance } from './simple-wallet/src/wallet'
+import { Balance } from './balances'
+
+import { UTXO } from './utxo'
 
 import config from './config'
 
@@ -64,11 +66,11 @@ export async function getBalance(asset: string, address: string): Promise<Balanc
 
     log.debug('blockchair.getBalance.result', data)
 
-    const { balance: value, balance_usd: value_usd } = data['data'][address]['address']
+    const { balance: value } = data['data'][address]['address']
 
     const utxos = data['data'][address]['utxo']
 
-    return { asset, address, value: parseFloat(value), value_usd: parseFloat(value_usd.toFixed(2)) }
+    return { chain: asset, currency: asset, address, value: parseFloat(value) }
 
   } catch(err) {
 
@@ -88,13 +90,7 @@ export interface BlockchairUtxo {
   value: number;
 }
 
-interface Utxo {
-  txid: string;
-  vout: number;
-  value: number;
-}
-
-export async function listUnspent(asset: string, address: string): Promise<Utxo[]> {
+export async function listUnspent(asset: string, address: string): Promise<UTXO[]> {
 
   try {
 
@@ -106,8 +102,12 @@ export async function listUnspent(asset: string, address: string): Promise<Utxo[
 
     log.debug('blockchair.listUnspent.result', data)
 
-    const utxos: BlockchairUtxo[] = data['data'][address]['utxo']
+    //const utxos: BlockchairUtxo[] = data['data'][address]['utxo']
+    const utxos: any[] = data['data'][address]['utxo'] //TODO: Revert any
 
+    console.log('UTXOs', utxos) //TODO: Remove
+
+    /*
     return utxos.map(utxo => {
       return {
         txid: utxo.transaction_hash,
@@ -115,7 +115,9 @@ export async function listUnspent(asset: string, address: string): Promise<Utxo[
         value: utxo.value
       }
     })
+    */
 
+    return utxos
 
   } catch(err) {
 

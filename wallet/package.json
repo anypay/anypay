@@ -9,7 +9,7 @@
       "test": "NODE_ENV=test nyc --reporter=lcov mocha --require=ts-node/register --timeout=20000 __tests__/**/*_test.ts --exit",
       "runtest": "NODE_ENV=test nyc nyc --reporter=lcov mocha --require=ts-node/register --timeout=20000 $1",
       "build": "tsc",
-      "postbuild": "shebang-trim dist/wallet-bot/src/bin/cli.js && chmod +x dist/wallet-bot/src/bin/cli.js",
+      "postbuild": "shebang-trim dist/bin/cli.js && chmod +x dist/bin/cli.js",
       "ci": "circleci local execute --job build",
       "commit": "npx cz",
       "seed-phrase": "seed-phrase",
@@ -28,6 +28,7 @@
       "@hapi/inert": "^6.0.5",
       "@hapi/joi": "^17.1.1",
       "@hapi/vision": "^6.1.0",
+      "@solana/web3.js": "^1.76.0",
       "anypay": "^0.1.1",
       "anypay-simple-wallet": "^0.4.0",
       "axios": "^0.27.2",
@@ -49,10 +50,12 @@
       "rabbi": "^1.19.4",
       "seed-phrase": "^1.0.0",
       "socket.io-client": "^4.5.1",
+      "usdc": "^0.1.4",
       "winston": "^3.3.3",
       "winston-loki": "^6.0.5",
       "winston-transport": "^4.5.0",
-      "ws": "^8.2.0"
+      "ws": "^8.2.0",
+      "yargs": "^17.7.2"
    },
    "devDependencies": {
       "@hapi/code": "^8.0.7",

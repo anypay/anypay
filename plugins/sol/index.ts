@@ -17,7 +17,7 @@ export default class SOL extends Plugin {
 
   chain = 'SOL'
 
-  decimals = 0 //TODO
+  decimals = 9
 
   async parsePayments(txhex: string): Promise<Payment[]> {
     throw new Error() //TODO

@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import { Client } from 'payment-protocol'
 
-import { log }  from '../../../..'
+import { log }  from '../../..'
 
 const bitcore = {
 

@@ -6,7 +6,7 @@ export { bitcore }
 
 import { Utxo } from '../../wallet'
 
-import { listUnspent as blockchainInfoListUnspent } from '../../../../blockchain_info'
+import { listUnspent as blockchainInfoListUnspent } from '../../../blockchain_info'
 
 export const rpc = {
 

@@ -2,11 +2,11 @@
 
 import { program } from 'commander'
 
-import { loadWallet } from '../wallet'
+import { loadWallet } from '../simple-wallet/wallet'
 
 import * as btc from 'bitcore-lib'
 
-import { Client } from '/Users/zyler/github/anypay/payment-protocol'
+import { Client } from 'payment-protocol'
 
 program
   .command('balances')
