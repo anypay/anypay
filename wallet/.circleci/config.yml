@@ -1,0 +1,54 @@
+version: 2.1
+jobs:
+
+  build:
+    docker:
+      - image: circleci/node:14
+      - image: circleci/postgres:9.5-postgis
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: database
+          POSTGRES_PASSWORD: "letmein"
+      - image: rabbitmq:3
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - run:
+          name: Run Main Tests
+          command: npm test
+      - run:
+          name: Report Code Coverage
+          command: |
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov
+      - run:
+          name: Tag and Release New Version
+          command: npx semantic-release
+
+
+  build_docker:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build docker image
+          command: docker build -t $DOCKER_REPO:$CIRCLE_BRANCH . 
+      - run:
+          name: Push to Docker Hub
+          command: |
+            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+            docker push $DOCKER_REPO:$CIRCLE_BRANCH
+
+workflows:
+  version: 2
+  build_and_release:
+    jobs:
+      - build
+      - build_docker:
+          requires:
+            - build

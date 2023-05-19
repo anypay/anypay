@@ -1,0 +1,86 @@
+{
+   "name": "wallet-bot",
+   "version": "0.8.1",
+   "private": false,
+   "description": "Your Money-Sending Robot Friend",
+   "main": "./dist/wallet-bot/src/index.js",
+   "scripts": {
+      "start": "ts-node src/main.ts",
+      "test": "NODE_ENV=test nyc --reporter=lcov mocha --require=ts-node/register --timeout=20000 __tests__/**/*_test.ts --exit",
+      "runtest": "NODE_ENV=test nyc nyc --reporter=lcov mocha --require=ts-node/register --timeout=20000 $1",
+      "build": "tsc",
+      "postbuild": "shebang-trim dist/wallet-bot/src/bin/cli.js && chmod +x dist/wallet-bot/src/bin/cli.js",
+      "ci": "circleci local execute --job build",
+      "commit": "npx cz",
+      "seed-phrase": "seed-phrase",
+      "cover:report": "nyc report --reporter=lcov --reporter=text"
+   },
+   "bin": {
+      "wallet-bot": "dist/wallet-bot/src/bin/cli.js"
+   },
+   "keywords": [],
+   "author": "Anypay",
+   "license": "",
+   "dependencies": {
+      "@dashevo/dashcore-mnemonic": "^1.6.1",
+      "@hapi/basic": "^7.0.0",
+      "@hapi/hapi": "^20.2.2",
+      "@hapi/inert": "^6.0.5",
+      "@hapi/joi": "^17.1.1",
+      "@hapi/vision": "^6.1.0",
+      "anypay": "^0.1.1",
+      "anypay-simple-wallet": "^0.4.0",
+      "axios": "^0.27.2",
+      "bip39": "^3.0.4",
+      "bitcoinme": "^1.0.0",
+      "bitcore-lib-doge": "^8.25.40",
+      "commander": "^9.3.0",
+      "delay": "^5.0.0",
+      "dotenv": "^10.0.0",
+      "fastq": "^1.13.0",
+      "hapi-swagger": "^14.3.0",
+      "joi": "^17.6.0",
+      "nconf": "^0.12.0",
+      "node-cron": "^3.0.0",
+      "payment-protocol": "^0.3.0",
+      "pg": "^8.4.0",
+      "prom-client": "^14.0.1",
+      "prompt-async": "^0.9.9",
+      "rabbi": "^1.19.4",
+      "seed-phrase": "^1.0.0",
+      "socket.io-client": "^4.5.1",
+      "winston": "^3.3.3",
+      "winston-loki": "^6.0.5",
+      "winston-transport": "^4.5.0",
+      "ws": "^8.2.0"
+   },
+   "devDependencies": {
+      "@hapi/code": "^8.0.7",
+      "@hapi/lab": "^24.6.0",
+      "@types/node": "^8.10.66",
+      "chai": "^4.3.6",
+      "chai-as-promised": "^7.1.1",
+      "codecov": "^3.8.3",
+      "commitizen": "^4.2.4",
+      "cz-conventional-changelog": "^3.3.0",
+      "mocha": "^9.1.2",
+      "nyc": "^15.1.0",
+      "shebang-trim": "^1.1.0",
+      "ts-node": "3.3.0",
+      "typescript": "^3.9.10"
+   },
+   "config": {
+      "commitizen": {
+         "path": "./node_modules/cz-conventional-changelog"
+      }
+   },
+   "nyc": {
+      "check-coverage": false,
+      "all": true,
+      "include": [
+         "src/**.ts"
+      ],
+      "reporter": "lcov",
+      "report-dir": "./coverage"
+   }
+}

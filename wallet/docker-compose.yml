@@ -1,0 +1,45 @@
+version: "3.9"
+
+services:
+
+  wallet:
+    build:
+      context: .
+    environment:
+      loki_host: http://loki:3100
+      LOKI_HOST: http://loki:3100
+    ports:
+      - 5200
+
+  prometheus:
+    image: prom/prometheus
+    build:
+      context: ./devops/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - prometheus-data:/var/lib/prometheus
+
+  grafana:
+    image: grafana/grafana
+    build:
+      context: ./devops/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  loki:
+    image: grafana/loki
+    ports:
+      - 3100:3100
+    volumes:
+      - loki-data:/var/lib/loki
+
+volumes:
+  grafana-data:
+    external: true
+  prometheus-data:
+    external: true
+  loki-data:
+    external: true
