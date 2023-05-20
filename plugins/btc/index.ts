@@ -100,9 +100,4 @@ export function validateAddress(address: string){
 
 }
 
-export async function getNewAddress(deprecatedParam){
-
-  return deprecatedParam.value;
-
-}
 

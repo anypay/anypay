@@ -194,6 +194,9 @@ export async function findAddress(account: Account, currency: string): Promise<A
 }
 
 export class Address extends Orm {
+
+  static model = models.Address
+
   currency: string;
   chain: string;
 }

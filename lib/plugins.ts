@@ -3,7 +3,7 @@ require('bitcore-lib')
 
 import configurePlugins from "../config/plugins";
 
-import { models } from './';
+import { Address } from './addresses' 
 
 export interface BroadcastTxResult {
   txid: string;
@@ -69,30 +69,29 @@ class Plugins {
 
   }
 
-  async getNewAddress(currency: string, accountId: number, amount) {
+  async getNewAddress(currency: string, address: Address, amount) {
 
     if (currency === 'USDC') { currency = 'MATIC' }
 
-    let address = await models.Address.findOne({ where: {
-
-      currency,
-
-      account_id: accountId 
-
-    }});
-
     if (!address) {
-      throw new Error(`${currency} address not found for account ${accountId}`);
+      throw new Error(`${currency} address not found for account ${address.get('account_id')}`);
     }
 
-    if(!this.plugins[currency].getNewAddress){
+    let plugin = this.plugins[currency]
 
-      return address.value
+    if (!plugin) {
 
-    } else {
+      return address.get('value')
 
-      return await this.plugins[currency].getNewAddress(address, amount);
     }
+
+    if(!plugin.getNewAddress) {
+
+      return address.get('value')
+
+    }
+
+    return plugin.getNewAddress(address.record, amount);
 
   }
 

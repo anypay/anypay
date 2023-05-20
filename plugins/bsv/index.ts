@@ -12,6 +12,8 @@ import * as run from './lib/run'
 
 import * as whatsonchain from './lib/whatsonchain'
 
+import { Address } from '../../lib/addresses'
+
 interface Payment {
   amount: number;
   hash: string;
@@ -157,17 +159,19 @@ export async function transformAddress(alias: string){
 }
 
 
-export async function getNewAddress(params){
+export async function getNewAddress(address: Address): Promise<string>{
 
-  if (params.paymail && params.paymail.match('handcash.io')) {
+  const paymail = address.get('paymail')
 
-    let resolved = await polynym.resolveAddress(params.paymail)
+  if (paymail) {
+
+    let resolved = await polynym.resolveAddress(paymail)
 
     return resolved.address
 
   } else {
 
-    return params.value;
+    return address.get('value');
 
   }
 
