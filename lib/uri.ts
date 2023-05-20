@@ -22,7 +22,7 @@ const protocols = {
   'BSV': 'pay'
 };
 
-export function computeInvoiceURI(params: InvoiceURIParams) {
+export function computeInvoiceURI(params: InvoiceURIParams): string {
 
   const protocol = protocols[params.currency] || 'pay';
 

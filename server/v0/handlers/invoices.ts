@@ -12,6 +12,8 @@ import { Invoice, getInvoice, createInvoice, cancelInvoice } from '../../../lib/
 
 import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
+import { computeInvoiceURI } from '../../../lib/uri'
+
 import * as moment from 'moment';
 
 export async function cancel(req, h) {
@@ -144,7 +146,7 @@ export async function index (request, reply) {
 
 };
 
-export async function create(request, h) {
+export async function createDeprecated(request, h) {
 
   const account = new Account(request.account)
 
@@ -164,6 +166,80 @@ export async function create(request, h) {
     const json = invoice.toJSON();
 
     const payment_options = await getPaymentOptions(invoice.uid)
+
+    const responseInvoice = {
+      amount: json['amount'],
+      currency: json['denomination'],
+      status: json['status'],
+      uid: json['uid'],
+      uri: json['uri'],
+      createdAt: json['createdAt'],
+      expiresAt: json['expiry'],
+      payment_options: payment_options.map(option => {
+
+        const { chain, currency, instructions } = option
+
+        const uri = computeInvoiceURI({ uid: json.uid, currency: chain })
+
+        const amount = instructions[0].outputs.reduce((sum, output) => {
+
+          return sum + output.amount
+
+        }, 0)
+
+        return {
+          uri,
+          chain,
+          currency,
+          amount 
+        }
+
+      })
+    }
+
+    return h.response({
+      success: true,
+      invoice: responseInvoice,
+      uid: json['uid']
+    })
+    .code(200)
+
+  } catch(error) {
+
+    log.error('api.v0.invoices.create', error)
+
+    return h.badRequest(error)
+
+  }
+
+}
+
+
+
+export async function create(request, h) {
+
+  const account = new Account(request.account)
+
+  try {
+
+    let invoice: Invoice = await createInvoice({
+      account,
+      ...request.payload
+    })
+
+    if (request.is_public_request) {
+
+      invoice.set('is_public_request', true);
+
+    }
+
+    const json = invoice.toJSON();
+
+    console.log('get-payment-options')
+
+    const payment_options = await getPaymentOptions(invoice.uid)
+
+    console.log('payment-options', payment_options)
 
     const responseInvoice = {
       amount: json['amount'],

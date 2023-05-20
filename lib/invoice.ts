@@ -153,7 +153,7 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   await invoice.set('expiry', moment().add(15, 'minutes').toDate())
 
-  log.info('invoice.refreshed', {
+  log.debug('invoice.refreshed', {
     invoice_uid: invoice.uid,
     expiry: invoice.expiry
   })
