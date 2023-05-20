@@ -363,6 +363,24 @@ async function Server() {
   server.route({
     method: "GET",
     path: "/invoices/{invoice_id}",
+    handler: v0.Invoices.showDeprecated,
+    options: {
+      tags: ['api', 'v0'],
+      validate: {
+        params: Joi.object({
+          invoice_id: Joi.string().required()
+        }),
+        failAction
+      },
+      plugins: responsesWithSuccess({ model: models.Invoice.Response })
+    }
+  });
+
+
+
+  server.route({
+    method: "GET",
+    path: "/api/v1/invoices/{invoice_id}",
     handler: v0.Invoices.show,
     options: {
       tags: ['api', 'v0'],

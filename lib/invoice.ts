@@ -27,24 +27,19 @@ import { findAll, findOne } from './orm';
 import { PaymentRequest } from './payment_requests';
 import { Invoice } from './invoices';
 
-interface Address {
-  currency: string;
-  value: string;
-  chain?: string;
-}
+import { Address } from './addresses';
 
-async function getNewInvoiceAddress(accountId: number, currency: string, amount): Promise<Address> {
-  var address;
+async function getNewInvoiceAddress(address: Address, currency: string, amount): Promise<{currency:string, value:string}> {
 
-  address = await plugins.getNewAddress(currency, accountId, amount);
+  const value = await plugins.getNewAddress(currency, address, amount);
 
-  if (!address) {
+  if (!value) {
     throw new Error(`unable to generate address for ${currency}`);
   }
 
   return {
     currency,
-    value: address
+    value
   }
 
 };
@@ -186,94 +181,111 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
 // TODO: Only create options from existing options coins if options exist
 export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
+  console.log('listAvailableAddresses')
 
-  let addresses = await listAvailableAddresses(new Account(account))
+  let addresses: Address[] = await listAvailableAddresses(new Account(account))
+
+  console.log('listAvailableAddresses.result', addresses)
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
 
-    let { currency, chain } = record
+    try {
 
-    if (!chain) { chain = currency }
+      let { currency, chain } = record
 
-    if (currency === 'MATIC') {
+      if (!chain) { chain = currency }
 
-      currency = 'USDC'
+      if (currency === 'MATIC') {
 
-      chain = 'MATIC'
+        currency = 'USDC'
 
-    }
+        chain = 'MATIC'
 
-    let coin = getCoin(record.currency)
+      }
 
-    const value = invoice.get('amount')
+      let coin = getCoin(record.currency)
 
-    let { value: amount } = await convert({
-      currency: account.denomination,
-      value
-    }, currency, coin.precision);
+      const value = invoice.get('amount')
 
-    let address = (await getNewInvoiceAddress(account.id, currency, amount)).value;
+      let { value: amount } = await convert({
+        currency: account.denomination,
+        value
+      }, currency, coin.precision);
 
-    if (address.match(':')) {
-      address = address.split(':')[1]
-    }
+      console.log('get new invoice address', {currency, record})
 
-    var paymentAmount = pay.toSatoshis(amount, currency)
+      let address = (await getNewInvoiceAddress(record, currency, amount)).value;
 
-    let outputs = []
+      console.log({ address })
 
-    let fee = await pay.fees.getFee(currency, paymentAmount)
+      if (address.match(':')) {
+        address = address.split(':')[1]
+      }
 
-    if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
+      var paymentAmount = pay.toSatoshis(amount, currency)
 
-      paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
+      let outputs = []
 
-      outputs.push({
+      let fee = await pay.fees.getFee(currency, paymentAmount)
+
+      if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
+
+        paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
+
+        outputs.push({
+          address,
+          amount: paymentAmount
+        })
+
+        outputs.push({
+          address: fee.address,
+          amount: fee.amount
+        })
+
+      } else {
+
+        outputs.push({
+          address,
+          amount: paymentAmount
+        })
+
+      }
+
+      let uri = computeInvoiceURI({
+        currency: currency,
+        uid: invoice.uid
+      });
+
+      amount = outputs.reduce((sum, output) => {
+
+        return sum.plus(output.amount)
+
+      }, new BigNumber(0)).toNumber()
+
+      let optionRecord = await models.PaymentOption.create({
+        invoice_uid: invoice.uid,
+        currency,
+        chain,
+        amount,
         address,
-        amount: paymentAmount
+        outputs,
+        uri,
+        fee: fee.amount
       })
 
-      outputs.push({
-        address: fee.address,
-        amount: fee.amount
-      })
+      return new PaymentOption(optionRecord)
 
-    } else {
+    } catch(error) {
 
-      outputs.push({
-        address,
-        amount: paymentAmount
-      })
+      console.error('create payment option error', error)
+
+      return null
 
     }
-
-    let uri = computeInvoiceURI({
-      currency: currency,
-      uid: invoice.uid
-    });
-
-    amount = outputs.reduce((sum, output) => {
-
-      return sum.plus(output.amount)
-
-    }, new BigNumber(0)).toNumber()
-
-    let optionRecord = await models.PaymentOption.create({
-      invoice_uid: invoice.uid,
-      currency,
-      chain,
-      amount,
-      address,
-      outputs,
-      uri,
-      fee: fee.amount
-    })
-
-    return new PaymentOption(optionRecord)
 
   }));
 
-  return paymentOptions
+  return paymentOptions.filter(option => !!option)
 }
 
 export function isExpired(invoice) {

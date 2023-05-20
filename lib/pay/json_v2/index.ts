@@ -8,16 +8,17 @@ require('dotenv').config();
 
 import * as moment from 'moment';
 
-import { config } from '../../config'
-
-import * as mempool from '../../mempool.space'
-
 import { PaymentOption, GetCurrency, Currency } from '../types';
+
 import { nameFromCode } from '../currencies';
+
 import { BigNumber } from 'bignumber.js';
 
 import { getFee, Fee } from '../fees';
+
 import { getBaseURL } from '../environment';
+
+import { getRequiredFeeRate } from '../required_fee_rate'
 
 interface JsonV2Output {
   address?: string;
@@ -71,29 +72,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   }
 
-  var requiredFeeRate = 1
-
-  const rate_env_variable = `REQUIRED_FEE_RATE_${currency}`
-
-  const feeFromEnv = process.env[rate_env_variable]
-
-  if (feeFromEnv) {
-
-    requiredFeeRate = parseInt(feeFromEnv)
-
-  }
-
-  if (paymentOption.currency === 'BTC') {
-
-    if (config.get('mempool_space_fees_enabled')) {
-
-      const level = mempool.FeeLevels[options.fee_rate_level]
-
-      requiredFeeRate = await mempool.getFeeRate(level || mempool.FeeLevels.fastestFee)
-
-    }
-
-  }
+  const requiredFeeRate = await getRequiredFeeRate({ chain: currency })
 
   const network = "main"
 

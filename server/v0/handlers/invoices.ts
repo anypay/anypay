@@ -293,9 +293,57 @@ function sanitizeInvoice(invoice) {
   delete resp.webhook_url;
   delete resp.id;
   delete resp.dollar_amount;
+  delete resp.headers;
 
   return resp;
 }
+
+
+export async function showDeprecated(request, reply) {
+
+  let invoiceId = request.params.invoice_id;
+
+  let invoice = await models.Invoice.findOne({
+    where: {
+      uid: invoiceId
+    }
+  });
+
+  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
+
+    invoice = await invoices.refreshInvoice(invoice.uid)
+
+  }
+
+  if (invoice) {
+
+    log.debug('invoice.requested', invoice.toJSON());
+
+    invoice.payment_options = await getPaymentOptions(invoice.uid)
+
+    let notes = await models.InvoiceNote.findAll({where: {
+      invoice_uid: invoice.uid
+    }});
+
+    let sanitized = sanitizeInvoice(invoice);
+
+    let resp = Object.assign({
+      invoice: sanitized,
+      payment_options: invoice.payment_options,
+      notes
+    }, sanitized)
+
+    return resp;
+
+  } else {
+
+    log.error('no invoice found', new Error(`invoice ${invoiceId} not found`));
+
+    throw new Error('invoice not found')
+  }
+
+}
+
 
 export async function show(request, h) {
 

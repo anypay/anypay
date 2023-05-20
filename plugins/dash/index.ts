@@ -67,12 +67,6 @@ export function transformAddress(address: string){
 
 }
 
-export async function getNewAddress(record: any) {
-
-  return record.value;
-
-}
-
 const currency = 'DASH';
 
 export {

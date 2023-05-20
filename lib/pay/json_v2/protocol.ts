@@ -5,8 +5,6 @@ import { config } from '../../config'
 
 import { findPaymentOption } from '../../payment_option'
 
-import * as mempool from '../../mempool.space'
-
 import { log } from '../../log'
 
 import { Protocol } from './schema'
@@ -16,6 +14,8 @@ import { plugins } from '../../plugins'
 import { models } from '../../models'
 
 import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
+
+import { getRequiredFeeRate } from '../required_fee_rate'
 
 export interface Tx {
   tx: string;
@@ -383,25 +383,7 @@ export interface LogOptions {
   wallet?: string;
 }
 
-async function getRequiredFeeRate(invoice: Invoice, currency: string): Promise<number> {
 
-  var requiredFeeRate = 1
-
-  if (currency === 'BTC') {
-
-    if (config.get('mempool_space_fees_enabled')) {
-
-      const level = mempool.FeeLevels[invoice.get('fee_rate_level')]
-
-      requiredFeeRate = await mempool.getFeeRate(level || mempool.FeeLevels.fastestFee)
-
-    }
-
-  }
-
-  return requiredFeeRate
-
-}
 
 export async function listPaymentOptions(invoice: Invoice, options: LogOptions = {}): Promise<PaymentOptions> {
 
@@ -417,7 +399,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
     const estimatedAmount = paymentOption.get('outputs')
       .reduce((sum, output) => sum + output.amount, 0)
 
-    var requiredFeeRate = await getRequiredFeeRate(invoice, paymentOption.get('currency'))
+    const requiredFeeRate = await getRequiredFeeRate({ invoice, chain: paymentOption.get('currency') })
 
     return {
       currency: paymentOption.get('currency'),
@@ -464,7 +446,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
     chain: option.chain
   })
 
-  const requiredFeeRate = await getRequiredFeeRate(invoice, option.currency)
+  const requiredFeeRate = await getRequiredFeeRate({ invoice, chain: option.currency })
 
   const result = {
 

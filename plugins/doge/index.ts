@@ -16,10 +16,6 @@ export function validateAddress(address: string){
 
 }
 
-export async function getNewAddress(record) {
-  return record.value;
-}
-
 import { BroadcastTxResult } from '../../lib/plugins'
 
 import { oneSuccess } from 'promise-one-success'
