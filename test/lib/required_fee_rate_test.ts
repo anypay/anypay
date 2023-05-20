@@ -7,7 +7,7 @@ describe("Required Fee Rate", () => {
 
   it("should get the required fee rate from environment variables", async () => {
 
-    const environmentVariable = Number(process.env.REQUIRED_FEE_RATE_DASH)
+    const environmentVariable = Number(process.env.REQUIRED_FEE_RATE_DOGE)
 
     expect(environmentVariable).to.be.greaterThan(1)
 
