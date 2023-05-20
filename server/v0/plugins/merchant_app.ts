@@ -57,15 +57,71 @@ export async function register(server: Server) {
       auth: "token",
       tags: ['v0', 'invoices']
     }
+
   });
 
   server.route({
     method: "POST",
     path: "/invoices",
+    handler: v0.Invoices.createDeprecated,
+    options: {
+      auth: "token",
+      tags: [],
+      validate: {
+        payload:  Joi.object({
+          amount: Joi.number().required(),
+          currency: Joi.string().optional(),
+          redirect_url: Joi.string().optional().allow(''),
+          webhook_url: Joi.string().optional().allow(''),
+          wordpress_site_url: Joi.string().optional().allow(''),
+          memo: Joi.string().optional().allow(''),
+          email: Joi.string().optional().allow(''),
+          external_id: Joi.string().optional().allow(''),
+          business_id: Joi.string().optional().allow(''),
+          location_id: Joi.string().optional().allow(''),
+          register_id: Joi.string().optional().allow(''),
+          required_fee_rate: Joi.string().allow(
+            'fastestFee',
+            'halfHourFee',
+            'hourFee',
+            'economyFee',
+            'minimumFee'
+          ).optional()
+        }).label('InvoiceRequest'),
+        failAction: 'log'
+      },
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          invoice: Joi.object({
+            amount: Joi.number().required(),
+            currency: Joi.string().required(),
+            status: Joi.string().required(),
+            uid: Joi.string().required(),
+            uri: Joi.string().required(),
+            createdAt: Joi.date().required(),
+            expiresAt: Joi.date().required(),
+            payment_options: Joi.array().items(Joi.object({
+              uri: Joi.string().required(),
+              currency: Joi.string().required(),
+              amount: Joi.number().required(),
+              chain: Joi.string().required()
+            })).label('PaymentOptions').required()
+          }).label('Invoice').required()
+        })
+      }
+    }
+  });
+
+
+
+  server.route({
+    method: "POST",
+    path: "/api/v1/invoices",
     handler: v0.Invoices.create,
     options: {
       auth: "token",
-      tags: ['api', 'v0', 'invoices'],
+      tags: ['api', 'invoices'],
       validate: {
         payload:  Joi.object({
           amount: Joi.number().required(),
