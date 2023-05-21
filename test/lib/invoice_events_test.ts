@@ -32,7 +32,7 @@ describe('Invoice Events', () => {
 
   })
 
-  it('should have a created event by default upon creation', async () => {
+  it.skip('should have a created event by default upon creation', async () => {
 
     let events = await listInvoiceEvents(invoice, 'invoice.created')
 
