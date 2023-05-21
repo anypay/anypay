@@ -6,18 +6,13 @@ import { BigNumber } from 'bignumber.js'
 
 const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
 
-export interface Price {
-  base_currency: string;
-  currency: string;
-  value: number;
-  source: string;
-}
+import { Price } from '../price'
 
-export async function fetchCurrencies(base_currency='USD'): Promise<Price[]> {
+export async function fetchCurrencies(base='USD'): Promise<Price[]> {
 
-  base_currency = base_currency.toLowerCase();
+  base = base.toLowerCase();
 
-  const url = `http://data.fixer.io/api/latest?access_key=${apiKey}&base=${base_currency}`;
+  const url = `http://data.fixer.io/api/latest?access_key=${apiKey}&base=${base}`;
 
   let response = await http.get(url);
 
@@ -26,7 +21,7 @@ export async function fetchCurrencies(base_currency='USD'): Promise<Price[]> {
   return Object.keys(rates).map((currency) => {
 
      return {
-       base_currency: base_currency.toUpperCase(),
+       base: base.toUpperCase(),
        currency: currency,
        value: new BigNumber(1).dividedBy(rates[currency]).toNumber(),
        source: 'data.fixer.io/api/latest'

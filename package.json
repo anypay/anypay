@@ -20,7 +20,7 @@
     "commit": "npx cz",
     "console": "ts-node --experimental-repl-await",
     "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
-    "db:seed:prices": "ts-node test/seed_prices.ts",
+    "db:seed:prices": "NODE_ENV=test ts-node test/seed_prices.ts",
     "dev": "./node_modules/nodemon/bin/nodemon.js --watch 'servers/**/*.ts' --exec 'ts-node' main.ts",
     "runtest": "NODE_ENV=test mocha --require=ts-node/register $TEST --timeout=20000 --exit",
     "start": "ts-node main.ts",

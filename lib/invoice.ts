@@ -218,30 +218,27 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
 // TODO: Only create options from existing options coins if options exist
 export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
-  console.log('listAvailableAddresses')
 
   let addresses: Address[] = await listAvailableAddresses(new Account(account))
 
-  console.log('listAvailableAddresses.result', addresses)
-
-  let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async record => {
+  let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
 
     try {
 
-      if (!chain) { chain = currency }
+      const chain = record.get('chain')
+
+      const currency = record.get('currency')
 
       const value = invoice.get('amount')
+
+      const coin = getCoin(currency)
 
       let { value: amount } = await convert({
         currency: account.denomination,
         value
       }, currency, coin.precision);
 
-      console.log('get new invoice address', {currency, record})
-
-      let newAddress = await getNewInvoiceAddress(account.id, currency, amount)
-
-      let address = await getNewAddress({ account, currency, chain })
+      let address = await getNewAddress({ account, address: record, currency, chain })
 
       if (!address) { return }
 
@@ -316,12 +313,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 }
 
 export function isExpired(invoice) {
-  console.log('invoice.expiry', invoice.expiry)
 
   let expiry = moment(invoice.expiry);  
   let now = moment()
-
-  console.log('now', now.toDate())
 
   return now > expiry;
 }

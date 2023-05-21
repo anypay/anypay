@@ -191,8 +191,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    console.log("HERE 1")
-
     let plugin = find({ chain, currency })
 
     if (plugin.validateUnsignedTx) {
@@ -201,8 +199,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
         payment_option,
         transactions: payment.transactions
       })
-
-      console.log("HERE 1")
 
       if (valid) {
         

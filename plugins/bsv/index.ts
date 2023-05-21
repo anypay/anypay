@@ -2,8 +2,6 @@ require('dotenv').config()
 
 import * as bsv from 'bsv';
 
-import { fromSatoshis } from '../../lib/pay'
-
 import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
@@ -13,12 +11,6 @@ import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transactio
 import { oneSuccess } from 'promise-one-success'
 
 import { blockchair, log } from '../../lib';
-
-import { Account } from '../../lib/account'
-
-import { Address } from '../../lib/addresses'
-
-import { findOne } from '../../lib/orm'
 
 const polynym = require('polynym');
 
@@ -91,32 +83,6 @@ export default class BSV extends Plugin {
     return false
   }
 
-  async getNewAddress(account: Account): Promise<string> {
-
-    let address = await findOne<Address>(Address, {
-      where: {
-        account_id: account.get('id'),
-        currency: 'BSV',
-        chain: 'BSV'
-      }
-    })
-
-    if (!address) { throw new Error('address not found') }
-
-    if (address && address.get('paymail') && address.get('paymail').match('@')) {
-
-      let resolved = await polynym.resolveAddress(address.get('paymail'))
-
-      return resolved.address
-
-    } else {
-
-      return address.get('value');
-
-    }
-
-  }
-
   async validateAddress(address: string): Promise<boolean> {
 
     try {
@@ -162,19 +128,6 @@ export default class BSV extends Plugin {
 export async function transformAddress(alias: string){
 
   try {
-
-    try{
-            
-      if( isCashAddress(alias) ){
-      
-        return toLegacyAddress(alias)
-
-      }
-
-
-    }catch(err){
-
-    }
 
     if (alias.match(':')) {
 

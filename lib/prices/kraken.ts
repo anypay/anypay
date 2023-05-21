@@ -3,7 +3,7 @@ import * as http from 'superagent'
 
 import { log } from '../log'
 
-import { Price } from './'
+import { Price } from '../price'
 
 class InvalidPricePair implements Error {
   name = 'KrakenInvalidPricePair'
@@ -15,11 +15,14 @@ class InvalidPricePair implements Error {
   
 }
 
-const currencies = {
-  'XMR': 'XXMRZUSD'
-}
-
 export async function getPrice(currency: string): Promise<Price> {
+
+  if (currency === 'DOGE') {
+    currency = 'XDG'
+  }
+  if (currency === 'BTC') {
+    currency = 'XBT'
+  }
 
   const pair = `${currency}USD`
 
@@ -27,12 +30,28 @@ export async function getPrice(currency: string): Promise<Price> {
 
     let {body} = await http.get(`https://api.kraken.com/0/public/Ticker?pair=${pair}`)
 
-    var code = currencies[currency]
+    var value: number;
 
-    let value = parseFloat(body.result[code]['a'][0])
+    if (body.result[pair]) {
+
+      value = parseFloat(body.result[`${currency}USD`]['a'][0])
+
+    } else if (body.result[`X${currency}ZUSD`]) {
+
+      value = parseFloat(body.result[`X${currency}ZUSD`]['a'][0])
+
+    } else if (body.result[`X${currency}USD`]) {
+
+      value = parseFloat(body.result[`X${currency}USD`]['a'][0])
+
+    } else {
+
+      throw new Error(`kraken pair ${pair} not supported`)
+
+    }
 
     return {
-      base_currency: 'USD',
+      base: 'USD',
       currency,
       value,
       source: 'kraken'

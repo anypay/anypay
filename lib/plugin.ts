@@ -1,11 +1,13 @@
 
+import { Address } from './addresses'
+
 import { Account } from './account'
 
-import { Address } from './addresses'
+import { Price } from './price'
 
 import { PaymentOption } from './payment_option'
 
-import { findOne } from './orm'
+import { getPrice } from './prices/kraken'
 
 abstract class AbstractPlugin {
 
@@ -25,7 +27,7 @@ abstract class AbstractPlugin {
 
   abstract broadcastTx(params: BroadcastTx): Promise<BroadcastTxResult>;
 
-  abstract getNewAddress(account: Account): Promise<string>;
+  abstract getNewAddress(params: GetNewAddress): Promise<string>;
 
   abstract transformAddress(address: string): Promise<string>;
 
@@ -35,6 +37,13 @@ abstract class AbstractPlugin {
 
   abstract parsePayments(txhex: string): Promise<Payment[]>;
 
+  abstract getPrice({chain, currency, base}: {chain:string, currency: string, base: string}): Promise<Price>;
+
+}
+
+interface GetNewAddress {
+  account: Account;
+  address: Address;
 }
 
 export interface BroadcastTx {
@@ -66,17 +75,15 @@ export abstract class Plugin extends AbstractPlugin {
     return true
   }
 
-  async getNewAddress(account: Account): Promise<string> {
-
-    let address = await findOne<Address>(Address, {
-      where: {
-        account_id: account.get('id'),
-        currency: this.currency,
-        chain: this.chain
-      }
-    })
+  async getNewAddress({address}: { account: Account, address: Address }): Promise<string> {
 
     return address.get('value')
+
+  }
+
+  async getPrice({currency}: { chain: string, currency: string, base: string }): Promise<Price> {
+
+    return getPrice(currency)
 
   }
 

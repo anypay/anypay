@@ -46,6 +46,8 @@ describe("BIP270 Payment Requests", () => {
 
           console.log('RESP BODY', resp.body)
 
+          console.log('--payment url--', resp.body.paymentUrl)
+
           let url = resp.body.paymentUrl.replace('undefined', '')
 
           let parts = url.split('://')[1].split('/')

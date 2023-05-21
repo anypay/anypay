@@ -8,7 +8,12 @@ import { prices } from '../lib';
 
 (async () => {
 
+  console.log('setAllCryptoPrices')
+
   await prices.setAllCryptoPrices()
+
+  console.log('setAllFiatPrices')
+
   await prices.setAllFiatPrices()
 
   process.exit(0);

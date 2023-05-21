@@ -9,7 +9,7 @@ describe('Prices', () => {
   it('#setPrice should set a price in the database', async () => {
 
     await prices.setPrice({
-      base_currency: 'USD',
+      base: 'USD',
       value: 0.0001,
       source: 'testsource',
       currency: 'BTC'
@@ -21,7 +21,7 @@ describe('Prices', () => {
   it("#convert should convert from USD to XRP", async () => {
 
     await prices.setPrice({
-      base_currency: 'USD',
+      base: 'USD',
       value: 0.3,
       source: 'testsource',
       currency: 'XRP'

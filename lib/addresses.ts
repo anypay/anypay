@@ -197,9 +197,13 @@ export class Address extends Orm {
 
   static model = models.Address;
 
-  currency: string;
+  get currency() {
+    return this.get('currency')
+  }
 
-  chain: string;
+  get chain() {
+    return this.get('chain') || this.get('currency')
+  }
 
 }
 

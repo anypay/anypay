@@ -9,20 +9,15 @@ export { fixer }
 
 import { BigNumber } from 'bignumber.js'
 
-import * as http from 'superagent';
-
 import * as bittrex from './bittrex'
 
 import * as kraken from './kraken'
 
+import * as coinmarketcap from './coinmarketcap'
+
 export { bittrex, kraken }
 
-export interface Price {
-  base_currency: string;
-  currency: string;
-  value: number;
-  source: string;
-}
+import { Price } from '../price'
 
 const MAX_DECIMALS = 5;
 
@@ -72,7 +67,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
   // output currency is the payment option currency
 
   let where = {
-    base_currency: outputCurrency,
+    base: outputCurrency,
     currency: inputAmount.currency
   };
 
@@ -90,7 +85,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
   } else {
 
     let inverse = await models.Price.findOne({ where: {
-      base_currency: inputAmount.currency,
+      base: inputAmount.currency,
       currency: outputCurrency
     }});
 
@@ -124,15 +119,13 @@ export async function setPrice(price: Price): Promise<Price> {
 
       currency: price.currency,
 
-      base_currency: price.base_currency
+      base: price.base
 
     },
 
     defaults: price
 
   });
-
-  await models.PriceRecord.create(price)
 
   if (!isNew) {
 
@@ -152,7 +145,7 @@ export async function updateCryptoUSDPrice(currency) {
 
   let BCH_USD_PRICE = await models.Price.findOne({
     where: {
-      base_currency: 'USD',
+      base: 'USD',
       currency
     }
   });
@@ -165,7 +158,7 @@ export async function updateCryptoUSDPrice(currency) {
 
   return Promise.all(prices.map(async (price) => {
 
-    if (price.base_currency === currency || price.currency === currency) {
+    if (price.base === currency || price.currency === currency) {
       return
     }
 
@@ -174,12 +167,12 @@ export async function updateCryptoUSDPrice(currency) {
     await setPrice({
       currency,
       value, 
-      base_currency: price.base_currency,
+      base: price.base,
       source: 'fixer•coinmarketcap'
     });
 
     await setPrice({
-      base_currency: price.base_currency,
+      base: price.base,
       value: 1 / value,
       source: 'fixer•coinmarketcap',
       currency
@@ -202,8 +195,8 @@ export async function updateUSDPrices() {
   return Promise.all(prices.map(price => {
 
     return {
-      base_currency: price.currency,
-      currency: price.base_currency,
+      base: price.currency,
+      currency: price.base,
       value: 1 / price.value,
       source: price.source
     }
@@ -216,57 +209,42 @@ export async function updateUSDPrices() {
 
 }
 
-const http = require('superagent');
-
-export async function getCryptoPrices(base_currency: string) {
-
-  let resp = await http
-     .get('https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest')
-     .query({
-        start: 1,
-        limit: 5000,
-        convert: base_currency
-      })
-      .set( 'X-CMC_PRO_API_KEY', process.env.COINMARKETCAP_API_KEY);
-
-  await models.CoinMarketCapPrice.bulkCreate(resp.body.data.map(price => {
-    price.cmd_id = price.id 
-    delete price['id']
-    return price
-  }))
-
-  return resp.body.data;
-
-}
-
 export async function setAllCryptoPrices() {
 
-  var prices: Price[];
- 
-  const bittrexCoins = [
-    'AVAX',
-    'BCH',
-    'BTC',
-    'DASH',
-    'DOGE',
-    'ETH',
-    'LTC',
-    'MATIC',
-    'SOL',
-    'USDC',
-    'USDT',
-    'XLM',
-    'ZEC'
-  ];
+  const prices: Promise<Price>[] = [];
 
-  prices = await Promise.all(bittrexCoins.map(bittrex.getPrice))
 
-  prices = prices.filter(p => !!p)
+  prices.push(coinmarketcap.getPrice('BSV'))
 
-  prices.push(await kraken.getPrice('XMR'))
-  prices.push(await kraken.getPrice('TRX'))
+  prices.push(bittrex.getPrice('USDC'))
+  prices.push(bittrex.getPrice('USDT'))
+  prices.push(bittrex.getPrice('MATIC'))
 
-  await Promise.all(prices.map(setPrice))
+  prices.push(kraken.getPrice('XMR'))
+  prices.push(kraken.getPrice('DASH'))
+  prices.push(kraken.getPrice('BTC'))
+  prices.push(kraken.getPrice('BCH'))
+  prices.push(kraken.getPrice('ETH'))
+  prices.push(kraken.getPrice('SOL'))
+
+  prices.push(kraken.getPrice('AVAX'))
+  prices.push(kraken.getPrice('DOGE'))
+  prices.push(kraken.getPrice('LTC'))
+  prices.push(kraken.getPrice('ZEC'))
+  prices.push(kraken.getPrice('XLM'))
+
+  await Promise.all(prices.map(async priceResult => {
+
+    try {
+
+      return setPrice(await priceResult)
+
+    } catch(error) {
+
+      console.error(`error getting price`, error)
+    }
+
+  }))
 
 }
 
