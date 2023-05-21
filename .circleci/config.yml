@@ -23,10 +23,14 @@ jobs:
           name: Seed Prices
           command: npm run db:seed:prices
       - run:
-          name: Run Main Tests
-          command: npm test
-            #- coveralls/upload:
-            #path_to_lcov: ./coverage
+          name: Run Model Tests
+          command: npm run test:models
+      - run:
+          name: Run Lib Tests
+          command: npm run test:lib
+      - run:
+          name: Run Integration Tests
+          command: npm run test:integration
       - run:
           name: Report Code Coverage
           command: |
