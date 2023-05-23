@@ -1,6 +1,4 @@
 
-require('dotenv').config();
-
 import { fromSatoshis, Payment } from '../../lib/pay'
 
 import { blockchair, blockcypher } from '../../lib'
@@ -15,6 +13,8 @@ var WAValidator = require('anypay-wallet-address-validator');
 
 import { BroadcastTxResult } from '../../lib/plugins'
 
+imporot * as rpc from './rpc'
+
 export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
   const broadcastProviders: Promise<BroadcastTxResult>[] = [
@@ -23,7 +23,13 @@ export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
 
     blockcypher.publish('dash', rawTx),
 
-    insight.broadcastTx(rawTx)
+    insight.broadcastTx(rawTx),
+
+    rpc.broadcastTx({ txhex }),
+
+    rpc.broadcastTx2({ txhex }),
+
+    rpc.broadcastTx3({ txhex })
 
   ]
 
