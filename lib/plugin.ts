@@ -155,7 +155,7 @@ export interface Payment {
 }
 
 export interface ValidateUnsignedTx {
-    payment_option: PaymentOption;
+    paymentOption: PaymentOption;
     transactions: Transaction[];
 }
 

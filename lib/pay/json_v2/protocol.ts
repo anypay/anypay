@@ -57,9 +57,9 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       chain
     }
 
-    let payment_option = await models.PaymentOption.findOne({ where })
+    let paymentOption = await models.PaymentOption.findOne({ where })
 
-    if (!payment_option) {
+    if (!paymentOption) {
 
       log.info('pay.jsonv2.payment.error.currency_unsupported', {
         invoice_uid,
@@ -76,7 +76,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
 
       const verified = await verify({
-        payment_option,
+        paymentOption,
         transaction,
         protocol: 'JSONV2'
       })
@@ -96,11 +96,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       var response;
 
-      if (payment_option.currency === 'XMR') {
+      if (paymentOption.currency === 'XMR') {
 
         response = await plugin.broadcastTx(transaction)
 
-      } else if (payment_option.chain === 'SOL') {
+      } else if (paymentOption.chain === 'SOL') {
 
         response = await plugin.broadcastTx(transaction)
 
@@ -115,9 +115,9 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
-      if (payment_option.currency === 'BTC' && config.get('require_btc_confirmations')) {
+      if (paymentOption.currency === 'BTC' && config.get('require_btc_confirmations')) {
 
-        let paymentRecord = await handleUnconfirmedPayment(payment_option, transaction)
+        let paymentRecord = await handleUnconfirmedPayment(paymentOption, transaction)
 
         if (payment.wallet) {
           paymentRecord.wallet = payment.wallet
@@ -128,7 +128,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
          
       } else {
 
-        let paymentRecord = await completePayment(payment_option, transaction)
+        let paymentRecord = await completePayment(paymentOption, transaction)
 
         if (payment.wallet) {
           paymentRecord.wallet = payment.wallet
@@ -181,13 +181,13 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       throw new Error(`invoice ${payment.invoice_uid} not found`)
     }
 
-    let payment_option = await models.PaymentOption.findOne({ where: {
+    let paymentOption = await models.PaymentOption.findOne({ where: {
       invoice_uid: invoice.uid,
       currency,
       chain
     }})
 
-    if (!payment_option) {
+    if (!paymentOption) {
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
@@ -196,7 +196,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
     if (plugin.validateUnsignedTx) {
 
       const valid = await plugin.validateUnsignedTx({
-        payment_option,
+        paymentOption,
         transactions: payment.transactions
       })
 
@@ -221,7 +221,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
     for (const transaction of payment.transactions) {
 
       const verified = await plugin.verifyPayment({
-        payment_option,
+        paymentOption,
         transaction,
         protocol: 'JSONV2'
       })

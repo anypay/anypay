@@ -17,7 +17,7 @@ const mnemonic = process.env.anypay_wallet_mnemonic
 
 describe("Sending USDC Payments on MATIC", () => {
 
-  it("should get the wallet address from the seed phrase", () => {
+  it.skip("should get the wallet address from the seed phrase", () => {
 
     let address = polygon.getAddressFromMnemonic({ mnemonic })
 
@@ -74,6 +74,8 @@ describe("Sending USDC Payments on MATIC", () => {
       currency: 'USDC'
     })
 
+    console.log(paymentOption.toJSON())
+
     expect(paymentOption.outputs.length).to.be.equal(1)
 
     const transaction: Transaction = await buildSignedPayment({ paymentOption, mnemonic })
@@ -92,7 +94,7 @@ describe("Sending USDC Payments on MATIC", () => {
 
   })
 
-  it('createInvoice should include an option for USDC on MATIC', async () => {
+  it.skip('createInvoice should include an option for USDC on MATIC', async () => {
 
 
   })

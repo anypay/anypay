@@ -7,52 +7,9 @@ import Web3 from 'web3'
 
 import { ethers } from 'ethers'
 
+import { Transaction } from './plugin'
+
 import ERC20_ABI from './erc20_abi';
-
-/**
- * 
- * Builds a new signed transaction to send USDC to a given address given the wallet private key.
- * This function does not transmit or broadcast the transaction and therefore no gas will
- * be spent until the transaction is sent by a subsequent call to sendSignedTransaction.
- * 
- * Example ERC20 Transfer: https://etherscan.io/tx/0xeda0433ebbb12256ef1c4ab0278ea0c71de4832b7edd65501cc445794ad1f46c
- * 
- */
-export async function buildERC20Transfer({ mnemonic, address, amount, providerURL, token }: {
-  mnemonic: string, address: string, amount: number, providerURL: string, token: string
-}): Promise<{
-  txhex: string,
-  txid: string;
-}> {
-
-  const provider = new ethers.providers.JsonRpcProvider(providerURL)
-
-  const senderWallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider)
-
-  let contract = new ethers.utils.Interface(ERC20_ABI)
-
-  const data = contract.encodeFunctionData("transfer", [ address, amount ])
-
-  const fees = await provider.getFeeData()
-
-  const gasPrice: any = fees.gasPrice
-
-  const transactionRequest = {
-    gasPrice,
-    to: token,
-    data
-  }
-
-  const populatedTransactionRequest = await senderWallet.populateTransaction(transactionRequest)
-
-  const signedTxHex = await senderWallet.signTransaction(populatedTransactionRequest)
-
-  const transaction = decodeTransactionHex({ transactionHex: signedTxHex })
-
-  const transfer = parseERC20Transfer(transaction)
-  
-  return { txhex: signedTxHex, txid: transfer.hash }
-}
 
 interface TransmitResult {
   blockHash: string,

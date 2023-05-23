@@ -55,7 +55,7 @@ export default class SOL extends Plugin {
 
   }
 
-  async verifyPayment({ payment_option, transaction: {txhex}, protocol }: VerifyPayment): Promise<boolean> {
+  async verifyPayment({ paymentOption, transaction: {txhex}, protocol }: VerifyPayment): Promise<boolean> {
 
     const transaction = Transaction.from(Buffer.from(txhex, 'hex'))
 
@@ -121,7 +121,7 @@ export default class SOL extends Plugin {
 }
 
 interface ValidateUnsignedTx {
-    payment_option; any;
+    paymentOption; any;
     transactions: any[];
 }
 
