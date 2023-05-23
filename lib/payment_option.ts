@@ -1,5 +1,5 @@
 
-import { Orm } from './orm'
+import { Orm, FindOne } from './orm'
 
 import { Invoice } from './invoices'
 
@@ -33,6 +33,14 @@ export class PaymentOption extends Orm {
 
   get outputs() {
     return this.get('outputs')
+  }
+
+  static async findOne(params: FindOne): Promise<PaymentOption> {
+
+    const record = await PaymentOption.model.findOne(params)
+
+    return new PaymentOption(record)
+
   }
 
 }

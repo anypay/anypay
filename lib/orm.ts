@@ -13,7 +13,13 @@ export interface Record {
 
 }
 
-interface FindOrCreate {
+export interface FindOne {
+
+  where: any;
+
+}
+
+export interface FindOrCreate {
 
   where: any;
 
@@ -37,16 +43,45 @@ export class Orm {
 
   }
 
+  /*static findOrCreate<T>(params: FindOrCreate): Promise<[T, boolean]> {
+
+    const [record, isNew] = await T.model.findOrCreate(params)
+
+    return [new T(record), isNew]
+
+  }
+  */
   get id() {
     return this.get('id')
   }
+  /*
 
-  static findOrCreate(params: FindOrCreate) {
+  static async findOrCreate<T extends Orm>(params: FindOrCreate): Promise<[T, boolean]> {
 
-    return Orm.model.findOrCreate(params)
+    const [record, isNew] = await this.model.findOrCreate(params)
+
+    return [new T(record), isNew]
 
   }
 
+  static async findAll<T extends Orm>(params: any): Promise<T[]> {
+
+    let records = await this.model.find(params)
+
+    return records.map(record => new this(record))
+
+  }
+
+  static async findOne<T extends Orm>(params: any): Promise<T| null> {
+
+    let record = await T.model.findOne(params)
+
+    if (!record) { return null }
+
+    return new this(record)
+
+  }
+  */
   async save() {
 
     return this.record.save()

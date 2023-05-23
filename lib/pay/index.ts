@@ -17,8 +17,6 @@ import { models } from '../models'
 import { getBitcore } from '../bitcore';
 import { sendWebhookForInvoice } from '../webhooks';
 
-import { BigNumber } from 'bignumber.js';
-
 import { broadcast } from './broadcast'
 
 import * as bip70 from './bip70';
@@ -440,34 +438,5 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
 }
 
-export function toSatoshis(decimal: number, currency?: string): number {
-
-  if (currency === 'XMR') {
-
-    return new BigNumber(decimal).times(Math.pow(10, 12)).toNumber()
-
-  } else if (['ETH', 'AVAX', 'BNB', 'MATIC'].includes(String(currency))){
-
-    return new BigNumber(decimal).times(Math.pow(10, 18)).toNumber()
-
-  } else if (currency === 'USDC') {
-
-    return new BigNumber(decimal).times(Math.pow(10, 6)).toNumber()
-
-  } else {
-
-    // BSV, BCH, BTC, DASH, LTC, DOGE
-    return new BigNumber(decimal).times(Math.pow(10, 8)).toNumber()
-
-  }
-
-}
-
 export { broadcast }
-
-export function fromSatoshis(integer: number): number {
-
-  return (new BigNumber(integer)).dividedBy(Math.pow(10, 8)).toNumber()
-
-}
 

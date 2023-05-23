@@ -1,7 +1,7 @@
 
 import { models } from './models'
 
-import { Orm } from './orm'
+import { Orm, FindOrCreate } from './orm'
 
 import * as bsv from 'bsv'
 
@@ -11,6 +11,19 @@ interface NewApp {
 }
 
 export class App extends Orm {
+
+  static findOne = findOne;
+
+  static model = models.App
+
+  static async findOrCreate(params: FindOrCreate): Promise<[App, boolean]> {
+
+    const [record, isNew] = await App.model.findOrCreate(params)
+
+    return [new App(record), isNew]
+
+  }
+
 }
 
 export async function findApp(id: number): Promise<App> {

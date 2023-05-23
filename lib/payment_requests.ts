@@ -13,6 +13,20 @@ import BigNumber from 'bignumber.js'
 
 import { create, Orm } from './orm'
 
+import { PaymentOption } from './payment_option'
+
+//type PaymentRequestTemplate = any;
+
+/*export interface PaymentRequest {
+  app_id: number;
+  template: PaymentRequestTemplate;
+  status: string;
+  invoice_uid?: string;
+  uri?: string;
+  webpage_url?: string;
+}
+*/
+
 export class PaymentRequest extends Orm {
 
   static model = models.PaymentRequest
@@ -20,6 +34,33 @@ export class PaymentRequest extends Orm {
   get invoice_uid() {
 
     return this.get('invoice_uid')
+
+  }
+
+  get template() {
+    return this.get('template')
+  }
+
+  get app_id() {
+    return this.get('app_id')
+  }
+
+  get status() {
+    return this.get('status')
+  }
+
+  async getPaymentOption({ chain, currency }: {chain: string, currency: string}): Promise<PaymentOption | null> {
+
+    return PaymentOption.findOne({
+
+      where: {
+
+        invoice_uid: this.invoice_uid,
+
+        currency
+      }
+
+    })
 
   }
 

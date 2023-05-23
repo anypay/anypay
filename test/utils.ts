@@ -16,9 +16,15 @@ import { Account } from '../lib/account'
 
 import { Address } from '../lib/addresses'
 
+import { createApp, App } from '../lib/apps'
+
 import { Invoice, createInvoice } from '../lib/invoices'
 
 import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
+
+//import { initFromConfig } from '../lib/coins'
+
+import { initialize } from '../lib'
 
 export async function generateAccount() {
   return registerAccount(chance.email(), chance.word());
@@ -201,12 +207,12 @@ export {
 
 export { log } from '../lib'
 
-var request, account, walletBot: WalletBot;
+var request, account, walletBot: WalletBot, app: App;
 
 import {Server, server } from '../server/v0/server';
 import * as supertest from 'supertest'
 
-export { server, request, account, walletBot }
+export { server, request, account, walletBot, app }
 
 
 
@@ -290,12 +296,22 @@ beforeEach(() => {
 
 before(async () => {
 
+  console.log('initialize')
+  await initialize()
+
+  console.log('initialized')
+
   await Server();
+
+  //await initFromConfig()
 
   request = supertest(server.listener)
 
   account = await createAccountWithAddresses()
 
+  app = await createApp({ name: 'test', account_id: account.id })
+
   walletBot = (await findOrCreateWalletBot(account)).walletBot
 
 })
+

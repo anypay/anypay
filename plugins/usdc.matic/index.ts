@@ -26,6 +26,23 @@ export default class USDC_MATIC extends Plugin {
 
   decimals = 6
 
+  async buildSignedPayment({ paymentOption, mnemonic }): Promise<AnypayTransaction> {
+
+    const address = paymentOption.outputs[0].address
+
+    const amount = paymentOption.outputs[0].amount
+
+    const {txhex, txid} = await polygon.buildUSDCTransfer({
+      to: address,
+      amount,
+      mnemonic,
+      transmit: false
+    })
+
+    return {txhex, txid}
+
+  }
+
   async getPayments(txid: string): Promise<Payment[]> {
 
     const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
@@ -171,7 +188,7 @@ export default class USDC_MATIC extends Plugin {
 
   }
 
-  async verifyPayment({ payment_option, transaction: {txhex, txid}, protocol }: VerifyPayment) {
+  async verifyPayment({ paymentOption, transaction: {txhex, txid}, protocol }: VerifyPayment) {
 
     /*
 
@@ -181,7 +198,7 @@ export default class USDC_MATIC extends Plugin {
 
     */
 
-    const expectedOutput = payment_option.outputs[0]
+    const expectedOutput = paymentOption.outputs[0]
 
     try {
 
@@ -207,9 +224,9 @@ export default class USDC_MATIC extends Plugin {
 
       }
 
-      const correctAddress = parsed.address.toLowerCase() === expectedOutput.address.toLowerCase()
+      const correctAddress = (parsed.address.toLowerCase() === expectedOutput.address.toLowerCase())
 
-      const correctAmount = expectedOutput.amount === parsed.amount
+      const correctAmount = (expectedOutput.amount === parsed.amount)
 
       return correctAmount && correctAddress
 

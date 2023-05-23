@@ -9,6 +9,8 @@ import { PaymentOption } from './payment_option'
 
 import { getPrice } from './prices/kraken'
 
+import { BigNumber } from 'bignumber.js'
+
 abstract class AbstractPlugin {
 
   abstract readonly currency: string;
@@ -18,6 +20,8 @@ abstract class AbstractPlugin {
   abstract readonly decimals: number;
 
   token: string;
+
+  abstract buildSignedPayment(params: BuildSignedPayment): Promise<Transaction>;
 
   abstract verifyPayment(params: VerifyPayment): Promise<boolean>;
 
@@ -69,6 +73,11 @@ export abstract class Plugin extends AbstractPlugin {
     }
   }
 
+  async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
+
+    throw new Error(`buildSignedPayment not implemented for ${this.currency} on ${this.chain}`)
+  }
+
   // should override if you want this to work properly
   async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
 
@@ -98,7 +107,24 @@ export abstract class Plugin extends AbstractPlugin {
     return address;
 
   }
+
+  toSatoshis(decimal: number): number {
+
+    return new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber()
+
+  }
+
+  fromSatoshis(integer: number): number {
+
+    return new BigNumber(integer).dividedBy(Math.pow(10, this.decimals)).toNumber()
+
+  }
   
+}
+
+export interface BuildSignedPayment {
+  paymentOption: PaymentOption;
+  mnemonic: string;
 }
 
 export interface BroadcastTxResult {
@@ -109,9 +135,9 @@ export interface BroadcastTxResult {
 }
 
 export interface VerifyPayment {
-  payment_option: PaymentOption;
+  paymentOption: PaymentOption;
   transaction: Transaction;
-  protocol: string;
+  protocol?: string;
 }
 
 export interface Transaction {

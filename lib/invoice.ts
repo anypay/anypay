@@ -27,6 +27,8 @@ import { findAll, findOne } from './orm';
 import { PaymentRequest } from './payment_requests';
 import { Invoice } from './invoices';
 
+import { toSatoshis } from './plugins'
+
 import { Address } from './addresses';
 
 interface EmptyInvoiceOptions {
@@ -110,11 +112,13 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     const outputs = await Promise.all(template.to.map(async (to) => {
 
-      const { currency, amount: value } = to
+      const { currency: _currency, amount: value } = to
 
-      const conversion = await convert({ currency, value }, option.get('currency'))
+      const conversion = await convert({ currency: _currency, value }, option.get('currency'))
 
-      const amount = pay.toSatoshis(conversion.value, option.get('currency'))
+      const { currency, chain } = option
+
+      const amount = toSatoshis({decimal: conversion.value, currency, chain})
 
       return {
 
@@ -246,7 +250,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
         address = address.split(':')[1]
       }
 
-      var paymentAmount = pay.toSatoshis(amount, currency)
+      var paymentAmount = toSatoshis({ decimal: amount, currency, chain })
 
       let outputs = []
 

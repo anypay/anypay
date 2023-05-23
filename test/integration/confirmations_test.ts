@@ -24,7 +24,7 @@ describe("Confirming Transactions", () => {
             address: fixtures.BTC_Confirmation_Test.address
           })
 
-        let invoice = await newInvoice({ amount: 100 })
+        let invoice = await newInvoice({ account, amount: 100 })
 
         expect(invoice.status).to.be.equal('unpaid')
 

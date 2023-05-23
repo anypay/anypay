@@ -1,6 +1,10 @@
 
 
-import { models } from '../../lib/models'
+import { App } from '../../lib/apps'
+
+import { AccessToken } from '../../lib/access_tokens'
+
+import { findOne } from '../../lib/orm'
 
 import { log } from '../../lib/log'
 
@@ -12,10 +16,10 @@ export async function auth(request, username, password, hapi) {
     }
   }
 
-  let prometheusApp = await models.App.findOne({
+  const prometheusApp: App = await findOne<App>(App, {
     where: {
       name: 'prometheus',
-      account_id: 1177
+      account_id: 0
     }
   })
 
@@ -27,10 +31,10 @@ export async function auth(request, username, password, hapi) {
     };
   }
 
-  var accessToken = await models.AccessToken.findOne({
+  const accessToken: AccessToken = await findOne<AccessToken>(AccessToken, {
     where: {
       uid: password,
-      app_id: prometheusApp.id
+      app_id: prometheusApp.get('id')
     }
   });
 

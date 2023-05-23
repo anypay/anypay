@@ -5,13 +5,11 @@ import {  } from './log';
 
 import { convert } from './prices'
 
-import { toSatoshis } from './pay'
+import { toSatoshis } from './plugins'
 
 import { computeInvoiceURI } from './uri'
 
 import {getCoin} from './coins';
-
-import { BigNumber } from 'bignumber.js'
 
 import { PaymentRequest } from './payment_requests';
 
@@ -28,18 +26,14 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
     let outputs = await Promise.all(option.to.map(async (to) => {
 
+      const { currency, chain } = option
+
       let conversion = await convert({
         currency: to.currency,
         value: parseFloat(to.amount)
       }, option.currency)
 
-      var amount = toSatoshis(conversion.value)
-
-      if (to.currency === 'XMR') {
-
-        amount = new BigNumber(amount).times(10000).toNumber()
-
-      }
+      var amount = toSatoshis({decimal: conversion.value, currency, chain})
 
       return {
         address: to.address,

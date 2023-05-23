@@ -3,7 +3,7 @@ import { convert } from '../prices';
 
 import { BigNumber } from 'bignumber.js';
 
-import { toSatoshis } from './'
+import { toSatoshis } from '../plugins'
 
 const fees = { }
 
@@ -33,6 +33,18 @@ const feesFiat = {
     value: 0.10
   },
   'XMR': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDC_MATIC': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDT_MATIC': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'MATIC': {
     currency: 'USD',
     value: 0.01
   }
@@ -101,9 +113,11 @@ async function updateFees() {
   
   for (let key of Object.keys(feesFiat)) {
 
-    const fee = await convert(feesFiat[key], key);
+    const [currency, chain] = key.split('_')
 
-    fees[key] = toSatoshis(fee.value)
+    const fee = await convert(feesFiat[key], currency);
+
+    fees[key] = toSatoshis({ decimal: fee.value, currency, chain })
 
   }
 

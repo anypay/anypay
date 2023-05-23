@@ -29,6 +29,13 @@ export class AccessToken extends Orm {
     this.account = account
   }
 
+  static async create(params: any): Promise<AccessToken> {
+
+    const record = await AccessToken.model.create(params)
+
+    return new AccessToken(record)
+  }
+
   get accessToken() {
 
     return this.jwt
