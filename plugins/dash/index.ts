@@ -13,17 +13,17 @@ var WAValidator = require('anypay-wallet-address-validator');
 
 import { BroadcastTxResult } from '../../lib/plugins'
 
-imporot * as rpc from './rpc'
+import * as rpc from './rpc'
 
-export async function broadcastTx(rawTx: string): Promise<BroadcastTxResult> {
+export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
   const broadcastProviders: Promise<BroadcastTxResult>[] = [
 
-    blockchair.publish('dash', rawTx),
+    blockchair.publish('dash', txhex),
 
-    blockcypher.publish('dash', rawTx),
+    blockcypher.publish('dash', txhex),
 
-    insight.broadcastTx(rawTx),
+    insight.broadcastTx(txhex),
 
     rpc.broadcastTx({ txhex }),
 
