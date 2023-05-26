@@ -18,6 +18,16 @@ export class Account extends Orm {
 
   static model = models.Account;
 
+  static async fromAccessToken({ token }: { token: string }): Promise<Account> {
+
+    let accessToken = await models.AccessToken.findOne({ where: { uid: token }})
+
+    if (!accessToken) { return null }
+
+    return this.findOne({ id: accessToken.account_id })
+
+  }
+
   static async findOne(where: any): Promise<Account> {
 
     let record = await models.Account.findOne({ where })

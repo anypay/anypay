@@ -113,7 +113,9 @@ async function updateFees() {
   
   for (let key of Object.keys(feesFiat)) {
 
-    const [currency, chain] = key.split('_')
+    let [currency, chain] = key.split('_')
+
+    if (!chain) { chain = currency }
 
     const fee = await convert(feesFiat[key], currency);
 

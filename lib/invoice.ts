@@ -99,8 +99,6 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     const template = paymentRequest.get('template').find(template => {
 
-      if (template.currency === 'USDC' && !template.chain) { template.chain = 'MATIC' } //TODO: Refactor to remove coin-specific logic
-
       return template.currency === option.get('currency') &&
              (!template.chain || template.chain === option.get('chain'))
 
@@ -176,47 +174,27 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
   for (let address of availableAddresses) {
 
-    if (address.currency == 'ETH') {
+    console.log(address)
 
-      let usdc_address: any = address.toJSON()
-      usdc_address.chain = 'ETH'
-      usdc_address.currency = 'USDC'
-      availableAddresses.push(usdc_address)
+    if (['ETH', 'AVAX', 'MATIC', 'SOL'].includes(address.chain)) {
 
-      //let usdt_address: any = address.toJSON()
-      //usdt_address.chain = 'ETH'
-      //usdt_address.currency = 'USDT'
-      //availableAddresses.push(usdt_address)
+      if (address.chain === address.currency) {
 
-    } else if (address.currency == 'AVAX') {
+        availableAddresses.push(
+          new models.Address({...address.toJSON(), currency: 'USDC' })
+        )
 
-      let usdc_address: any = address.toJSON()
-      usdc_address.chain = 'AVAX'
-      usdc_address.currency = 'USDC'
-      availableAddresses.push(usdc_address)
+        availableAddresses.push(
+          new models.Address({...address.toJSON(), currency: 'USDT' })
+        )
 
-      //let usdt_address: any = address.toJSON()
-      //usdt_address.chain = 'AVAX'
-      //usdt_address.currency = 'USDT'
-      //availableAddresses.push(usdt_address)
+      }
 
-    } else if (address.currency == 'MATIC') {
-
-      let usdc_address: any = address.toJSON()
-      usdc_address.chain = 'MATIC'
-      usdc_address.currency = 'USDC'
-      availableAddresses.push(usdc_address)
-
-      //let usdt_address: any = address.toJSON()
-      //usdt_address.chain = 'MATIC'
-      //usdt_address.currency = 'USDT'
-      //availableAddresses.push(usdt_address)
-
-    }
+    } 
 
   }
 
-  return availableAddresses
+  return availableAddresses.map(record => new Address(record))
 
 }
 
@@ -229,11 +207,13 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     try {
 
-      const chain = record.get('chain')
+      const chain = record.chain
 
-      const currency = record.get('currency')
+      const currency = record.currency
 
-      const value = invoice.get('amount')
+      console.log('RECORD', {chain, currency})
+
+      const value = invoice.amount
 
       const coin = getCoin(currency)
 

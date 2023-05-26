@@ -105,7 +105,7 @@ export default class BCH extends Plugin {
 
     log.info("payment.verify.txoutputs", txOutputs);
 
-    let outputs = await buildOutputs(params.payment_option, 'JSONV2');
+    let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
 
     for (let output of outputs) {
 
