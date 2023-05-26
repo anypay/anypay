@@ -182,6 +182,16 @@ export class Invoice extends Orm {
 
   }
 
+  async getPaymentOption({chain, currency}:{chain:string, currency:string}): Promise<PaymentOption> {
+
+    let record = await models.PaymentOption.findOne({
+      where: { invoice_uid: this.get('uid'), chain, currency }
+    })
+
+    return new PaymentOption(record)
+
+  }
+
 }
 
 interface CreateInvoice {
@@ -258,7 +268,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   let invoice = new Invoice(record)
 
-  await createWebhookForInvoice(invoice)
+  createWebhookForInvoice(invoice)
 
   const paymentOptions = await createPaymentOptions(account.record, invoice)
 
@@ -286,6 +296,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
     invoice_uid: record.uid
 
   })
+
+  console.log('paymentrequest.created', paymentRequest)
 
   log.info('paymentrequest.created', paymentRequest)
 

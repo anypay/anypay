@@ -174,8 +174,6 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
   for (let address of availableAddresses) {
 
-    console.log(address)
-
     if (['ETH', 'AVAX', 'MATIC', 'SOL'].includes(address.chain)) {
 
       if (address.chain === address.currency) {
@@ -205,13 +203,15 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
 
+    const {chain, currency }= record
+
+    console.log({chain, currency})
+
     try {
 
       const chain = record.chain
 
       const currency = record.currency
-
-      console.log('RECORD', {chain, currency})
 
       const value = invoice.amount
 
@@ -285,13 +285,15 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     } catch(error) {
 
-      console.error('create payment option error', error)
+      console.error('create payment option error---', error)
 
       return null
 
     }
 
   }));
+
+  console.log(paymentOptions, '--POs--')
 
   return paymentOptions.filter(option => !!option)
 }

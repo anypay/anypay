@@ -39,5 +39,5 @@ const Wallet = {
 
 }
 
-export default Wallet
+module.exports = Wallet
 
