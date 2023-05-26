@@ -17,7 +17,9 @@ export default abstract class ERC20_Card extends EVM_Card {
 
     let contract = new ethers.Contract(this.token, ERC20_ABI, this.provider)
 
-    return contract.balanceOf(await this.getAddress())
+    const wallet = ethers.Wallet.fromPhrase(this.phrase)
+
+    return contract.balanceOf(wallet.address)
     
   }
 
@@ -25,15 +27,47 @@ export default abstract class ERC20_Card extends EVM_Card {
 
     if (option.instructions.length > 1) { throw new Error('ERC20 supports only one instruction') }
     
-    const wallet = this.getPrivateKey()
+    const wallet = ethers.Wallet.fromPhrase(this.phrase)
+
+    const isBrowser: boolean = process.env.APP_ENV === 'browser'
+
+    console.log('IS BROWSER', isBrowser)
+
+    const provider = isBrowser ? 
+      new ethers.BrowserProvider(window.ethereum, this.chainID) :
+      new ethers.JsonRpcProvider(this.providerURL, this.chainID)
+
+    const signer = isBrowser ?
+      new ethers.JsonRpcSigner(provider, wallet.address) :
+      new ethers.JsonRpcSigner(provider, wallet.address)
 
     let contract = new ethers.Interface(ERC20_ABI)
 
     const [instruction] = option.instructions
 
-    const data = contract.encodeFunctionData("transfer", [ instruction.to, instruction.amount ])
+    var to, amount;
+
+    if (instruction.data) {
+
+      // TODO: Parse to and amount from data instead
+      to = instruction.to
+
+      amount = instruction.amount
+
+    } else if (instruction.outputs) {
+
+      to = instruction.outputs[0].address
+      amount = instruction.outputs[0].amount
+
+    }
+
+    const data = contract.encodeFunctionData("transfer", [ to, amount ])
+
+    console.log('DATA', data)
 
     const fees = await this.provider.getFeeData()
+
+    console.log('FEES', fees)
 
     const gasPrice: any = fees.gasPrice
 
@@ -43,9 +77,15 @@ export default abstract class ERC20_Card extends EVM_Card {
       data
     }
 
-    const populatedTransactionRequest = await wallet.populateTransaction(transactionRequest)
+    console.log(transactionRequest)
 
-    const signedTxHex = await wallet.signTransaction(populatedTransactionRequest)
+    const populatedTransactionRequest = await signer.populateTransaction(transactionRequest)
+
+    console.log('populated', populatedTransactionRequest)
+
+    const signedTxHex = await signer.signTransaction(populatedTransactionRequest)
+
+    console.log('signed', signedTxHex)
 
     const transaction: ethers.Transaction = ethers.Transaction.from(signedTxHex)
 

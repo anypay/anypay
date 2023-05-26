@@ -1,8 +1,11 @@
 {
-  "name": "anypay-wallet",
-  "version": "0.0.1",
+  "name": "@anypay/wallet",
+  "version": "0.0.3",
   "description": "",
-  "main": "index.js",
+  "main": "dist/bundle.js",
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "@types/hex2dec": "^1.1.2",
     "ts-loader": "^9.4.3",
@@ -17,7 +20,9 @@
   "license": "ISC",
   "dependencies": {
     "@metamask/providers": "^11.0.0",
+    "axios": "^1.4.0",
     "ethers": "^6.4.0",
-    "hex2dec": "^1.1.2"
+    "hex2dec": "^1.1.2",
+    "usdc": "^0.1.4"
   }
 }

@@ -1,7 +1,7 @@
 
 import Instruction from './instruction'
 
-export default interface PaymentOption {
+interface PaymentOption {
 
   chain: string;
 
@@ -12,4 +12,11 @@ export default interface PaymentOption {
   instructions: Instruction[];
 
 }
+
+
+class PaymentOption {
+
+}
+
+export default PaymentOption
 

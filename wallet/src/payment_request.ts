@@ -1,7 +1,7 @@
 
 import PaymentOption from './payment_option'
 
-export default interface PaymentRequest {
+interface PaymentRequest {
 
   url: string;
 
@@ -12,3 +12,9 @@ export default interface PaymentRequest {
   expiresAt: Date;
 
 }
+
+class PaymentRequest {
+
+}
+
+export default PaymentRequest

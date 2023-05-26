@@ -5,7 +5,14 @@ interface ERC20TransferInstruction {
   amount: number; // this is the amount to transfer in the base units (6 decimals for ERC20)
 }
 
-type Instruction = ERC20TransferInstruction
+interface UTXOTransferInstruction {
+  outputs: {
+    address: string;
+    amount: number;
+  }[]; 
+}
+
+type Instruction = ERC20TransferInstruction | UTXOTransferInstruction | any
 
 export default Instruction
 

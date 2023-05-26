@@ -3,31 +3,42 @@ import Card from './_base'
 
 import { ethers } from 'ethers'
 
+interface EvmCardParams {
+  phrase: string;
+}
+
 export default abstract class EVM_Card extends Card {
 
-  constructor() {
+  constructor(params?: EvmCardParams) {
 
     super()
 
-    if (!this.provider) {
+    if (params.phrase) {
 
-      this.provider = process.env.APP_ENV === 'browser' ? 
-          new ethers.BrowserProvider(window.ethereum, this.chainID) :
-          new ethers.JsonRpcProvider(this.providerURL, this.chainID)
+      this.phrase = params.phrase
+
     }
+
+  }
+
+  get provider() {
+
+    return process.env.APP_ENV === 'browser' ? 
+      new ethers.BrowserProvider(window.ethereum, this.chainID) :
+      new ethers.JsonRpcProvider(this.providerURL, this.chainID)
 
   }
 
   async getAddress(): Promise<string> {
 
-    const signers = await this.provider.getSigners()
+    const signer = await this.provider.getSigner()
 
-    return signers[0].address
+    return signer.address
   }
 
   getPrivateKey(): ethers.HDNodeWallet {
 
-    const wallet = ethers.Wallet.fromPhrase(this.mnemonic)
+    const wallet = ethers.Wallet.fromPhrase(this.phrase)
 
     wallet.connect(this.provider)
 

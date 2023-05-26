@@ -9,7 +9,7 @@ import PrivateKey from '../private_key'
 
 export default abstract class Card {
 
-  mnemonic: string;
+  phrase: string;
 
   currency: string;
 
@@ -20,8 +20,6 @@ export default abstract class Card {
   token: string;
 
   chainID: number;
-
-  provider: Provider;
 
   providerURL: string;
 
@@ -36,6 +34,8 @@ export default abstract class Card {
   abstract getBalance(): Promise<number>
 
   abstract buildSignedPayment(paymentOption: PaymentOption): Promise<Transaction>
+
+  abstract get provider(): Provider
 
 }
 

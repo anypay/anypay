@@ -9,8 +9,6 @@ declare global {
 
 import * as Cards from './cards'
 
-import Instruction from './instruction'
-
 import PaymentOption from './payment_option'
 
 import PaymentRequest from './payment_request'
@@ -21,7 +19,17 @@ export {
 
   Cards,
 
-  Instruction,
+  PaymentOption,
+
+  PaymentRequest,
+
+  Transaction
+
+}
+
+const Wallet = {
+
+  Cards,
 
   PaymentOption,
 
@@ -30,4 +38,6 @@ export {
   Transaction
 
 }
+
+export default Wallet
 
