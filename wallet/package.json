@@ -1,0 +1,23 @@
+{
+  "name": "anypay-wallet",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/hex2dec": "^1.1.2",
+    "ts-loader": "^9.4.3",
+    "webpack": "^5.84.1",
+    "webpack-cli": "^5.1.1"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@metamask/providers": "^11.0.0",
+    "ethers": "^6.4.0",
+    "hex2dec": "^1.1.2"
+  }
+}
