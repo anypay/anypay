@@ -26,16 +26,14 @@ export default abstract class ERC20_Card extends EVM_Card {
   async buildSignedPayment(option: PaymentOption): Promise<Transaction> {
 
     if (option.instructions.length > 1) { throw new Error('ERC20 supports only one instruction') }
-    
-    const wallet = ethers.Wallet.fromPhrase(this.phrase)
 
     const isBrowser: boolean = process.env.APP_ENV === 'browser'
-
-    console.log('IS BROWSER', isBrowser)
 
     const provider = isBrowser ? 
       new ethers.BrowserProvider(window.ethereum, this.chainID) :
       new ethers.JsonRpcProvider(this.providerURL, this.chainID)
+    
+    const wallet = ethers.Wallet.fromPhrase(this.phrase, provider)
 
     const signer = isBrowser ?
       new ethers.JsonRpcSigner(provider, wallet.address) :
@@ -63,29 +61,20 @@ export default abstract class ERC20_Card extends EVM_Card {
 
     const data = contract.encodeFunctionData("transfer", [ to, amount ])
 
-    console.log('DATA', data)
-
-    const fees = await this.provider.getFeeData()
-
-    console.log('FEES', fees)
+    const fees = await provider.getFeeData()
 
     const gasPrice: any = fees.gasPrice
 
     const transactionRequest = { 
       gasPrice,
       to: this.token,
-      data
+      data,
+      chainId: this.chainID
     }
 
-    console.log(transactionRequest)
+    const populatedTransactionRequest = await wallet.populateTransaction(transactionRequest)
 
-    const populatedTransactionRequest = await signer.populateTransaction(transactionRequest)
-
-    console.log('populated', populatedTransactionRequest)
-
-    const signedTxHex = await signer.signTransaction(populatedTransactionRequest)
-
-    console.log('signed', signedTxHex)
+    const signedTxHex = await wallet.signTransaction(populatedTransactionRequest)
 
     const transaction: ethers.Transaction = ethers.Transaction.from(signedTxHex)
 
