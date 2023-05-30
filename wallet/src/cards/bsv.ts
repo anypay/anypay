@@ -2,7 +2,7 @@
 import Card from './_base'
 
 //@ts-ignore
-import * as dash from '@dashevo/dashcore-lib'
+import * as bsv from 'bsv'
 
 import axios from 'axios'
 
@@ -14,29 +14,29 @@ import { BigNumber } from 'bignumber.js'
 
 import * as bip39 from 'bip39'
 
-interface DashCardParams {
+interface BSVCardParams {
   phrase: string;
 }
 
-export default class DASH extends Card {
+export default class BSV extends Card {
 
-  currency = 'DASH'
+  currency = 'BSV'
 
-  chain = 'DASH'
+  chain = 'BSV'
 
   decimals = 8
 
-  providerURL = 'https://insight.dash.org/insight-api'
+  providerURL = 'https://api.whatsonchain.com/v1/bsv/main'
 
-  privateKey: dash.HDPrivateKey;
+  privateKey: bsv.HDPrivateKey;
 
   get provider() {
 
-    return dash
+    return bsv
 
   }
 
-  constructor(params?: DashCardParams) {
+  constructor(params?: BSVCardParams) {
 
     super()
 
@@ -46,7 +46,7 @@ export default class DASH extends Card {
 
       const seed = bip39.mnemonicToSeedSync(this.phrase).toString('hex')
 
-      this.privateKey = dash.HDPrivateKey.fromSeed(seed)
+      this.privateKey = bsv.HDPrivateKey.fromSeed(seed)
 
       this.address = this.privateKey.privateKey.toAddress().toString()
 
@@ -62,33 +62,30 @@ export default class DASH extends Card {
 
   async listUnspent(address: string): Promise<Utxo[]> {
 
-      const response = await axios.get(`${this.providerURL}/addr/${address}/utxo`)
+    const { data } = await axios.get(`${this.providerURL}/address/${this.address}/unspent}`)
 
-      const utxos: InsightUtxo[] = response.data
+    const utxos: any[] = data
 
-      return utxos.map(utxo => {
-          return {
-              scriptPubKey: utxo.scriptPubKey,
-              value: utxo.satoshis,
-              txid: utxo.txid,
-              vout: utxo.vout
-          }
-      })
+    return utxos.map(utxo => {
+        return {
+            scriptPubKey: utxo.scriptPubKey,
+            value: utxo.satoshis,
+            txid: utxo.txid,
+            vout: utxo.vout
+        }
+    })
 
   }
 
   async getBalance(): Promise<number> {
 
-      const utxos: Utxo[] = await this.listUnspent(this.address)
+    const { data } = await axios.get(`${this.providerURL}/address/${this.address}/balance}`)
 
-      return utxos.reduce((sum, utxo) => {
+    return data.confirmed + data.unconfirmed
 
-          return sum + utxo.value
-
-      }, 0)
   }
 
-  async getPrivateKey(): dash.HDPrivateKey {
+  async getPrivateKey(): bsv.HDPrivateKey {
 
     return this.privateKey
 
@@ -116,7 +113,7 @@ export default class DASH extends Card {
       return result
     })
 
-    const tx = new dash.Transaction()
+    const tx = new bsv.Transaction()
       .from(coins)
 
     let totalInput = unspent.reduce((sum, input) => {
@@ -129,12 +126,12 @@ export default class DASH extends Card {
 
     for (let output of outputs) {
 
-      let address = dash.Address.fromString(output.address)
+      let address = bsv.Address.fromString(output.address)
 
-      let script = dash.Script.fromAddress(address)
+      let script = bsv.Script.fromAddress(address)
 
       tx.addOutput(
-        dash.Transaction.Output({
+        bsv.Transaction.Output({
           satoshis: output.amount,
           script: script.toHex()
         })
@@ -147,12 +144,12 @@ export default class DASH extends Card {
     if (totalInput < totalOutput) {
 
       console.log('InsufficientFunds', {
-        currency: 'DASH',
+        currency: 'BSV',
         totalInput,
         totalOutput
       })
 
-      throw new Error(`Insufficient ${'DASH'} funds to pay invoice`)
+      throw new Error(`Insufficient ${'BSV'} funds to pay invoice`)
     }
 
     tx.change(this.address)
@@ -166,14 +163,9 @@ export default class DASH extends Card {
 
 import Utxo from '../utxo'
 
-interface InsightUtxo {
-    address: string;
-    txid: string;
-    vout: number;
-    scriptPubKey: string;
-    amount: number;
-    satoshis: number;
-    height: number;
-    confirmations: number;
+interface WhatsonchainUnspent {
+  height: number;
+  tx_pos: number;
+  tx_hash: string;
+  value: number;
 }
-
