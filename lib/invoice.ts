@@ -234,7 +234,8 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       let fee = await pay.fees.getFee(currency, paymentAmount)
 
-      if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
+      if (!['MATIC', 'ETH', 'AVAX'].includes(chain)) { // multiple outputs disallowed
+      //if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
 
         paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
 
@@ -297,9 +298,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  console.log(paymentOptions, '--POs--')
-
-  return paymentOptions.filter(option => !!option)
+  return paymentOptions.filter(option => !!option && !!option.record)
 }
 
 export function isExpired(invoice) {

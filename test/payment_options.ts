@@ -100,22 +100,15 @@ async function main() {
 
     const { chain, currency } = option
 
-    console.log({chain,currency})
-
     const paymentOption = await invoice.getPaymentOption({ chain, currency })
 
     if (!paymentOption){
       console.log('payment option not found', {chain, currency})
      }
 
-    console.log({chain:paymentOption.chain,currency:paymentOption.currency}, 'OPTION')
-
     if (paymentOption.outputs) {
 
-      for (let output of paymentOption.outputs) {
-
-        console.log({currency, chain, output}, 'output')
-      }
+      console.log(paymentOption.toJSON())
 
    } else {
 
