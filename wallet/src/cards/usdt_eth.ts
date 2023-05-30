@@ -5,15 +5,15 @@ import PaymentOption from '../payment_option'
 
 import Transaction from '../transaction'
 
-export default class USDC_ETH extends ERC20_Card {
+export default class USDT_ETH extends ERC20_Card {
 
-  currency = 'USDC'
+  currency = 'USDT'
 
   chain = 'ETH'
 
   decimals = 6
 
-  token = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48'
+  token = '0xdac17f958d2ee523a2206206994597c13d831ec7'
 
   chainID = 1
 

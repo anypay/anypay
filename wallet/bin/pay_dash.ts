@@ -8,11 +8,11 @@ async function main() {
 
   const url = process.argv[2]
 
-  const chain = 'MATIC'
+  const chain = 'DASH'
 
-  const currency = 'USDC'
+  const currency = 'DASH'
 
-  const card = new Cards.USDC_MATIC({
+  const card = new Cards.DASH({
     phrase: process.env.anypay_wallet_phrase
   })
 
