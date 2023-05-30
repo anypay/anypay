@@ -205,15 +205,11 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
     const {chain, currency }= record
 
-    console.log({chain, currency})
-
     try {
 
-      const chain = record.chain
+      console.log(invoice.toJSON(), 'invoice creating payment option')
 
-      const currency = record.currency
-
-      const value = invoice.amount
+      const value = invoice.get('amount')
 
       const coin = getCoin(currency)
 
@@ -221,6 +217,8 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
         currency: account.denomination,
         value
       }, currency, coin.precision);
+
+      console.log({base:account.denomination, value, result:amount, currency}, 'converted')
 
       let address = await getNewAddress({ account, address: record, currency, chain })
 
@@ -280,6 +278,12 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
         uri,
         fee: fee.amount
       })
+
+      if (!optionRecord){
+        console.error('no payment option record created', {currency,chain,amount,address,uid:invoice.uid,outputs,uri})
+        throw new Error('no payment option record created')
+        return null
+      }
 
       return new PaymentOption(optionRecord)
 

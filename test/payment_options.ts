@@ -21,9 +21,6 @@ const options = [{
   currency:'USDC',
   chain:'AVAX'
 },{
-  currency:'USDC',
-  chain:'SOL'
-},{
   currency:'USDT',
   chain:'MATIC'
 },{
@@ -33,8 +30,26 @@ const options = [{
   currency:'USDT',
   chain:'AVAX'
 }, {
-  currency:'USDT',
-  chain:'SOL'
+  currency:'BTC',
+  chain:'BTC'
+},{
+  currency:'BCH',
+  chain:'BCH'
+},{
+  currency:'BSV',
+  chain:'BSV'
+},{
+  currency:'LTC',
+  chain:'LTC'
+},{
+  currency:'DASH',
+  chain:'DASH'
+},{
+  currency:'DOGE',
+  chain:'DOGE'
+},{
+  currency:'XMR',
+  chain:'XMR'
 }]
 
 /*
@@ -67,8 +82,6 @@ async function main() {
 
   const records = await models.PaymentOption.findAll({ where:{ invoice_uid: invoice.uid }})
 
-  console.log(records, 'records')
-
   for (let option of records){
 
     const { chain, currency } = option
@@ -79,13 +92,15 @@ async function main() {
       console.log('payment option not found', { chain, currency })
     }
 
-    console.log({currency: paymentOption.currency, chain:paymentOption.chain, outputs:paymentOption.outputs}, '--PO')
-
   }
 
   for (let option of options) {
 
+   try {
+
     const { chain, currency } = option
+
+    console.log({chain,currency})
 
     const paymentOption = await invoice.getPaymentOption({ chain, currency })
 
@@ -93,20 +108,26 @@ async function main() {
       console.log('payment option not found', {chain, currency})
      }
 
-    for (let output of paymentOption.outputs) {
+    console.log({chain:paymentOption.chain,currency:paymentOption.currency}, 'OPTION')
 
-      console.log({currency, chain, output}, 'output')
+    if (paymentOption.outputs) {
 
-      if (!(output.amount  >0)) {
+      for (let output of paymentOption.outputs) {
 
-        console.log('NO AMOUNT', {currency, chain, output})
+        console.log({currency, chain, output}, 'output')
+      }
 
-       }
+   } else {
+
+      console.log(paymentOption, 'no outputs')
 
     }
   
-   }
+  } catch(error){
+    console.error(error)
+  }
 
+  }
 }
 
 main()
