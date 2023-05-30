@@ -402,8 +402,6 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
   if (!option.chain && option.currency) { option.chain = option.currency }
   if (!option.currency && option.chain) { option.currency = option.chain }
 
-  if (option.chain === 'USDC') { option.chain = 'MATIC' }
-
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
   let paymentOption = await findPaymentOption({
