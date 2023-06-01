@@ -395,8 +395,6 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
 export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentRequest, options: LogOptions = {}): Promise<PaymentRequest> {
 
-  if (!option.chain && option.currency) { option.chain = option.currency }
-  if (!option.currency && option.chain) { option.currency = option.chain }
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 

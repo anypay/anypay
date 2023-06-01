@@ -74,24 +74,39 @@ export abstract class EVM extends Plugin {
 
   async broadcastTx({txhex}: BroadcastTx): Promise<BroadcastTxResult> {
 
-    if (txhex.length === 66) {
+    return new Promise((resolve, reject) => {
 
-      console.log('skip broadcast of txid', { txid: txhex })
+      if (txhex.length === 66) {
 
-      return {
-        txhex,
-        txid: '', //TODO
-        result: txhex,
-        success: true 
+        console.log('skip broadcast of txid', { txid: txhex })
+
+        return {
+          txhex,
+          txid: '', //TODO
+          result: txhex,
+          success: true 
+        }
+
       }
 
-    }
+      const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
+      web3.eth.sendSignedTransaction(txhex)
+      .on('transactionHash', txid => {
 
-    const transmitResult: any = await web3.eth.sendSignedTransaction(txhex)
+        resolve({ txid, txhex, result: txid, success: true })
 
-    return transmitResult
+      })
+      .on('receipt', receipt => {
+
+        console.log("web3.ethers.receipt", receipt)
+
+        // TODO: Confirm Transaction
+
+       })
+      .on('confirmation', confirmation => console.log("web3.ethers.confirmation", confirmation))
+
+    })
 
   }
 
