@@ -27,15 +27,23 @@ export default async function(): Promise<Plugins> {
 
   for (let path of pluginDirectoryPaths) {
 
-    let parts = path.split('/');
+    try {
 
-    let name = parts[parts.length - 1];
+      let parts = path.split('/');
 
-    const PluginClass = (await import(`../plugins/${name}`)).default
+      let name = parts[parts.length - 1];
 
-    if (typeof PluginClass === 'function') {
+      const PluginClass = (await import(`../plugins/${name}`)).default
 
-      plugins[name.toUpperCase()] = new PluginClass();
+      if (typeof PluginClass === 'function') {
+
+        plugins[name.toUpperCase()] = new PluginClass();
+
+      }
+
+    } catch(error) {
+
+      console.error('failed to load plugin', error)
 
     }
   }

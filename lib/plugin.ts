@@ -39,7 +39,7 @@ abstract class AbstractPlugin {
 
   abstract getPayments(txid: string): Promise<Payment[]>;
 
-  abstract parsePayments(txhex: string): Promise<Payment[]>;
+  abstract parsePayments(transaction: Transaction): Promise<Payment[]>;
 
   abstract getPrice({chain, currency, base}: {chain:string, currency: string, base: string}): Promise<Price>;
 

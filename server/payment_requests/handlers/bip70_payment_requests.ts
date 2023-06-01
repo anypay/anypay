@@ -86,7 +86,8 @@ export async function create(req, h) {
 
   log.info(`bip70.currency.parsed`, currency)
 
-  let plugin = await plugins.findForChain(currency.code)
+  //@ts-ignore
+  let plugin = plugins.find({chain: currency.code, currency: currency.code})
 
   await channel.publish('anypay', `bip70.payments.${currency.code.toLowerCase()}`, req.payload);
 

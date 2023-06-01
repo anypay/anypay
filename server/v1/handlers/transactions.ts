@@ -1,5 +1,5 @@
 
-import { plugins } from '../../../lib/plugins'
+//import { plugins } from '../../../lib/plugins'
 
 import { log } from '../../../lib'
 
@@ -10,12 +10,14 @@ import { badRequest } from 'boom'
 export async function create(req, h) {
 
   try {
+    //const { chain, currency, transaction } = req.payload
 
-    let plugin = plugins.findForChain(req.payload.chain)
+    //let plugin = plugins.find({ chain, currency })
 
-    let result = await plugin.broadcast(req.payload.transaction)
+    //let result = await plugin.broadcastTx({ txhex: transaction })
 
-    return { result }
+    //return { result }
+    return {  }
 
   } catch(error) {
 

@@ -50,12 +50,12 @@ export async function findPaymentOption({
 }: {
   invoice: Invoice,
   currency: string
-  chain? : string
+  chain : string
 }): Promise<PaymentOption> {
 
   let record = await models.PaymentOption.findOne({
 
-    where: { invoice_uid: invoice.uid, currency }
+    where: { invoice_uid: invoice.uid, currency, chain }
 
   })
 

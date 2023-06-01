@@ -10,9 +10,9 @@ async function main() {
 
   const chain = 'MATIC'
 
-  const currency = 'USDC'
+  const currency = 'USDT'
 
-  const card = new Cards.USDC_MATIC({
+  const card = new Cards.USDT_MATIC({
     phrase: process.env.anypay_wallet_phrase
   })
 

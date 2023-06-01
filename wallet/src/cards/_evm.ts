@@ -82,8 +82,6 @@ export default abstract class EVM_Card extends Card {
       new ethers.JsonRpcSigner(provider, wallet.address) :
       new ethers.JsonRpcSigner(provider, wallet.address)
 
-    let contract = new ethers.Interface(ERC20_ABI)
-
     const [instruction] = option.instructions
 
     var to, amount;
@@ -93,16 +91,14 @@ export default abstract class EVM_Card extends Card {
       // TODO: Parse to and amount from data instead
       to = instruction.to
 
-      amount = instruction.amount
+      amount = BigInt(instruction.amount)
 
     } else if (instruction.outputs) {
 
       to = instruction.outputs[0].address
-      amount = instruction.outputs[0].amount
+      amount = BigInt(instruction.outputs[0].amount)
 
     }
-
-    const data = contract.encodeFunctionData("transfer", [ to, amount ])
 
     const fees = await provider.getFeeData()
 
@@ -110,8 +106,8 @@ export default abstract class EVM_Card extends Card {
 
     const transactionRequest = { 
       gasPrice,
-      to: this.token,
-      data,
+      to,
+      value: amount,
       chainId: this.chainID
     }
 

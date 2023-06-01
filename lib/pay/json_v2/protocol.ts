@@ -73,7 +73,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     for (const transaction of payment.transactions) {
 
-      const verify: Function = plugin.verifyPayment ? plugin.verifyPayment : verifyPayment
+      const verify: Function = plugin.verifyPayment ? plugin.verifyPayment.bind(plugin) : verifyPayment
 
       const verified = await verify({
         paymentOption,

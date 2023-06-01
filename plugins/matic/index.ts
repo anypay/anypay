@@ -1,11 +1,11 @@
 
 import { EVM } from '../../lib/plugins/evm'
 
-export default class AVAX extends EVM {
+export default class MATIC extends EVM {
 
-  chain = 'AVAX'
+  chain = 'MATIC'
 
-  currency = 'AVAX'
+  currency = 'MATIC'
 
   decimals = 18
 

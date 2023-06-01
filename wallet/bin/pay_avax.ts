@@ -8,11 +8,11 @@ async function main() {
 
   const url = process.argv[2]
 
-  const chain = 'MATIC'
+  const chain = 'AVAX'
 
-  const currency = 'USDC'
+  const currency = 'AVAX'
 
-  const card = new Cards.USDC_MATIC({
+  const card = new Cards.AVAX({
     phrase: process.env.anypay_wallet_phrase
   })
 
@@ -53,7 +53,7 @@ async function main() {
 
   } catch(error) {
 
-    console.error(error.response.data)
+    console.error(error)
 
     process.exit(1)
 

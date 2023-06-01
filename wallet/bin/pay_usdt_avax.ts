@@ -2,17 +2,19 @@ require('dotenv').config()
 
 import { Cards, PaymentOption } from '../src'
 
+import { polygon } from 'usdc'
+
 import axios from 'axios'
 
 async function main() {
 
   const url = process.argv[2]
 
-  const chain = 'MATIC'
+  const chain = 'AVAX'
 
-  const currency = 'USDC'
+  const currency = 'USDT'
 
-  const card = new Cards.USDC_MATIC({
+  const card = new Cards.USDT_AVAX({
     phrase: process.env.anypay_wallet_phrase
   })
 
@@ -28,10 +30,6 @@ async function main() {
     })
 
     console.log({ paymentOption })
-
-    const { instructions } = paymentOption
-
-    console.log({ instructions })
 
     const { txhex, txid } = await card.buildSignedPayment(paymentOption)
 
@@ -53,7 +51,15 @@ async function main() {
 
   } catch(error) {
 
-    console.error(error.response.data)
+    if (error.response) {
+
+      console.error(error.response.data)
+
+    } else {
+
+      console.error(error)
+
+    }
 
     process.exit(1)
 

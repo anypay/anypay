@@ -13,7 +13,7 @@ export default class XRP extends Plugin {
 
   decimals = 0 //TODO
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments(transaction: Transaction): Promise<Payment[]> {
     throw new Error() //TODO
   }
 

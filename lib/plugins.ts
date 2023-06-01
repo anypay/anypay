@@ -5,17 +5,19 @@ import { plugins } from "../config/plugins";
 
 export { plugins }
 
-import { Plugin, Transaction } from './plugin'
+import { Transaction } from './plugin'
 
 import { Account } from './account'
 
 import { Address } from './addresses'
 
+import { Payment } from './plugin'
+
 import { PaymentOption } from './payment_option'
 
-export function find({currency, chain }: {currency: string, chain: string}): Plugin {
+export function find({currency, chain }: {currency: string, chain: string}) {
 
-  let plugin: Plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
+  let plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
 
   if (!plugin) {
 
@@ -33,6 +35,14 @@ export async function getTransaction({ txid, chain, currency }: { txid: string, 
   let plugin = find({ chain, currency }) 
 
   return plugin.getTransaction(txid)
+
+}
+
+export async function parsePayments({ currency, chain, transaction }: { currency: string, chain: string, transaction: Transaction }): Promise<Payment[]> {
+
+  let plugin = find({ chain, currency }) 
+
+  return plugin.parsePayments(transaction)
 
 }
 

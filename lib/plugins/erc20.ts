@@ -17,7 +17,13 @@ import ERC20_ABI from '../erc20_abi';
 
 //TODO: FinishPluginImplementation
 
-export abstract class ERC20 extends EVM {
+export class ERC20 extends EVM {
+
+  chain = ''
+
+  currency = ''
+
+  decimals = 0
 
   async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
 
@@ -71,7 +77,7 @@ export abstract class ERC20 extends EVM {
 
   }
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
 
     const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
 

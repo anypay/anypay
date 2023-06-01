@@ -29,6 +29,8 @@ import { publish } from 'rabbi'
 
 export { fees, bip70, bip270, jsonV2 }
 
+import { parsePayments } from '../plugins'
+
 export interface Payment{
   amount: number;
   hash: string;
@@ -372,7 +374,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
 export async function completePayment(paymentOption, transaction: Transaction) {
 
-  const { txhex } = transaction
+  var { txhex, txid } = transaction
 
   var { currency, chain, invoice_uid } = paymentOption
 
@@ -380,21 +382,20 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
   if (!chain) { chain = currency }
 
-  let bitcore = getBitcore(chain)
+  if (!txid) {
 
-  let tx = new bitcore.Transaction(txhex)
+    txid = (await parsePayments({ chain, currency, transaction }))[0].txid
+
+  }
 
   let invoice = await models.Invoice.findOne({ where: {
     uid: invoice_uid
   }})
 
-  const txid = transaction.txid || tx.hash
-  
   let paymentRecord = await models.Payment.create({
     txid,
     currency,
     chain: chain || currency,
-    txjson: tx.toJSON(),
     txhex: txhex,
     tx_key: transaction.txkey,
     payment_option_id: paymentOption.id,

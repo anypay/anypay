@@ -44,7 +44,7 @@ export default class XMR extends Plugin {
 
   decimals = 12
 
-  async parsePayments(txhex: string): Promise<AnypayPayment[]> {
+  async parsePayments({txhex}: Transaction): Promise<AnypayPayment[]> {
     throw new Error() //TODO
   }
 

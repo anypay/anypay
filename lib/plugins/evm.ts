@@ -1,7 +1,7 @@
 
 const Web3 = require('web3')
 
-import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment, Plugin } from '../../lib/plugin'
+import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment, VerifyPayment, Plugin } from '../../lib/plugin'
 
 import BigNumber from 'bignumber.js'
 
@@ -29,13 +29,13 @@ export abstract class EVM extends Plugin {
 
   }
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
 
     const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
 
     const address = transaction.to.toLowerCase()
 
-    const amount = parseFloat(ethers.utils.formatEther(transaction.value))
+    const amount = parseInt(transaction.value.toString())
 
     const txid = transaction.hash
 
@@ -107,9 +107,58 @@ export abstract class EVM extends Plugin {
 
   }
 
-  async verifyPayment(params) {
+  async verifyPayment({ paymentOption, transaction: {txhex, txid}, protocol }: VerifyPayment) {
 
-    return false
+    /*
+
+      Determine whether "hex" is a full raw transaction or a txid
+
+      If it is a txid, fetch the transaction details from the blockchain
+
+    */
+
+    const expectedOutput = paymentOption.outputs[0]
+
+    console.log('VERIFY', {txhex,  txid})
+
+    try {
+
+      const transaction = this.decodeTransactionHex({ transactionHex: txhex })
+
+      console.log({transaction})
+
+      const output: any = await this.parsePayments({txhex})
+
+      console.log({output})
+
+      console.log({expectedOutput})
+
+      const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
+
+      console.log({ correctAddress })
+
+      const correctAmount = expectedOutput.amount === parseInt(output.amount)
+
+      console.log({ correctAmount })
+
+      const correctToken = output.symbol.toLowerCase() == this.token.toLowerCase()
+
+      console.log({ correctToken })
+
+      return correctToken && correctAmount && correctAddress
+
+    } catch(error) {
+
+      const [parsed] = await this.parsePayments({ txhex })
+
+      const correctAddress = (parsed.address.toLowerCase() === expectedOutput.address.toLowerCase())
+
+      const correctAmount = (expectedOutput.amount === parsed.amount)
+
+      return correctAmount && correctAddress
+
+    }
+
 
   }
 

@@ -433,20 +433,6 @@ async function Server() {
     },
   });
 
-  server.route({
-    method: "POST",
-    path: "/accounts/{account_id}/invoices",
-    handler: v0.Invoices.createPublic,
-    options: {
-      tags: ['v0', 'invoices'],
-      validate: {
-        payload: models.Invoice.Request,
-        failAction
-      },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
-    }
-  });
-
 
   // END PUBLIC ROUTES
 

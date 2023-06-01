@@ -10,9 +10,9 @@ async function main() {
 
   const chain = 'MATIC'
 
-  const currency = 'USDC'
+  const currency = 'MATIC'
 
-  const card = new Cards.USDC_MATIC({
+  const card = new Cards.MATIC({
     phrase: process.env.anypay_wallet_phrase
   })
 
@@ -53,7 +53,7 @@ async function main() {
 
   } catch(error) {
 
-    console.error(error.response.data)
+    console.error(error)
 
     process.exit(1)
 

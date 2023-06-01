@@ -2,8 +2,6 @@ const Boom = require('boom');
 
 import { Op } from 'sequelize';
 
-import {plugins} from '../../../lib/plugins';
-
 import { log, models, invoices } from '../../../lib';
 
 import { Account } from '../../../lib/account';
@@ -268,69 +266,6 @@ export async function create(request, h) {
 
 }
 
-export async function createPublicInvoice(account_id, payload) {
-  var currency;
-
-  if (!(payload.amount > 0)) {
-    throw new Error('amount must be greater than zero');
-  }
-
-  let addresses = await models.Address.findAll({ where: {
-
-    account_id
-
-  }});
- 
-  let addressesMap = addresses.reduce((set, record) => {
-
-    set[record.currency] = record.value;
-    return set;
-  }, {});
-
-  if (addressesMap['BCH']) {
-    currency = 'BCH';
-  } else if (addressesMap['DASH']) {
-    currency = 'DASH';
-  } else if (addressesMap['BSV']) {
-    currency = 'BSV';
-  } else {
-    currency = addresses[0].currency;
-  }
-
-  let plugin = await plugins.findForChain(currency);
-
-  let invoice = await plugin.createInvoice(account_id, payload.amount);
-
-  invoice.redirect_url = payload.redirect_url;
-
-  invoice.webhook_url = payload.webhook_url;
-
-  invoice.external_id = payload.external_id;
-
-  invoice.is_public_request = true;
-
-  invoice.email = payload.email;
-
-  await invoice.save();
-
-  if (invoice.email) {
-    await models.InvoiceNote.create({
-      content: `Customer Email: ${invoice.email}`,
-      invoice_uid: invoice.uid,
-    });
-  }
-
-  invoice.payment_options = await getPaymentOptions(invoice.uid)
-
-  let sanitized = sanitizeInvoice(invoice);
-
-  return Object.assign({
-    invoice: sanitized,
-    payment_options: invoice.payment_options
-  }, sanitized);
-
-}
-
 async function getPaymentOptions(invoice_uid) { 
 
   let invoice: Invoice = await getInvoice(invoice_uid)
@@ -341,23 +276,18 @@ async function getPaymentOptions(invoice_uid) {
 
   return Promise.all(payment_options.map(async option => {
 
+   console.log(option.toJSON(), '--option2--')
+   console.log(option.template, '--option2-template--')
+
+    
     const request = await getPaymentRequest(invoice, { chain: option.chain, currency: option.currency })
 
-    request.currency = request.currency || option.currency
-    request.chain = request.chain || option.chain
+    console.log(request, '--paymentRequest--')
+    console.log(request.instructions[0], '--paymentRequest instructions--')
 
     return request
 
   }))
-
-}
-
-export async function createPublic (request, reply) {
-
-  let response = await createPublicInvoice(
-    request.params.account_id, request.payload);
-
-  return response;
 
 }
 

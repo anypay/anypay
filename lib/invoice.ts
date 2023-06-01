@@ -203,11 +203,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
 
-    const {chain, currency }= record
+    const {chain, currency } = record
 
     try {
-
-      console.log(invoice.toJSON(), 'invoice creating payment option')
 
       const value = invoice.get('amount')
 
@@ -235,7 +233,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       let fee = await pay.fees.getFee(currency, paymentAmount)
 
       if (!['MATIC', 'ETH', 'AVAX'].includes(chain)) { // multiple outputs disallowed
-      //if (currency !== 'USDC' && currency !== 'MATIC' && currency !== 'ETH' && currency !== 'AVAX') { // multiple outputs disallowed
 
         paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
 

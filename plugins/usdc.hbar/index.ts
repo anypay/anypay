@@ -13,7 +13,7 @@ export default class USDC_HBAR extends Plugin {
 
   decimals = 6
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments(transaction: Transaction): Promise<Payment[]> {
     throw new Error() //TODO
   }
 

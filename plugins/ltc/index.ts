@@ -27,7 +27,7 @@ export default class LTC extends Plugin {
 
   }
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
     throw new Error() //TODO
   }
 

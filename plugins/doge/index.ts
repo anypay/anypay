@@ -20,12 +20,10 @@ export default class DOGE extends Plugin {
   decimals: number = 8;
 
   get bitcore() {
-
     return doge
-
   }
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
+  async parsePayments(transaction: Transaction): Promise<Payment[]> {
     throw new Error() //TODO
   }
 
