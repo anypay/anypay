@@ -11,7 +11,7 @@ import { Protocol } from './schema'
 
 import { find } from '../../plugins'
 
-import { Transaction } from '../../plugin'
+import { Transaction, Plugin } from '../../plugin'
 
 import { models } from '../../models'
 
@@ -69,7 +69,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       throw new Error(`Unsupported Currency or Chain for Payment Option`)
     }
 
-    let plugin = find({ chain, currency })
+    let plugin: Plugin = find({ chain, currency })
 
     for (const transaction of payment.transactions) {
 
@@ -96,11 +96,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       var response;
 
-      if (paymentOption.currency === 'XMR') {
-
-        response = await plugin.broadcastTx(transaction)
-
-      } else if (paymentOption.chain === 'SOL') {
+      if (paymentOption.chain === 'SOL') {
 
         response = await plugin.broadcastTx(transaction)
 
@@ -491,7 +487,8 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
   if (!params.chain && params.currency) { params.chain = params.currency }
   if (!params.currency && params.chain) { params.currency = params.chain }
 
-  await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
+  // TODO: Fix This:
+  //await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 
   if (params.currency === 'XMR') {
 

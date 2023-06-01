@@ -1,9 +1,9 @@
 require("dotenv").config();
 require('bitcore-lib')
 
-import configurePlugins from "../config/plugins";
+import { plugins } from "../config/plugins";
 
-export const plugins = configurePlugins()
+export { plugins }
 
 import { Plugin, Transaction } from './plugin'
 
@@ -15,7 +15,7 @@ import { PaymentOption } from './payment_option'
 
 export function find({currency, chain }: {currency: string, chain: string}): Plugin {
 
-  let plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
+  let plugin: Plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
 
   if (!plugin) {
 
@@ -23,7 +23,8 @@ export function find({currency, chain }: {currency: string, chain: string}): Plu
 
   }
 
-  return new plugin()
+  return plugin
+
 }
 
 

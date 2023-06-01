@@ -2,27 +2,48 @@
 const { lstatSync, readdirSync } = require('fs')
 const { join } = require('path')
 
+import { Plugin } from '../lib/plugin'
+
 const isDirectory = source => lstatSync(source).isDirectory()
 const getDirectories = source =>
   readdirSync(source).map(name => join(source, name)).filter(isDirectory)
 
-export default function() {
+var loaded = false
+var loading = false
 
-  let pluginDirectorPaths = getDirectories(join(__dirname, '../plugins'));
+export interface Plugins {
+  [name: string]: Plugin
+}
 
-  return pluginDirectorPaths.reduce((map, path) => {
+export const plugins: Plugins = {}
+
+export default async function(): Promise<Plugins> {
+
+  if (loaded || loading) { return plugins }
+
+  loading = true
+
+  let pluginDirectoryPaths = getDirectories(join(__dirname, '../plugins'));
+
+  for (let path of pluginDirectoryPaths) {
 
     let parts = path.split('/');
 
-    let currency = parts[parts.length - 1];
+    let name = parts[parts.length - 1];
 
-    let plugin = require(`../plugins/${currency}`);
+    const PluginClass = (await import(`../plugins/${name}`)).default
 
-    map[currency.toUpperCase()] = plugin.default;
+    if (typeof PluginClass === 'function') {
 
-    return map;
+      plugins[name.toUpperCase()] = new PluginClass();
 
-  }, {});
+    }
+  }
+
+  loaded = true
+  loading = false
+
+  return plugins
 
 }
 
