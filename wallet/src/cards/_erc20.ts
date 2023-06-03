@@ -30,6 +30,7 @@ export default abstract class ERC20_Card extends EVM_Card {
     const isBrowser: boolean = process.env.APP_ENV === 'browser'
 
     const provider = isBrowser ? 
+      //@ts-ignore
       new ethers.BrowserProvider(window.ethereum, this.chainID) :
       new ethers.JsonRpcProvider(this.providerURL, this.chainID)
     

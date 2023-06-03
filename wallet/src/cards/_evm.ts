@@ -21,11 +21,13 @@ export default abstract class EVM_Card extends Card {
 
   constructor(params?: EvmCardParams) {
 
-    super()
+    const { phrase } = params
 
-    if (params.phrase) {
+    super({ phrase })
 
-      this.phrase = params.phrase
+    if (phrase) {
+
+      this.phrase = phrase
 
       this.privateKey = ethers.Wallet.fromPhrase(this.phrase)
 
@@ -38,6 +40,7 @@ export default abstract class EVM_Card extends Card {
   get provider() {
 
     return process.env.APP_ENV === 'browser' ? 
+      //@ts-ignore
       new ethers.BrowserProvider(window.ethereum, this.chainID) :
       new ethers.JsonRpcProvider(this.providerURL, this.chainID)
 

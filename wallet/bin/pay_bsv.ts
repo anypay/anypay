@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { Cards, PaymentOption } from '../src'
 
-import DashCard from '../src/cards/dash'
+import Card from '../src/cards/bsv'
 
 import axios from 'axios'
 
@@ -10,14 +10,12 @@ async function main() {
 
   const url = process.argv[2]
 
-  const chain = 'DASH'
+  const chain = 'BSV'
 
-  const currency = 'DASH'
+  const currency = 'BSV'
 
-  const card = new DashCard({
-
+  const card = new Card({
     phrase: process.env.anypay_wallet_phrase
-
   })
 
   try {

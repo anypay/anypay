@@ -21,8 +21,10 @@
   "dependencies": {
     "@metamask/providers": "^11.0.0",
     "axios": "^1.4.0",
+    "bitcore-lib-doge": "^10.0.5",
     "ethers": "^6.4.0",
     "hex2dec": "^1.1.2",
+    "scrypt-ts": "^0.1.7",
     "usdc": "^0.1.4"
   }
 }

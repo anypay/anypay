@@ -7,9 +7,13 @@ import Provider from '../provider'
 
 import PrivateKey from '../private_key'
 
+import * as bip39 from 'bip39'
+
 export default abstract class Card {
 
   phrase: string;
+
+  seed: Buffer;
 
   currency: string;
 
@@ -36,6 +40,15 @@ export default abstract class Card {
   abstract buildSignedPayment(paymentOption: PaymentOption): Promise<Transaction>
 
   abstract get provider(): Provider
+
+  constructor({ phrase }: { phrase: string }) {
+
+    this.phrase = phrase
+
+    this.seed = bip39.mnemonicToSeedSync(phrase)
+
+  }
+
 
 }
 

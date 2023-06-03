@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { Cards, PaymentOption } from '../src'
 
-import DashCard from '../src/cards/dash'
+import LTCCard from '../src/cards/ltc'
 
 import axios from 'axios'
 
@@ -10,14 +10,14 @@ async function main() {
 
   const url = process.argv[2]
 
-  const chain = 'DASH'
+  const currency = 'LTC'
 
-  const currency = 'DASH'
+  const chain = 'LTC'
 
-  const card = new DashCard({
+  //const LTCCard = Cards.getCard('LTC')
 
+  const card = new LTCCard({
     phrase: process.env.anypay_wallet_phrase
-
   })
 
   try {
@@ -67,7 +67,7 @@ async function main() {
 
     } else {
 
-      console.error(error)
+      console.error(error.response)
 
     }
 
