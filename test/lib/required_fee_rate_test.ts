@@ -21,7 +21,7 @@ describe("Required Fee Rate", () => {
 
     const environmentVariable = process.env.REQUIRED_FEE_RATE_BSV
 
-    expect(environmentVariable).to.be.equal(undefined)
+    expect(environmentVariable).to.be.equal(null)
 
     const requiredFeeRate = await getRequiredFeeRate({ chain: 'BSV' })
 
