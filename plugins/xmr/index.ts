@@ -239,10 +239,6 @@ interface XMRVerifyPayment {
   tx_key: string;
 }
 
-interface Verify {
-  payment_option: any;
-  transaction: Transaction;
-}
 
 interface Txn {
   as_hex: string;
@@ -365,7 +361,7 @@ export async function getTransaction(txid: string): Promise<Txn> {
 }
 
 
-export async function verifyPayment({payment_option, transaction}: Verify): Promise<boolean> {
+export async function verifyPayment({paymentOption, transaction}: VerifyPayment): Promise<boolean> {
 
   /*
 
@@ -395,13 +391,13 @@ export async function verifyPayment({payment_option, transaction}: Verify): Prom
 
     try {
 
-      const { invoice_uid } = payment_option
+      const { invoice_uid } = paymentOption
 
-      const url = `${config.get('api_base')}/i/${payment_option.invoice_uid}`
+      const url = `${config.get('api_base')}/i/${paymentOption.invoice_uid}`
     
       log.info('xmr.verifyPayment', {
         invoice_uid, 
-        payment_option, 
+        paymentOption, 
         txhex: transaction.txhex,
         txkey: transaction.txkey,
         txid: transaction.txid,
