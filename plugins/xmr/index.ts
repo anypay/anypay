@@ -82,12 +82,7 @@ export default class XMR extends Plugin {
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
-    console.log("XMR VERIFY UNSIGNED", params)
-
-    //TODO
-    throw new Error()
-
-    return false
+    return verifyPayment(params)
 
   }
 
