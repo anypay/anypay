@@ -3,11 +3,7 @@ const Web3 = require('web3')
 
 import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment, VerifyPayment, Plugin } from '../../lib/plugin'
 
-import BigNumber from 'bignumber.js'
-
 import { ethers } from 'ethers'
-
-//TODO: FinishPluginImplementation
 
 export abstract class EVM extends Plugin {
 
@@ -23,7 +19,7 @@ export abstract class EVM extends Plugin {
 
     const address = transaction.to.toLowerCase()
 
-    const amount = new BigNumber(parseInt(transaction.value)).times(Math.pow(10, this.decimals * -1)).toNumber()
+    const amount = parseInt(transaction.value)
 
     return [{ address, amount, txid, chain: this.chain, currency: this.currency }]
 
@@ -164,7 +160,10 @@ export abstract class EVM extends Plugin {
 
     } catch(error) {
 
-      const [parsed] = await this.parsePayments({ txhex })
+      const txid = txhex
+
+      const [parsed] = await this.getPayments(txid) 
+
 
       const correctAddress = (parsed.address.toLowerCase() === expectedOutput.address.toLowerCase())
 
