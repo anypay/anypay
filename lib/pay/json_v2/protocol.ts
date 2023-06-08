@@ -160,7 +160,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
   try {
 
-    log.info('payment.unsigned.verify', payment);
+    console.log('payment.unsigned.verify', payment);
 
     let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
 
@@ -188,6 +188,17 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
     }
 
     let plugin = find({ chain, currency })
+
+    console.log('plugin.validateUnsignedTx', payment);
+ 
+    return {
+      success: true,
+      transactions: payment.transactions.map(({txhex}) => {
+        return {
+          tx: txhex
+        }
+      })
+    }
 
     if (plugin.validateUnsignedTx) {
 
@@ -477,22 +488,19 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
 export async function sendSignedPayment(invoice: Invoice, params: PaymentVerificationRequest, options: LogOptions = {}): Promise<PaymentResponse> {
 
-  log.info('pay.jsonv2.payment', Object.assign({
+  console.log('pay.jsonv2.payment', Object.assign({
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
   }, Object.assign(params, options)))
 
-  if (!params.chain && params.currency) { params.chain = params.currency }
-  if (!params.currency && params.chain) { params.currency = params.chain }
-
   // TODO: Fix This:
   //await Protocol.Payment.request.validateAsync(params, { allowUnknown: true })
 
-  if (params.currency === 'XMR') {
+  /*if (params.currency === 'XMR') {
 
     for (let tx of params.transactions) {
 
-      if (!tx.txkey || !tx.txid) {
+      if (!tx.tx_key || !tx.tx_hash) {
 
         throw new Error('tx_key and tx_hash required for all XMR transactions')
 
@@ -501,6 +509,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
     }
     
   }
+*/
 
   try {
 

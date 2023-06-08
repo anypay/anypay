@@ -169,11 +169,13 @@ async function submitPayment(req, h) {
 
     var params = req.payload
 
+    console.log("PAYLOAD", params)
+
     params.transactions = req.payload.transactions.map(transaction => {
       return {
         txhex: transaction.tx,
         txkey: transaction.tx_key,
-        txid: transaction.txid
+        txid: transaction.tx_hash || transaction.txid
       }
     })
 

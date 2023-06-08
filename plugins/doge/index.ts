@@ -3,7 +3,7 @@ import * as blockchair from '../../lib/blockchair';
 
 const doge = require('bitcore-doge-lib');
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, Confirmation } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -21,14 +21,6 @@ export default class DOGE extends Plugin {
 
   get bitcore() {
     return doge
-  }
-
-  async parsePayments(transaction: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
-  }
-
-  async getPayments(txid: string): Promise<Payment[]> {
-    throw new Error() //TODO
   }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
@@ -79,11 +71,6 @@ export default class DOGE extends Plugin {
   async getTransaction(txid: string): Promise<Transaction> {
 
     return { txhex: '' } //TODO
-  }
-
-  async verifyPayment(params: VerifyPayment): Promise<boolean> {
-
-    return false //TODO
   }
 
 }

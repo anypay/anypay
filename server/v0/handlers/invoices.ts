@@ -233,11 +233,7 @@ export async function create(request, h) {
 
     const json = invoice.toJSON();
 
-    console.log('get-payment-options')
-
     const payment_options = await getPaymentOptions(invoice.uid)
-
-    console.log('payment-options', payment_options)
 
     const responseInvoice = {
       amount: json['amount'],
@@ -276,14 +272,7 @@ async function getPaymentOptions(invoice_uid) {
 
   return Promise.all(payment_options.map(async option => {
 
-   console.log(option.toJSON(), '--option2--')
-   console.log(option.template, '--option2-template--')
-
-    
     const request = await getPaymentRequest(invoice, { chain: option.chain, currency: option.currency })
-
-    console.log(request, '--paymentRequest--')
-    console.log(request.instructions[0], '--paymentRequest instructions--')
 
     return request
 

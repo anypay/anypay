@@ -38,10 +38,6 @@ export default class BCH extends Plugin {
 
   }
 
-  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
-  }
-
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
   }
@@ -103,7 +99,7 @@ export default class BCH extends Plugin {
     })
     .filter(n => n != null)
 
-    log.info("payment.verify.txoutputs", txOutputs);
+    console.log("payment.verify.txoutputs", txOutputs);
 
     let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
 
@@ -185,7 +181,10 @@ export default class BCH extends Plugin {
 
   async verifyPayment(params: VerifyPayment): Promise<boolean> {
 
-    return false
+    return this.validateUnsignedTx({
+      paymentOption: params.paymentOption,
+      transactions: [params.transaction]
+    })
   }
 
 }

@@ -12,7 +12,7 @@ import {
   nownodes
 } from '../../lib'
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, VerifyPayment, Confirmation, Payment } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Plugin,  Confirmation, Payment } from '../../lib/plugin'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
@@ -32,10 +32,6 @@ export default class BTC extends Plugin {
 
     return btc
 
-  }
-
-  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
@@ -134,10 +130,6 @@ export default class BTC extends Plugin {
     return { txhex: '' } //TODO
   }
 
-  async verifyPayment(params: VerifyPayment): Promise<boolean> {
-
-    return false //TODO
-  }
 
 }
 

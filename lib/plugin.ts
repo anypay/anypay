@@ -11,6 +11,8 @@ import { getPrice } from './prices/kraken'
 
 import { BigNumber } from 'bignumber.js'
 
+import { buildOutputs, verifyOutput } from './pay'
+
 abstract class AbstractPlugin {
 
   abstract readonly currency: string;
@@ -73,15 +75,15 @@ export abstract class Plugin extends AbstractPlugin {
     }
   }
 
+  async getPayments(txid: string): Promise<Payment[]> {
+
+    throw new Error('not implemented')
+
+  }
+
   async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
 
     throw new Error(`buildSignedPayment not implemented for ${this.currency} on ${this.chain}`)
-  }
-
-  // should override if you want this to work properly
-  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
-
-    return true
   }
 
   async getNewAddress({address}: { account: Account, address: Address }): Promise<string> {
@@ -119,7 +121,105 @@ export abstract class Plugin extends AbstractPlugin {
     return new BigNumber(integer).dividedBy(Math.pow(10, this.decimals)).toNumber()
 
   }
-  
+
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> { 
+
+    let tx = new this.bitcore.Transaction(params.transactions[0].txhex);
+
+    let txOutputs = tx.outputs.map(output => {
+
+      try {
+
+        let address = new this.bitcore.Address(output.script).toString()
+
+        if (address.match(':')) {
+          address = address.split(':')[1]
+        }
+
+        return {
+          address,
+          amount: output.satoshis
+        }
+
+      } catch(error) {
+
+        return null
+
+      }
+
+    })
+    .filter(n => n != null)
+
+    let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
+
+    for (let output of outputs) {
+
+      var address;
+
+      if (output.script) {
+
+        address = new this.bitcore.Address(output.script).toString()
+
+      } else {
+
+        address = output.address
+
+      }
+
+      if (address.match(':')) {
+        address = output && output.address ? output.address.split(':')[1] : null
+      }
+
+      verifyOutput(txOutputs, address, output.amount);
+    }
+
+    return true
+
+  }
+
+  async verifyPayment(params: VerifyPayment): Promise<boolean> {
+
+    return this.validateUnsignedTx({
+      paymentOption: params.paymentOption,
+      transactions: [params.transaction]
+    })
+  }
+
+  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
+
+    let tx = new this.bitcore.Transaction(txhex);
+
+    let txOutputs = tx.outputs.map(output => {
+
+      try {
+
+        let address = new this.bitcore.Address(output.script).toString()
+
+        if (address.match(':')) {
+          address = address.split(':')[1]
+        }
+
+        return {
+          address,
+          amount: output.satoshis,
+          currency: this.currency,
+          chain: this.chain,
+          txid: tx.hash
+        }
+
+      } catch(error) {
+
+        return null
+
+      }
+
+    })
+    .filter(n => n != null)
+
+    return txOutputs
+
+  }
+
 }
 
 export interface BuildSignedPayment {

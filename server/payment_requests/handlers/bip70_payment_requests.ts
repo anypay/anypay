@@ -1,7 +1,9 @@
 import {awaitChannel} from '../../../lib/amqp';
 import * as Boom from 'boom';
 
-import { log, models, plugins } from '../../../lib'
+import { log, models } from '../../../lib'
+
+import { find } from '../../../lib/plugins'
 
 import * as pay from '../../../lib/pay'
 import { Trace } from '../../../lib/trace';
@@ -86,8 +88,7 @@ export async function create(req, h) {
 
   log.info(`bip70.currency.parsed`, currency)
 
-  //@ts-ignore
-  let plugin = plugins.find({chain: currency.code, currency: currency.code})
+  let plugin = find({chain: currency.code, currency: currency.code})
 
   await channel.publish('anypay', `bip70.payments.${currency.code.toLowerCase()}`, req.payload);
 
@@ -175,7 +176,7 @@ export async function create(req, h) {
 
       log.info(`bip70.${payment_option.currency}.broadcast`, { transaction, trace })
 
-      let resp = await plugin.broadcastTx(transaction);
+      let resp = await plugin.broadcastTx({ txhex: transaction });
 
       log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp, trace })
 

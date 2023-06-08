@@ -5,7 +5,7 @@ const ltc = require('litecore-lib');
 
 export const currency = 'LTC'
 
-import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation, VerifyPayment, Transaction, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation,  Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -25,10 +25,6 @@ export default class LTC extends Plugin {
 
     return ltc
 
-  }
-
-  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
@@ -83,11 +79,6 @@ export default class LTC extends Plugin {
   async getTransaction(txid: string): Promise<Transaction> {
 
     return { txhex: '' } //TODO
-  }
-
-  async verifyPayment(params: VerifyPayment): Promise<boolean> {
-
-    return false //TODO
   }
 
 }

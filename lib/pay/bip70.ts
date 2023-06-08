@@ -146,18 +146,36 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
 
       const file_with_x509_private_key = fs.readFileSync(keyPath);
 
+      console.log({ file_with_x509_private_key })
+
       const certificates = new PaymentProtocol().makeX509Certificates();
 
+      console.log({ domainDerPath, rootDerPath, keyPath })
+
+      const domainDer = fs.readFileSync(domainDerPath)
+
+      console.log({ domainDer })
+
+      const rootDer = fs.readFileSync(rootDerPath)
+
+      console.log({ rootDer })
+
       certificates.set('certificate', [
-        fs.readFileSync(domainDerPath),
-        fs.readFileSync(rootDerPath)
+        domainDer,
+        rootDer
       ]);
+
+      const pki_data = certificates.serialize()
+
+      console.log({ pki_data })
 
       paypro.set('payment_details_version', 1);
 
       paypro.set('pki_type', 'x509+sha256');
 
-      paypro.set('pki_data', certificates.serialize());
+      paypro.set('pki_data', pki_data);
+
+      console.log("about to sign")
 
       paypro.sign(file_with_x509_private_key);
 

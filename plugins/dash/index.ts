@@ -6,7 +6,7 @@ import * as dash from '@dashevo/dashcore-lib';
 
 import * as insight from './lib/insight'
 
-import { BroadcastTx, BroadcastTxResult, VerifyPayment, Transaction, Plugin, Confirmation, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Transaction, Plugin, Confirmation, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -26,10 +26,6 @@ export default class DASH extends Plugin {
 
     return dash
 
-  }
-
-  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
@@ -89,11 +85,6 @@ export default class DASH extends Plugin {
 
     throw new Error('plugin.dash.getTansaction(txid: string) not implemented')
 
-  }
-
-  async verifyPayment(params: VerifyPayment): Promise<boolean> {
-
-    return false
   }
 
 }
