@@ -19,7 +19,9 @@ export { bittrex, kraken }
 
 import { Price } from '../price'
 
-const MAX_DECIMALS = 5;
+import { Op } from 'sequelize'
+
+const MAX_DECIMALS = 8;
 
 interface Amount {
   currency: string;
@@ -259,6 +261,22 @@ export async function setAllFiatPrices(): Promise<Price[]> {
   }
 
   return prices
+
+}
+
+export async function listPrices(): Promise<Price[]> {
+
+  const coins = await models.Coin.findAll()
+
+  return models.Price.findAll({
+    where: {
+      base: 'USD',
+      currency: {
+        [Op.in]: coins.map(c => c.code)
+      }
+    },
+    order: [['currency', 'asc']]
+  })
 
 }
 

@@ -208,7 +208,7 @@ async function Server() {
           type: 'basic',
         },
       },
-      host: 'api.anypayx.com',
+      host: 'anypayx.com',
       schemes: ['https'],
       documentationPath: '/api',
       security: [{

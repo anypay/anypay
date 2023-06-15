@@ -15,7 +15,7 @@ import { start as startPrices } from './lib/prices/cron'
 
 import { start as startFees } from './actors/detect_fees/actor'
 
-import { hapi as kraken } from './plugins/kraken'
+import { hapi as kraken } from './lib/kraken'
 
 import { plugin as websockets } from './server/ws/plugin'
 
@@ -63,7 +63,7 @@ import * as core from './lib'
 
     })
 
-    startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
+    startActorsDirectory(join(__dirname, 'lib/kraken/actors'))
 
     refunds()
     

@@ -15,4 +15,6 @@ export interface Price {
 
   source: PriceSource;
 
+  updatedAt?: Date;
+
 }
