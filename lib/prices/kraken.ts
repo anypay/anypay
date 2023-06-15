@@ -50,6 +50,14 @@ export async function getPrice(currency: string): Promise<Price> {
 
     }
 
+    if (currency === 'XDG') {
+      currency = 'DOGE'
+    }
+
+    if (currency === 'XBT') {
+      currency = 'BTC'
+    }
+
     return {
       base: 'USD',
       currency,
