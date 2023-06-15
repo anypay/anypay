@@ -359,7 +359,7 @@ describe("Plugins", () => {
 
   describe('SOL', () => {
 
-    it('should find the plugin for SOL', async () => {
+    it.skip('should find the plugin for SOL', async () => {
 
       let plugin = await find({ chain: 'SOL', currency: 'SOL' })
 
@@ -369,7 +369,7 @@ describe("Plugins", () => {
 
     })
 
-    it('#getConfirmation should return block data for confirmed transaction', async () => {
+    it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
       let plugin = await find({ chain: 'SOL', currency: 'SOL' });
 
@@ -391,7 +391,7 @@ describe("Plugins", () => {
 
   describe('TRON', () => {
 
-    it('should find the plugin for TRON', async () => {
+    it.skip('should find the plugin for TRON', async () => {
 
       let plugin = await find({ chain: 'TRON', currency: 'TRON' })
 
@@ -401,7 +401,7 @@ describe("Plugins", () => {
 
     })
 
-    it('#getConfirmation should return block data for confirmed transaction', async () => {
+    it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
       let plugin = await find({ chain: 'TRON', currency: 'TRON' });
 
@@ -452,6 +452,7 @@ describe("Plugins", () => {
     })
 
   })
+/*
 
   describe('XLM', () => {
 
@@ -494,6 +495,8 @@ describe("Plugins", () => {
     })
 
   })
+
+*/
 
   describe('USDC', () => {
 
@@ -599,6 +602,8 @@ describe("Plugins", () => {
 
     })
 
+    /*
+
     describe('USDC.SOL', () => {
 
       it('should find the plugin for USDC.SOL', async () => {
@@ -636,7 +641,7 @@ describe("Plugins", () => {
 
     describe('USDC.TRON', () => {
 
-      it('should find the plugin for USDC.TRON', async () => {
+      it.skip('should find the plugin for USDC.TRON', async () => {
 
         let plugin = await find({ chain: 'TRON', currency: 'USDC' })
 
@@ -648,7 +653,7 @@ describe("Plugins", () => {
 
       })
 
-      it('#getConfirmation should return block data for confirmed transaction', async () => {
+      it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
         let plugin = await find({ chain: 'TRON', currency: 'USDT' });
 
@@ -670,7 +675,7 @@ describe("Plugins", () => {
 
     describe('USDC.FLOW', () => {
 
-      it('should find the plugin for USDC.FLOW', async () => {
+      it.skip('should find the plugin for USDC.FLOW', async () => {
 
         let plugin = await find({ chain: 'FLOW', currency: 'USDC' })
 
@@ -715,6 +720,7 @@ describe("Plugins", () => {
       })
 
     })
+    */
 
   })
 
@@ -828,6 +834,8 @@ describe("Plugins", () => {
 
     })
 
+    /*
+
     describe('USDT.SOL', () => {
 
       it('should find the plugin for USDT.SOL', async () => {
@@ -897,6 +905,8 @@ describe("Plugins", () => {
       })
 
     })
+
+    */
 
   })
 

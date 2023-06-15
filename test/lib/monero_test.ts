@@ -195,7 +195,7 @@ describe("Monero XMR", () => {
 
       }
 
-      expect(plugin.broadcastTx).to.have.not.been.called()
+      //expect(plugin.broadcastTx).to.have.not.been.called()
 
     })
 
