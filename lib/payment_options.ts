@@ -26,7 +26,9 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
     let outputs = await Promise.all(option.to.map(async (to) => {
 
-      const { currency, chain } = option
+      var { currency, chain } = option
+
+      if (!chain) { chain = currency }
 
       let conversion = await convert({
         currency: to.currency,
