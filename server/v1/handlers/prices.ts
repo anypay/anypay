@@ -1,7 +1,7 @@
 
 import { badRequest } from 'boom'
 
-import { listPrices } from '../../../lib/prices'
+import { listPrices, getPriceHistory } from '../../../lib/prices'
 
 export async function index() {
 
@@ -26,6 +26,24 @@ export async function index() {
       })
 
     }
+
+  } catch(error) {
+
+    return badRequest(error)
+
+  }
+
+}
+
+export async function show(req, h) {
+
+  try {
+
+    const { currency } = req.params
+
+    const result = await getPriceHistory(currency)
+
+    return result
 
   } catch(error) {
 

@@ -1,7 +1,7 @@
 
 import { log } from '../log';
 
-import { models } from '../models';
+import { models, sequelize } from '../models';
 
 import * as fixer from './fixer';
 
@@ -278,6 +278,29 @@ export async function listPrices(): Promise<Price[]> {
       }
     },
     order: [['currency', 'asc']]
+  })
+
+}
+
+export async function getPriceHistory(currency: string, days: number=30) {
+  // hourly average of price records for the past thirty days
+
+  const query = `SELECT date_trunc('hour', "public"."PriceRecords"."createdAt") AS "createdAt", avg("public"."PriceRecords"."value") AS "avg"
+  FROM "public"."PriceRecords"
+  WHERE ("public"."PriceRecords"."currency" = '${currency}'
+     AND "public"."PriceRecords"."createdAt" >= CAST((now() + (INTERVAL '-${days} day')) AS date) AND "public"."PriceRecords"."createdAt" < CAST(now() AS date))
+  GROUP BY date_trunc('hour', "public"."PriceRecords"."createdAt")
+  ORDER BY date_trunc('hour', "public"."PriceRecords"."createdAt") ASC;`
+
+  const [results] = await sequelize.query(query)
+
+  return results.map(result => {
+
+    return {
+      createdAt: result.createdAt,
+      avg: parseFloat(result.avg)
+    }
+
   })
 
 }

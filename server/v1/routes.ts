@@ -577,6 +577,20 @@ export async function attachV1Routes(server) {
     },
   })
 
+  server.route({
+    method: 'GET',
+    path: '/api/v1/prices/{currency}/history',
+    handler: v1.Prices.show,
+    options: {
+      tags: ['v1', 'prices'],
+      response: {
+        schema: Joi.object({
+        }),
+        failAction
+      }
+    },
+  })
+
 
 
 }
