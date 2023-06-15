@@ -127,6 +127,8 @@ export async function setPrice(price: Price): Promise<Price> {
 
   });
 
+  await models.PriceRecord.create(price)
+
   if (!isNew) {
 
     record.value = price.value;
