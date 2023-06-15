@@ -556,4 +556,27 @@ export async function attachV1Routes(server) {
     },
   })
 
+  server.route({
+    method: 'GET',
+    path: '/api/v1/prices',
+    handler: v1.Prices.index,
+    options: {
+      tags: ['v1', 'api', 'prices'],
+      response: {
+        schema: Joi.object({
+          prices: Joi.array().items(Joi.object({
+            currency: Joi.string().required(),
+            base: Joi.string().required(),
+            value: Joi.number().required(),
+            updatedAt: Joi.date().required(),
+            source: Joi.string().required() 
+          }).label('Price')).label('Prices')
+        }),
+        failAction
+      }
+    },
+  })
+
+
+
 }
