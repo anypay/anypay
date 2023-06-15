@@ -274,7 +274,8 @@ export async function listPrices(): Promise<Price[]> {
       currency: {
         [Op.in]: coins.map(c => c.code)
       }
-    }
+    },
+    order: [['currency', 'asc']]
   })
 
 }
