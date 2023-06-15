@@ -189,17 +189,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     let plugin = find({ chain, currency })
 
-    console.log('plugin.validateUnsignedTx', payment);
- 
-    return {
-      success: true,
-      transactions: payment.transactions.map(({txhex}) => {
-        return {
-          tx: txhex
-        }
-      })
-    }
-
     if (plugin.validateUnsignedTx) {
 
       const valid = await plugin.validateUnsignedTx({
