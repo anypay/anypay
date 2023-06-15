@@ -9,14 +9,9 @@ const v1 = requireHandlersDirectory(join(__dirname, './v1/handlers'))
 
 const jsonV2 = requireHandlersDirectory(join(__dirname, './jsonV2/handlers'))
 
-import { log } from '../lib/log'
-
 export { v0, v1, jsonV2 }
 
-export function failAction(request, h, error) {
+const failAction = 'log'
 
-  log.error('api.failAction', error)
-
-  return error
-}
+export { failAction }
 
