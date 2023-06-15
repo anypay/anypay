@@ -66,7 +66,7 @@ jobs:
     steps:
       - run:
           name: Deploy Develop Branch To Beta Web Server
-          command: ssh beta.anypayx.com "sudo chef-client -o recipe[anypay_api::beta]"
+          command: ssh root@ionia.anypayx.com "/opt/deploy_anypay_api.sh"
 
 workflows:
   version: 2
