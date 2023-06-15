@@ -22,7 +22,13 @@ import { find } from '../../lib/plugins'
 
 describe("Monero XMR", () => {
 
-  let plugin: Plugin = find({ chain: 'XMR', currency: 'XMR' })
+  var plugin: Plugin;
+
+  before(() => {
+
+    plugin = find({ chain: 'XMR', currency: 'XMR' })
+
+  })
 
   describe("Account / Address Setup", () => {
 
