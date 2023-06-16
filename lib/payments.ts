@@ -3,8 +3,6 @@ import { models } from './models'
 
 import { Invoice } from './invoices'
 
-import { PaymentOption } from './payment_option'
-
 import { Orm } from './orm'
 
 interface PaymentDetails {
@@ -14,29 +12,9 @@ interface PaymentDetails {
   txjson?: any;
 }
 
-interface NewPayment {
-  record: any;
-  invoice: Invoice;
-  option: PaymentOption;
-}
-
 export class Payment extends Orm {
 
   static model = models.Payment;
-
-  invoice: Invoice
-
-  option: PaymentOption;
-
-  constructor(newPayment: NewPayment) {
-
-    super(newPayment.record);
-
-    this.invoice = newPayment.invoice;
-
-    this.option = newPayment.option;
-
-  }
 
   toJSON() {
 
@@ -48,18 +26,12 @@ export class Payment extends Orm {
 
       createdAt: this.get('createdAt'),
 
-      outputs: this.outputs,
-
       tx_hex: this.get('txhex'),
 
       tx_json: this.get('txjson')
 
     }
 
-  }
-
-  get outputs() {
-    return this.option.get('outputs')
   }
 
   get currency() {
@@ -103,7 +75,7 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
     account_id: invoice.get('account_id')
   }))
 
-  return new Payment({ record, invoice, option })
+  return new Payment(record)
 
 }
 
@@ -115,15 +87,11 @@ export async function getPayment(invoice: Invoice): Promise<Payment> {
 
   if (!record) { return }
 
-  let option = await models.PaymentOption.findOne({
-    where: { invoice_uid: invoice.uid, currency: record.currency }
-  })
-
-  return new Payment({ record, invoice, option })
+  return new Payment(record)
 
 }
 
-export async function listPayments(account, params: {limit: number, offset: number} = {limit: 100, offset: 0}): Promise<Payment> {
+export async function listPayments(account, params: {limit: number, offset: number} = {limit: 100, offset: 0}): Promise<any[]> {
 
   return models.Payment.findAll({
 

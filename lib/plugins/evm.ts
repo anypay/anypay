@@ -5,11 +5,22 @@ import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment, Ver
 
 import { ethers } from 'ethers'
 
+import { models } from '../models'
+
+import { confirmPaymentByTxid, revertPayment } from '../confirmations'
+
 export abstract class EVM extends Plugin {
 
   providerURL: string;
 
   chainID: number;
+
+  web3: typeof Web3;
+
+  constructor() {
+    super()
+    this.web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
+  }
 
   async getPayments(txid: string): Promise<Payment[]> {
 
@@ -41,11 +52,21 @@ export abstract class EVM extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
+    let record = await models.EvmTransactionReceipt.findOne({
+      where: { txid }
+    })
+
+    if (record) {
+
+    }
+
     const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
 
-    const receipt: any = await web3.eth.getTransactionReceipt(txid)
+    let receipt: any = await web3.eth.getTransactionReceipt(txid)
 
-    if (!receipt) { return }
+    if (!receipt) { return } 
+
+    //TODO: Handle Unfortunate Cirmcumstance When EVM Reverts the Transaction
 
     const { blockHash: hash, blockNumber: height } = receipt
 
@@ -77,30 +98,65 @@ export abstract class EVM extends Plugin {
         console.log('skip broadcast of txid', { txid: txhex })
 
         return {
-          txhex,
-          txid: '', //TODO
+          txhex, //TODO
+          txid: txhex,
           result: txhex,
           success: true 
         }
 
       }
 
-      const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
-
-      web3.eth.sendSignedTransaction(txhex)
+      this.web3.eth.sendSignedTransaction(txhex)
       .on('transactionHash', txid => {
 
         resolve({ txid, txhex, result: txid, success: true })
 
       })
-      .on('receipt', receipt => {
+      .on('receipt', (receipt: TransactionReceipt) => {
 
         console.log("web3.ethers.receipt", receipt)
 
-        // TODO: Confirm Transaction
+        if (!receipt.status) {
+          return revertPayment({ txid: receipt.transactionHash })
+        }
 
        })
-      .on('confirmation', confirmation => console.log("web3.ethers.confirmation", confirmation))
+      .on('confirmation', async (confirmation, receipt: TransactionReceipt) => {
+
+        console.log("web3.ethers.confirmation", {confirmation, receipt})
+
+        if (!receipt.status) {
+          return revertPayment({ txid: receipt.transactionHash })
+        }
+
+        const block = await this.web3.eth.getBlock(receipt.blockHash)
+
+        confirmPaymentByTxid({
+          txid: receipt.transactionHash,
+          confirmation: {
+            confirmation_height: receipt.blockNumber,
+            confirmation_hash: receipt.blockHash,
+            confirmation_date: new Date(block.timestamp * 1000)
+          }
+        })
+
+        const [record, isNew] = await models.EvmTransactionReceipt.findOrCreate({
+          where: {
+            txid: receipt.transactionHash
+          },
+          defaults: {
+            txid: receipt.transactionHash,
+            receipt
+          }
+        })
+
+        if (isNew) {
+
+          console.log('evm.transactionReceipt.saved', record.toJSON())
+
+        }
+
+      })
 
     })
 
@@ -186,3 +242,14 @@ export abstract class EVM extends Plugin {
 
 }
 
+interface TransactionReceipt {
+  status: boolean;
+  transactionHash: string;
+  transactionIndex: number;
+  blockHash?: string;
+  blockNumber?: number;
+  contractAddress: string;
+  cumulativeGasUsed: number;
+  gasUsed: number;
+  logs: any[];
+}
