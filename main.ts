@@ -23,8 +23,6 @@ import { start as refunds } from './actors/refunds/actor'
 
 import eventWebhooks from './actors/webhooks-events/actor'
 
-import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
-
 import { init } from 'rabbi'
 
 import * as core from './lib'
@@ -72,14 +70,6 @@ import * as core from './lib'
   }
 
   eventWebhooks()
-
-  if (config.get('rabbi_start_cron')) {
-
-    startCronDirectory(join(__dirname, 'cron'))
-
-  }
-
-  startTask('wallet_bot_send_xmr_on_interval')
 
 })()
 

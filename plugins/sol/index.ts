@@ -19,8 +19,9 @@ export default class SOL extends Plugin {
 
   decimals = 0 //TODO
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
-    throw new Error() //TODO
+  async parsePayments({ txhex }: AnypayTransaction): Promise<Payment[]> {
+    // TODO Implement
+    return []
   }
 
   async getPayments(txid: string): Promise<Payment[]> {

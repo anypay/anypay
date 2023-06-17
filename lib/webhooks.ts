@@ -7,15 +7,9 @@ import { config } from './config'
 
 import { Invoice } from './invoices'
 
-import { PaymentRequired } from 'get402'
-
 import { Account, findAccount } from './account'
 
-import { email } from 'rabbi'
-
 import { Orm, findOrCreate } from './orm'
-
-import { findClient, createClient, Client } from './get_402'
 
 import * as http from 'superagent';
 
@@ -386,76 +380,6 @@ export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
 
 export interface ApiClient {
   identifier: string;
-}
-
-
-
-export class PaidWebhook {
-
-  client: Client;
-
-  webhook: Webhook
-
-  constructor(params: NewPaidWebhook) {
-
-    this.client = createClient(params.client.identifier);
-
-    this.webhook = params.webhook;
-
-  }
-
-  async attemptWebhook(): Promise<Attempt> {
-
-    try {
-
-      await this.client.chargeCredit({ credits: 1 })
-
-      return attemptWebhook(this.webhook)
-
-    } catch(error) {
-
-      if (error instanceof PaymentRequired) {
-
-        let account = await this.webhook.getAccount()
-
-        await email.sendEmail('get402-insufficient-funds', account.email, config.get('EMAIL_SENDER'))
-
-      }
-
-      throw error
-
-    }
-
-  }
-
-}
-
-interface NewPaidWebhook {
-  webhook: Webhook,
-  client: ApiClient
-}
-
-export function makePaidWebhook(params: NewPaidWebhook): PaidWebhook {
-
-  return new PaidWebhook(params)
-
-}
-
-export async function getPaidWebhookForInvoice(invoice: Invoice): Promise<PaidWebhook> {
-
-  let account = await invoice.getAccount()
-
-  let client = await findClient(account)
-
-  if (!client) {
-
-    return null
-  }
-
-  let webhook = await findWebhook({ invoice_uid: invoice.uid })
-
-  return makePaidWebhook({ webhook, client })
-
 }
 
 interface ListOptions {
