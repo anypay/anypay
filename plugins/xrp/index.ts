@@ -53,10 +53,10 @@ export default class XRP extends Plugin {
     client.disconnect();
 
     return {
-      hash,
-      height,
-      timestamp,
-      depth: latest - height + 1
+      confirmation_hash: hash,
+      confirmation_height: height,
+      confirmation_date: timestamp,
+      confirmations: latest - height + 1
     }
 
   }

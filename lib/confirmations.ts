@@ -3,14 +3,17 @@ import { Payment } from './payments'
 
 import { Invoice } from './invoices'
 
-import { findOne } from './orm'
+import { findOne, findAll } from './orm'
 
 import { publish } from 'rabbi'
 
-interface Confirmation {
+import { Op } from 'sequelize'
+
+export interface Confirmation {
   confirmation_hash: string;
   confirmation_height: number;
   confirmation_date: Date;
+  confirmations?: number;
 }
 
 export async function confirmPayment({payment, confirmation}: {payment: Payment, confirmation: Confirmation}): Promise<Payment> {
@@ -31,7 +34,9 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
 
     confirmation_height,
 
-    confirmation_date
+    confirmation_date,
+
+    status: 'confirmed'
 
   })
 
@@ -77,5 +82,20 @@ export async function revertPayment({ txid }: { txid: string }): Promise<Reverte
   publish('anypay', 'payment.revered', payment.toJSON())
 
   return { invoice, payment }
+}
+
+
+export async function listUnconfirmedPayments({chain, currency}: {chain: string, currency: string}): Promise<Payment[]> {
+
+  return findAll<Payment>(Payment, {
+    where: {
+      confirmation_hash: {
+        [Op.eq]: null
+      },
+      chain,
+      currency
+    }
+  })
+
 }
 

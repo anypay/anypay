@@ -11,6 +11,10 @@ import { getPrice } from './prices/kraken'
 
 import { BigNumber } from 'bignumber.js'
 
+import { Confirmation } from './confirmations'
+
+export { Confirmation }
+
 import { buildOutputs, verifyOutput } from './pay'
 
 abstract class AbstractPlugin {
@@ -57,15 +61,6 @@ export interface BroadcastTx {
   txid?: string;
   txkey?: string;
 }
-
-interface iConfirmation {
-  hash: string;
-  height: number;
-  timestamp: Date;
-  depth: number;
-}
-
-export type Confirmation = iConfirmation | null
 
 export abstract class Plugin extends AbstractPlugin {
 

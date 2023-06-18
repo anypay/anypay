@@ -48,10 +48,10 @@ export default class SOL extends Plugin {
 
     return {
 
-      hash: block.blockhash,
-      height: slot,
-      timestamp: new Date(block.blockTime * 1000),
-      depth: signatureStatus.context.slot - slot + 1
+      confirmation_hash: block.blockhash,
+      confirmation_height: slot,
+      confirmation_date: new Date(block.blockTime * 1000),
+      confirmations: signatureStatus.context.slot - slot + 1
     }
 
   }

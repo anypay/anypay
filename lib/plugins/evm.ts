@@ -68,23 +68,23 @@ export abstract class EVM extends Plugin {
 
     //TODO: Handle Unfortunate Cirmcumstance When EVM Reverts the Transaction
 
-    const { blockHash: hash, blockNumber: height } = receipt
+    const { blockHash: confirmation_hash, blockNumber: confirmation_height } = receipt
 
-    if (!hash) { return }
+    if (!confirmation_hash) { return }
 
-    const block = await web3.eth.getBlock(hash)
+    const block = await web3.eth.getBlock(confirmation_hash)
 
     const latestBlock = await web3.eth.getBlock('latest')
 
-    const depth = latestBlock.number - height + 1
+    const confirmations = latestBlock.number - confirmation_height + 1
 
-    const timestamp = new Date(block.timestamp * 1000)
+    const confirmation_date = new Date(block.timestamp * 1000)
 
     return {
-      hash,
-      height,
-      depth,
-      timestamp
+      confirmation_hash,
+      confirmation_height,
+      confirmation_date,
+      confirmations
     }
 
   }

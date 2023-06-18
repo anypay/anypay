@@ -47,10 +47,10 @@ export default class BTC extends Plugin {
     if (!transaction.block_hash) { return }
 
     return {
-      height: transaction.block_height,
-      hash: transaction.block_hash, 
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
+      confirmation_height: transaction.block_height,
+      confirmation_hash: transaction.block_hash, 
+      confirmation_date: moment(transaction.confirmed).toDate(),
+      confirmations: transaction.confirmations
     }
 
   }

@@ -52,6 +52,8 @@ describe("Confirmations", () => {
 
       expect(payment.get('confirmation_date').toString()).to.be.equal(confirmation_date.toString())
 
+      expect(payment.get('status')).to.be.equal('confirmed')
+
     })
 
   })
