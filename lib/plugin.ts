@@ -107,7 +107,7 @@ export abstract class Plugin extends AbstractPlugin {
 
   toSatoshis(decimal: number): number {
 
-    return new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber()
+    return Math.trunc(new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber())
 
   }
 

@@ -40,6 +40,14 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
 
   })
 
+  let invoice = await findOne<Invoice>(Invoice, {
+    where: {
+      uid: payment.get('invoice_uid')
+    } 
+  })
+
+  await invoice.set('status', 'paid')
+
   publish('anypay', 'payment.confirmed', payment.toJSON())
 
   return payment

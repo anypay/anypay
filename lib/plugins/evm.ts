@@ -91,23 +91,38 @@ export abstract class EVM extends Plugin {
 
   async broadcastTx({txhex}: BroadcastTx): Promise<BroadcastTxResult> {
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
+
+
+      const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
 
       if (txhex.length === 66) {
 
-        console.log('skip broadcast of txid', { txid: txhex })
+        const txid = txhex
 
-        return {
+        // SKIP BROADCAST
+        resolve({
           txhex, //TODO
-          txid: txhex,
+          txid,
           result: txhex,
           success: true 
+        })
+
+        const receipt = await web3.eth.getTransactionReceipt(txid)
+
+        if (receipt) {
+
+          handleTransactionReceipt(web3, receipt)
+
         }
+
+        return
 
       }
 
-      this.web3.eth.sendSignedTransaction(txhex)
-      .on('transactionHash', txid => {
+      const receiptListener = web3.eth.sendSignedTransaction(txhex)
+
+      receiptListener.on('transactionHash', txid => {
 
         resolve({ txid, txhex, result: txid, success: true })
 
@@ -123,36 +138,18 @@ export abstract class EVM extends Plugin {
        })
       .on('confirmation', async (confirmation, receipt: TransactionReceipt) => {
 
-        console.log("web3.ethers.confirmation", {confirmation, receipt})
+        try {
 
-        if (!receipt.status) {
-          return revertPayment({ txid: receipt.transactionHash })
-        }
+          console.log("web3.ethers.confirmation", {confirmation, receipt})
 
-        const block = await this.web3.eth.getBlock(receipt.blockHash)
+          handleTransactionReceipt(web3, receipt)
 
-        confirmPaymentByTxid({
-          txid: receipt.transactionHash,
-          confirmation: {
-            confirmation_height: receipt.blockNumber,
-            confirmation_hash: receipt.blockHash,
-            confirmation_date: new Date(block.timestamp * 1000)
-          }
-        })
+          receiptListener.off('confirmation')
+          receiptListener.off('receipt')
 
-        const [record, isNew] = await models.EvmTransactionReceipt.findOrCreate({
-          where: {
-            txid: receipt.transactionHash
-          },
-          defaults: {
-            txid: receipt.transactionHash,
-            receipt
-          }
-        })
+        } catch(error) {
 
-        if (isNew) {
-
-          console.log('evm.transactionReceipt.saved', record.toJSON())
+          console.error('EVM Confirmation Error', error)
 
         }
 
@@ -185,8 +182,6 @@ export abstract class EVM extends Plugin {
     */
 
     const expectedOutput = paymentOption.outputs[0]
-
-    console.log('VERIFY', {txhex,  txid})
 
     try {
 
@@ -252,4 +247,42 @@ interface TransactionReceipt {
   cumulativeGasUsed: number;
   gasUsed: number;
   logs: any[];
+}
+
+async function handleTransactionReceipt(web3, receipt: TransactionReceipt): Promise<void> {
+
+  if (!receipt.status) {
+    revertPayment({ txid: receipt.transactionHash })
+    return
+  }
+
+  const block = await web3.eth.getBlock(receipt.blockHash)
+
+  const confirmResult = await confirmPaymentByTxid({
+    txid: receipt.transactionHash,
+    confirmation: {
+      confirmation_height: receipt.blockNumber,
+      confirmation_hash: receipt.blockHash,
+      confirmation_date: new Date(block.timestamp * 1000)
+    }
+  })
+
+  console.log({ confirmResult })
+
+  const [record, isNew] = await models.EvmTransactionReceipt.findOrCreate({
+    where: {
+      txid: receipt.transactionHash
+    },
+    defaults: {
+      txid: receipt.transactionHash,
+      receipt
+    }
+  })
+
+  if (isNew) {
+
+    console.log('evm.transactionReceipt.saved', record.toJSON())
+
+  }
+
 }

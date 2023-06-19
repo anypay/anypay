@@ -38,7 +38,7 @@ export default class DASH extends Card {
 
   constructor(params?: DashCardParams) {
 
-    super()
+    super({ phrase: params.phrase })
 
     if (params.phrase) {
 
