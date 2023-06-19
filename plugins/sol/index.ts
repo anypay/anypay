@@ -19,8 +19,9 @@ export default class SOL extends Plugin {
 
   decimals = 0 //TODO
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
-    throw new Error() //TODO
+  async parsePayments({ txhex }: AnypayTransaction): Promise<Payment[]> {
+    // TODO Implement
+    return []
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
@@ -47,10 +48,10 @@ export default class SOL extends Plugin {
 
     return {
 
-      hash: block.blockhash,
-      height: slot,
-      timestamp: new Date(block.blockTime * 1000),
-      depth: signatureStatus.context.slot - slot + 1
+      confirmation_hash: block.blockhash,
+      confirmation_height: slot,
+      confirmation_date: new Date(block.blockTime * 1000),
+      confirmations: signatureStatus.context.slot - slot + 1
     }
 
   }

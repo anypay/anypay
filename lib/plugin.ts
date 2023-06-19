@@ -11,6 +11,10 @@ import { getPrice } from './prices/kraken'
 
 import { BigNumber } from 'bignumber.js'
 
+import { Confirmation } from './confirmations'
+
+export { Confirmation }
+
 import { buildOutputs, verifyOutput } from './pay'
 
 abstract class AbstractPlugin {
@@ -58,15 +62,6 @@ export interface BroadcastTx {
   txkey?: string;
 }
 
-interface iConfirmation {
-  hash: string;
-  height: number;
-  timestamp: Date;
-  depth: number;
-}
-
-export type Confirmation = iConfirmation | null
-
 export abstract class Plugin extends AbstractPlugin {
 
   get bitcore(): any {
@@ -112,7 +107,7 @@ export abstract class Plugin extends AbstractPlugin {
 
   toSatoshis(decimal: number): number {
 
-    return new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber()
+    return Math.trunc(new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber())
 
   }
 

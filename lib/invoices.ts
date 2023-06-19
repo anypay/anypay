@@ -299,8 +299,6 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   })
 
-  console.log('paymentrequest.created', paymentRequest)
-
   log.info('paymentrequest.created', paymentRequest)
 
   log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })

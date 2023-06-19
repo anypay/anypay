@@ -46,10 +46,10 @@ export default class BSV extends Plugin {
     const depth = transaction.confirmations
 
     return {
-      hash,
-      height,
-      depth,
-      timestamp
+      confirmation_hash: hash,
+      confirmation_height: height,
+      confirmations: depth,
+      confirmation_date: timestamp
     }
 
   }
