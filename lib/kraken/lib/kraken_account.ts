@@ -127,6 +127,10 @@ export class KrakenAccount extends Orm {
             pair = 'XLTCZUSD'
           }
 
+          if (!assetPairs[pair]) {
+            return false
+          }
+
           let minimum = parseFloat(assetPairs[pair].ordermin)
 
           if (balance < minimum) {

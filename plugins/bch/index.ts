@@ -59,10 +59,10 @@ export default class BCH extends Plugin {
     const height = block.height
 
     return {
-      hash,
-      height,
-      depth,
-      timestamp
+      confirmation_height: height,
+      confirmation_hash: hash,
+      confirmation_date: timestamp,
+      confirmations: depth
     }
     
   }

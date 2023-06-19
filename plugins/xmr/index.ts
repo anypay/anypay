@@ -72,10 +72,10 @@ export default class XMR extends Plugin {
     const { count } = await get_block_count()
 
     return {
-      hash,
-      height,
-      timestamp,
-      depth: count - height + 1
+      confirmation_hash: hash,
+      confirmation_height: height,
+      confirmation_date: timestamp,
+      confirmations: count - height + 1
     }
 
   }

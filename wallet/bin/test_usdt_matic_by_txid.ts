@@ -2,21 +2,36 @@ require('dotenv').config()
 
 import { Cards, PaymentOption } from '../src'
 
-import { polygon } from 'usdc'
-
 import axios from 'axios'
 
 async function main() {
 
-  const url = process.argv[2]
+  const chain = 'MATIC'
 
-  const chain = 'AVAX'
+  const currency = 'USDT'
 
-  const currency = 'USDC'
-
-  const card = new Cards.USDC_AVAX({
+  const card = new Cards.USDT_MATIC({
     phrase: process.env.anypay_wallet_phrase
   })
+
+  const amount = 0.01
+
+  const base = 'http://localhost:8000'
+
+  const { data } = await axios.post(`${base}/invoices`, {
+    amount
+  }, {
+    auth: {
+      username: process.env.anypay_access_token,
+      password: ''
+    }
+  })
+
+  console.log(data, 'invoice.created')
+
+  const uid = data.invoice.uid
+
+  const url = `${base}/r/${uid}`
 
   try {
 
@@ -31,14 +46,24 @@ async function main() {
 
     console.log({ paymentOption })
 
+    const { instructions } = paymentOption
+
+    console.log({ instructions })
+
     const { txhex, txid } = await card.buildSignedPayment(paymentOption)
 
     console.log({txhex, txid})
 
+    // broadcast
+
+    const broadcastResult = await card.broadcastSignedTransaction(txhex)
+
+    console.log("BROADCAST RESULT", broadcastResult)
+
     const { data: paymentResult } = await axios.post(url, {
       chain,
       currency,
-      transactions: [{ tx: txhex }]
+      transactions: [{ tx: broadcastResult }]
     }, {
       headers: {
         'content-type': 'application/payment'

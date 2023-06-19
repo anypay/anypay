@@ -58,14 +58,15 @@ const cards: CardsMap = {
   "USDT_MATIC": USDT_MATIC,
   "USDT_ETH": USDT_ETH,
   "USDT_AVAX": USDT_AVAX,
+}
 
-export function getCard({ chain, currency, phrase }: {chain: string, currency: string,phrase: string}): typeof _Base {
+/*%export function getCard({ chain, currency, phrase }: {chain: string, currency: string, phrase: string}): typeof _Base {
 
-  const name: any = chain === currency ? chain : `${currency}_${chain}`
+  const name: any = chain === currency ? chain : `${currency}_${chain}`;
 
   var Card: any;
 
-  switch name {
+  switch (name) {
 
     case 'BCH':
 
@@ -83,7 +84,7 @@ export function getCard({ chain, currency, phrase }: {chain: string, currency: s
 
   return new Card({ phrase })
 
-}
+}*/
 
 export {
 
