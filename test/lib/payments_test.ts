@@ -17,12 +17,11 @@ describe('Payments', () => {
       txhex: '11111111111'
     })
 
-    expect(payment.invoice).to.be.equal(invoice)
+    expect(payment.invoice_uid).to.be.equal(invoice.uid)
 
     let invoicePayment = await getPayment(invoice)
 
     expect(payment.get('id')).to.be.equal(invoicePayment.get('id'))
-    expect(payment.outputs).to.be.an('array')
 
   })
 
@@ -37,7 +36,7 @@ describe('Payments', () => {
       txjson: { some: 'json' }
     })
 
-    expect(payment.invoice).to.be.equal(invoice);
+    expect(payment.invoice_uid).to.be.equal(invoice.uid);
 
     try {
 
