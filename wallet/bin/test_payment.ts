@@ -6,17 +6,19 @@ import axios from 'axios'
 
 async function main() {
 
-  const chain = 'MATIC'
+  const chain = process.argv[2] || 'MATIC'
 
-  const currency = 'USDC'
+  const currency = process.argv[3] || 'USDC'
 
-  const card = new Cards.USDC_MATIC({
+  const Card = Cards.getCard({ chain, currency })
+
+  const card = new Card({
     phrase: process.env.anypay_wallet_phrase
   })
 
-  const amount = 0.01
+  const amount = process.argv[4] ? parseFloat(process.argv[4]) : 0.0001
 
-  const base = 'http://localhost:8000'
+  const base = 'https://develop.anypayx.com'
 
   const { data } = await axios.post(`${base}/invoices`, {
     amount
