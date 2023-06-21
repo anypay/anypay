@@ -13,6 +13,8 @@ import { Address } from './addresses'
 
 import { Payment } from './plugin'
 
+import { Price } from './price'
+
 import { PaymentOption } from './payment_option'
 
 export function find({currency, chain }: {currency: string, chain: string}) {
@@ -87,6 +89,14 @@ export function verifyPayment({paymentOption,transaction}: {paymentOption: Payme
   const plugin = find({ currency, chain })
 
   return plugin.verifyPayment({ paymentOption, transaction })
+
+}
+
+export function getPrice({chain,currency}: {chain:string, currency:string }): Promise<Price> {
+
+  const plugin = find({ currency, chain })
+
+  return plugin.getPrice()
 
 }
 
