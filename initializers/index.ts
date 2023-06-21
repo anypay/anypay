@@ -9,6 +9,9 @@ import { Anypay } from '../lib/index'
 
 export async function initialize(anypay: Anypay) {
 
+  console.log('initialize plugins')
+  await plugins()
+
   console.log('initialize coins')
   await coins()
 
@@ -20,9 +23,6 @@ export async function initialize(anypay: Anypay) {
 
   console.log('initialize prometheus')
   await prometheus(anypay)
-
-  console.log('initialize plugins')
-  await plugins()
 
   console.log('initialization complete')
 }

@@ -13,13 +13,13 @@ import * as bittrex from './bittrex'
 
 import * as kraken from './kraken'
 
-import * as coinmarketcap from './coinmarketcap'
-
 export { bittrex, kraken }
 
 import { Price } from '../price'
 
 import { Op } from 'sequelize'
+
+import { getPrice } from '../plugins'
 
 const MAX_DECIMALS = 8;
 
@@ -145,47 +145,6 @@ export async function setPrice(price: Price): Promise<Price> {
 
 }
 
-export async function updateCryptoUSDPrice(currency) {
-
-  let BCH_USD_PRICE = await models.Price.findOne({
-    where: {
-      base: 'USD',
-      currency
-    }
-  });
-
-  let prices = await models.Price.findAll({
-    where: {
-      currency: 'USD'
-    }
-  });
-
-  return Promise.all(prices.map(async (price) => {
-
-    if (price.base === currency || price.currency === currency) {
-      return
-    }
-
-    let value = price.value * BCH_USD_PRICE.value
-
-    await setPrice({
-      currency,
-      value, 
-      base: price.base,
-      source: 'fixer•coinmarketcap'
-    });
-
-    await setPrice({
-      base: price.base,
-      value: 1 / value,
-      source: 'fixer•coinmarketcap',
-      currency
-    });
-
-  }))
-
-}
-
 export async function updateUSDPrices() {
 
   let prices: Price[] = await fixer.fetchCurrencies('USD');
@@ -218,7 +177,7 @@ export async function setAllCryptoPrices() {
   const prices: Promise<Price>[] = [];
 
 
-  prices.push(coinmarketcap.getPrice('BSV'))
+  prices.push(getPrice({ chain: 'BSV', currency: 'BSV' }))
 
   prices.push(bittrex.getPrice('USDC'))
   prices.push(bittrex.getPrice('USDT'))
@@ -230,7 +189,6 @@ export async function setAllCryptoPrices() {
   prices.push(kraken.getPrice('BCH'))
   prices.push(kraken.getPrice('ETH'))
   prices.push(kraken.getPrice('SOL'))
-
   prices.push(kraken.getPrice('AVAX'))
   prices.push(kraken.getPrice('DOGE'))
   prices.push(kraken.getPrice('LTC'))
