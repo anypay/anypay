@@ -6,7 +6,7 @@ import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin, Payment, Price } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Payment, Price } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
@@ -14,15 +14,19 @@ import { blockchair, log } from '../../lib';
 
 import axios from 'axios'
 
+import UTXO_Plugin from '../../lib/plugins/utxo'
+
 const polynym = require('polynym');
 
-export default class BSV extends Plugin {
+export default class BSV extends UTXO_Plugin {
 
-  currency: string = 'BSV'
+  currency = 'BSV'
 
-  chain: string = 'BSV'
+  chain = 'BSV'
 
-  decimals: number = 8
+  decimals = 8
+
+  providerURL = process.env.getblock_bsv_url
 
   get bitcore() {
 

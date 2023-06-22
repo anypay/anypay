@@ -9,6 +9,8 @@ import { publish } from 'rabbi'
 
 import { Op } from 'sequelize'
 
+import { getConfirmation } from './plugins'
+
 export interface Confirmation {
   confirmation_hash: string;
   confirmation_height: number;
@@ -51,6 +53,26 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
   publish('anypay', 'payment.confirmed', payment.toJSON())
 
   return payment
+
+}
+
+export async function getConfirmationForTxid({ txid }: { txid: string }): Promise<Payment | null> {
+
+  let payment = await findOne<Payment>(Payment, {
+    where: { txid }
+  })
+
+  if (!payment) { return }
+
+  const { chain, currency } = payment
+
+  const confirmation = await getConfirmation({ txid, chain, currency })
+
+  console.log({ confirmation })
+
+  if (!confirmation) { return }
+
+  return confirmPayment({ payment, confirmation })
 
 }
 
@@ -104,6 +126,53 @@ export async function listUnconfirmedPayments({chain, currency}: {chain: string,
       currency
     }
   })
+
+}
+
+export async function startConfirmingTransactions() {
+
+  return setInterval(async () => {
+
+    try {
+
+      const unconfirmed = await findAll<Payment>(Payment, {
+        where: {
+          confirmation_hash: {
+            [Op.eq]: null
+          }
+        },
+        order: [['createdAt', 'desc']]
+      })
+
+      for (let payment of unconfirmed) {
+
+        try {
+
+          const { chain, currency, txid } = payment
+
+          const confirmation = await getConfirmation({ txid, chain, currency })
+
+          console.log({ confirmation })
+
+          if (!confirmation) { continue }
+
+          await confirmPayment({ payment, confirmation })
+
+        } catch(error) {
+
+          console.error(error)
+
+        }
+
+      }
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
+
+  }, 1000 * 60)
 
 }
 
