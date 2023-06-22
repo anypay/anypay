@@ -11,6 +11,8 @@ import { Op } from 'sequelize'
 
 import { getConfirmation } from './plugins'
 
+import * as moment from 'moment'
+
 export interface Confirmation {
   confirmation_hash: string;
   confirmation_height: number;
@@ -137,8 +139,9 @@ export async function startConfirmingTransactions() {
 
       const unconfirmed = await findAll<Payment>(Payment, {
         where: {
-          confirmation_hash: {
-            [Op.eq]: null
+          status: 'confirming',
+          createdAt: {
+            [Op.gte]: moment().subtract(7, 'days').toDate()
           }
         },
         order: [['createdAt', 'desc']]

@@ -10,11 +10,33 @@ import { Confirmation } from '../lib/plugin'
 
 import { Payment } from '../lib/payments'
 
-import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid } from '../lib/confirmations'
+import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid, startConfirmingTransactions, revertPayment } from '../lib/confirmations'
 
 import { initialize } from '../lib'
 
 const program = new Command();
+
+program
+  .command('start-confirming-transactions')
+  .action(async () => {
+
+    await initialize()
+
+    startConfirmingTransactions()
+
+  });
+
+program
+  .command('revert-payment <txid>')
+  .action(async (txid) => {
+
+    await initialize()
+
+    const result = await revertPayment({ txid })
+
+    console.log(result)
+
+  });
 
 program
   .command('count-unconfirmed <currency> <chain>')
