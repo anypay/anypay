@@ -23,6 +23,8 @@ import { start as refunds } from './actors/refunds/actor'
 
 import eventWebhooks from './actors/webhooks-events/actor'
 
+import { startConfirmingTransactions } from './lib/confirmations'
+
 import { init } from 'rabbi'
 
 import * as core from './lib'
@@ -70,6 +72,8 @@ import * as core from './lib'
   }
 
   eventWebhooks()
+
+  startConfirmingTransactions()
 
 })()
 
