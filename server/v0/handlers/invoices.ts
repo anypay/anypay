@@ -381,6 +381,10 @@ export async function show(request, h) {
         responseInvoice['hash'] = invoice.hash
       }
 
+      if (invoice.redirect_url) {
+        responseInvoice['redirect_url'] = invoice.redirect_url
+      }
+
       responseInvoice['payment_options'] = payment_options
       responseInvoice['notes'] = notes
 

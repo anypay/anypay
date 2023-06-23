@@ -178,6 +178,7 @@ export async function setAllCryptoPrices() {
 
 
   prices.push(getPrice({ chain: 'BSV', currency: 'BSV' }))
+  prices.push(getPrice({ chain: 'XRP', currency: 'XRP' }))
 
   prices.push(bittrex.getPrice('USDC'))
   prices.push(bittrex.getPrice('USDT'))

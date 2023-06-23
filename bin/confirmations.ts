@@ -10,11 +10,33 @@ import { Confirmation } from '../lib/plugin'
 
 import { Payment } from '../lib/payments'
 
-import { listUnconfirmedPayments, confirmPayment } from '../lib/confirmations'
+import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid, startConfirmingTransactions, revertPayment } from '../lib/confirmations'
 
 import { initialize } from '../lib'
 
 const program = new Command();
+
+program
+  .command('start-confirming-transactions')
+  .action(async () => {
+
+    await initialize()
+
+    startConfirmingTransactions()
+
+  });
+
+program
+  .command('revert-payment <txid>')
+  .action(async (txid) => {
+
+    await initialize()
+
+    const result = await revertPayment({ txid })
+
+    console.log(result)
+
+  });
 
 program
   .command('count-unconfirmed <currency> <chain>')
@@ -27,6 +49,36 @@ program
     console.log(`${unconfirmed.length} unconfirmed payments of ${currency} on ${chain}`)
 
   });
+
+program
+  .command('manual-confirmation <txid> <blockhash> <blockheight> <timestamp>')
+  .action(async (txid, confirmation_hash, confirmation_height, confirmation_date) => {
+
+    await initialize()
+
+    const confirmation = {
+      confirmation_hash,
+      confirmation_height,
+      confirmation_date
+    }
+
+    const result = await confirmPaymentByTxid({ txid, confirmation })
+
+    console.log(result)
+
+  });
+
+
+
+program
+  .command('confirm-payment <txid>')
+  .action(async (txid) => {
+
+    let payment = await getConfirmationForTxid({ txid })
+
+    console.log({ payment: payment.toJSON() })
+
+  })
   
 program
   .command('confirm-payments <currency> <chain>')
@@ -61,6 +113,12 @@ program
       } catch(error) {
 
         console.error(error, 'CONFIRM ERROR')
+
+        if (error.response) {
+
+          console.log(error.response.data)
+
+        }
 
       }
 

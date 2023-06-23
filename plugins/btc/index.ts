@@ -3,8 +3,6 @@ const btc = require('bitcore-lib')
 
 const bitcoinJsLib = require('bitcoinjs-lib')
 
-import * as moment from 'moment'
-
 import {
   blockchair,
   config,
@@ -12,21 +10,23 @@ import {
   nownodes
 } from '../../lib'
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin,  Confirmation, Payment } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Payment } from '../../lib/plugin'
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
+import UTXO_Plugin from '../../lib/plugins/utxo'
 
-export default class BTC extends Plugin {
+export default class BTC extends UTXO_Plugin {
 
-  currency: string = 'BTC'
+  currency = 'BTC'
 
-  chain: string = 'BTC'
+  chain = 'BTC'
 
-  decimals: number = 8;
+  decimals = 8;
+
+  providerURL = process.env.getblock_btc_url
 
   get bitcore() {
 
@@ -36,23 +36,6 @@ export default class BTC extends Plugin {
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
-  }
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
-
-    const transaction = await getTransaction('BTC', txid)
-
-    if (!transaction) { return }
-
-    if (!transaction.block_hash) { return }
-
-    return {
-      confirmation_height: transaction.block_height,
-      confirmation_hash: transaction.block_hash, 
-      confirmation_date: moment(transaction.confirmed).toDate(),
-      confirmations: transaction.confirmations
-    }
-
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
