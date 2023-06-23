@@ -384,7 +384,15 @@ export async function completePayment(paymentOption, transaction: Transaction, c
 
   if (!txid) {
 
-    txid = (await parsePayments({ chain, currency, transaction }))[0].txid
+    if (txhex.length == 66) {
+
+      txid = txhex
+
+    } else {
+
+      txid = (await parsePayments({ chain, currency, transaction }))[0].txid
+
+    }
 
   }
 
