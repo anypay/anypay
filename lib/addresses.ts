@@ -75,13 +75,17 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
 
 }
 
-export async function lockAddress(accountId: number, currency: string) {
+export async function lockAddress(args: {account_id: number, currency: string, chain: string}) {
+
+  const { account_id, chain, currency } = args
 
   let address = await models.Address.findOne({ where: {
 
-    account_id: accountId,
+    account_id,
 
-    currency
+    currency,
+    
+    chain
 
   }});
 
@@ -97,13 +101,17 @@ export async function lockAddress(accountId: number, currency: string) {
 
 }
 
-export async function unlockAddress(accountId: number, currency: string) {
+export async function unlockAddress(args: {account_id: number, currency: string, chain: string}) {
+
+  const { chain, currency, account_id } = args
 
   let address = await models.Address.findOne({ where: {
 
-    account_id: accountId,
+    account_id,
 
-    currency
+    currency,
+
+    chain
 
   }});
 
@@ -123,13 +131,14 @@ class AddressNotFound implements Error {
   name = 'AddressNotFound'
   message = 'address not found'
 
-  constructor(account: Account, currency) {
-    this.message = `${currency} address not found for account ${account.id}`
+  constructor(account: Account, currency: string, chain: string) {
+    this.message = `${currency} address not found for account ${account.id} on ${chain}`
   }
 }
 
 interface SetAddress {
   currency: string;
+  chain: string;
   value: string;
   label?: string;
   view_key?: string;
@@ -141,6 +150,7 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
   let result: any = await _setAddress({
     address: params.value,
     currency: params.currency,
+    chain: params.chain,
     view_key: params.view_key,
     account_id: account.id
   })
@@ -149,15 +159,17 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
 
 }
 
-export async function removeAddress(account: Account, currency: string): Promise<void> {
+export async function removeAddress(args: {account: Account, currency: string, chain: string}): Promise<void> {
 
-  const account_id = account.id
+  const { account, chain, currency } = args
 
   let record = await models.Address.findOne({ where: {
 
-    account_id,
+    account_id: account.id,
 
-    currency
+    currency: currency,
+
+    chain: chain
 
   }})
 
@@ -173,19 +185,23 @@ export async function removeAddress(account: Account, currency: string): Promise
 
 }
 
-export async function findAddress(account: Account, currency: string): Promise<Address> {
+export async function findAddress(args: {account: Account, currency: string, chain: string}): Promise<Address> {
+
+  const { account, chain, currency } = args
 
   let record = await models.Address.findOne({ where: {
 
     account_id: account.id,
 
-    currency
+    currency: currency,
+
+    chain: chain
 
   }})
 
   if (!record) {
 
-    throw new AddressNotFound(account, currency)
+    throw new AddressNotFound(account, currency, chain)
 
   }
 
@@ -202,7 +218,7 @@ export class Address extends Orm {
   }
 
   get chain() {
-    return this.get('chain') || this.get('currency')
+    return this.get('chain')
   }
 
 }

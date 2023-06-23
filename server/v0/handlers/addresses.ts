@@ -10,7 +10,8 @@ export async function destroy(req, h) {
 
   let address = await models.Address.findOne({ where: {
     account_id: req.account.id,
-    currency: req.params.currency
+    currency: req.params.currency,
+    chain: req.params.currency
   }})
 
   if (address) {
@@ -68,6 +69,8 @@ export async function update(request, h) {
       account_id: accountId,
 
       currency: currency.toUpperCase(),
+
+      chain: currency.toUpperCase(),
 
       address: address
 

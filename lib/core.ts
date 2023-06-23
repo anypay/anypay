@@ -12,6 +12,7 @@ interface DenominationChangeset {
 interface AddressChangeSet {
   account_id: number;
   currency: string;
+  chain: string;
   address: string;
   metadata?: string;
   paymail?: string;
@@ -25,7 +26,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
-  let plugin = find({ chain: changeset.currency, currency: changeset.currency });
+  let plugin = find({ chain: changeset.currency, currency: changeset.chain });
 
   if (changeset.address.match('@')) {
 
@@ -54,7 +55,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var address = await models.Address.findOne({ where: {
     account_id: changeset.account_id,
-    currency: changeset.currency
+    currency: changeset.currency,
+    chain: changeset.chain
   }});
 
   if (address) {
@@ -77,7 +79,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
     address = await models.Address.create({
       account_id: changeset.account_id,
       currency: changeset.currency,
-      chain: changeset.currency,
+      chain: changeset.chain,
       value: changeset.address,
       view_key: changeset.view_key,
       paymail: changeset.paymail
