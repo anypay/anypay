@@ -1,6 +1,4 @@
 
-import * as Joi from 'joi';
-
 import { setAddress } from '../../../lib/core';
 import { log } from '../../../lib';
 
@@ -10,7 +8,8 @@ export async function destroy(req, h) {
 
   let address = await models.Address.findOne({ where: {
     account_id: req.account.id,
-    currency: req.params.currency
+    currency: req.params.currency,
+    chain: req.params.currency
   }})
 
   if (address) {
@@ -57,9 +56,7 @@ export async function update(request, h) {
 
   try {
 
-    let currency = request.params.currency;
-
-    let address = request.payload.address;
+    const { currency, chain, address } = request.payload
 
     let accountId = request.account.id;
 
@@ -67,7 +64,9 @@ export async function update(request, h) {
 
       account_id: accountId,
 
-      currency: currency.toUpperCase(),
+      currency: currency,
+
+      chain: chain,
 
       address: address
 
@@ -80,6 +79,8 @@ export async function update(request, h) {
     return {
 
       currency: changeset.currency,
+
+      chain: changeset.chain,
 
       value: changeset.address
 
@@ -95,13 +96,42 @@ export async function update(request, h) {
 
 }
 
-export const PayoutAddresses = Joi.object({
-  BTC: Joi.string().optional(),
-  DASH: Joi.string(),
-  BCH: Joi.string(),
-}).label('Addresses');
+export async function updateLegacy(request, h) {
 
-export const PayoutAddressUpdate = Joi.object({
-  address: Joi.string().required(),
-}).label('PayoutAddressUpdate');
+  try {
+
+    const { currency } = request.params
+
+    const { address } = request.payload
+
+    var changeset = {
+
+      account_id: request.account.id,
+
+      currency: currency,
+
+      chain: currency,
+
+      address
+
+    };
+
+    log.info('address.update', changeset);
+
+    let result = await setAddress(changeset);
+
+    return {
+      currency,
+      value: result.value
+    }
+
+  } catch(error) {
+
+    log.error('server.v0.handlers.addresses', error)
+
+    return h.badRequest(error)
+
+  }
+
+}
 
