@@ -11,6 +11,7 @@ import { Invoice } from './invoices'
 
 interface SetAddress {
   currency: string;
+  chain: string;
   address: string;
 }
 
@@ -63,10 +64,11 @@ export class Account extends Orm {
     await setAddress({
       account_id: this.id,
       currency: params.currency,
+      chain: params.chain,
       address: params.address
     })
 
-    return findAddress(this, params.currency)
+    return findAddress({ account: this, currency: params.currency, chain: params.chain })
 
   }
 

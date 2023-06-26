@@ -21,6 +21,7 @@ describe("Confirming Transactions", () => {
         await setAddress({
             account_id: account.id,
             currency: 'BTC',
+            chain: 'BTC',
             address: fixtures.BTC_Confirmation_Test.address
           })
 

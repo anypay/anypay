@@ -26,7 +26,7 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   var isValid = true;
 
-  let plugin = find({ chain: changeset.currency, currency: changeset.chain });
+  let plugin = find({ chain: changeset.chain, currency: changeset.currency });
 
   if (changeset.address.match('@')) {
 
