@@ -17,6 +17,8 @@ import { Price } from './price'
 
 import { PaymentOption } from './payment_option'
 
+import { Confirmation } from './confirmations'
+
 export function find({currency, chain }: {currency: string, chain: string}) {
 
   let plugin = chain === currency ? plugins[currency] : plugins[`${currency}.${chain}`]
@@ -97,6 +99,14 @@ export function getPrice({chain,currency}: {chain:string, currency:string }): Pr
   const plugin = find({ currency, chain })
 
   return plugin.getPrice()
+
+}
+
+export function getConfirmation({txid, chain,currency}: {txid: string, chain:string, currency:string }): Promise<Confirmation> {
+
+  const plugin = find({ currency, chain })
+
+  return plugin.getConfirmation(txid)
 
 }
 

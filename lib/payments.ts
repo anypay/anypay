@@ -38,6 +38,10 @@ export class Payment extends Orm {
     return this.get('currency')
   }
 
+  get chain() {
+    return this.get('chain')
+  }
+
   get txid() {
     return this.get('txid')
   }
