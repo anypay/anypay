@@ -15,6 +15,7 @@ import { getCoins } from './coins'
 
 interface Coin {
   code: string;
+  chain: string;
   currency: string;
   name: string;
   enabled: boolean;
@@ -43,6 +44,8 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
     coin = {
       name: coin.name,
       code: coin.code,
+      chain: coin.chain,
+      currency: coin.currency,
       logo: coin.logo_url,
       precision: coin.precision,
       enabled: coin.supported && !coin.unavailable,
@@ -61,7 +64,7 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
 
     try {
 
-      let { value: price } = await convert({ currency: coin.code, value: 1 }, 'USD')
+      let { value: price } = await convert({ currency: coin.currency, value: 1 }, 'USD')
 
       coin['price'] = price
 
