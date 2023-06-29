@@ -27,6 +27,8 @@ export async function index(req, h) {
 
           currency: payment.currency,
 
+          chain: payment.chain,
+
           txid: payment.txid,
 
           createdAt: payment.createdAt,
