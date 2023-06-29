@@ -398,7 +398,7 @@ export async function show(request, h) {
 
         if (payment) {
 
-          const { chain, currency, txid, txhex, confirmation_hash, confirmation_date, confirmation_height, status, createdAt, invoice_uid } = payment.toJSON()
+          const { chain, currency, txid, txhex, confirmation_hash, confirmation_date, confirmation_height, status, createdAt, invoice_uid, block_explorer_url } = payment.toJSON()
 
           response['payment'] = {
             invoice_uid,
@@ -411,6 +411,7 @@ export async function show(request, h) {
             confirmation_hash,
             confirmation_date,
             confirmation_height,
+            block_explorer_url
           }
 
         }
