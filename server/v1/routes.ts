@@ -351,13 +351,13 @@ export async function attachV1Routes(server) {
 
   server.route({
     method: 'DELETE',
-    path: '/v1/api/account/addresses/{currency}',
+    path: '/v1/api/account/addresses/{code}',
     options: {
       tags: ['v1', 'addresses'],
       auth: "jwt",
       validate: {
         params: Joi.object({
-          currency: Joi.string().required()
+          code: Joi.string().required()
         }),
         failAction
       },

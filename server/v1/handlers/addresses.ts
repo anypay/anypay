@@ -25,10 +25,14 @@ export async function remove(req, h) {
 
   try {
 
+    let [currency, chain] = req.params.code.split('_')
+
+    if (!chain) { chain = currency }
+
     await removeAddress({
       account: req.account,
-      currency: req.payload.currency,
-      chain: req.payload.chain
+      chain,
+      currency
     })
 
     return h.response({ success: true }).code(200)
