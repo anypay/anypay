@@ -183,47 +183,23 @@ export abstract class EVM extends Plugin {
 
     const expectedOutput = paymentOption.outputs[0]
 
-    try {
+    const [output]: any = await this.parsePayments({txhex})
 
-      const transaction = this.decodeTransactionHex({ transactionHex: txhex })
+    const correctAddress = String(output.address).toLowerCase() === expectedOutput.address.toLowerCase()
 
-      console.log({transaction})
+    const correctAmount = expectedOutput.amount === parseInt(output.amount)
 
-      const output: any = await this.parsePayments({txhex})
-
-      console.log({output})
-
-      console.log({expectedOutput})
-
-      const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
-
-      console.log({ correctAddress })
-
-      const correctAmount = expectedOutput.amount === parseInt(output.amount)
-
-      console.log({ correctAmount })
+    if (output.symbol) {
 
       const correctToken = output.symbol.toLowerCase() == this.token.toLowerCase()
 
-      console.log({ correctToken })
-
       return correctToken && correctAmount && correctAddress
 
-    } catch(error) {
-
-      const txid = txhex
-
-      const [parsed] = await this.getPayments(txid) 
-
-
-      const correctAddress = (parsed.address.toLowerCase() === expectedOutput.address.toLowerCase())
-
-      const correctAmount = (expectedOutput.amount === parsed.amount)
+    } else {
 
       return correctAmount && correctAddress
 
     }
-
 
   }
 
