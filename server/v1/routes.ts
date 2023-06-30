@@ -329,6 +329,7 @@ export async function attachV1Routes(server) {
       auth: "jwt",
       validate: {
         payload: Joi.object({
+          chain: Joi.string().required(),
           currency: Joi.string().required(),
           value: Joi.string().required(),
           label: Joi.string().optional()
