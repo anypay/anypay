@@ -33,7 +33,8 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
   })
 
   records = records.reduce((map, record) => {
-    map[record.currency] = record
+    const code = `${record.currency}_${record.chain}`
+    map[code] = record
     return map;
   }, {})
 
@@ -41,9 +42,11 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
 
   return Promise.all(coins.map(async coin => {
 
+    const code = `${coin.currency}_${coin.chain}`
+
     coin = {
       name: coin.name,
-      code: coin.code,
+      code: code,
       chain: coin.chain,
       currency: coin.currency,
       logo: coin.logo_url,
@@ -52,7 +55,7 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
       color: coin.color
     }
 
-    let record = records[coin.code]
+    let record = records[code]
 
     if (record) {
 
