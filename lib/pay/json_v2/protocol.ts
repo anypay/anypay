@@ -388,7 +388,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     memo: invoice.get('memo'),
 
-    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
@@ -418,7 +418,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
     memo: invoice.get('memo'),
 
-    paymentUrl: `${config.get('API_BASE')}/i/${invoice.uid}`,
+    paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
     paymentId: invoice.uid,
 
