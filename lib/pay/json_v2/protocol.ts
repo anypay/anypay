@@ -111,28 +111,32 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       log.info(`jsonv2.${payment.currency.toLowerCase()}.transaction.submit.response`, { invoice_uid, transaction, response })
 
+      var paymentRecord;
+
       if (paymentOption.currency === 'BTC' && config.get('require_btc_confirmations')) {
 
-        let paymentRecord = await handleUnconfirmedPayment(paymentOption, transaction)
+        paymentRecord = await handleUnconfirmedPayment(paymentOption, transaction)
 
-        if (payment.wallet) {
-          paymentRecord.wallet = payment.wallet
-          await paymentRecord.save()
-        }
   
+        log.info('payment.confirming', paymentRecord);
+
+      } else if (['ETH', 'MATIC', 'AVAX', 'SOL', 'XRP', 'XLM'].includes(paymentOption.chain)) {
+
+        paymentRecord = await completePayment(paymentOption, transaction, true)
+
         log.info('payment.confirming', paymentRecord);
          
       } else {
 
-        let paymentRecord = await completePayment(paymentOption, transaction)
+        paymentRecord = await completePayment(paymentOption, transaction)
 
-        if (payment.wallet) {
-          paymentRecord.wallet = payment.wallet
-          await paymentRecord.save()
-        }
-  
         log.info('payment.completed', paymentRecord);
         
+      }
+
+      if (payment.wallet) {
+        paymentRecord.wallet = payment.wallet
+        await paymentRecord.save()
       }
 
     }
@@ -188,17 +192,6 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
     }
 
     let plugin = find({ chain, currency })
-
-    console.log('plugin.validateUnsignedTx', payment);
- 
-    return {
-      success: true,
-      transactions: payment.transactions.map(({txhex}) => {
-        return {
-          tx: txhex
-        }
-      })
-    }
 
     if (plugin.validateUnsignedTx) {
 

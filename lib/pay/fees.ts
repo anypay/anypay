@@ -104,7 +104,7 @@ export async function getFee(currency:string, amount?: number): Promise<Fee> {
 
     address: feeAddresses[currency],
 
-    amount: fee
+    amount: Math.trunc(fee) || 0
   }
 
 }

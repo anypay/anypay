@@ -329,6 +329,7 @@ export async function attachV1Routes(server) {
       auth: "jwt",
       validate: {
         payload: Joi.object({
+          chain: Joi.string().required(),
           currency: Joi.string().required(),
           value: Joi.string().required(),
           label: Joi.string().optional()
@@ -351,13 +352,13 @@ export async function attachV1Routes(server) {
 
   server.route({
     method: 'DELETE',
-    path: '/v1/api/account/addresses/{currency}',
+    path: '/v1/api/account/addresses/{code}',
     options: {
       tags: ['v1', 'addresses'],
       auth: "jwt",
       validate: {
         params: Joi.object({
-          currency: Joi.string().required()
+          code: Joi.string().required()
         }),
         failAction
       },
@@ -372,6 +373,36 @@ export async function attachV1Routes(server) {
     },
     handler: v1.Addresses.remove
   }); 
+
+  server.route({
+    method: 'GET',
+    path: '/api/v1/addresses',
+    options: {
+      tags: ['v1', 'addresses'],
+      auth: "token",
+      response: {
+        failAction: 'log',
+        schema: Joi.object({
+          addresses: Joi.array().items(Joi.object({
+            currency: Joi.string().required(),
+            chain: Joi.string().required(),
+            code: Joi.string().required(),
+            name: Joi.string().required(),
+            enabled: Joi.boolean().required(),
+            price: Joi.number().required(),
+            icon: Joi.string().required(),
+            address: Joi.string().required(),
+            supported: Joi.boolean().required(),
+            wallet: Joi.string().optional(),
+            note: Joi.string().optional()
+          }))
+        })
+      }
+    },
+    handler: v1.Addresses.index
+  }); 
+
+
 
   server.route({
     method: 'GET',
@@ -555,5 +586,42 @@ export async function attachV1Routes(server) {
       tags: ['v1', 'blockcypher', 'webhooks']
     },
   })
+
+  server.route({
+    method: 'GET',
+    path: '/api/v1/prices',
+    handler: v1.Prices.index,
+    options: {
+      tags: ['v1', 'api', 'prices'],
+      response: {
+        schema: Joi.object({
+          prices: Joi.array().items(Joi.object({
+            currency: Joi.string().required(),
+            base: Joi.string().required(),
+            value: Joi.number().required(),
+            updatedAt: Joi.date().required(),
+            source: Joi.string().required() 
+          }).label('Price')).label('Prices')
+        }),
+        failAction
+      }
+    },
+  })
+
+  server.route({
+    method: 'GET',
+    path: '/api/v1/prices/{currency}/history',
+    handler: v1.Prices.show,
+    options: {
+      tags: ['v1', 'prices'],
+      response: {
+        schema: Joi.object({
+        }),
+        failAction
+      }
+    },
+  })
+
+
 
 }

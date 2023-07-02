@@ -43,7 +43,7 @@ export async function createAccountWithAddress(): Promise<[Account, Address]> {
 
   let keypair = await generateKeypair()
 
-  let address = await  account.setAddress({ currency: 'BSV', address: keypair.address })
+  let address = await  account.setAddress({ currency: 'BSV', chain: 'BSV', address: keypair.address })
 
   return [account, address]
 }
@@ -93,15 +93,15 @@ export async function createAccountWithAddresses(): Promise<Account> {
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', address })
+  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', address: bch_address })
+  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', address: dash_address })
+  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
 
   return account
 }
@@ -110,15 +110,15 @@ export async function setAddresses(account: Account): Promise<Account> {
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', address })
+  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', address: bch_address })
+  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', address: dash_address })
+  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
 
   return account
 }
@@ -129,15 +129,15 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', address })
+  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', address: bch_address })
+  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', address: dash_address })
+  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
 
   let invoice = await createInvoice({
     account,

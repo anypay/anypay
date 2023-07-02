@@ -3,40 +3,36 @@ import * as blockchair from '../../lib/blockchair';
 
 const doge = require('bitcore-doge-lib');
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Plugin, Confirmation } from '../../lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
+import UTXO_Plugin from '../../lib/plugins/utxo'
 
-import * as moment from 'moment'
+import axios from 'axios'
 
-export default class DOGE extends Plugin {
+export default class DOGE extends UTXO_Plugin {
 
-  currency: string = 'DOGE'
+  currency = 'DOGE'
 
-  chain: string = 'DOGE'
+  chain = 'DOGE'
 
-  decimals: number = 8;
+  decimals = 8;
+
+  providerURL = process.env.getblock_doge_url
 
   get bitcore() {
     return doge
   }
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getBlock(hash: string) {
 
-    const transaction = await getTransaction('DOGE', txid)
+    const { data } = await axios.post(this.providerURL, {
+      method: 'getblock',
+      params: [hash, true]
+    })
 
-    if (!transaction) { return }
-
-    if (!transaction.block_hash) { return }
-
-    return {
-      height: transaction.block_height,
-      hash: transaction.block_hash, 
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
-    }
+    return data.result
 
   }
 

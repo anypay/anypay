@@ -5,11 +5,17 @@ import { Account } from './account'
 
 import { Price } from './price'
 
+export { Price }
+
 import { PaymentOption } from './payment_option'
 
 import { getPrice } from './prices/kraken'
 
 import { BigNumber } from 'bignumber.js'
+
+import { Confirmation } from './confirmations'
+
+export { Confirmation }
 
 import { buildOutputs, verifyOutput } from './pay'
 
@@ -43,7 +49,7 @@ abstract class AbstractPlugin {
 
   abstract parsePayments(transaction: Transaction): Promise<Payment[]>;
 
-  abstract getPrice({chain, currency, base}: {chain:string, currency: string, base: string}): Promise<Price>;
+  abstract getPrice(): Promise<Price>;
 
 }
 
@@ -57,15 +63,6 @@ export interface BroadcastTx {
   txid?: string;
   txkey?: string;
 }
-
-interface iConfirmation {
-  hash: string;
-  height: number;
-  timestamp: Date;
-  depth: number;
-}
-
-export type Confirmation = iConfirmation | null
 
 export abstract class Plugin extends AbstractPlugin {
 
@@ -92,9 +89,9 @@ export abstract class Plugin extends AbstractPlugin {
 
   }
 
-  async getPrice({currency}: { chain: string, currency: string, base: string }): Promise<Price> {
+  async getPrice(): Promise<Price> {
 
-    return getPrice(currency)
+    return getPrice(this.currency)
 
   }
 
@@ -112,7 +109,7 @@ export abstract class Plugin extends AbstractPlugin {
 
   toSatoshis(decimal: number): number {
 
-    return new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber()
+    return Math.trunc(new BigNumber(decimal).times(Math.pow(10, this.decimals)).toNumber())
 
   }
 

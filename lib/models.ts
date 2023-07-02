@@ -2,6 +2,8 @@ import * as Sequelize from 'sequelize';
 
 import * as sequelize from './database';
 
+export { sequelize }
+
 import { join } from 'path';
 
 import { bindAllModelsHooks } from './rabbi-sequelize';

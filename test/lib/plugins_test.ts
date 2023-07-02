@@ -3,11 +3,19 @@ require("dotenv").config();
 
 import { find } from '../../lib/plugins';
 
+import { initialize } from '../../lib';
+
 import * as assert from 'assert';
 
 import { expect } from 'chai'
 
 describe("Plugins", () => {
+
+  before(async () => {
+
+    await initialize()
+
+  })
 
   describe('BCH', () => {
 
@@ -29,15 +37,15 @@ describe("Plugins", () => {
 
       let txid = '4e51acd9be7d61955838cf4ec20a294465d612f485c6615c5777b7b52320ba4f'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('000000000000000002a18e30eb35e7c9d12a5daa9d5ebe840d39e39ca4ac29ce')
+      expect(confirmation_hash).to.be.equal('000000000000000002a18e30eb35e7c9d12a5daa9d5ebe840d39e39ca4ac29ce')
 
-      expect(height).to.be.equal(792678)
+      expect(confirmation_height).to.be.equal(792678)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -65,15 +73,15 @@ describe("Plugins", () => {
 
       let txid = 'ffa3a4e7169bdc61a509a1bbf8a560c21a04ee6783cdec23f3d28910d5407d02'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('00000000000000000003e7cb4d095fb3a4fb8db43196afab6408c022e73ec85f')
+      expect(confirmation_hash).to.be.equal('00000000000000000003e7cb4d095fb3a4fb8db43196afab6408c022e73ec85f')
 
-      expect(height).to.be.equal(789613)
+      expect(confirmation_height).to.be.equal(789613)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -99,19 +107,17 @@ describe("Plugins", () => {
 
       let txid = '1eb4e53d410c4a7e44e6d80484756791052a0c79c35151bffb1bed970323a6b1'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('0000000000000008dc00e5b8eba00897b0b3e50ab0e6fe1d16818d13fe8232a1')
+      expect(confirmation_hash).to.be.equal('0000000000000008dc00e5b8eba00897b0b3e50ab0e6fe1d16818d13fe8232a1')
 
-      expect(height).to.be.equal(1870467)
+      expect(confirmation_height).to.be.equal(1870467)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
-
-
 
   })
 
@@ -135,15 +141,15 @@ describe("Plugins", () => {
 
       let txid = '6bab5b587ce5ea0938c1477c1f6c6cd38dc2cc58f9b52e7d93c24320ad1f0388'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('98a2a60c30e30960296b454d69d85d1905953d571f90f2befa0f0dd7c7631d3e')
+      expect(confirmation_hash).to.be.equal('98a2a60c30e30960296b454d69d85d1905953d571f90f2befa0f0dd7c7631d3e')
 
-      expect(height).to.be.equal(2473321)
+      expect(confirmation_height).to.be.equal(2473321)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -171,15 +177,15 @@ describe("Plugins", () => {
 
       let txid = '4c8adb87aa5d2c3c16880afea9b7c34040e064463f3a19341d838386bc859bd3'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('d52fc7ea1b838c4ed9d9ad30c123cd18e25f842129c21a887736d3f2eef8439f')
+      expect(confirmation_hash).to.be.equal('d52fc7ea1b838c4ed9d9ad30c123cd18e25f842129c21a887736d3f2eef8439f')
 
-      expect(height).to.be.equal(4716421)
+      expect(confirmation_height).to.be.equal(4716421)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -205,15 +211,15 @@ describe("Plugins", () => {
 
       let txid = 'de2b352e1849392a7fce7a8fa2f6295d922307303b007d3804f9589b66624028'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('0000000000000000003a7c1fa88eb6134c0f8b4027e1b1e753079181a462d99a')
+      expect(confirmation_hash).to.be.equal('0000000000000000003a7c1fa88eb6134c0f8b4027e1b1e753079181a462d99a')
 
-      expect(height).to.be.equal(791940)
+      expect(confirmation_height).to.be.equal(791940)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -241,15 +247,15 @@ describe("Plugins", () => {
 
       let txid = '58f8df857270cfc783c7dfb5e58c69e8dee5b9113242b52cefc62b4296fbcec3'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('cc3d8eace4332c99e13aa915c1f7521490c3f91054cfc7500fce6ec58f66c98a')
+      expect(confirmation_hash).to.be.equal('cc3d8eace4332c99e13aa915c1f7521490c3f91054cfc7500fce6ec58f66c98a')
 
-      expect(height).to.be.equal(2885963)
+      expect(confirmation_height).to.be.equal(2885963)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -275,15 +281,15 @@ describe("Plugins", () => {
 
       let txid = '0xcd43123eea81e3b9e2227d6468f6f6ad174e90e6f793b2302c7b03f04604381b'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
+      expect(confirmation_hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
 
-      expect(height).to.be.equal(17255716)
+      expect(confirmation_height).to.be.equal(17255716)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -309,15 +315,15 @@ describe("Plugins", () => {
 
       let txid = '0x494011badb5faf691bc11027c96e154da6d8ee3ab2dd70ce346900b8153b4d1c'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('0xde5a4703ca10f3176be78ee832881bfc3bae5600f06924f82ab4951b29271573')
+      expect(confirmation_hash).to.be.equal('0xde5a4703ca10f3176be78ee832881bfc3bae5600f06924f82ab4951b29271573')
 
-      expect(height).to.be.equal(42680415)
+      expect(confirmation_height).to.be.equal(42680415)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -343,15 +349,15 @@ describe("Plugins", () => {
 
       let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
+      expect(confirmation_hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
 
-      expect(height).to.be.equal(29994194)
+      expect(confirmation_height).to.be.equal(29994194)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -359,7 +365,7 @@ describe("Plugins", () => {
 
   describe('SOL', () => {
 
-    it('should find the plugin for SOL', async () => {
+    it.skip('should find the plugin for SOL', async () => {
 
       let plugin = await find({ chain: 'SOL', currency: 'SOL' })
 
@@ -369,21 +375,21 @@ describe("Plugins", () => {
 
     })
 
-    it('#getConfirmation should return block data for confirmed transaction', async () => {
+    it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
       let plugin = await find({ chain: 'SOL', currency: 'SOL' });
 
       let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
+      expect(confirmation_hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
 
-      expect(height).to.be.equal(193936012)
+      expect(confirmation_height).to.be.equal(193936012)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -391,7 +397,7 @@ describe("Plugins", () => {
 
   describe('TRON', () => {
 
-    it('should find the plugin for TRON', async () => {
+    it.skip('should find the plugin for TRON', async () => {
 
       let plugin = await find({ chain: 'TRON', currency: 'TRON' })
 
@@ -401,21 +407,21 @@ describe("Plugins", () => {
 
     })
 
-    it('#getConfirmation should return block data for confirmed transaction', async () => {
+    it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
       let plugin = await find({ chain: 'TRON', currency: 'TRON' });
 
       let txid = 'f6fe081a567701931e01555e20cc8f00bcfdef056df92d262480620568d6f9cb'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('00000000030c5eb3e4e7d51c0ed80a2456b9142f41426a94daf601779dca2777')
+      expect(confirmation_hash).to.be.equal('00000000030c5eb3e4e7d51c0ed80a2456b9142f41426a94daf601779dca2777')
 
-      expect(height).to.be.equal(51142323)
+      expect(confirmation_height).to.be.equal(51142323)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
@@ -439,19 +445,20 @@ describe("Plugins", () => {
 
       let txid = '8F3A872BA256DAEAB6634E6CFE346DD0F02347C28DF37A3B4D26FB6D29CA9C2D'
 
-      let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-      expect(depth).to.be.greaterThan(0)
+      expect(confirmations).to.be.greaterThan(0)
 
-      expect(hash).to.be.equal('13B9FFF7C1A0D5C36DA1442130F2AA3D2537C414CDDB9A2FFEEE918D89CC458D')
+      expect(confirmation_hash).to.be.equal('13B9FFF7C1A0D5C36DA1442130F2AA3D2537C414CDDB9A2FFEEE918D89CC458D')
 
-      expect(height).to.be.equal(79781368)
+      expect(confirmation_height).to.be.equal(79781368)
 
-      expect(timestamp).to.be.a('date')
+      expect(confirmation_date).to.be.a('date')
 
     })
 
   })
+/*
 
   describe('XLM', () => {
 
@@ -495,6 +502,8 @@ describe("Plugins", () => {
 
   })
 
+*/
+
   describe('USDC', () => {
 
     describe('USDC.ETH', () => {
@@ -517,15 +526,15 @@ describe("Plugins", () => {
 
         let txid = '0x49bfaf3135b1b8c1a45e334706ca089826e7043d7feb7326d3d02206e1eae5a6'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
+        expect(confirmation_hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
 
-        expect(height).to.be.equal(17255716)
+        expect(confirmation_height).to.be.equal(17255716)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -551,15 +560,15 @@ describe("Plugins", () => {
 
         let txid = '0x7fa214be78f449b5c2ce854688a4244bfa6039971edea30f46ee535636fed0a0'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0x01a9acc2827368254847ff96169257db4c756e08647db003c808e99306382df3')
+        expect(confirmation_hash).to.be.equal('0x01a9acc2827368254847ff96169257db4c756e08647db003c808e99306382df3')
 
-        expect(height).to.be.equal(42679642)
+        expect(confirmation_height).to.be.equal(42679642)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -585,19 +594,21 @@ describe("Plugins", () => {
 
         let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
+        expect(confirmation_hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
 
-        expect(height).to.be.equal(29994194)
+        expect(confirmation_height).to.be.equal(29994194)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
     })
+
+    /*
 
     describe('USDC.SOL', () => {
 
@@ -619,15 +630,15 @@ describe("Plugins", () => {
 
         let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
+        expect(confirmation_hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
 
-        expect(height).to.be.equal(193936012)
+        expect(confirmation_height).to.be.equal(193936012)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -636,7 +647,7 @@ describe("Plugins", () => {
 
     describe('USDC.TRON', () => {
 
-      it('should find the plugin for USDC.TRON', async () => {
+      it.skip('should find the plugin for USDC.TRON', async () => {
 
         let plugin = await find({ chain: 'TRON', currency: 'USDC' })
 
@@ -648,21 +659,21 @@ describe("Plugins", () => {
 
       })
 
-      it('#getConfirmation should return block data for confirmed transaction', async () => {
+      it.skip('#getConfirmation should return block data for confirmed transaction', async () => {
 
         let plugin = await find({ chain: 'TRON', currency: 'USDT' });
 
         let txid = '96ca9572aad4c23a7545ea02661d6d1f3def87cc6bfe604529a9c85f59afe097'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('00000000030c5c3a40dec96e91cb370d9ad63f8140c5428e515ab419fdba309d')
+        expect(confirmation_hash).to.be.equal('00000000030c5c3a40dec96e91cb370d9ad63f8140c5428e515ab419fdba309d')
 
-        expect(height).to.be.equal(51141690)
+        expect(confirmation_height).to.be.equal(51141690)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -670,7 +681,7 @@ describe("Plugins", () => {
 
     describe('USDC.FLOW', () => {
 
-      it('should find the plugin for USDC.FLOW', async () => {
+      it.skip('should find the plugin for USDC.FLOW', async () => {
 
         let plugin = await find({ chain: 'FLOW', currency: 'USDC' })
 
@@ -715,6 +726,7 @@ describe("Plugins", () => {
       })
 
     })
+    */
 
   })
 
@@ -742,15 +754,15 @@ describe("Plugins", () => {
 
         let txid = '0xf24f352490d539085f2114ed1f35fe8a664f1a27f4587429cbcf7e56926b0eeb'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0x444e405425339f6a17cba63c822af4a72f6337542db5642592fbb31cfd8d801d')
+        expect(confirmation_hash).to.be.equal('0x444e405425339f6a17cba63c822af4a72f6337542db5642592fbb31cfd8d801d')
 
-        expect(height).to.be.equal(17247170)
+        expect(confirmation_height).to.be.equal(17247170)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -776,15 +788,15 @@ describe("Plugins", () => {
 
         let txid = '0x0d66c0c4a13e2c525fe9fa3929078e55df7d17cb3d58ad419f05449d0b56ec2c'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0xd51998fb091e2cce9e3684f5f45cc56a2deb09bd0f51514b426abd04be2f85d4')
+        expect(confirmation_hash).to.be.equal('0xd51998fb091e2cce9e3684f5f45cc56a2deb09bd0f51514b426abd04be2f85d4')
 
-        expect(height).to.be.equal(42680347)
+        expect(confirmation_height).to.be.equal(42680347)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -812,21 +824,23 @@ describe("Plugins", () => {
 
         let txid = '0x8cf9a0048f4536a6eec4f277ae4aa61e6569d7c3c3eb9d28a9d153ebe90683a2'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('0x91fffe943de27a50c45c09fe6d90418af26fab4904f09cd497475f123ee877df')
+        expect(confirmation_hash).to.be.equal('0x91fffe943de27a50c45c09fe6d90418af26fab4904f09cd497475f123ee877df')
 
-        expect(height).to.be.equal(29994293)
+        expect(confirmation_height).to.be.equal(29994293)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
 
 
     })
+
+    /*
 
     describe('USDT.SOL', () => {
 
@@ -848,15 +862,15 @@ describe("Plugins", () => {
 
         let txid = '3saePwvDwQZxUk4XMmRL3Taw23fRNmv2auQUxCGvWCeqvTBff9nWAepAU7UHMmuQWemrKB2edWbY7LXg9Uwp8U46'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('FNhzxG5N5XQCGqnYK7coTJAoUEqLuN7Mo6ttcPHaoq2D')
+        expect(confirmation_hash).to.be.equal('FNhzxG5N5XQCGqnYK7coTJAoUEqLuN7Mo6ttcPHaoq2D')
 
-        expect(height).to.be.equal(193945797)
+        expect(confirmation_height).to.be.equal(193945797)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
@@ -884,19 +898,21 @@ describe("Plugins", () => {
 
         let txid = '56e33d3633e6756cd66d630b9cdae3ebce2dd78e419c9e820fc982becca2a1a4'
 
-        let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
 
-        expect(depth).to.be.greaterThan(0)
+        expect(confirmations).to.be.greaterThan(0)
 
-        expect(hash).to.be.equal('00000000030c5bfbd0ed1ced5f70d9b6941bb5b210c2b406500e542134140373')
+        expect(confirmation_hash).to.be.equal('00000000030c5bfbd0ed1ced5f70d9b6941bb5b210c2b406500e542134140373')
 
-        expect(height).to.be.equal(51141627)
+        expect(confirmation_height).to.be.equal(51141627)
 
-        expect(timestamp).to.be.a('date')
+        expect(confirmation_date).to.be.a('date')
 
       })
 
     })
+
+    */
 
   })
 

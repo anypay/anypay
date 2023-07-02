@@ -197,7 +197,7 @@ export async function register(server: Server) {
   server.route({
     method: "PUT",
     path: "/addresses/{currency}",
-    handler: v0.Addresses.update,
+    handler: v0.Addresses.updateLegacy,
     options: {
       auth: "token",
       tags: ['v0', 'addresses'],
@@ -207,6 +207,25 @@ export async function register(server: Server) {
         }),
         payload: Joi.object({
           address: Joi.string().required()
+        }),
+        failAction: 'log'
+      }
+    }
+  });
+
+
+  server.route({
+    method: "POST",
+    path: "/api/v1/addresses",
+    handler: v0.Addresses.update,
+    options: {
+      auth: "token",
+      tags: ['v0', 'addresses'],
+      validate: {
+        payload: Joi.object({
+          address: Joi.string().required(),
+          currency: Joi.string().required(),
+          chain: Joi.string().required()
         }),
         failAction: 'log'
       }

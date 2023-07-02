@@ -372,7 +372,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
 }
 
-export async function completePayment(paymentOption, transaction: Transaction) {
+export async function completePayment(paymentOption, transaction: Transaction, confirming: Boolean=false) {
 
   var { txhex, txid } = transaction
 
@@ -384,7 +384,15 @@ export async function completePayment(paymentOption, transaction: Transaction) {
 
   if (!txid) {
 
-    txid = (await parsePayments({ chain, currency, transaction }))[0].txid
+    if (txhex.length == 66) {
+
+      txid = txhex
+
+    } else {
+
+      txid = (await parsePayments({ chain, currency, transaction }))[0].txid
+
+    }
 
   }
 
@@ -413,7 +421,7 @@ export async function completePayment(paymentOption, transaction: Transaction) {
       currency: paymentOption.currency,
       address: paymentOption.address,
       hash: txid,
-      status: 'paid',
+      status: confirming ? 'confirming' : 'paid',
       paidAt: new Date(),
       complete: true,
       completed_at: new Date()

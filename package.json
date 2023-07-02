@@ -109,7 +109,6 @@
     "fcm-node": "^1.5.2",
     "filepay": "^2.2.12",
     "geoip-lite": "^1.4.2",
-    "get402": "^0.3.0",
     "handlebars": "^4.1.0",
     "hapi-auth-bearer-token": "^8.0.0",
     "hapi-boom-decorators": "^4.1.2",

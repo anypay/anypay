@@ -5,21 +5,21 @@ const ltc = require('litecore-lib');
 
 export const currency = 'LTC'
 
-import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation,  Transaction, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
+import UTXO_Plugin from '../../lib/plugins/utxo'
 
-import * as moment from 'moment'
+export default class LTC extends UTXO_Plugin {
 
-export default class LTC extends Plugin {
+  currency = 'LTC'
 
-  currency: string = 'LTC'
+  chain = 'LTC'
 
-  chain: string = 'LTC'
+  decimals = 8
 
-  decimals: number = 8;
+  providerURL = process.env.getblock_ltc_url
 
   get bitcore() {
 
@@ -29,23 +29,6 @@ export default class LTC extends Plugin {
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
-  }
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
-
-    const transaction = await getTransaction('LTC', txid)
-
-    if (!transaction) { return }
-
-    if (!transaction.block_hash) { return }
-
-    return {
-      height: transaction.block_height,
-      hash: transaction.block_hash, 
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
-    }
-
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
@@ -82,4 +65,5 @@ export default class LTC extends Plugin {
   }
 
 }
+
 

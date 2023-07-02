@@ -17,12 +17,14 @@ describe("Account Coins over HTTP", async () => {
     await setAddress({
       account_id: account.id,
       currency: "DASH",
+      chain: "DASH",
       address: "XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9"
     });
 
     await setAddress({
       account_id: account.id,
       currency: "BTC",
+      chain: "BTC",
       address: "1FdmEDQHL4p4nyE83Loyz8dJcm7edagn8C"
     });
 

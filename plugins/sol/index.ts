@@ -1,17 +1,15 @@
 
-
-
-import { Transaction, Connection, PublicKey, Keypair, sendAndConfirmRawTransaction, clusterApiUrl } from '@solana/web3.js'
+import { Transaction, Connection, PublicKey, Keypair, } from '@solana/web3.js'
 
 import { decodeTransferInstruction } from '@solana/spl-token';
 
-import { Plugin, VerifyPayment, BroadcastTx, BroadcastTxResult, Confirmation, Transaction as AnypayTransaction, Payment } from '../../lib/plugin'
+import {  VerifyPayment, Transaction as AnypayTransaction, Payment } from '../../lib/plugin'
 
-import axios from 'axios'
+import SolanaPlugin from '../../lib/plugins/solana'
 
 //TODO: FinishPluginImplementation
 
-export default class SOL extends Plugin {
+export default class SOL extends SolanaPlugin {
 
   currency = 'SOL'
 
@@ -19,40 +17,13 @@ export default class SOL extends Plugin {
 
   decimals = 0 //TODO
 
-  async parsePayments(txhex: string): Promise<Payment[]> {
-    throw new Error() //TODO
+  async parsePayments({ txhex }: AnypayTransaction): Promise<Payment[]> {
+    // TODO Implement
+    return []
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
-  }
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
-
-    let connection = new Connection(clusterApiUrl("mainnet-beta"), "finalized");
-
-    let signatureStatus = await connection.getSignatureStatus(txid, {
-      searchTransactionHistory: true
-    })
-
-    const slot = signatureStatus.value.slot
-
-    if (!slot) { return }
-
-    let block: any = await connection.getBlock(slot, {
-      maxSupportedTransactionVersion: 2
-    });
-
-    if (!block || !block.blockhash) { return }
-
-    return {
-
-      hash: block.blockhash,
-      height: slot,
-      timestamp: new Date(block.blockTime * 1000),
-      depth: signatureStatus.context.slot - slot + 1
-    }
-
   }
 
   async verifyPayment({ paymentOption, transaction: {txhex}, protocol }: VerifyPayment): Promise<boolean> {
@@ -74,42 +45,6 @@ export default class SOL extends Plugin {
     throw new Error() //TODO
 
   }
-
-  async getTransaction(txid: string): Promise<AnypayTransaction> {
-
-    const { data } = await axios.post(`https://api.mainnet-beta.solana.com`, {
-      "jsonrpc": "2.0",
-      "id": 1,
-      "method": "getTransaction",
-      "params": [txid, "base64"]
-    })
-
-    const txhex = Buffer.from(data.result.transaction[0], 'base64').toString('hex')
-
-    return {
-      txhex,
-      txid
-    }
-
-  }
-
-  async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
-
-    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/zQCP8Bt8cAq63ToBYunRGWyag8HdzWp-');    
-
-    const signature = await sendAndConfirmRawTransaction(connection, Buffer.from(txhex, 'hex'))
-
-    console.log('solana.broadcast.response.signature', signature)
-
-    return {
-      txid: signature,
-      txhex,
-      success: true,
-      result: signature
-    }
-
-  }
-
   async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
 
     console.log('SOLANA VALIDATE UNSIGNED TX', params)
@@ -119,61 +54,6 @@ export default class SOL extends Plugin {
   }
 
 }
-
-interface ValidateUnsignedTx {
-    paymentOption; any;
-    transactions: any[];
-}
-
-interface Output {
-    address: string;
-    amount: number;
-}
-
-interface ValidateTransaction {
-    template: Output[];
-    txhex: string;
-}
-
-interface InstructionOutput {
-    amount: number;
-    source: string;
-    destination: string;
-    owner: string;
-    programId: string;
-}
-
-class BitcoreTransaction {
-    hex: string;
-    transaction: Transaction;
-    constructor(hex) {
-        this.hex = hex
-        this.transaction = Transaction.from(Buffer.from(hex, 'hex'))
-
-    }
-
-    get hash() {
-        return this.transaction.signature.toString('hex')
-    }
-    toJSON() {
-        return {
-            hash: this.hash,
-            hex: this.hex
-        }
-    }
-}
-
-class Bitcore {
-
-    get Transaction() {
-        return BitcoreTransaction
-    }
-
-}
-
-const bitcore = new Bitcore()
-
-export { bitcore }
 
 async function validateTransaction({template, txhex}: ValidateTransaction): Promise<[boolean, any | null]> {
 
@@ -212,7 +92,6 @@ async function validateTransaction({template, txhex}: ValidateTransaction): Prom
 
     }).filter((output: any) => !!output)
 
-
     for (let expectedOutput of template) {
 
         let destination = await getTokenAddress(expectedOutput.address, usdc)
@@ -250,7 +129,7 @@ export async function getTokenAddress(accountAddress: string, token: PublicKey):
 
     const provider = Keypair.generate()
 
-    var toTokenAccount: any = await  getOrCreateAssociatedTokenAccount(
+    var toTokenAccount: any = await getOrCreateAssociatedTokenAccount(
         connection,
         provider,
         token,
@@ -263,5 +142,30 @@ export async function getTokenAddress(accountAddress: string, token: PublicKey):
 
 function getOrCreateAssociatedTokenAccount(connection: any, provider: Keypair, token: PublicKey, arg3: any) {
     throw new Error('Function not implemented.');
+}
+
+
+
+interface ValidateUnsignedTx {
+    paymentOption; any;
+    transactions: any[];
+}
+
+interface Output {
+    address: string;
+    amount: number;
+}
+
+interface ValidateTransaction {
+    template: Output[];
+    txhex: string;
+}
+
+interface InstructionOutput {
+    amount: number;
+    source: string;
+    destination: string;
+    owner: string;
+    programId: string;
 }
 

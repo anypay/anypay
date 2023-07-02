@@ -1,65 +1,124 @@
 {
   "coins": [
-
     {
       "code": "DASH",
+      "chain": "DASH",
+      "currency": "DASH",
       "name": "DASH",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
     {
-      "code": "USDC",
-      "name": "USD Coin",
+      "code": "USDC_ETH",
+      "chain": "ETH",
+      "currency": "USDC",
+      "name": "USD Coin on Ethereum",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
     {
-      "code": "USDT",
-      "name": "Tether USD",
+      "code": "USDT_ETH",
+      "chain": "ETH",
+      "currency": "USDT",
+      "name": "Tether USD on Ethereum",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
-
+    {
+      "code": "USDC_ETH",
+      "chain": "ETH",
+      "currency": "USDC",
+      "name": "USD Coin on Polygon",
+      "enabled": true,
+      "supported": true,
+      "icon_url": ""
+    },
+    {
+      "code": "USDT_ETH",
+      "chain": "ETH",
+      "currency": "USDT",
+      "name": "Tether USD on Polygon",
+      "enabled": true,
+      "supported": true,
+      "icon_url": ""
+    },
+    {
+      "code": "USDC_ETH",
+      "chain": "ETH",
+      "currency": "USDC",
+      "name": "USD Coin on Avalanche",
+      "enabled": true,
+      "supported": true,
+      "icon_url": ""
+    },
+    {
+      "code": "USDT_ETH",
+      "chain": "ETH",
+      "currency": "USDT",
+      "name": "Tether USD on Avalanche",
+      "enabled": true,
+      "supported": true,
+      "icon_url": ""
+    },
     {
       "code": "XMR",
+      "chain": "XMR",
+      "currency": "XMR",
       "name": "Monero",
+      "enabled": true,
+      "supported": true,
       "icon_url": "https://:"
     },
-
     {
       "code": "LTC",
+      "chain": "LTC",
+      "currency": "LTC",
       "name": "Litecoin",
+      "enabled": true,
+      "supported": true,
       "icon_url": "https://app.anypayinc.com/ltc.png"
     },
-
     {
       "code": "BCH",
+      "chain": "BCH",
+      "currency": "BCH",
       "name": "Bitcoin Cash",
       "enabled": true,
       "supported": true,
       "icon_url": ""
     },
-
     {
       "code": "BTC",
+      "chain": "BTC",
+      "currency": "BTC",
       "name": "Bitcoin",
       "enabled": true,
       "supported": true,
       "icon_url": ""
     },
-
     {
       "code": "DOGE",
+      "chain": "DOGE",
+      "currency": "DOGE",
       "name": "Dogecoin",
+      "enabled": true,
+      "supported": true,
       "icon_url": ""
     },
-
     {
       "code": "BSV",
-      "name": "Bitcoin Satoshi Vision",
+      "chain": "BSV",
+      "currency": "BSV",
+      "name": "BitCoin SV",
       "enabled": true,
       "supported": true,
       "icon_url": ""
     }
-
   ]
+
 }
 
 
