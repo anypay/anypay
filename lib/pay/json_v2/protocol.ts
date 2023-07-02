@@ -446,6 +446,8 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
 export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVerificationRequest, options: LogOptions = {}): Promise<PaymentVerification> {
 
+  const { transactions } = params
+
   log.info('pay.jsonv2.payment-verification', Object.assign({
     invoice_uid: invoice.uid,
     account_id: invoice.get('account_id')
@@ -467,7 +469,7 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   await verifyUnsigned({
     invoice_uid: invoice.uid,
-    transactions: params.transactions,
+    transactions: transactions,
     currency: params.currency,
     chain: params.chain
   })
