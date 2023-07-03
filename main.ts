@@ -73,7 +73,13 @@ import * as core from './lib'
 
   eventWebhooks()
 
-  startConfirmingTransactions()
+  if (config.get('start_confirming_transactions')) {
+
+    console.log('start_confirming_transactions', config.get('start_confirming_transactions'))
+
+    startConfirmingTransactions()
+
+  }
 
 })()
 
