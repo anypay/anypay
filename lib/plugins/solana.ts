@@ -1,5 +1,5 @@
 
-import { Connection, sendAndConfirmRawTransaction, clusterApiUrl } from '@solana/web3.js'
+import { Connection, sendAndConfirmRawTransaction, clusterApiUrl, PublicKey } from '@solana/web3.js'
 
 import axios from 'axios'
 
@@ -75,7 +75,24 @@ export default abstract class SolanaPlugin extends Plugin {
 
   }
 
+  async validateAddress(address: string): Promise<boolean> {
 
+    try {
+
+      const owner = new PublicKey(address);
+
+      if (!PublicKey.isOnCurve(owner.toBytes())) return false;
+      if (!PublicKey.isOnCurve(owner.toString())) return false;
+
+    } catch(error) {
+
+      return false
+
+    }
+
+    return true
+
+  }
 
 }
 

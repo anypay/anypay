@@ -20,8 +20,42 @@ export default class SOL extends SolanaPlugin {
   connection: Connection;
 
   async parsePayments({ txhex }: AnypayTransaction): Promise<Payment[]> {
-    // TODO Implement
-    return []
+
+    const transaction: Transaction = Transaction.from(Buffer.from(txhex, 'hex'))
+
+    const signature = transaction.signature.toString()
+
+    const payments: Payment[] = transaction.instructions.map(instruction => {
+
+        try {
+
+            console.log(instruction)
+
+            const decodedTransferInstruction = SystemInstruction.decodeTransfer(instruction)
+
+            const { toPubkey, lamports } = decodedTransferInstruction
+
+            const address = toPubkey.toString()
+
+            const amount = Number(lamports)
+
+            return {
+              txid: signature, 
+              address,
+              amount,
+              currency: this.currency,
+              chain: this.chain
+            }
+
+        } catch(error) {
+
+            console.debug(error)
+        }
+
+    }).filter((output: any) => !!output)
+
+    return payments
+
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
@@ -39,19 +73,6 @@ export default class SOL extends SolanaPlugin {
     console.log(validateResult, 'validateResult')
 
     return true
-
-  }
-
-  async validateAddress(address: string): Promise<boolean> {
-
-    throw new Error() //TODO
-
-  }
-  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
-
-    console.log('SOLANA VALIDATE UNSIGNED TX', params)
-
-    throw new Error() // TODO
 
   }
 
@@ -123,7 +144,7 @@ async function validateTransaction({template, txhex}: ValidateTransaction): Prom
 
 export async function getTokenAddress(accountAddress: string, token: PublicKey): Promise<string> {
 
-    const connection = new Connection('https://solana-mainnet.g.alchemy.com/v2/zQCP8Bt8cAq63ToBYunRGWyag8HdzWp-');    
+    const connection = new Connection(process.env.solana_connection_url);
 
     const provider = Keypair.generate()
 
@@ -144,10 +165,6 @@ function getOrCreateAssociatedTokenAccount(connection: any, provider: Keypair, t
 
 
 
-interface ValidateUnsignedTx {
-    paymentOption; any;
-    transactions: any[];
-}
 
 interface Output {
     address: string;
