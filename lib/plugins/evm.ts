@@ -93,7 +93,6 @@ export abstract class EVM extends Plugin {
 
     return new Promise(async (resolve, reject) => {
 
-
       const web3 = new Web3(new Web3.providers.HttpProvider(this.providerURL), this.chainID)
 
       if (txhex.length === 66) {

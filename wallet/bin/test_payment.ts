@@ -6,9 +6,9 @@ import axios from 'axios'
 
 async function main() {
 
-  const chain = process.argv[2] || 'MATIC'
+  const chain = process.argv[2] || 'SOL'
 
-  const currency = process.argv[3] || 'USDC'
+  const currency = process.argv[3] || 'SOL'
 
   const Card = Cards.getCard({ chain, currency })
 
@@ -18,13 +18,13 @@ async function main() {
 
   const amount = process.argv[4] ? parseFloat(process.argv[4]) : 0.0001
 
-  const base = 'https://develop.anypayx.com'
+  const base = 'http://localhost:5211'
 
   const { data } = await axios.post(`${base}/invoices`, {
     amount
   }, {
     auth: {
-      username: process.env.anypay_access_token,
+      username: process.env.anypay_api_key,
       password: ''
     }
   })

@@ -70,19 +70,26 @@ export default class SOL extends Card {
 
     for (let output of paymentOption.instructions[0].outputs) {
 
-      tx.add(
-        SystemProgram.transfer({
-          fromPubkey: this.publicKey,
-          toPubkey: new PublicKey(output.address),
-          lamports: output.amount,
-        })
-      );
+      if (output.amount > 0) {
+
+        tx.add(
+          SystemProgram.transfer({
+            fromPubkey: this.publicKey,
+            toPubkey: new PublicKey(output.address),
+            lamports: output.amount,
+          })
+        );
+
+      }
     
     }
 
     tx.feePayer = this.publicKey;
 
-    tx.sign(this.publicKey)
+    let blockhash = (await this.connection.getLatestBlockhash('finalized')).blockhash;
+    tx.recentBlockhash = blockhash;
+
+    tx.sign(this.privateKey)
 
     const txhex = tx.serialize().toString('hex')
 

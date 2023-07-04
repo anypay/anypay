@@ -1,7 +1,5 @@
 
-import { Transaction, Connection, PublicKey, Keypair, } from '@solana/web3.js'
-
-import { decodeTransferInstruction } from '@solana/spl-token';
+import { Transaction, Connection, PublicKey, Keypair, SystemInstruction } from '@solana/web3.js'
 
 import {  VerifyPayment, Transaction as AnypayTransaction, Payment } from '../../lib/plugin'
 
@@ -15,7 +13,11 @@ export default class SOL extends SolanaPlugin {
 
   chain = 'SOL'
 
-  decimals = 0 //TODO
+  decimals = 10
+
+  providerURL = process.env.solana_provider_url || "https://api.mainnet-beta.solana.com"
+
+  connection: Connection;
 
   async parsePayments({ txhex }: AnypayTransaction): Promise<Payment[]> {
     // TODO Implement
@@ -57,33 +59,25 @@ export default class SOL extends SolanaPlugin {
 
 async function validateTransaction({template, txhex}: ValidateTransaction): Promise<[boolean, any | null]> {
 
-    const usdc = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v")
-
-
     const errors = []
 
     const transaction: Transaction = Transaction.from(Buffer.from(txhex, 'hex'))
 
-    const outputs: (InstructionOutput | undefined)[] | any[] = transaction.instructions.map(instruction => {
+    const outputs: any[] = transaction.instructions.map(instruction => {
 
         try {
 
-            let decoded = decodeTransferInstruction(instruction)
+            console.log(instruction)
 
-            const output: InstructionOutput = {
-                amount: parseInt(decoded.data.amount.toString()),
-                source: decoded.keys.source.pubkey.toBase58(),
-                destination: decoded.keys.destination.pubkey.toBase58(),
-                owner: decoded.keys.owner.pubkey.toBase58(),
-                programId: decoded.programId.toBase58()
-            }
+            const decodedTransferInstruction = SystemInstruction.decodeTransfer(instruction)
 
-            if (output) {
+            const { toPubkey, lamports } = decodedTransferInstruction
 
-                console.log('solana.tx.output', output)
-            }
+            const address = toPubkey.toString()
 
-            return output
+            const amount = Number(lamports)
+
+            return { address, amount }
 
         } catch(error) {
 
@@ -92,11 +86,15 @@ async function validateTransaction({template, txhex}: ValidateTransaction): Prom
 
     }).filter((output: any) => !!output)
 
+    console.log('--outputs--', outputs)
+
     for (let expectedOutput of template) {
 
-        let destination = await getTokenAddress(expectedOutput.address, usdc)
+        let destination = expectedOutput.address
 
         const matching = outputs.find((output: InstructionOutput) => {
+
+            console.log('--output--', output)
 
             let expectedAmount = 1_000_000 * expectedOutput.amount
 
