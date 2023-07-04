@@ -31,6 +31,8 @@ import USDT_AVAX from './cards/usdt_avax'
 
 import USDT_ETH from './cards/usdt_eth'
 
+import SOL from './cards/sol'
+
 import _EVM from './cards/_evm'
 
 import _ERC20 from './cards/_erc20'
@@ -58,6 +60,7 @@ const cards: CardsMap = {
   "USDT_MATIC": USDT_MATIC,
   "USDT_ETH": USDT_ETH,
   "USDT_AVAX": USDT_AVAX,
+  "SOL": SOL
 }
 
 /*%export function getCard({ chain, currency, phrase }: {chain: string, currency: string, phrase: string}): typeof _Base {
