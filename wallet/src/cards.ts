@@ -31,6 +31,12 @@ import USDT_AVAX from './cards/usdt_avax'
 
 import USDT_ETH from './cards/usdt_eth'
 
+import SOL from './cards/sol'
+
+import USDC_SOL from './cards/usdc_sol'
+
+import USDT_SOL from './cards/usdt_sol'
+
 import _EVM from './cards/_evm'
 
 import _ERC20 from './cards/_erc20'
@@ -119,6 +125,12 @@ export {
   BCH,
 
   XMR,
+
+  SOL,
+
+  USDC_SOL,
+  
+  USDT_SOL,
 
   _Base,
 
