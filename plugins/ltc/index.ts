@@ -1,7 +1,7 @@
 
 import * as blockchair from '../../lib/blockchair'
 
-const ltc = require('litecore-lib');
+const bitcoinJsLib = require('bitcoinjs-lib')
 
 export const currency = 'LTC'
 
@@ -12,6 +12,18 @@ import { oneSuccess } from 'promise-one-success'
 import { getTransaction } from '../../lib/blockcypher'
 
 import * as moment from 'moment'
+
+const LITECOIN = {
+  messagePrefix: '\x19Litecoin Signed Message:\n',
+  bech32: 'ltc',
+  bip32: {
+    public: 0x019da462,
+    private: 0x019d9cfe,
+  },
+  pubKeyHash: 0x30,
+  scriptHash: 0x32,
+  wif: 0xb0,
+};
 
 export default class LTC extends Plugin {
 
@@ -41,7 +53,7 @@ export default class LTC extends Plugin {
 
     return {
       height: transaction.block_height,
-      hash: transaction.block_hash, 
+      hash: transaction.block_hash,
       timestamp: moment(transaction.confirmed).toDate(),
       depth: transaction.confirmations
     }
@@ -64,9 +76,9 @@ export default class LTC extends Plugin {
 
     try {
 
-      new ltc.Address(address);
+      bitcoinJsLib.address.toOutputScript(address, LITECOIN)
 
-      return true;
+      return true
 
     } catch(error) {
 
