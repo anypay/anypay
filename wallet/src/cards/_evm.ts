@@ -154,5 +154,14 @@ export default abstract class EVM_Card extends Card {
     };
   }
 
+  broadcastSignedTransaction(txhex: string) {
+
+    //@ts-ignore
+    return this.provider.send('eth_sendRawTransaction', [txhex])
+
+  }
+
+
+
 }
 

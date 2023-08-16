@@ -142,7 +142,13 @@ export class ERC20 extends EVM {
 
     } catch(error) {
 
-      const { parsed, full } = await this.fetchERC20Transfer({ txid })
+      console.error(error)
+
+    }
+
+    try {
+
+      const { parsed, full } = await this.fetchERC20Transfer({ txid: txid || txhex })
 
       log.info('fetchERC20Transfer.result', { parsed, full })
 
@@ -158,7 +164,13 @@ export class ERC20 extends EVM {
 
       const correctAmount = (expectedOutput.amount === parsed.amount)
 
+      console.log('PAYMENT VERIFIED')
+
       return correctAmount && correctAddress
+
+    } catch(error) {
+
+      console.error(error)
 
     }
 

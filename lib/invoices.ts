@@ -214,7 +214,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const uid = shortid.generate();
 
-  var { webhook_url, account, amount, currency } = params
+  var { redirect_url, webhook_url, account, amount, currency } = params
 
   if (!webhook_url) {
 
@@ -235,6 +235,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
     account_id: account.id,
 
     webhook_url,
+
+    redirect_url,
 
     external_id: params.external_id,
 
@@ -287,7 +289,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
           amount: record.denomination_amount,
           address: option.get('address')
         }]
-        
+
       }
     }),
 
@@ -296,8 +298,6 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
     invoice_uid: record.uid
 
   })
-
-  console.log('paymentrequest.created', paymentRequest)
 
   log.info('paymentrequest.created', paymentRequest)
 

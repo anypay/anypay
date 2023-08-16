@@ -5,13 +5,13 @@ const bitcoinJsLib = require('bitcoinjs-lib')
 
 export const currency = 'LTC'
 
-import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation,  Transaction, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
+import UTXO_Plugin from '../../lib/plugins/utxo'
 
-import * as moment from 'moment'
+export default class LTC extends UTXO_Plugin {
 
 const LITECOIN = {
   messagePrefix: '\x19Litecoin Signed Message:\n',
@@ -27,11 +27,13 @@ const LITECOIN = {
 
 export default class LTC extends Plugin {
 
-  currency: string = 'LTC'
+  currency = 'LTC'
 
-  chain: string = 'LTC'
+  chain = 'LTC'
 
-  decimals: number = 8;
+  decimals = 8
+
+  providerURL = process.env.getblock_ltc_url
 
   get bitcore() {
 
@@ -94,4 +96,5 @@ export default class LTC extends Plugin {
   }
 
 }
+
 

@@ -46,8 +46,6 @@ export default abstract class ERC20_Card extends EVM_Card {
 
     var to, amount;
 
-    console.log(instruction, 'INSTRUCTION')
-
     if (instruction.data) {
 
       // TODO: Parse to and amount from data instead

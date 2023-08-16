@@ -10,9 +10,7 @@ import { BroadcastTx, BroadcastTxResult, Transaction, Plugin, Confirmation, Paym
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
-
-import * as moment from 'moment'
+import axios from 'axios'
 
 export default class DASH extends Plugin {
 
@@ -34,19 +32,27 @@ export default class DASH extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    const transaction = await getTransaction('DASH', txid)
+    const transaction = await getRawTransaction(txid)
 
-    if (!transaction) { return }
+    if (!transaction.blockhash) { return }
 
-    if (!transaction.block_hash) { return }
+    const hash = transaction.blockhash
+
+    const timestamp = new Date(transaction.blocktime * 1000)
+
+    const depth = transaction.confirmations
+
+    const block = await getBlock(hash)
+
+    const height = block.height
 
     return {
-      height: transaction.block_height,
-      hash: transaction.block_hash, 
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
+      confirmation_height: height,
+      confirmation_hash: hash,
+      confirmation_date: timestamp,
+      confirmations: depth
     }
-
+    
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
@@ -88,4 +94,49 @@ export default class DASH extends Plugin {
   }
 
 }
+
+interface GetRawTransactionResult {
+  txid: string;
+  hash: string;
+  version: number;
+  size: number;
+  locktime: number;
+  vin: any[];
+  vout: any[];
+  hex: string;
+  blockhash: string;
+  confirmations: number;
+  time: number;
+  blocktime: number;
+}
+
+async function getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
+
+  const { data } = await axios.post(process.env.getblock_dash_url, {
+    method: 'getrawtransaction',
+    params: [txid, true]
+  })
+
+  return data.result
+
+}
+
+interface GetBlockResult {
+  hash: string;
+  height: number;
+  time: number; 
+}
+
+async function getBlock(hash: string): Promise<GetBlockResult> {
+
+  const { data } = await axios.post(process.env.getblock_dash_url, {
+    method: 'getblock',
+    params: [hash, 1]
+  })
+
+  return data.result
+
+}
+
+
 

@@ -1,4 +1,4 @@
-
+const base58Monero = require('base58-monero')
 export const currency = 'XMR'
 
 import {
@@ -72,10 +72,10 @@ export default class XMR extends Plugin {
     const { count } = await get_block_count()
 
     return {
-      hash,
-      height,
-      timestamp,
-      depth: count - height + 1
+      confirmation_hash: hash,
+      confirmation_height: height,
+      confirmation_date: timestamp,
+      confirmations: count - height + 1
     }
 
   }
@@ -96,10 +96,43 @@ export default class XMR extends Plugin {
   }
 
   async validateAddress(address: string): Promise<boolean> {
+    const chain = {
+      "name": "XMR",
+      "publicAddressBytes": [
+        18
+      ],
+    };
 
-    // TODO
-    return true
+    const validateCryptonote = (address, chain) => {
+      const {publicAddressBytes} = chain
 
+      if (!publicAddressBytes || !Array.isArray(publicAddressBytes) && publicAddressBytes.length) {
+        throw new Error('Array of numbers accepted for network bytes are accepted')
+      }
+
+      if (address.length !== 95 + ((publicAddressBytes.length - 1) * 2)) {
+        throw new Error('Invalid address length')
+      }
+
+      const buffer = base58Monero.decode(address)
+
+      if ((buffer.length !== (69 + publicAddressBytes.length - 1))) {
+        throw new Error('Invalid address buffer length')
+      }
+
+      if (buffer.slice(0, publicAddressBytes.length).compare(Buffer.from(publicAddressBytes)) !== 0) {
+        throw new Error('Invalid network bytes')
+      }
+    }
+
+
+    try {
+      validateCryptonote(address, chain)
+
+      return true
+    } catch (e) {
+      return false
+    }
   }
 
   async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
@@ -132,7 +165,7 @@ export default class XMR extends Plugin {
     if (result.status === 'Failed') {
       throw new Error(result.reason)
     }
-    
+
     return {
       txhex,
       txid,
@@ -204,7 +237,7 @@ export async function callWalletRpc(method: string, params: any): Promise<any> {
   const { data } = response
 
   log.info('xmr.monero_wallet_rpc.result', data)
-  
+
   const { result } = data
 
   log.info('xmr.monero_wallet_rpc.response', { method, params, result, trace })
@@ -312,7 +345,7 @@ export async function check_confirmations(invoice: Invoice): Promise<[Payment, b
     })
 
     return [payment, true]
-    
+
   } else {
 
     log.info('payment.unconfirmed', {
@@ -394,22 +427,22 @@ export async function verifyPayment({paymentOption, transaction}: VerifyPayment)
       const { invoice_uid } = paymentOption
 
       const url = `${config.get('api_base')}/i/${paymentOption.invoice_uid}`
-    
+
       log.info('xmr.verifyPayment', {
-        invoice_uid, 
-        paymentOption, 
+        invoice_uid,
+        paymentOption,
         txhex: transaction.txhex,
         txkey: transaction.txkey,
         txid: transaction.txid,
         url
       })
-    
+
       await verify({
         url,
         tx_hash: String(transaction.txid),
         tx_key: String(transaction.txkey)
       })
-      
+
     } catch(error) {
 
       log.error('xmr.verifyPayment.error', error)
@@ -439,7 +472,7 @@ export async function check_tx_key(params: CheckTxKey): Promise<CheckTxKeyResult
   const result = await callWalletRpc('check_tx_key', params)
 
   return result
-  
+
 }
 
 export async function verify({url, tx_hash, tx_key}: XMRVerifyPayment) {

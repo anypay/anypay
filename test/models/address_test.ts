@@ -17,6 +17,7 @@ describe('Address Model', () => {
       account_id: account.id,
       value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
       currency: 'DASH',
+      chain: 'DASH',
       locked: true
     });
 

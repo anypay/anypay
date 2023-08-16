@@ -15,7 +15,7 @@ import { start as startPrices } from './lib/prices/cron'
 
 import { start as startFees } from './actors/detect_fees/actor'
 
-import { hapi as kraken } from './plugins/kraken'
+import { hapi as kraken } from './lib/kraken'
 
 import { plugin as websockets } from './server/ws/plugin'
 
@@ -23,7 +23,7 @@ import { start as refunds } from './actors/refunds/actor'
 
 import eventWebhooks from './actors/webhooks-events/actor'
 
-import { startDirectory as startCronDirectory, startTask } from './lib/rabbi/cron'
+import { startConfirmingTransactions } from './lib/confirmations'
 
 import { init } from 'rabbi'
 
@@ -63,7 +63,7 @@ import * as core from './lib'
 
     })
 
-    startActorsDirectory(join(__dirname, 'plugins/kraken/actors'))
+    startActorsDirectory(join(__dirname, 'lib/kraken/actors'))
 
     refunds()
     
@@ -73,13 +73,13 @@ import * as core from './lib'
 
   eventWebhooks()
 
-  if (config.get('rabbi_start_cron')) {
+  if (config.get('start_confirming_transactions')) {
 
-    startCronDirectory(join(__dirname, 'cron'))
+    console.log('start_confirming_transactions', config.get('start_confirming_transactions'))
+
+    startConfirmingTransactions()
 
   }
-
-  startTask('wallet_bot_send_xmr_on_interval')
 
 })()
 
