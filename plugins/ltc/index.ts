@@ -13,23 +13,22 @@ import UTXO_Plugin from '../../lib/plugins/utxo'
 
 export default class LTC extends UTXO_Plugin {
 
-const LITECOIN = {
-  messagePrefix: '\x19Litecoin Signed Message:\n',
-  bech32: 'ltc',
-  bip32: {
-    public: 0x019da462,
-    private: 0x019d9cfe,
-  },
-  pubKeyHash: 0x30,
-  scriptHash: 0x32,
-  wif: 0xb0,
-};
-
-export default class LTC extends Plugin {
-
   currency = 'LTC'
 
   chain = 'LTC'
+
+  networkInfo = {
+    messagePrefix: '\x19Litecoin Signed Message:\n',
+    bech32: 'ltc',
+    bip32: {
+      public: 0x019da462,
+      private: 0x019d9cfe,
+    },
+    pubKeyHash: 0x30,
+    scriptHash: 0x32,
+    wif: 0xb0,
+  };
+
 
   decimals = 8
 
@@ -43,23 +42,6 @@ export default class LTC extends Plugin {
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
-  }
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
-
-    const transaction = await getTransaction('LTC', txid)
-
-    if (!transaction) { return }
-
-    if (!transaction.block_hash) { return }
-
-    return {
-      height: transaction.block_height,
-      hash: transaction.block_hash,
-      timestamp: moment(transaction.confirmed).toDate(),
-      depth: transaction.confirmations
-    }
-
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
