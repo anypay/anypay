@@ -5,6 +5,8 @@ const bitcoinJsLib = require('bitcoinjs-lib')
 
 export const currency = 'LTC'
 
+const ltc = require('litecore-lib');
+
 import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
@@ -60,7 +62,7 @@ export default class LTC extends UTXO_Plugin {
 
     try {
 
-      bitcoinJsLib.address.toOutputScript(address, LITECOIN)
+      bitcoinJsLib.address.toOutputScript(address, this.networkInfo)
 
       return true
 

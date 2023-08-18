@@ -1,6 +1,11 @@
-import {accounts}  from '../../../lib';
+import {accounts} from '../../../lib';
 
 import * as Joi from 'joi';
+
+type Coin = {
+    currency: string
+    chain: string
+}
 
 /**
  * @api {get} /coins Request User Supported Coins
@@ -33,7 +38,17 @@ export async function list(request, h) {
 
   let accountCoins = await accounts.getSupportedCoins(request.account.id);
 
-  let coins = Object.values(accountCoins);
+  let coins = Object.values(accountCoins).map((coin: Coin) => {
+      let coinName = coin.currency.toLowerCase();
+
+      if (coin.currency != coin.chain) {
+          coinName = `${coin.currency.toLowerCase()}.${coin.chain.toLowerCase()}`
+      }
+
+      const plugin = require('../../../plugins/' + coinName)
+
+      return ({...coin, decimals: new plugin.default().decimals})
+  });
 
   return h.response({
     'coins': sortBCHFirst(coins)
