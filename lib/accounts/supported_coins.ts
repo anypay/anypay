@@ -11,10 +11,11 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
   });
 
   let accountCoins  = addresses.reduce((acc,address) => {
-  
+
     acc[address.currency] = {
       code: address.currency,
       currency: address.currency,
+      chain: address.chain,
       name: address.currency,
       enabled: true,
       icon: `https://app.anypayinc.com/${address.currency.toLowerCase()}.png`,
@@ -42,6 +43,8 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
       accountCoins[coin.code] = {
         code: coin.code,
         name: coin.name,
+        currency: coin.currency,
+        chain: coin.chain,
         enabled: false,
         icon: coin.logo_url || `https://app.anypayinc.com/${coin.code.toLowerCase()}.png`,
         supported: coin.supported
