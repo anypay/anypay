@@ -107,5 +107,121 @@ describe("Setting Addresses Via REST", async () => {
 
   })
 
+  it("POST /api/v1/addresses should set the DASH address", async () => {
+
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    const chain = 'DASH'
+
+    const currency = 'DASH'
+
+    let response = await auth(account, 0)({
+      method: 'POST',
+      url: '/api/v1/addresses',
+      payload: {
+        address: address,
+        chain,
+        currency
+      }
+    })
+
+    expect(response.result.value).to.be.equal(address);
+    expect(response.result.chain).to.be.equal(chain);
+    expect(response.result.currency).to.be.equal(currency);
+
+  })
+
+  it("POST /api/v1/addresses should set the USDC address", async () => {
+
+    var address = '0x029b705658D7De7c98176F0290cd282a0b9D1486';
+
+    const chain = 'ETH'
+
+    const currency = 'USDC'
+
+    let response = await auth(account, 0)({
+      method: 'POST',
+      url: '/api/v1/addresses',
+      payload: {
+        address,
+        chain,
+        currency
+      }
+    })
+
+    expect(response.result.value).to.be.equal(address);
+
+    expect(response.result.chain).to.be.equal(chain);
+
+    expect(response.result.currency).to.be.equal(currency);
+
+  })
+
+  it("POST /api/v1/addresses should require both chain and currency", async () => {
+
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    const currency = 'DASH'
+
+    let response = await auth(account, 0)({
+      method: 'POST',
+      url: '/api/v1/addresses',
+      payload: {
+        address: address,
+        currency
+      }
+    })
+
+    expect(response.error).to.not.equal(null)
+    expect(response.statusCode).to.equal(400)
+
+  })
+
+  it("POST /api/v1/addresses should not allow unsupported coins", async () => {
+
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    const currency = 'XXX'
+
+    const chain = 'BTC'
+
+    let response = await auth(account, 0)({
+      method: 'POST',
+      url: '/api/v1/addresses',
+      payload: {
+        address: address,
+        chain,
+        currency
+      }
+    })
+
+    expect(response.error).to.not.equal(null)
+    expect(response.statusCode).to.equal(400)
+
+  })
+
+
+  it("POST /api/v1/addresses should not allow unsupported chains", async () => {
+
+    var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
+
+    const currency = 'USDC'
+
+    const chain = 'BTC'
+
+    let response = await auth(account, 0)({
+      method: 'POST',
+      url: '/api/v1/addresses',
+      payload: {
+        address: address,
+        chain,
+        currency
+      }
+    })
+
+    expect(response.error).to.not.equal(null)
+    expect(response.statusCode).to.equal(400)
+
+  })
 })
 

@@ -6,21 +6,27 @@ import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Plugin, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Payment, Price } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
 import { blockchair, log } from '../../lib';
 
+import axios from 'axios'
+
+import UTXO_Plugin from '../../lib/plugins/utxo'
+
 const polynym = require('polynym');
 
-export default class BSV extends Plugin {
+export default class BSV extends UTXO_Plugin {
 
-  currency: string = 'BSV'
+  currency = 'BSV'
 
-  chain: string = 'BSV'
+  chain = 'BSV'
 
-  decimals: number = 8
+  decimals = 8
+
+  providerURL = process.env.getblock_bsv_url
 
   get bitcore() {
 
@@ -101,7 +107,7 @@ export default class BSV extends Plugin {
 
   }
 
-  async transformAddress(alias: string){
+  async transformAddress(alias: string) {
 
     try {
 
@@ -119,6 +125,22 @@ export default class BSV extends Plugin {
 
       throw new Error('invalid BSV address');
 
+    }
+
+  }
+
+  async getPrice(): Promise<Price> {
+
+    const { data } = await axios.get(`https://data.gateapi.io/api2/1/ticker/bsv_usdt`)
+
+    const value = parseFloat(data.last)
+
+    return {
+      value,
+      base: 'USD',
+      currency: this.currency, 
+      chain: this.chain, 
+      source: 'gate.io'
     }
 
   }

@@ -38,6 +38,7 @@ describe("Monero XMR", () => {
 
       let record = await setAddress(account, {
         currency: 'XMR',
+        chain: 'XMR',
         view_key,
         value: address
       })
@@ -64,6 +65,7 @@ describe("Monero XMR", () => {
 
       await setAddress(account, {
         currency: 'XMR',
+        chain: 'XMR',
         value: address,
         view_key
       })

@@ -1,25 +1,40 @@
 
 import * as blockchair from '../../lib/blockchair'
 
-const ltc = require('litecore-lib');
+const bitcoinJsLib = require('bitcoinjs-lib')
 
 export const currency = 'LTC'
 
-import { BroadcastTx, BroadcastTxResult, Plugin, Confirmation,  Transaction, Payment } from '../../lib/plugin'
+const ltc = require('litecore-lib');
+
+import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib/plugin'
 
 import { oneSuccess } from 'promise-one-success'
 
-import { getTransaction } from '../../lib/blockcypher'
+import UTXO_Plugin from '../../lib/plugins/utxo'
 
-import * as moment from 'moment'
+export default class LTC extends UTXO_Plugin {
 
-export default class LTC extends Plugin {
+  currency = 'LTC'
 
-  currency: string = 'LTC'
+  chain = 'LTC'
 
-  chain: string = 'LTC'
+  networkInfo = {
+    messagePrefix: '\x19Litecoin Signed Message:\n',
+    bech32: 'ltc',
+    bip32: {
+      public: 0x019da462,
+      private: 0x019d9cfe,
+    },
+    pubKeyHash: 0x30,
+    scriptHash: 0x32,
+    wif: 0xb0,
+  };
 
-  decimals: number = 8;
+
+  decimals = 8
+
+  providerURL = process.env.getblock_ltc_url
 
   get bitcore() {
 
@@ -29,23 +44,6 @@ export default class LTC extends Plugin {
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
-  }
-
-  async getConfirmation(txid: string): Promise<Confirmation> {
-
-    const transaction = await getTransaction('LTC', txid)
-
-    if (!transaction) { return }
-
-    if (!transaction.block_hash) { return }
-
-    return {
-      confirmation_height: transaction.block_height,
-      confirmation_hash: transaction.block_hash, 
-      confirmation_date: moment(transaction.confirmed).toDate(),
-      confirmations: transaction.confirmations
-    }
-
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
@@ -64,9 +62,9 @@ export default class LTC extends Plugin {
 
     try {
 
-      new ltc.Address(address);
+      bitcoinJsLib.address.toOutputScript(address, this.networkInfo)
 
-      return true;
+      return true
 
     } catch(error) {
 
@@ -82,4 +80,5 @@ export default class LTC extends Plugin {
   }
 
 }
+
 

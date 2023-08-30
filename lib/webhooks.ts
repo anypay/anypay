@@ -138,10 +138,6 @@ export class WebhookAlreadySent implements Error {
   message = 'webhook already sent for this invoice'
 }
 
-export class ApiKeyPaymentRequired implements Error {
-  name = 'ApiKeyPaymentRequired'
-  message = 'webhook may not be sent without api key credits'
-}
 
 interface NewAttempt {
   record: any;

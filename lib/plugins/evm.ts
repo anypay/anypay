@@ -122,21 +122,35 @@ export abstract class EVM extends Plugin {
 
       const receiptListener = web3.eth.sendSignedTransaction(txhex)
 
-      receiptListener.on('transactionHash', txid => {
+      receiptListener.once('transactionHash', txid => {
 
         resolve({ txid, txhex, result: txid, success: true })
 
       })
-      .on('receipt', (receipt: TransactionReceipt) => {
+      .once('receipt', (receipt: TransactionReceipt) => {
 
         console.log("web3.ethers.receipt", receipt)
 
-        if (!receipt.status) {
-          return revertPayment({ txid: receipt.transactionHash })
+        if (receipt.status) {
+
+          console.log("web3.ethers.confirmation", {receipt})
+
+          handleTransactionReceipt(web3, receipt)
+
+        } else {
+
+          revertPayment({ txid: receipt.transactionHash })
+
         }
 
+        receiptListener.removeAllListeners('transactionHash')
+
+        receiptListener.removeAllListeners('receipt')
+
+        //receiptListener.removeAllListeners('confirmation')
+
        })
-      .on('confirmation', async (confirmation, receipt: TransactionReceipt) => {
+      /*.once('confirmation', async (confirmation, receipt: TransactionReceipt) => {
 
         try {
 
@@ -144,8 +158,11 @@ export abstract class EVM extends Plugin {
 
           handleTransactionReceipt(web3, receipt)
 
-          receiptListener.off('confirmation')
-          receiptListener.off('receipt')
+          receiptListener.removeAllListeners('transactionHash')
+
+          receiptListener.removeAllListeners('receipt')
+
+          receiptListener.removeAllListeners('confirmation')
 
         } catch(error) {
 
@@ -154,7 +171,7 @@ export abstract class EVM extends Plugin {
         }
 
       })
-
+      */
     })
 
   }
@@ -183,47 +200,23 @@ export abstract class EVM extends Plugin {
 
     const expectedOutput = paymentOption.outputs[0]
 
-    try {
+    const [output]: any = await this.parsePayments({txhex})
 
-      const transaction = this.decodeTransactionHex({ transactionHex: txhex })
+    const correctAddress = String(output.address).toLowerCase() === expectedOutput.address.toLowerCase()
 
-      console.log({transaction})
+    const correctAmount = expectedOutput.amount === parseInt(output.amount)
 
-      const output: any = await this.parsePayments({txhex})
-
-      console.log({output})
-
-      console.log({expectedOutput})
-
-      const correctAddress = output.address.toLowerCase() === expectedOutput.address.toLowerCase()
-
-      console.log({ correctAddress })
-
-      const correctAmount = expectedOutput.amount === parseInt(output.amount)
-
-      console.log({ correctAmount })
+    if (output.symbol) {
 
       const correctToken = output.symbol.toLowerCase() == this.token.toLowerCase()
 
-      console.log({ correctToken })
-
       return correctToken && correctAmount && correctAddress
 
-    } catch(error) {
-
-      const txid = txhex
-
-      const [parsed] = await this.getPayments(txid) 
-
-
-      const correctAddress = (parsed.address.toLowerCase() === expectedOutput.address.toLowerCase())
-
-      const correctAmount = (expectedOutput.amount === parsed.amount)
+    } else {
 
       return correctAmount && correctAddress
 
     }
-
 
   }
 
