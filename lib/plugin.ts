@@ -5,6 +5,8 @@ import { Account } from './account'
 
 import { Price } from './price'
 
+export { Price }
+
 import { PaymentOption } from './payment_option'
 
 import { getPrice } from './prices/kraken'
@@ -47,7 +49,7 @@ abstract class AbstractPlugin {
 
   abstract parsePayments(transaction: Transaction): Promise<Payment[]>;
 
-  abstract getPrice({chain, currency, base}: {chain:string, currency: string, base: string}): Promise<Price>;
+  abstract getPrice(): Promise<Price>;
 
 }
 
@@ -87,9 +89,9 @@ export abstract class Plugin extends AbstractPlugin {
 
   }
 
-  async getPrice({currency}: { chain: string, currency: string, base: string }): Promise<Price> {
+  async getPrice(): Promise<Price> {
 
-    return getPrice(currency)
+    return getPrice(this.currency)
 
   }
 

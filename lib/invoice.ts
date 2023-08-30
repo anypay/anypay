@@ -172,26 +172,6 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
     return address
   })
 
-  for (let address of availableAddresses) {
-
-    if (['ETH', 'AVAX', 'MATIC', 'SOL'].includes(address.chain)) {
-
-      if (address.chain === address.currency) {
-
-        availableAddresses.push(
-          new models.Address({...address.toJSON(), currency: 'USDC' })
-        )
-
-        availableAddresses.push(
-          new models.Address({...address.toJSON(), currency: 'USDT' })
-        )
-
-      }
-
-    } 
-
-  }
-
   return availableAddresses.map(record => new Address(record))
 
 }
@@ -215,8 +195,6 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
         currency: account.denomination,
         value
       }, currency, coin.precision);
-
-      console.log({base:account.denomination, value, result:amount, currency}, 'converted')
 
       let address = await getNewAddress({ account, address: record, currency, chain })
 

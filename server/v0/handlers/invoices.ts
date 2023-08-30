@@ -381,13 +381,44 @@ export async function show(request, h) {
         responseInvoice['hash'] = invoice.hash
       }
 
+      if (invoice.redirect_url) {
+        responseInvoice['redirect_url'] = invoice.redirect_url
+      }
+
       responseInvoice['payment_options'] = payment_options
       responseInvoice['notes'] = notes
 
-      return h.response({
+      const response = {
         invoice: responseInvoice
-      })
-      .code(200)
+      }
+
+      if (invoice.hash) {
+
+        let payment = await models.Payment.findOne({ where: { invoice_uid: invoice.uid }})
+
+        if (payment) {
+
+          const { chain, currency, txid, txhex, confirmation_hash, confirmation_date, confirmation_height, status, createdAt, invoice_uid, block_explorer_url } = payment.toJSON()
+
+          response['payment'] = {
+            invoice_uid,
+            status,
+            date: createdAt,
+            chain,
+            currency,
+            txid,
+            txhex,
+            confirmation_hash,
+            confirmation_date,
+            confirmation_height,
+            block_explorer_url
+          }
+
+        }
+
+      }
+
+      return h.response(response).code(200)
 
     } else {
 
