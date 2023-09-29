@@ -13,7 +13,7 @@ jobs:
     container: node:16
     services:
       postgres:
-        image: postgres:9.5-postgis
+        image: postgis/postgis:16-3.4
         env:
           POSTGRES_USER: ${{ env.POSTGRES_USER }}
           POSTGRES_DB: ${{ env.POSTGRES_DB }}
