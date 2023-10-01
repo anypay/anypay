@@ -15,7 +15,9 @@ interface SendRawTransactionResult {
     id: string;
 }
 
-const hosts = {
+const hosts: {
+    [key: string]: string;
+} = {
     'BTC': 'btc.nownodes.io'
 }
 

@@ -4,11 +4,13 @@ const http = require("superagent");
 
 const base = 'https://chat.anypayinc.com/hooks';
 
-const channels = {
+const channels: {
+  [key: string]: string
+} = {
   'misc': 'nbfWhcsDeXypz4RDu/AXqEGLCQbno7gotBTuipAwsZzuTTMtPZ3LHfRx86u3dHf6aY'
 }
 
-export function notify(channel, message: string) {
+export function notify(channel: string, message: string) {
 
   if (!channels[channel]) {
     log.info(`rocketchat channel ${channel} not found`);
@@ -22,7 +24,7 @@ export function notify(channel, message: string) {
     .send({
       text: message
     })
-    .end((error, response) => {
+    .end((error: Error, response: { body: any; }) => {
       if (error) {
         log.error("rocketchat.error", error);
       } else {

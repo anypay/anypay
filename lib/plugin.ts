@@ -1,7 +1,5 @@
 
-import { Address } from './addresses'
-
-import { Account } from './account'
+import { addresses, accounts, payment_options } from '@prisma/client'
 
 import { Price } from './price'
 
@@ -54,8 +52,8 @@ abstract class AbstractPlugin {
 }
 
 interface GetNewAddress {
-  account: Account;
-  address: Address;
+  account: accounts;
+  address: addresses;
 }
 
 export interface BroadcastTx {
@@ -78,14 +76,14 @@ export abstract class Plugin extends AbstractPlugin {
 
   }
 
-  async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
+  async buildSignedPayment({ paymentOption, mnemonic }: { paymentOption: payment_options, mnemonic: string}): Promise<Transaction> {
 
     throw new Error(`buildSignedPayment not implemented for ${this.currency} on ${this.chain}`)
   }
 
-  async getNewAddress({address}: { account: Account, address: Address }): Promise<string> {
+  async getNewAddress({address}: { account: accounts, address: addresses }): Promise<string> {
 
-    return address.get('value')
+    return address.value
 
   }
 
@@ -123,7 +121,7 @@ export abstract class Plugin extends AbstractPlugin {
 
     let tx = new this.bitcore.Transaction(params.transactions[0].txhex);
 
-    let txOutputs = tx.outputs.map(output => {
+    let txOutputs = tx.outputs.map((output: any) => {
 
       try {
 
@@ -145,7 +143,7 @@ export abstract class Plugin extends AbstractPlugin {
       }
 
     })
-    .filter(n => n != null)
+    .filter((n: any) => n != null)
 
     let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
 
@@ -186,7 +184,7 @@ export abstract class Plugin extends AbstractPlugin {
 
     let tx = new this.bitcore.Transaction(txhex);
 
-    let txOutputs = tx.outputs.map(output => {
+    let txOutputs = tx.outputs.map((output: any) => {
 
       try {
 
@@ -211,7 +209,7 @@ export abstract class Plugin extends AbstractPlugin {
       }
 
     })
-    .filter(n => n != null)
+    .filter((n: any) => n != null)
 
     return txOutputs
 
@@ -220,7 +218,7 @@ export abstract class Plugin extends AbstractPlugin {
 }
 
 export interface BuildSignedPayment {
-  paymentOption: PaymentOption;
+  paymentOption: payment_options;
   mnemonic: string;
 }
 

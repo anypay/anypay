@@ -16,7 +16,6 @@ import * as invoices from './invoice';
 import { Invoice } from './invoices'
 import * as settings from './settings';
 import * as prices from './prices';
-import { models } from './models';
 import * as database from './database';
 import * as addresses from './addresses';
 import * as coins from './coins';
@@ -35,6 +34,9 @@ import * as nownodes from './nownodes'
 import { Payment } from './payments'
 import { PaymentOption } from './payment_option'
 import * as orm from './orm'
+import { prisma } from './prisma'
+
+export { prisma } 
 
 import { Transaction } from './plugin'
 
@@ -43,7 +45,6 @@ var initialized = false;
 import * as initializers from '../initializers'
 
 export interface Anypay {
-  models:        any;
   log:           any;
   orm:           any;
   App:           any;
@@ -56,7 +57,6 @@ export interface Anypay {
 
 const anypay = {
   log,
-  models,
   orm: orm,
   Account: Account,
   AccessToken: AccessToken,
@@ -94,7 +94,6 @@ export {
   invoices,
   log,
   login,
-  models,
   nownodes,
   password,
   pay,

@@ -1,8 +1,6 @@
 
 import { Orm } from './orm'
 
-import { models } from './models'
-
 import { Account } from './account'
 
 import { log } from './log'
@@ -47,8 +45,8 @@ export async function listLinkedAccounts(account: Account, options: any={}): Pro
   })
 
   return {
-    target: target.map(record => new LinkedAccount(record)),
-    source: source.map(record => new LinkedAccount(record))
+    target,
+    source
   }
 
 }

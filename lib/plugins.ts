@@ -7,10 +7,6 @@ export { plugins }
 
 import { Transaction } from './plugin'
 
-import { Account } from './account'
-
-import { Address } from './addresses'
-
 import { Payment } from './plugin'
 
 import { Price } from './price'
@@ -18,6 +14,7 @@ import { Price } from './price'
 import { PaymentOption } from './payment_option'
 
 import { Confirmation } from './confirmations'
+import { accounts, addresses, payment_options } from "@prisma/client";
 
 export function find({currency, chain }: {currency: string, chain: string}) {
 
@@ -50,7 +47,7 @@ export async function parsePayments({ currency, chain, transaction }: { currency
 
 }
 
-export async function getNewAddress({ address, account, chain, currency }: { address: Address, account: Account, chain: string, currency: string }): Promise<string> {
+export async function getNewAddress({ address, account, chain, currency }: { address: addresses, account: accounts, chain: string, currency: string }): Promise<string> {
 
   let plugin = find({ chain, currency }) 
 
@@ -74,7 +71,7 @@ export function fromSatoshis({integer,currency,chain}: {integer: number, currenc
 
 }
 
-export function buildSignedPayment({paymentOption,mnemonic}: {paymentOption: PaymentOption, mnemonic: string}): Promise<Transaction> {
+export function buildSignedPayment({paymentOption,mnemonic}: {paymentOption: payment_options, mnemonic: string}): Promise<Transaction> {
 
   const { currency, chain } = paymentOption
 

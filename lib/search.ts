@@ -1,11 +1,10 @@
 
-import { models } from './models'
-
 import { Account } from './account'
 
 import { log } from './log'
 
 import * as _ from 'underscore'
+import { prisma } from './prisma';
 
 export interface SearchResult {
   type: string; // invoice, account, etc
@@ -34,16 +33,18 @@ export async function search(query: string, account?: Account): Promise<SearchRe
 
 export async function searchInvoiceUid(uid: string, account?: Account): Promise<SearchResult[]>{
 
-  const where = { uid }
+  const where: { uid: string, account_id?: number } = { uid }
 
   if (account) {
-    where['account_id'] = account.id
+    where['account_id'] = parseInt(account.id)
   }
 
-  let value = await models.Invoice.findOne({ where })
+  const invoice = await prisma.invoices.findFirst({ where })
 
-  if (value) {
-    return [{ type: 'invoice', value, where }]
+
+  if (invoice) {
+    
+    return [{ type: 'invoice', value: invoice, where }]
   }
   return []
 
@@ -51,11 +52,14 @@ export async function searchInvoiceUid(uid: string, account?: Account): Promise<
 
 export async function searchAccountEmail(email: string, account?: Account): Promise<SearchResult[]> {
 
-  const where = { email }
+  const where: {
+    email: string,
+    id?: number
+  } = { email }
 
   if (account) { where['id'] = account.id }
 
-  let value = await models.Account.findOne({ where })
+  const value = await prisma.accounts.findFirst({ where })
 
   if (value) {
     return [{ type: 'account', value, where }]
@@ -65,11 +69,14 @@ export async function searchAccountEmail(email: string, account?: Account): Prom
 
 export async function searchInvoiceHash(hash: string, account?: Account): Promise<SearchResult[]> {
 
-  const where = { hash }
+  const where: {
+    hash: string,
+    account_id?: number
+  } = { hash }
 
   if (account) { where['account_id'] = account.id }
 
-  let value = await models.Invoice.findOne({ where })
+  const value = await prisma.invoices.findFirst({ where })
 
   if (value) {
     return [{ type: 'invoice', value, where }]
@@ -79,11 +86,14 @@ export async function searchInvoiceHash(hash: string, account?: Account): Promis
 
 export async function searchInvoiceExternalId(external_id: string, account?: Account): Promise<SearchResult[]> {
 
-  const where = { external_id }
+  const where: {
+    external_id: string,
+    account_id?: number
+  } = { external_id }
 
   if (account) { where['account_id'] = account.id }
 
-  let value = await  models.Invoice.findOne({ where })
+  const value = await prisma.invoices.findFirst({ where })
 
   if (value) {
     return [{ type: 'invoice', value, where }]

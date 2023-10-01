@@ -1,11 +1,13 @@
 
+import { Request } from '@hapi/hapi'
+
 export interface HapiSequelizeDefaults {
   order?: any,
   limit?: number;
   offset?: number;
 }
 
-export function parseRequest(request, defaults: HapiSequelizeDefaults = {}): any {
+export function parseRequest(request: Request, defaults: HapiSequelizeDefaults = {}): any {
 
   let order = parseOrder(request, defaults.order);
   let limit = parseLimit(request, defaults.limit);
@@ -15,7 +17,7 @@ export function parseRequest(request, defaults: HapiSequelizeDefaults = {}): any
 
 };
 
-export function parseOrder(request, defaultOrder=[['createdAt', 'desc']]) {
+export function parseOrder(request: Request, defaultOrder=[['createdAt', 'desc']]) {
 
   if (!request.query || !request.query.orderBy) {
     return defaultOrder;
@@ -27,7 +29,7 @@ export function parseOrder(request, defaultOrder=[['createdAt', 'desc']]) {
   
 }
 
-export function parseLimit(request, defaultLimit=100) {
+export function parseLimit(request: Request, defaultLimit=100) {
 
   if (!request.query || !request.query.limit) {
     return defaultLimit;
@@ -37,7 +39,7 @@ export function parseLimit(request, defaultLimit=100) {
 
 }
 
-export function parseOffset(request, defaultOffset=0) {
+export function parseOffset(request: Request, defaultOffset=0) {
 
   if (!request.query || !request.query.offset) {
     return defaultOffset;

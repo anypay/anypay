@@ -1,12 +1,13 @@
 const bcrypt = require('bcryptjs');
 
-import { models } from '../models';
-
 import { log } from '../log';
 
 import * as database from '../database';
 
+import { accounts } from '@prisma/client'
+
 import {getAddress, getSupportedCoins} from './supported_coins';
+import { prisma } from '../prisma';
 
 interface AccountAddress {
   account_id: number;
@@ -43,13 +44,15 @@ function pointFromLatLng(lat, lng) {
 
 }
 
-export async function setPositionFromLatLng(account) {
+export async function setPositionFromLatLng(account: accounts): Promise<accounts> {
 
   let point = pointFromLatLng(account.latitude, account.longitude)
 
   account.position = point
 
   await account.save()
+
+  return 
 
   return models.Account.findOne({ where: { id: account.id }})
 
@@ -117,14 +120,18 @@ export async function findAllWithTags(tags: string[]): Promise<any> {
 
 }
 
-export async function registerAccount(email: string, password: string): Promise<any>{
+export async function registerAccount(email: string, password: string): Promise<accounts>{
 
   let passwordHash = await hash(password);
 
-  let account = await models.Account.create({
-    email: email,
-    password_hash: passwordHash
-  });
+  const account = await prisma.accounts.create({
+    data: {
+        email,
+        password_hash: passwordHash,
+        createdAt: new Date(),
+        updatedAt: new Date()
+    }
+  })
 
   if( account ){
 
@@ -229,7 +236,7 @@ export async function getAccountAddress(accountId: number, currency: string): Pr
 
 }
 
-export function hash(password) {
+export function hash(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
 
     bcrypt.hash(password, 10, (error, hash) => {

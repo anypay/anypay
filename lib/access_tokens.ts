@@ -8,6 +8,7 @@ import { generateAccountToken } from './jwt'
 import { models } from './models'
 
 import { App } from './apps'
+import { accounts } from '@prisma/client'
 
 export class AccessToken extends Orm {
 
@@ -49,7 +50,7 @@ export class AccessToken extends Orm {
 
 }
 
-export async function ensureAccessToken(account: Account): Promise<AccessToken> {
+export async function ensureAccessToken(account: accounts): Promise<AccessToken> {
 
   let [record] = await models.AccessToken.findOrCreate({
 

@@ -1,10 +1,6 @@
 require('dotenv').config();
 
-import * as Chance from 'chance';
-
 import * as uuid from 'uuid';
-
-const chance = new Chance();
 
 import * as assert from 'assert';
 
@@ -12,9 +8,7 @@ import { registerAccount } from '../lib/accounts';
 
 import { ensureAccessToken } from '../lib/access_tokens'
 
-import { Account } from '../lib/account'
-
-import { Address } from '../lib/addresses'
+import { Address, setAddress } from '../lib/addresses'
 
 import { createApp, App } from '../lib/apps'
 
@@ -26,24 +20,25 @@ import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
 
 import { initialize } from '../lib'
 
+type Account = accounts
+
+import { faker } from '@faker-js/faker';
+
 export async function generateAccount() {
-  return registerAccount(chance.email(), chance.word());
+  return registerAccount(faker.internet.email(), faker.internet.password());
 }
 
-export async function createAccount(): Promise<Account> {
-  let record = await registerAccount(chance.email(), chance.word());
-
-  return new Account(record)
+export async function createAccount(): Promise<accounts> {
+  return registerAccount(faker.internet.email(), faker.internet.password());
 }
 
-export async function createAccountWithAddress(): Promise<[Account, Address]> {
-  let record = await registerAccount(chance.email(), chance.word());
-
-  let account = new Account(record)
+export async function createAccountWithAddress(): Promise<[accounts, Address]> {
+  
+  let account = await registerAccount(faker.internet.email(), faker.internet.password());
 
   let keypair = await generateKeypair()
 
-  let address = await  account.setAddress({ currency: 'BSV', chain: 'BSV', address: keypair.address })
+  let address = await  setAddress(account, { currency: 'BSV', chain: 'BSV', value: keypair.address })
 
   return [account, address]
 }
@@ -87,21 +82,19 @@ interface NewInvoice {
 
 export async function createAccountWithAddresses(): Promise<Account> {
 
-  let record = await registerAccount(chance.email(), chance.word());
-
-  let account = new Account(record)
+  let account = await registerAccount(faker.internet.email(), faker.internet.password());
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
+  await setAddress(account, { currency: 'BSV', chain: 'BSV', value: address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
+  await setAddress(account, { currency: 'BCH', chain: 'BCH', value: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddress(account, { currency: 'DASH', chain: 'DASH', value: dash_address })
 
   return account
 }
@@ -110,15 +103,15 @@ export async function setAddresses(account: Account): Promise<Account> {
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
+  await setAddress(account, { currency: 'BSV', chain: 'BSV', value: address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
+  await setAddress(account, { currency: 'BCH', chain: 'BCH', value: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddress(account, { currency: 'DASH', chain: 'DASH', value: dash_address })
 
   return account
 }
@@ -129,15 +122,15 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
+  await setAddress(account, { currency: 'BSV', chain: 'BSV', value: address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
+  await setAddress(account, { currency: 'BCH', chain: 'BCH', value: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddress(account, { currency: 'DASH', chain: 'DASH', value: dash_address })
 
   let invoice = await createInvoice({
     account,
@@ -199,7 +192,6 @@ export { spy }
 const expect = chai.expect
 
 export {
-  chance,
   assert,
   uuid,
   expect
@@ -275,6 +267,7 @@ import { Wallet } from 'anypay-simple-wallet'
 import { getBitcore } from '../lib/bitcore';
 import { Payment, recordPayment } from '../lib/payments';
 import { createHash } from 'crypto';
+import { accounts } from '@prisma/client';
 
 const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 

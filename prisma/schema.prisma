@@ -219,6 +219,8 @@ model LinkedAccounts {
   id        Int      @id @default(autoincrement())
   source    Int
   target    Int
+  source_account accounts @relation("SourceAccount", fields: [source], references: [id])
+  target_account accounts @relation("TargetAccount", fields: [target], references: [id])
   createdAt DateTime @db.Timestamptz(6)
   updatedAt DateTime @db.Timestamptz(6)
 }
@@ -430,7 +432,7 @@ model Webhooks {
   response_code Int?
   response_body String?
   error         String?
-  invoice_uid   String?   @db.VarChar(255)
+  invoice_uid   String?   @db.VarChar(255) @unique
   createdAt     DateTime  @db.Timestamptz(6)
   updatedAt     DateTime  @db.Timestamptz(6)
   status        String?   @default("pending") @db.VarChar(255)
@@ -528,6 +530,8 @@ model accounts {
   access_tokens             access_tokens[]
   extended_public_keys      extended_public_keys[]
   pair_tokens               pair_tokens[]
+  LinkedAsSource LinkedAccounts[] @relation("SourceAccount")
+  LinkedAsTarget LinkedAccounts[] @relation("TargetAccount")
 }
 
 model address_routes {

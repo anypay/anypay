@@ -1,17 +1,17 @@
 
 import { log } from './log'
 
-import { models } from './models'
-
 import { setAddress as _setAddress } from './core'
 
 import { convert } from './prices'
 
-import { Orm } from './orm'
-
 import { Account } from './account'
 
 import { getCoins } from './coins'
+
+import { accounts, addresses, coins } from '@prisma/client'
+
+import { prisma } from './prisma'
 
 interface Coin {
   code: string;
@@ -24,15 +24,13 @@ interface Coin {
   address: string;
 }
 
-export async function listAddresses(account: Account): Promise<Coin[]> {
+export async function listAddresses(account: Account): Promise<coins[]> {
 
-  let records = await models.Address.findAll({
-
+  let records = await prisma.addresses.findMany({
     where: { account_id: account.id }
-
   })
 
-  records = records.reduce((map, record) => {
+  const addressesRecords = records.reduce((map: any, record: addresses) => {
     const code = `${record.currency}_${record.chain}`
     map[code] = record
     return map;
@@ -42,7 +40,7 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
 
   return Promise.all(coins.map(async coin => {
 
-    const code = `${coin.currency}_${coin.chain}`
+    const code: string = `${coin.currency}_${coin.chain}`
 
     coin = {
       name: coin.name,
@@ -55,7 +53,7 @@ export async function listAddresses(account: Account): Promise<Coin[]> {
       color: coin.color
     }
 
-    let record = records[code]
+    let record = addressesRecords[code]
 
     if (record) {
 
@@ -85,25 +83,18 @@ export async function lockAddress(args: {account_id: number, currency: string, c
 
   const { account_id, chain, currency } = args
 
-  let address = await models.Address.findOne({ where: {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id,
+      currency,
+      chain
+    }
+  })
 
-    account_id,
-
-    currency,
-    
-    chain
-
-  }});
-
-  if (!address) { 
-
-    throw new Error('address not found');
-
-  }
-
-  address.locked = true;
-
-  await address.save();
+  await prisma.addresses.update({
+    where: { id: address.id },
+    data: { locked: true }
+  })
 
 }
 
@@ -111,25 +102,18 @@ export async function unlockAddress(args: {account_id: number, currency: string,
 
   const { chain, currency, account_id } = args
 
-  let address = await models.Address.findOne({ where: {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id,
+      currency,
+      chain
+    }
+  })
 
-    account_id,
-
-    currency,
-
-    chain
-
-  }});
-
-  if (!address) { 
-
-    throw new Error('address not found');
-
-  }
-
-  address.locked = false;
-
-  await address.save();
+  await prisma.addresses.update({
+    where: { id: address.id },
+    data: { locked: false }
+  })
 
 }
 
@@ -151,9 +135,9 @@ interface SetAddress {
   paymail?: string;
 }
 
-export async function setAddress(account: Account, params: SetAddress): Promise<Address> {
+export async function setAddress(account: accounts, params: SetAddress): Promise<addresses> {
 
-  let result: any = await _setAddress({
+  return  _setAddress({
     address: params.value,
     currency: params.currency,
     chain: params.chain,
@@ -161,71 +145,38 @@ export async function setAddress(account: Account, params: SetAddress): Promise<
     account_id: account.id
   })
 
-  return new Address(result)
-
 }
 
 export async function removeAddress(args: {account: Account, currency: string, chain: string}): Promise<void> {
 
   const { account, chain, currency } = args
 
-  let record = await models.Address.findOne({ where: {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: account.id,
+      currency,
+      chain
+    }
+  })
 
-    account_id: account.id,
-
-    currency: currency,
-
-    chain: chain
-
-  }})
-
-  if (!record) {
-    throw new Error('attempted to remove address that does not exist')
-  }
-
-  let address = record.toJSON()
-
-  await record.destroy() 
+  await prisma.addresses.delete({
+    where: { id: address.id }
+  })
 
   log.info('address.removed', address)
 
 }
 
-export async function findAddress(args: {account: Account, currency: string, chain: string}): Promise<Address> {
+export async function findAddress(args: {account: Account, currency: string, chain: string}): Promise<addresses> {
 
   const { account, chain, currency } = args
 
-  let record = await models.Address.findOne({ where: {
-
-    account_id: account.id,
-
-    currency: currency,
-
-    chain: chain
-
-  }})
-
-  if (!record) {
-
-    throw new AddressNotFound(account, currency, chain)
-
-  }
-
-  return new Address(record)
+  return await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: account.id,
+      currency,
+      chain
+    }
+  })
 
 }
-
-export class Address extends Orm {
-
-  static model = models.Address;
-
-  get currency() {
-    return this.get('currency')
-  }
-
-  get chain() {
-    return this.get('chain')
-  }
-
-}
-

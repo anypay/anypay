@@ -1,4 +1,3 @@
-import * as http from 'superagent'
 
 import { log } from './log'
 
@@ -8,7 +7,9 @@ import { getBitcore } from './bitcore'
 
 import { BroadcastTxResult } from './plugin'
 
-const COIN_MAP = {
+const COIN_MAP: {
+  [key: string]: string;
+} = {
   'LTC': 'litecoin',
   'BTC': 'bitcoin',
   'BCH': 'bitcoin-cash',
@@ -18,7 +19,9 @@ const COIN_MAP = {
   'DOGE': 'doge'
 }
 
-export const CURRENCIES = {
+export const CURRENCIES: {
+  [key: string]: string;
+} = {
   'BSV': 'bitcoin-sv',
   'LTC': 'litecoin',
   'BTC': 'bitcoin',
@@ -28,23 +31,23 @@ export const CURRENCIES = {
   'DOGE': 'doge'
 }
 
-export async function publish(coin, hex): Promise<BroadcastTxResult> {
+export async function publish(coin: string, hex: string): Promise<BroadcastTxResult> {
 
   /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
 
   try {
 
-    let resp = await http.post(`https://api.blockchair.com/${coin}/push/transaction`).send({
+    const { data } = await axios.post(`https://api.blockchair.com/${coin}/push/transaction`, {
       data: hex
     });
 
-    log.info(`blockchair.push.transaction.${coin}`, resp);
+    log.info(`blockchair.push.transaction.${coin}`, data);
 
     return {
       txhex: hex,
-      txid: resp.body.data.transaction_hash,
+      txid: data.transaction_hash,
       success: true,
-      result: resp.body
+      result: data
     }
 
   } catch(error) {
@@ -90,7 +93,7 @@ export async function getRawTransaction(chain: string, txid: string): Promise<Ge
   }
 }
 
-export async function getTransaction(_coin, txid) {
+export async function getTransaction(_coin: string, txid: string) {
 
   const coin = COIN_MAP[_coin]
 

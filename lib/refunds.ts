@@ -1,50 +1,33 @@
 
-import { models } from './models'
 
 import { createPaymentRequest } from './payment_requests'
 
 import { getDecodedTransaction, CURRENCIES } from './blockchair'
 
-import { Invoice } from './invoices'
-
-import { Orm } from './orm'
-
 import { createApp } from './apps'
 import { log } from './log'
-
-export class Refund extends Orm {
-
-  original_invoice: Invoice;
-
-  constructor(original_invoice: Invoice, record: any) {
-
-    super(record);
-
-    this.original_invoice = original_invoice;
-
-  }
-
-}
+import { invoices, Refunds } from '@prisma/client'
+import { prisma } from './prisma'
 
 interface RefundAddress {
   currency: string;
   value: string;
-  invoice: Invoice;
+  invoice: invoices;
 }
 
 export class RefundErrorInvoiceNotPaid extends Error {}
 
-export async function getRefund(invoice: Invoice, address?: string): Promise<Refund> {
+export async function getRefund(invoice: invoices, address?: string): Promise<Refunds> {
 
   const original_invoice_uid = invoice.uid
 
-  let record = await models.Refund.findOne({
+  let refund = await prisma.refunds.findFirst({
     where: {
       original_invoice_uid
     }
   })
 
-  if (!record) {
+  if (!refund) {
 
     if (!address) {
 
@@ -54,16 +37,16 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
     }
 
     const template = [{
-      currency: invoice.get('invoice_currency'),
+      currency: invoice.invoice_currency,
       to: [{
         address,
-        amount: parseFloat(invoice.get('denomination_amount_paid')),
-        currency: invoice.get('denomination') || invoice.get('invoice_currency')
+        amount: invoice.denomination_amount_paid,
+        currency: invoice.denomination_currency || invoice.invoice_currency
       }]
     }]
 
     const app = await createApp({
-      account_id: invoice.get('account_id'),
+      account_id: invoice.account_id,
       name: '@refunds'
     })
 
@@ -76,36 +59,40 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
 
     let refund_invoice_uid = payment_request.get('invoice_uid')
 
-    record = await models.Refund.create({
-      original_invoice_uid,
-      refund_invoice_uid,
-      status: 'unpaid',
-      address
+    refund = await prisma.refunds.create({
+      data: {
+        original_invoice_uid,
+        refund_invoice_uid,
+        status: 'unpaid',
+        address,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
     })
 
   }
 
-  return new Refund(invoice, record)
+  return refund
 
 }
 
-export async function getAddressForInvoice(invoice: Invoice): Promise<RefundAddress> {
+export async function getAddressForInvoice(invoice: invoices): Promise<RefundAddress> {
 
-  log.info('refunds.getAddressForInvoice', invoice.record.dataValues)
+  log.info('refunds.getAddressForInvoice', invoice)
 
-  if (invoice.get('status') === 'unpaid') {
+  if (invoice.status === 'unpaid') {
 
     throw new RefundErrorInvoiceNotPaid()
   }
 
-  const currency = CURRENCIES[invoice.get('payment_currency') || invoice.get('invoice_currency') || invoice.get('currency')]
+  const currency = CURRENCIES[invoice.currency]
 
-  let rawtx = await getDecodedTransaction(currency, invoice.get('hash'))
+  let rawtx = await getDecodedTransaction(currency, invoice.hash)
 
   let inputTx = await getDecodedTransaction(currency, rawtx.vin[0].txid)
 
   return {
-    currency: invoice.get('currency'),
+    currency: invoice.currency,
     invoice,
     value: inputTx.vout[rawtx.vin[0].vout].scriptPubKey.addresses[0]
   }

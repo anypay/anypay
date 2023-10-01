@@ -2,9 +2,9 @@ import { getNewAddress } from './plugins';
 
 import { BigNumber } from 'bignumber.js';
 
-import { Account } from './account'
+import { addresses, invoices, payment_options } from '@prisma/client'
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import * as pay from './pay';
 
@@ -12,24 +12,25 @@ import * as _ from 'underscore';
 
 import { log } from './log'
 
-import { models } from './models';
-
 import {convert} from './prices';
 
 import {getCoin} from './coins';
 
-import * as shortid from 'shortid'
+import { nanoid } from 'nanoid'
 
 import { computeInvoiceURI } from './uri';
 
 import { PaymentOption } from './payment_option';
+
 import { findAll, findOne } from './orm';
+
 import { PaymentRequest } from './payment_requests';
-import { Invoice } from './invoices';
 
 import { toSatoshis } from './plugins'
 
-import { Address } from './addresses';
+import { accounts } from '@prisma/client';
+
+import { prisma } from './prisma';
 
 interface EmptyInvoiceOptions {
   uid?: string;
@@ -42,13 +43,13 @@ interface EmptyInvoiceOptions {
   redirect_url?: string;
 }
 
-export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}) {
+export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}): Promise<invoices> {
 
   var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url } = options
 
-  uid = !!uid ? uid : shortid.generate();
+  uid = !!uid ? uid : nanoid(12);
 
-  let app = await models.App.findOne({ where: { id: app_id }})
+  const app = await prisma.apps.findFirst({ where: { id: app_id }})
 
   if (!app) {
     throw new Error('app not found')
@@ -59,27 +60,32 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     uid
   })
 
-  let record = await models.Invoice.create({
-    app_id,
-    account_id: app.account_id,
-    uid,
-    uri,
-    currency,
-    amount,
-    webhook_url,
-    memo,
-    secret,
-    metadata,
-    redirect_url
+  return prisma.invoices.create({
+    data: {
+      app_id,
+      account_id: app.account_id,
+      uid,
+      uri,
+      currency,
+      amount,
+      webhook_url,
+      memo,
+      secret,
+      metadata,
+      redirect_url,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
   })
-
-  return record;
-
 }
 
-export async function refreshInvoice(uid: string): Promise<Invoice> {
+export async function refreshInvoice(uid: string): Promise<invoices> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid }})
+  const invoice = await prisma.invoices.findFirst({
+    where: {
+      uid
+    }
+  })
 
   const paymentOptions: PaymentOption[] = await findAll<PaymentOption>(PaymentOption, {
     where: {
@@ -97,7 +103,7 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
   for (let option of paymentOptions) {
 
-    const template = paymentRequest.get('template').find(template => {
+    const template = paymentRequest.get('template').find((template: { currency: any; chain: any; }) => {
 
       return template.currency === option.get('currency') &&
              (!template.chain || template.chain === option.get('chain'))
@@ -108,7 +114,7 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
       return
     }
 
-    const outputs = await Promise.all(template.to.map(async (to) => {
+    const outputs = await Promise.all(template.to.map(async (to: { address?: any; currency?: any; amount?: any; }) => {
 
       const { currency: _currency, amount: value } = to
 
@@ -128,7 +134,7 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     }))
 
-    const record = await models.PaymentOption.findOne({
+    const paymentOption = await prisma.payment_options.findFirst({
       where: {
         invoice_uid: invoice.uid,
         currency: option.get('currency'),
@@ -136,13 +142,27 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
       }
     })
 
-    record.outputs = outputs
+    await prisma.payment_options.update({
+      where: {
+        id: paymentOption.id
+      },
+      data: {
+        outputs
+      }
+    })
 
-    await record.save()
+    return invoice
 
   }
 
-  await invoice.set('expiry', moment().add(15, 'minutes').toDate())
+  await prisma.invoices.update({
+    where: {
+      id: invoice.id
+    },
+    data: {
+      expiry:  moment().add(15, 'minutes').toDate()
+    }
+  })
 
   log.debug('invoice.refreshed', {
     invoice_uid: invoice.uid,
@@ -153,47 +173,46 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
 }
 
-async function listAvailableAddresses(account: Account): Promise<Address[]> {
+async function listAvailableAddresses(account: accounts): Promise<addresses[]> {
 
-  let addresses = await models.Address.findAll({ where: {
-    account_id: account.id
-  }});
+  const addresses = await prisma.addresses.findMany({
+    where: {
+      account_id: account.id
+    }
+  })
 
-  let availableAddresses = _.reject(addresses, (address) => {
+  return _.reject(addresses, (address) => {
     let coin = getCoin(address.currency);
     if (!coin) { return true }
 
     return coin.unavailable;
-  });
-
-  availableAddresses = availableAddresses.map(address => {
+  })
+  .map(address => {
     if (!address.chain) { address.chain = address.currency }
     if (!address.currency) { address.currency = address.chain }
     return address
   })
 
-  return availableAddresses.map(record => new Address(record))
-
 }
 
 // TODO: Only create options from existing options coins if options exist
-export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
+export async function createPaymentOptions(account: accounts, invoice: invoices): Promise<payment_options[]> {
 
-  let addresses: Address[] = await listAvailableAddresses(new Account(account))
+  let addresses: addresses[] = await listAvailableAddresses(account)
 
-  let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
+  let paymentOptions: payment_options[] = await Promise.all(addresses.map(async (record: addresses) => {
 
     const {chain, currency } = record
 
     try {
 
-      const value = invoice.get('amount')
+      const value = invoice.amount
 
       const coin = getCoin(currency)
 
       let { value: amount } = await convert({
         currency: account.denomination,
-        value
+        value: Number(value)
       }, currency, coin.precision);
 
       let address = await getNewAddress({ account, address: record, currency, chain })
@@ -244,24 +263,20 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       }, new BigNumber(0)).toNumber()
 
-      let optionRecord = await models.PaymentOption.create({
-        invoice_uid: invoice.uid,
-        currency,
-        chain,
-        amount,
-        address,
-        outputs,
-        uri,
-        fee: fee.amount
+      return prisma.payment_options.create({
+        data: {
+          invoice_uid: invoice.uid,
+          currency,
+          chain,
+          amount,
+          address,
+          outputs,
+          uri,
+          fee: fee.amount,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
       })
-
-      if (!optionRecord){
-        console.error('no payment option record created', {currency,chain,amount,address,uid:invoice.uid,outputs,uri})
-        throw new Error('no payment option record created')
-        return null
-      }
-
-      return new PaymentOption(optionRecord)
 
     } catch(error) {
 
@@ -273,10 +288,10 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  return paymentOptions.filter(option => !!option && !!option.record)
+  return paymentOptions.filter(option => !!option)
 }
 
-export function isExpired(invoice) {
+export function isExpired(invoice: invoices) {
 
   let expiry = moment(invoice.expiry);  
   let now = moment()
@@ -286,13 +301,10 @@ export function isExpired(invoice) {
 
 export async function ensureInvoice(uid: string): Promise<any> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid }});
-
-  if (!invoice) {
-    throw  new Error(`invoice ${uid} not found`)
-  }
-
-  return invoice;
+  return prisma.invoices.findFirstOrThrow({
+    where: {
+      uid
+    }
+  })
 
 }
-

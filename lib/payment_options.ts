@@ -1,5 +1,4 @@
 
-import { models } from './models';
 
 import {  } from './log';
 
@@ -22,9 +21,9 @@ export interface NewPaymentOption {
 
 export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequest) {
 
-  let options = await Promise.all(paymentRequest.get('template').map(async (option) => {
+  let options = await Promise.all(paymentRequest.get('template').map(async (option: { to?: any; currency: any; chain: any; }) => {
 
-    let outputs = await Promise.all(option.to.map(async (to) => {
+    let outputs = await Promise.all(option.to.map(async (to: { currency: any; amount: string; address: any; }) => {
 
       var { currency, chain } = option
 
