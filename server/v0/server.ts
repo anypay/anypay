@@ -176,6 +176,13 @@ async function Server() {
   await server.register(require('hapi-boom-decorators'))
 
   await server.register({
+    plugin: require('hapi-sentry'),
+    options: {
+      client: { dsn: process.env.SENTRY_DSN },
+    },
+  });
+
+  await server.register({
     plugin: HapiSwagger,
     options: {
       info: {
