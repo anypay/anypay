@@ -38,22 +38,6 @@ jobs:
             chmod +x codecov
             ./codecov
 
-  build_docker:
-    docker:
-      - image: circleci/node:16
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: Build docker image
-          command: docker build -t anypay . 
-      - run:
-          name: Push to Docker Hub
-          command: |
-            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD 
-            docker tag anypay anypay/anypay:$CIRCLE_BRANCH
-            docker push anypay/anypay:$CIRCLE_BRANCH
-
   deploy:
     machine: true
     steps:
@@ -65,32 +49,24 @@ jobs:
     machine: true
     steps:
       - run:
-          name: Deploy Develop Branch To Beta Web Server
-          command: ssh root@ionia.anypayx.com "/opt/deploy_anypay_api.sh"
+          name: Deploy Develop Branch To Develop Web Server
+          command: ssh develop@ionia.anypayx.com "/opt/deploy_anypay_api.sh"
 
 workflows:
   version: 2
   build_and_deploy:
     jobs:
       - build
-      - build_docker:
+      - deploy:
           requires:
             - build
           filters:
             branches:
               only:
                 - master
-                - develop
-      - deploy:
+      - deploy_develop:
           requires:
-            - build_docker
-          filters:
-            branches:
-              only:
-                - master
-      - deploy_beta:
-          requires:
-            - build_docker
+            - build
           filters:
             branches:
               only:
