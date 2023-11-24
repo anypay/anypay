@@ -50,7 +50,7 @@ jobs:
     steps:
       - run:
           name: Deploy Develop Branch To Develop Web Server
-          command: ssh root@develop.anypayx.com "/opt/deploy_anypay_api.sh"
+          command: ssh root@develop.anypayx.com "/opt/deploy_anypay_api_develop.sh"
 
 workflows:
   version: 2
