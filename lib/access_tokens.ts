@@ -13,8 +13,6 @@ export class AccessToken extends Orm {
 
   static model = models.AccessToken
 
-  account: Account;
-
   jwt: string;
 
   constructor({ record, account }) {
@@ -25,8 +23,6 @@ export class AccessToken extends Orm {
       account_id: account.id, 
       uid: record.uid
     })
-
-    this.account = account
   }
 
   static async create(params: any): Promise<AccessToken> {

@@ -70,6 +70,9 @@
     ]
   },
   "dependencies": {
+    "@anypay/bitcore-lib": "^10.0.18",
+    "@anypay/bitcore-lib-cash": "^10.0.20",
+    "@anypay/simple-wallet": "^0.6.5",
     "@dashevo/dashcore-lib": "^0.17.9",
     "@hapi/basic": "^7.0.0",
     "@hapi/boom": "^9.1.4",
@@ -77,12 +80,12 @@
     "@hapi/inert": "^6.0.5",
     "@hapi/vision": "^6.1.0",
     "@prisma/client": "^5.6.0",
+    "@promster/hapi": "^12.0.0",
     "@types/axios": "^0.14.0",
     "@types/jsonwebtoken": "^8.5.9",
     "@types/ws": "^8.5.4",
     "amqplib": "^0.10.3",
     "anypay": "^0.7.0",
-    "anypay-simple-wallet": "^0.0.2",
     "anypay-wallet-address-validator": "^0.2.6",
     "api": "^5.0.8",
     "asn1.js-rfc5280": "^3.0.0",

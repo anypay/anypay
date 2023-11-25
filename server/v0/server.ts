@@ -44,6 +44,8 @@ import { register as merchant_app } from './plugins/merchant_app'
 
 import { schema } from 'anypay'
 
+//const { createPlugin } = require('@promster/hapi');
+
 const kBadRequestSchema = Joi.object({
   statusCode: Joi.number().integer().required(),
   error: Joi.string().required(),
@@ -168,6 +170,8 @@ async function Server() {
   })
 
   await server.register(require('@hapi/basic'));
+
+  //server.register(createPlugin());
 
   await server.register(Inert);
 

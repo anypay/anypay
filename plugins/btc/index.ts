@@ -1,5 +1,6 @@
 require('dotenv').config()
-const btc = require('bitcore-lib')
+
+const btc = require('@anypay/bitcore-lib')
 
 const bitcoinJsLib = require('bitcoinjs-lib')
 

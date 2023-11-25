@@ -9,7 +9,7 @@ import { buildOutputs, verifyOutput } from '../../lib/pay'
 
 import { log } from '../../lib';
 
-const bch: any = require('bitcore-lib-cash');
+const bch: any = require('@anypay/bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');
 
