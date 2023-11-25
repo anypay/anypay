@@ -51,6 +51,9 @@ jobs:
           AMQP_URL: amqp://guest:guest@rabbitmq:5672/
         run: |
           npm install
-          npm test
+          npm run db:seed:prices
+          npm run test:models
+          npm run test:lib
+          npm run test:integration
       - uses: codecov/codecov-action@v3
 
