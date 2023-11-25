@@ -2,11 +2,11 @@
 
 import { App } from '../../lib/apps'
 
-import { AccessToken } from '../../lib/access_tokens'
-
 import { findOne } from '../../lib/orm'
 
 import { log } from '../../lib/log'
+
+import prisma from '../../lib/prisma'
 
 export async function auth(request, username, password, hapi) {
 
@@ -23,7 +23,15 @@ export async function auth(request, username, password, hapi) {
     }
   })
 
-  log.debug('auth.app.prometheus', { username }) 
+  if (!prometheusApp) {
+
+    log.error('auth.app.error', new Error('prometheus app not found'))
+
+    return {
+      isValid: false
+    }
+
+  }
 
   if (!password) {
     return {
@@ -31,16 +39,41 @@ export async function auth(request, username, password, hapi) {
     };
   }
 
-  const accessToken: AccessToken = await findOne<AccessToken>(AccessToken, {
-    where: {
-      uid: password,
-      app_id: prometheusApp.get('id')
+  try {
+
+    const accessToken = await prisma.access_tokens.findFirst({
+      where: {
+        uid: password,
+        app_id: prometheusApp.get('id')
+
+      }
+    })
+
+    if (!accessToken) {
+
+      log.error('auth.app.error', new Error('access token not found'))
+
+      return {
+        isValid: false
+      }
+
     }
-  });
 
-  if (!accessToken) {
+    return {
 
-    log.error('auth.app.error', new Error('access token not found'))
+      isValid: true,
+
+      credentials: {
+
+        accessToken
+
+      }
+
+    }
+
+  } catch(error) {
+
+    log.error('auth.app.error', error)
 
     return {
       isValid: false
@@ -48,17 +81,6 @@ export async function auth(request, username, password, hapi) {
 
   }
 
-  return {
-
-    isValid: true,
-
-    credentials: {
-
-      accessToken
-
-    }
-
-  }
 
 }
 
