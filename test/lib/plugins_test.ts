@@ -241,7 +241,8 @@ describe("Plugins", () => {
 
     });
 
-    it('#getConfirmation should return block data for confirmed transaction', async () => {
+    // TODO enable this test once XMR is back online
+    xit('#getConfirmation should return block data for confirmed transaction', async () => {
 
       let plugin = await find({ chain: 'XMR', currency: 'XMR' });
 

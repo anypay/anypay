@@ -37,14 +37,6 @@ jobs:
         node-version: [16.x]
     steps:
       - uses: actions/checkout@v2
-      - name: Install PostgreSQL client
-        run: |
-          apt-get update
-          apt-get install --yes postgresql-client
-      - name: Setup database
-        run: psql -h postgres -U postgres_user -c 'CREATE DATABASE "postgres_db";'
-        env:
-          PGPASSWORD: postgres_password
       - name: Node.js
         uses: actions/setup-node@v1
         with:
@@ -53,6 +45,7 @@ jobs:
       - name: install, build and test
         env:
           SKIP_E2E_PAYMENTS_TESTS: true
+          DEV_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
           DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
           TEST_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
           AMQP_URL: amqp://guest:guest@rabbitmq:5672/

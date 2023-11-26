@@ -122,21 +122,35 @@ export abstract class EVM extends Plugin {
 
       const receiptListener = web3.eth.sendSignedTransaction(txhex)
 
-      receiptListener.on('transactionHash', txid => {
+      receiptListener.once('transactionHash', txid => {
 
         resolve({ txid, txhex, result: txid, success: true })
 
       })
-      .on('receipt', (receipt: TransactionReceipt) => {
+      .once('receipt', (receipt: TransactionReceipt) => {
 
         console.log("web3.ethers.receipt", receipt)
 
-        if (!receipt.status) {
-          return revertPayment({ txid: receipt.transactionHash })
+        if (receipt.status) {
+
+          console.log("web3.ethers.confirmation", {receipt})
+
+          handleTransactionReceipt(web3, receipt)
+
+        } else {
+
+          revertPayment({ txid: receipt.transactionHash })
+
         }
 
+        receiptListener.removeAllListeners('transactionHash')
+
+        receiptListener.removeAllListeners('receipt')
+
+        //receiptListener.removeAllListeners('confirmation')
+
        })
-      .on('confirmation', async (confirmation, receipt: TransactionReceipt) => {
+      /*.once('confirmation', async (confirmation, receipt: TransactionReceipt) => {
 
         try {
 
@@ -144,8 +158,11 @@ export abstract class EVM extends Plugin {
 
           handleTransactionReceipt(web3, receipt)
 
-          receiptListener.off('confirmation')
-          receiptListener.off('receipt')
+          receiptListener.removeAllListeners('transactionHash')
+
+          receiptListener.removeAllListeners('receipt')
+
+          receiptListener.removeAllListeners('confirmation')
 
         } catch(error) {
 
@@ -154,7 +171,7 @@ export abstract class EVM extends Plugin {
         }
 
       })
-
+      */
     })
 
   }

@@ -1,0 +1,945 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AccountSettings {
+  id         Int      @id @default(autoincrement())
+  account_id Int
+  key        String   @db.VarChar(255)
+  value      String   @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model AddressBalanceUpdates {
+  id            Int      @id @default(autoincrement())
+  difference    Decimal? @db.Decimal
+  chain         String?  @db.VarChar(255)
+  currency      String?  @db.VarChar(255)
+  address       String?  @db.VarChar(255)
+  balance       Decimal? @db.Decimal
+  wallet_bot_id Int?
+  account_id    Int?
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model AppWebhooks {
+  id               Int      @id @default(autoincrement())
+  app_id           Int
+  url              String   @db.VarChar(255)
+  enabled          Boolean? @default(true)
+  events_whitelist Json?    @default("[\"*\"]") @db.Json
+  events_blacklist Json?    @default("[]") @db.Json
+  createdAt        DateTime @db.Timestamptz(6)
+  updatedAt        DateTime @db.Timestamptz(6)
+}
+
+model Apps {
+  id          Int      @id @default(autoincrement())
+  account_id  Int
+  name        String   @db.VarChar(255)
+  public_key  String   @db.VarChar(255)
+  private_key String   @db.VarChar(255)
+  webhook_url String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+}
+
+model Bip70PaymentRequests {
+  id          Int      @id @default(autoincrement())
+  invoice_uid String?  @db.VarChar(255)
+  hex         String?
+  currency    String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+}
+
+model BlockcypherHooks {
+  id              Int      @id @default(autoincrement())
+  uid             String?  @db.VarChar(255)
+  event           String?  @db.VarChar(255)
+  address         String?  @db.VarChar(255)
+  url             String?  @db.VarChar(255)
+  callback_errors Int?
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+}
+
+model Discounts {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  percent    Decimal? @db.Decimal
+  currency   String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model EmailDeliveries {
+  id         Int       @id @default(autoincrement())
+  email_id   Int?
+  account_id Int?
+  error      String?   @db.VarChar(255)
+  uid        String?   @db.VarChar(255)
+  sent_at    DateTime? @db.Timestamptz(6)
+  createdAt  DateTime  @db.Timestamptz(6)
+  updatedAt  DateTime  @db.Timestamptz(6)
+}
+
+model Emails {
+  id        Int      @id @default(autoincrement())
+  name      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model EnergyCityAccounts {
+  id             Int      @id @default(autoincrement())
+  moneybutton_id Int?
+  createdAt      DateTime @db.Timestamptz(6)
+  updatedAt      DateTime @db.Timestamptz(6)
+}
+
+model Events {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  type       String?  @db.VarChar(255)
+  payload    Json?    @db.Json
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model EvmTransactionReceipts {
+  id        Int      @id @default(autoincrement())
+  txid      String?  @db.VarChar(255)
+  receipt   Json?    @db.Json
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model Fees {
+  id            Int      @id @default(autoincrement())
+  currency_code String?  @db.VarChar(255)
+  dollar_amount Decimal? @db.Decimal
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model HDKeyAddresses {
+  id        Int      @id @default(autoincrement())
+  currency  String?  @db.VarChar(255)
+  address   String?  @db.VarChar(255)
+  xpub_key  String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model KrakenAccounts {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  api_key    String?  @db.VarChar(255)
+  api_secret String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+  autosell   String[] @default(dbgenerated("(ARRAY[]::character varying[])::character varying(255)[]")) @db.VarChar(255)
+}
+
+model KrakenDeposits {
+  id                Int      @id @default(autoincrement())
+  account_id        Int
+  kraken_account_id Int
+  method            String   @db.VarChar(255)
+  aclass            String   @db.VarChar(255)
+  asset             String   @db.VarChar(255)
+  refid             String   @db.VarChar(255)
+  txid              String   @db.VarChar(255)
+  info              String   @db.VarChar(255)
+  amount            String   @db.VarChar(255)
+  fee               String   @db.VarChar(255)
+  time              Int
+  status            String   @db.VarChar(255)
+  createdAt         DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @db.Timestamptz(6)
+
+  @@index([account_id], map: "kraken_deposits_account_id")
+  @@index([account_id, txid], map: "kraken_deposits_account_id_txid")
+  @@index([txid], map: "kraken_deposits_txid")
+}
+
+model KrakenInvoiceSellOrders {
+  id                  Int      @id @default(autoincrement())
+  invoice_uid         String?  @db.VarChar(255)
+  invoice_amount_paid Decimal? @db.Decimal
+  invoice_currency    String?  @db.VarChar(255)
+  order_id            String?  @db.VarChar(255)
+  order_volume        Decimal? @db.Decimal
+  order_price         Decimal? @db.Decimal
+  createdAt           DateTime @db.Timestamptz(6)
+  updatedAt           DateTime @db.Timestamptz(6)
+}
+
+model KrakenTrades {
+  id         Int       @id @default(autoincrement())
+  ordertxid  String?   @db.VarChar(255)
+  postxid    String?   @db.VarChar(255)
+  pair       String?   @db.VarChar(255)
+  time       Decimal?  @db.Decimal
+  type       String?   @db.VarChar(255)
+  ordertype  String?   @db.VarChar(255)
+  price      Decimal?  @db.Decimal
+  cost       Decimal?  @db.Decimal
+  fee        Decimal?  @db.Decimal
+  vol        Decimal?  @db.Decimal
+  margin     Decimal?  @db.Decimal
+  misc       String?   @db.VarChar(255)
+  createdAt  DateTime  @db.Timestamptz(6)
+  updatedAt  DateTime  @db.Timestamptz(6)
+  tradeid    String?   @db.VarChar(255)
+  account_id Int?
+  date       DateTime? @db.Timestamptz(6)
+}
+
+model LineItems {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  price       Decimal  @db.Decimal
+  currency    String?  @default("USD") @db.VarChar(255)
+  quantity    Int?     @default(1)
+  invoice_uid String   @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+}
+
+model LinkedAccounts {
+  id        Int      @id @default(autoincrement())
+  source    Int
+  target    Int
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model LogEvents {
+  id        Int      @id @default(autoincrement())
+  event     String?  @db.VarChar(255)
+  payload   Json?    @db.Json
+  level     String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model Logins {
+  id          Int      @id @default(autoincrement())
+  account_id  Int?
+  ip_address  String?  @db.VarChar(255)
+  geolocation Json?    @db.Json
+  user_agent  String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+}
+
+model MoneybuttonOauths {
+  id            Int      @id @default(autoincrement())
+  state         String?  @db.VarChar(255)
+  access_token  String?  @db.VarChar(255)
+  token_type    String?  @db.VarChar(255)
+  expires_in    Int?
+  refresh_token String?  @db.VarChar(255)
+  scope         String?  @db.VarChar(255)
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model MoneybuttonUsers {
+  id               Int       @id @default(autoincrement())
+  mb_id            Int?
+  mb_created_at    DateTime? @db.Timestamptz(6)
+  name             String?   @db.VarChar(255)
+  default_currency String?   @db.VarChar(255)
+  default_language String?   @db.VarChar(255)
+  bio              String?
+  primary_paymail  String?   @db.VarChar(255)
+  avatar_url       String?   @db.VarChar(255)
+  createdAt        DateTime  @db.Timestamptz(6)
+  updatedAt        DateTime  @db.Timestamptz(6)
+}
+
+model OauthApps {
+  id                Int      @id @default(autoincrement())
+  client_identifier String?  @db.VarChar(255)
+  app_identifier    String?  @db.VarChar(255)
+  redirect_url      String?  @db.VarChar(255)
+  createdAt         DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @db.Timestamptz(6)
+}
+
+model PaymentRequests {
+  id          Int      @id @default(autoincrement())
+  invoice_uid String?  @db.VarChar(255)
+  template    Json     @db.Json
+  app_id      Int
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  webpage_url String?  @db.VarChar(255)
+  uri         String?  @db.VarChar(255)
+  status      String?  @db.VarChar(255)
+}
+
+model PaymentSubmissions {
+  id          Int      @id @default(autoincrement())
+  invoice_uid String?  @db.VarChar(255)
+  txhex       String?
+  currency    String?  @db.VarChar(255)
+  headers     Json?    @db.Json
+  wallet      String?  @db.VarChar(255)
+  protocol    String?  @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+}
+
+model Payments {
+  id          Int      @id @default(autoincrement())
+  order_uid   String   @db.VarChar(255)
+  transaction String   @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  orders      orders   @relation(fields: [order_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model PriceRecords {
+  id            Int      @id @default(autoincrement())
+  currency      String   @db.VarChar(255)
+  value         Decimal  @db.Decimal
+  base_currency String   @db.VarChar(255)
+  source        String   @db.VarChar(255)
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+}
+
+model ProtobufPayments {
+  id        Int      @id @default(autoincrement())
+  hex       String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model RabbiEvents {
+  id        Int      @id @default(autoincrement())
+  event     String?  @db.VarChar(255)
+  payload   Json?    @db.Json
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+
+  @@index([createdAt], map: "rabbi_events_created_at")
+  @@index([event], map: "rabbi_events_event")
+}
+
+model Refunds {
+  id                   Int      @id @default(autoincrement())
+  createdAt            DateTime @db.Timestamptz(6)
+  updatedAt            DateTime @db.Timestamptz(6)
+  original_invoice_uid String   @db.VarChar(255)
+  refund_invoice_uid   String   @db.VarChar(255)
+  address              String   @db.VarChar(255)
+  status               String   @default("unpaid") @db.VarChar(255)
+  txid                 String?  @db.VarChar(255)
+}
+
+model SequelizeMeta {
+  name String @id @db.VarChar(255)
+}
+
+model Subscriptions {
+  id                  Int       @id @default(autoincrement())
+  account_id          Int?
+  product_id          Int?
+  business_account_id Int?
+  start_date          DateTime? @db.Timestamptz(6)
+  status              String?   @db.VarChar(255)
+  createdAt           DateTime  @db.Timestamptz(6)
+  updatedAt           DateTime  @db.Timestamptz(6)
+}
+
+model Teams {
+  id             Int      @id @default(autoincrement())
+  ownerAccountId Int
+  iconUrl        String   @db.VarChar(255)
+  bannerUrl      String   @db.VarChar(255)
+  name           String   @db.VarChar(255)
+  createdAt      DateTime @db.Timestamptz(6)
+  updatedAt      DateTime @db.Timestamptz(6)
+}
+
+model TransactionInputs {
+  id          Int      @id @default(autoincrement())
+  txid        String?  @db.VarChar(255)
+  input_txid  String?  @db.VarChar(255)
+  input_index Int?
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+
+  @@index([input_txid, input_index], map: "transaction_inputs_input_txid_input_index")
+}
+
+model Transactions {
+  id        Int      @id @default(autoincrement())
+  txid      String?  @db.VarChar(255)
+  time      Int?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  blockhash String?  @db.VarChar(255)
+
+  @@index([txid], map: "transactions_txid")
+}
+
+model WalletBots {
+  id                Int      @id @default(autoincrement())
+  identifier        String?
+  name              String?  @db.VarChar(255)
+  account_id        Int?
+  app_id            Int?
+  slack_webhook_url String?  @db.VarChar(255)
+  webhook_url       String?  @db.VarChar(255)
+  email_address     String?  @db.VarChar(255)
+  createdAt         DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @db.Timestamptz(6)
+}
+
+model WebhookAttempts {
+  id            Int       @id @default(autoincrement())
+  webhook_id    Int?
+  started_at    DateTime? @db.Timestamptz(6)
+  ended_at      DateTime? @db.Timestamptz(6)
+  response_code Int?
+  response_body String?
+  error         String?
+  createdAt     DateTime  @db.Timestamptz(6)
+  updatedAt     DateTime  @db.Timestamptz(6)
+}
+
+model Webhooks {
+  id            Int       @id @default(autoincrement())
+  type          String?   @db.VarChar(255)
+  url           String?   @db.VarChar(255)
+  started_at    DateTime? @db.Timestamptz(6)
+  ended_at      DateTime? @db.Timestamptz(6)
+  response_code Int?
+  response_body String?
+  error         String?
+  invoice_uid   String?   @db.VarChar(255)
+  createdAt     DateTime  @db.Timestamptz(6)
+  updatedAt     DateTime  @db.Timestamptz(6)
+  status        String?   @default("pending") @db.VarChar(255)
+  retry_policy  String?   @default("no_retry") @db.VarChar(255)
+  account_id    Int?
+  payload       Json      @default("{}") @db.Json
+}
+
+model WoocommerceImages {
+  id        Int      @id @default(autoincrement())
+  url       String?  @db.VarChar(255)
+  name      String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model WoocommerceSettings {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  image_url  String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model access_tokens {
+  id         Int      @id @default(autoincrement())
+  uid        String?  @db.VarChar(255)
+  account_id Int
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+  app_id     Int?
+  accounts   accounts @relation(fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model account_settings {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  key        String?  @db.VarChar(255)
+  value      Boolean?
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model account_tags {
+  id         Int      @id @default(autoincrement())
+  account_id Int?
+  tag        String?  @db.VarChar(255)
+  type       String?  @db.VarChar(255)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model accounts {
+  id                        Int                      @id @default(autoincrement())
+  uid                       String?                  @db.VarChar(255)
+  email                     String?                  @unique @db.VarChar(255)
+  password_hash             String?                  @db.VarChar(255)
+  createdAt                 DateTime                 @db.Timestamptz(6)
+  updatedAt                 DateTime                 @db.Timestamptz(6)
+  webhook_url               String?                  @db.VarChar(255)
+  denomination              String?                  @db.VarChar(255)
+  is_admin                  Boolean?                 @default(false)
+  business_name             String?                  @db.VarChar(255)
+  physical_address          String?                  @db.VarChar(255)
+  latitude                  String?                  @db.VarChar(255)
+  longitude                 String?                  @db.VarChar(255)
+  authenticator_secret      String?                  @db.VarChar(255)
+  image_url                 String?                  @db.VarChar(255)
+  tipjar_enabled            Boolean?                 @default(false)
+  allow_cashback_amount     Boolean?                 @default(false)
+  coordinates               Unsupported("geometry")?
+  watch_address_webhook_url String?                  @db.VarChar(255)
+  stub                      String?                  @db.VarChar(255)
+  bank_account_id           Int?
+  ach_enabled               Boolean?                 @default(false)
+  ambassador_id             Int?
+  convert_to_bank           Boolean?                 @default(false)
+  email_valid               String?                  @default(dbgenerated("true")) @db.VarChar(255)
+  should_settle             Boolean?                 @default(false)
+  settlement_strategy       String?                  @db.VarChar(255)
+  google_place_id           String?                  @db.VarChar(255)
+  dash_text_enabled         String?                  @default(dbgenerated("false")) @db.VarChar(255)
+  website_url               String?                  @db.VarChar(255)
+  city                      String?                  @db.VarChar(255)
+  state                     String?                  @db.VarChar(255)
+  country                   String?                  @db.VarChar(255)
+  description               String?                  @db.VarChar(255)
+  ambassador_percent        Decimal?                 @default(0) @db.Decimal
+  customer_pays_ambassador  Boolean?                 @default(true)
+  registration_geolocation  Json?                    @db.Json
+  registration_ip_address   String?                  @db.VarChar(255)
+  position                  Unsupported("geometry")?
+  inserted_at               DateTime?                @db.Timestamptz(6)
+  updated_at                DateTime?                @db.Timestamptz(6)
+  access_tokens             access_tokens[]
+  extended_public_keys      extended_public_keys[]
+  pair_tokens               pair_tokens[]
+}
+
+model address_routes {
+  id              Int       @id @default(autoincrement())
+  input_address   String    @db.VarChar(255)
+  input_currency  String    @db.VarChar(255)
+  output_address  String    @db.VarChar(255)
+  output_currency String    @db.VarChar(255)
+  expires         DateTime? @db.Timestamptz(6)
+  createdAt       DateTime  @db.Timestamptz(6)
+  updatedAt       DateTime  @db.Timestamptz(6)
+  is_static       Boolean?  @default(false)
+}
+
+model addresses {
+  id           Int      @id @default(autoincrement())
+  account_id   Int?
+  currency     String?  @db.VarChar(255)
+  plugin       String?  @db.VarChar(255)
+  value        String?  @db.VarChar(255)
+  createdAt    DateTime @db.Timestamptz(6)
+  updatedAt    DateTime @db.Timestamptz(6)
+  locked       Boolean? @default(false)
+  nonce        Int?     @default(0)
+  paymail      String?  @db.VarChar(255)
+  price_scalar Decimal? @default(1) @db.Decimal
+  note         String?  @db.VarChar(255)
+  view_key     String?  @db.VarChar(255)
+  chain        String?  @db.VarChar(255)
+}
+
+model apps {
+  id               Int                @id @default(autoincrement())
+  account_id       Int
+  name             String?            @db.VarChar(255)
+  created_at       DateTime           @db.Timestamptz(6)
+  updated_at       DateTime           @db.Timestamptz(6)
+  payment_requests payment_requests[]
+}
+
+model blockchain_receipts {
+  id           Int       @id @default(autoincrement())
+  invoice_uid  String?   @db.VarChar(255)
+  txid         String?   @db.VarChar(255)
+  hex          String?
+  error        String?   @db.VarChar(255)
+  published_at DateTime? @db.Timestamptz(6)
+  createdAt    DateTime  @db.Timestamptz(6)
+  updatedAt    DateTime  @db.Timestamptz(6)
+}
+
+model blockcypher_events {
+  id        Int      @id @default(autoincrement())
+  type      String?  @db.VarChar(255)
+  payload   String?
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model blockcypher_hooks {
+  id              Int      @id @default(autoincrement())
+  uid             String?  @db.VarChar(255)
+  event           String?  @db.VarChar(255)
+  address         String?  @db.VarChar(255)
+  url             String?  @db.VarChar(255)
+  callback_errors Int?
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+}
+
+model coins {
+  id                Int      @id @default(autoincrement())
+  code              String   @db.VarChar(255)
+  name              String   @db.VarChar(255)
+  logo_url          String?  @db.VarChar(255)
+  uri_template      String?  @db.VarChar(255)
+  unavailable       Boolean?
+  createdAt         DateTime @db.Timestamptz(6)
+  updatedAt         DateTime @db.Timestamptz(6)
+  precision         Int?
+  supported         Boolean? @default(false)
+  required_fee_rate Int?     @default(1)
+  color             String?  @db.VarChar(255)
+  currency          String?  @db.VarChar(255)
+  chain             String?  @db.VarChar(255)
+}
+
+model dash_instantsend_transactions {
+  id        Int      @id @default(autoincrement())
+  hash      String   @unique @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model dash_invoice_payouts {
+  id              Int           @id @default(autoincrement())
+  dash_invoice_id Int?
+  dash_payout_id  Int?
+  invoices        invoices?     @relation(fields: [dash_invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  dash_payouts    dash_payouts? @relation(fields: [dash_payout_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model dash_payouts {
+  id                   Int                       @id @default(autoincrement())
+  account_id           Int?
+  payment_hash         String?                   @db.VarChar(255)
+  amount               Decimal?                  @db.Decimal
+  status               enum_dash_payouts_status? @default(unpaid)
+  completedAt          DateTime?                 @db.Timestamptz(6)
+  createdAt            DateTime                  @db.Timestamptz(6)
+  updatedAt            DateTime                  @db.Timestamptz(6)
+  address              String                    @db.VarChar(255)
+  dash_invoice_payouts dash_invoice_payouts[]
+}
+
+model discounts {
+  id         Int      @id @default(autoincrement())
+  account_id Int
+  coin       String   @default("*") @db.VarChar(255)
+  percent    Decimal  @default(0) @db.Decimal
+  active     Boolean? @default(true)
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model events {
+  id          Int      @id @default(autoincrement())
+  account_id  Int?
+  type        String   @db.VarChar(255)
+  payload     Json     @db.Json
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  invoice_uid String?  @db.VarChar(255)
+  namespace   String?  @db.VarChar(255)
+  error       Boolean?
+  app_id      Int?
+
+  @@index([account_id], map: "events_by_account_id")
+  @@index([type, account_id], map: "events_by_account_id_and_type")
+  @@index([invoice_uid], map: "events_by_invoice_uid")
+  @@index([type, invoice_uid], map: "events_by_invoice_uid_and_type")
+  @@index([type], map: "events_by_type")
+  @@index([invoice_uid], map: "events_invoice_uid")
+  @@index([invoice_uid, createdAt], map: "events_invoice_uid_created_at")
+}
+
+model extended_public_keys {
+  id         Int       @id @default(autoincrement())
+  xpubkey    String    @db.VarChar(255)
+  nonce      Int?      @default(0)
+  createdAt  DateTime? @db.Timestamptz(6)
+  updatedAt  DateTime? @db.Timestamptz(6)
+  account_id Int
+  currency   String?   @db.VarChar(255)
+  accounts   accounts  @relation(fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model firebase_tokens {
+  id         Int      @id @default(autoincrement())
+  token      String?  @db.VarChar(255)
+  account_id Int?
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+}
+
+model grab_and_go_invoices {
+  id              Int      @id @default(autoincrement())
+  item_id         Int?
+  invoice_uid     String?  @db.VarChar(255)
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+  square_order_id String?  @db.VarChar(255)
+}
+
+model grab_and_go_items {
+  id                       Int      @id @default(autoincrement())
+  name                     String?  @db.VarChar(255)
+  stub                     String?  @db.VarChar(255)
+  price                    Decimal? @db.Decimal
+  uid                      String?  @db.VarChar(255)
+  account_id               Int?
+  payment_request_url      String?  @db.VarChar(255)
+  createdAt                DateTime @db.Timestamptz(6)
+  updatedAt                DateTime @db.Timestamptz(6)
+  square_catalog_object_id String?  @db.VarChar(255)
+  square_variation_id      String?  @db.VarChar(255)
+  image_url                String?  @db.VarChar(255)
+
+  @@unique([account_id, name])
+  @@unique([account_id, stub])
+}
+
+model invoice_notes {
+  id          Int      @id @default(autoincrement())
+  invoice_uid String   @db.VarChar(255)
+  content     String
+  created_at  DateTime @db.Timestamptz(6)
+  updated_at  DateTime @db.Timestamptz(6)
+}
+
+model invoices {
+  id                           Int                    @id @default(autoincrement())
+  uid                          String?                @db.VarChar(255)
+  amount                       Decimal?               @db.Decimal
+  address                      String?                @db.VarChar(255)
+  account_id                   Int?
+  access_token                 String?                @db.VarChar(255)
+  hash                         String?                @unique(map: "unique_invoice_hash_constraint") @db.VarChar(255)
+  status                       String?                @db.VarChar(255)
+  createdAt                    DateTime               @db.Timestamptz(6)
+  updatedAt                    DateTime               @db.Timestamptz(6)
+  settledAt                    DateTime?              @db.Timestamptz(6)
+  paidAt                       DateTime?              @db.Timestamptz(6)
+  dollar_amount                Decimal?               @db.Decimal
+  currency                     String?                @db.VarChar(255)
+  blockcypher_webhook_uid      String?                @db.VarChar(255)
+  paid_amount                  Decimal?               @db.Decimal
+  denomination_amount          Decimal?               @db.Decimal
+  denomination_currency        String?                @db.VarChar(255)
+  invoice_amount               Decimal?               @db.Decimal
+  invoice_currency             String?                @db.VarChar(255)
+  redirect_url                 String?                @db.VarChar(255)
+  webhook_url                  String?                @db.VarChar(255)
+  invoice_amount_paid          Decimal?               @db.Decimal
+  denomination_amount_paid     Decimal?               @db.Decimal
+  complete                     Boolean?               @default(false)
+  completed_at                 DateTime?              @db.Timestamptz(6)
+  output_hash                  String?                @db.VarChar(255)
+  output_address               String?                @db.VarChar(255)
+  output_currency              String?                @db.VarChar(255)
+  output_amount                Decimal?               @db.Decimal
+  instantsend                  Boolean?
+  external_id                  String?                @db.VarChar(255)
+  expiry                       DateTime?              @db.Timestamptz(6)
+  locked                       Boolean?
+  cashback_amount              Decimal?               @db.Decimal
+  cashback_denomination_amount Decimal?               @db.Decimal
+  uri                          String?                @db.VarChar(255)
+  is_public_request            Boolean?               @default(false)
+  bank_account_id              Int?
+  ach_batch_id                 Int?
+  replace_by_fee               Boolean?               @default(false)
+  should_settle                Boolean?               @default(false)
+  router                       String?                @default("anypay") @db.VarChar(255)
+  settlement_id                Int?
+  energycity_account_id        Int?
+  currency_specified           Boolean?               @default(false)
+  discount_percent             Decimal?               @default(0) @db.Decimal
+  secret                       String?                @db.VarChar(255)
+  metadata                     Json?                  @db.Json
+  app_id                       Int?
+  item_uid                     String?                @db.VarChar(255)
+  email                        String?                @db.VarChar(255)
+  wordpress_site_url           String?                @db.VarChar(255)
+  tags                         String[]               @db.VarChar(255)
+  headers                      Json?                  @db.Json
+  cancelled                    Boolean?               @default(false)
+  business_id                  String?                @db.VarChar(255)
+  location_id                  String?                @db.VarChar(255)
+  register_id                  String?                @db.VarChar(255)
+  memo                         String?                @db.VarChar(255)
+  fee_rate_level               String?                @default("fastestFee") @db.VarChar(255)
+  dash_invoice_payouts         dash_invoice_payouts[]
+
+  @@index([account_id], map: "invoice_account_id")
+}
+
+model orders {
+  id              Int        @id @default(autoincrement())
+  product_id      String     @db.VarChar(255)
+  amount          Int
+  uid             String     @unique @db.VarChar(255)
+  paymail         String     @db.VarChar(255)
+  createdAt       DateTime   @db.Timestamptz(6)
+  updatedAt       DateTime   @db.Timestamptz(6)
+  payment_request Json?      @db.Json
+  webhook         Json?      @db.Json
+  egifter_order   Json?      @db.Json
+  status          String?    @default("unpaid") @db.VarChar(255)
+  token           Json?      @db.Json
+  Payments        Payments[]
+  products        products   @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model pair_tokens {
+  id              Int      @id @default(autoincrement())
+  uid             String?  @db.VarChar(255)
+  account_id      Int
+  createdAt       DateTime @db.Timestamptz(6)
+  updatedAt       DateTime @db.Timestamptz(6)
+  device_name     String?  @db.VarChar(255)
+  access_token_id Int?
+  accounts        accounts @relation(fields: [account_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model password_resets {
+  uid       String   @id @db.Uuid
+  claimed   Boolean?
+  email     String?  @db.VarChar(255)
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model payment_options {
+  id                Int       @id @default(autoincrement())
+  invoice_uid       String    @db.VarChar(255)
+  currency          String    @db.VarChar(255)
+  amount            Decimal?  @db.Decimal
+  address           String?
+  uri               String?
+  expires           DateTime? @db.Timestamptz(6)
+  createdAt         DateTime  @db.Timestamptz(6)
+  updatedAt         DateTime  @db.Timestamptz(6)
+  fee               BigInt?
+  outputs           Json?     @db.Json
+  currency_name     String?   @db.VarChar(255)
+  currency_logo_url String?   @db.VarChar(255)
+  chain             String?   @db.VarChar(255)
+}
+
+model payment_requests {
+  id           Int      @id @default(autoincrement())
+  uid          String   @db.VarChar(255)
+  parameters   Json     @db.Json
+  app_id       Int
+  token_pubkey String   @db.VarChar(255)
+  expires_at   DateTime @db.Timestamptz(6)
+  created_at   DateTime @db.Timestamptz(6)
+  updated_at   DateTime @db.Timestamptz(6)
+  template     Json?    @db.Json
+  apps         apps     @relation(fields: [app_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payments {
+  id                  Int       @id @default(autoincrement())
+  txid                String    @db.VarChar(255)
+  txhex               String?
+  txjson              Json?     @db.Json
+  currency            String    @db.VarChar(255)
+  invoice_uid         String    @db.VarChar(255)
+  payment_option_id   Int
+  createdAt           DateTime  @db.Timestamptz(6)
+  updatedAt           DateTime  @db.Timestamptz(6)
+  wallet              String?   @db.VarChar(255)
+  ip_address          String?   @db.VarChar(255)
+  account_id          Int?
+  total_input         Int?
+  total_output        Int?
+  network_fee         Int?
+  confirmation_date   DateTime? @db.Timestamptz(6)
+  confirmation_hash   String?   @db.VarChar(255)
+  confirmation_height Int?
+  tx_key              String?   @db.VarChar(255)
+  status              String?   @default("confirming") @db.VarChar(255)
+  chain               String?   @db.VarChar(255)
+}
+
+model prices {
+  id            Int      @id @default(autoincrement())
+  currency      String   @db.VarChar(255)
+  value         Decimal  @db.Decimal
+  base_currency String?  @default("BTC") @db.VarChar(255)
+  createdAt     DateTime @db.Timestamptz(6)
+  updatedAt     DateTime @db.Timestamptz(6)
+  source        String?  @db.VarChar(255)
+}
+
+model products {
+  id         Int      @id @default(autoincrement())
+  product_id String   @unique(map: "unique_product_id") @db.VarChar(255)
+  details    Json     @db.Json
+  createdAt  DateTime @db.Timestamptz(6)
+  updatedAt  DateTime @db.Timestamptz(6)
+  recurring  Boolean?
+  period     String?  @db.VarChar(255)
+  orders     orders[]
+}
+
+model rabbi_events {
+  id        Int      @id @default(autoincrement())
+  event     String?  @db.VarChar(255)
+  payload   Json?    @db.Json
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+}
+
+model schema_migrations {
+  version     BigInt    @id
+  inserted_at DateTime? @db.Timestamp(0)
+}
+
+model simple_wallets {
+  id                 Int       @id @default(autoincrement())
+  name               String?   @db.VarChar(255)
+  currency           String?   @db.VarChar(255)
+  address            String?   @db.VarChar(255)
+  balance            Decimal?  @db.Decimal
+  balance_updated_at DateTime? @db.Timestamptz(6)
+  createdAt          DateTime  @db.Timestamptz(6)
+  updatedAt          DateTime  @db.Timestamptz(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model spatial_ref_sys {
+  srid      Int     @id
+  auth_name String? @db.VarChar(256)
+  auth_srid Int?
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+}
+
+enum enum_dash_payouts_status {
+  unpaid
+  paid
+}
