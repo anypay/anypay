@@ -8,6 +8,8 @@ const Vision = require('@hapi/vision');
 
 const HapiSwagger = require("hapi-swagger");
 
+const { createPlugin: promsterPlugin } = require('@promster/hapi');
+
 import { config } from '../../lib/config'
 
 import { HealthPlugin } from 'hapi-k8s-health'
@@ -174,6 +176,8 @@ async function Server() {
   await server.register(Vision);
 
   await server.register(require('hapi-boom-decorators'))
+
+  await server.register(promsterPlugin())
 
   if (process.env.SENTRY_DSN) {
 
