@@ -208,7 +208,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       let outputs = []
 
-      let fee = await pay.fees.getFee(currency, paymentAmount)
+      let fee = await pay.fees.getFee({ chain, currency, amount: paymentAmount})
 
       if (!['MATIC', 'ETH', 'AVAX'].includes(chain)) { // multiple outputs disallowed
 
