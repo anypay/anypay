@@ -8,31 +8,31 @@ import { toSatoshis } from '../plugins'
 const fees = { }
 
 const feesFiat = {
-  'BCH': {
+  'BCH_BCH': {
     currency: 'USD',
     value: 0.01
   },
-  'DASH': {
+  'DASH_DASH': {
     currency: 'USD',
     value: 0.01
   },
-  'BSV': {
+  'BSV_BSV': {
     currency: 'USD',
     value: 0.01
   },
-  'LTC': {
+  'LTC_LTC': {
     currency: 'USD',
     value: 0.01
   },
-  'DOGE': {
+  'DOGE_DOGE': {
     currency: 'USD',
     value: 0.01
   },
-  'BTC': {
+  'BTC_BTC': {
     currency: 'USD',
     value: 0.10
   },
-  'XMR': {
+  'XMR_XMR': {
     currency: 'USD',
     value: 0.01
   },
@@ -44,7 +44,43 @@ const feesFiat = {
     currency: 'USD',
     value: 0.01
   },
-  'MATIC': {
+  'MATIC_MATIC': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDC_AVAX': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDT_AVAX': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'AVAX_AVAX': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDC_SOL': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDT_SOL': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'SOL_SOL': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDC_ETH': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'USDT_ETH': {
+    currency: 'USD',
+    value: 0.01
+  },
+  'ETH_ETH': {
     currency: 'USD',
     value: 0.01
   }
@@ -69,11 +105,13 @@ const feeAddresses = {
   'AVAX': '0x8881c5306fec0a4f6b829e39f0ffbb6c4a9faa05'
 }
 
-export async function getFee(currency:string, amount?: number): Promise<Fee> {
+export async function getFee({ currency, chain, amount }: {chain: string, currency:string, amount?: number}): Promise<Fee> {
 
-  if (!fees[currency]) {
-  
-    await updateFees();
+  const symbol = `${currency}_${chain}`  
+
+  if (!fees[symbol]) {
+
+    fees[symbol] = feesFiat[symbol] ? toSatoshis({ decimal: feesFiat[symbol].value, currency, chain }) : 0
 
   } else {
 
@@ -81,7 +119,7 @@ export async function getFee(currency:string, amount?: number): Promise<Fee> {
 
   }
 
-  var fee = fees[currency];
+  var fee = fees[symbol];
 
   if (amount) {
 
@@ -109,7 +147,7 @@ export async function getFee(currency:string, amount?: number): Promise<Fee> {
 
 }
 
-async function updateFees() {
+export async function updateFees() {
   
   for (let key of Object.keys(feesFiat)) {
 
@@ -124,4 +162,3 @@ async function updateFees() {
   }
 
 }
-

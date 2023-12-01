@@ -110,7 +110,7 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 
   } else {
 
-    let fee: Fee = await getFee(paymentOption.currency);
+    let fee: Fee = await getFee({ currency: paymentOption.currency, chain: paymentOption.chain });
 
     if (paymentOption.fee) {
       fee.amount = paymentOption.fee;
