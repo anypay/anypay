@@ -87,7 +87,7 @@
     "anypay-wallet-address-validator": "^0.2.6",
     "api": "^5.0.8",
     "asn1.js-rfc5280": "^3.0.0",
-    "axios": "^1.3.2",
+    "axios": "^1.6.0",
     "base58-monero": "^0.0.5",
     "bchaddrjs": "^0.4.3",
     "bcryptjs": "^2.4.3",
