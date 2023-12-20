@@ -622,6 +622,21 @@ export async function attachV1Routes(server) {
     },
   })
 
-
+  server.route({
+    method: 'GET',
+    path: '/api/v1/version',
+    handler: v1.Version.index,
+    options: {
+      tags: ['v1', 'version'],
+      response: {
+        schema: Joi.object({
+		      version: Joi.number().required(),
+          revision: Joi.string().required(),
+          date: Joi.date().required()
+        }).required().label('Version'),
+        failAction
+      }
+    },
+  })
 
 }
