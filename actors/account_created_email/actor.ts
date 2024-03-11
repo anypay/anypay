@@ -17,13 +17,11 @@ export async function start() {
     queue: 'send_invoice_paid_email_receipt',
 
   })
-  .start(async (channel, msg) => {
+  .start(async (_, msg) => {
 
     let account = JSON.parse(msg.content.toString());
 
     await email.newAccountCreatedEmail(account);
-
-    channel.ack(msg);
 
   });
 

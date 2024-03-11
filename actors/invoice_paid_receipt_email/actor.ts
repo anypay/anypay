@@ -29,8 +29,6 @@ export async function start() {
 
     await email.invoicePaidEmail(invoice.toJSON());
 
-    channel.ack(msg);
-
   });
 
   Actor.create({
@@ -64,8 +62,6 @@ export async function start() {
       await email.firstInvoicePaidEmail(invoice.toJSON());
 
     }
-
-    channel.ack(msg);
 
   });
 

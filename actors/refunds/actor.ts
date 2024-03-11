@@ -36,8 +36,6 @@ export async function start() {
 
     if (!refund || refund.status === 'paid') {
 
-      channel.ack(msg);
-
       return
 
     }
@@ -64,8 +62,6 @@ export async function start() {
       account_id: original_invoice.account_id,
       invoice_uid: refund.original_invoice_uid
     }))
-
-    channel.ack(msg);
 
   });
 

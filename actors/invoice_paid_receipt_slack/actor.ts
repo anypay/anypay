@@ -50,8 +50,6 @@ export async function start() {
 
     await notify(notificationMessage)
 
-    channel.ack(msg);
-
   });
 
 

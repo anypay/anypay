@@ -57,8 +57,6 @@ export async function start() {
 
     }
 
-    await channel.ack(msg);
-
   });
 
 

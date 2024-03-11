@@ -30,7 +30,7 @@ export async function start() {
     let account = await models.Account.findOne({ where: { id: invoice.account_id }});
 
     if (!invoice) {
-      return channel.ack(msg);
+      return
     }
 
     let grabAndGoInvoice = await models.GrabAndGoInvoice.findOne({
@@ -52,14 +52,14 @@ export async function start() {
         }});
 
         if (!item) {
-          return channel.ack(msg);
+          return
         }
 
         await sendMessage(account.email, "Grab & Go Cashier-Less Payment", `$${invoice.denomination_amount_paid} | ${item.name}`, {
           path: `/payments/${invoiceUid}`,
         })
 
-        return channel.ack(msg);
+        return
 
       } catch(error) {
 
@@ -68,8 +68,6 @@ export async function start() {
       }
 
     }
-
-    channel.ack(msg);
 
   });
 

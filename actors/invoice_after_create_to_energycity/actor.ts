@@ -35,8 +35,6 @@ export async function start() {
 
     }
 
-    channel.ack(msg);
-
   });
 
   Actor.create({
@@ -52,8 +50,6 @@ export async function start() {
 
     await updateEnergyCityAccounts();
 
-    await channel.ack(msg);
-
   });
 
   Actor.create({
@@ -68,8 +64,6 @@ export async function start() {
   .start(async (channel, msg, json) => {
 
     await updateEnergyCityAccounts();
-
-    await channel.ack(msg);
 
   });
 

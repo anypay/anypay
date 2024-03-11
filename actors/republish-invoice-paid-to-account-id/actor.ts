@@ -31,11 +31,10 @@ export async function start() {
     let routingKey2 = `accounts.${invoice.account_id}.invoice.paid`;
 
     await channel.publish('anypay.events', routingKey1, msg.content);
+    
     await channel.publish('anypay.account_events', routingKey2, Buffer.from(
       JSON.stringify(invoice.toJSON())
     ));
-
-    channel.ack(msg);
 
   });
 
@@ -56,8 +55,6 @@ export async function start() {
 
     log.info(routingKey, { invoice: json });
 
-    channel.ack(msg);
-
   });
 
   Actor.create({
@@ -76,8 +73,6 @@ export async function start() {
     await channel.publish('anypay.events', routingKey, msg.content);
 
     log.info(routingKey, { invoice: json });
-
-    channel.ack(msg);
 
   });
 
