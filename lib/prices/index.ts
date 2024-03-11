@@ -9,11 +9,9 @@ export { fixer }
 
 import { BigNumber } from 'bignumber.js'
 
-import * as bittrex from './bittrex'
-
 import * as kraken from './kraken'
 
-export { bittrex, kraken }
+export { kraken }
 
 import { Price } from '../price'
 
@@ -179,10 +177,6 @@ export async function setAllCryptoPrices() {
 
   prices.push(getPrice({ chain: 'BSV', currency: 'BSV' }))
   prices.push(getPrice({ chain: 'XRP', currency: 'XRP' }))
-
-  prices.push(bittrex.getPrice('USDC'))
-  prices.push(bittrex.getPrice('USDT'))
-  prices.push(bittrex.getPrice('MATIC'))
 
   prices.push(kraken.getPrice('XMR'))
   prices.push(kraken.getPrice('DASH'))
