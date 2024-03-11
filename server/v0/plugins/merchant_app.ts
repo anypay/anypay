@@ -450,36 +450,6 @@ export async function register(server: Server) {
 
   server.route({
     method: 'POST',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.create,
-    options: {
-      tags: ['v0', 'bittrex'],
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'GET',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.show,
-    options: {
-      tags: ['v0', 'bittrex'],
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'DELETE',
-    path: '/bittrex_api_keys',
-    handler: v0.BittrexApiKeys.destroy,
-    options: {
-      tags: ['v0', 'bittrex'],
-      auth: "token"
-    }
-  }); 
-
-  server.route({
-    method: 'POST',
     path: '/kraken_api_keys',
     handler: v0.KrakenApiKeys.create,
     options: {
