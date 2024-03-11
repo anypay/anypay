@@ -38,8 +38,6 @@ export async function start() {
 
     }
 
-    channel.ack(msg);
-
   });
 
   Actor.create({
@@ -72,8 +70,6 @@ export async function start() {
       await email.sendEmail('reminder_unpaid_invoice', account.email, 'Anypay<support@anypayx.com>', invoice)
 
     }
-
-    channel.ack(msg);
 
   });
 

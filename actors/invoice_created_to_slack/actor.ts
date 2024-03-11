@@ -23,8 +23,6 @@ export async function start() {
 
     slack.notify(`Invoice created by ${account.email} for ${json.denomination_amount} ${json.denomination_currency}`);
 
-    await channel.ack(msg);
-
   });
 
 }

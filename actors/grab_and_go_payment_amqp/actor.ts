@@ -26,7 +26,7 @@ export async function start() {
     let invoice = await models.Invoice.findOne({ where: { uid: invoiceUid }});
 
     if (!invoice) {
-      return channel.ack(msg);
+      return
     }
 
     let grabAndGoInvoice = await models.GrabAndGoInvoice.findOne({
@@ -48,7 +48,7 @@ export async function start() {
         }});
 
         if (!item) {
-          return channel.ack(msg);
+          return
         }
 
         await channel.publish(
@@ -61,7 +61,7 @@ export async function start() {
           }))
         );
 
-        return channel.ack(msg);
+        return
 
       } catch(error) {
 
@@ -70,8 +70,6 @@ export async function start() {
       }
 
     }
-
-    channel.ack(msg);
 
   });
 

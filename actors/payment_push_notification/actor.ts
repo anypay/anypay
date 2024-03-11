@@ -31,7 +31,7 @@ export async function start() {
     let account = await models.Account.findOne({ where: { id: invoice.account_id }});
 
     if (!invoice) {
-      return channel.ack(msg);
+      return
     }
 
     try {
@@ -40,15 +40,13 @@ export async function start() {
         path: `/payments/${invoiceUid}`,
       });
 
-      return channel.ack(msg);
+      return
 
     } catch(error) {
 
       log.error('actors.payment_push_notification', error);
 
     }
-
-    channel.ack(msg);
 
   });
 

@@ -21,7 +21,7 @@ export async function start() {
     queue: 'cache_fees_after_payment'
 
   })
-  .start(async (channel, msg, json) => {
+  .start(async (_, msg, json) => {
 
     let uid = msg.content.toString();
 
@@ -36,8 +36,6 @@ export async function start() {
     await payment.set('total_input', fee.total_input)
     await payment.set('total_output', fee.total_output)
     await payment.set('network_fee', fee.network_fee)
-
-    channel.ack(msg);
 
   });
 

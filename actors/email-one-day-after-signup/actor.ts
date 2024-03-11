@@ -28,8 +28,6 @@ export async function start() {
 
     await email.sendEmail('one_day_after_signup', json.email, sender, json)
 
-    channel.ack(msg);
-
   });
 
   Actor.create({
@@ -48,8 +46,6 @@ export async function start() {
         'x-delay': 1000 * 60 * 60 * 24
       }
     })
-
-    channel.ack(msg);
 
   });
 
