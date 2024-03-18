@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-import * as bsv from 'bsv';
+import { bsv } from 'scrypt-ts'
 
 import * as taal from './lib/taal'
 
@@ -8,7 +8,7 @@ import * as whatsonchain from './lib/whatsonchain'
 
 import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Payment, Price } from '../../lib/plugin'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 import { blockchair, log } from '../../lib';
 
@@ -26,8 +26,8 @@ export default class BSV extends UTXO_Plugin {
 
   decimals = 8
 
-  providerURL = process.env.getblock_bsv_url
-
+  providerURL = String(process.env.getblock_bsv_url
+    )
   get bitcore() {
 
     return bsv

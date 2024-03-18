@@ -1,48 +1,59 @@
 
-import { models } from './models'
 
+import * as uuid from 'uuid'
 import { createApp, createAppToken } from './apps'
 
-export async function getMerchantApiKey(account_id) {
+import { access_tokens as AccessToken } from '@prisma/client'
 
-  let token = await models.AccessToken.findOne({
+import prisma from './prisma'
+
+export async function getMerchantApiKey(account_id: number): Promise<string> {
+
+  let accessToken: AccessToken | null = await prisma.access_tokens.findFirst({
     where: {
-      account_id
-    },
-    order: [["createdAt", "asc"]]
+      account_id,
+    }
   })
 
-  if (!token) {
+  if (!accessToken) {
 
-    token = await models.AccessToken.create({
-      account_id
+    accessToken = await prisma.access_tokens.create({
+      data: {
+        account_id,
+        uid: uuid.v4(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
     })
 
   }
 
-  return token.uid
+  return String(accessToken.uid)
 
 }
 
-export async function getPlatformApiKey(account_id) {
+export async function getPlatformApiKey(account_id: number) {
 
   let app = await createApp({account_id, name: 'platform'})
 
-  let token = await models.AccessToken.findOne({
+  let accessToken = await prisma.access_tokens.findFirst({
     where: {
       account_id,
       app_id: app.id
     },
-    order: [["createdAt", "asc"]]
+    orderBy: {
+      createdAt: 'asc'
+    }
   })
 
-  if (!token) {
 
-    token = await createAppToken(app.id)
+  if (!accessToken) {
+
+    accessToken = await createAppToken(app.id)
 
   }
 
-  return token.uid
+  return String(accessToken?.uid)
 
 }
 

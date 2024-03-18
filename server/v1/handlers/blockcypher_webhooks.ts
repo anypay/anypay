@@ -1,7 +1,7 @@
 
 import { log } from "../../../lib"
 
-import { publish } from 'rabbi'
+import { publish } from '../../../lib/amqp'
 
 import { confirmTransactionsFromBlockWebhook } from "../../../lib/blockcypher"
 
@@ -13,7 +13,7 @@ export async function create(req, h) {
 
         log.info('blockcypher.webhook.received', webhook)
 
-        publish('anypay', 'blockcypher.webhook.received', webhook)
+        publish('blockcypher.webhook.received', webhook)
 
         confirmTransactionsFromBlockWebhook(webhook)
 

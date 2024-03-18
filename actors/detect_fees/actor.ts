@@ -9,12 +9,13 @@ import { ensureInvoice } from '../../lib/invoices'
 import { getPayment } from '../../lib/payments'
 
 import { getMiningFee } from '../../lib/fees'
+import { exchange } from '../../lib/amqp';
 
 export async function start() {
 ``
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
     routingkey: 'invoice:paid',
 

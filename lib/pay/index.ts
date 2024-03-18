@@ -11,7 +11,6 @@ import { log } from '../log'
 
 import { Invoice, ensureInvoice } from '../invoices'
 
-import { awaitChannel } from '../amqp'
 import { models } from '../models'
 
 import { getBitcore } from '../bitcore';
@@ -30,6 +29,8 @@ import { publish } from 'rabbi'
 export { fees, bip70, bip270, jsonV2 }
 
 import { parsePayments } from '../plugins'
+import { register } from '../../server/v0/plugins/merchant_app';
+import { registerSchema } from '../amqp';
 
 export interface Payment{
   amount: number;
@@ -310,6 +311,22 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 }
 
+registerSchema('payment.confirming', {
+  type: 'object',
+  properties: {
+    txid: { type: 'string' },
+    currency: { type: 'string' },
+    chain: { type: 'string' },
+    txjson: { type: 'object' },
+    txhex: { type: 'string' },
+    tx_key: { type: 'string' },
+    payment_option_id: { type: 'number' },
+    invoice_uid: { type: 'string' },
+    account_id: { type: 'number' }
+  },
+  required: ['txid', 'currency', 'chain', 'txjson', 'txhex', 'tx_key', 'payment_option_id', 'invoice_uid', 'account_id']
+})
+
 export async function handleUnconfirmedPayment(paymentOption, transaction: Transaction) {
 
   const { txhex } = transaction
@@ -366,7 +383,7 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
   log.info('payment.confirming', paymentRecord.toJSON())
 
-  publish('anypay', 'payment.confirming', paymentRecord.toJSON())
+  publish('payment.confirming', paymentRecord.toJSON())
 
   return paymentRecord
 
@@ -437,9 +454,7 @@ export async function completePayment(paymentOption, transaction: Transaction, c
 
   log.info('invoice.paid', invoice)
 
-  let channel = await awaitChannel()
-
-  channel.publish('anypay:invoices', 'invoice:paid', Buffer.from(invoice.uid))
+  publish('invoice.paid', invoice.toJSON())
 
   sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
 

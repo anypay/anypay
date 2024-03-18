@@ -5,6 +5,7 @@ require('dotenv').config();
 import { Actor, log } from 'rabbi';
 
 import { models } from '../../lib/models'
+import { exchange } from '../../lib/amqp';
 
 export async function start() {
 
@@ -13,16 +14,16 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
-    routingkey: 'invoice:paid',
+    routingkey: 'invoice.paid',
 
     queue: 'update_refund_paid',
 
   })
   .start(async (channel, msg, json) => {
 
-    const uid = msg.content.toString()
+    const { uid } = json
 
     const refund = await models.Refund.findOne({
 

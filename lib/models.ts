@@ -7,14 +7,15 @@ export { sequelize }
 import { join } from 'path';
 
 import { bindAllModelsHooks } from './rabbi-sequelize';
+import { exchange } from './amqp';
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+function capitalizeFirstLetter(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 var models: any = require('require-all')({
   dirname: join(__dirname, 'models'),
-  map: function(name, path) {
+  map: function(name: string, path: string) {
     return name.split('_').map(p => {
 
       return capitalizeFirstLetter(p);    
@@ -22,10 +23,9 @@ var models: any = require('require-all')({
     })
     .join('');
   },
-  resolve: (model) => model(sequelize, Sequelize)
+  resolve: (model: any) => model(sequelize, Sequelize)
 });
 
-export const exchange = 'anypay.events';
 
 bindAllModelsHooks(models, exchange);
 

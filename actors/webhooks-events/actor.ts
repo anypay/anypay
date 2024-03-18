@@ -7,12 +7,13 @@ import { models } from '../../lib';
 
 import { Webhook, sendWebhook } from '../../lib/webhooks';
 import { create } from '../../lib/orm';
+import { exchange } from '../../lib/amqp';
 
 export default async function start() {
 
   Actor.create({
 
-    exchange: 'anypay.events',
+    exchange,
 
     routingkey: 'event.created',
 

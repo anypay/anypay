@@ -12,13 +12,16 @@ import { registerAccount } from '../lib/accounts';
 
 import { ensureAccessToken } from '../lib/access_tokens'
 
-import { Account } from '../lib/account'
+import {
+  accounts as Account,
+  addresses as Address,
+  apps as App,
+  invoices as Invoice
+} from '@prisma/client'
 
-import { Address } from '../lib/addresses'
+import { createApp } from '../lib/apps'
 
-import { createApp, App } from '../lib/apps'
-
-import { Invoice, createInvoice } from '../lib/invoices'
+import { createInvoice } from '../lib/invoices'
 
 import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
 
@@ -31,15 +34,12 @@ export async function generateAccount() {
 }
 
 export async function createAccount(): Promise<Account> {
-  let record = await registerAccount(chance.email(), chance.word());
-
-  return new Account(record)
+  return registerAccount(chance.email(), chance.word());
 }
 
 export async function createAccountWithAddress(): Promise<[Account, Address]> {
-  let record = await registerAccount(chance.email(), chance.word());
-
-  let account = new Account(record)
+  
+  const account  = await registerAccount(chance.email(), chance.word());
 
   let keypair = await generateKeypair()
 

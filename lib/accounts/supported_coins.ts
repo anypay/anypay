@@ -1,25 +1,41 @@
-import {models} from '../models';
 
 import { getCoins } from '../coins';
+import { addresses as Address } from '@prisma/client';
+import prisma from '../prisma';
+
+interface AccountCoin {
+  code: string;
+  currency: string;
+  chain: string;
+  name: string;
+  enabled: boolean;
+  icon: string;
+  address?: string;
+  supported?: boolean;
+  unavailable?: boolean;
+}
+
+interface AccountCoins {
+  [key: string]: AccountCoin;
+
+}
 
 export async function getSupportedCoins(accountId: number): Promise<any> {
 
-  let addresses = await models.Address.findAll({
+  const addresses = await prisma.addresses.findMany({ where: { account_id: accountId }});
 
-    where: { account_id: accountId  }
+  let accountCoins: AccountCoins  = addresses.reduce((acc: AccountCoins,address: Address) => {
 
-  });
-
-  let accountCoins  = addresses.reduce((acc,address) => {
-
-    acc[address.currency] = {
-      code: address.currency,
-      currency: address.currency,
-      chain: address.chain,
-      name: address.currency,
-      enabled: true,
-      icon: `https://app.anypayinc.com/${address.currency.toLowerCase()}.png`,
-      address: address.value
+    if (address.currency !== null) {
+      acc[address.currency] = {
+        code: address.currency,
+        currency: address.currency,
+        chain: String(address.chain),
+        name: address.currency,
+        enabled: true,
+        icon: `https://app.anypayinc.com/${address.currency.toLowerCase()}.png`,
+        address: String(address.value)
+      }
     }
 
     return acc;
@@ -33,21 +49,21 @@ export async function getSupportedCoins(accountId: number): Promise<any> {
     if (accountCoins[coin.code]) {
 
       accountCoins[coin.code]['name'] = coin.name;
-      accountCoins[coin.code]['icon'] = coin.logo_url || `https://app.anypayinc.com/${coin.code.toLowerCase()}.png`;
+      accountCoins[coin.code]['icon'] = coin.logo_url as string
 
-      accountCoins[coin.code].unavailable = coin.unavailable;
-      accountCoins[coin.code].supported = coin.supported;
+      accountCoins[coin.code].unavailable = Boolean(coin.unavailable)
+      accountCoins[coin.code].supported = Boolean(coin.supported)
 
     } else {
 
       accountCoins[coin.code] = {
         code: coin.code,
         name: coin.name,
-        currency: coin.currency,
-        chain: coin.chain,
+        currency: coin.currency as string,
+        chain: coin.chain as string,
         enabled: false,
-        icon: coin.logo_url || `https://app.anypayinc.com/${coin.code.toLowerCase()}.png`,
-        supported: coin.supported
+        icon: coin.logo_url as string,
+        supported: coin.supported as boolean
       };
 
     }

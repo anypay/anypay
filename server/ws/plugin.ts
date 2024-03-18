@@ -8,7 +8,7 @@ import { log } from '../../lib/log'
 
 import { Actor } from 'rabbi'
 
-import { awaitChannel, channel } from '../../lib/amqp'
+import { awaitChannel, channel, exchange } from '../../lib/amqp'
 
 import { models } from "../../lib";
 
@@ -33,7 +33,7 @@ async function handleInvoiceWebsocket(invoice_uid, socket, req) {
 
   const actor = await Actor.create({
 
-    exchange: 'anypay.events',
+    exchange,
 
     routingkey: `invoices.${invoice_uid}.events`,
 
@@ -125,7 +125,7 @@ export const plugin = (() => {
 
           const actor = await Actor.create({
 
-            exchange: 'anypay.events',
+            exchange,
 
             routingkey: `accounts.${account.id}.events`,
 

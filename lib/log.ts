@@ -33,7 +33,15 @@ if (config.get('loki_enabled') && config.get('loki_host')) {
 
   const LokiTransport = require("winston-loki");
 
-  const lokiConfig = {
+  const lokiConfig: {
+    format: any;
+    host: string;
+    json: boolean;
+    batching: boolean;
+    labels: any;
+    basicAuth?: string;
+  
+  } = {
     format: winston.format.json(),
     host: config.get('loki_host'),
     json: true,
@@ -72,7 +80,7 @@ export class Logger {
 
     this.namespace = params.namespace || 'anypay'
 
-    this.env = params.env || process.env.NODE_ENV
+    this.env = String(params.env || process.env.NODE_ENV)
 
   }
 
@@ -104,13 +112,13 @@ export class Logger {
       error: false
     })
 
-    await publish('anypay.events', type, payload)
+    await publish(type, payload)
 
     if (payload.account_id) {
 
       const routing_key = `accounts.${payload.account_id}.events`
 
-      await publish('anypay.events', routing_key, record.toJSON())    
+      await publish(routing_key, record.toJSON())    
 
     }
 
@@ -118,7 +126,7 @@ export class Logger {
 
       const routing_key = `apps.${payload.app_id}.events`
 
-      await publish('anypay.events', routing_key, record.toJSON())
+      await publish(routing_key, record.toJSON())
 
     }
 
@@ -126,11 +134,11 @@ export class Logger {
 
       const routing_key = `invoices.${payload.invoice_uid}.events`
 
-      await publish( 'anypay.events', routing_key, record.toJSON())
+      await publish(routing_key, record.toJSON())
 
     }
 
-    publish('anypay.events', 'event.created', record.toJSON())
+    publish('event.created', record.toJSON())
 
     return record
 
@@ -167,7 +175,13 @@ export class Logger {
 
     this.log.debug('log.read', query)
 
-    const where = {
+    const where: {
+      namespace: string;
+      error: boolean;
+      type?: string;
+      payload?: any;
+    
+    } = {
       namespace: this.namespace,
       error: query.error || false
     }

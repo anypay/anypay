@@ -7,26 +7,27 @@ import { Actor, log } from 'rabbi';
 import { models } from '../../lib';
 
 import { sendMessage } from '../../lib/push_notifications';
+import { exchange } from '../../lib/amqp';
 
 
 export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
     routingkey: 'invoice:paid',
 
     queue: 'payment_push_notification'
 
   })
-  .start(async (channel, msg) => {
+  .start(async (_, msg, json) => {
 
     log.info(msg.content.toString());
 
-    let invoiceUid = msg.content.toString();
+    const { uid } = json
 
-    let invoice = await models.Invoice.findOne({ where: { uid: invoiceUid }});
+    let invoice = await models.Invoice.findOne({ where: { uid }});
 
     let account = await models.Account.findOne({ where: { id: invoice.account_id }});
 
@@ -37,7 +38,7 @@ export async function start() {
     try {
 
       await sendMessage(account.email, `Payment Received ${invoice.denomination_amount_paid} ${invoice.denomination_currency}`, invoice.currency, {
-        path: `/payments/${invoiceUid}`,
+        path: `/payments/${uid}`,
       });
 
       return

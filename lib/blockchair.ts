@@ -1,4 +1,3 @@
-import * as http from 'superagent'
 
 import { log } from './log'
 
@@ -28,26 +27,26 @@ export const CURRENCIES = {
   'DOGE': 'doge'
 }
 
-export async function publish(coin, hex): Promise<BroadcastTxResult> {
+export async function publish(coin: string, hex: string): Promise<BroadcastTxResult> {
 
   /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
 
   try {
 
-    let resp = await http.post(`https://api.blockchair.com/${coin}/push/transaction`).send({
+    let { data } = await axios.post(`https://api.blockchair.com/${coin}/push/transaction`, {
       data: hex
     });
 
-    log.info(`blockchair.push.transaction.${coin}`, resp);
+    log.info(`blockchair.push.transaction.${coin}`, data);
 
     return {
       txhex: hex,
-      txid: resp.body.data.transaction_hash,
+      txid: data.transaction_hash,
       success: true,
-      result: resp.body
+      result: data
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error(`blockchair.push.transaction.${coin}.error`, error);
 
@@ -90,12 +89,12 @@ export async function getRawTransaction(chain: string, txid: string): Promise<Ge
   }
 }
 
-export async function getTransaction(_coin, txid) {
+export async function getTransaction(_coin: string, txid: string) {
 
-  const coin = COIN_MAP[_coin]
+  const coin = COIN_MAP[_coin as keyof typeof COIN_MAP];
 
   if (!coin) {
-    throw new Error(`blockchair coin ${coin} not supported`)
+    throw new Error(`blockchair coin ${coin} not supported`);
   }
 
   /* litecoin, bitcoin, bitcoin-cash, bitcoin-sv, dash, zcash, ethereum, doge */
@@ -110,7 +109,7 @@ export async function getTransaction(_coin, txid) {
 
     return tx
 
-  } catch(error) {
+  } catch(error: any) {
     
     log.error(`blockchair.transaction.get.${coin}.${txid}.error`, error);
 

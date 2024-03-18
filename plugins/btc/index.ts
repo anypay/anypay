@@ -14,7 +14,7 @@ import { BroadcastTxResult, BroadcastTx, Transaction, Payment } from '../../lib/
 
 import * as bitcoind_rpc from './bitcoind_rpc'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '../../lib/plugins/utxo'
 
@@ -26,7 +26,7 @@ export default class BTC extends UTXO_Plugin {
 
   decimals = 8;
 
-  providerURL = process.env.getblock_btc_url
+  providerURL = String(process.env.getblock_btc_url)
 
   get bitcore() {
 
@@ -53,20 +53,7 @@ export default class BTC extends UTXO_Plugin {
 
     if (config.get('chain_so_broadcast_provider_enabled')) {
 
-      broadcastProviders.push((async () => {
-
-        try {
-
-          const result = await chain_so.broadcastTx('BTC', txhex)
-
-          return result
-        } catch(error) {
-
-          console.log('plugin-btc: chain_so broadcast failed, trying next provider')
-
-        }
-
-      })())
+      broadcastProviders.push(chain_so.broadcastTx('BTC', txhex))
 
     }
 
@@ -78,7 +65,6 @@ export default class BTC extends UTXO_Plugin {
       )
     }
 
-
     if (config.get('nownodes_enabled')) {
 
       broadcastProviders.push(
@@ -88,7 +74,6 @@ export default class BTC extends UTXO_Plugin {
     }
 
     return oneSuccess<BroadcastTxResult>(broadcastProviders)
-
 
   }
 

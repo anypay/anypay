@@ -12,6 +12,7 @@ import { Op } from 'sequelize'
 import { getConfirmation } from './plugins'
 
 import * as moment from 'moment'
+import { registerSchema } from './amqp'
 
 export interface Confirmation {
   confirmation_hash: string;
@@ -52,7 +53,7 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
 
   await invoice.set('status', 'paid')
 
-  publish('anypay', 'payment.confirmed', payment.toJSON())
+  publish('payment.confirmed', payment.toJSON())
 
   return payment
 
@@ -95,6 +96,15 @@ interface RevertedPayment {
   payment: Payment;
 }
 
+registerSchema('payment.reverted', {
+  type: 'object',
+  properties: {
+    invoice: { type: 'object' },
+    payment: { type: 'object' }
+  },
+  required: ['invoice', 'payment']
+})
+
 export async function revertPayment({ txid }: { txid: string }): Promise<RevertedPayment> {
 
   // Transaction was reverted by EVM! 
@@ -111,7 +121,7 @@ export async function revertPayment({ txid }: { txid: string }): Promise<Reverte
 
   await payment.set('status', 'failed')
 
-  publish('anypay', 'payment.revered', payment.toJSON())
+  publish('payment.reverted', payment.toJSON())
 
   return { invoice, payment }
 }

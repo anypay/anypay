@@ -4,64 +4,62 @@ import { log } from './log'
 
 import { createWebhookForInvoice } from './webhooks'
 
-import { Account } from './account'
-
-import { PaymentOption } from './payment_option'
+import {
+  payment_options as PaymentOption,
+  accounts as Account,
+  invoices as Invoice
+} from '@prisma/client'
 
 import { computeInvoiceURI } from './uri'
-
-import { models } from './models'
-
-import { Orm } from './orm'
 
 import * as shortid from 'shortid';
 
 import { createPaymentOptions } from './invoice'
 
-import { publish } from './amqp'
+import { publish, registerSchema } from './amqp'
 
-export class InvoiceNotFound implements Error {
-  name = 'InvoiceNotFound'
-  message = 'Invoice Not Found'
-}
+import Joi = require('@hapi/joi')
+import prisma from './prisma'
 
-export async function ensureInvoice(uid: string) {
+export async function ensureInvoice(uid: string): Promise<Invoice> {
 
-  let record = await models.Invoice.findOne({
-    where: { uid }
-  })
-
-
-  if (!record) { throw new InvoiceNotFound() }
-
-  return new Invoice(record)
+  return prisma.invoices.findFirstOrThrow({ where: { uid } })
 
 }
-export async function getInvoice(uid: string) {
+export async function getInvoice(uid: string): Promise<Invoice | null> {
 
-  let record = await models.Invoice.findOne({
-    where: { uid }
-  })
-
-  if (!record) { return }
-
-  return new Invoice(record)
+  return prisma.invoices.findFirst({ where: { uid } })
 
 }
+
+registerSchema('invoice.cancelled', Joi.object({
+  uid: Joi.string().required(),
+  status: Joi.string().valid('cancelled').required(),
+  timestamp: Joi.date().timestamp().required()
+}).required())
 
 export async function cancelInvoice(invoice: Invoice) {
 
-  if (invoice.get('status') !== 'unpaid') {
+  if (invoice.status !== 'unpaid') {
     throw new Error('can only cancel unpaid invoices')
-  }
+  }  
 
-  await invoice.set('status', 'cancelled')
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      status: 'cancelled',
+      cancelled: true
+    }
+  
+  })
 
-  await invoice.set('cancelled', true)
+  log.info('invoice.cancelled', { uid: invoice.uid })
 
-  log.info('invoice.cancelled', { uid: invoice.get('uid') })
-
-  publish('invoice.cancelled', { uid: invoice.get('uid') })
+  publish('invoice.cancelled', {
+    uid: invoice.uid,
+    status: 'cancelled',
+    timestamp: new Date()
+  })
 
   return invoice
 
@@ -77,121 +75,6 @@ export class InvalidWebhookURL implements Error {
 
     this.message = `${this.message}: received ${invalidURL}`
   }
-}
-
-export class Invoice extends Orm {
-
-  static model = models.Invoice;
-
-  get account_id(): any {
-
-    return this.get('account_id')
-  }
-
-  get app_id(): any {
-
-    return this.get('app_id')
-  }
-
-  get denomination(): string {
-    return this.get('denomination_currency')
-  }
-
-  get payment(): any {
-    return this.record['payment']
-  }
-
-  get currency(): string {
-    return this.record['currency']
-  }
-
-  get refund(): any {
-    return this.record['refund']
-  }
-
-  get status(): string {
-
-    return this.get('status')
-  }
-
-  get uid(): string {
-
-    return this.get('uid')
-  }
-
-  get webhook_url(): string {
-
-    return this.get('webhook_url')
-
-  }
-
-  toJSON() {
-
-    let json = super.toJSON()
-
-    Object.keys(json).forEach(key => {
-      if (json[key] === undefined) {
-        delete json[key];
-      }
-
-      if (json[key] === null) {
-        delete json[key];
-      }
-
-      if (Number.isNaN(json[key])) {
-        delete json[key];
-      }
-    });
-
-    delete json.currency
-    delete json.cancelled
-    delete json.locked
-    delete json.replace_by_fee
-    delete json.denomination_amount
-    delete json.denomination_currency
-    delete json.account_id
-    delete json.id
-    delete json.complete
-    delete json.headers
-    delete json.currency_specified
-    delete json.currency_specified
-    delete json.updatedAt
-
-    return json
-
-  }
-
-  async getAccount(): Promise<Account> {
-
-    let record = await models.Account.findOne({
-      where: { id: this.get('account_id') }
-    })
-
-    return new Account(record)
-
-  }
-
-
-  async getPaymentOptions(): Promise<PaymentOption[]> {
-
-    let records = await models.PaymentOption.findAll({
-      where: { invoice_uid: this.get('uid') }
-    })
-
-    return records.map(record => new PaymentOption(record))
-
-  }
-
-  async getPaymentOption({chain, currency}:{chain:string, currency:string}): Promise<PaymentOption> {
-
-    let record = await models.PaymentOption.findOne({
-      where: { invoice_uid: this.get('uid'), chain, currency }
-    })
-
-    return new PaymentOption(record)
-
-  }
-
 }
 
 interface CreateInvoice {
@@ -214,11 +97,13 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const uid = shortid.generate();
 
-  var { redirect_url, webhook_url, account, amount, currency } = params
+  var { redirect_url, account, amount, currency } = params
 
-  if (!webhook_url) {
+  let webhook_url: string | undefined = params.webhook_url
 
-    webhook_url = account.get('webhook_url')
+  if (!webhook_url && account.webhook_url) {
+
+    webhook_url = account.webhook_url
 
   }
 
@@ -266,42 +151,47 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   }
 
-  var record = await models.Invoice.create(newInvoice);
-
-  let invoice = new Invoice(record)
+  const invoice = await prisma.invoices.create({ data: newInvoice })
 
   createWebhookForInvoice(invoice)
 
-  const paymentOptions = await createPaymentOptions(account.record, invoice)
+  const paymentOptions = await createPaymentOptions(account, invoice)
 
-  let paymentRequest = await models.PaymentRequest.create({
+  const paymentRequest = await prisma.paymentRequests.create({
+      
+      data: {
+  
+        app_id: 1,
+    
+        template: paymentOptions.map(option => {
+  
+          return {
+            currency: option.get('currency'),
+            to: [{
+              currency: invoice.denomination_currency,
+              amount: invoice.denomination_amount,
+              address: option.address
+            }]
+  
+          }
+        }),
+  
+        status: 'unpaid',
+  
+        invoice_uid: invoice.uid,
 
-    app_id: 1,
+        updatedAt: new Date(),
 
-    account_id: account.id,
-
-    template: paymentOptions.map(option => {
-
-      return {
-        currency: option.get('currency'),
-        to: [{
-          currency: record.denomination_currency,
-          amount: record.denomination_amount,
-          address: option.get('address')
-        }]
-
+        createdAt: new Date()
+  
       }
-    }),
+  
+    })
 
-    status: 'unpaid',
-
-    invoice_uid: record.uid
-
-  })
 
   log.info('paymentrequest.created', paymentRequest)
 
-  log.info('invoice.created', { ...record.toJSON(), invoice_uid: record.uid })
+  log.info('invoice.created', invoice)
 
   return invoice;
 

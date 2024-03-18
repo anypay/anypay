@@ -13,7 +13,7 @@ const bch: any = require('bitcore-lib-cash');
 
 var bchaddr: any = require('bchaddrjs');
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 //import { getDecodedTransaction } from '../../lib/blockchair'
 
@@ -42,11 +42,11 @@ export default class BCH extends Plugin {
     throw new Error() //TODO
   }
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     const transaction = await getRawTransaction(txid)
 
-    if (!transaction.blockhash) { return }
+    if (!transaction.blockhash) { return null }
 
     const hash = transaction.blockhash
 
@@ -73,7 +73,7 @@ export default class BCH extends Plugin {
 
     let tx = new this.bitcore.Transaction(params.transactions[0].txhex);
 
-    let txOutputs = tx.outputs.map(output => {
+    let txOutputs = tx.outputs.map((output: { script: any; satoshis: any; }) => {
 
       try {
 
@@ -88,7 +88,7 @@ export default class BCH extends Plugin {
           amount: output.satoshis
         }
 
-      } catch(error) {
+      } catch(error: any) {
 
         log.error(`payment.verify.error`, error)
 
@@ -97,7 +97,7 @@ export default class BCH extends Plugin {
       }
 
     })
-    .filter(n => n != null)
+    .filter((n: null) => n != null)
 
     console.log("payment.verify.txoutputs", txOutputs);
 
@@ -206,7 +206,7 @@ interface GetRawTransactionResult {
 
 async function getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
 
-  const { data } = await axios.post(process.env.getblock_bch_url, {
+  const { data } = await axios.post(String(process.env.getblock_bch_url), {
     method: 'getrawtransaction',
     params: [txid, true]
   })
@@ -223,7 +223,7 @@ interface GetBlockResult {
 
 async function getBlock(hash: string): Promise<GetBlockResult> {
 
-  const { data } = await axios.post(process.env.getblock_bch_url, {
+  const { data } = await axios.post(String(process.env.getblock_bch_url), {
     method: 'getblock',
     params: [hash, 1]
   })

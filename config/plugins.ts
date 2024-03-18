@@ -4,9 +4,9 @@ const { join } = require('path')
 
 import { Plugin } from '../lib/plugin'
 
-const isDirectory = source => lstatSync(source).isDirectory()
-const getDirectories = source =>
-  readdirSync(source).map(name => join(source, name)).filter(isDirectory)
+const isDirectory = (source: string) => lstatSync(source).isDirectory()
+const getDirectories = (source: string) =>
+  readdirSync(source).map((name: string) => join(source, name)).filter(isDirectory)
 
 var loaded = false
 var loading = false

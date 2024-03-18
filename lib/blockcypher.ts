@@ -19,7 +19,16 @@ import { Op } from 'sequelize'
 
 import { sendWebhookForInvoice } from './webhooks';
 
-export async function publish(currency, hex): Promise<BroadcastTxResult> {
+import { registerSchema } from './amqp';
+
+import * as Joi from '@hapi/joi'
+
+import {
+  payments as Payment
+} from '@prisma/client'
+import prisma from './prisma';
+
+export async function publish(currency: string, hex: string): Promise<BroadcastTxResult> {
 
   const trace = uuid()
 
@@ -42,7 +51,7 @@ export async function publish(currency, hex): Promise<BroadcastTxResult> {
       txhex: hex
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     const message = error.response.data.error
 
@@ -74,7 +83,7 @@ export async function getNewBlockWebhook() {
 
   let { data } = await axios.get(`https://api.blockcypher.com/v1/btc/main/hooks?token=${token}`)
 
-  return data.filter(hook => hook.event === 'new-block')[0]
+  return data.filter((hook: { event: string; }) => hook.event === 'new-block')[0]
 
 }
 
@@ -133,7 +142,25 @@ export async function getTransaction(chain: string, txid: string): Promise<GetTr
 
 }
 
-export async function confirmTransaction(payment, transaction?: GetTransactionResult) {
+registerSchema('payment.confirmed', Joi.object({
+  uid: Joi.string().required(),
+  txid: Joi.string().required(),
+  currency: Joi.string().required(),
+  amount: Joi.number().required(),
+  invoice_uid: Joi.string().required(),
+  confirmation_date: Joi.string().required(),
+  confirmation_height: Joi.number().required(),
+  confirmation_hash: Joi.string().required()
+}).required())
+
+
+registerSchema('invoice.paid', Joi.object({
+  uid: Joi.string().required(),
+  status: Joi.string().valid('paid').required(),
+  timestamp: Joi.date().timestamp().required(),
+}).required())
+
+export async function confirmTransaction(payment: Payment, transaction?: GetTransactionResult) {
 
   if (!transaction) {
 
@@ -141,41 +168,47 @@ export async function confirmTransaction(payment, transaction?: GetTransactionRe
 
   }
 
-  payment.confirmation_date = transaction.confirmed
-
-  payment.confirmation_height = transaction.block_height
-
-  payment.confirmation_hash = transaction.block_hash
-
-  payment.status = 'confirmed'
-
-  await payment.save()
-
-  publishAMQP('anypay', 'payment.confirmed', payment.toJSON())
-
-  const invoice = await models.Invoice.findOne({
-    where: {
-      uid: payment.invoice_uid
+  prisma.payments.update({
+    where: { id: payment.id },
+    data: {
+      status: 'confirmed',
+      confirmation_date: transaction.confirmed,
+      confirmation_height: transaction.block_height,
+      confirmation_hash: transaction.block_hash
     }
+  })
+
+  const updatedPayment = await prisma.payments.findFirstOrThrow({
+    where: { id: payment.id }
+  })
+
+  publishAMQP('payment.confirmed', updatedPayment)
+
+  let invoice = await prisma.invoices.findFirstOrThrow({
+    where: { uid: payment.invoice_uid }
   })
 
   const originalStatus = invoice.status
 
+
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      status: 'paid'
+    }
+  })
+
+  invoice = await prisma.invoices.findFirstOrThrow({
+    where: { id: invoice.id }
+  })
+
   if (originalStatus === 'confirming') {
 
-    invoice.status = 'paid'
-
-    await invoice.save()
-
-    publishAMQP('anypay', 'invoice.paid', invoice.toJSON())
+    publishAMQP('invoice.paid', invoice)
 
   }
 
-  invoice.status = 'paid'
-
-  await invoice.save()
-
-  sendWebhookForInvoice(invoice.uid, 'confirmTransaction')
+  sendWebhookForInvoice(String(invoice.uid), 'confirmTransaction')
 
   return payment
   
@@ -183,7 +216,7 @@ export async function confirmTransaction(payment, transaction?: GetTransactionRe
 
 export async function confirmTransactionsFromBlock(hash: string) {
 
-  var newTransactions: string[];
+  var newTransactions: string[] | null = null;
 
   var offset = 0
 
@@ -225,7 +258,11 @@ export async function confirmTransactionsFromBlock(hash: string) {
 
 }
 
-export async function confirmTransactionsFromBlockWebhook(webhook) {
+interface BlockcypherWebhook {
+  hash: string;
+}
+
+export async function confirmTransactionsFromBlockWebhook(webhook: BlockcypherWebhook) {
 
   return confirmTransactionsFromBlock(webhook.hash)
   

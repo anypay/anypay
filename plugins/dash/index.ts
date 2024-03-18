@@ -8,9 +8,11 @@ import * as insight from './lib/insight'
 
 import { BroadcastTx, BroadcastTxResult, Transaction, Plugin, Confirmation, Payment } from '../../lib/plugin'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 import axios from 'axios'
+
+const providerURL = String(process.env.getblock_dash_url)
 
 export default class DASH extends Plugin {
 
@@ -19,6 +21,8 @@ export default class DASH extends Plugin {
   chain: string = 'DASH'
 
   decimals: number = 8;
+
+  providerURL = String(process.env.getblock_dash_url)
 
   get bitcore() {
 
@@ -30,11 +34,11 @@ export default class DASH extends Plugin {
     throw new Error() //TODO
   }
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     const transaction = await getRawTransaction(txid)
 
-    if (!transaction.blockhash) { return }
+    if (!transaction.blockhash) { return null }
 
     const hash = transaction.blockhash
 
@@ -112,7 +116,7 @@ interface GetRawTransactionResult {
 
 async function getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
 
-  const { data } = await axios.post(process.env.getblock_dash_url, {
+  const { data } = await axios.post(providerURL, {
     method: 'getrawtransaction',
     params: [txid, true]
   })
@@ -129,7 +133,7 @@ interface GetBlockResult {
 
 async function getBlock(hash: string): Promise<GetBlockResult> {
 
-  const { data } = await axios.post(process.env.getblock_dash_url, {
+  const { data } = await axios.post(providerURL, {
     method: 'getblock',
     params: [hash, 1]
   })

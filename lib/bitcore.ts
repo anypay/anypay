@@ -1,7 +1,7 @@
 
 import { find } from './plugins'
 
-export function getBitcore(currency) {
+export function getBitcore(currency: string) {
 
   let plugin = find({ currency, chain: currency })
 

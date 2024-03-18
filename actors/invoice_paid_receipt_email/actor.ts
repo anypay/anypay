@@ -5,25 +5,26 @@ require('dotenv').config();
 import { Actor } from 'rabbi';
 
 import {email, models} from '../../lib';
+import { exchange } from '../../lib/amqp';
 
 export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
-    routingkey: 'invoice:paid',
+    routingkey: 'invoice.paid',
 
     queue: 'send_invoice_paid_email_receipt',
 
   })
-  .start(async (channel, msg) => {
+  .start(async (channel, msg, json) => {
 
-    let uid = msg.content.toString();
+    const { uid } = json
 
     let invoice = await models.Invoice.findOne({
  
-      where: { uid: uid }
+      where: { uid }
 
     });
 

@@ -1,35 +1,40 @@
 
-
-import { models } from './models'
-
 import { log } from './log'
 
 import { compare } from './bcrypt'
 
-export async function withEmailPassword (email, password) {
+import {
+  access_tokens as AccessToken
+} from '@prisma/client'
+import prisma from './prisma'
+import { uuid } from '../test/utils'
 
-  var account = await models.Account.findOne({
+export async function withEmailPassword (email: string, password: string): Promise<AccessToken> {
+
+  const account = await prisma.accounts.findFirstOrThrow({
     where: {
       email: email.toLowerCase()
     }
-  });
+  })
 
-  if (!account) {
-    log.info('no account found for email', email);
-    throw new Error('account with email not found');
-  }
   try {
 
-    await compare(password, account.password_hash);
+    await compare(password, String(account.password_hash));
 
   } catch(error) {
 
-    return;
+    throw new Error('invalid password');
   }
   
   log.info(`password for email ${email} is correct`);
 
-  var token = await models.AccessToken.create({ account_id: account.id })
+  return await prisma.access_tokens.create({
+    data: {
+      account_id: account.id,
+      uid: uuid.v4(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
 
-  return token;
 };

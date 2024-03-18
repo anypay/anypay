@@ -5,6 +5,7 @@ require('dotenv').config();
 import { Actor, log, getChannel } from 'rabbi';
 
 import { models } from '../../lib';
+import { exchange, publish } from '../../lib/amqp';
 
 export async function start() {
 
@@ -14,33 +15,31 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
-    routingkey: 'invoice:paid',
+    routingkey: 'invoice.paid',
 
     queue: 'republish_invoice_paid_as_account_id_dev'
 
   })
-  .start(async (channel, msg) => {
+  .start(async (channel, msg, json) => {
 
-    const uid = msg.content.toString();
-
+    const { uid } = json
+ 
     let invoice = await models.Invoice.findOne({ where: { uid }});
 
     let routingKey1 = `accounts.${invoice.account_id}.invoicepaid`;
     let routingKey2 = `accounts.${invoice.account_id}.invoice.paid`;
 
-    await channel.publish('anypay.events', routingKey1, msg.content);
-    
-    await channel.publish('anypay.account_events', routingKey2, Buffer.from(
-      JSON.stringify(invoice.toJSON())
-    ));
+    await channel.publish(routingKey1, msg.content);
+
+    publish(routingKey2, invoice.toJSON())
 
   });
 
   Actor.create({
 
-    exchange: 'anypay.events',
+    exchange,
 
     routingkey: 'models.Invoice.afterCreate',
 
@@ -51,7 +50,7 @@ export async function start() {
 
     let routingKey = `accounts.${json.account_id}.invoicecreated`;
 
-    await channel.publish('anypay.events', routingKey, msg.content);
+    await channel.publish(exchange, routingKey, msg.content);
 
     log.info(routingKey, { invoice: json });
 
@@ -59,7 +58,7 @@ export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay.events',
+    exchange,
 
     routingkey: 'models.Invoice.afterUpdate',
 
@@ -70,7 +69,7 @@ export async function start() {
 
     let routingKey = `accounts.${json.account_id}.invoiceupdated`;
 
-    await channel.publish('anypay.events', routingKey, msg.content);
+    await channel.publish(exchange, routingKey, msg.content);
 
     log.info(routingKey, { invoice: json });
 

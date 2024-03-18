@@ -38,7 +38,7 @@ const hookNames = [
 
 ]
 
-export function bindAllModelsHooks(models, exchange) {
+export function bindAllModelsHooks(models: any, exchange: string) {
 
   Object.values(models).forEach(async (model: any) => {
 
@@ -48,7 +48,7 @@ export function bindAllModelsHooks(models, exchange) {
 
 }
 
-export function bindModelHooks(model, exchange) {
+export function bindModelHooks(model: any, exchange: string) {
 
   hookNames.forEach(hookName => {
 
@@ -58,14 +58,14 @@ export function bindModelHooks(model, exchange) {
 
 }
 
-export function bindHook(model, hookName, exchange) {
+export function bindHook(model: any, hookName: string, exchange: string) {
 
   var name = model.options.name.singular
     .split('_')
     .map(capitalizeFirstLetter)
     .join('');
 
-  model.addHook(hookName, async (instance) => {
+  model.addHook(hookName, async (instance: any) => {
 
     let channel = await awaitChannel();
 
@@ -81,7 +81,7 @@ export function bindHook(model, hookName, exchange) {
 
 }
 
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+function capitalizeFirstLetter(s: string) {
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 

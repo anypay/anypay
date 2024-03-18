@@ -5,13 +5,19 @@ import { log } from './log';
 
 import { config } from './config'
 
-import { Invoice } from './invoices'
+import {
+  invoices as Invoice,
+  accounts as Account
+} from '@prisma/client'
 
-import { Account, findAccount } from './account'
+import axios from 'axios'
 
-import { Orm, findOrCreate } from './orm'
+import {
+  Webhooks as Webhook,
+  WebhookAttempts as WebhookAttempt,
+} from '@prisma/client'
 
-import * as http from 'superagent';
+import prisma from './prisma';
 
 export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
@@ -21,33 +27,36 @@ export async function sendWebhook(webhook: Webhook) {
 
     try {
 
-      let resp = await http.post(webhook.url).send(webhook.payload);
+      let resp = await axios.post(webhook.url, webhook.payload)
 
-      let response_code = resp.statusCode; 
+      let response_code = resp.status; 
 
-      let response_body = resp.body; 
+      let response_body = resp.data; 
 
-      if (typeof resp.body !== 'string') {
-        response_body = JSON.stringify(resp.body); 
+      if (typeof resp.data !== 'string') {
+        response_body = JSON.stringify(resp.data); 
       } else {
-        response_body = resp.body; 
+        response_body = resp.data; 
       }
 
-      await webhook.update({
-        response_body,
-        status: 'success',
-        ended_at: new Date(),
-        response_code
+      await prisma.webhooks.update({
+        where: { id: webhook.id },
+        data: {
+          response_body,
+          status: 'success',
+          ended_at: new Date(),
+          response_code
+        }
       })
 
-      const event = webhook.toJSON()
+      const event = Object.create({...webhook})
 
       delete event.account_id
       delete event.invoice_uid
 
       log.info('webhook.sent', event)
 
-    } catch(e) {
+    } catch(e: any) {
 
       log.debug('webhook.error', e)
       log.debug('webhook.error', e.message)
@@ -66,20 +75,24 @@ export async function sendWebhook(webhook: Webhook) {
 
       }
 
-      await webhook.update({
-        'status': 'failed',
-        error: e.message,
-        ended_at: new Date(),
-        response_body,
-        response_code
+      await prisma.webhooks.update({
+        where: { id: webhook.id },
+        data: {
+          status: 'failed',
+          error: e.message,
+          ended_at: new Date(),
+          response_body,
+          response_code
+        }
       })
 
-      const event = webhook.toJSON()
+      const event = Object.create({...webhook })
 
       delete event.account_id
       delete event.invoice_uid
 
-      log.info('webhook.failed', webhook)
+    
+      log.info('webhook.failed', event)
 
     }
 
@@ -97,27 +110,39 @@ export async function sendWebhookForInvoice(invoiceUid: string, type: string = '
 
   const payload = invoice.toJSON();
 
-  let [webhook] = await findOrCreate<Webhook>(Webhook, {
-    where: {
-      invoice_uid: invoice.uid
-    },
-    defaults: {
-      account_id: invoice.account_id,
-      invoice_uid: invoice.uid,
-      type,
-      url: invoice.webhook_url,
-      status: 'pending',
-      payload
-    }
+  let webhook = await prisma.webhooks.findFirst({
+    where: { invoice_uid: invoice.uid }
   })
+
+  if (!webhook) {
+
+    webhook = await prisma.webhooks.create({
+      data: {
+        account_id: invoice.account_id,
+        invoice_uid: invoice.uid,
+        url: invoice.webhook_url,
+        type,
+        status: 'pending',
+        payload,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+
+  }
 
   if (JSON.stringify(webhook.payload) == '{}') {
 
-    await webhook.update({
-      payload: invoice.toJSON()
+    webhook = await prisma.webhooks.update({
+      where: { id: webhook.id },
+      data: {
+        payload
+      }
+    
     })
 
-    log.info('webhook.emptyPayload.updated', webhook.toJSON())
+
+    log.info('webhook.emptyPayload.updated', webhook)
 
   }
 
@@ -128,249 +153,130 @@ interface FindWebhook {
   invoice_uid: string
 }
 
-class WebhookNotFound implements Error {
-  name = 'WebhookNotFound'
-  message = 'webhook not found for invoice uid'
-}
-
 export class WebhookAlreadySent implements Error {
   name = 'WebhookAlreadySent'
   message = 'webhook already sent for this invoice'
 }
 
-
-interface NewAttempt {
-  record: any;
-  webhook: Webhook;
-}
-
-export class Attempt extends Orm {
-
-  webhook: Webhook;
-
-  constructor(params: NewAttempt) {
-    super(params.record)
-    this.webhook = params.webhook
-  }
-
-  get response_code() {
-    return this.get('response_code')
-  }
-}
-
-export class Webhook extends Orm {
-
-  static model = models.Webhook;
-
-  attempts: Attempt[];
-
-  invoice: Invoice;
-
-  constructor(record) {
-    super(record)
-
-    this.attempts = []
-  }
-
-  toJSON() {
-
-    let json = super.toJSON()
-
-    let attempts = this.attempts.map(attempt => attempt.toJSON())
-
-    return Object.assign(json, { attempts })
-
-  }
-
-
-  async getAccount(): Promise<Account> {
-
-    return findAccount(this.invoice.account_id)
-
-  }
-
-  get retry_policy(): string {
-    return this.get('retry_policy')
-  }
-
-  get id(): number {
-    return this.get('id')
-  }
-
-  get url(): string {
-    return this.get('url')
-  }
-
-  get payload(): string {
-    return this.get('payload')
-  }
-
-  get success(): boolean {
-    return this.get('status') === 'success'
-  }
-
-  get status(): boolean {
-    return this.get('status')
-  }
-
-  setAttempts(attempts: Attempt[]) {
-    this.attempts = attempts
-  }
-
-  setInvoice(invoice: Invoice) {
-    this.invoice = invoice
-  }
-
-  invoiceToJSON() {
-
-    return this.invoice.toJSON()
-
-  }
-
-}
-
 export async function webhookForInvoice(invoice: Invoice): Promise<Webhook> {
 
-  let record = await models.Webhook.findOne({
-    where: { invoice_uid: invoice.uid }
+  return prisma.webhooks.findFirstOrThrow({
+    where: {
+      invoice_uid: invoice.uid
+    }
   })
 
-  if (!record) { throw new WebhookNotFound() }
-
-  let attempts = await models.WebhookAttempt.findAll({
-
-    where: { webhook_id: record.id }
-
-  })
-
-  const webhook = new Webhook(record)
-
-  webhook.setInvoice(invoice)
-  webhook.setAttempts(attempts.map(attempt => new Attempt({record: attempt, webhook})))
-
-  return webhook
 }
 
-export async function findWebhook(where: FindWebhook) {
+export async function findWebhook(where: FindWebhook): Promise<Webhook> {
 
-  let record = await models.Webhook.findOne({where})
-
-  if (!record) { throw new WebhookNotFound() }
-
-  let invoice = await models.Invoice.findOne({ where: { uid: record.invoice_uid }})
-
-  let attempts = await models.WebhookAttempt.findAll({
-
-    where: { webhook_id: record.id }
-
+  const webhook = await prisma.webhooks.findFirstOrThrow({
+    where
   })
-
-  const webhook = new Webhook(record)
-
-  webhook.setInvoice(new Invoice(invoice))
-  webhook.setAttempts(attempts.map(attempt => new Attempt({record: attempt, webhook})))
 
   return webhook
 }
 
 export async function createWebhookForInvoice(invoice: Invoice): Promise<Webhook> {
 
-  const where = {
-    invoice_uid: invoice.uid,
-    url: invoice.get('webhook_url') || DEFAULT_WEBHOOK_URL,
-    account_id: invoice.get('account_id')
-  }
-
-  let [webhook] = await models.Webhook.findOrCreate({
-    where,
-    defaults: where
+  let webhook = await prisma.webhooks.findFirst({
+    where: {
+      invoice_uid: invoice.uid
+    }
   })
 
-  if (!webhook) { throw new WebhookNotFound() }
+  if (!webhook) {
 
-  return new Webhook(webhook)
-
-}
-
-export class WebhookFailed implements Error {
-  name = 'WebhookFailed'
-  message = 'webhook failed'
-  attempt: Attempt;
-
-  constructor(attempt: Attempt) {
-    this.attempt = attempt
+    webhook = await prisma.webhooks.create({
+      data: {
+        invoice_uid: invoice.uid,
+        url: invoice.webhook_url || DEFAULT_WEBHOOK_URL,
+        account_id: invoice.account_id,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
   }
+  return webhook
 }
 
-export async function attemptWebhook(webhook: Webhook): Promise<Attempt> {
+export async function attemptWebhook(webhook: Webhook): Promise<WebhookAttempt> {
 
-  if (webhook.success) {
+  if (webhook.status === 'success') {
 
     throw new WebhookAlreadySent()
   }
 
-  let record = await models.WebhookAttempt.create({
-    webhook_id: webhook.id
+  var attempt = await prisma.webhookAttempts.create({
+    data: {
+      webhook_id: webhook.id,
+      started_at: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
   })
 
-  record.start_time = new Date()
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: { uid: webhook.invoice_uid }
+  })
 
-  record.started_at = new Date();
-
-  var resp;
-
-  let attemp = new Attempt({record, webhook})
-
-  webhook.attempts.push(attemp)
-
-  let json = webhook.invoiceToJSON();
+  let json = JSON.parse(JSON.stringify(invoice))
 
   try {
 
-    resp = await http.post(webhook.url).send(json);
+    const resp = await axios.post(String(webhook.url), json);
 
-    record.response_code = resp.statusCode; 
+    const response_code = resp.status;
+    const response_body = typeof resp.data !== 'string' ? JSON.stringify(resp.data) : resp.data;
+    const ended_at = new Date();
 
-    record.response_body = resp.body; 
+    attempt = await prisma.webhookAttempts.update({
+      where: { id: attempt.id },
+      data: {
+        response_code,
+        response_body,
+        ended_at,
+        updatedAt: new Date(),
 
-    if (typeof resp.body !== 'string') {
+      }
+    })
 
-      console.log('RESP 1', resp.body)
+    await prisma.webhooks.update({
+      where: { id: webhook.id },
+      data: {
+        status: 'success',
+        ended_at: new Date()
+      }
+    })
 
-      record.response_body = JSON.stringify(resp.body); 
+  } catch(e: any) {
 
-    } else {
-      console.log('RESP 2', resp.body)
+    var response_code, response_body;
 
-      record.response_body = resp.body; 
-    }
-
-    record.ended_at = new Date();
-
-    await webhook.set('status', 'success')
-
-  } catch(e) {
 
     if (e.response) {
 
-      record.response_code = e.response.statusCode;
+      response_code = e.response.statusCode;
 
-      record.response_body = e.response.text
+      response_body = e.response.text
 
     }
-    record.error = e.message;
 
-    record.ended_at = new Date();
-
-    record.status = 'failed'
-
-    record.ended_at = new Date()
+    await prisma.webhookAttempts.update({
+      where: { id: attempt.id },
+      data: {
+        error: e.message,
+        ended_at: new Date(),
+        updatedAt: new Date(),
+        response_body,
+        response_code
+      }
+    })
 
   }
 
-  await Promise.all([record.save(), webhook.save()])
-
-  return new Attempt({record, webhook})
+  return attempt
 
 }
 

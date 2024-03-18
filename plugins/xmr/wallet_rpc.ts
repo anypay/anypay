@@ -7,7 +7,7 @@ import { log } from '../../lib';
 
 import  { Trace } from '../../lib/trace'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 const rpcs = [{
     url: config.get('monero_wallet_rpc_url')
@@ -15,7 +15,7 @@ const rpcs = [{
 
 class MoneroWalletRPCPool {
 
-    async call<Response>(method, params): Promise<Response | any> {
+    async call<Response>(method: string, params: any): Promise<Response | any> {
 
         try {
 
@@ -33,7 +33,7 @@ class MoneroWalletRPCPool {
 
             return result
 
-        } catch(error) {
+        } catch(error: any) {
 
             error.method = method
 
@@ -62,7 +62,7 @@ class MoneroWalletRPC {
         this.url = params.url
     }
 
-  async call<Response>(method, params): Promise<Response | any> {
+  async call<Response>(method: string, params: any): Promise<Response | any> {
 
     const trace = Trace();
 
@@ -80,7 +80,7 @@ class MoneroWalletRPC {
 
       return result
        
-    } catch(error) {
+    } catch(error: any) {
 
       error.trace = trace
 

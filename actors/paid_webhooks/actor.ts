@@ -9,23 +9,24 @@ import { getPaidWebhookForInvoice, createWebhookForInvoice } from '../../lib/web
 import { ensureInvoice, Invoice } from '../../lib/invoices'
 
 import { Account } from '../../lib/account'
+import { exchange } from '../../lib/amqp';
 
 export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
-    routingkey: 'invoice:paid',
+    routingkey: 'invoice.paid',
 
     queue: 'webhooks.invoice.tosendpaid'
 
   })
-  .start(async (channel, msg) => {
+  .start(async (channel, msg, json) => {
 
     try {
 
-      let uid = msg.content.toString();
+      let {uid} = json
 
       log.info('webhook.sendforinvoice', { uid });
 

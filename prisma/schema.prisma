@@ -301,15 +301,6 @@ model PaymentSubmissions {
   updatedAt   DateTime @db.Timestamptz(6)
 }
 
-model Payments {
-  id          Int      @id @default(autoincrement())
-  order_uid   String   @db.VarChar(255)
-  transaction String   @db.VarChar(255)
-  createdAt   DateTime @db.Timestamptz(6)
-  updatedAt   DateTime @db.Timestamptz(6)
-  orders      orders   @relation(fields: [order_uid], references: [uid], onDelete: NoAction, onUpdate: NoAction)
-}
-
 model PriceRecords {
   id            Int      @id @default(autoincrement())
   currency      String   @db.VarChar(255)
@@ -808,7 +799,7 @@ model orders {
   egifter_order   Json?      @db.Json
   status          String?    @default("unpaid") @db.VarChar(255)
   token           Json?      @db.Json
-  Payments        Payments[]
+  payments        payments[]
   products        products   @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -883,6 +874,8 @@ model payments {
   tx_key              String?   @db.VarChar(255)
   status              String?   @default("confirming") @db.VarChar(255)
   chain               String?   @db.VarChar(255)
+  orders              orders?   @relation(fields: [ordersId], references: [id])
+  ordersId            Int?
 }
 
 model prices {

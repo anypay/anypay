@@ -9,7 +9,7 @@ const ltc = require('litecore-lib');
 
 import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib/plugin'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '../../lib/plugins/utxo'
 
@@ -34,7 +34,7 @@ export default class LTC extends UTXO_Plugin {
 
   decimals = 8
 
-  providerURL = process.env.getblock_ltc_url
+  providerURL = String(process.env.getblock_ltc_url)
 
   get bitcore() {
 

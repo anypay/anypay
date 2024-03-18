@@ -6,19 +6,19 @@ import { log } from '../../lib/log';
 
 import  { Trace } from '../../lib/trace'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 const { monerod_rpcs } = require('./config.json')
 
 export class MonerodRPCPool {
 
-  async call<Response>(method, params): Promise<Response | any> {
+  async call<Response>(method: string, params: any): Promise<Response | any> {
 
       try {
 
           log.info('xmr.rpc.pool.call', { method, params })
 
-          const result = await oneSuccess<Response>(monerod_rpcs.map(({ host, port }) => {
+          const result = await oneSuccess<Response>(monerod_rpcs.map(({ host, port }: { host: string, port: number}) => {
 
               const rpc = new JsonRPC({ host, port })
               
@@ -30,7 +30,7 @@ export class MonerodRPCPool {
 
           return result
 
-      } catch(error) {
+      } catch(error: any) {
 
           error.method = method
 
@@ -55,7 +55,7 @@ export class JsonRPC {
       this.url = `http://${host}:${port}`
   }
 
-  async call<Result>(method, params): Promise<Result> {
+  async call<Result>(method: string, params: any): Promise<Result> {
 
     const trace = Trace();
 
@@ -73,7 +73,7 @@ export class JsonRPC {
 
       return data.result
        
-    } catch(error) {
+    } catch(error: any) {
 
       error.trace = trace
 
@@ -96,7 +96,7 @@ class MonerodOtherRPC {
     this.url = `http://${host}:${port}`
 }
 
-  async call<Result>(method, params): Promise<Result> {
+  async call<Result>(method: string, params: any): Promise<Result> {
 
     const trace = Trace();
 
@@ -110,7 +110,7 @@ class MonerodOtherRPC {
 
       return result
        
-    } catch(error) {
+    } catch(error: any) {
 
       error.trace = trace
 
@@ -127,13 +127,13 @@ class MonerodOtherRPC {
 
 export class MonerodOtherRPCPool {
 
-  async call<Response>(method, params): Promise<Response | any> {
+  async call<Response>(method: string, params: any): Promise<Response | any> {
 
       try {
 
           log.info('xmr.rpc.other.pool.call', { method, params })
 
-          const result = await oneSuccess<Response>(monerod_rpcs.map(({ host, port }) => {
+          const result = await oneSuccess<Response>(monerod_rpcs.map(({ host, port }: {host: string, port: number}) => {
 
               const rpc = new MonerodOtherRPC({ host, port })
               
@@ -145,7 +145,7 @@ export class MonerodOtherRPCPool {
 
           return result
 
-      } catch(error) {
+      } catch(error: any) {
 
           error.method = method
 

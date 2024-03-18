@@ -11,10 +11,3 @@ export function startActors(actorNames) {
   .forEach(actor => actor.start());
 
 }
-
-export function publishJson(channel, exchange, routingkey, json) {
-  return channel.publish(exchange, routingkey, Buffer.from(
-    JSON.stringify(json) 
-  ))
-}
-

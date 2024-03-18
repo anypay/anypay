@@ -4,6 +4,7 @@
     "lib": [
       "es6", "ES2015", "ES2016", "ES2017"
     ],
+    "strict": true,
     "allowJs": true,
     "module": "commonjs",
     "outDir": "dist",

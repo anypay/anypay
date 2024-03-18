@@ -9,7 +9,7 @@ export interface Record {
 
   dataValues: any;
 
-  updateAttributes: (any) => Promise<any>;
+  updateAttributes: (params: any) => Promise<any>;
 
 }
 
@@ -92,7 +92,7 @@ export class Orm {
 
     for (let [key, value] of Object.entries(updates)) {
 
-      this.record[key] = value
+      this.record[key as keyof Record] = value
 
     }
 
@@ -113,7 +113,7 @@ export class Orm {
 
   async set(key: string, value: any): Promise<any> {
 
-    this.record[key] = value
+    this.record[key as keyof Record] = value
 
     return this.record.save()
 
@@ -145,7 +145,7 @@ export async function findAll<T>(constructor: any, params: any): Promise<T[]> {
 
   let records = await constructor.model.findAll(params)
 
-  return records.map(record => new constructor(record))
+  return records.map((record: any) => new constructor(record))
 
 }
 

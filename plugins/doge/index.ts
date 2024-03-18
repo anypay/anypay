@@ -5,7 +5,7 @@ const doge = require('bitcore-doge-lib');
 
 import { BroadcastTxResult, BroadcastTx, Transaction } from '../../lib/plugin'
 
-import { oneSuccess } from 'promise-one-success'
+import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '../../lib/plugins/utxo'
 
@@ -19,7 +19,7 @@ export default class DOGE extends UTXO_Plugin {
 
   decimals = 8;
 
-  providerURL = process.env.getblock_doge_url
+  providerURL = String(process.env.getblock_doge_url)
 
   get bitcore() {
     return doge

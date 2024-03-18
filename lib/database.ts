@@ -39,7 +39,7 @@ if (process.env.NODE_ENV === 'production') {
 
 module.exports = database
 
-export async function query(statement) {
+export async function query(statement: string) {
   return database.query(statement)
 }
 

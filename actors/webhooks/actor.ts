@@ -6,20 +6,22 @@ import { Actor } from 'rabbi'
 
 import { sendWebhookForInvoice } from '../../lib/webhooks';
 
+import { exchange } from '../../lib/amqp';
+
 export async function start() {
 
   Actor.create({
 
-    exchange: 'anypay:invoices',
+    exchange,
 
-    routingkey: 'invoice:paid',
+    routingkey: 'invoice.paid',
 
     queue: 'webhooks.invoice.tosend'
 
   })
-  .start(async (channel, msg) => {
+  .start(async (_channel, _msg, json) => {
 
-    let uid = msg.content.toString();
+    const { uid } = json
 
     try {
 

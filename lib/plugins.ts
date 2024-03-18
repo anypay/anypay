@@ -7,15 +7,16 @@ export { plugins }
 
 import { Transaction } from './plugin'
 
-import { Account } from './account'
-
-import { Address } from './addresses'
+import {
+  addresses as Address,
+  accounts as Account
+} from '@prisma/client'
 
 import { Payment } from './plugin'
 
 import { Price } from './price'
 
-import { PaymentOption } from './payment_option'
+import { payment_options as PaymentOption } from "@prisma/client";
 
 import { Confirmation } from './confirmations'
 
@@ -78,7 +79,7 @@ export function buildSignedPayment({paymentOption,mnemonic}: {paymentOption: Pay
 
   const { currency, chain } = paymentOption
 
-  const plugin = find({ currency, chain })
+  const plugin = find({ currency, chain: chain as string })
 
   return plugin.buildSignedPayment({ paymentOption, mnemonic })
 
@@ -88,7 +89,7 @@ export function verifyPayment({paymentOption,transaction}: {paymentOption: Payme
 
   const { currency, chain } = paymentOption
 
-  const plugin = find({ currency, chain })
+  const plugin = find({ currency, chain: chain as string })
 
   return plugin.verifyPayment({ paymentOption, transaction })
 
@@ -102,7 +103,7 @@ export function getPrice({chain,currency}: {chain:string, currency:string }): Pr
 
 }
 
-export function getConfirmation({txid, chain,currency}: {txid: string, chain:string, currency:string }): Promise<Confirmation> {
+export function getConfirmation({txid, chain,currency}: {txid: string, chain:string, currency:string }): Promise<Confirmation | null> {
 
   const plugin = find({ currency, chain })
 

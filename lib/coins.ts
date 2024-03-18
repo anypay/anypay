@@ -1,65 +1,109 @@
+// 
+import { coins as Coin } from '@prisma/client'
 
-import { models } from '../lib/models';
+export { Coin }
 
-var coins = [];
+import prisma from './prisma';
 
-export async function refreshCoins() {
+var coins: Coin[] = [];
 
-  coins = await models.Coin.findAll();
+export async function refreshCoins(): Promise<Coin[]> {
 
-}
-
-export async function initFromConfig(coinsConfig) {
-
-  for (var i=0; i<coinsConfig.length; i++) {
-
-    let coin = coinsConfig[i];
-
-    let existingCoin = await models.Coin.findOne({ where: { code: coin.code }});
-
-    if (!existingCoin) {
-
-      await models.Coin.create(coin);
-
-    }
-
-  }
-
-  await refreshCoins();
-
-}
-
-export async function getCoins() {
+  coins = await prisma.coins.findMany();
 
   return coins;
 
 }
 
-export async function deactivateCoin(code) {
+interface CoinConfig {
+  code: string;
+  currency: string;
+  name: string;
+  enabled: boolean;
+  supported: boolean;
+  icon: string;
+  address: string;
+  unavailable: boolean;
+}
 
-  let coin = await models.Coin.findOne({ where: { code }});
+export async function initFromConfig(coinsConfig: CoinConfig[]): Promise<Coin[]> {
 
-  coin.unavailable = true;
+  for (var i=0; i<coinsConfig.length; i++) {
 
-  await coin.save();
+    let coin = coinsConfig[i];
 
-  await refreshCoins();
+    let existingCoin: Coin | null = await prisma.coins.findFirst({ where: { code: coin.code }});
+
+    if (!existingCoin) {
+
+      await prisma.coins.create({
+        data: {
+          code: coin.code,
+          currency: coin.currency,
+          name: coin.name,
+          supported: coin.supported,
+          logo_url: coin.icon,
+          unavailable: coin.unavailable,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      });
+
+    }
+
+  }
+
+  return refreshCoins();
 
 }
 
-export async function activateCoin(code) {
+export async function getCoins(): Promise<Coin[]> {
 
-  let coin = await models.Coin.findOne({ where: { code }});
-
-  coin.unavailable = false;
-
-  await coin.save();
-
-  await refreshCoins();
+  return coins;
 
 }
 
-export function getCoin(currency: string) {
+export async function deactivateCoin(code: string): Promise<Coin[]> {
+
+  const coin = await prisma.coins.findFirst({ where: { code }});
+
+  if (!coin) {
+    throw new Error(`Coin not found: ${code}`);
+  }
+
+  await prisma.coins.update({
+    where: { id: coin.id },
+    data: {
+      unavailable: true
+    }
+  
+  })
+
+  return refreshCoins();
+
+}
+
+export async function activateCoin(code: string): Promise<Coin[]> {
+
+  const coin = await prisma.coins.findFirst({ where: { code }});
+
+  if (!coin) {
+    throw new Error(`Coin not found: ${code}`);
+  }
+
+  await prisma.coins.update({
+    where: { id: coin.id },
+    data: {
+      unavailable: false
+    }
+  
+  })
+
+  return refreshCoins();
+
+}
+
+export function getCoin(currency: string): Coin | undefined {
 
   return coins.find(coin => {
     return coin.code === currency

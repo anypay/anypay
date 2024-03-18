@@ -1,13 +1,14 @@
 
-import { Address } from './addresses'
-
-import { Account } from './account'
+import { addresses as Address } from '@prisma/client'
 
 import { Price } from './price'
 
 export { Price }
 
-import { PaymentOption } from './payment_option'
+import {
+  payment_options as PaymentOption,
+  accounts as Account
+} from '@prisma/client'
 
 import { getPrice } from './prices/kraken'
 
@@ -27,7 +28,7 @@ abstract class AbstractPlugin {
 
   abstract readonly decimals: number;
 
-  token: string;
+  token?: string;
 
   abstract buildSignedPayment(params: BuildSignedPayment): Promise<Transaction>;
 
@@ -78,14 +79,17 @@ export abstract class Plugin extends AbstractPlugin {
 
   }
 
-  async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
+  async buildSignedPayment({ paymentOption, mnemonic }: {
+    paymentOption: PaymentOption;
+    mnemonic: string;
+  }): Promise<Transaction> {
 
     throw new Error(`buildSignedPayment not implemented for ${this.currency} on ${this.chain}`)
   }
 
   async getNewAddress({address}: { account: Account, address: Address }): Promise<string> {
 
-    return address.get('value')
+    return address.value as string
 
   }
 
@@ -123,7 +127,7 @@ export abstract class Plugin extends AbstractPlugin {
 
     let tx = new this.bitcore.Transaction(params.transactions[0].txhex);
 
-    let txOutputs = tx.outputs.map(output => {
+    let txOutputs = tx.outputs.map((output: { script: any; satoshis: any }) => {
 
       try {
 
@@ -145,9 +149,18 @@ export abstract class Plugin extends AbstractPlugin {
       }
 
     })
-    .filter(n => n != null)
+    .filter((n: null) => n != null)
 
-    let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
+    const buildOutputsParams = Object.assign(params.paymentOption, {
+      
+      chain: params.paymentOption.chain as string,
+      currency: params.paymentOption.currency,
+      address: params.paymentOption.address as string,
+      amount: params.paymentOption.amount,
+
+    });
+
+    let outputs = await buildOutputs(buildOutputsParams, 'JSONV2');
 
     for (let output of outputs) {
 
@@ -186,7 +199,7 @@ export abstract class Plugin extends AbstractPlugin {
 
     let tx = new this.bitcore.Transaction(txhex);
 
-    let txOutputs = tx.outputs.map(output => {
+    let txOutputs = tx.outputs.map((output: { script: any; satoshis: any }) => {
 
       try {
 
@@ -211,7 +224,7 @@ export abstract class Plugin extends AbstractPlugin {
       }
 
     })
-    .filter(n => n != null)
+    .filter((n: null) => n != null)
 
     return txOutputs
 

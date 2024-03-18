@@ -7,7 +7,7 @@ import { config } from './lib/config'
 
 import { log } from './lib'
 
-import { startActorsDirectory } from 'rabbi';
+import { startActorsDirectory, init } from 'rabbi';
 
 import { server, start } from './server/v0/server'
 
@@ -24,8 +24,6 @@ import { start as refunds } from './actors/refunds/actor'
 import eventWebhooks from './actors/webhooks-events/actor'
 
 import { startConfirmingTransactions } from './lib/confirmations'
-
-import { init } from 'rabbi'
 
 import * as core from './lib'
 

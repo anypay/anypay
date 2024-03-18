@@ -17,13 +17,6 @@ export interface SendTxResponse {
     }
 }
 
-export class SendTxError extends Error {
-    status: "fail";
-    data: {
-        network: string;
-        tx_hex: string;
-    }
-}
 
 export enum Networks {
     DOGE = 'DOGE',
@@ -74,9 +67,7 @@ export async function send_tx(currency: string, tx_hex: string): Promise<SendTxR
 
     if (response.status !== 200) {
 
-        const error = new SendTxError(response.data)
-
-        console.error('ERROR__', error)
+        const error = new Error(response.data)
 
         log.error('chain.so.api.v2.send_tx.error', error)
 
@@ -86,7 +77,7 @@ export async function send_tx(currency: string, tx_hex: string): Promise<SendTxR
 
     return response.data
 
-  } catch(error) {
+  } catch(error: any) {
 
     const message = error.response.data.error
 

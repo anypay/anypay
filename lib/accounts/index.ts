@@ -7,6 +7,8 @@ import { log } from '../log';
 import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
+import { accounts as Account } from '@prisma/client';
+import prisma from '../prisma';
 
 interface AccountAddress {
   account_id: number;
@@ -18,11 +20,11 @@ interface AccountAddress {
   code?: string;
 }
 
-export async function near(latitude, longitude, limit=100) {
+export async function near(latitude: number, longitude: number, limit=100) {
 let query = `SELECT *,
 	ST_Distance(
     position,
-    'SRID=4326;POINT(${parseFloat(longitude)} ${parseFloat(latitude)})'::geometry
+    'SRID=4326;POINT(${longitude} ${latitude})'::geometry
     ) AS distance
     from accounts where position is not null and business_name is not null order by distance limit ${limit};`
 
@@ -31,57 +33,27 @@ let query = `SELECT *,
   return result[0]
 }
 
-function pointFromLatLng(lat, lng) {
+export async function findByEmail(email: string): Promise<Account | null> {
 
-  let point = {
-    type: 'Point',
-    coordinates: [lat, lng],
-    crs: { type: 'name', properties: { name: 'EPSG:4326'} }
-  }
-
-  return point
+  return prisma.accounts.findFirst({ where: { email }});
 
 }
 
-export async function setPositionFromLatLng(account) {
-
-  let point = pointFromLatLng(account.latitude, account.longitude)
-
-  account.position = point
-
-  await account.save()
-
-  return models.Account.findOne({ where: { id: account.id }})
-
-}
-
-export async function findByEmail(email) {
-
-  return models.Account.findOne({ where: { email }});
-
-}
-
-export async function updateAccount(account, payload) {
-
-  if (!account) {
-
-    return {
-
-      success: false,
-
-      error: 'account not found'
-
-    }
-
-  }
+export async function updateAccount(account: Account, payload: any): Promise<Account> {
 
   let updateAttrs: any = Object.assign(payload, {});
+  
+  await prisma.accounts.update({
+    where: { id: account.id },
+    data: updateAttrs
+  
+  })
 
-  log.info('account.update', updateAttrs)
+  const updatedAccount = await prisma.accounts.findFirstOrThrow({ where: { id: account.id }});
 
-  await account.update(updateAttrs)
+  log.info('account.updated', updatedAccount)
 
-  return account
+  return updatedAccount
 
 }
 
@@ -93,7 +65,7 @@ export async function findAllWithTags(tags: string[]): Promise<any> {
       where: { tag }
     })
 
-    return tags.map(tag => tag.account_id);
+    return tags.map((tag: { account_id: any; }) => tag.account_id);
 
   }));
 
@@ -117,24 +89,29 @@ export async function findAllWithTags(tags: string[]): Promise<any> {
 
 }
 
-export async function registerAccount(email: string, password: string): Promise<any>{
+export async function registerAccount(email: string, password: string): Promise<Account>{
 
   let passwordHash = await hash(password);
 
-  let account = await models.Account.create({
-    email: email,
-    password_hash: passwordHash
+  let account = await prisma.accounts.findFirst({
+    where: {
+      email
+    }
   });
 
-  if( account ){
-
-    await log.info('account.created', {
-      id: account.id,
-      account_id: account.id,
-      email: account.email
-    })
-
+  if (account) {
+      
+      throw new Error(`account ${email} already exists`);
   }
+
+  account = await prisma.accounts.create({
+    data: {
+      email,
+      password_hash: passwordHash,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  });
 
   return account;
 }
@@ -229,10 +206,10 @@ export async function getAccountAddress(accountId: number, currency: string): Pr
 
 }
 
-export function hash(password) {
+export function hash(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
 
-    bcrypt.hash(password, 10, (error, hash) => {
+    bcrypt.hash(password, 10, (error: Error, hash: string) => {
       if (error) { return reject(error) }
       resolve(hash);
     })
@@ -244,7 +221,6 @@ export {
   getAddress
 }
 
-function getIntersection(arrA, arrB) {
+function getIntersection(arrA: any[], arrB: any[]): any[] {
   return arrA.filter(x => arrB.includes(x));
 }
-
