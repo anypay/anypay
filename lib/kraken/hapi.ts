@@ -1,9 +1,11 @@
 
-import { Server } from 'hapi'
+import { Server, Plugin, PluginProperties, Request, ResponseToolkit } from '@hapi/hapi'
 
 import { start } from './main'
 
 import * as Joi from 'joi'
+import AuthenticatedRequest from '../../server/auth/AuthenticatedRequest'
+import prisma from '../prisma'
 
 export const plugin = ((server, options) => {
 
@@ -11,23 +13,24 @@ export const plugin = ((server, options) => {
 
     autosell: {
 
-      index: (core) => {
-
-        return async function(req, h) {
-
-          let account = await core.models.KrakenAccount.findOne({
-            where: { account_id: req.account.id}
+      index: async function(request: AuthenticatedRequest, h: ResponseToolkit) {
+          const account = await prisma.krakenAccounts.findFirstOrThrow({
+            where: {
+              account_id: request.account.id
+            }
           })
 
-          let orders = await core.models.Event.findAll({
+          const orderCreatedEvents = await prisma.events.findMany({
             where: {
               type: 'kraken.order.created',
-              account_id: req.account.id
+              account_id: request.account.id
             },
-            order: [['createdAt', 'desc']]
+            orderBy: {
+              createdAt: 'desc'
+            }
           })
 
-          orders = orders.map(order => {
+          const orders = orderCreatedEvents.map((order: any) => {
 
             return Object.assign(order.payload.result, {
               createdAt: order.createdAt
@@ -48,22 +51,19 @@ export const plugin = ((server, options) => {
 
       }
     }
-  }
 
   return {
 
     name: 'kraken',
 
-    register: function(server: Server, options, next) {
-
-      options.core.log.info('server.plugins.register.kraken')
+    register: function(server: Server) {
 
       start()
 
       server.route({
         method: "GET",
         path: "/v1/api/kraken/autosell",
-        handler: handlers.autosell.index(options.core),
+        handler: handlers.autosell.index,
         options: {
           tags: ['api', 'exchange', 'kraken', 'v1'],
           auth: "jwt",
@@ -85,7 +85,7 @@ export const plugin = ((server, options) => {
       server.route({
         method: "GET",
         path: "/v0/api/kraken/autosell",
-        handler: handlers.autosell.index(options.core),
+        handler: handlers.autosell.index,
         options: {
           tags: ['api', 'exchange', 'kraken', 'v1'],
           auth: "token",

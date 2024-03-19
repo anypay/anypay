@@ -1,11 +1,13 @@
 
+import { ResponseToolkit } from '@hapi/hapi';
 import { models } from '../../../lib';
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 
-export async function show(req, h) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let firebase_token = await models.FirebaseToken.findOne({
     where: {
-      account_id: req.account.id
+      account_id: request.account.id
     }
   });
 
@@ -13,11 +15,11 @@ export async function show(req, h) {
 
 }
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let firebase_tokens = await models.FirebaseToken.findAll({
     where: {
-      account_id: req.account.id
+      account_id: request.account.id
     }
   });
 
@@ -25,21 +27,23 @@ export async function index(req, h) {
 
 }
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
+
+  const { firebase_token: token } = request.payload as { firebase_token: string }
 
   let [firebase_token] = await models.FirebaseToken.findOrCreate({
 
     where: {
-      account_id: req.account.id,
+      account_id: request.account.id,
 
-      token: req.payload.firebase_token
+      token
     },
 
     defaults: {
 
-      account_id: req.account.id,
+      account_id: request.account.id,
 
-      token: req.payload.firebase_token
+      token
 
     }
   })
@@ -48,9 +52,9 @@ export async function create(req, h) {
 
 }
 
-export async function update(req, h) {
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  return create(req, h)
+  return create(request, h)
 
 }
 

@@ -13,11 +13,14 @@ import * as kraken from './kraken'
 
 export { kraken }
 
-import { Price } from '../price'
+import { Price } from './price'
 
 import { Op } from 'sequelize'
 
 import { getPrice } from '../plugins'
+import prisma from '../prisma';
+
+import { coins as Coin } from '@prisma/client'
 
 const MAX_DECIMALS = 8;
 
@@ -43,16 +46,6 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
     timestamp
   };
 };
-
-export class PriceNotFoundError implements Error {
-
-  name = "PriceNotFoundError"
-  message = "price not found for pair"
-
-  constructor(input, output) {
-    this.message = `price not found to convert ${input} to ${output}`
-  }
-}
 
 async function convert(inputAmount: Amount, outputCurrency: string, precision: number = 2): Promise<Amount> {
 
@@ -91,7 +84,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
 
     if (!inverse) {
 
-      throw new PriceNotFoundError(inputAmount.currency, outputCurrency)
+      throw new Error(`no price for ${inputAmount.currency} to ${outputCurrency}`)
 
     }
 
@@ -221,13 +214,13 @@ export async function setAllFiatPrices(): Promise<Price[]> {
 
 export async function listPrices(): Promise<Price[]> {
 
-  const coins = await models.Coin.findAll()
+  const coins = await prisma.coins.findMany()
 
   return models.Price.findAll({
     where: {
       base: 'USD',
       currency: {
-        [Op.in]: coins.map(c => c.code)
+        [Op.in]: coins.map((c: Coin) => c.code)
       }
     },
     order: [['currency', 'asc']]
@@ -247,7 +240,7 @@ export async function getPriceHistory(currency: string, days: number=30) {
 
   const [results] = await sequelize.query(query)
 
-  return results.map(result => {
+  return results.map((result: { createdAt: any; avg: string; }) => {
 
     return {
       createdAt: result.createdAt,

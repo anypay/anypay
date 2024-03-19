@@ -16,7 +16,6 @@ export async function createApp(params: NewApp): Promise<App> {
 
   let privkey = new bsv.PrivateKey()
 
-
       return  prisma.apps.create({
         data: {
           name: params.name,
@@ -27,8 +26,6 @@ export async function createApp(params: NewApp): Promise<App> {
           updatedAt: new Date()
         }
       })
-
-
 
 }
 

@@ -2,7 +2,7 @@ import { getNewAddress } from './plugins';
 
 import { BigNumber } from 'bignumber.js';
 
-import { Account } from './account'
+import { accounts as Account } from '@prisma/client'
 
 import * as moment from 'moment';
 
@@ -22,14 +22,13 @@ import * as shortid from 'shortid'
 
 import { computeInvoiceURI } from './uri';
 
-import { PaymentOption } from './payment_option';
-import { findAll, findOne } from './orm';
-import { PaymentRequest } from './payment_requests';
-import { Invoice } from './invoices';
+import { payment_options as PaymentOption } from '@prisma/client';
+import { invoices as Invoice } from '@prisma/client';
 
 import { toSatoshis } from './plugins'
 
-import { Address } from './addresses';
+import { addresses as Address } from '@prisma/client';
+import prisma from './prisma';
 
 interface EmptyInvoiceOptions {
   uid?: string;
@@ -48,7 +47,11 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
 
   uid = !!uid ? uid : shortid.generate();
 
-  let app = await models.App.findOne({ where: { id: app_id }})
+  const app = await prisma.apps.findFirstOrThrow({
+    where: {
+      id: app_id
+    }
+  })
 
   if (!app) {
     throw new Error('app not found')
@@ -59,18 +62,24 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     uid
   })
 
-  let record = await models.Invoice.create({
-    app_id,
-    account_id: app.account_id,
-    uid,
-    uri,
-    currency,
-    amount,
-    webhook_url,
-    memo,
-    secret,
-    metadata,
-    redirect_url
+
+  const record = await prisma.invoices.create({
+    data: {
+      app_id,
+      account_id: app.account_id,
+      uid,
+      uri,
+      currency,
+      amount,
+      webhook_url,
+      memo,
+      secret,
+      metadata,
+      redirect_url,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: 'unpaid'
+    }
   })
 
   return record;
@@ -79,42 +88,46 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
 
 export async function refreshInvoice(uid: string): Promise<Invoice> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid
+    }
+  })
 
-  const paymentOptions: PaymentOption[] = await findAll<PaymentOption>(PaymentOption, {
+  const paymentOptions = await prisma.payment_options.findMany({
     where: {
       invoice_uid: uid
     }
   })
 
-  const paymentRequest: PaymentRequest = await findOne<PaymentRequest>(PaymentRequest, {
-
+  const paymentRequest = await prisma.paymentRequests.findFirstOrThrow({
     where: {
-
-      invoice_uid: invoice.uid
+      invoice_uid: uid
     }
   })
 
   for (let option of paymentOptions) {
 
-    const template = paymentRequest.get('template').find(template => {
+    const template = (paymentRequest.template as Array<any>)?.find(template => {
 
-      return template.currency === option.get('currency') &&
-             (!template.chain || template.chain === option.get('chain'))
+      return template.currency === option.currency &&
+             (!template.chain || template.chain === option.chain)
 
     })
 
     if (!template) {
-      return
+      continue;
     }
 
-    const outputs = await Promise.all(template.to.map(async (to) => {
+    const outputs = await Promise.all(template.to.map(async (to: { address?: any; currency?: any; amount?: any; }) => {
 
-      const { currency: _currency, amount: value } = to
+      const { currency: _currency, amount: value, } = to
 
-      const conversion = await convert({ currency: _currency, value }, option.get('currency'))
+      const conversion = await convert({ currency: _currency, value }, option.currency)
 
-      const { currency, chain } = option
+      const { currency } = option
+
+      const chain = String(option.chain)
 
       const amount = toSatoshis({decimal: conversion.value, currency, chain})
 
@@ -128,21 +141,35 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
     }))
 
-    const record = await models.PaymentOption.findOne({
+
+    const record = await prisma.payment_options.findFirstOrThrow({
       where: {
-        invoice_uid: invoice.uid,
-        currency: option.get('currency'),
-        chain: option.get('chain')
+        invoice_uid: String(invoice.uid),
+        currency: option.currency,
+        chain: option.chain
       }
     })
 
-    record.outputs = outputs
-
-    await record.save()
+    await prisma.payment_options.update({
+      where: {
+        id: record.id
+      },
+      data: {
+        outputs
+      }
+    })
 
   }
 
-  await invoice.set('expiry', moment().add(15, 'minutes').toDate())
+  await prisma.invoices.update({
+    where: {
+      id: invoice.id
+    },
+    data: {
+      expiry: moment().add(15, 'minutes').toDate()
+    }
+  
+  })
 
   log.debug('invoice.refreshed', {
     invoice_uid: invoice.uid,
@@ -155,15 +182,17 @@ export async function refreshInvoice(uid: string): Promise<Invoice> {
 
 async function listAvailableAddresses(account: Account): Promise<Address[]> {
 
-  let addresses = await models.Address.findAll({ where: {
-    account_id: account.id
-  }});
+  const addresses = await prisma.addresses.findMany({
+    where: {
+      account_id: account.id
+    }
+  })
 
-  let availableAddresses = _.reject(addresses, (address) => {
-    let coin = getCoin(address.currency);
-    if (!coin) { return true }
+  var availableAddresses = addresses.filter((address) => {
+    let coin = getCoin(String(address.currency));
+    if (!coin) { return false }
 
-    return coin.unavailable;
+    return !coin.unavailable;
   });
 
   availableAddresses = availableAddresses.map(address => {
@@ -172,29 +201,30 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
     return address
   })
 
-  return availableAddresses.map(record => new Address(record))
+  return availableAddresses
 
 }
 
 // TODO: Only create options from existing options coins if options exist
-export async function createPaymentOptions(account, invoice): Promise<PaymentOption[]> {
+export async function createPaymentOptions(account: Account, invoice: Invoice): Promise<PaymentOption[]> {
 
-  let addresses: Address[] = await listAvailableAddresses(new Account(account))
+  let addresses: Address[] = await listAvailableAddresses(account)
 
   let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
 
-    const {chain, currency } = record
+    const chain = String(record.chain);
+    const currency = String(record.currency);
 
     try {
 
-      const value = invoice.get('amount')
+      const value = invoice.amount
 
       const coin = getCoin(currency)
 
       let { value: amount } = await convert({
-        currency: account.denomination,
-        value
-      }, currency, coin.precision);
+        currency: String(account.denomination),
+        value: Number(value)
+      }, currency, Number(coin?.precision));
 
       let address = await getNewAddress({ account, address: record, currency, chain })
 
@@ -208,9 +238,9 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
       let outputs = []
 
-      let fee = await pay.fees.getFee(currency, paymentAmount)
+      let fee = await pay.fees.getFee(String(currency), paymentAmount)
 
-      if (!['MATIC', 'ETH', 'AVAX'].includes(chain)) { // multiple outputs disallowed
+      if (!['MATIC', 'ETH', 'AVAX'].includes(String(chain))) { // multiple outputs disallowed
 
         paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
 
@@ -234,8 +264,8 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
       }
 
       let uri = computeInvoiceURI({
-        currency: currency,
-        uid: invoice.uid
+        currency: String(currency),
+        uid: invoice.uid || ''
       });
 
       amount = outputs.reduce((sum, output) => {
@@ -261,7 +291,7 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
         return null
       }
 
-      return new PaymentOption(optionRecord)
+      return optionRecord
 
     } catch(error) {
 
@@ -273,10 +303,10 @@ export async function createPaymentOptions(account, invoice): Promise<PaymentOpt
 
   }));
 
-  return paymentOptions.filter(option => !!option && !!option.record)
+  return paymentOptions.filter(option => !!option)
 }
 
-export function isExpired(invoice) {
+export function isExpired(invoice: Invoice) {
 
   let expiry = moment(invoice.expiry);  
   let now = moment()

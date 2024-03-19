@@ -25,8 +25,6 @@ import eventWebhooks from './actors/webhooks-events/actor'
 
 import { startConfirmingTransactions } from './lib/confirmations'
 
-import * as core from './lib'
-
 (async () => {
 
   await init()
@@ -54,11 +52,7 @@ import * as core from './lib'
   if (config.get('KRAKEN_PLUGIN')) {
 
     await server.register({
-
-      plugin: kraken, 
-
-      options: { core }
-
+      plugin: kraken
     })
 
     startActorsDirectory(join(__dirname, 'lib/kraken/actors'))

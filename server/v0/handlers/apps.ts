@@ -1,11 +1,14 @@
 
+import { ResponseToolkit } from '@hapi/hapi'
 import { models, apps } from '../../../lib'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { notFound } from '@hapi/boom'
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let apps = await models.App.findAll({ where: {
   
-    account_id: req.account.id
+    account_id: request.account.id
 
   }})
 
@@ -13,30 +16,34 @@ export async function index(req, h) {
 
 }
 
-export async function show(req, h) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let app = await models.App.findOne({ where: {
   
-    account_id: req.account.id,
+    account_id: request.account.id,
 
-    id: req.params.id
+    id: request.params.id
 
   }})
 
   if (!app) {
 
-    return h.notFound(`app ${req.params.id} not found`)
+    return notFound(`app ${request.params.id} not found`)
   }
 
   return  { app }
 
 }
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
+
+  const { name } = request.payload as {
+    name: string
+  }
 
   let app = await apps.createApp({
-    account_id: req.account.id,
-    name: req.payload.name
+    account_id: request.account.id,
+    name
   })
   
   return  { app }

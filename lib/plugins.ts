@@ -14,7 +14,7 @@ import {
 
 import { Payment } from './plugin'
 
-import { Price } from './price'
+import { Price } from './prices/price'
 
 import { payment_options as PaymentOption } from "@prisma/client";
 

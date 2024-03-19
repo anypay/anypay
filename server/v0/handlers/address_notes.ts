@@ -1,31 +1,32 @@
 
-import { models } from '../../../lib';
+import { ResponseToolkit } from '@hapi/hapi';
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+import prisma from '../../../lib/prisma';
 
-export async function update(req, h) {
+interface UpdateNotePayload {
+  note: string
+}
 
-  let address = await models.Address.findOne({
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
+  await prisma.addresses.update({
     where: {
-
-      account_id: req.account.id,
-
-      id: req.params.id
-
+      id: request.params.id,
+      account_id: request.account.id
+    },
+    data: {
+      note: (request.payload as UpdateNotePayload).note
     }
+  })
 
-  });
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      id: request.params.id,
+      account_id: request.account.id
+    }
+  })
 
-  if (!address) {
-
-    throw new Error('authorized address not found');
-
-  }
-
-  address.note = req.payload.note;
-
-  await address.save();
-
-  return { address }
+  return h.response({address})
 
 }
 

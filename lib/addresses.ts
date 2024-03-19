@@ -5,9 +5,10 @@ import { models } from './models'
 
 import { setAddress as _setAddress } from './core'
 
-import { Account } from './account'
-
-import { addresses as Address } from '@prisma/client'
+import {
+  addresses as Address,
+  accounts as Account
+} from '@prisma/client'
 
 import prisma from './prisma'
 

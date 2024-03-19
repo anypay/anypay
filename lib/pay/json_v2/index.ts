@@ -80,7 +80,7 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   const expires = moment(paymentOption.createdAt).add(15, 'minutes').toDate()
 
-  const { memo } = options
+  const memo = String(options.memo)
 
   const paymentUrl = `${BASE_URL}/r/${invoice_uid}/pay/${currency}/jsonv2`
 

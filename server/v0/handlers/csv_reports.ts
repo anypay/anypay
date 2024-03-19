@@ -1,25 +1,25 @@
 
 import * as moment from 'moment';
 import * as Joi from 'joi';
-import * as Boom from 'boom';
+import * as Boom from '@hapi/boom';
 
 import { buildAccountCsvReport, buildReportCsvFromDates } from '../../../lib/csv';
-import { models } from '../../../lib';
 
-import { findAccount } from '../../../lib/account';
+import prisma from '../../../lib/prisma';
+import { Server } from '@hapi/hapi';
 
-export async function accountCSVReports(server) {
+export async function accountCSVReports(server: Server) {
 
   server.route({
     method: 'GET',
     path: '/csv_reports.csv',
     handler: async (req, h) => {
 
-      let token = await models.AccessToken.findOne({ where: {
-
-        uid: req.query.token
-
-      }});
+      const token = await prisma.access_tokens.findFirst({
+        where: {
+          uid: req.query.token
+        }
+      })
 
       if (!token) {
 
@@ -64,18 +64,22 @@ export async function accountCSVReports(server) {
     path: '/reports/csv/payments.csv',
     handler: async (req, h) => {
 
-      let token = await models.AccessToken.findOne({ where: {
-
-        uid: req.query.token
-
-      }});
+      const token = await prisma.access_tokens.findFirst({
+        where: {
+          uid: req.query.token
+        }
+      })
 
       if (!token) {
 
         return Boom.unauthorized('invalid access token');
       }
 
-      let account = await findAccount(token.account_id)
+      const account = await prisma.accounts.findFirst({
+        where: {
+          id: token.account_id
+        }
+      })
 
       let content = await buildAccountCsvReport(account)
 

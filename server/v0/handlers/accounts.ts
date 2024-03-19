@@ -1,39 +1,40 @@
 const Boom = require('boom');
 var geoip = require('geoip-lite');
 
-import {Op} from 'sequelize'
-
 import * as moment from 'moment'
 
-import { coins, models, accounts, slack, log, utils } from '../../../lib';
+import { coins, models, accounts, log, utils } from '../../../lib';
 
 import { near } from '../../../lib/accounts'
+import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from '../../../lib/prisma';
+import { badRequest } from '@hapi/boom';
 
-export async function nearby(req, h) {
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+
+export async function nearby(request: Request, h: ResponseToolkit) {
 
   try {
 
-    let accounts = await near(req.params.latitude, req.params.longitude, req.query.limit)
+    let accounts = await near(request.params.latitude, request.params.longitude, request.query.limit)
 
     return { accounts }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.nearby', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function update(req, h) {
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    let account = await accounts.updateAccount(req.account, req.payload);
-
-    slack.notify(`${account.email} updated their profile ${utils.toKeyValueString(req.payload)}`)
+    let account = await accounts.updateAccount(request.account, request.payload);
 
     return {
 
@@ -43,79 +44,103 @@ export async function update(req, h) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.update', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function create (request, h) {
+export async function create (request: Request, h: ResponseToolkit) {
+
+  const payload = request.payload as {
+    email: string,
+    password: string
+  }
 
   try {
-    let email = request.payload.email;
+    let email = payload.email;
 
-    log.info('create.account', email);
+    log.debug('create.account', { email });
 
-    let passwordHash = await utils.hash(request.payload.password);
+    let passwordHash = await utils.hash(payload.password);
 
-    let account = await models.Account.create({
-      email: request.payload.email,
-      password_hash: passwordHash
-    });
+    let account = await prisma.accounts.findFirst({
+      where: {
+        email: email
+      }
+    })
 
+    if (account) {
+        
+        return Boom.conflict('Account already exists');
+    }
+
+    account = await prisma.accounts.create({
+      data: {
+        email: email,
+        password_hash: String(passwordHash),
+        registration_ip_address: request.info.remoteAddress,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+    
     let geoLocation = geoip.lookup(request.headers['x-forwarded-for'] || request.info.remoteAddress)
 
     if (geoLocation) {
 
-      let userLocation = utils.toKeyValueString(Object.assign(geoLocation, { ip: request.info.remoteAddress }))
 
-      slack.notify(`${account.email} registerd from ${userLocation}`);
+      await prisma.accounts.update({
+        where: {
+          id: account.id
+        },
+        data: {
+          registration_geolocation: geoLocation
+        }
+      
+      })
 
-      account.registration_geolocation = geoLocation
-
-    } else {
-
-      slack.notify(`${account.email} registerd from ${request.info.remoteAddress}`);
+      account = await prisma.accounts.findFirstOrThrow({
+        where: {
+          id: account.id
+        }
+      })
 
     }
-
-    account.registration_ip_address = request.info.remoteAddress
-
-    account.save()
     
     return account;
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.create', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function showPublic (req, h) {
+export async function showPublic (request: Request, h: ResponseToolkit) {
 
   try {
 
-    let account = await models.Account.findOne({
+    let account = await prisma.accounts.findFirst({
       where: {
-        email: req.params.id
+        email: request.params.id
       }
-    });
+    })
 
     if (!account) {
 
-      account = await models.Account.findOne({
+      account = await prisma.accounts.findFirst({
         where: {
-          id: req.params.id
+          id: request.params.id
         }
-      });
+      })
     }
 
     if (!account) {
@@ -123,47 +148,38 @@ export async function showPublic (req, h) {
       return Boom.notFound();
     }
 
-    let addresses = await models.Address.findAll({
-
+    const addresses = await prisma.addresses.findMany({
       where: {
         account_id: account.id
       }
+    
+    })
 
-    });
-
-    let payments = await models.Invoice.findAll({
-
+    const payments = await prisma.invoices.findMany({
       where: {
         account_id: account.id,
         status: 'paid',
         createdAt: {
-          [Op.gte]: moment().subtract(1, 'month')
+          gte: moment().subtract(1, 'month').toDate()
         }
       },
 
-      order: [["createdAt", "desc"]]
+      orderBy: {
+        createdAt: 'desc'
+      }
     
     })
 
-    let latest = await models.Invoice.findOne({
-
+    let latest = await prisma.invoices.findMany({
       where: {
         account_id: account.id,
         status: 'paid'
       },
 
-      order: [["createdAt", "desc"]]
-    
-    })
-
-    if (latest) {
-      latest = {
-        time: latest.paidAt,
-        denomination_amount: latest.denomination_amount,
-        denomination_currency: latest.denomination_currency,
-        currency: latest.currency
+      orderBy: {
+        createdAt: 'desc'
       }
-    }
+    })
 
     return {
       id: account.id,
@@ -174,7 +190,7 @@ export async function showPublic (req, h) {
         longitude: account.longitude
       },
       coins: addresses.filter(a => {
-        let coin = coins.getCoin(a.currency)
+        let coin = coins.getCoin(String(a.currency))
         return !!coin && !coin.unavailable
       }).map(a => a.currency),
       payments: {
@@ -184,17 +200,19 @@ export async function showPublic (req, h) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.showPublic', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function show (request, h) {
+
+
+export async function show (request: AuthenticatedRequest, h: ResponseToolkit) {
 
     try {
 
@@ -210,16 +228,16 @@ export async function show (request, h) {
       addresses
     }
     
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.show', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 };
 
-export async function index(request, h) {
+export async function index(request: Request, h: ResponseToolkit) {
 
   try {
 
@@ -231,13 +249,12 @@ export async function index(request, h) {
 
     return accounts;
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.Accounts.nearby', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 };
-

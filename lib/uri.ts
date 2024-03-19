@@ -6,7 +6,8 @@ interface InvoiceURIParams {
 
 import { getBaseURL } from './pay/environment';
 
-const protocols = {
+
+const protocols: { [key: string]: string } = {
   'DASH': 'dash',
   'ZEC': 'zcash',
   'BTC': 'bitcoin',
@@ -21,8 +22,8 @@ const protocols = {
   'RVN': 'ravencoin',
   'BSV': 'pay'
 };
-
 export function computeInvoiceURI(params: InvoiceURIParams): string {
+
 
   const protocol = protocols[params.currency] || 'pay';
 

@@ -1,7 +1,9 @@
 
 import { log } from './log'
 
-export var feesRecommended = {}
+export var feesRecommended: {
+  [key: string]: number
+} = {}
 
 import axios from 'axios'
 
@@ -13,7 +15,7 @@ async function updateFeesRecommended() {
 
     log.debug('mempool.space.feesRecommended.updated', feesRecommended)
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('mempool.space.feesRecommended', error)
 

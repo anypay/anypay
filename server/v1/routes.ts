@@ -1,10 +1,11 @@
 require('dotenv').config()
 
+import { Server } from '@hapi/hapi';
 import { v1, failAction } from '../handlers'
 
 import * as Joi from 'joi'
 
-export async function attachV1Routes(server) {
+export async function attachV1Routes(server: Server) {
 
   server.route({
     method: "POST",
@@ -16,7 +17,7 @@ export async function attachV1Routes(server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        }),
+        }).required(),
         failAction
       }
     },
@@ -261,7 +262,9 @@ export async function attachV1Routes(server) {
         query: Joi.object({
           order: Joi.string().valid('asc', 'desc').optional()
         }),
-        failAction
+        failAction: (request: any, h: any, err: any) => {
+          throw err;
+        }
       },
       response: {
         schema: Joi.object({
@@ -278,7 +281,9 @@ export async function attachV1Routes(server) {
             namespace: Joi.string().optional()
           }))
         }),
-        failAction
+        failAction: (request: any, h: any, err: any) => {
+          throw err;
+        }
       }
     }
   }
@@ -464,7 +469,7 @@ export async function attachV1Routes(server) {
   server.route({
     method: 'POST',
     path: '/v1/api/fail',
-    handler: (req, h) => { return h.response(200) },
+    handler: (req, h) => { return h.response().code(400) },
     options: {
       tags: ['v1', 'test'],
       validate: {

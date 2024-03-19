@@ -1,5 +1,5 @@
 
-import { Invoice } from '../invoices'
+import { invoices as Invoice } from '@prisma/client'
 
 import * as mempool from '../mempool.space'
 
@@ -34,9 +34,9 @@ export async function getRequiredFeeRate({ chain, invoice }: {chain: string, inv
 
   if (chain === 'BTC') {
 
-    if (config.get('mempool_space_fees_enabled')) {
+    if (config.get('mempool_space_fees_enabled') && invoice?.fee_rate_level) {
 
-      const level = mempool.FeeLevels[invoice.get('fee_rate_level')]
+      const level = mempool.FeeLevels[invoice.fee_rate_level as keyof typeof mempool.FeeLevels]
 
       requiredFeeRate = await mempool.getFeeRate(level || mempool.FeeLevels.fastestFee)
 

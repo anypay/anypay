@@ -1,21 +1,10 @@
+import { Request, ResponseToolkit } from "@hapi/hapi";
 
-const Fixer = require('../../../lib/prices/fixer');
+import * as Fixer from '../../../lib/prices/fixer'
 
-export async function index(req, h) {
+export async function index(request: Request, h: ResponseToolkit) {
 
-  var currencies = await Fixer.getCurrencies();
-
-  var rates = currencies.rates;
-
-  let sortedCurrencies = Object.keys(rates).sort();
-
-  currencies.rates = sortedCurrencies.reduce((map, key) => {
-
-    map[key] = rates[key];
-
-    return map;
-
-  }, {});
+  var currencies = await Fixer.fetchCurrencies();
 
   return currencies;
 

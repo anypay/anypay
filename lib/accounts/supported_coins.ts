@@ -15,12 +15,11 @@ interface AccountCoin {
   unavailable?: boolean;
 }
 
-interface AccountCoins {
+export interface AccountCoins {
   [key: string]: AccountCoin;
-
 }
 
-export async function getSupportedCoins(accountId: number): Promise<any> {
+export async function getSupportedCoins(accountId: number): Promise<AccountCoins> {
 
   const addresses = await prisma.addresses.findMany({ where: { account_id: accountId }});
 

@@ -12,18 +12,20 @@ import { registerAccount } from '../lib/accounts';
 
 import { ensureAccessToken } from '../lib/access_tokens'
 
+import { setAddress } from '../lib/addresses';
+
 import {
   accounts as Account,
   addresses as Address,
-  apps as App,
+  Apps as App,
   invoices as Invoice
 } from '@prisma/client'
 
-import { createApp } from '../lib/apps'
-
 import { createInvoice } from '../lib/invoices'
 
-import { findOrCreateWalletBot, WalletBot } from '../apps/wallet-bot';
+import { findOrCreateWalletBot } from '../apps/wallet-bot';
+
+import { WalletBots as WalletBot } from '@prisma/client'
 
 //import { initFromConfig } from '../lib/coins'
 
@@ -43,7 +45,7 @@ export async function createAccountWithAddress(): Promise<[Account, Address]> {
 
   let keypair = await generateKeypair()
 
-  let address = await  account.setAddress({ currency: 'BSV', chain: 'BSV', address: keypair.address })
+  let address = await setAddress(account, { currency: 'BSV', chain: 'BSV', value: keypair.address })
 
   return [account, address]
 }
@@ -63,12 +65,14 @@ export async function payInvoice(invoice: Invoice): Promise<Payment> {
     txhex: tx.tx_hex
   })
 
-  await invoice.update({
-    invoice_currency: 'BSV',
-    denomination: 'USD',
-    denomination_amount_paid: 52.00,
-    status: 'paid',
-    hash: createHash('sha256').update(uuid.v4()).digest().toString('hex')
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      invoice_currency: 'BSV',
+      denomination_currency: 'USD',
+      denomination_amount_paid: 52.00,
+      status: 'paid',
+      hash: createHash('sha256').update(uuid.v4()).digest().toString('hex')    }
   })
 
   return payment
@@ -82,26 +86,24 @@ interface NewAccountInvoice {
 
 interface NewInvoice {
   amount?: number;
-  account?: Account;
+  account: Account;
 }
 
 export async function createAccountWithAddresses(): Promise<Account> {
 
-  let record = await registerAccount(chance.email(), chance.word());
-
-  let account = new Account(record)
+  const account = await registerAccount(chance.email(), chance.word());
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
+  await setAddress(account, { currency: 'BSV', chain: 'BSV', value: address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
+  await setAddress(account, { currency: 'BCH', chain: 'BCH', value: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddress(account, { currency: 'DASH', chain: 'DASH', value: dash_address })
 
   return account
 }
@@ -110,15 +112,15 @@ export async function setAddresses(account: Account): Promise<Account> {
 
   let { address } = await generateKeypair()
 
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
+  await setAddress(account, { currency: 'BSV', chain: 'BSV', value: address })
 
   let { address: bch_address } = await generateKeypair('BCH')
 
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
+  await setAddress(account, { currency: 'BCH', chain: 'BCH', value: bch_address })
 
   let { address: dash_address } = await generateKeypair('DASH')
   
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddress(account, { currency: 'DASH', chain: 'DASH', value: dash_address })
 
   return account
 }
@@ -127,17 +129,7 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   let account = await createAccount()
 
-  let { address } = await generateKeypair()
-
-  await account.setAddress({ currency: 'BSV', chain: 'BSV', address })
-
-  let { address: bch_address } = await generateKeypair('BCH')
-
-  await account.setAddress({ currency: 'BCH', chain: 'BCH', address: bch_address })
-
-  let { address: dash_address } = await generateKeypair('DASH')
-  
-  await account.setAddress({ currency: 'DASH', chain: 'DASH', address: dash_address })
+  await setAddresses(account)
 
   let invoice = await createInvoice({
     account,
@@ -148,10 +140,10 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
 }
 
-export async function newInvoice(params: NewInvoice = {}): Promise<Invoice> {
+export async function newInvoice(params: NewInvoice): Promise<Invoice> {
 
   let invoice = await createInvoice({
-    account: params.account || account,
+    account: params.account,
     amount: params.amount || 52.00,
     webhook_url: 'https://anypayx.com/api/v1/test/webhooks'
   })
@@ -217,25 +209,26 @@ export { server, request, account, walletBot, app }
 
 
 
-export async function authRequest(account: Account, params) {
+export async function authRequest(account: Account, params: any) {
 
-  let accessToken = await ensureAccessToken(account)
+  const jwt = await generateAccountToken({ account_id: account.id, uid: String(account.uid) })
 
   if (!params.headers) { params['headers'] = {} }
 
-  params.headers['Authorization'] = `Bearer ${accessToken.jwt}`
+  //params.headers['Authorization'] = `Bearer ${accessToken.jwt}`
+  params.headers['Authorization'] = `Bearer ${jwt}`
 
   return server.inject(params)
 
 }
 
-export async function v0AuthRequest(account: Account, params) {
+export async function v0AuthRequest(account: Account, params: any) {
 
   let accessToken = await ensureAccessToken(account)
 
   if (!params.headers) { params['headers'] = {} }
 
-  let token = new Buffer(accessToken.get('uid') + ':').toString('base64');
+  let token = new Buffer(accessToken.uid + ':').toString('base64');
 
   params.headers['Authorization'] = `Basic ${token}`
 
@@ -243,7 +236,7 @@ export async function v0AuthRequest(account: Account, params) {
 
 }
 
-export function auth(account, version=1) {
+export function auth(account: Account, version=1) {
 
   var strategy = authRequest;
 
@@ -253,7 +246,7 @@ export function auth(account, version=1) {
 
   }
 
-  return async function(params) {
+  return async function(params: { [x: string]: {}; headers: { [x: string]: string; }; }) {
 
     return strategy(account, params)
 
@@ -271,10 +264,13 @@ export function authHeaders(username:string, password:string, headers: any = {})
 
 }
 
-import { Wallet } from 'anypay-simple-wallet'
+//import { Wallet } from '@anypay/simple-wallet'
+//import { Wallet } from '/Users/zyler/Github/@anypay/simple-wallet'
 import { getBitcore } from '../lib/bitcore';
 import { Payment, recordPayment } from '../lib/payments';
 import { createHash } from 'crypto';
+import prisma from '../lib/prisma';
+import { generateAccountToken } from '../lib/jwt';
 
 const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 
@@ -284,9 +280,9 @@ if (!WIF) {
 
 }
 
-const wallet = Wallet.fromWIF(WIF)
+//const wallet = Wallet.fromWIF(WIF)
 
-export { wallet } 
+//export { wallet } 
 
 beforeEach(() => {
 
@@ -309,7 +305,7 @@ before(async () => {
 
   account = await createAccountWithAddresses()
 
-  app = await createApp({ name: 'test', account_id: account.id })
+  //app await createApp({ name: 'test', account_id: account.id })
 
   walletBot = (await findOrCreateWalletBot(account)).walletBot
 

@@ -1,8 +1,6 @@
 
 import { log } from './log'
 
-import { models } from './models'
-
 import { invoices } from './'
 
 import { paymentRequestToPaymentOptions } from './payment_options'
@@ -11,9 +9,10 @@ import { schema } from 'anypay'
 
 import BigNumber from 'bignumber.js'
 
-import { create, Orm } from './orm'
-
-import { PaymentOption } from './payment_option'
+import {
+  PaymentRequests as PaymentRequest
+} from '@prisma/client'
+import prisma from './prisma'
 
 //type PaymentRequestTemplate = any;
 
@@ -26,45 +25,6 @@ import { PaymentOption } from './payment_option'
   webpage_url?: string;
 }
 */
-
-export class PaymentRequest extends Orm {
-
-  static model = models.PaymentRequest
-
-  get invoice_uid() {
-
-    return this.get('invoice_uid')
-
-  }
-
-  get template() {
-    return this.get('template')
-  }
-
-  get app_id() {
-    return this.get('app_id')
-  }
-
-  get status() {
-    return this.get('status')
-  }
-
-  async getPaymentOption({ chain, currency }: {chain: string, currency: string}): Promise<PaymentOption | null> {
-
-    return PaymentOption.findOne({
-
-      where: {
-
-        invoice_uid: this.invoice_uid,
-
-        currency
-      }
-
-    })
-
-  }
-
-}
 
 function ensureConsistentCurrencyAmount(template: any): {currency: string, amount: number} {
 
@@ -122,16 +82,13 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     log.info('pay.request.create.template.valid', template)
 
-    let paymentRequest = await create<PaymentRequest>(PaymentRequest, {
-
-      app_id,
-
-      template: template,
-
-      options,
-
-      status: 'unpaid'
-
+    let paymentRequest = await prisma.paymentRequests.create({
+      data: {
+        app_id,
+        template: template,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
     })
 
     let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount })
@@ -144,35 +101,33 @@ export async function createPaymentRequest(app_id: number, template: any, option
 
     if (options) {
 
-      invoice.webhook_url = options.webhook_url
-
-      invoice.redirect_url = options.redirect_url
-
-      invoice.secret = options.secret
-
-      invoice.metadata = options.metadata
+      await prisma.invoices.update({
+        where: { id: invoice.id },
+        data: {
+          webhook_url: options.webhook_url,
+          redirect_url: options.redirect_url,
+          secret: options.secret,
+          metadata: options.metadata
+        }
+      })
 
     }
 
-    await invoice.save()
-
-    await paymentRequest.update({
-
-      invoice_uid: invoice.uid,
-
-      uri: invoice.uri,
-
-      uid: invoice.uid,
-
-      webpage_url: `https://anypayx.com/i/${invoice.uid}`,
-
-      status: 'unpaid'
-      
+    await prisma.paymentRequests.update({
+      where: { id: paymentRequest.id },
+      data: {
+        invoice_uid: invoice.uid,
+        uri: invoice.uri,
+        webpage_url: `https://anypayx.com/i/${invoice.uid}`,
+        status: 'unpaid',
+        updatedAt: new Date()        
+      }
     })
+
 
     await paymentRequestToPaymentOptions(paymentRequest)
 
-    log.info('pay.request.created', paymentRequest.toJSON())
+    log.info('pay.request.created', paymentRequest)
 
     return paymentRequest;
 

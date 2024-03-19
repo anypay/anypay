@@ -2,12 +2,18 @@
 import * as Joi from 'joi'
 
 import { settings } from '../../../lib';
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+import { ResponseToolkit } from '@hapi/hapi';
 
-export async function update(request, h) {
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let currency = request.payload.denomination;
+  const {denomination: currency} = request.payload as {
+    denomination: string
+  }
 
-  let accountId = request.auth.credentials.accessToken.account_id;
+  const accessToken: any = request.auth.credentials.accessToken;
+
+  let accountId = accessToken.account_id;
 
   let denomination = await settings.setDenomination(accountId, currency.toUpperCase());
 
@@ -18,10 +24,12 @@ export async function update(request, h) {
 
 };
 
-export async function show(request, h) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let accountId = request.auth.credentials.accessToken.account_id;
+  const accessToken: any = request.auth.credentials.accessToken;
 
+  let accountId = accessToken.account_id;
+  
   let denomination = await settings.getDenomination(accountId);
 
   return {

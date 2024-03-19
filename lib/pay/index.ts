@@ -1,4 +1,7 @@
+//@ts-ignore
 import * as BIP70Protocol from 'bip70-payment-protocol';
+
+import * as Joi from '@hapi/joi'
 
 export { BIP70Protocol }
 
@@ -9,14 +12,14 @@ import { Transaction } from '../plugin'
 
 import { log } from '../log'
 
-import { Invoice, ensureInvoice } from '../invoices'
+
+import { invoices as Invoice } from '@prisma/client'
 
 import { models } from '../models'
 
 import { getBitcore } from '../bitcore';
 import { sendWebhookForInvoice } from '../webhooks';
 
-import { broadcast } from './broadcast'
 
 import * as bip70 from './bip70';
 import * as bip270 from './bip_270';
@@ -29,8 +32,8 @@ import { publish } from 'rabbi'
 export { fees, bip70, bip270, jsonV2 }
 
 import { parsePayments } from '../plugins'
-import { register } from '../../server/v0/plugins/merchant_app';
 import { registerSchema } from '../amqp';
+import prisma from '../prisma';
 
 export interface Payment{
   amount: number;
@@ -59,7 +62,7 @@ export enum Wallets {
   Copay = 'copay',
 }
 
-export function detectWallet(headers, invoice_uid): string {
+export function detectWallet(headers: { [x: string]: any; }, invoice_uid: any): string | undefined {
 
   var wallet; 
 
@@ -89,7 +92,7 @@ export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
 
   let tx = new bitcore.Transaction(v.transaction.txhex);
 
-  let txOutputs = tx.outputs.map(output => {
+  let txOutputs = tx.outputs.map((output: { script: any; satoshis: any; }) => {
 
     try {
 
@@ -104,7 +107,7 @@ export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
         amount: output.satoshis
       }
 
-    } catch(error) {
+    } catch(error: any) {
 
       log.error(`payment.verify.error`, error)
 
@@ -113,7 +116,7 @@ export async function verifyPayment(v: VerifyPayment): Promise<boolean> {
     }
 
   })
-  .filter(n => n != null)
+  .filter((n: null) => n != null)
 
   log.info("payment.verify.txoutputs", txOutputs);
 
@@ -166,7 +169,11 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     throw error
   }
   
-  let invoice = await ensureInvoice(params.uid)
+  let invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: params.uid
+    }
+  })
 
   paymentOption = Object.assign(paymentOption, {
     protocol: params.protocol
@@ -205,7 +212,7 @@ export async function buildPaymentRequest({paymentOption, invoice}: BuildPayment
   case 'BIP70':
 
     content = await  bip70.buildPaymentRequest(paymentOption, {
-      memo: invoice.get('memo')
+      memo: String(invoice.memo)
     });
 
     break;
@@ -213,14 +220,14 @@ export async function buildPaymentRequest({paymentOption, invoice}: BuildPayment
   case 'BIP270':
 
     content = await bip270.buildPaymentRequest(paymentOption, {
-      memo: invoice.get('memo')
+      memo: String(invoice.memo)
     });
     break;
 
   case 'JSONV2':
 
     content = await jsonV2.buildPaymentRequest(paymentOption, {
-      memo: invoice.get('memo')
+      memo: String(invoice.memo)
     });
     break;
 
@@ -286,7 +293,7 @@ export async function buildOutputs(paymentOption: PaymentOption, protocol: strin
 
 }
 
-export function verifyOutput(outputs, targetAddress, targetAmount) {
+export function verifyOutput(outputs: any[], targetAddress: any, targetAmount: number) {
 
   log.info('verifyoutput', {
     outputs,
@@ -311,23 +318,19 @@ export function verifyOutput(outputs, targetAddress, targetAmount) {
 
 }
 
-registerSchema('payment.confirming', {
-  type: 'object',
-  properties: {
-    txid: { type: 'string' },
-    currency: { type: 'string' },
-    chain: { type: 'string' },
-    txjson: { type: 'object' },
-    txhex: { type: 'string' },
-    tx_key: { type: 'string' },
-    payment_option_id: { type: 'number' },
-    invoice_uid: { type: 'string' },
-    account_id: { type: 'number' }
-  },
-  required: ['txid', 'currency', 'chain', 'txjson', 'txhex', 'tx_key', 'payment_option_id', 'invoice_uid', 'account_id']
-})
+registerSchema('payment.confirming', Joi.object({
+  txid: Joi.string().required(),
+  currency: Joi.string().required(),
+  chain: Joi.string().required(),
+  txjson: Joi.object().required(),
+  txhex: Joi.string().required(),
+  tx_key: Joi.string().required(),
+  payment_option_id: Joi.number().required(),
+  invoice_uid: Joi.string().required(),
+  account_id: Joi.number().required()
+}).required())
 
-export async function handleUnconfirmedPayment(paymentOption, transaction: Transaction) {
+export async function handleUnconfirmedPayment(paymentOption: { id?: any; amount?: any; currency: any; address?: any; chain?: any; invoice_uid?: any; }, transaction: Transaction) {
 
   const { txhex } = transaction
 
@@ -339,27 +342,32 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
 
   let tx = new bitcore.Transaction(txhex)
 
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: invoice_uid
-  }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
+  })
 
   const txid = transaction.txid || tx.hash
   
-  let paymentRecord = await models.Payment.create({
-    txid,
-    currency: currency,
-    chain: chain || currency,
-    txjson: tx.toJSON(),
-    txhex: txhex,
-    tx_key: transaction.txkey,
-    payment_option_id: paymentOption.id,
-    invoice_uid: invoice_uid,
-    account_id: invoice.account_id
+  const paymentRecord = await prisma.payments.create({
+    data: {
+      txid,
+      currency,
+      chain: chain || currency,
+      txhex: txhex,
+      tx_key: transaction.txkey,
+      payment_option_id: paymentOption.id,
+      invoice_uid: invoice_uid,
+      account_id: invoice.account_id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
   })
 
-  await models.Invoice.update(
-    {
-      amount_paid: invoice.amount,
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
       invoice_amount: paymentOption.amount,
       invoice_amount_paid: paymentOption.amount,
       invoice_currency: currency,
@@ -371,25 +379,18 @@ export async function handleUnconfirmedPayment(paymentOption, transaction: Trans
       paidAt: new Date(),
       complete: true,
       completed_at: new Date()
-    },
-    {
-      where: { uid: paymentOption.invoice_uid }
     }
-  );
+  });
 
-  invoice = await models.Invoice.findOne({ where: {
-    id: invoice.id
-  }})
+  log.info('payment.confirming', paymentRecord)
 
-  log.info('payment.confirming', paymentRecord.toJSON())
-
-  publish('payment.confirming', paymentRecord.toJSON())
+  publish('payment.confirming', paymentRecord)
 
   return paymentRecord
 
 }
 
-export async function completePayment(paymentOption, transaction: Transaction, confirming: Boolean=false) {
+export async function completePayment(paymentOption: { id?: any; amount?: any; currency: any; address?: any; chain?: any; invoice_uid?: any; }, transaction: Transaction, confirming: Boolean=false) {
 
   var { txhex, txid } = transaction
 
@@ -413,24 +414,30 @@ export async function completePayment(paymentOption, transaction: Transaction, c
 
   }
 
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: invoice_uid
-  }})
-
-  let paymentRecord = await models.Payment.create({
-    txid,
-    currency,
-    chain: chain || currency,
-    txhex: txhex,
-    tx_key: transaction.txkey,
-    payment_option_id: paymentOption.id,
-    invoice_uid: invoice_uid,
-    account_id: invoice.account_id
+  let invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
   })
 
-  await models.Invoice.update(
-    {
-      amount_paid: invoice.amount,
+  const paymentRecord = await prisma.payments.create({
+    data: {
+      txid,
+      currency,
+      chain: chain || currency,
+      txhex: txhex,
+      tx_key: transaction.txkey,
+      payment_option_id: paymentOption.id,
+      invoice_uid: invoice_uid,
+      account_id: invoice.account_id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
+
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
       invoice_amount: paymentOption.amount,
       invoice_amount_paid: paymentOption.amount,
       invoice_currency: currency,
@@ -442,25 +449,22 @@ export async function completePayment(paymentOption, transaction: Transaction, c
       paidAt: new Date(),
       complete: true,
       completed_at: new Date()
-    },
-    {
-      where: { uid: paymentOption.invoice_uid }
     }
-  );
+  });
 
-  invoice = await models.Invoice.findOne({ where: {
-    id: invoice.id
-  }})
+  invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
+  })
 
   log.info('invoice.paid', invoice)
 
-  publish('invoice.paid', invoice.toJSON())
+  publish('invoice.paid', invoice)
 
-  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
+  sendWebhookForInvoice(String(invoice.uid), 'api_on_complete_payment')
 
   return paymentRecord
 
 }
-
-export { broadcast }
 

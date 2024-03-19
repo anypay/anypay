@@ -1,9 +1,10 @@
+import { Request, ResponseToolkit } from '@hapi/hapi'
 import { models } from '../../../lib'
 
-export async function show(req, h) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   let account = await models.Account.findOne({
-    where: { email: req.params.email }
+    where: { email: request.params.email }
   })
 
   if (account) {
@@ -12,7 +13,7 @@ export async function show(req, h) {
 
   } else {
 
-    return `${req.params.email} Not Yet Registered With Anypay`
+    return `${request.params.email} Not Yet Registered With Anypay`
 
   }
 

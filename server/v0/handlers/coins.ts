@@ -1,6 +1,8 @@
 import {accounts} from '../../../lib';
 
 import * as Joi from 'joi';
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+import { ResponseToolkit } from '@hapi/hapi';
 
 type Coin = {
     currency: string
@@ -34,7 +36,7 @@ type Coin = {
  *       }]
  *     }
  */
-export async function list(request, h) {
+export async function list(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let accountCoins = await accounts.getSupportedCoins(request.account.id);
 
@@ -55,9 +57,9 @@ export async function list(request, h) {
   })
 }
 
-function sortBCHFirst(data) {
+function sortBCHFirst(data: { currency: string }[]) {
 
-  data.sort(function(x,y){ return x.code == 'BCH' ? -1 : y.code == 'BCH' ? 1 : 0; });
+  data.sort(function(x,y){ return x.currency == 'BCH' ? -1 : y.currency == 'BCH' ? 1 : 0; });
 
   return data
 }

@@ -11,7 +11,7 @@ import { computeInvoiceURI } from './uri'
 
 import {getCoin} from './coins';
 
-import { PaymentRequest } from './payment_requests';
+import { PaymentRequests as PaymentRequest } from '@prisma/client';
 
 export interface NewPaymentOption {
   invoice_uid: string;
@@ -22,9 +22,15 @@ export interface NewPaymentOption {
 
 export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequest) {
 
-  let options = await Promise.all(paymentRequest.get('template').map(async (option) => {
+  const template = paymentRequest.template as Array<any> || [] 
 
-    let outputs = await Promise.all(option.to.map(async (to) => {
+  let options = await Promise.all(template.map(async (option) => {
+
+    let outputs = await Promise.all(option.to.map(async (to: {
+      address: string;
+      currency: string;
+      amount: number;
+    }) => {
 
       var { currency, chain } = option
 
@@ -32,7 +38,7 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
       let conversion = await convert({
         currency: to.currency,
-        value: parseFloat(to.amount)
+        value: to.amount
       }, option.currency)
 
       var amount = toSatoshis({decimal: conversion.value, currency, chain})
@@ -46,18 +52,18 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
     let uri = await computeInvoiceURI({
       currency: option.currency,
-      uid: paymentRequest.get('invoice_uid')
+      uid: String(paymentRequest.invoice_uid)
     })
 
     let coin = getCoin(option.currency)
 
     return {
-      invoice_uid: paymentRequest.get('invoice_uid'),
+      invoice_uid: paymentRequest.invoice_uid,
       currency: option.currency,
       chain: option.chain || option.currency,
       outputs,
-      currency_name: coin.name,
-      currency_logo_url: coin.logo_url,
+      currency_name: coin?.name,
+      currency_logo_url: coin?.logo_url,
       uri
     }
 

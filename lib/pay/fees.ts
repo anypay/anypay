@@ -5,9 +5,18 @@ import { BigNumber } from 'bignumber.js';
 
 import { toSatoshis } from '../plugins'
 
-const fees = { }
+const fees: {
+  [key: string]: number
 
-const feesFiat = {
+} = { }
+
+const feesFiat: {
+  [key: string]: {
+    currency: string;
+    value: number;
+  }
+
+} = {
   'BCH': {
     currency: 'USD',
     value: 0.01
@@ -55,7 +64,10 @@ export interface Fee {
   amount: number;
 }
 
-const feeAddresses = {
+const feeAddresses: {
+  [key: string]: string
+
+} = {
   'BTC': '3PSFeZrEj1eSeFKs6cwYiU9Y4frfKati8L',
   'ETH': '0x8a3fe74311084e6f71ef9fc04bc6481e257a7325',
   'LTC': 'MGzgGYeni8WZ6Hc2iqd3vWwQRKa7wkf4GG',

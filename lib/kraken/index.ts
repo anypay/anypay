@@ -3,7 +3,7 @@ export { plugin as hapi } from './hapi'
 
 import { fromAccount } from './lib/kraken_account'
 
-import { Account } from '../../lib/account'
+import { accounts as Account } from '@prisma/client'
 
 import { models } from '../../lib/models'
 

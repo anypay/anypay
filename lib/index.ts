@@ -21,12 +21,10 @@ import { log } from './log';
 import { plugins } from './plugins';
 import * as password from './password';
 import * as auth from './auth';
-import * as slack from './slack/notifier';
 import * as events from './events';
 import * as utils from './utils';
 import * as pay from './pay';
 import * as access from './access_tokens';
-import { AccessToken } from './access_tokens'
 import * as mempool from './mempool.space'
 import * as nownodes from './nownodes'
 import { Payment } from './payments'
@@ -46,7 +44,6 @@ export interface Anypay {
   models:        any;
   log:           any;
   orm:           any;
-  AccessToken:   any;
   Payment:       any;
 }
 
@@ -54,7 +51,6 @@ const anypay = {
   log,
   models,
   orm: orm,
-  AccessToken: AccessToken,
   Payment: Payment,
 }
 
@@ -93,7 +89,6 @@ export {
   plugins,
   prices,
   settings,
-  slack,
   utils,
   mempool,
   PaymentOption,

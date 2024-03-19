@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+//@ts-ignore
 import * as Hapi from "@hapi/hapi";
 
 const Inert = require('@hapi/inert');
@@ -52,7 +53,7 @@ const kBadRequestSchema = Joi.object({
   message: Joi.string().required()
 }).label('BoomError')
 
-function responsesWithSuccess({ model }) {
+function responsesWithSuccess({ model }: { model: any }) {
   return {
     'hapi-swagger': {
       responses: {
@@ -94,9 +95,9 @@ import { useJWT } from '../auth/jwt'
 
 async function Server() {
 
-  server.ext('onRequest', (request, h) => {
+  server.ext('onRequest', (request: any, h: any) => {
 
-    request.startTimer = function({ method, path }) {
+    request.startTimer = function({ method, path }: { method: string, path: string }) {
 
       try {
 
@@ -116,7 +117,7 @@ async function Server() {
 
   })
 
-  server.ext('onPreResponse', (request, h) => {
+  server.ext('onPreResponse', (request: any, h: any) => {
 
     try {
 
@@ -136,7 +137,7 @@ async function Server() {
   })
 
   // Transform non-boom errors into boom ones
-  server.ext('onPreResponse', (request, h) => {
+  server.ext('onPreResponse', (request: any, h: any) => {
     // Transform only server errors 
     if (request.response.isBoom) {
 
@@ -268,22 +269,6 @@ async function Server() {
     log.debug('apps.wallet-bot.plugin.registered')
 
   }
-
-  server.route({
-    method: "GET",
-    path: "/throws",
-    handler: () => {
-      throw new Error('big bad wolf')
-    }
-  });
-
-  server.route({
-    method: "GET",
-    path: "/bad-request",
-    handler: (req, h) => {
-      return h.badRequest('unexpected hurricane')
-    }
-  });
 
   server.route({
     method: "GET",
@@ -497,7 +482,7 @@ async function Server() {
   server.route({
     method: 'GET',
     path: '/',
-    handler: (req, h) => {
+    handler: (req: any, h: any) => {
       return h.redirect('/api')
     }
   }); 

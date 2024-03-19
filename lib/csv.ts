@@ -1,92 +1,55 @@
 
-import { models } from './models';
-
 import * as moment from 'moment';
-
-import { Op } from 'sequelize';
 
 import { join } from 'path';
 
-import { Account } from './account'
+import {
+  accounts as Account,
+  invoices as Invoice
+} from '@prisma/client'
+import prisma from './prisma';
 
-export async function getInvoicesByDates(accountId, start, end) {
+export async function getInvoicesByDates(accountId: number, start: Date, end: Date): Promise<Invoice[]> {
 
-  let invoices = await models.Invoice.findAll({
-
+  const invoices = await prisma.invoices.findMany({
     where: {
-
       account_id: accountId,
-
       complete: true,
-
       completed_at: {
-
-        [Op.gte]: start,
-
-        [Op.lt]: end
-
+        gte: start,
+        lt: end
       }
-
     },
-
-    order: [['completed_at', 'desc']],
-
-  });
-
-  invoices = invoices.map(invoice => {
-
-    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    return invoice;
-
-  });
+    orderBy: {
+      completed_at: 'desc'
+    }
+  })
 
   return invoices;
 }
 
 export async function getInvoices(invoiceUID: string) {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: invoiceUID }});
-
-  if (!invoice) {
-    throw new Error(`invoice ${invoiceUID} not found`);
-  }
-
-  let account = await models.Account.findOne({
-    where: { id: invoice.account_id }
-  });
-
-  let invoices = await models.Invoice.findAll({
-
+  const invoice = await prisma.invoices.findFirstOrThrow({
     where: {
+      uid: invoiceUID
+    }
+  })
 
-      account_id: account.id,
-
+  const invoices = await prisma.invoices.findMany({
+    where: {
+      account_id: invoice.account_id,
       complete: true,
-
+      //completed_at is greater than the invoice completed_at
       completed_at: {
-
-        [Op.gt]: invoice.completed_at
-
+        gt: invoice.completed_at as Date
       }
 
     },
-
-    order: [['createdAt', 'DESC']]
-
-  });
-
-  invoices = invoices.map(invoice => {
-
-    invoice.completed_at = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    invoice.completed = moment(invoice.completed_at).format('MM/DD/YYYY');
-
-    return invoice;
-
-  });
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 
   return invoices;
 
@@ -110,44 +73,31 @@ interface ReportInvoice {
 
 export async function buildAccountCsvReport(account: Account): Promise<string> {
 
-  let paidInvoices = await models.Invoice.findAll({
+  const paidInvoices = await prisma.invoices.findMany({
     where: {
       status: 'paid',
-      account_id: account.get('id'),
+      account_id: account.id,
       app_id: null
     },
+    orderBy: {
+      paidAt: 'desc'
+    }
+  });
 
-    include: [{
-      model: models.Payment,
-      as: 'payment'
-    }, {
-      model: models.Refund,
-      as: 'refund'
-    }],
+  let invoices = paidInvoices.map((invoice: Invoice) => {
 
-    order: [['paidAt', 'desc']]
-  })
-
-  let invoices = paidInvoices.map(invoice => {
-
-    let data = {
-      invoice_uid: invoice.uid,
+    let data: ReportInvoice = {
+      invoice_uid: String(invoice.uid),
       invoice_date: invoice.createdAt,
-      invoice_amount: invoice.denomination_amount,
-      invoice_currency: invoice.denomination_currency,
-      invoice_external_id: invoice.external_id
+      invoice_amount: Number(invoice.denomination_amount),
+      invoice_currency: String(invoice.denomination_currency),
+      invoice_external_id: String(invoice.external_id)
     }
 
-    data['payment_date'] = invoice.paidAt
-    data['payment_currency'] = invoice.invoice_currency
-    data['payment_amount'] = invoice.invoice_amount
-    data['payment_txid'] = invoice.hash
-
-    if (invoice.refund) {
-      data['refund_address'] = invoice.refund.address
-      data['refund_txid'] = invoice.refund.txid
-      data['refund_address'] = invoice.refund.address
-    }
+    data['payment_date'] = invoice.paidAt as Date
+    data['payment_currency'] = String(invoice.invoice_currency)
+    data['payment_amount'] = Number(invoice.invoice_amount)
+    data['payment_txid'] = String(invoice.hash)
 
     return data
 
@@ -192,43 +142,54 @@ export async function buildReportCsv(invoices: ReportInvoice[], filepath: string
 
 }
 
-export async function buildReportCsvFromDates(accountId, start, end) {
+export async function buildReportCsvFromDates(accountId: number, start: Date, end: Date) {
 
   let invoices = await getInvoicesByDates(accountId, start, end);
 
   let filepath = join(__dirname,
   `../../.tmp/account-${accountId}-${start}-${end}.csv`);
 
-  return buildReportCsv(invoices, filepath);
+  const formattedInvoices: ReportInvoice[] = invoices.map((invoice: Invoice) => {
+      
+      let data: ReportInvoice = {
+        invoice_uid: String(invoice.uid),
+        invoice_date: invoice.createdAt,
+        invoice_amount: Number(invoice.denomination_amount),
+        invoice_currency: String(invoice.denomination_currency),
+        invoice_external_id: String(invoice.external_id)
+      }
+  
+      data['payment_date'] = invoice.paidAt as Date
+      data['payment_currency'] = String(invoice.invoice_currency)
+      data['payment_amount'] = Number(invoice.invoice_amount)
+      data['payment_txid'] = String(invoice.hash)
+  
+      return data
+  
+    })
+
+  return buildReportCsv(formattedInvoices, filepath);
 
 }
 
-export async function buildAllTimeReport(accountId) {
+export async function buildAllTimeReport(accountId: number) {
 
-  let invoices = await models.Invoice.findAll({
-    where: {account_id: accountId },
-    include: [{
-      model: models.AchBatch,
-      attributes: ['batch_id'],
-      as: 'ach_batch'
-    }, {
 
-      model: models.BitpaySettlement,
+  const invoices = await prisma.invoices.findMany({
+    where: {
+      account_id: accountId
+    }
+  })
 
-      as: 'bitpay_settlement'
-    
-    }]
-  });
-
-  invoices = invoices.map(invoice => {
-    var i = invoice.toJSON();
+  let formattedInvoices = invoices.map((invoice: Invoice) => {
+    var i = JSON.parse(JSON.stringify(invoice))
     i.created_at = moment(i.createdAt).format("MM/DD/YYYY");
     return i;
   });
 
   let filepath = join(__dirname, `../../.tmp/account-${accountId}-complete-history.csv`);
 
-  return buildReportCsv(invoices, filepath);
+  return buildReportCsv(formattedInvoices, filepath);
 
 }
 
@@ -238,7 +199,27 @@ export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<
 
   let filepath = join(__dirname, `../../.tmp/${invoiceUid}.csv`);
 
-  return buildReportCsv(invoices, filepath);
+  const formattedInvoices: ReportInvoice[] = invoices.map((invoice: Invoice) => {
+        
+        let data: ReportInvoice = {
+          invoice_uid: String(invoice.uid),
+          invoice_date: invoice.createdAt,
+          invoice_amount: Number(invoice.denomination_amount),
+          invoice_currency: String(invoice.denomination_currency),
+          invoice_external_id: String(invoice.external_id)
+        }
+    
+        data['payment_date'] = invoice.paidAt as Date
+        data['payment_currency'] = String(invoice.invoice_currency)
+        data['payment_amount'] = Number(invoice.invoice_amount)
+        data['payment_txid'] = String(invoice.hash)
+    
+        return data
+    
+      }
+  )
+
+  return buildReportCsv(formattedInvoices, filepath);
 
 }
 

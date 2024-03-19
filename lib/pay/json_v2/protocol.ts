@@ -1,9 +1,7 @@
 
-import { Invoice } from '../../invoices'
+import { invoices as Invoice, payment_options } from '@prisma/client'
 
 import { config } from '../../config'
-
-import { findPaymentOption } from '../../payment_option'
 
 import { log } from '../../log'
 
@@ -18,6 +16,7 @@ import { models } from '../../models'
 import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 import { getRequiredFeeRate } from '../required_fee_rate'
+import prisma from '../../prisma'
 
 export interface SubmitPaymentRequest {
   currency: string;
@@ -135,8 +134,12 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       }
 
       if (payment.wallet) {
-        paymentRecord.wallet = payment.wallet
-        await paymentRecord.save()
+        await prisma.payments.update({
+          where: { id: paymentRecord.id },
+          data: {
+            wallet: payment.wallet
+          }
+        })
       }
 
     }
@@ -148,7 +151,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       })
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('pay.jsonv2.payment.error', error)
 
@@ -160,7 +163,8 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
 export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<SubmitPaymentResponse> {
 
-  const { chain, currency } = payment
+  const chain = String(payment.chain)
+  const currency = String(payment.currency)
 
   try {
 
@@ -243,7 +247,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       })
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('pay.jsonv2.payment.unsigned.verify.error', error)
 
@@ -355,21 +359,27 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   log.info('pay.jsonv2.payment-options', Object.assign(options, {
     invoice_uid: invoice.uid,
-    account_id: invoice.get('account_id')
+    account_id: invoice.account_id
   }))
 
-  let _paymentOptions = await invoice.getPaymentOptions()
+  const _paymentOptions = await prisma.payment_options.findMany({
+    where: {
+      invoice_uid: String(invoice.uid)
+    }
+  })
 
-  let paymentOptions = await Promise.all(_paymentOptions.map(async paymentOption => {
+  let paymentOptions = await Promise.all(_paymentOptions.map(async (paymentOption: payment_options) => {
 
-    const estimatedAmount = paymentOption.get('outputs')
-      .reduce((sum, output) => sum + output.amount, 0)
+    const outputs = paymentOption.outputs
+    const estimatedAmount = outputs && Array.isArray(outputs) ? outputs.reduce((sum: number, output: any) => sum + Number(output.amount), 0) : 0
 
-    const requiredFeeRate = await getRequiredFeeRate({ invoice, chain: paymentOption.get('currency') })
+    const chain = String(paymentOption.chain)
+
+    const requiredFeeRate = await getRequiredFeeRate({ invoice, chain: paymentOption.currency })
 
     return {
-      currency: paymentOption.get('currency'),
-      chain: paymentOption.get('chain'),
+      currency: paymentOption.currency,
+      chain,
       network: 'main',
       estimatedAmount,
       requiredFeeRate,
@@ -382,15 +392,15 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   return {
 
-    time: invoice.get('createdAt'),
+    time: invoice.createdAt.toUTCString(),
 
-    expires: invoice.get('expiry'),
+    expires: invoice.expiry?.toUTCString() || new Date(Date.now() + 15 * 60 * 1000).toUTCString(),
 
-    memo: invoice.get('memo'),
+    memo: String(invoice.memo),
 
     paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
-    paymentId: invoice.uid,
+    paymentId: String(invoice.uid),
 
     paymentOptions
 
@@ -402,25 +412,30 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   await Protocol.PaymentRequest.request.validateAsync(option, { allowUnknown: true })
 
-  let paymentOption = await findPaymentOption({
-    invoice,
-    currency: option.currency,
-    chain: option.chain
+
+  const paymentOption = await prisma.payment_options.findFirstOrThrow({
+    where: {
+      invoice_uid: String(invoice.uid),
+      currency: option.currency,
+      chain: option.chain
+    }
   })
 
   const requiredFeeRate = await getRequiredFeeRate({ invoice, chain: option.currency })
 
+  const outputs = paymentOption.outputs as any[]
+
   const result = {
 
-    time: invoice.get('createdAt'),
+    time: invoice.createdAt.toUTCString(),
 
-    expires: invoice.get('expiry'),
+    expires: invoice.expiry?.toUTCString() || new Date(Date.now() + 15 * 60 * 1000).toUTCString(),
 
-    memo: invoice.get('memo'),
+    memo: String(invoice.memo),
 
     paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
-    paymentId: invoice.uid,
+    paymentId: String(invoice.uid),
 
     chain: option.chain,
 
@@ -434,7 +449,12 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
       requiredFeeRate,
 
-      outputs: paymentOption.get('outputs')
+      outputs: outputs.map(output => {
+        return {
+          amount: output.amount,
+          address: output.address
+        }
+      })
 
     }]
 
@@ -450,7 +470,7 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
 
   log.info('pay.jsonv2.payment-verification', Object.assign({
     invoice_uid: invoice.uid,
-    account_id: invoice.get('account_id')
+    account_id: invoice.account_id
   }, Object.assign(params, options)))
 
   if (!params.chain && params.currency) { params.chain = params.currency }
@@ -468,7 +488,7 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
   await Protocol.PaymentVerification.request.validateAsync(verifyParams, { allowUnknown: true })
 
   await verifyUnsigned({
-    invoice_uid: invoice.uid,
+    invoice_uid: String(invoice.uid),
     transactions: transactions,
     currency: params.currency,
     chain: params.chain
@@ -485,7 +505,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
 
   console.log('pay.jsonv2.payment', Object.assign({
     invoice_uid: invoice.uid,
-    account_id: invoice.get('account_id')
+    account_id: invoice.account_id
   }, Object.assign(params, options)))
 
   // TODO: Fix This:
@@ -512,12 +532,12 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
       chain: params.chain,
       currency: params.currency,
       transactions: params.transactions,
-      invoice_uid: invoice.uid
+      invoice_uid: String(invoice.uid)
     })
 
     log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {
       invoice_uid: invoice.uid,
-      account_id: invoice.get('account_id')
+      account_id: invoice.account_id
     }))
 
     return {
@@ -525,12 +545,12 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
       memo: 'Transactions accepted and broadcast to the network'
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.info('pay.jsonv2.payment.error', Object.assign(options, {
       error: error.message,
       invoice_uid: invoice.uid,
-      account_id: invoice.get('account_id')
+      account_id: invoice.account_id
     }))
 
     throw error

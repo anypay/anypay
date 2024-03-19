@@ -3,15 +3,28 @@ import { models } from '../../../lib';
 
 import { log } from '../../../lib/log'
 
+import { badRequest } from '@hapi/boom'
+
 var geoip = require('geoip-lite');
 
-export async function create(request, h) {
+import { Request, ResponseToolkit } from '@hapi/hapi';
+
+interface Token {
+  account_id: number,
+  account: any,
+  uid: string
+
+}
+
+export async function create(request: Request, h: ResponseToolkit) {
 
   try {
 
-    let token = request.auth.credentials.accessToken;
+    let token: Token = request.auth.credentials.accessToken as Token;
 
-    token.account = request.auth.credentials.account;
+    const account: any = request.auth.credentials.account as any;
+
+    token.account = account;
 
     const ip = request.info.remoteAddress
 
@@ -45,15 +58,16 @@ export async function create(request, h) {
 
       account_id: token.account_id,
 
-      email: request.auth.credentials.account.email
+      email: account.email
 
     })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.AccessTokens.create', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
+
 
   }
 

@@ -20,6 +20,10 @@ export function getCurrency(params: GetCurrency): Currency {
 export async function buildOutputs(paymentOption: PaymentOption): Promise<PaymentOutput[]> {
 
   let bitcore = getBitcore(paymentOption.currency);
+  
+  if (!paymentOption.outputs || paymentOption.outputs?.length === 0) {  
+    return []
+  }
 
   let outputs = paymentOption.outputs.map(output => {
 
@@ -88,7 +92,16 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   let memo = invoice.memo || "Anypay™"
 
-  let request = {
+  let request: {
+    network: string,
+    outputs: any[],
+    creationTimestamp: number,
+    expirationTimestamp: number,
+    memo: string,
+    paymentUrl: string,
+    merchantData: string
+    redirectUrl?: string
+  } = {
     network:"bitcoin-sv",
     outputs,
     creationTimestamp: moment(invoice.createdAt).unix(),

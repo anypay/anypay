@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 
+//@ts-ignore
 import * as PaymentProtocol from 'bip70-payment-protocol'
 
 import { getBitcore } from '../bitcore'
@@ -60,21 +61,25 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 
   let bitcore = getBitcore(payment_option.currency);
 
+  if (!payment_option.outputs) {
+    return []
+  }
+
   return payment_option.outputs.map(o => {
 
     var output = new PaymentProtocol.Output();
     var script
 
-    if (o.address.match(/^1/)) {
+    if (o.address?.match(/^1/)) {
 
       script = bitcore.Script.buildPublicKeyHashOut(o.address)
 
-    } else if (o.address.match(/^3/)){
+    } else if (o.address?.match(/^3/)){
       try {
 
         script = bitcore.Script.buildScriptHashOut(new bitcore.Address(o.address))
 
-      } catch(error) {
+      } catch(error: any) {
 
         log.error('bitcore.error', error)
       }
@@ -98,7 +103,7 @@ const BASE_URL = getBaseURL();
 
 import { PaymentRequest, PaymentRequestOptions } from './'
 
-export async function buildPaymentRequest(paymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
+export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
   // build outputs
   let outputs = await buildOutputs(paymentOption);
@@ -124,7 +129,7 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
   pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
   if (process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]) {
-    pd.set('required_fee_rate', parseInt(process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]));
+    pd.set('required_fee_rate', parseInt(String(process.env[`REQUIRED_FEE_RATE_${String(paymentOption.currency)}`])));
   } else {
     pd.set('required_fee_rate', 1);
   }
@@ -140,9 +145,9 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
   if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
     try {
 
-      let domainDerPath = process.env.X509_DOMAIN_CERT_DER_PATH;
-      let rootDerPath = process.env.X509_ROOT_CERT_DER_PATH;
-      let keyPath = process.env.X509_PRIVATE_KEY_PATH;
+      let domainDerPath = String(process.env.X509_DOMAIN_CERT_DER_PATH);
+      let rootDerPath = String(process.env.X509_ROOT_CERT_DER_PATH);
+      let keyPath = String(process.env.X509_PRIVATE_KEY_PATH);
 
       const file_with_x509_private_key = fs.readFileSync(keyPath);
 
@@ -179,7 +184,7 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
 
       paypro.sign(file_with_x509_private_key);
 
-    } catch(error) {
+    } catch(error: any) {
 
       log.error('paypro.bip70.error', error)
 
@@ -191,7 +196,7 @@ export async function buildPaymentRequest(paymentOption, options: PaymentRequest
 
 }
 
-export function paymentRequestToJSON(hex, currency) {
+export function paymentRequestToJSON(hex: any, currency: string) {
 
   let bitcore = getBitcore(currency)
 
@@ -202,7 +207,7 @@ export function paymentRequestToJSON(hex, currency) {
   let decoded = {
     PaymentRequest: paymentRequest,
     PaymentDetails: details,
-    outputs: details.outputs.map(output => {
+    outputs: details.outputs.map((output: { script: { toString: (arg0: string) => any; }; amount: string; }) => {
       return {
         address: new bitcore.Address(new bitcore.Script(output.script.toString('hex'))).toString(),
         amount: parseInt(output.amount)

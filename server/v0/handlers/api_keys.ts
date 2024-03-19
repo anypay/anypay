@@ -1,11 +1,13 @@
 
+import { ResponseToolkit } from '@hapi/hapi'
 import { apikeys } from '../../../lib'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let merchant_api_key = await apikeys.getMerchantApiKey(req.account.id)
+  let merchant_api_key = await apikeys.getMerchantApiKey(request.account.id)
 
-  let platform_api_key = await apikeys.getPlatformApiKey(req.account.id)
+  let platform_api_key = await apikeys.getPlatformApiKey(request.account.id)
 
   return {
 

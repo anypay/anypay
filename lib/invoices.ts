@@ -5,7 +5,6 @@ import { log } from './log'
 import { createWebhookForInvoice } from './webhooks'
 
 import {
-  payment_options as PaymentOption,
   accounts as Account,
   invoices as Invoice
 } from '@prisma/client'
@@ -166,7 +165,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
         template: paymentOptions.map(option => {
   
           return {
-            currency: option.get('currency'),
+            currency: option.currency,
             to: [{
               currency: invoice.denomination_currency,
               amount: invoice.denomination_amount,
