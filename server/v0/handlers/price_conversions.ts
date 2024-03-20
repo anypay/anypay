@@ -1,17 +1,19 @@
 
 import {createConversion } from '../../../lib/prices';
 
-export async function show(req, h) {
+import {Request} from '@hapi/hapi';
+
+export async function show(request: Request) {
 
   let inputAmount = {
 
-    currency: req.params.oldcurrency,
+    currency: request.params.oldcurrency,
 
-    value: parseFloat(req.params.oldamount)
+    value: parseFloat(request.params.oldamount)
 
   };
 
-  let conversion = await createConversion(inputAmount, req.params.newcurrency);
+  let conversion = await createConversion(inputAmount, request.params.newcurrency);
 
   return {conversion};
 

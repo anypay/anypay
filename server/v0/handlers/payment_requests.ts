@@ -1,62 +1,73 @@
 
-import { cancelInvoice, Invoice } from '../../../lib/invoices';
+import { cancelInvoice } from '../../../lib/invoices';
 import { log } from '../../../lib/log';
-import { findOne } from '../../../lib/orm';
 
 import { createPaymentRequest } from '../../../lib/payment_requests'
+import { ResponseToolkit } from '@hapi/hapi';
+import { badRequest, notFound } from '@hapi/boom';
+import prisma from '../../../lib/prisma';
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
+  const payload = request.payload as {
+    template: string;
+    options: any;
+  }
 
   try {
 
     let result = await createPaymentRequest(
-      req.app_id,
-      req.payload.template,
-      req.payload.options
+      request.app_id,
+      payload.template,
+      payload.options
     )
 
     return h.response(result)
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('pay.request.create.error', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function cancel(req, h) {
+export async function cancel(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    const invoice: Invoice = await findOne<Invoice>(Invoice, {
-      where: {
-        uid: req.params.uid
-      }
+    const invoice = await prisma.invoices.findFirst({
+      where:{ uid: request.params.uid }
     })
+
+
   
     if (!invoice) {
   
-      return h.notFound()
+      return notFound()
     }
   
-    if (invoice.get('app_id') !== req.app.id) {
+    if (invoice.app_id !== request.app_id) {
   
-      return h.notAuthorized()
+      return notAuthorized()
     }
   
     await cancelInvoice(invoice)
   
     return h.response({ success: true })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.payment-requests.cancel', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
+function notAuthorized() {
+  throw new Error('Function not implemented.');
+}
+

@@ -17,8 +17,10 @@ import { createPaymentOptions } from './invoice'
 
 import { publish, registerSchema } from './amqp'
 
-import Joi = require('@hapi/joi')
+import * as Joi from 'joi';
 import prisma from './prisma'
+
+export { Invoice }
 
 export async function ensureInvoice(uid: string): Promise<Invoice> {
 

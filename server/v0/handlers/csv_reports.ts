@@ -31,8 +31,8 @@ export async function accountCSVReports(server: Server) {
 
       let content = await buildReportCsvFromDates(
         token.account_id,
-        start_date,
-        end_date
+        start_date.toDate(),
+        end_date.toDate()
       );
 
       let start_formatted = start_date.format('MM-DD-YYYY');
@@ -75,7 +75,7 @@ export async function accountCSVReports(server: Server) {
         return Boom.unauthorized('invalid access token');
       }
 
-      const account = await prisma.accounts.findFirst({
+      const account = await prisma.accounts.findFirstOrThrow({
         where: {
           id: token.account_id
         }

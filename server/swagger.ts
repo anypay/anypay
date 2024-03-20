@@ -7,7 +7,7 @@ export const kBadRequestSchema = Joi.object({
   message: Joi.string().required()
 }).label('BoomError')
 
-export function responsesWithSuccess({ model }) {
+export function responsesWithSuccess({ model }: { model: Joi.Schema }) {
   return {
     'hapi-swagger': {
       responses: {

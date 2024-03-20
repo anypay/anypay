@@ -5,9 +5,11 @@ require('dotenv').config();
 import { Actor } from 'rabbi';
 import { models } from '../../lib';
 
-import { Webhook, sendWebhook } from '../../lib/webhooks';
-import { create } from '../../lib/orm';
+import { sendWebhook } from '../../lib/webhooks';
 import { exchange } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
+
+
 
 export default async function start() {
 
@@ -41,13 +43,16 @@ export default async function start() {
 
         console.log('account.webhook_url', account.webhook_url)
 
-        const webhook = await create<Webhook>(Webhook, {
-          url: account.webhook_url,
-          account_id: account.id,
-          invoice_uid: event.invoice_uid,
-          type: event.type,
-          payload: event.payload,
-          namespace: 'events',
+        const webhook = await prisma.webhooks.create({
+          data: {
+            url: account.webhook_url,
+            account_id: account.id,
+            invoice_uid: event.invoice_uid,
+            type: event.type,
+            payload: event.payload,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
         })
 
         const result = await sendWebhook(webhook)

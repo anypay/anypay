@@ -1,11 +1,11 @@
 
-import { Request } from 'hapi'
+import { Request } from '@hapi/hapi'
 
-import { Account } from '../account'
+import { accounts as Account } from '@prisma/client'
 
 import * as geoip from 'geoip-lite'
 
-import * as slack from '../slack/notifier'
+import * as slack from '../slack'
 
 import * as utils from '../utils'
 
@@ -14,6 +14,7 @@ import { models } from '../models'
 import { log } from '../log'
 
 import { compare } from '../bcrypt'
+import prisma from '../prisma'
 
 interface NewAccount {
   email: string;
@@ -53,7 +54,7 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   log.info('account.created', { id, email })
 
-  return new Account(account);
+  return account
 
 }
 
@@ -67,7 +68,15 @@ export async function geolocateAccountFromRequest(account: Account, request: Req
 
     slack.notify(`${account.email} registerd from ${userLocation}`);
 
-    await account.set('registration_geolocation', geoLocation)
+    await prisma.accounts.update({
+      where: {
+        id: account.id
+      },
+      data: {
+        registration_geolocation: userLocation
+      }
+    
+    })
 
   } else {
 
@@ -75,10 +84,15 @@ export async function geolocateAccountFromRequest(account: Account, request: Req
 
   }
 
-  await account.set('registration_ip_address', request.info.remoteAddress)
-
-  account.save()
- 
+  await prisma.accounts.update({
+    where: {
+      id: account.id
+    },
+    data: {
+      registration_ip_address: request.info.remoteAddress
+    }
+  
+  })
 
 }
 
@@ -125,7 +139,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   log.info('account.login', { account_id: account.id })
 
-  return new Account(account)
+  return account
 
 }
 

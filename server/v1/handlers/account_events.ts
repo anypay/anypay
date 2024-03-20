@@ -1,7 +1,9 @@
 
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { listAccountEvents } from '../../../lib/events'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function index(request, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let events = await listAccountEvents(request.account, {
 
@@ -13,7 +15,7 @@ export async function index(request, h) {
 
     account_id: request.account.id,
 
-    events: events.map(event => event.toJSON())
+    events
 
   })
 

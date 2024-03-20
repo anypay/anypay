@@ -1,77 +1,73 @@
 
 
-import { create, findAll, Orm } from './orm'
-
-import { Invoice } from './invoices'
-
-import { Account } from './account'
+import {
+  invoices as Invoice,
+  accounts as Account,
+  events as Event
+} from '@prisma/client'
 
 import { events } from 'rabbi'
 
 import { log } from './log';
 
-import {models} from './models';
-
 import { publish } from 'rabbi'
+import prisma from './prisma';
 
 interface EventData {
   type: string;
   payload: any;
   account_id?: number;
+  app_id?: number;
 }
 
-export async function record(data: EventData) {
+export async function record(data: EventData): Promise<Event> {
 
-  return create<Event>(Event, data);
+  return prisma.events.create({
+    data: {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      account_id: 1,
+    },
+
+  })
 
 }
 
 export async function recordEvent(payload: any, type: string): Promise<Event> {
 
-  return create<Event>(Event, { payload, type });
-
-}
-
-export class Event extends Orm {
-
-  static model = models.Event;
-
-  // Override base class default getter to search for payload json if column key not found
-  get(key) {
-
-    let value = this.record.dataValues[key]
-
-    if (value) return value
-
-    return this.record.dataValues.payload[key]
-
-  }
+  return prisma.events.create({
+    data: {
+      type,
+      payload,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
 
 }
 
 export async function listEvents(type: string, payload: any): Promise<Event[]> {
 
-  let records = await findAll<Event>(Event, {
-
+  return prisma.events.findMany({
     where: {
-
       type,
-
       payload
-
     }
-
   })
 
-  return records
 
 }
 
 export async function listInvoiceEvents(invoice: Invoice, type?: string): Promise<Event[]> {
 
-  var where = {
+  var where: {
+    invoice_uid: string;
+    type?: string;
+  
+  } = {
 
-    invoice_uid: invoice.uid
+    invoice_uid: String(invoice.uid)
 
   }
 
@@ -81,9 +77,13 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
   }
 
-  let records = await findAll<Event>(Event, { where, order: [['createdAt', 'desc']] })
+  return prisma.events.findMany({
+    where,
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
 
-  return records;
 
 }
 
@@ -96,7 +96,7 @@ interface EventLogOptions {
 
 export async function listAccountEvents(account: Account, options: EventLogOptions={}): Promise<Event[]> {
 
-  var query = {
+  var query: any = {
 
     where: {
 
@@ -126,29 +126,36 @@ export async function listAccountEvents(account: Account, options: EventLogOptio
 
   log.info('events.listAccountEvents', { query })
 
-  return findAll<Event>(Event, query)
+  return prisma.events.findMany({
+    where: query.where,
+    orderBy: {
+      createdAt: 'desc'
+    },
+    take: query.limit,
+    skip: query.offset
+  })
 
 }
 
 export async function republishEventToRoutingKeys(event: Event): Promise<void> {
 
-  if (event.get('account_id')) {
+  if (event.account_id) {
 
-    const key = `accounts.${event.get('account_id')}.events`
+    const key = `accounts.${event.account_id}.events`
 
-    publish(key, event.toJSON())
-
-  }
-
-  if (event.get('app_id')) {
-
-    publish(`apps.${event.get('app_id')}.events`, event.toJSON())
+    publish(key, event)
 
   }
 
-  if (event.get('invoice_uid')) {
+  if (event.app_id) {
 
-    publish(`invoices.${event.get('invoice_uid')}.events`, event.toJSON())
+    publish(`apps.${event.app_id}.events`, event)
+
+  }
+
+  if (event.invoice_uid) {
+
+    publish(`invoices.${event.invoice_uid}.events`, event)
 
   }
 

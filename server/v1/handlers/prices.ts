@@ -1,7 +1,8 @@
 
-import { badRequest } from 'boom'
+import { badRequest } from '@hapi/boom'
 
 import { listPrices, getPriceHistory } from '../../../lib/prices'
+import { Request, ResponseToolkit } from '@hapi/hapi'
 
 export async function index() {
 
@@ -27,7 +28,7 @@ export async function index() {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     return badRequest(error)
 
@@ -35,19 +36,19 @@ export async function index() {
 
 }
 
-export async function show(req, h) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   try {
 
-    const { currency } = req.params
+    const { currency } = request.params
 
     const result = await getPriceHistory(currency)
 
     return result
 
-  } catch(error) {
+  } catch(error: any) {
 
-    return badRequest(error)
+    return badRequest(error.message)
 
   }
 

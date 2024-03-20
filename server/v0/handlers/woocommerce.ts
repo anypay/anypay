@@ -1,10 +1,12 @@
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 import {models}  from '../../../lib';
+import { ResponseToolkit } from '@hapi/hapi';
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let coins = await models.Address.findAll({
 
-    where: { account_id: req.account.id }
+    where: { account_id: request.account.id }
 
   })
 
@@ -12,7 +14,7 @@ export async function index(req, h) {
 
     where: {
 
-      account_id: req.account.id
+      account_id: request.account.id
     }
 
   })
@@ -26,7 +28,7 @@ export async function index(req, h) {
     }
   }
 
-  settings.coins = coins.map(coin => {
+  settings.coins = coins.map((coin: { currency: string}) => {
 
     return coin.currency
   });

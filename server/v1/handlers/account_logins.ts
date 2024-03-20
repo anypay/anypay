@@ -4,16 +4,25 @@ import { loginAccount, geolocateAccountFromRequest } from '../../../lib/accounts
 import { ensureAccessToken } from '../../../lib/access_tokens'
 
 import { log } from '../../../lib/log'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+import { ResponseToolkit } from '@hapi/hapi';
 
-export async function create(request, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   var account;
 
   try {
 
-    account = await loginAccount(request.payload)
+    account = await loginAccount(request.payload as {
+        
+        email: string,
+  
+        password: string,
+  
+      
+    })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('login.error', error)
 
@@ -23,11 +32,11 @@ export async function create(request, h) {
 
   geolocateAccountFromRequest(account, request)
 
-  const { accessToken } = await ensureAccessToken(account)
+  const accessToken = await ensureAccessToken(account)
 
   return h.response({
 
-    user: account.toJSON(),
+    user: account,
 
     accessToken,
 

@@ -1,5 +1,5 @@
 import {awaitChannel} from '../../../lib/amqp';
-import * as Boom from 'boom';
+import * as Boom from '@hapi/boom';
 
 import { log, models } from '../../../lib'
 
@@ -7,22 +7,23 @@ import { find } from '../../../lib/plugins'
 
 import * as pay from '../../../lib/pay'
 import { Trace } from '../../../lib/trace';
+import { Request, ResponseToolkit } from '@hapi/hapi';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
 
 
-export async function show(req, h) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   let currency: pay.Currency = pay.getCurrency({
     protocol: 'BIP70',
-    headers: req.headers
+    headers: request.headers
   })
 
   log.info(`bip70.currency.parsed`, currency)
 
   let paymentRequest: pay.PaymentRequest = await pay.buildPaymentRequestForInvoice({
-    uid: req.params.uid,
+    uid: request.params.uid,
     currency: currency.code,
     protocol: 'BIP70'
   })
@@ -33,22 +34,22 @@ export async function show(req, h) {
 
   models.Bip70PaymentRequest.findOrCreate({
     where: {
-      invoice_uid: req.params.uid,
+      invoice_uid: request.params.uid,
       currency: currency.code
     },
     defaults: {
-      invoice_uid: req.params.uid,
+      invoice_uid: request.params.uid,
       currency: currency.code,
       hex
     }
   })
-  .then(([record, isNew]) => {
+  .then(([record, isNew]: [any, boolean]) => {
 
     if (isNew) {
       log.info('bip70.paymentrequest.recorded', record)
     }
   })
-  .catch(error => {
+  .catch((error: any) => {
     log.info('error recording paymentrequest', error.message)
   })
 
@@ -61,7 +62,7 @@ export async function show(req, h) {
     var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
     var signature = Message(digest).sign(privateKey);
     response.header('x-signature-type', 'ecc');
-    response.header('x-identity',process.env.JSON_PROTOCOL_IDENTITY_ADDRESS );
+    response.header('x-identity', String(process.env.JSON_PROTOCOL_IDENTITY_ADDRESS) );
     response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
     response.header('digest', `SHA-256=${digest}`);
 
@@ -77,22 +78,22 @@ export async function show(req, h) {
 
 }
 
-export async function create(req, h) {
+export async function create(request: Request, h: ResponseToolkit) {
 
   let channel = await awaitChannel();
 
   let currency: pay.Currency = pay.getCurrency({
     protocol: 'BIP70',
-    headers: req.headers
+    headers: request.headers
   })
 
   log.info(`bip70.currency.parsed`, currency)
 
   let plugin = find({chain: currency.code, currency: currency.code})
 
-  await channel.publish('anypay', `bip70.payments.${currency.code.toLowerCase()}`, req.payload);
+  let payment = pay.BIP70Protocol.Payment.decode(request.payload);
 
-  let payment = pay.BIP70Protocol.Payment.decode(req.payload);
+  await channel.publish('anypay', `bip70.payments.${currency.code.toLowerCase()}`, payment);
 
   log.info('bip70.payment.decoded', payment);
 
@@ -100,7 +101,7 @@ export async function create(req, h) {
 
     where: {
 
-      invoice_uid: req.params.uid,
+      invoice_uid: request.params.uid,
 
       currency: currency.code
 
@@ -109,7 +110,7 @@ export async function create(req, h) {
 
   let invoice = await models.Invoice.findOne({
     where: {
-      uid: req.params.uid
+      uid: request.params.uid
     }
   })
 
@@ -120,7 +121,7 @@ export async function create(req, h) {
   }
 
   if (!payment_option) {
-    throw new Error(`${currency.code} payment option for invoice ${req.params.uid} not found`)
+    throw new Error(`${currency.code} payment option for invoice ${request.params.uid} not found`)
   }
 
   for (let transaction of payment.transactions) {
@@ -132,18 +133,18 @@ export async function create(req, h) {
         await models.PaymentSubmission.create({
           invoice_uid: invoice.uid,
           txhex: transaction.toString('hex'),
-          headers: req.headers,
+          headers: request.headers,
           wallet: null,
           protocol: 'bip70',
           currency: payment_option.currency
         })
   
-      } catch(error) {
+      } catch(error: any) {
 
         log.info('models.PaymentSubmission.create.error', {
           invoice_uid: invoice.uid,
           txhex: transaction.toString('hex'),
-          headers: req.headers,
+          headers: request.headers,
           wallet: null,
           protocol: 'bip70',
           currency: payment_option.currency,
@@ -181,7 +182,7 @@ export async function create(req, h) {
       log.info(`bip70.${payment_option.currency}.broadcast.result`, { result: resp, trace })
 
       
-    } catch(error) {
+    } catch(error: any) {
 
       log.error(`bip70.${payment_option.currency}.broadcast.error`, error)
 

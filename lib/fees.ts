@@ -28,7 +28,7 @@ export async function getMiningFee(currency: string, txhex: string): Promise<Fee
 
   console.log('total input', total_input)
 
-  const total_output = tx.outputs.reduce((sum, output) => sum + output.satoshis, 0)
+  const total_output = tx.outputs.reduce((sum: number, output: {satoshis: number}) => sum + output.satoshis, 0)
 
   console.log('total output', total_output)
 

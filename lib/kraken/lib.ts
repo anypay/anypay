@@ -1,7 +1,7 @@
 
 import { database, models, log } from '../../lib';
 
-export async function getDASHBalance(kraken) {
+export async function getDASHBalance(kraken: any) {
 
   let balance = await kraken.api('Balance');
 
@@ -9,7 +9,7 @@ export async function getDASHBalance(kraken) {
 
 }
 
-export async function getBalancesBreakdown(kraken) {
+export async function getBalancesBreakdown(kraken: any) {
 
   /* Available balances, meaning they are available for placing orders */
 
@@ -17,7 +17,7 @@ export async function getBalancesBreakdown(kraken) {
 
   let orders = await listOpenOrders(kraken);
 
-  let locked = Object.values(orders.result.open).reduce((accumulator, order: any) => {
+  let locked: any = Object.values(orders.result.open).reduce((accumulator: any, order: any) => {
 
     if (!accumulator[order.descr.pair]) {
 
@@ -57,7 +57,7 @@ export async function getBalancesBreakdown(kraken) {
 
 }
 
-export async function getBalances(kraken) {
+export async function getBalances(kraken: any) {
 
   let balance = await kraken.api('Balance');
 
@@ -65,7 +65,7 @@ export async function getBalances(kraken) {
 
 }
 
-export async function listOpenOrders(kraken): Promise<any> {
+export async function listOpenOrders(kraken: any): Promise<any> {
 
   let openOrders = await kraken.api('OpenOrders');
 
@@ -73,7 +73,7 @@ export async function listOpenOrders(kraken): Promise<any> {
 
 }
 
-export async function getTicker(kraken, pair) {
+export async function getTicker(kraken: any, pair: any) {
 
   let ticker = await kraken.api('Ticker', { pair });
 
@@ -81,7 +81,7 @@ export async function getTicker(kraken, pair) {
 
 }
 
-export async function cancelOrder(kraken, txid) {
+export async function cancelOrder(kraken: any, txid: string) {
 
   let result = await kraken.api('CancelOrder', { txid });
 
@@ -89,7 +89,7 @@ export async function cancelOrder(kraken, txid) {
 
 }
 
-export async function getOpenPositions(kraken) {
+export async function getOpenPositions(kraken: any) {
 
   let openPositions = await kraken.api('OpenPositions');
 
@@ -97,7 +97,7 @@ export async function getOpenPositions(kraken) {
 
 }
 
-export async function listClosedOrders(kraken) {
+export async function listClosedOrders(kraken: any) {
 
   let closedOrders = await kraken.api('ClosedOrders');
 
@@ -105,7 +105,7 @@ export async function listClosedOrders(kraken) {
 
 }
 
-export async function listTrades(kraken, options={}) {
+export async function listTrades(kraken: any, options={}) {
 
   options = Object.assign({
     type: 'all'
@@ -117,7 +117,7 @@ export async function listTrades(kraken, options={}) {
 
 }
 
-export async function listBankAccounts(kraken, options={}) {
+export async function listBankAccounts(kraken: any, options={}) {
 
   options = Object.assign({
     type: 'all'
@@ -129,7 +129,7 @@ export async function listBankAccounts(kraken, options={}) {
 
 }
 
-export async function withdrawStatus(kraken, options={}) {
+export async function withdrawStatus(kraken: any, options={}) {
 
   options = Object.assign({
     asset: 'USD',
@@ -143,7 +143,7 @@ export async function withdrawStatus(kraken, options={}) {
 
 const USD_WITHDRAW_ACCOUNT_NAME = process.env.KRAKEN_WITHDRAW_KEY || '???'
 
-export async function withdrawInfo(kraken, options={}) {
+export async function withdrawInfo(kraken: any, options={}) {
 
   options = Object.assign({
     amount: 1000,
@@ -157,7 +157,7 @@ export async function withdrawInfo(kraken, options={}) {
 
 }
 
-export async function withdrawAllUSD(kraken, options: any={}) {
+export async function withdrawAllUSD(kraken: any, options: any={}) {
 
   let balances = await getAccountBalance(kraken)
 
@@ -172,7 +172,7 @@ export async function withdrawAllUSD(kraken, options: any={}) {
 }
  
 
-export async function withdrawUSD(kraken, options: any={}) {
+export async function withdrawUSD(kraken: any, options: any={}) {
 
   options = Object.assign({
     amount: options.amount,
@@ -186,7 +186,7 @@ export async function withdrawUSD(kraken, options: any={}) {
 
 }
 
-export async function getAccountBalance(kraken) {
+export async function getAccountBalance(kraken: any) {
 
   let balance = await kraken.api('Balance');
 
@@ -194,7 +194,7 @@ export async function getAccountBalance(kraken) {
 
 }
 
-export async function getTradeBalance(kraken) {
+export async function getTradeBalance(kraken: any) {
 
   let balance = await kraken.api('TradeBalance');
 
@@ -202,7 +202,7 @@ export async function getTradeBalance(kraken) {
 
 }
 
-export async function getUSDBalance(kraken) {
+export async function getUSDBalance(kraken: any) {
 
   let balance = await kraken.api('Balance');
 
@@ -210,7 +210,7 @@ export async function getUSDBalance(kraken) {
 
 }
 
-export async function transferAllUSDToBank(kraken) {
+export async function transferAllUSDToBank(kraken: any) {
 
   let usdBalance = await getUSDBalance(kraken);
 
@@ -223,7 +223,7 @@ export async function transferAllUSDToBank(kraken) {
   return withdrawal.result;
 
 }
-export async function marketSell(kraken, pair, volume) {
+export async function marketSell(kraken: any, pair: any, volume: any) {
 
   let result = await kraken.api('AddOrder', {
 
@@ -241,7 +241,7 @@ export async function marketSell(kraken, pair, volume) {
 
 }
 
-export async function sellStopLoss(kraken, pair, price, volume) {
+export async function sellStopLoss(kraken: any, pair: any, price: any, volume: any) {
 
   let result = await kraken.api('AddOrder', {
 
@@ -261,7 +261,7 @@ export async function sellStopLoss(kraken, pair, price, volume) {
 
 }
 
-export async function sellAllDASH(kraken) {
+export async function sellAllDASH(kraken: any) {
 
   let balance = await getDASHBalance(kraken);
 
@@ -289,7 +289,7 @@ export async function sellAllDASH(kraken) {
 
 }
 
-export async function sellAllOfPair(kraken, pair, balance) {
+export async function sellAllOfPair(kraken: any, pair: any, balance: any) {
 
   if (balance > 0) {
 
@@ -315,7 +315,7 @@ export async function sellAllOfPair(kraken, pair, balance) {
 
 }
 
-export async function syncAllNewTrades(kraken) {
+export async function syncAllNewTrades(kraken: any) {
 
   var newTrades = [true];
 
@@ -330,7 +330,7 @@ export async function syncAllNewTrades(kraken) {
 }
   
 
-export async function syncNewTrades(kraken) {
+export async function syncNewTrades(kraken: any) {
 
   let tradeCount = await database.query(`select count(*) from "KrakenTrades";`);
 

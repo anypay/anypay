@@ -21,7 +21,7 @@ import { sendWebhookForInvoice } from './webhooks';
 
 import { registerSchema } from './amqp';
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 import {
   payments as Payment

@@ -15,7 +15,10 @@ interface SendRawTransactionResult {
     id: string;
 }
 
-const hosts = {
+const hosts: {
+    [key: string]: string
+
+} = {
     'BTC': 'btc.nownodes.io'
 }
 
@@ -60,7 +63,7 @@ export async function sendRawTransaction(currency: string, hex: string): Promise
 
         return data
 
-    } catch(error) {
+    } catch(error: any) {
 
         error.trace = trace
 

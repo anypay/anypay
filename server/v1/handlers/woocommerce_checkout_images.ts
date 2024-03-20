@@ -2,8 +2,14 @@
 import axios from 'axios'
 
 import { getAccountSetting, setAccountSetting } from '../../../lib/settings'
+import { Request, ResponseToolkit } from '@hapi/hapi'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { badRequest } from '@hapi/boom'
 
-const files = {
+const files: {
+  [key: string]: string
+
+} = {
   'XMR': 'https://doge.bitcoinfiles.org/406e0f115578598c4364ea42aa3887e8aeccf513d948c183054c42d12782cd38',
   'DASH': 'https://doge.bitcoinfiles.org/a5f08a3aad5e97da45515b70c7d09dac75baf107ddc1176bf676cad0e347d2d1',
   'BCH': 'https://doge.bitcoinfiles.org/c028b3d5843fb65da41555a090963da84b80356492f6950bc573d4ec9c3af3f2',
@@ -14,7 +20,7 @@ const files = {
   'ANYPAY': 'https://doge.bitcoinfiles.org/31bc517ddae2134408f15acd582606ffe493e4d3800e8a60250899c61ace9bb3'
 }
 
-export async function image(request, hapi) {
+export async function image(request: Request, h: ResponseToolkit) {
 
   try {
 
@@ -26,21 +32,21 @@ export async function image(request, hapi) {
       responseType: 'arraybuffer'
     })
 
-    return hapi.response(data).header(
+    return h.response(data).header(
       'Content-Type', 'image/png'
     )
 
-  } catch(error) {
+  } catch(error: any) {
 
     console.error(error)
 
-    return hapi.response({ error: error.message }).code(500)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function show(request, hapi) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
@@ -48,40 +54,43 @@ export async function show(request, hapi) {
 
     const url = files[image]
 
-    return hapi.response({
+    return h.response({
       image: {
         name: image,
         url
       }
     })
 
-  } catch(error) {
+  } catch(error: any) {
 
     console.error(error)
 
-    return hapi.response({ error: error.message }).code(500)
+    return h.response({ error: error.message }).code(500)
 
   }
 
 }
 
-export async function index(request, hapi) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  return hapi.response({ images: files }).code(200)
+  return h.response({ images: files }).code(200)
 
 }
 
-export async function update(request, hapi) {
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let url = files[request.payload.name]
+  const { name } = request.payload as {
+    name: string
+  }
+
+  let url = files[name]
 
   if (url) {
 
-    await setAccountSetting(request.account.id, 'woocommerce.checkout.image', request.payload.name)
+    await setAccountSetting(request.account.id, 'woocommerce.checkout.image', name)
 
   }
 
-  return hapi.response({ name: request.payload.name, url }).code(200)
+  return h.response({ name, url }).code(200)
 
 }
-

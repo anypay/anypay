@@ -1,14 +1,10 @@
 
-
-import { App } from '../../lib/apps'
-
-import { findOne } from '../../lib/orm'
-
 import { log } from '../../lib/log'
 
 import prisma from '../../lib/prisma'
+import { Request } from '@hapi/hapi'
 
-export async function auth(request, username, password, hapi) {
+export async function auth(request: Request, username: string, password: string) {
 
   if (username.toLowerCase() !== 'prometheus') {
     return {
@@ -16,7 +12,7 @@ export async function auth(request, username, password, hapi) {
     }
   }
 
-  const prometheusApp: App = await findOne<App>(App, {
+  const prometheusApp = await prisma.apps.findFirst({
     where: {
       name: 'prometheus',
       account_id: 0
@@ -44,7 +40,7 @@ export async function auth(request, username, password, hapi) {
     const accessToken = await prisma.access_tokens.findFirst({
       where: {
         uid: password,
-        app_id: prometheusApp.get('id')
+        app_id: prometheusApp.id
 
       }
     })
@@ -71,7 +67,7 @@ export async function auth(request, username, password, hapi) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('auth.app.error', error)
 

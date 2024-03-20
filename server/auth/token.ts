@@ -1,17 +1,15 @@
 
-import * as Hapi from 'hapi';
+import * as Hapi from '@hapi/hapi';
 
 import * as jwt from '../../lib/jwt';
 
 import { models, log } from '../../lib';
 
-import { findApp } from '../../lib/apps'
+import { Request } from '@hapi/hapi';
+import AuthenticatedRequest from './AuthenticatedRequest';
+import prisma from '../../lib/prisma';
 
-import { findAccount } from '../../lib/account'
-
-import { compare } from '../../lib/bcrypt'
-
-export async function validateAdminToken(request: Hapi.Request, username:string, password:string, h: Hapi.ResponseToolkit) {
+export async function validateAdminToken(request: Request, username:string, password:string, h: Hapi.ResponseToolkit) {
 
   try {
 
@@ -31,7 +29,7 @@ export async function validateAdminToken(request: Hapi.Request, username:string,
   }
 }
 
-async function validateToken (request, username, password, h) {
+async function validateToken (request: AuthenticatedRequest, username: string, password: string) {
 
   if (!username) {
     return {
@@ -62,28 +60,7 @@ async function validateToken (request, username, password, h) {
 
   } else {
 
-    try {
 
-      await compare(password, process.env.SUDO_PASSWORD_HASH);
-
-      request.account = account;
-      request.account_id = account.id;
-
-      return {
-
-        isValid: true,
-
-        credentials: {
-
-          admin: true
-
-        }
-
-      }
-
-    } catch(error) {
-
-      log.error('auth.token.error', error);
 
       return {
 
@@ -91,12 +68,11 @@ async function validateToken (request, username, password, h) {
 
       }
 
-    }
 
   }
 };
 
-export async function validateAppToken (request, username, password, h) {
+export async function validateAppToken (request: AuthenticatedRequest, username: string, password: string) {
 
   log.debug('auth.app', { username, password }) 
 
@@ -130,9 +106,17 @@ export async function validateAppToken (request, username, password, h) {
 
     request.app_id = accessToken.app_id
 
-    request.app = await findApp(accessToken.app_id)
+    request.app = await await prisma.apps.findFirstOrThrow({
+      where: {
+        id: accessToken.app_id
+      }
+    })
 
-    request.account = await findAccount(accessToken.account_id)
+    request.account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        id: accessToken.account_id
+      }
+    })
 
     request.token = username
 

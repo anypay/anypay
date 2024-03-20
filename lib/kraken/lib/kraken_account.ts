@@ -1,7 +1,8 @@
 
 import { Orm } from '../../../lib/orm'
 
-import { Account } from '../../../lib/account'
+
+import { accounts as Account } from '@prisma/client'
 
 import { models } from '../../../lib/models'
 
@@ -9,6 +10,7 @@ import { log } from '../../../lib/log'
 
 import * as krakenLib from '../lib'
 
+//@ts-ignore
 import * as KrakenClient from 'kraken-api'
 
 export class KrakenAccount extends Orm {
@@ -17,7 +19,7 @@ export class KrakenAccount extends Orm {
 
   client: KrakenClient;
 
-  constructor(record: any, account) {
+  constructor(record: any, account: Account) {
 
     super(record);
 
@@ -142,7 +144,7 @@ export class KrakenAccount extends Orm {
 
           return true
 
-        } catch(error) {
+        } catch(error: any) {
 
           error.pair = pair
 
@@ -180,7 +182,7 @@ export class KrakenAccount extends Orm {
 
         trades.push(trade)
 
-      } catch(error) {
+      } catch(error: any) {
 
         log.error('kraken.autosell.currency.error', error)
 
@@ -236,7 +238,7 @@ export async function listAll({ where }: { where?: any } = {}) {
     }]
   })
 
-  return records.map(record => {
+  return records.map((record: any) => {
 
     return new KrakenAccount(record, record.account)
 

@@ -4,16 +4,18 @@ import { getCoins } from '../../../lib/coins'
 import { convert } from '../../../lib/prices'
 
 import { log } from '../../../lib/log'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let coins = await getCoins()
 
   //coins = coins.filter(coin => coin.supported && !coin.unavailable)
 
-  coins = await Promise.all(coins.map(async coin => {
+  const response = await Promise.all(coins.map(async coin => {
 
-    var result = {
+    var result: any = {
       name: coin.name,
       code: coin.code,
       logo: coin.logo_url,
@@ -38,7 +40,7 @@ export async function index(req, h) {
 
   }))
 
-  return h.response({ coins }).code(200)
+  return h.response({ coins: response }).code(200)
 
 }
 

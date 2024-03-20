@@ -4,9 +4,12 @@ import { Op } from 'sequelize';
 
 import { log, models, invoices } from '../../../lib';
 
-import { Account } from '../../../lib/account';
+import {
+  invoices as Invoice,
+  payment_options as PaymentOption
+} from '@prisma/client'
 
-import { Invoice, getInvoice, createInvoice, cancelInvoice } from '../../../lib/invoices';
+import { createInvoice, cancelInvoice } from '../../../lib/invoices';
 
 import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
@@ -14,11 +17,21 @@ import { computeInvoiceURI } from '../../../lib/uri'
 
 import * as moment from 'moment';
 
-export async function cancel(req, h) {
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 
-  let where = {
-    uid: req.params.uid,
-    account_id: req.account.id
+import { Request, ResponseToolkit } from '@hapi/hapi';
+import { badRequest } from '@hapi/boom';
+import prisma from '../../../lib/prisma';
+
+export async function cancel(request: AuthenticatedRequest, h: ResponseToolkit) {
+
+  let where: {
+    uid: string,
+    account_id: number,
+    status?: string
+  } = {
+    uid: request.params.uid,
+    account_id: request.account.id
   }
 
   let invoice = await models.Invoice.findOne({
@@ -51,7 +64,7 @@ export async function cancel(req, h) {
 
 }
 
-export async function index (request, reply) {
+export async function index (request: AuthenticatedRequest, h: ResponseToolkit) {
 
   /*
 
@@ -68,11 +81,33 @@ export async function index (request, reply) {
 
   */
 
-  let query = {
+  let query: {
+    where: {
+      account_id: number,
+      status?: string,
+      complete?: boolean,
+      completed_at?: {
+        [Op.gte]?: Date,
+        [Op.lt]?: Date
+      },
+      createdAt?: {
+        [Op.gte]?: Date,
+        [Op.lt]?: Date
+      }
+    },
+    include: {
+      model: any,
+      as: string
+    }[],
+    order: any[],
+    offset: number,
+    limit: number
+  
+  } = {
 
     where: {
 
-      account_id: request.auth.credentials.accessToken.account_id,
+      account_id: request.account.id,
 
     },
 
@@ -115,6 +150,7 @@ export async function index (request, reply) {
 
     if (!query.where['completed_at']) {
 
+
       query.where['completed_at'] = {};
     }
 
@@ -144,26 +180,20 @@ export async function index (request, reply) {
 
 };
 
-export async function createDeprecated(request, h) {
+export async function createDeprecated(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  const account = new Account(request.account)
+  const account = request.account
 
   try {
 
     let invoice: Invoice = await createInvoice({
       account,
-      ...request.payload
+      ...request.payload as any
     })
 
-    if (request.is_public_request) {
+    const json = JSON.parse(JSON.stringify(invoice))
 
-      invoice.set('is_public_request', true);
-
-    }
-
-    const json = invoice.toJSON();
-
-    const payment_options = await getPaymentOptions(invoice.uid)
+    const payment_options = await getPaymentOptions(String(invoice.uid))
 
     const responseInvoice = {
       amount: json['amount'],
@@ -175,11 +205,11 @@ export async function createDeprecated(request, h) {
       expiresAt: json['expiry'],
       payment_options: payment_options.map(option => {
 
-        const { chain, currency, instructions } = option
+        const { chain, currency, instructions } = option as any
 
         const uri = computeInvoiceURI({ uid: json.uid, currency: chain })
 
-        const amount = instructions[0].outputs.reduce((sum, output) => {
+        const amount = instructions[0].outputs.reduce((sum: number, output: { amount: number; }) => {
 
           return sum + output.amount
 
@@ -202,11 +232,11 @@ export async function createDeprecated(request, h) {
     })
     .code(200)
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.invoices.create', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
@@ -214,26 +244,20 @@ export async function createDeprecated(request, h) {
 
 
 
-export async function create(request, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  const account = new Account(request.account)
 
   try {
 
     let invoice: Invoice = await createInvoice({
-      account,
-      ...request.payload
+      account: request.account,
+      ...request.payload as any
     })
 
-    if (request.is_public_request) {
 
-      invoice.set('is_public_request', true);
+    const json = JSON.parse(JSON.stringify(invoice))
 
-    }
-
-    const json = invoice.toJSON();
-
-    const payment_options = await getPaymentOptions(invoice.uid)
+    const payment_options = await getPaymentOptions(String(invoice.uid))
 
     const responseInvoice = {
       amount: json['amount'],
@@ -252,27 +276,34 @@ export async function create(request, h) {
     })
     .code(200)
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v0.invoices.create', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-async function getPaymentOptions(invoice_uid) { 
+async function getPaymentOptions(invoice_uid: string) { 
 
-  let invoice: Invoice = await getInvoice(invoice_uid)
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
+  
+  })
 
-  let payment_options = await models.PaymentOption.findAll({where: {
-    invoice_uid
-  }});
+  const payment_options = await prisma.payment_options.findMany({
+    where: {
+      invoice_uid
+    }
+  })
+  
+  return Promise.all(payment_options.map(async (option: PaymentOption) => {
 
-  return Promise.all(payment_options.map(async option => {
-
-    const request = await getPaymentRequest(invoice, { chain: option.chain, currency: option.currency })
+    const request = await getPaymentRequest(invoice, { chain: String(option.chain), currency: option.currency })
 
     return request
 
@@ -280,9 +311,9 @@ async function getPaymentOptions(invoice_uid) {
 
 }
 
-function sanitizeInvoice(invoice) {
+function sanitizeInvoice(invoice: Invoice) {
 
-  let resp = invoice.toJSON();
+  let resp = JSON.parse(JSON.stringify(invoice))
 
   delete resp.webhook_url;
   delete resp.id;
@@ -295,7 +326,7 @@ function sanitizeInvoice(invoice) {
 }
 
 
-export async function showDeprecated(request, reply) {
+export async function showDeprecated(request: Request, h: ResponseToolkit) {
 
   let invoiceId = request.params.invoice_id;
 
@@ -341,7 +372,7 @@ export async function showDeprecated(request, reply) {
 }
 
 
-export async function show(request, h) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   try {
 
@@ -367,7 +398,7 @@ export async function show(request, h) {
         invoice_uid: invoice.uid
       }});
 
-      const responseInvoice = {
+      const responseInvoice: any = {
         amount: invoice.amount,
         currency: invoice.denomination,
         status: invoice.status,
@@ -388,7 +419,11 @@ export async function show(request, h) {
       responseInvoice['payment_options'] = payment_options
       responseInvoice['notes'] = notes
 
-      const response = {
+      const response: {
+        invoice: any,
+        payment?: any
+      
+      } = {
         invoice: responseInvoice
       }
 
@@ -427,17 +462,17 @@ export async function show(request, h) {
       throw new Error('invoice not found')
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('invoices.show.error', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function showLegacy(request, reply) {
+export async function showLegacy(request: Request, h: ResponseToolkit) {
 
   let invoiceId = request.params.invoice_id;
 

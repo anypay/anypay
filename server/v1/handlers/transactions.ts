@@ -1,13 +1,15 @@
 
 //import { plugins } from '../../../lib/plugins'
 
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { log } from '../../../lib'
 
-import { badRequest } from 'boom'
+import { badRequest } from '@hapi/boom'
+import { ResponseToolkit } from '@hapi/hapi'
 
 // broadcast transaction
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
     //const { chain, currency, transaction } = req.payload
@@ -19,7 +21,7 @@ export async function create(req, h) {
     //return { result }
     return {  }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('server.v1.handlers.transactions.create', error)
 

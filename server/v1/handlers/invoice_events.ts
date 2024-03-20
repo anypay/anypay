@@ -1,11 +1,13 @@
 
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { listInvoiceEvents } from '../../../lib/events'
 
 import { ensureInvoice } from '../../../lib/invoices'
 
-import { unauthorized } from 'boom'
+import { unauthorized } from '@hapi/boom'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function index(request, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let invoice = await ensureInvoice(request.params.invoice_uid)
 
@@ -21,7 +23,7 @@ export async function index(request, h) {
 
     invoice_uid: request.params.invoice_uid,
 
-    events: events.map(event => event.toJSON())
+    events
 
   })
 

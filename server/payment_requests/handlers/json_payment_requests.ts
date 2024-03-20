@@ -1,26 +1,26 @@
 
+import { Request, ResponseToolkit } from '@hapi/hapi';
 import { models, log } from '../../../lib'
 
 import { detectWallet, buildPaymentRequestForInvoice, getCurrency } from '../../../lib/pay';
 
 import { submitPayment } from '../../../lib/pay/json_v2/protocol'
+import { badRequest } from '@hapi/boom';
 
-import * as Hapi from 'hapi';
-
-export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   let currency = getCurrency({
-    headers: req.headers,
+    headers: request.headers,
     protocol: 'JSONV2'
   })
 
   log.info(`paymentrequest.jsonv2`, {
     currency: currency.code,
-    invoice_uid: req.params.uid
+    invoice_uid: request.params.uid
   })
 
   const paymentRequest = await buildPaymentRequestForInvoice({
-    uid: req.params.uid,
+    uid: request.params.uid,
     currency: currency.code,
     protocol: 'JSONV2'
   })
@@ -37,26 +37,31 @@ export async function show(req: Hapi.Request, h: Hapi.ResponseToolkit) {
 
 }
 
-export async function create(req, h) {
+export async function create(request: Request, h: ResponseToolkit) {
 
   try {
 
-    const currency = req.params.currency.toUpperCase()
+    const payload = request.payload as {
+      chain: string;
+      transactions: any[];
+    }
 
-    const chain = req.payload.chain.toUpperCase()
+    const currency = request.params.currency.toUpperCase()
 
-    let invoice_uid = req.params.uid
+    const chain = payload.chain.toUpperCase()
 
-    let transactions = req.payload.transactions;
+    let invoice_uid = request.params.uid
 
-    let wallet = detectWallet(req.headers, req.params.uid)
+    let transactions = payload.transactions;
+
+    let wallet = detectWallet(request.headers, request.params.uid)
 
     for (let transaction of transactions) {
 
       models.PaymentSubmission.create({
         invoice_uid,
         txhex: transaction,
-        headers: req.headers,
+        headers: request.headers,
         wallet,
         currency,
         chain
@@ -73,11 +78,11 @@ export async function create(req, h) {
 
     return response
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('http.payment_requests.JsonPaymentRequests.create', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 

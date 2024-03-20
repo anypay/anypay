@@ -1,6 +1,6 @@
 import {connect, Connection, Channel} from 'amqplib';
 
-import { Schema } from '@hapi/joi';
+import { Schema } from 'joi';
 
 var connection: Connection;
 var channel: Channel;

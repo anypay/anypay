@@ -1,9 +1,15 @@
 
 const _ = require('lodash')
 
-import { log, models } from '../../../lib';
+import { Request, ResponseToolkit } from '@hapi/hapi';
+import { log } from '../../../lib';
 
-import { Invoice, createInvoice } from '../../../lib/invoices'
+import { createInvoice } from '../../../lib/invoices'
+import {
+  invoices as Invoice,
+} from '@prisma/client'
+import AuthenticatedRequest from '../../../server/auth/AuthenticatedRequest';
+import prisma from '../../../lib/prisma';
 
 interface InvoiceAdditions {
   webhook_url?: string;
@@ -11,8 +17,8 @@ interface InvoiceAdditions {
   wordpress_site_url?: string;
   tags?: string[];
   external_id?: string;
-  is_public_request?: string;
-  headers?: string;
+  is_public_request?: boolean;
+  headers?: Record<string, any>;
   email?: string;
   business_id?: string;
   location_id?: string;
@@ -25,51 +31,65 @@ export async function setInvoiceAdditions(invoice: Invoice, additions: InvoiceAd
 
 }
 
-export async function show(request, hapi) {
+export async function show(request: Request, h: ResponseToolkit) {
 
   try {
 
-    let invoice = await models.Invoice.findOne({ where: { uid: request.params.invoice_uid }})
+    const invoice = await prisma.invoices.findFirst({
+      where: { uid: request.params.invoice_uid }
+    })
 
     if (!invoice) {
 
-      return hapi.response({ error: 'invoice not found' }).code(404)
+      return h.response({ error: 'invoice not found' }).code(404)
 
     }
+    
+    const payment = await prisma.payments.findFirst({
+      where: { invoice_uid: String(invoice.uid) }
+    })
 
-    let payment = await models.Payment.findOne({ where: { invoice_uid: invoice.uid }})
-
-    var response = {
+    var response: {
       invoice: {
-        currency: invoice.denomination,
-        amount: invoice.denomination_amount,
-        status: invoice.status,
+        currency: string;
+        amount: number;
+        status: string;
+        createdAt: Date;
+      };
+      payment?: any;
+      kraken_deposits?: any;
+    
+    } = {
+      invoice: {
+        currency: String(invoice.denomination_currency),
+        amount: Number(invoice.denomination_amount),
+        status: String(invoice.status),
         createdAt: invoice.createdAt
       }
     }
 
-    if (payment) { response['payment'] = payment.toJSON() }
+    if (payment) { response['payment'] = payment }
 
-    response['kraken_deposits'] = await models.KrakenDeposit.findAll({
+    response['kraken_deposits'] = await prisma.krakenDeposits.findMany({
       where: {
-        account_id: invoice.account_id,
-        txid: invoice.hash
+        account_id: Number(invoice.account_id),
+        txid: String(invoice.hash)
       }
     })
 
-    return hapi.response(response).code(200)
+    return h.response(response).code(200)
 
-  } catch(error) {
+  } catch(error: any) {
 
     console.error('invoic.show.error', error)
 
-    return hapi.response({ error: error.message }).code(500)
+    return h.response({ error: error.message }).code(500)
 
   }
 
 }
 
-export async function create (request, h) {
+export async function create (request: AuthenticatedRequest, h: ResponseToolkit) {
 
   // TODO: Refactor to call only a SINGLE core library method
 
@@ -77,35 +97,63 @@ export async function create (request, h) {
     account_id: request.account.id
   }, request.payload))
 
+  const payload = request.payload as {
+    amount: number;
+    currency: string;
+    external_id: string;
+    business_id: string;
+    location_id: string;
+    register_id: string;
+    webhook_url: string;
+    redirect_url: string;
+    memo: string;
+    fee_rate_level: string;
+    wordpress_site_url: string;
+    email: string;
+  }
+
   let invoice = await createInvoice({
     account: request.account,
-    amount: request.payload.amount,
-    currency: request.payload.currency,
-    external_id: request.payload.external_id,
-    business_id: request.payload.business_id,
-    location_id: request.payload.location_id,
-    register_id: request.payload.register_id,
-    webhook_url: request.payload.webhook_url,
-    redirect_url: request.payload.redirect_url,
-    memo: request.payload.memo,
-    fee_rate_level: request.payload.fee_rate_level,
-    wordpress_site_url: request.payload.wordpress_site_url,
-    email: request.payload.email
+    amount: payload.amount,
+    currency: payload.currency,
+    external_id: payload.external_id,
+    business_id: payload.business_id,
+    location_id: payload.location_id,
+    register_id: payload.register_id,
+    webhook_url: payload.webhook_url,
+    redirect_url: payload.redirect_url,
+    memo: payload.memo,
+    fee_rate_level: payload.fee_rate_level,
+    wordpress_site_url: payload.wordpress_site_url,
+    email: payload.email
   })
 
   const additional: InvoiceAdditions = {}
 
-  additional.is_public_request = request.is_public_request
+  additional.is_public_request = request.is_public_request ? true : false
 
   additional.headers = request.headers
 
-  await invoice.update(additional)
+  await setInvoiceAdditions(invoice, additional)
+
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      is_public_request: additional.is_public_request,
+      headers: additional.headers
+    }
+  
+  })
+
+  invoice = await prisma.invoices.findFirstOrThrow({
+    where: { id: invoice.id }
+  })
 
   let payment_options = await getPaymentOptions(invoice)
 
   return h.response({
 
-    invoice: invoice.toJSON(),
+    invoice,
 
     payment_options
 
@@ -113,11 +161,16 @@ export async function create (request, h) {
 
 };
 
-async function getPaymentOptions(invoice: Invoice) { 
+async function getPaymentOptions(invoice: Invoice): Promise<{
+  uri: string;
+  currency: string;
+  amount: number;
 
-  let payment_options = await models.PaymentOption.findAll({where: {
-    invoice_uid: invoice.uid
-  }});
+}[]> { 
+
+  const payment_options = await prisma.payment_options.findMany({
+    where: { invoice_uid: String(invoice.uid) }
+  })
 
   return payment_options.map(option => _.pick(option,
     'uri',

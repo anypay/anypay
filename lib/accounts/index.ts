@@ -202,7 +202,20 @@ export async function getAccountAddress(accountId: number, currency: string): Pr
 
   let coin = coins[currency];
 
-  return coin;
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: accountId,
+      currency
+    }
+  });
+
+  return {
+    currency: coin.currency,
+    enabled: coin.enabled,
+    address: String(address.value),
+    nonce: 0,
+    account_id: accountId
+  };
 
 }
 

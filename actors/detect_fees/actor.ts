@@ -30,6 +30,8 @@ export async function start() {
 
     let payment = await getPayment(invoice)
 
+    if (!payment) { return }
+
     log.info(invoice);
 
     let fee = await getMiningFee(payment.currency, payment.get('txhex'))

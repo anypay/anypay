@@ -2,7 +2,7 @@ require('dotenv').config()
 
 const socketio = require('socket.io')
 
-import { Server } from '@hapi/hapi'
+import { ResponseToolkit, Server } from '@hapi/hapi'
 
 const AuthBearer = require('hapi-auth-bearer-token');
 
@@ -32,7 +32,7 @@ export const plugin = (() => {
 
     name: 'socket.io',
 
-    register: async function(server: Server, options, next) {
+    register: async function(server: Server) {
 
       const path = '/v1/apps/wallet-bot'
 
@@ -40,7 +40,7 @@ export const plugin = (() => {
 
       log.info('socket.io.started', { path })
 
-      io.use(async (socket, next) => {
+      io.use(async (socket: any, next: Function) => {
 
         try {
 
@@ -78,7 +78,7 @@ export const plugin = (() => {
 
       })
 
-      io.on('connection', async function(socket) {
+      io.on('connection', async function(socket: any) {
 
         try {
 
@@ -90,7 +90,7 @@ export const plugin = (() => {
 
           Object.keys(websocketsHandlers).forEach(event => {
 
-            socket.on(event, (message) => {
+            socket.on(event, (message: any) => {
 
               if (websocketsHandlers[event]) {
 
@@ -119,7 +119,7 @@ export const plugin = (() => {
 
           log.info('wallet-bot.socket.io.sockets', { count: sockets.length })
 
-        } catch(error) {
+        } catch(error: any) {
 
           log.error('io.connection.error', error)
 
@@ -133,11 +133,11 @@ export const plugin = (() => {
       server.route({
         path: `${base}`,
         method: 'GET',
-        handler: async (req, h) => {
+        handler: async (request: AuthenticatedRequest, h: ResponseToolkit) => {
 
           try {
 
-            const {walletBot} = await findOrCreateWalletBot(req.account)
+            const {walletBot} = await findOrCreateWalletBot(request.account)
 
             const accessToken = await getAccessToken(walletBot)
 
@@ -149,7 +149,7 @@ export const plugin = (() => {
 
             const wallet_bot = {
 
-              id: walletBot.get('id'),
+              id: walletBot.id,
 
               status
 
@@ -157,7 +157,7 @@ export const plugin = (() => {
 
             const balances = socket ? socket.data.balances : null
 
-            const access_token = accessToken.get('uid')
+            const access_token = accessToken.uid
 
             return {
 
@@ -171,11 +171,11 @@ export const plugin = (() => {
 
             }
            
-          } catch(error) {
+          } catch(error: any) {
 
             log.error('apps.wallet-bot.api', error)
 
-            return h.badImplementation(error)
+            return badImplementation(error)
 
           }
 
@@ -199,7 +199,7 @@ export const plugin = (() => {
       server.route({
         path: `${base}/dashboard`,
         method: 'GET',
-        handler: async (req, h) => {
+        handler: async (req: AuthenticatedRequest, h) => {
 
           try {
 
@@ -237,11 +237,11 @@ export const plugin = (() => {
 
             }
            
-          } catch(error) {
+          } catch(error: any) {
 
             log.error('apps.wallet-bot.api', error)
 
-            return h.badImplementation(error)
+            return badImplementation(error)
 
           }
 
@@ -368,6 +368,8 @@ export const plugin = (() => {
 
 import { requireDirectory } from 'rabbi'
 import Joi = require('joi');
+import AuthenticatedRequest from '../../server/auth/AuthenticatedRequest';
+import { badImplementation } from '@hapi/boom';
 
 const auth = requireDirectory('../../server/auth')
 

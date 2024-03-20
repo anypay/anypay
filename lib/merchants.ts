@@ -25,7 +25,7 @@ export async function getMerchantInfo(identifier: any): Promise<MerchantInfo> {
       stub: identifier.toString()
     }})
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('merchants.getMerchantInfo.error', error)
 

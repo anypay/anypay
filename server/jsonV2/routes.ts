@@ -1,10 +1,11 @@
 
 
+import { Server } from '@hapi/hapi';
 import { jsonV2, failAction } from '../handlers'
 
 import * as Joi from 'joi'
 
-export async function attachRoutes(server) {
+export async function attachRoutes(server: Server) {
 
   server.route({
     method: "GET",

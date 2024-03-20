@@ -1,7 +1,7 @@
 //@ts-ignore
 import * as BIP70Protocol from 'bip70-payment-protocol';
 
-import * as Joi from '@hapi/joi'
+import * as Joi from 'joi'
 
 export { BIP70Protocol }
 

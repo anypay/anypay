@@ -7,7 +7,10 @@ import { getBitcore } from './bitcore'
 
 import { BroadcastTxResult } from './plugin'
 
-const COIN_MAP = {
+const COIN_MAP: {
+  [key: string]: string
+
+} = {
   'LTC': 'litecoin',
   'BTC': 'bitcoin',
   'BCH': 'bitcoin-cash',
@@ -17,7 +20,10 @@ const COIN_MAP = {
   'DOGE': 'doge'
 }
 
-export const CURRENCIES = {
+export const CURRENCIES: {
+  [key: string]: string
+
+} = {
   'BSV': 'bitcoin-sv',
   'LTC': 'litecoin',
   'BTC': 'bitcoin',

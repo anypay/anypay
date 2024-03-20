@@ -1,43 +1,49 @@
 
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { setAddress, listAddresses, removeAddress } from '../../../lib/addresses'
 
 import { log } from '../../../lib/log'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function update(req, h) {
+export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  log.debug('server.v1.handlers.addresses.update', req.payload)
+  log.debug('server.v1.handlers.addresses.update', request.payload)
 
-  let address = await setAddress(req.account, req.payload)
+  let address = await setAddress(request.account, request.payload as {
+    chain: string,
+    currency: string,
+    value: string
+  })
 
-  return h.response({ address: address.toJSON() }).code(200)
+  return h.response({ address }).code(200)
 
 }
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let addresses = await listAddresses(req.account)
+  let addresses = await listAddresses(request.account)
 
   return h.response({ addresses }).code(200)
 
 }
 
-export async function remove(req, h) {
+export async function remove(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    let [currency, chain] = req.params.code.split('_')
+    let [currency, chain] = request.params.code.split('_')
 
     if (!chain) { chain = currency }
 
     await removeAddress({
-      account: req.account,
+      account: request.account,
       chain,
       currency
     })
 
     return h.response({ success: true }).code(200)
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('server.addresses.remove.error', error)
 

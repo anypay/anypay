@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import { WebSocketServer, WebSocket } from 'ws'
 
-import { Server } from '@hapi/hapi'
+import { Request, Server } from '@hapi/hapi'
 
 import { log } from '../../lib/log'
 
@@ -13,12 +13,12 @@ import { awaitChannel, channel, exchange } from '../../lib/amqp'
 import { models } from "../../lib";
 
 class AliveSocket extends WebSocket {
-  isAlive: boolean;
+  isAlive?: boolean;
 }
 
 import { v4 } from 'uuid'
 
-async function handleInvoiceWebsocket(invoice_uid, socket, req) {
+async function handleInvoiceWebsocket(invoice_uid: string, socket: WebSocket, req: Request) {
 
   await awaitChannel()
 
@@ -75,8 +75,8 @@ export const plugin = (() => {
 
     register: function(server?: Server) {
 
-      function heartbeat() {
-        this.isAlive = true;
+      function heartbeat(socket: AliveSocket) {
+        socket.isAlive = true;
       }
 
       const port = Number(process.env.websockets_port) || 5201
@@ -85,17 +85,17 @@ export const plugin = (() => {
 
       log.info('websockets.server.started', { port })
 
-      wsServer.on("connection", async (socket, req) => {
+      wsServer.on("connection", async (socket: WebSocket, request: Request) => {
 
-        if (req.headers['anypay-invoice-uid']) {
+        if (request.headers['anypay-invoice-uid']) {
 
-          const invoice_uid = req.headers['anypay-invoice-uid']
+          const invoice_uid = String(request.headers['anypay-invoice-uid'])
 
-          return handleInvoiceWebsocket(invoice_uid, socket, req)
+          return handleInvoiceWebsocket(invoice_uid, socket, request)
 
         }
 
-        const uid = req.headers['anypay-access-token']     
+        const uid = request.headers['anypay-access-token']     
         
         if (uid) {
 
@@ -164,7 +164,7 @@ export const plugin = (() => {
 
           if (json.type === 'invoice.subscribe' && json.payload.uid) {
 
-            handleInvoiceWebsocket(json.payload.uid, socket, req)
+            handleInvoiceWebsocket(json.payload.uid, socket, request)
 
           }
 
@@ -188,7 +188,7 @@ export const plugin = (() => {
 
       wsServer.on('connection', function connection(socket: AliveSocket) {
         socket.isAlive = true;
-        socket.on('pong', heartbeat);
+        socket.on('pong', () => heartbeat(socket));
       });
 
       const interval = setInterval(function ping() {

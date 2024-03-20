@@ -1,7 +1,7 @@
 
-import { log, models, invoices } from '../../../lib';
+import { log, invoices } from '../../../lib';
 
-import { cancelInvoice, Invoice } from '../../../lib/invoices'
+import { cancelInvoice } from '../../../lib/invoices'
 
 import { show as handleBIP70 } from './bip70_payment_requests'
 
@@ -13,55 +13,65 @@ import { detectWallet } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
-import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
+import { listPaymentOptions, RequestWithInvoice } from '../../jsonV2/handlers/protocol'
 
 import { createWebhookForInvoice } from '../../../lib/webhooks'
 
 import { schema } from 'anypay'
 
-import { findOne } from '../../../lib/orm';
+import { ResponseToolkit } from '@hapi/hapi';
 
-export async function cancel(req, h) {
+import { badRequest, notFound } from '@hapi/boom';
+
+import prisma from '../../../lib/prisma';
+
+import AuthenticatedRequest from '../../../server/auth/AuthenticatedRequest';
+
+export async function cancel(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    const invoice: Invoice = await findOne<Invoice>(Invoice, {
-      where: {
-        uid: req.params.uid
-      }
+    const invoice = await prisma.invoices.findFirst({
+      where:{ uid: request.params.uid }
+    
     })
-  
+
     if (!invoice) {
   
-      return h.notFound()
+      return notFound()
     }
   
-    if (invoice.get('app_id') !== req.app.id) {
+    if (invoice.app_id !== request.app.id) {
   
-      return h.notAuthorized()
+      return notAuthorized()
     }
   
     await cancelInvoice(invoice)
   
     return h.response({ success: true })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.payment-requests.cancel', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 
 }
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    log.info('pay.request.create', { template: req.payload.template, options: req.payload.options })
+    const payload = request.payload as {
+      template: any;
+      options: any
+    }
 
-    let { error, template } = schema.PaymentRequestTemplate.validate(req.payload.template)
+    log.info('pay.request.create', { template: payload.template, options: payload.options })
+
+    let { error, template } = schema.PaymentRequestTemplate.validate(payload.template)
 
     if (error) {
 
@@ -73,56 +83,76 @@ export async function create(req, h) {
 
       log.info('pay.request.create.template.valid', template)
 
-      let record = await models.PaymentRequest.create({
-
-        app_id: req.app_id,
-
-        template: req.payload.template,
-
-        status: 'unpaid'
-
+      let record = await prisma.paymentRequests.create({
+        data: {
+          app_id: request.app.id,
+          template: payload.template,
+          status: 'unpaid',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
       })
 
-      let invoice = await invoices.createEmptyInvoice(req.app_id)
+      let invoice = await invoices.createEmptyInvoice(request.app_id)
 
-      invoice.currency = req.payload.template[0].currency
+      const update: {
+        currency?: string;
+        webhook_url?: string;
+        redirect_url?: string;
+        secret?: string;
+        metadata?: any;
+      
+      } = {
+      }
 
-      if (req.payload.options) {
+      update.currency = payload.template[0].currency
 
-        invoice.webhook_url = req.payload.options.webhook
+      if (payload.options) {
 
-        invoice.redirect_url = req.payload.options.redirect
+        update.webhook_url = payload.options.webhook
 
-        invoice.secret = req.payload.options.secret
+        update.redirect_url = payload.options.redirect
 
-        invoice.metadata = req.payload.options.metadata
+        update.secret = payload.options.secret
+
+        update.metadata = payload.options.metadata
 
       }
 
-      await invoice.save()
+      await prisma.invoices.update({
+        where: { id: invoice.id },
+        data: update
+      })
 
-      record.invoice_uid = invoice.uid
-      record.uri = invoice.uri
-      record.webpage_url = `https://anypayx.com/i/${invoice.uid}`
-      record.status = 'unpaid'
+      await prisma.paymentRequests.update({
+        where: { id: record.id },
+        data: {
+          invoice_uid: invoice.uid,
+          uri: invoice.uri,
+          webpage_url: `https://anypayx.com/i/${invoice.uid}`,
+          status: 'unpaid'
+        }
+      })
 
-      await record.save()
+      record = await prisma.paymentRequests.findFirstOrThrow({
+        where: { id: record.id },
+      })
 
       await paymentRequestToPaymentOptions(record)
 
-      log.info('pay.request.created', record.toJSON())
+      log.info('pay.request.created', record)
 
-      createWebhookForInvoice(new Invoice(invoice))
+      createWebhookForInvoice(invoice)
 
       return {
 
-        uid: record.uid,
+        uid: record.invoice_uid,
 
         uri: record.uri,
 
         url: record.webpage_url,
 
-        payment_request: record.toJSON()
+        payment_request: record
 
         //options: req.payload.options
 
@@ -130,30 +160,32 @@ export async function create(req, h) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
-    return h.badRequest(error.message);
+    return badRequest(error.message);
 
   }
 
 }
 
-export async function show(req, h) {
+export async function show(request: RequestWithInvoice, h: ResponseToolkit) {
 
   //log.debug('pay.request.show', { uid: req.params.uid, headers: req.headers })
 
-  detectWallet(req.headers, req.params.uid)
+  detectWallet(request.headers, request.params.uid)
 
-  let invoice = await models.Invoice.findOne({ where: { uid: req.params.uid }})
+  request.invoice  = await prisma.invoices.findFirstOrThrow({
+    where: { uid: request.params.uid }
+  });
 
-  if (invoice.cancelled) {
+  if (request.invoice.cancelled) {
     
-    return h.badRequest('invoice cancelled')
+    return badRequest('invoice cancelled')
   }
 
-  if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
+  if (request.invoice.status === 'unpaid' && invoices.isExpired(request.invoice)) {
 
-    invoice = await invoices.refreshInvoice(invoice.uid)
+    request.invoice = await invoices.refreshInvoice(String(request.invoice.uid))
 
   }
 
@@ -165,37 +197,41 @@ export async function show(req, h) {
 
     let isJsonV2 = /application\/payment-request$/
 
-    let accept = req.headers['accept']
+    let accept = request.headers['accept']
 
     if (accept && accept.match(/payment-options/)) {
 
-      return listPaymentOptions(req, h)
+      return listPaymentOptions(request, h)
 
     } else if (accept && accept.match(isBIP270)) {
 
-      return handleBIP270(req, h)
+      return handleBIP270(request, h)
 
     } else if (accept && accept.match(isBIP70)) {
 
-      return handleBIP70(req, h)
+      return handleBIP70(request, h)
 
     } else if (accept && accept.match(isJsonV2)) {
 
-      return handleJsonV2(req, h)
+      return handleJsonV2(request, h)
 
     } else {
 
-      return handleBIP270(req, h)
+      return handleBIP270(request, h)
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('pay.request.error', error);
 
-    return h.badRequest(error.message);
+    return badRequest(error.message);
 
   }
 
+}
+
+function notAuthorized() {
+  throw new Error('Function not implemented.');
 }
 

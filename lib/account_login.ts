@@ -7,7 +7,7 @@ import {
   access_tokens as AccessToken
 } from '@prisma/client'
 import prisma from './prisma'
-import { uuid } from '../test/utils'
+import * as uuid from 'uuid'
 
 export async function withEmailPassword (email: string, password: string): Promise<AccessToken> {
 

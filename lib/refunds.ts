@@ -5,12 +5,11 @@ import { createPaymentRequest } from './payment_requests'
 
 import { getDecodedTransaction, CURRENCIES } from './blockchair'
 
-import { Invoice } from './invoices'
+import { invoices as Invoice } from '@prisma/client'
 
 import { Orm } from './orm'
 
 import { createApp } from './apps'
-import { log } from './log'
 
 export class Refund extends Orm {
 
@@ -54,16 +53,16 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
     }
 
     const template = [{
-      currency: invoice.get('invoice_currency'),
+      currency: invoice.invoice_currency,
       to: [{
         address,
-        amount: parseFloat(invoice.get('denomination_amount_paid')),
-        currency: invoice.get('denomination') || invoice.get('invoice_currency')
+        amount: invoice.denomination_amount_paid,
+        currency: invoice.denomination_currency || invoice.invoice_currency
       }]
     }]
 
     const app = await createApp({
-      account_id: invoice.get('account_id'),
+      account_id: Number(invoice.account_id),
       name: '@refunds'
     })
 
@@ -74,7 +73,7 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
     )
 
 
-    let refund_invoice_uid = payment_request.get('invoice_uid')
+    let refund_invoice_uid = payment_request.invoice_uid
 
     record = await models.Refund.create({
       original_invoice_uid,
@@ -91,21 +90,20 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
 
 export async function getAddressForInvoice(invoice: Invoice): Promise<RefundAddress> {
 
-  log.info('refunds.getAddressForInvoice', invoice.record.dataValues)
-
-  if (invoice.get('status') === 'unpaid') {
+  if (invoice.status === 'unpaid') {
 
     throw new RefundErrorInvoiceNotPaid()
   }
+  
 
-  const currency = CURRENCIES[invoice.get('payment_currency') || invoice.get('invoice_currency') || invoice.get('currency')]
+  const currency = CURRENCIES[invoice.invoice_currency ? String(invoice.invoice_currency) : String(invoice.currency)]
 
-  let rawtx = await getDecodedTransaction(currency, invoice.get('hash'))
+  let rawtx = await getDecodedTransaction(currency, String(invoice.hash))
 
   let inputTx = await getDecodedTransaction(currency, rawtx.vin[0].txid)
 
   return {
-    currency: invoice.get('currency'),
+    currency: String(invoice.currency),
     invoice,
     value: inputTx.vout[rawtx.vin[0].vout].scriptPubKey.addresses[0]
   }

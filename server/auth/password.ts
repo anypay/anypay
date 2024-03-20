@@ -4,8 +4,9 @@ import { models } from '../../lib/models'
 import { log } from '../../lib/log'
 
 import * as AccountLogin from '../../lib/account_login'
+import { Request, ResponseToolkit } from '@hapi/hapi';
 
-export async function validate(request, username, password, h) {
+export async function validate(request: Request, username: string, password: string, h: ResponseToolkit) {
 
   try {
 
@@ -45,7 +46,7 @@ export async function validate(request, username, password, h) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('auth.passwords.validate.error', error);
 

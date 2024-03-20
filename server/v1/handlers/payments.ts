@@ -6,20 +6,25 @@ import { log } from '../../../lib/log'
 import { models } from '../../../lib/models'
 
 import { listPayments } from '../../../lib/payments'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function index(req, h) {
+import { payments as Payment } from '@prisma/client'
+import { badRequest } from '@hapi/boom'
+
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    let payments: any = await listPayments(req.account, {
+    let payments: any = await listPayments(request.account, {
 
-      limit: req.query.limit || 1000,
+      limit: request.query.limit || 1000,
 
-      offset: req.query.offset || 0
+      offset: request.query.offset || 0
 
     })
 
-    payments = payments.map(payment => {
+    payments = payments.map((payment: any) => {
 
       try {
 
@@ -47,7 +52,7 @@ export async function index(req, h) {
 
         }
 
-      } catch(error) {
+      } catch(error: any) {
 
         log.error('listpayments', error)
 
@@ -55,7 +60,7 @@ export async function index(req, h) {
 
     })
 
-    payments = payments.filter(payment => !!payment)
+    payments = payments.filter((payment: any) => !!payment)
 
     return h.response({
 
@@ -63,11 +68,11 @@ export async function index(req, h) {
 
     })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('api.v1.payments.index', error)
 
-    return h.badRequest(error)
+    return badRequest(error)
 
   }
 
@@ -86,9 +91,9 @@ interface Confirmation {
   timestamp: number;
 }
 
-export async function show(req, h) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  const { invoice_uid } = req.params
+  const { invoice_uid } = request.params
 
   const payment = await models.Payment.findsOne({ where: {
     invoice_uid

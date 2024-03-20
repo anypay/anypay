@@ -1,18 +1,17 @@
 
-import { Payment } from './payments'
-
-import { Invoice } from './invoices'
-
-import { findOne, findAll } from './orm'
-
 import { publish } from 'rabbi'
 
-import { Op } from 'sequelize'
+import {
+  invoices as Invoice,
+  payments as Payment
+} from '@prisma/client'
 
 import { getConfirmation } from './plugins'
 
 import * as moment from 'moment'
 import { registerSchema } from './amqp'
+import prisma from './prisma'
+import * as Joi from 'joi'
 
 export interface Confirmation {
   confirmation_hash: string;
@@ -25,7 +24,7 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
 
   const { confirmation_hash, confirmation_height, confirmation_date } = confirmation
 
-  if (payment.get('confirmation_hash')) {
+  if (payment.confirmation_hash) {
 
     // Payment already confirmed
 
@@ -33,41 +32,50 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
 
   }
 
-  await payment.update({
-
-    confirmation_hash,
-
-    confirmation_height,
-
-    confirmation_date,
-
-    status: 'confirmed'
-
+  await prisma.payments.update({
+    where: { id: payment.id },
+    data: {
+      confirmation_hash,
+      confirmation_height,
+      confirmation_date,
+      status: 'confirmed'
+    }
   })
 
-  let invoice = await findOne<Invoice>(Invoice, {
+  payment = await prisma.payments.findFirstOrThrow({
     where: {
-      uid: payment.get('invoice_uid')
-    } 
+      id: payment.id
+    }
   })
 
-  await invoice.set('status', 'paid')
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: { uid: payment.invoice_uid }
+  })
 
-  publish('payment.confirmed', payment.toJSON())
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      status: 'paid'
+    }
+  })
+
+  publish('payment.confirmed', payment)
 
   return payment
 
 }
 
-export async function getConfirmationForTxid({ txid }: { txid: string }): Promise<Payment | null> {
+export async function getConfirmationForTxid({ txid }: { txid: string }): Promise<Payment | undefined> {
 
-  let payment = await findOne<Payment>(Payment, {
+  const payment = await prisma.payments.findFirst({
     where: { txid }
   })
 
   if (!payment) { return }
 
-  const { chain, currency } = payment
+  const chain = String(payment.chain)
+
+  const currency = String(payment.currency)
 
   const confirmation = await getConfirmation({ txid, chain, currency })
 
@@ -81,11 +89,10 @@ export async function getConfirmationForTxid({ txid }: { txid: string }): Promis
 
 export async function confirmPaymentByTxid({txid, confirmation}: {txid: string, confirmation: Confirmation}): Promise<Payment> {
 
-  let payment = await findOne<Payment>(Payment, {
+  const payment = await prisma.payments.findFirstOrThrow({
     where: { txid }
+  
   })
-
-  if (!payment) { throw new Error(`Payment not found for txid ${txid}`) }
 
   return confirmPayment({ payment, confirmation })
 
@@ -96,14 +103,12 @@ interface RevertedPayment {
   payment: Payment;
 }
 
-registerSchema('payment.reverted', {
-  type: 'object',
-  properties: {
-    invoice: { type: 'object' },
-    payment: { type: 'object' }
-  },
-  required: ['invoice', 'payment']
-})
+registerSchema('payment.reverted',
+  Joi.object({
+    invoice: Joi.object().required(),
+    payment: Joi.object().required()
+  }).required()
+)
 
 export async function revertPayment({ txid }: { txid: string }): Promise<RevertedPayment> {
 
@@ -111,17 +116,38 @@ export async function revertPayment({ txid }: { txid: string }): Promise<Reverte
   // Mark the payment as failed
   // Mark the invoice as unpaid
 
-  const invoice = await findOne<Invoice>(Invoice, { where: { hash: txid }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      hash: txid
+    }
+  })
 
-  const payment = await findOne<Payment>(Payment, { where: { txid }})
+  let payment = await prisma.payments.findFirstOrThrow({
+    where: {
+      txid
+    }
+  })
 
-  await invoice.set('status', 'unpaid')
+  await prisma.invoices.update({
+    where: { id: invoice.id },
+    data: {
+      status: 'unpaid',
+      hash: null,
+    }
+  })
 
-  await invoice.set('hash', null)
+  await prisma.payments.update({
+    where: { id: payment.id },
+    data: {
+      status: 'failed'
+    }
+  })
 
-  await payment.set('status', 'failed')
+  payment = await prisma.payments.findFirstOrThrow({
+    where: { id: payment.id }
+  })
 
-  publish('payment.reverted', payment.toJSON())
+  publish('payment.reverted', {payment, invoice})
 
   return { invoice, payment }
 }
@@ -129,14 +155,13 @@ export async function revertPayment({ txid }: { txid: string }): Promise<Reverte
 
 export async function listUnconfirmedPayments({chain, currency}: {chain: string, currency: string}): Promise<Payment[]> {
 
-  return findAll<Payment>(Payment, {
+  return prisma.payments.findMany({
     where: {
-      confirmation_hash: {
-        [Op.eq]: null
-      },
+      confirmation_hash: null,
       chain,
       currency
     }
+  
   })
 
 }
@@ -147,21 +172,28 @@ export async function startConfirmingTransactions() {
 
     try {
 
-      const unconfirmed = await findAll<Payment>(Payment, {
+      const unconfirmed = await prisma.payments.findMany({
+
         where: {
           status: 'confirming',
           createdAt: {
-            [Op.gte]: moment().subtract(7, 'days').toDate()
+            gte: moment().subtract(7, 'days').toDate()
           }
         },
-        order: [['createdAt', 'desc']]
+        orderBy: {
+          createdAt: 'desc'
+        }
       })
 
       for (let payment of unconfirmed) {
 
         try {
 
-          const { chain, currency, txid } = payment
+          const { chain, currency, txid } = payment as {
+            chain: string;
+            currency: string;
+            txid: string;
+          }
 
           const confirmation = await getConfirmation({ txid, chain, currency })
 

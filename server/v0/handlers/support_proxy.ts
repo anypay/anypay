@@ -1,9 +1,12 @@
 
-import { log, models, slack } from '../../../lib'
+import { Request, ResponseToolkit } from '@hapi/hapi'
+import { log, models } from '../../../lib'
 
-export async function show(req, h) {
+import  * as slack from '../../../lib/slack'
 
-  let accessToken = await models.AccessToken.findOne({ where: { uid: req.params.token }})
+export async function show(request: Request, h: ResponseToolkit) {
+
+  let accessToken = await models.AccessToken.findOne({ where: { uid: request.params.token }})
 
   let account = await models.Account.findOne({ where: { id: accessToken.account_id }})
 
@@ -19,6 +22,6 @@ export async function show(req, h) {
     email: account.email
   })}`, 'events')
 
-  return h.redirect(`https://anypayinc.com/pay`)
+  return h.redirect(`https://anypayx.com/pay`)
 
 }

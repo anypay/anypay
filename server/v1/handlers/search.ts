@@ -2,24 +2,22 @@
 import { search } from '../../../lib/search'
 
 import { log } from '../../../lib/log'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
   
   try {
 
-    let result = await search(req.payload.search, req.account)
+    const { search: query } = request.payload as {
+      search: string
+    }
 
-    result = result.map(item => {
-
-      item.value = item.value.toJSON()
-
-      return item
-
-    })
+    let result = await search(query, request.account)
 
     return h.response({ result })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('search.error', error)
 

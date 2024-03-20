@@ -116,10 +116,13 @@ export function attach(server: Hapi.Server) {
     method: "POST",
     path: "/r/{uid}/pay/{currency}/bip70",
     handler: handlers.Bip70PaymentRequests.create,
-    config: {
+    options: {
       payload: {
         output: 'data',
         parse: false
+      },
+      response: {
+        schema: false,         // Indicate that the response schema should not be validated
       }
     }
   })

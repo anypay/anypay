@@ -1,27 +1,29 @@
 const bcrypt = require('bcryptjs');
 
-import { models } from './models';
-
+import shortid = require('shortid');
 import { config } from './config'
 
 import  { ses } from './email'
 
 import { log } from './log'
+import prisma from './prisma';
 
-export function hash(password) {
+import { password_resets as PasswordReset } from '@prisma/client';
+
+export function hash(password: string): Promise<string> {
   return new Promise((resolve, reject) => {
 
-    bcrypt.hash(password, 10, (error, hash) => {
+    bcrypt.hash(password, 10, (error: Error, hash: string) => {
       if (error) { return reject(error) }
       resolve(hash);
     })
   });
 }
 
-export async function resetPasswordByEmail(email, newPassword) {
+export async function resetPasswordByEmail(email: string, newPassword: string) {
 
-  let account = await models.Account.findOne({
-    where: { email: email }
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: { email }
   })
 
   if (account) {
@@ -35,22 +37,21 @@ export async function resetPasswordByEmail(email, newPassword) {
   }
 }
 
-async function resetPassword(accountId, newPassword): Promise<boolean> {
+async function resetPassword(accountId: number, newPassword: string): Promise<boolean> {
 
   let passwordHash = await hash(newPassword);
 
-  await models.Account.update({
-    password_hash: passwordHash
-  }, {
-    where: {
-      id: accountId
+  await prisma.accounts.update({
+    where: { id: accountId },
+    data: {
+      password_hash: passwordHash
     }
   })
 
   return true;
 }
 
-export async function sendPasswordResetEmail(email) {
+export async function sendPasswordResetEmail(email: string) {
   return new Promise(async (resolve, reject) => {
 
     let passwordReset = await createPasswordReset(email);
@@ -75,7 +76,7 @@ export async function sendPasswordResetEmail(email) {
         }
       },
       Source: sender
-    }, (error, response) => {
+    }, (error: Error, response: unknown) => {
       if (error) {
         log.error('error sending password reset email', error);
         return reject(error)
@@ -86,9 +87,17 @@ export async function sendPasswordResetEmail(email) {
   })
 }
 
-function createPasswordReset(email) {
+function createPasswordReset(email: string): Promise<PasswordReset> {
 
-  return models.PasswordReset.create({ email })
+  return prisma.password_resets.create({
+    data: {
+      email,
+      uid: shortid.generate(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
+
 }
 
 module.exports.resetPasswordById = resetPassword;

@@ -105,15 +105,6 @@ model EnergyCityAccounts {
   updatedAt      DateTime @db.Timestamptz(6)
 }
 
-model Events {
-  id         Int      @id @default(autoincrement())
-  account_id Int?
-  type       String?  @db.VarChar(255)
-  payload    Json?    @db.Json
-  createdAt  DateTime @db.Timestamptz(6)
-  updatedAt  DateTime @db.Timestamptz(6)
-}
-
 model EvmTransactionReceipts {
   id        Int      @id @default(autoincrement())
   txid      String?  @db.VarChar(255)
@@ -647,13 +638,7 @@ model events {
   error       Boolean?
   app_id      Int?
 
-  @@index([account_id], map: "events_by_account_id")
-  @@index([type, account_id], map: "events_by_account_id_and_type")
-  @@index([invoice_uid], map: "events_by_invoice_uid")
-  @@index([type, invoice_uid], map: "events_by_invoice_uid_and_type")
-  @@index([type], map: "events_by_type")
-  @@index([invoice_uid], map: "events_invoice_uid")
-  @@index([invoice_uid, createdAt], map: "events_invoice_uid_created_at")
+
 }
 
 model extended_public_keys {

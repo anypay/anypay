@@ -1,5 +1,5 @@
 
-import { Server, Plugin, PluginProperties, Request, ResponseToolkit } from '@hapi/hapi'
+import { Server, ResponseToolkit } from '@hapi/hapi'
 
 import { start } from './main'
 

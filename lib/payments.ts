@@ -1,7 +1,9 @@
 
 import { models } from './models'
 
-import { Invoice } from './invoices'
+import { invoices as Invoice } from '@prisma/client'
+
+import { accounts as Account } from '@prisma/client'
 
 import { Orm } from './orm'
 
@@ -76,26 +78,34 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
     payment_option_id: option.id,
     currency: option.currency,
     chain: option.chain || option.currency,
-    account_id: invoice.get('account_id')
+    account_id: invoice.account_id
   }))
 
   return new Payment(record)
 
 }
 
-export async function getPayment(invoice: Invoice): Promise<Payment> {
+export async function getPayment(invoice: Invoice): Promise<Payment | null> {
 
   let record = await models.Payment.findOne({
     where: { invoice_uid: invoice.uid }
   })
 
-  if (!record) { return }
+  if (!record) { return null}
 
   return new Payment(record)
 
 }
 
-export async function listPayments(account, params: {limit: number, offset: number} = {limit: 100, offset: 0}): Promise<any[]> {
+interface PaymentListItem {
+
+  option: any;
+
+  invoice: any
+
+}
+
+export async function listPayments(account: Account, params: {limit: number, offset: number} = {limit: 100, offset: 0}): Promise<PaymentListItem[]> {
 
   return models.Payment.findAll({
 

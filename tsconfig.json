@@ -11,11 +11,11 @@
 		"sourceMap": true,
 		"sourceRoot": ".",
     "noUnusedLocals": true,
-    "noEmit": true
+    "noEmit": true,
   },
   "exclude": [
     "node_modules",
     "dist",
-    "test"
+    "test/**/*"
   ]
 }

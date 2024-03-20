@@ -4,14 +4,17 @@ import { getRefund } from '../../../lib/refunds'
 import { ensureInvoice } from '../../../lib/invoices'
 
 import { log } from '../../../lib'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { ResponseToolkit } from '@hapi/hapi'
+import { badRequest } from '@hapi/boom'
 
-export async function show(req, h) {
+export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   try {
 
-    let invoice = await ensureInvoice(req.params.invoice_uid)
+    let invoice = await ensureInvoice(request.params.invoice_uid)
 
-    if (invoice.get('account_id') !== req.account.id) {
+    if (invoice.account_id !== request.account.id) {
 
       return h.response({ error: 'unauthorized' }).code(401)
     }
@@ -22,15 +25,15 @@ export async function show(req, h) {
 
     return h.response({
       refund: refund.toJSON(),
-      original_invoice: invoice.toJSON(),
-      refund_invoice: refund_invoice.toJSON()
+      original_invoice: invoice,
+      refund_invoice: refund_invoice
     })
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('servers.v1.handlers.Refunds.show', error)
 
-    return h.badRequest(error)
+    return badRequest(error.message)
 
   }
 

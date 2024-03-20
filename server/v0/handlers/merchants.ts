@@ -1,7 +1,8 @@
+import { Request } from '@hapi/hapi';
 import { getMerchantInfo } from '../../../lib/merchants';
 
-export async function show(req, h) {
+export async function show(request: Request) {
 
-  return getMerchantInfo(req.params.account_id);
+  return getMerchantInfo(request.params.account_id);
 
 };

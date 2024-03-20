@@ -2,15 +2,16 @@ require("dotenv").config()
 
 import { log } from './log';
 
-import { models } from './models'
-
-import { Account, findAccount } from './account'
-
 import { verifyToken } from './jwt'
 
 import { compare } from './bcrypt'
+import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from './prisma';
+import AuthenticatedRequest from '../server/auth/AuthenticatedRequest'
 
-export async function validateSudoPassword(request, username, password, h) {
+import { accounts as Account } from '@prisma/client';
+
+export async function validateSudoPassword(request: Request, username: string, password: string, h: ResponseToolkit) {
 
   log.info('validate sudo password');
 
@@ -26,7 +27,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
   try {
 
-    await compare(username, process.env.SUDO_PASSWORD_HASH);
+    await compare(username, String(process.env.SUDO_PASSWORD_HASH));
 
     return {
 
@@ -40,7 +41,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
     }
 
-  } catch(error) {
+  } catch(error: any) {
 
     log.error('auth.sudo.error', error);
 
@@ -57,7 +58,7 @@ export async function validateSudoPassword(request, username, password, h) {
 
 
 
-export async function validateToken(request, username, password, h) {
+export async function validateToken(request: AuthenticatedRequest, username: string, password: string) {
 
   if (!username) {
     return {
@@ -65,19 +66,21 @@ export async function validateToken(request, username, password, h) {
     };
   }
 
-  var accessToken = await models.AccessToken.findOne({
+  let accessToken = await prisma.access_tokens.findFirst({
     where: {
       uid: username
     }
   });
 
   if (accessToken) {
-		var account = await models.Account.findOne({
-			where: {
-				id: accessToken.account_id
-			}
-		})
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        id: accessToken.account_id
+      }
+    })
+
 		request.account = account;
+
     request.account_id = accessToken.account_id;
 
     return {
@@ -85,29 +88,6 @@ export async function validateToken(request, username, password, h) {
       credentials: { accessToken: accessToken }
     }
   } else {
-
-    try {
-
-      await compare(password, process.env.SUDO_PASSWORD_HASH);
-
-      request.account = account;
-      request.account_id = account.id;
-
-      return {
-
-        isValid: true,
-
-        credentials: {
-
-          admin: true
-
-        }
-
-      }
-
-    } catch(error) {
-
-      log.error('auth.token.error', error);
 
       return {
 
@@ -117,14 +97,17 @@ export async function validateToken(request, username, password, h) {
 
     }
 
-  }
 };
 
 export async function authorizeAccount(token: string): Promise<Account> {
 
   let verified = await verifyToken(token)
 
-  return findAccount(verified.account_id)
+  return prisma.accounts.findFirstOrThrow({
+    where: {
+      id: verified.account_id
+    }
+  })
 
 }
 

@@ -1,8 +1,6 @@
 
 import { listForAccount, attemptWebhook, webhookForInvoice } from '../../../lib/webhooks'
 
-import { findAccount, Account } from '../../../lib/account'
-
 import { ensureInvoice } from '../../../lib/invoices'
 
 import { log } from '../../../lib/log'
@@ -10,16 +8,16 @@ import { log } from '../../../lib/log'
 import { config } from '../../../lib/config'
 
 import axios from 'axios'
+import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
+import { ResponseToolkit } from '@hapi/hapi'
 
-export async function index(req, h) {
+export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let account: Account = await findAccount(req.account.id)
+  let webhooks = await listForAccount(request.account, {
 
-  let webhooks = await listForAccount(account, {
+    limit: request.query.limit,
 
-    limit: req.query.limit,
-
-    offset: req.query.offset
+    offset: request.query.offset
 
   })
 
@@ -27,7 +25,7 @@ export async function index(req, h) {
 
 }
 
-async function notifyRocketchat({ uid }) {
+async function notifyRocketchat({ uid }: { uid: string }) {
 
   if (config.get('rocketchat_webhook_url')) {
 
@@ -50,11 +48,13 @@ async function notifyRocketchat({ uid }) {
 
 }
 
-export async function test(req, h) {
+export async function test(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  log.info('webhooks.test.received', req.payload)
+  log.info('webhooks.test.received', request.payload)
 
-  const { uid } = req.payload
+  const { uid } = request.payload as {
+    uid: string
+  }
 
   notifyRocketchat({ uid }) 
 
@@ -62,7 +62,7 @@ export async function test(req, h) {
 
 }
 
-export async function attempt(request, h) {
+export async function attempt(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let invoice = await ensureInvoice(request.params.invoice_uid);
 
@@ -78,6 +78,6 @@ export async function attempt(request, h) {
 
   webhook = await webhookForInvoice(invoice)
   
-  return h.response({ attempt: attempt.toJSON(), webhook: webhook.toJSON() }).code(201)
+  return h.response({ attempt: attempt, webhook: webhook }).code(201)
 
 }

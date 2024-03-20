@@ -7,7 +7,9 @@ collectDefaultMetrics({ prefix: 'anypay_' })
 
 export { prometheus }
 
-const histograms = { }
+const histograms: {
+  [key: string]: prometheus.Histogram<any>
+} = { }
 
 export function getHistogram({ method, path }: {method: String, path: String}): prometheus.Histogram<any> {
 

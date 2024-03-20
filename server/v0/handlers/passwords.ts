@@ -1,18 +1,23 @@
-const password = require("../../../lib/password")
+
+
+import { resetPasswordByEmail, sendPasswordResetEmail } from '../../../lib/password';
 
 import * as Joi from 'joi'
 
 import { models } from '../../../lib';
+import { Request } from '@hapi/hapi';
 
-export async function reset (request, h) {
+export async function reset (request: Request) {
 
-  await password.sendPasswordResetEmail(request.payload.email);
+  const { email } = request.payload as { email: string }
+
+  await sendPasswordResetEmail(email);
 
   return { success: true };
 
 }
 
-export async function claim(request, h) {
+export async function claim(request: Request) {
 
   let passwordReset = await models.PasswordReset.findOne({ where:
     { uid: request.params.uid }
@@ -22,7 +27,9 @@ export async function claim(request, h) {
     return { success: false }
   }
 
-  await password.resetPasswordByEmail(passwordReset.email, request.payload.password);
+  const { password } = request.payload as { password: string }
+
+  await resetPasswordByEmail(passwordReset.email, password);
 
   return { success: true };
 

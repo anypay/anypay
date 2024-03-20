@@ -1,11 +1,11 @@
 
 const bcrypt = require('bcryptjs');
 
-export async function hash(password) {
+export async function hash(password: string) {
 
   return new Promise((resolve, reject) => {
 
-    bcrypt.hash(password, 10, (error, hash) => {
+    bcrypt.hash(password, 10, (error: Error | null, hash: string) => {
 
       if (error) { return reject(error) }
 

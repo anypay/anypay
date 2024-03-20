@@ -3,7 +3,7 @@ import { Orm } from './orm'
 
 import { models } from './models'
 
-import { Account } from './account'
+import { accounts as Account } from '@prisma/client'
 
 import { log } from './log'
 
@@ -47,8 +47,8 @@ export async function listLinkedAccounts(account: Account, options: any={}): Pro
   })
 
   return {
-    target: target.map(record => new LinkedAccount(record)),
-    source: source.map(record => new LinkedAccount(record))
+    target: target.map((record: any) => new LinkedAccount(record)),
+    source: source.map((record: any) => new LinkedAccount(record))
   }
 
 }

@@ -1,9 +1,10 @@
 
-import { Request } from 'hapi'
+import { Request, ResponseToolkit } from '@hapi/hapi'
 
 import { log } from '../../lib/log'
 
 import { authorizeAccount } from '../../lib/auth'
+import AuthenticatedRequest from './AuthenticatedRequest'
 
 export async function authorizeRequest(request: Request) {
 
@@ -29,7 +30,7 @@ export function useJWT() {
 
   return {
 
-    validate: async (request, token, h) => {
+    validate: async (request: AuthenticatedRequest, token: string, h: ResponseToolkit) => {
 
       try {
 
@@ -53,7 +54,7 @@ export function useJWT() {
 
         }
 
-      } catch(error) {
+      } catch(error: any) {
 
         log.error('jwt.auth.error', error)
 

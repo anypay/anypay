@@ -3,7 +3,7 @@ import { models } from './models';
 
 import { log } from './log'
 
-export async function getAccountSetting(account_id, key: string, options: { default?: string} = {}) {
+export async function getAccountSetting(account_id: number, key: string, options: { default?: string} = {}) {
 
   let record = await models.AccountSetting.findOne({ where: { account_id, key }})
 
@@ -12,7 +12,7 @@ export async function getAccountSetting(account_id, key: string, options: { defa
   return options.default
 
 }
-export async function setAccountSetting(account_id, key: string, value: string) {
+export async function setAccountSetting(account_id: number, key: string, value: string) {
 
   log.info('account.settings.update', {account_id, key, value })
 

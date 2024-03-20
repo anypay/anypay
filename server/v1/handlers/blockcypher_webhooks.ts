@@ -1,13 +1,31 @@
 
+import AuthenticatedRequest from "../../auth/AuthenticatedRequest"
 import { log } from "../../../lib"
 
 import { publish } from '../../../lib/amqp'
 
 import { confirmTransactionsFromBlockWebhook } from "../../../lib/blockcypher"
+import { ResponseToolkit } from "@hapi/hapi"
 
-export async function create(req, h) {
+export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-    const webhook = req.payload
+    const webhook = request.payload as {
+        event: string
+        address: string
+        url: string
+        confirmations: number
+        satoshis: number
+        hash: string
+        block_height: number
+        total: number
+        fees: number
+        received: string
+        confirmed: string
+        inputs: any[]
+        outputs: any[]
+        double_spend: boolean
+        data: any
+    }
 
     try {
 

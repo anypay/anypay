@@ -1,5 +1,5 @@
 require('dotenv').config()
-import {models} from './models';
+
 import {events} from './events'
 import * as database from './database';
 
@@ -13,13 +13,29 @@ const aws = require('aws-sdk');
 
 export const ses = new aws.SES({ region: 'us-east-1' });
 
-import { email as rabbiEmail } from 'rabbi';
+import * as rabbiEmail from './rabbi_email'
 
-export async function sendInvoiceToEmail(uid, email) {
+import {
+  accounts as Account,
+  invoices as Invoice
+} from '@prisma/client'
 
-  let invoice = await models.Invoice.findOne({ where: { uid }})
+import prisma from './prisma';
 
-  let account = await models.Account.findOne({ where: { id: invoice.account_id }})
+export async function sendInvoiceToEmail(uid: string, email: string) {
+
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid
+    }
+  
+  })
+
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: Number(invoice.account_id)
+    }
+  })
 
   return rabbiEmail.sendEmail('share-invoice', email, sender, {
     account_id: account.id,
@@ -32,28 +48,36 @@ export async function sendInvoiceToEmail(uid, email) {
 
 }
 
-export async function firstAddressSetEmail(account) {
+export async function firstAddressSetEmail(account: Account) {
 
-  return rabbiEmail.sendEmail('first_address_set', account.email, sender, {
+  return rabbiEmail.sendEmail('first_address_set', String(account.email), sender, {
     account_id: account.id
   });
 
 };
 
 
-export async function newAccountCreatedEmail(account) {
+export async function newAccountCreatedEmail(account: Account) {
 
-  return rabbiEmail.sendEmail('welcome', account.email, sender, { email: account.email });
+  return rabbiEmail.sendEmail('welcome', String(account.email), sender, { email: account.email });
 
 };
 
-export async function firstInvoiceCreatedEmail(email) {
+export async function firstInvoiceCreatedEmail(email: string) {
 
-  let account = await models.Account.findOne({ where: { email }})
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      email
+    }
+  })
 
-  let invoice = await models.Invoice.findOne({ where: { account_id: account.id }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      account_id: account.id
+    }
+  })
 
-  return rabbiEmail.sendEmail('first_invoice_created', account.email, sender, {
+  return rabbiEmail.sendEmail('first_invoice_created', String(account.email), sender, {
     email: account.email,
     invoice_uid: invoice.uid
   });
@@ -62,31 +86,39 @@ export async function firstInvoiceCreatedEmail(email) {
 
 export async function addressChangedEmail(address_id: number) {
 
-  let address = await models.Address.findOne({ where: {
-    id: address_id
-  }});
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      id: address_id
+    }
+  })
 
-  let account = await models.Account.findOne({ where: {
-    id: address.account_id
-  }});
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: Number(address.account_id)
+    }
+  })
 
-  return rabbiEmail.sendEmail('address_updated', account.email, sender, {
+
+
+  return rabbiEmail.sendEmail('address_updated', String(account.email), sender, {
     currency: address.currency,
     address: address.value,
-    updated_at_time: address.updated_at,
+    updated_at_time: address.updatedAt,
     notePresent: !!address.note,
     note: address.note
   });
 
 }
 
-export async function invoicePaidEmail(invoice){  
+export async function invoicePaidEmail(invoice: Invoice) {  
 
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: Number(invoice.account_id)
+    }
+  })
 
-  let variables = {
+  const variables = {
     invoice_paid_date_time: invoice.completed_at,
     currency: invoice.currency,
     invoiceUID: invoice.uid,
@@ -94,15 +126,15 @@ export async function invoicePaidEmail(invoice){
     amount_paid: invoice.invoice_amount_paid,
     denomination_amount_paid: invoice.denomination_amount_paid,
     businessName: account.business_name,
-    businessStreetAddress: account.business_street_address,
-    businessCity: account.business_city,
-    businessState: account.business_state,
-    businessZip: account.business_zip
+    //businessStreetAddress: account.business_street_address,
+    //businessCity: account.business_city,
+    //businessState: account.business_state,
+    //businessZip: account.business_zip
   };
 
   let resp = await rabbiEmail.sendEmail(
     'invoice_paid_receipt',
-    account.email,
+    String(account.email),
     config.get('EMAIL_SENDER'),
     variables
   )
@@ -110,22 +142,24 @@ export async function invoicePaidEmail(invoice){
   return resp;
 }
 
-export async function firstInvoicePaidEmail(invoice){  
+export async function firstInvoicePaidEmail(invoice: Invoice){  
 
-  let account = await models.Account.findOne({ where: {
-    id: invoice.account_id
-  }});
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: Number(invoice.account_id)
+    }
+  })
 
   let resp = await rabbiEmail.sendEmail(
     'first_invoice_paid',
-    account.email,
+    String(account.email),
     config.get('EMAIL_SENDER')
   )
 
   return resp;
 }
 
-async function checkInvoiceCount(invoice){
+async function checkInvoiceCount(invoice: Invoice){
 
   const query = `SELECT COUNT(*) FROM invoices WHERE account_id=${invoice.account_id};`
 
@@ -135,29 +169,35 @@ async function checkInvoiceCount(invoice){
 
     if(result[1].rows[0].count==1){
 
-      firstInvoiceCreatedEmail(invoice.id)
+      const account = await prisma.accounts.findFirstOrThrow({
+        where: {
+          id: Number(invoice.account_id)
+        }
+      })
+
+      firstInvoiceCreatedEmail(String(account.email))
       log.debug('email.invoice.created.first')
 
     }
-  }catch(error){
+  }catch(error: any){
     log.error('checkInvoiceCount.error', error)
   }
 
 }
 
-events.on('account.created', (account) => {
+events.on('account.created', (account: Account) => {
    
   newAccountCreatedEmail(account)
     
 })   
 
-events.on('invoice.created', (invoice)=>{
+events.on('invoice.created', (invoice: Invoice)=>{
  
   checkInvoiceCount(invoice)
  
 })
 
-events.on('address.set', (changeset)=>{
+events.on('address.set', (changeset: {address_id: number})=>{
 
   addressChangedEmail(changeset.address_id) 
 
