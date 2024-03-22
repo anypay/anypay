@@ -1,9 +1,13 @@
 
-import { expect, account } from '../utils'
+import { expect, generateAccount } from '../utils'
+
+import { listPaidInvoices } from '../../lib/invoices'
 
 describe('lib/account', () => {
 
   it('the default test account should be a Account', async () => {
+
+    const account = await generateAccount()
 
     expect(account).to.be.not.equal(null)
 
@@ -15,7 +19,9 @@ describe('lib/account', () => {
 
   it('#listPaidInvoices should list the invoices paid', async () => {
 
-    const paidInvoices = await account.listPaidInvoices()
+    const account = await generateAccount()
+
+    const paidInvoices = await listPaidInvoices(account)
 
     expect(paidInvoices).to.be.an('array')
 

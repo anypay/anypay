@@ -10,12 +10,12 @@ export interface PaymentOption {
   invoice_uid: string;
   chain: string;
   currency: string;
-  address: string;
+  address?: string;
   amount: number;
   protocol?: string;
   fee?: number;
   createdAt?: Date;
-  outputs?: PaymentOutput[];
+  outputs: PaymentOutput[];
 }
 
 export interface VerifyPayment {

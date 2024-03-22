@@ -9,7 +9,9 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let invoice = await utils.newInvoice({ amount: 0.02 })
+      const account = await utils.generateAccount()
+
+      let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 
@@ -28,7 +30,10 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it.skip('should return a valid BIP70 payment request', async () => {
 
-      let invoice = await utils.newInvoice({ amount: 0.02 })
+      const account = await utils.generateAccount()
+
+
+      let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 
@@ -47,7 +52,9 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      let invoice = await utils.newInvoice({ amount: 0.02 })
+      const account = await utils.generateAccount()
+
+      let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 

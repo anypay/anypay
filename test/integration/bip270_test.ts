@@ -1,10 +1,10 @@
 require('dotenv').config()
 
-import { Script, Address } from 'bsv'
-
-import { wallet, expect, request } from '../utils'
+import { expect, request } from '../utils'
 
 import * as utils from '../utils'
+
+import prisma from '../../lib/prisma'
 
 describe("BIP270 Payment Requests", () => {
 
@@ -12,7 +12,9 @@ describe("BIP270 Payment Requests", () => {
 
     it('should return a valid BIP270 payment request', async () => {
 
-      let invoice = await utils.newInvoice({ amount: 0.02 })
+      const account = await utils.generateAccount()
+
+      let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
         .get(`/r/${invoice.uid}`)
@@ -33,7 +35,9 @@ describe("BIP270 Payment Requests", () => {
 
       it('an invalid payment should be rejected', async () => {
 
-        let invoice = await utils.newInvoice({ amount: 0.02 })
+        const account = await utils.generateAccount()
+
+        let invoice = await utils.newInvoice({ amount: 0.02, account })
 
         let resp = await request
           .get(`/r/${invoice.uid}`) 
@@ -78,7 +82,7 @@ describe("BIP270 Payment Requests", () => {
 
     }
 
-    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+    /*if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
 
       it.skip('should accept a valid payment for a BIP270 payment request', async () => {
 
@@ -128,11 +132,13 @@ describe("BIP270 Payment Requests", () => {
 
       })
 
-    }
+    }*/
 
     it.skip('should reject payment for an invoice that was cancelled', async () => {
 
-      let invoice = await utils.newInvoice({ amount: 0.02 })
+      const account = await utils.generateAccount()
+
+      let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
         .get(`/r/${invoice.uid}`) 
@@ -143,7 +149,14 @@ describe("BIP270 Payment Requests", () => {
 
       let url = resp.body.paymentUrl.replace('undefined', '')
 
-      await invoice.set('cancelled', true)
+      await prisma.invoices.update({
+        where: {
+          id: invoice.id
+        },
+        data: {
+          cancelled: true
+        }
+      })
 
       let submitResponse = await request.post(url).send({
         transaction

@@ -18,7 +18,7 @@ describe("Accounts library", () => {
 
     var businessName = 'Some Nice Grocery';
 
-    await accounts.setName(account.email, businessName);
+    await accounts.setName(account, businessName);
 
     account = await models.Account.findOne({ where: { email }});
 
@@ -34,7 +34,7 @@ describe("Accounts library", () => {
 
     let physicalAddress = chance.address();
 
-    await accounts.setPhysicalAddress(account.email, physicalAddress);
+    await accounts.setPhysicalAddress(account, physicalAddress);
 
     account = await models.Account.findOne({ where: { email }});
 

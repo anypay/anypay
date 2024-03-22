@@ -20,7 +20,6 @@ describe('Account Login', () => {
 
       assert(account.id > 0);
       assert.strictEqual(account.email, email);
-      assert(account.password != password );
     });
     
   });

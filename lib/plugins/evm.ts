@@ -11,9 +11,9 @@ import { confirmPaymentByTxid, revertPayment } from '../confirmations'
 
 export abstract class EVM extends Plugin {
 
-  providerURL: string;
+  providerURL: string | undefined;
 
-  chainID: number;
+  chainID: number | undefined;
 
   web3: typeof Web3;
 
@@ -40,17 +40,17 @@ export abstract class EVM extends Plugin {
 
     const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
 
-    const address = transaction.to.toLowerCase()
+    const address = String(transaction.to?.toLowerCase())
 
     const amount = parseInt(transaction.value.toString())
 
-    const txid = transaction.hash
+    const txid = String(transaction.hash)
 
     return [{ address, amount, txid, chain: this.chain, currency: this.currency }]
 
   }
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     let record = await models.EvmTransactionReceipt.findOne({
       where: { txid }
@@ -64,13 +64,13 @@ export abstract class EVM extends Plugin {
 
     let receipt: any = await web3.eth.getTransactionReceipt(txid)
 
-    if (!receipt) { return } 
+    if (!receipt) { return null } 
 
     //TODO: Handle Unfortunate Cirmcumstance When EVM Reverts the Transaction
 
     const { blockHash: confirmation_hash, blockNumber: confirmation_height } = receipt
 
-    if (!confirmation_hash) { return }
+    if (!confirmation_hash) { return null }
 
     const block = await web3.eth.getBlock(confirmation_hash)
 
@@ -122,7 +122,7 @@ export abstract class EVM extends Plugin {
 
       const receiptListener = web3.eth.sendSignedTransaction(txhex)
 
-      receiptListener.once('transactionHash', txid => {
+      receiptListener.once('transactionHash', (txid: string) => {
 
         resolve({ txid, txhex, result: txid, success: true })
 
@@ -198,7 +198,7 @@ export abstract class EVM extends Plugin {
 
     */
 
-    const expectedOutput = paymentOption.outputs[0]
+    const expectedOutput = (paymentOption.outputs as any[])[0]
 
     const [output]: any = await this.parsePayments({txhex})
 
@@ -208,7 +208,7 @@ export abstract class EVM extends Plugin {
 
     if (output.symbol) {
 
-      const correctToken = output.symbol.toLowerCase() == this.token.toLowerCase()
+      const correctToken = output.symbol.toLowerCase() == this.token?.toLowerCase()
 
       return correctToken && correctAmount && correctAddress
 
@@ -242,7 +242,7 @@ interface TransactionReceipt {
   logs: any[];
 }
 
-async function handleTransactionReceipt(web3, receipt: TransactionReceipt): Promise<void> {
+async function handleTransactionReceipt(web3: { eth: { getBlock: (arg0: string | undefined) => any } }, receipt: TransactionReceipt): Promise<void> {
 
   if (!receipt.status) {
     revertPayment({ txid: receipt.transactionHash })
@@ -254,8 +254,8 @@ async function handleTransactionReceipt(web3, receipt: TransactionReceipt): Prom
   const confirmResult = await confirmPaymentByTxid({
     txid: receipt.transactionHash,
     confirmation: {
-      confirmation_height: receipt.blockNumber,
-      confirmation_hash: receipt.blockHash,
+      confirmation_height: Number(receipt.blockNumber),
+      confirmation_hash: String(receipt.blockHash),
       confirmation_date: new Date(block.timestamp * 1000)
     }
   })

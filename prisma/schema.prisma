@@ -812,7 +812,7 @@ model payment_options {
   outputs           Json?     @db.Json
   currency_name     String?   @db.VarChar(255)
   currency_logo_url String?   @db.VarChar(255)
-  chain             String?   @db.VarChar(255)
+  chain             String   @db.VarChar(255)
 }
 
 model payments {

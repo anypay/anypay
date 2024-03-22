@@ -132,54 +132,29 @@ export async function createAccessToken(accountId: number): Promise<any> {
 
 }
 
-export async function setName(email: string, name: string): Promise<any> {
+export async function setName(account: Account, name: string): Promise<any> {
 
-  let account = await models.Account.findOne({ where: { email }});
-
-  if (!account) {
-
-    throw new Error(`account ${email} not found`);
-
-  }
-
-  account.business_name = name; 
-
-  await account.save();
-
-  return account;
-
-}
-
-export async function setPhysicalAddress(email: string, address: string): Promise<any> {
-
-  let account = await models.Account.findOne({ where: { email }});
-
-  if (!account) {
-
-    throw new Error(`account ${email} not found`);
-
-  }
-
-  account.physical_address = address; 
-
-  await account.save();
-
-  return account;
-
-}
-
-export async function setAddressScalar(account_id: number, currency: string, price_scalar: number) {
-
-  log.info('address.scalar.set', { account_id, currency, price_scalar })
-
-  await models.Address.update({
-    price_scalar 
-  }, {
-    where: {
-      account_id,
-      currency
+  account = await prisma.accounts.update({
+    where: { id: account.id },
+    data: {
+      business_name: name
     }
-  })
+  });
+
+  return account;
+
+}
+
+export async function setPhysicalAddress(account: Account, address: string): Promise<any> {
+
+  account = await prisma.accounts.update({
+    where: { id: account.id },
+    data: {
+      physical_address: address
+    }
+  });
+
+  return account;
 
 }
 

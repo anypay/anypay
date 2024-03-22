@@ -1,7 +1,5 @@
 
-import { addresses as Address } from '@prisma/client'
-
-import { Price } from './price'
+import { addresses as Address, prices as Price } from '@prisma/client'
 
 export { Price }
 
@@ -19,6 +17,8 @@ import { Confirmation } from './confirmations'
 export { Confirmation }
 
 import { buildOutputs, verifyOutput } from './pay'
+
+import { Price as UnsavedPrice } from './prices/price'
 
 abstract class AbstractPlugin {
 
@@ -50,7 +50,7 @@ abstract class AbstractPlugin {
 
   abstract parsePayments(transaction: Transaction): Promise<Payment[]>;
 
-  abstract getPrice(): Promise<Price>;
+  abstract getPrice(): Promise<UnsavedPrice>;
 
 }
 
@@ -93,7 +93,7 @@ export abstract class Plugin extends AbstractPlugin {
 
   }
 
-  async getPrice(): Promise<Price> {
+  async getPrice(): Promise<UnsavedPrice> {
 
     return getPrice(this.currency)
 
@@ -156,8 +156,9 @@ export abstract class Plugin extends AbstractPlugin {
       chain: params.paymentOption.chain as string,
       currency: params.paymentOption.currency,
       address: params.paymentOption.address as string,
-      amount: params.paymentOption.amount,
-
+      amount: Number(params.paymentOption.amount),
+      fee: Number(params.paymentOption.fee),
+      outputs: params.paymentOption.outputs as any
     });
 
     let outputs = await buildOutputs(buildOutputsParams, 'JSONV2');

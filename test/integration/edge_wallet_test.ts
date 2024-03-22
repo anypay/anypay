@@ -1,17 +1,18 @@
 
 import * as utils from '../utils'
 
-import { expect, server, spy } from '../utils'
+import { expect, generateAccount, server, spy } from '../utils'
 
 import { Invoice } from '../../lib/invoices'
 
 import { Wallets } from '../../lib/pay'
 
 import * as Events from '../../lib/events'
+import { Server } from '@hapi/hapi'
 
 class EdgeWallet {
 
-  fetchPaymentRequest(invoice: Invoice, server) {
+  fetchPaymentRequest(invoice: Invoice, server: Server) {
 
     return server.inject({
       method: 'GET',
@@ -38,7 +39,9 @@ describe('Payment Requests With Edge Wallet', () => {
 
   it('requests payments with edge-specific headers', async () => {
 
-    let invoice = await utils.newInvoice({ amount: 0.02 })
+    const account = await generateAccount()
+
+    let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     let headers = wallet.getHeaders()
 
@@ -52,7 +55,9 @@ describe('Payment Requests With Edge Wallet', () => {
 
   it.skip('should detect and record when Edge requests a payment request', async () => {
 
-    let invoice = await utils.newInvoice({ amount: 0.02 })
+    const account = await generateAccount()
+
+    let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     spy.on(Events, ['recordEvent'])
 
@@ -68,7 +73,7 @@ describe('Payment Requests With Edge Wallet', () => {
 
     expect(events.length).to.be.equal(1)
 
-    expect(events[0].get('wallet')).to.be.equal(Wallets.Edge) 
+    expect((events[0].payload as any).wallet).to.be.equal(Wallets.Edge) 
 
     events = await Events.listInvoiceEvents(invoice, 'invoice.requested')
 

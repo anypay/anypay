@@ -14,24 +14,25 @@ import { ensureAccessToken } from '../lib/access_tokens'
 
 import { setAddress } from '../lib/addresses';
 
+import * as supertest from "supertest";
+
 import {
   accounts as Account,
   addresses as Address,
   Apps as App,
-  invoices as Invoice
+  invoices as Invoice,
+  WalletBots as WalletBot,
 } from '@prisma/client'
 
 import { createInvoice } from '../lib/invoices'
 
 import { findOrCreateWalletBot } from '../apps/wallet-bot';
 
-import { WalletBots as WalletBot } from '@prisma/client'
-
 //import { initFromConfig } from '../lib/coins'
 
 import { initialize } from '../lib'
 
-export async function generateAccount() {
+export async function generateAccount(): Promise<Account>{
   return registerAccount(chance.email(), chance.word());
 }
 
@@ -199,10 +200,9 @@ export {
 
 export { log } from '../lib'
 
-var request, account, walletBot: WalletBot, app: App;
+var request: supertest.Agent, account, walletBot: WalletBot, app: App;
 
 import {Server, server } from '../server/v0/server';
-import * as supertest from 'supertest'
 
 export { server, request, account, walletBot, app }
 
@@ -224,15 +224,19 @@ export async function authRequest(account: Account, params: any) {
 
 export async function v0AuthRequest(account: Account, params: any) {
 
-  let accessToken = await ensureAccessToken(account)
-
   if (!params.headers) { params['headers'] = {} }
 
-  let token = new Buffer(accessToken.uid + ':').toString('base64');
-
-  params.headers['Authorization'] = `Basic ${token}`
+  params.headers['Authorization'] = `Basic ${await createAuthHeader(account)}`
 
   return server.inject(params)
+
+}
+
+export async function createAuthHeader(account: Account): Promise<string> {
+
+  let accessToken = await ensureAccessToken(account)
+
+  return new Buffer(accessToken.uid + ':').toString('base64');
 
 }
 
@@ -246,9 +250,9 @@ export function auth(account: Account, version=1) {
 
   }
 
-  return async function(params: { [x: string]: {}; headers: { [x: string]: string; }; }) {
+  return async function(req: Request) {
 
-    return strategy(account, params)
+    return strategy(account, req)
 
   }
 
@@ -271,6 +275,7 @@ import { Payment, recordPayment } from '../lib/payments';
 import { createHash } from 'crypto';
 import prisma from '../lib/prisma';
 import { generateAccountToken } from '../lib/jwt';
+import { Request } from '@hapi/hapi';
 
 const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
 

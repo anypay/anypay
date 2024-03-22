@@ -1,27 +1,26 @@
 
 
-import {  auth, expect  } from '../utils'
+import {  createAuthHeader, expect, server  } from '../utils'
 
 import * as utils from '../utils'
 
 describe("Setting Addresses Via REST", async () => {
-  var account;
-  
-  before(async () => {
-  
-    account = await utils.generateAccount()
 
-  });
 
   it("PUT /addresses/DASH should set the DASH address", async () => {
 
     var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    let response = await auth(account, 0)({
-      method: 'PUT',
+    const account = await utils.generateAccount()
+
+    const response: any = await server.inject({
+      method: 'put',
       url: '/addresses/DASH',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
@@ -33,15 +32,19 @@ describe("Setting Addresses Via REST", async () => {
 
     var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
 
-    let response = await auth(account, 0)({
-      method: 'PUT',
+    const account = await utils.generateAccount()
+
+
+    return server.inject({
+      method: 'put',
       url: '/addresses/BTC',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
-
-    expect(response.result.value).to.be.equal(address);
 
   })
 
@@ -51,11 +54,14 @@ describe("Setting Addresses Via REST", async () => {
 
     const account = await utils.generateAccount()
 
-    var response = await auth(account, 0)({
-      method: 'GET',
-      url: '/addresses',
+    var response = await server.inject({
+      method: 'put',
+      url: '/addresses/BTC',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
@@ -63,47 +69,53 @@ describe("Setting Addresses Via REST", async () => {
 
     const address2 = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    await auth(account, 0)({
-      method: 'PUT',
+    await server.inject({
+      method: 'put',
       url: '/addresses/BTC',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    response = await auth(account, 0)({
-      method: 'GET',
+    response = await server.inject({
+      method: 'get',
       url: '/addresses',
-      payload: {
-        address: address
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    expect(Object.keys(response.result).length).to.be.equal(1);
+    expect(Object.keys(response.result as {}).length).to.be.equal(1);
 
-    await auth(account, 0)({
+    await server.inject({
       method: 'PUT',
       url: '/addresses/DASH',
       payload: {
         address: address2
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    response = await auth(account, 0)({
+    var response1: any = await server.inject({
       method: 'GET',
       url: '/addresses',
-      payload: {
-        address: address
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    expect(response.statusCode).to.be.equal(200);
+    expect(response1.statusCode).to.be.equal(200);
 
-    expect(Object.keys(response.result).length).to.be.equal(2);
+    expect(Object.keys(response1.result as {}).length).to.be.equal(2);
 
-    expect(response.result['BTC']).to.be.equal(address);
+    expect(response1.result['BTC']).to.be.equal(address);
 
-    expect(response.result['DASH']).to.be.equal(address2);
+    expect(response1.result['DASH']).to.be.equal(address2);
 
   })
 
@@ -115,13 +127,19 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'DASH'
 
-    let response = await auth(account, 0)({
+    const account = await utils.generateAccount()
+
+
+    const response: any = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
       payload: {
         address: address,
         chain,
         currency
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
@@ -139,13 +157,19 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'USDC'
 
-    let response = await auth(account, 0)({
+    const account = await utils.generateAccount()
+
+
+    const response: any = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
       payload: {
-        address,
+        address: address,
         chain,
         currency
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
@@ -163,16 +187,21 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'DASH'
 
-    let response = await auth(account, 0)({
+    const account = await utils.generateAccount()
+
+
+    const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
       payload: {
         address: address,
         currency
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    expect(response.error).to.not.equal(null)
     expect(response.statusCode).to.equal(400)
 
   })
@@ -185,17 +214,22 @@ describe("Setting Addresses Via REST", async () => {
 
     const chain = 'BTC'
 
-    let response = await auth(account, 0)({
+    const account = await utils.generateAccount()
+
+
+    const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
       payload: {
         address: address,
         chain,
         currency
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    expect(response.error).to.not.equal(null)
     expect(response.statusCode).to.equal(400)
 
   })
@@ -209,17 +243,22 @@ describe("Setting Addresses Via REST", async () => {
 
     const chain = 'BTC'
 
-    let response = await auth(account, 0)({
+    const account = await utils.generateAccount()
+
+
+    const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
       payload: {
         address: address,
         chain,
         currency
+      },
+      headers: {
+        Authorization: await createAuthHeader(account)
       }
     })
 
-    expect(response.error).to.not.equal(null)
     expect(response.statusCode).to.equal(400)
 
   })

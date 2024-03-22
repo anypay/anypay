@@ -19,7 +19,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(200)
 
-    expect(response.result.webhooks.length).to.be.equal(0)
+    expect((response.result as any).webhooks.length).to.be.equal(0)
 
   })
 
@@ -38,10 +38,12 @@ describe("Listing Available Webhooks", async () => {
       url: `/v1/api/webhooks/${invoice.uid}/attempts`
     })
 
+    const result = response.result as any
+
     expect(response.statusCode).to.be.equal(201)
-    expect(response.result.webhook.invoice_uid).to.be.equal(invoice.uid)
-    expect(response.result.webhook.attempts.length).to.be.equal(1)
-    expect(response.result.attempt.response_code).to.be.equal(405)
+    expect(result.webhook.invoice_uid).to.be.equal(invoice.uid)
+    expect(result.webhook.attempts.length).to.be.equal(1)
+    expect(result.attempt.response_code).to.be.equal(405)
 
     response = await utils.authRequest(account, {
       method: 'GET',
@@ -49,7 +51,7 @@ describe("Listing Available Webhooks", async () => {
     })
 
     expect(response.statusCode).to.be.equal(200)
-    expect(response.result.webhooks.length).to.be.equal(1)
+    expect((response.result as any).webhooks.length).to.be.equal(1)
 
   })
 
@@ -66,7 +68,7 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/webhooks'
     })
 
-    expect(response.result.webhooks.length).to.be.equal(0)
+    expect((response.result as any).webhooks.length).to.be.equal(0)
 
     await createInvoice({
       account,
@@ -79,11 +81,13 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/webhooks'
     })
 
-    expect(response.result.webhooks.length).to.be.equal(1)
+    const result = response.result as any
 
-    expect(response.result.webhooks[0].url).to.be.equal(webhook_url)
+    expect(result.webhooks.length).to.be.equal(1)
 
-    expect(response.result.webhooks[0].status).to.be.equal('pending')
+    expect(result.webhooks[0].url).to.be.equal(webhook_url)
+
+    expect(result.webhooks[0].status).to.be.equal('pending')
 
     await createInvoice({
       account,
@@ -96,7 +100,7 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/webhooks'
     })
 
-    expect(response.result.webhooks.length).to.be.equal(2)
+    expect((response.result as any).webhooks.length).to.be.equal(2)
 
   })
 
@@ -117,10 +121,11 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/webhooks'
     })
 
-    expect(response.result.webhooks.length).to.be.equal(1)
-    expect(response.result.webhooks[0].attempts.length).to.be.equal(0)
+    expect((response.result as any).webhooks.length).to.be.equal(1)
+    
+    expect((response.result as any).webhooks[0].attempts.length).to.be.equal(0)
 
-    let webhook = await findWebhook({ invoice_uid: invoice.uid })
+    let webhook = await findWebhook({ invoice_uid: String(invoice.uid) })
 
     await attemptWebhook(webhook)
 
@@ -129,7 +134,7 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/webhooks'
     })
 
-    expect(response.result.webhooks[0].attempts.length).to.be.equal(1)
+    expect((response.result as any).webhooks[0].attempts.length).to.be.equal(1)
     //expect(response.result.webhooks[0].status).to.be.equal('success')
     //expect(response.result.webhooks[0].attempts[0].response_code).to.be.equal(200)
 

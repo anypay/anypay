@@ -1,5 +1,5 @@
 
-import { expect, newInvoice } from '../utils'
+import { expect, generateAccount, newInvoice } from '../utils'
 
 import { confirmPayment, confirmPaymentByTxid, revertPayment } from '../../lib/confirmations'
 
@@ -17,7 +17,9 @@ describe("Confirmations", () => {
 
     it('should update the payment with confirmation data', async () => {
 
-      let invoice = await newInvoice({ amount: 0.52 })
+      const account = await generateAccount()
+
+      let invoice = await newInvoice({ amount: 0.52, account })
 
       let payment: any = await recordPayment(invoice, {
         txid: randomBytes(32).toString('hex'),
@@ -62,7 +64,9 @@ describe("Confirmations", () => {
 
     it('should update the invoice and payment accordingly', async () => {
 
-      let invoice = await newInvoice({ amount: 0.52 })
+      const account = await generateAccount()
+
+      let invoice = await newInvoice({ amount: 0.52, account })
 
       const txid = randomBytes(32).toString('hex')
 
@@ -109,7 +113,9 @@ describe("Confirmations", () => {
 
     it('#revertPayment should mark payment as failed and invoice as unpaid', async () => {
 
-      let invoice = await newInvoice({ amount: 0.52 })
+      const account = await generateAccount()
+
+      let invoice = await newInvoice({ amount: 0.52, account })
 
       const txid = randomBytes(32).toString('hex')
 

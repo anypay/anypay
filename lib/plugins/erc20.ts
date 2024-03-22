@@ -3,7 +3,7 @@ import { EVM } from './evm'
 
 import { log } from '../../lib/log'
 
-import { Transaction, Payment, VerifyPayment } from '../../lib/plugin'
+import { Transaction, Payment, VerifyPayment, PaymentOption } from '../../lib/plugin'
 
 import { BigNumber } from 'bignumber.js'
 
@@ -17,6 +17,11 @@ import ERC20_ABI from '../erc20_abi';
 
 //TODO: FinishPluginImplementation
 
+type PaymentOptionOutputs = {
+  address: string,
+  amount: number
+}[]
+
 export class ERC20 extends EVM {
 
   chain = ''
@@ -25,15 +30,25 @@ export class ERC20 extends EVM {
 
   decimals = 0
 
-  async buildSignedPayment({ paymentOption, mnemonic }): Promise<Transaction> {
+  async buildSignedPayment({ paymentOption, mnemonic }: {
+    paymentOption: PaymentOption,
+    mnemonic: string;
+  }): Promise<Transaction> {
 
-    const address = paymentOption.outputs[0].address
+    const outputs = paymentOption.outputs as PaymentOptionOutputs
 
-    const amount = paymentOption.outputs[0].amount
+    const address = outputs[0].address
+
+    const amount = outputs[0].amount
+
+    if (!this.providerURL) {
+        
+        throw new Error('providerURL is required')
+    }
 
     return this.buildERC20Transfer({
       providerURL: this.providerURL,
-      token: this.token,
+      token: String(this.token),
       address,
       amount,
       mnemonic
@@ -63,7 +78,7 @@ export class ERC20 extends EVM {
     }
     const address = `0x${input.slice(34, 74)}`;
 
-    let amount = parseInt(hexToDec(input.slice(74)));
+    let amount = parseInt(String(hexToDec(input.slice(74))));
 
     amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
 
@@ -81,7 +96,7 @@ export class ERC20 extends EVM {
 
     const transaction: ethers.Transaction = ethers.utils.parseTransaction(txhex)
 
-    if (transaction.to.toLowerCase() != this.token) {
+    if (transaction.to?.toLowerCase() != this.token) {
 
       return []
 
@@ -98,11 +113,11 @@ export class ERC20 extends EVM {
 
     const address = `0x${input.slice(34, 74)}`.toLowerCase();
 
-    let amount = parseInt(hexToDec(input.slice(74)));
+    let amount = parseInt(String(hexToDec(input.slice(74))));
 
     amount = new BigNumber(amount).times(Math.pow(10, this.decimals * -1)).toNumber()
 
-    const txid = transaction.hash
+    const txid = String(transaction.hash)
 
     return [{
       chain: this.chain,
@@ -124,7 +139,7 @@ export class ERC20 extends EVM {
 
     */
 
-    const expectedOutput = paymentOption.outputs[0]
+    const expectedOutput = (paymentOption.outputs as PaymentOptionOutputs)[0]
 
     try {
 
@@ -136,7 +151,7 @@ export class ERC20 extends EVM {
 
       const correctAmount = expectedOutput.amount === parseInt(output.amount)
 
-      const correctToken = output.symbol.toLowerCase() == this.token.toLowerCase()
+      const correctToken = output.symbol.toLowerCase() == this.token?.toLowerCase()
 
       return correctToken && correctAmount && correctAddress
 
@@ -164,7 +179,7 @@ export class ERC20 extends EVM {
 
       const correctAmount = (expectedOutput.amount === parsed.amount)
 
-      console.log('PAYMENT VERIFIED')
+      log.info('payment.verified', { paymentOption, txid, txhex })
 
       return correctAmount && correctAddress
 
@@ -173,6 +188,8 @@ export class ERC20 extends EVM {
       console.error(error)
 
     }
+
+    return false
 
   }
 
@@ -198,7 +215,7 @@ export class ERC20 extends EVM {
       throw "NO ERC20 TRANSFER";
     }
     const address = `0x${input.slice(34, 74)}`;
-    const amount = parseInt(hexToDec(input.slice(74)));
+    const amount = parseInt(String(hexToDec(input.slice(74))));
     const token = result.to.toLowerCase();
 
     return {
@@ -229,10 +246,10 @@ export class ERC20 extends EVM {
       throw "NO ERC20 TRANSFER";
     }
     const address = `0x${transaction.data.slice(34, 74)}`;
-    const amount = hexToDec(transaction.data.slice(74));
-    const symbol = transaction.to;
-    const sender = transaction.from;
-    const hash = transaction.hash
+    const amount = Number(hexToDec(transaction.data.slice(74)));
+    const symbol = String(transaction.to);
+    const sender = String(transaction.from);
+    const hash = String(transaction.hash)
     return { address, amount, symbol, hash, sender };
   }
 

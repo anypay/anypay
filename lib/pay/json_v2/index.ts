@@ -110,6 +110,11 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
 
   } else {
 
+    if (!paymentOption.address) {
+      
+      throw new Error('address is required if outputs are not explicitly provided')
+    }
+
     let fee: Fee = await getFee(paymentOption.currency);
 
     if (paymentOption.fee) {

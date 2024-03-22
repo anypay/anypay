@@ -23,7 +23,6 @@ import oneSuccess from 'promise-one-success'
 
 import axios from 'axios'
 
-
 export default class BCH extends Plugin {
 
   currency: string = 'BCH'

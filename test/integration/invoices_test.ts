@@ -18,16 +18,18 @@ describe('Integration | Invoices', () => {
           amount: 10
         }
       })
+
+      const invoice = (response.result as any).invoice as any
       
       expect(response.statusCode).to.be.equal(201)
 
-      expect(response.result.invoice.uid).to.be.a('string')
+      expect(invoice.uid).to.be.a('string')
 
-      expect(response.result.invoice.status).to.be.equal('unpaid')
+      expect(invoice.status).to.be.equal('unpaid')
 
-      expect(response.result.invoice.amount).to.be.equal(10)
+      expect(invoice.amount).to.be.equal(10)
 
-      expect(response.result.invoice.denomination).to.be.equal('USD')
+      expect(invoice.denomination).to.be.equal('USD')
 
     })
 
@@ -43,7 +45,9 @@ describe('Integration | Invoices', () => {
         }
       })
 
-      expect(response.result.payment_options[0].currency).to.be.equal('BSV')
+      const result = response.result as any
+
+      expect(result.payment_options[0].currency).to.be.equal('BSV')
 
     })
 
@@ -62,7 +66,9 @@ describe('Integration | Invoices', () => {
 
       expect(response.statusCode).to.be.equal(200)
 
-      expect(response.result.events).to.be.an('array')
+      const result = response.result as any
+
+      expect(result.events).to.be.an('array')
 
     })
 

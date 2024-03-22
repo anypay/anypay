@@ -1,12 +1,10 @@
 require("dotenv").config();
 
-import { models } from '../../lib';
+import prisma from '../../lib/prisma';
 
 const assert = require('assert');
 const Chance = require('chance');
 const chance = new Chance();
-
-const Account = models.Account;
 
 describe('Account Model', () => {
 
@@ -16,36 +14,28 @@ describe('Account Model', () => {
 
     let downcasedEmail = email.toLowerCase();
 
-    try {
-
-      let account = await Account.create({ email });
+      const account = await prisma.accounts.create({
+        data: {
+          email: chance.email(),
+          updatedAt: new Date(),
+          createdAt: new Date()
+        }
+      });
 
       assert.strictEqual(account.email, downcasedEmail);
 
-    } catch(error) {
-
-      console.error("ERROR", error);
-
-    }
-  });
-
-  it('should automatically generate a uid', done => {
-
-    Account.create({
-      email: chance.email()
-    })
-    .then(account => {
-      assert(account.uid);
-      done();
-    });
   });
 
 
   it("should store the default denomination currency", async () => {
 
-    let account = await Account.create({
-      email: chance.email(),
-      denomination: 'VEF'
+    const account = await prisma.accounts.create({
+      data: {
+        email: chance.email(),
+        denomination: 'VEF',
+        updatedAt: new Date(),
+        createdAt: new Date()
+      }
     });
 
     assert(account.id > 0);

@@ -198,3 +198,12 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
 }
 
+export async function listPaidInvoices(acocunt: Account): Promise<Invoice[]> {
+
+  return prisma.invoices.findMany({
+    where: {
+      account_id: acocunt.id,
+      status: 'paid'
+    }
+  })
+}

@@ -5,8 +5,13 @@ import { coins, accounts } from "../../lib";
 
 import { assert, server, chance } from '../utils'
 
+import {
+  access_tokens as AccessToken,
+  accounts as Account
+} from '@prisma/client'
+
 describe("Account Coins over HTTP", async () => {
-  var accessToken, account;
+  var accessToken: AccessToken, account: Account;
   
   before(async () => {
 
@@ -37,11 +42,11 @@ describe("Account Coins over HTTP", async () => {
         method: 'GET',
         url: '/coins',
         headers: {
-          'Authorization': auth(accessToken.uid, "")
+          'Authorization': auth(String(accessToken?.uid), "")
         }
       });
 
-      assert(response.result.coins);
+      assert((response.result as any).coins);
 
     } catch(error) {
 
@@ -59,11 +64,11 @@ describe("Account Coins over HTTP", async () => {
         method: 'GET',
         url: '/coins',
         headers: {
-          'Authorization': auth(accessToken.uid, "")
+          'Authorization': auth(String(accessToken?.uid), "")
         }
       });
 
-      let dash = response.result.coins.find(c => c.code === 'DASH');
+      let dash = (response.result as any).coins.find((c: any) => c.code === 'DASH');
 
       assert(dash.unavailable);
 
@@ -78,11 +83,11 @@ describe("Account Coins over HTTP", async () => {
         method: 'GET',
         url: '/coins',
         headers: {
-          'Authorization': auth(accessToken.uid, "")
+          'Authorization': auth(String(accessToken?.uid), "")
         }
       });
 
-      let dash = response.result.coins.find(c => c.code === 'DASH');
+      let dash = (response.result as any).coins.find((c: any) => c.code === 'DASH');
 
       assert(!dash.unavailable);
 
@@ -92,7 +97,7 @@ describe("Account Coins over HTTP", async () => {
 
 })
 
-function auth(username, password) {
+function auth(username: string, password: string) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
 }
 
