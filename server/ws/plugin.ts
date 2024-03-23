@@ -79,7 +79,7 @@ export const plugin = (() => {
         socket.isAlive = true;
       }
 
-      const port = Number(process.env.websockets_port) || 5201
+      const port = Number(process.env.WEBSOCKETS_PORT) || 5201
       
       const wsServer = new WebSocketServer({ port });
 

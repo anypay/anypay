@@ -1,7 +1,7 @@
 
 import axios from 'axios'
 
-let token = process.env.blockcypher_token;
+let token = process.env.BLOCKCYPHER_TOKEN;
 
 import { log } from './log';
 
@@ -72,7 +72,7 @@ export async function createNewBlockWebhook() {
   let { data } = await axios.post(`https://api.blockcypher.com/v1/btc/main/hooks?token=${token}`, {
     event: 'new-block',
     url: `${config.get('API_BASE')}/api/v1/blockcypher/webhooks`,
-    secret: process.env.blockcypher_webhook_secret
+    secret: process.env.BLOCKCYPHER_WEBHOOK_TOKEN
   })
 
   return data

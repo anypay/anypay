@@ -18,7 +18,7 @@ export async function initialize(anypay: Anypay) {
   console.log('initialize prices')
   await prices()
 
-  console.log('initialize rabbi')
+  console.log('initialize rabbi amqp actor system')
   await rabbi()
 
   console.log('initialize prometheus')
@@ -26,4 +26,3 @@ export async function initialize(anypay: Anypay) {
 
   console.log('initialization complete')
 }
-

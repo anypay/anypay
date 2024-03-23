@@ -202,7 +202,7 @@ export class ERC20 extends EVM {
     full: GetTransactionByHashResult
   }> {
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url), this.chainID)
+    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.INFURA_POLYGON_URL), this.chainID)
 
     const result: any = await web3.eth.getTransaction(txid)
 

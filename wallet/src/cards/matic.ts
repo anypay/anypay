@@ -11,7 +11,7 @@ export default class MATIC extends EVM_Card {
 
   decimals = 18
 
-  providerURL = process.env.infura_polygon_url
+  providerURL = process.env.INFURA_POLYGON_URL
 
 }
 

@@ -13,7 +13,7 @@ export default class USDC_MATIC extends ERC20_Card {
 
   chainID = 137
 
-  providerURL = process.env.infura_polygon_url
+  providerURL = process.env.INFURA_POLYGON_URL
 
 }
 

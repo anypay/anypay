@@ -103,7 +103,7 @@ export async function fetchERC20Transfer({ txid }: { txid: string }): Promise<{
   full: GetTransactionByHashResult
 }> {
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.infura_polygon_url))
+  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.INFURA_POLYGON_URL))
 
   const result: any = await web3.eth.getTransaction(txid)
 

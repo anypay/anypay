@@ -7,7 +7,7 @@ import { publish } from 'rabbi'
 
 import { config } from './config'
 
-const lokiEnabled = config.get('loki_enabled')
+const lokiEnabled = config.get('LOKI_ENABLED')
 
 interface NewLogger {
   namespace?: string;
@@ -29,7 +29,7 @@ const transports = [
   new winston.transports.Console({ level: 'debug' })
 ]
 
-if (config.get('loki_enabled') && config.get('loki_host')) {
+if (config.get('LOKI_ENABLED') && config.get('LOKI_HOST')) {
 
   const LokiTransport = require("winston-loki");
 
@@ -43,15 +43,15 @@ if (config.get('loki_enabled') && config.get('loki_host')) {
   
   } = {
     format: winston.format.json(),
-    host: config.get('loki_host'),
+    host: config.get('LOKI_HOST'),
     json: true,
     batching: false,
-    labels: { app: config.get('loki_label_app') }
+    labels: { app: config.get('LOKI_LABEL_APP') }
   }
 
-  if (config.get('loki_basic_auth')) {
+  if (config.get('LOKI_BASIC_AUTH')) {
 
-    lokiConfig['basicAuth'] = config.get('loki_basic_auth')
+    lokiConfig['basicAuth'] = config.get('LOKI_BASIC_AUTH')
   }
 
   transports.push(
