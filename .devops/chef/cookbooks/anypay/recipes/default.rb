@@ -1,4 +1,20 @@
 #
+#    This file is part of anypay: https://github.com/anypay/anypay
+#    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+#
+#    Permission to use, copy, modify, and/or distribute this software for any
+#    purpose  with  or without fee is hereby granted, provided that the above
+#    copyright notice and this permission notice appear in all copies.
+#
+#    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+#    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+#    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+#    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+#    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+#    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+#    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+#//==============================================================================
+#
 # Cookbook:: anypay
 # Recipe:: default
 #
@@ -68,12 +84,12 @@ docker_container "anypay" do
     "interval_wallet_bot_xmr_address=#{data_bag_item('anypay', 'wallet-bot')['xmr_address']}",
     "interval_wallet_bot_access_token=#{data_bag_item('anypay', 'wallet-bot')['access_token']}",
     "api_base=https://api.anypayx.com",
-    "nownodes_api_key=#{data_bag_item('anypay', 'api')['nownodes_api_key']}",
-    "nownodes_enabled=#{data_bag_item('anypay', 'api')['nownodes_enabled']}",
+    "NOWNODES_API_KEY=#{data_bag_item('anypay', 'api')['NOWNODES_API_KEY']}",
+    "NOWNODES_ENABLED=#{data_bag_item('anypay', 'api')['NOWNODES_ENABLED']}",
     "chain_so_broadcast_provider_enabled=#{data_bag_item('anypay', 'api')['chain_so_broadcast_provider_enabled']}",
     "blockchair_broadcast_provider_btc_enabled=#{data_bag_item('anypay', 'api')['blockchair_broadcast_provider_btc_enabled']}",
     "monero_wallet_rpc_url=http://184.73.109.23:28089/json_rpc",
-    "require_btc_confirmations=false",
+    "REQUIRE_BTC_CONFIRMATIONS=false",
     "bitcoind_rpc_host=http://52.3.113.228:8332",
     "bitcoind_rpc_username=anypay",
     "bitcoind_rpc_password=liberty"

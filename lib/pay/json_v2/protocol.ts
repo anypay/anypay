@@ -112,7 +112,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       var paymentRecord;
 
-      if (paymentOption.currency === 'BTC' && config.get('require_btc_confirmations')) {
+      if (paymentOption.currency === 'BTC' && config.get('REQUIRE_BTC_CONFIRMATIONS')) {
 
         paymentRecord = await handleUnconfirmedPayment(paymentOption, transaction)
 
