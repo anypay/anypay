@@ -10,6 +10,7 @@ import prisma from './prisma';
 import AuthenticatedRequest from '../server/auth/AuthenticatedRequest'
 
 import { accounts as Account } from '@prisma/client';
+import { config } from './config';
 
 export async function validateSudoPassword(request: Request, username: string, password: string, h: ResponseToolkit) {
 
@@ -27,7 +28,7 @@ export async function validateSudoPassword(request: Request, username: string, p
 
   try {
 
-    await compare(username, String(process.env.SUDO_PASSWORD_HASH));
+    await compare(username, String(config.get('SUDO_PASSWORD_HASH')));
 
     return {
 

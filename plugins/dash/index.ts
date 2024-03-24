@@ -1,6 +1,6 @@
 
 
-import { blockchair, blockcypher } from '../../lib'
+import { blockchair, blockcypher, config } from '../../lib'
 
 import * as dash from '@dashevo/dashcore-lib';
 
@@ -12,7 +12,7 @@ import oneSuccess from 'promise-one-success'
 
 import axios from 'axios'
 
-const providerURL = String(process.env.getblock_dash_url)
+const providerURL = String(config.get('GETBLOCK_DASH_URL'))
 
 export default class DASH extends Plugin {
 
@@ -22,7 +22,7 @@ export default class DASH extends Plugin {
 
   decimals: number = 8;
 
-  providerURL = String(process.env.getblock_dash_url)
+  providerURL = String(config.get('GETBLOCK_DASH_URL'))
 
   get bitcore() {
 

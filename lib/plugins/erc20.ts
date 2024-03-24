@@ -14,6 +14,7 @@ import { hexToDec } from 'hex2dec'
 import { ethers } from 'ethers'
 
 import ERC20_ABI from '../erc20_abi';
+import { config } from '../config'
 
 //TODO: FinishPluginImplementation
 
@@ -202,7 +203,7 @@ export class ERC20 extends EVM {
     full: GetTransactionByHashResult
   }> {
 
-    const web3 = new Web3(new Web3.providers.HttpProvider(process.env.INFURA_POLYGON_URL), this.chainID)
+    const web3 = new Web3(new Web3.providers.HttpProvider(config.get('INFURA_POLYGON_URL')), this.chainID)
 
     const result: any = await web3.eth.getTransaction(txid)
 

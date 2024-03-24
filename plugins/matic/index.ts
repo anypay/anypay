@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { EVM } from '../../lib/plugins/evm'
 
 export default class MATIC extends EVM {
@@ -11,7 +12,7 @@ export default class MATIC extends EVM {
 
   chainID = 137
 
-  providerURL = process.env.INFURA_POLYGON_URL
+  providerURL = config.get('INFURA_POLYGON_URL')
 
 }
 

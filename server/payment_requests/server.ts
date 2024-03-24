@@ -7,6 +7,7 @@ import { log } from '../../lib/log'
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
 import { join } from 'path'
+import { config } from '../../lib'
 
 const handlers = requireHandlersDirectory(join(__dirname, './handlers'));
 
@@ -136,8 +137,8 @@ export function attach(server: Hapi.Server) {
 async function Server() {
 
   var server = new Hapi.Server({
-    host: process.env.HOST || "localhost",
-    port: process.env.PORT || 8000,
+    host: config.get('HOST'),
+    port: config.get('PORT'),
     routes: {
       cors: true,
       validate: {

@@ -10,6 +10,7 @@ import { ethers } from 'ethers'
 import { Transaction } from './plugin'
 
 import ERC20_ABI from './erc20_abi';
+import { config } from './config'
 
 interface TransmitResult {
   blockHash: string,
@@ -103,7 +104,7 @@ export async function fetchERC20Transfer({ txid }: { txid: string }): Promise<{
   full: GetTransactionByHashResult
 }> {
 
-  const web3 = new Web3(new Web3.providers.HttpProvider(process.env.INFURA_POLYGON_URL))
+  const web3 = new Web3(new Web3.providers.HttpProvider(config.get('INFURA_POLYGON_URL')))
 
   const result: any = await web3.eth.getTransaction(txid)
 

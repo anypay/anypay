@@ -1,5 +1,6 @@
 
 import axios from 'axios'                                                                                                   
+import { config } from '../../../lib';
                                                                                                                             
 export interface UTXO {                                                                                                     
   txid: string;                                                                                                             
@@ -36,8 +37,8 @@ export class RpcClient {
                                                                                                                             
     let { data } = await axios.post(this.url, {method,params}, {                                                            
       auth: {                                                                                                               
-        username: process.env.BSV_RPC_USER,                                                                                 
-        password: process.env.BSV_RPC_PASSWORD                                                                              
+        username: config.get('BSV_RPC_USER'),                                                                                 
+        password: config.get('BSV_RPC_PASSWORD')
       }                                                                                                                     
     })                                                                                                                      
                                                                                                                             
@@ -47,10 +48,10 @@ export class RpcClient {
                                                                                                                             
 }                                                                                                                           
                                                                                                                             
-export async function listUnspent(address): Promise<UTXO[]> {                                                               
+export async function listUnspent(address: string): Promise<UTXO[]> {                                                               
                                                                                                                             
   let rpc = new RpcClient({                                                                                                 
-    url: process.env.BSV_RPC_URL                                                                                            
+    url: config.get('BSV_RPC_URL')                                                                                            
   })                                                                                                                        
                                                                                                                             
   return rpc.listUnspent(address)                                                                                           

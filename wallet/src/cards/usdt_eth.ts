@@ -4,6 +4,7 @@ import ERC20_Card from './_erc20'
 import PaymentOption from '../payment_option'
 
 import Transaction from '../transaction'
+import { config } from '../../../lib'
 
 export default class USDT_ETH extends ERC20_Card {
 
@@ -17,7 +18,7 @@ export default class USDT_ETH extends ERC20_Card {
 
   chainID = 1
 
-  providerURL = process.env.infura_ethereum_url
+  providerURL = config.get('INFURA_ETHEREUM_URL')
 
 }
 

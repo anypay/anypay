@@ -1,7 +1,8 @@
+import { config } from "../config";
 
 const http = require('superagent');
 
-const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY
+const apiKey = config.get('ANYPAY_FIXER_ACCESS_KEY')
 
 const url = `http://data.fixer.io/api/latest?access_key=${apiKey}&base=btc`
 

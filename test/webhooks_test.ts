@@ -25,6 +25,7 @@ import {
 } from '../lib/webhooks'
 
 import { createClient, loadClientForAccount } from '../lib/get_402'
+import { config } from '../lib'
 
 describe('Getting Prices', () => {
 
@@ -310,7 +311,7 @@ describe('Getting Prices', () => {
       let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
 
 
-      let client: get402.Client = createClient(process.env.GET402_TEST_CLIENT_IDENTIFIER)
+      let client: get402.Client = createClient(config.get('GET402_TEST_CLIENT_IDENTIFIER'))
 
       let paidWebhook: PaidWebhook = new PaidWebhook({ webhook, client })
 

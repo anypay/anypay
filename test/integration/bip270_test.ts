@@ -5,6 +5,7 @@ import { expect, request } from '../utils'
 import * as utils from '../utils'
 
 import prisma from '../../lib/prisma'
+import { config } from '../../lib'
 
 describe("BIP270 Payment Requests", () => {
 
@@ -31,7 +32,7 @@ describe("BIP270 Payment Requests", () => {
 
     })
 
-    if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+    if (!config.get('SKIP_E2E_PAYMENTS_TESTS')) {
 
       it('an invalid payment should be rejected', async () => {
 
@@ -82,7 +83,7 @@ describe("BIP270 Payment Requests", () => {
 
     }
 
-    /*if (!process.env.SKIP_E2E_PAYMENTS_TESTS) {
+    /*if (!config.get('SKIP_E2E_PAYMENTS_TESTS')) {
 
       it.skip('should accept a valid payment for a BIP270 payment request', async () => {
 

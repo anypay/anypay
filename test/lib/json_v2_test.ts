@@ -10,6 +10,7 @@ import { protocol, schema } from '../../lib/pay/json_v2'
 import { log } from '../../lib/log'
 
 import { ensureInvoice } from '../../lib/invoices'
+import { config } from '../../lib'
 
 describe('JSON Payment Protocol V2', () => {
 
@@ -80,7 +81,7 @@ describe('JSON Payment Protocol V2', () => {
 
   })
 
-  if (process.env.run_e2e_payment_tests) {
+  if (config.get('run_e2e_payment_tests')) {
 
     it('#sendSignedPayment should accept and broadcast transaction', async () => {
 

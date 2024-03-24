@@ -30,7 +30,7 @@ import { findOrCreateWalletBot } from '../apps/wallet-bot';
 
 //import { initFromConfig } from '../lib/coins'
 
-import { initialize } from '../lib'
+import { config, initialize } from '../lib'
 
 export async function generateAccount(): Promise<Account>{
   return registerAccount(chance.email(), chance.word());
@@ -153,7 +153,7 @@ export async function newInvoice(params: NewInvoice): Promise<Invoice> {
 
 }
 
-import * as bsv from 'bsv'
+import { bsv } from 'scrypt-ts'
 
 export async function generateKeypair(currency: string = 'BSV') {
 
@@ -277,11 +277,11 @@ import prisma from '../lib/prisma';
 import { generateAccountToken } from '../lib/jwt';
 import { Request } from '@hapi/hapi';
 
-const WIF = process.env.ANYPAY_SIMPLE_WALLET_WIF || new bsv.PrivateKey().toWIF()
+const WIF = config.get('ANYPAY_SIMPLE_WALLET_WIF') || new bsv.PrivateKey().toWIF()
 
 if (!WIF) {
 
-  throw new Error('process.env.ANYPAY_SIMPLE_WALLET_WIF must be set before running tests.')
+  throw new Error('ANYPAY_SIMPLE_WALLET_WIF environment variable must be set before running tests.')
 
 }
 

@@ -13,9 +13,9 @@ describe("Webhooks Default Endpoint", async () => {
 
     log.info('test.account.created', account)
 
-    const rocketchat_webhook_url = config.get('rocketchat_webhook_url')
+    const rocketchat_webhook_url = config.get('ROCKETCHAT_WEBHOOK_URL')
 
-    config.set('rocketchat_webhook_url', config.get('DEFAULT_WEBHOOK_URL'))
+    config.set('ROCKETCHAT_WEBHOOK_URL', config.get('DEFAULT_WEBHOOK_URL'))
 
     var response = await server.inject({
       method: 'POST',
@@ -27,7 +27,7 @@ describe("Webhooks Default Endpoint", async () => {
 
     expect(log.info).to.have.been.called.with('webhooks.test.received')
     
-    config.set('rocketchat_webhook_url', rocketchat_webhook_url)
+    config.set('ROCKETCHAT_WEBHOOK_URL', rocketchat_webhook_url)
   })
 
   it('should attempt a webhook for an invoice', async () => {

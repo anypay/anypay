@@ -13,7 +13,7 @@ export async function main() {
     amount: 10 
   }, {
     auth: {
-      username: process.env.anypay_access_token,
+      username: config.get('ANYPAY_ACCESS_TOKEN'),
       password: ''
     }
   })

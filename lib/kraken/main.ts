@@ -5,7 +5,7 @@ require('dotenv').config();
 
 import { Op } from 'sequelize'
 
-import { log } from '../../lib';
+import { config, log } from '../../lib';
 
 import { listAll } from './lib/kraken_account'
 
@@ -45,7 +45,7 @@ export async function start() {
 
   }
 
-  const interval = process.env.KRAKEN_AUTOSELL_INTERVAL || '0 * * * * *' // default to every minute
+  const interval = config.get('KRAKEN_AUTOSELL_INTERVAL') || '0 * * * * *' // default to every minute
 
   cron.schedule(interval, async () => {
 

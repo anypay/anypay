@@ -97,7 +97,7 @@ export class Logger {
 
     this.namespace = params.namespace || 'anypay'
 
-    this.env = String(params.env || process.env.NODE_ENV)
+    this.env = String(params.env || config.get('NODE_ENV'))
 
   }
 

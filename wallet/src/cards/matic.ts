@@ -1,4 +1,5 @@
 
+import { config } from '../../../lib'
 import EVM_Card from './_evm'
 
 export default class MATIC extends EVM_Card {
@@ -11,7 +12,7 @@ export default class MATIC extends EVM_Card {
 
   decimals = 18
 
-  providerURL = process.env.INFURA_POLYGON_URL
+  providerURL = config.get('INFURA_POLYGON_URL')
 
 }
 

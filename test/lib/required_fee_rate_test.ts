@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { getRequiredFeeRate } from '../../lib/pay/required_fee_rate'
 
 import { expect } from '../utils'
@@ -7,7 +8,7 @@ describe("Required Fee Rate", () => {
 
   it("should get the required fee rate from environment variables", async () => {
 
-    const environmentVariable = Number(process.env.REQUIRED_FEE_RATE_DOGE)
+    const environmentVariable = Number(config.get('REQUIRED_FEE_RATE_DOGE'))
 
     expect(environmentVariable).to.be.greaterThan(1)
 
@@ -19,7 +20,7 @@ describe("Required Fee Rate", () => {
 
   it("should default to value of 1 satoshi per byte if no variable set", async () => {
 
-    const environmentVariable = process.env.REQUIRED_FEE_RATE_BSV
+    const environmentVariable = config.get('REQUIRED_FEE_RATE_BSV')
 
     expect(environmentVariable).to.be.equal(undefined)
 

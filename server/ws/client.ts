@@ -5,9 +5,9 @@ import { config }  from '../../lib'
 
 export default async function main() {
 
-  const ws = new WebSocket(config.get('anypay_websockets_url'), {
+  const ws = new WebSocket(config.get('ANYPAY_WEBSOCKETS_URL'), {
     headers: {
-      'anypay-access-token': config.get('anypay_access_token')
+      'anypay-access-token': config.get('ANYPAY_ACCESS_TOKEN')
     }
   });
 

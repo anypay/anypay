@@ -4,9 +4,10 @@ import axios from 'axios'
 
 import { BigNumber } from 'bignumber.js'
 
-const apiKey = process.env.ANYPAY_FIXER_ACCESS_KEY;
+const apiKey = config.get('ANYPAY_FIXER_ACCESS_KEY');
 
 import { Price } from './price'
+import { config } from '../config';
 
 export async function fetchCurrencies(base='USD'): Promise<Price[]> {
 

@@ -12,6 +12,7 @@ import { BroadcastTx, BroadcastTxResult,  Transaction, Payment } from '../../lib
 import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '../../lib/plugins/utxo'
+import { config } from '../../lib';
 
 export default class LTC extends UTXO_Plugin {
 
@@ -34,7 +35,7 @@ export default class LTC extends UTXO_Plugin {
 
   decimals = 8
 
-  providerURL = String(process.env.getblock_ltc_url)
+  providerURL = String(config.get('GETBLOCK_LTC_URL'))
 
   get bitcore() {
 

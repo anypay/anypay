@@ -3,7 +3,7 @@ import { expect, walletBot } from "../../utils"
 
 import { AddressBalanceUpdate } from '../../../apps/wallet-bot'
 
-import { PrivateKey } from 'bsv'
+import { PrivateKey } from 'scrypt-ts'
 
 describe("Tracking Wallet Bot Balances", () => {
 

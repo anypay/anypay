@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 /*
     This file is part of anypay: https://github.com/anypay/anypay
     Copyright (c) 2017 Anypay Inc, Steven Zeiler
@@ -16,75 +16,22 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
-require('dotenv').config();
-
+const password = require('../lib/password');
 import { Command } from 'commander';
 const program = new Command();
 
-import { getAddressForInvoice, getRefund } from '../lib/refunds'
-
-import { ensureInvoice } from '../lib/invoices'
-
-//import { findAccount } from '../lib/account'
-
 program
-  .command('getrefund <invoice_uid>')
-  .action(async function(uid) {
+  .version('0.1.0')
+  .command('sendpasswordreset <email>')
+  .action(async function(email, newPassword) {
 
     try {
 
-      let invoice = await ensureInvoice(uid)
+      await password.sendPasswordResetEmail(email);
 
-      let result = await getRefund(invoice)
-
-      console.log(result)
+      console.log('password reset email sent successfully!');
 
     } catch(e) {
-
-      console.log("error", e.message);
-    }
-
-  });
-
-program
-  .command('listrefunds <account_id>')
-  .action(async function(account_id) {
-
-    try {
-
-
-      throw new Error('not implemented')
-      //let account = await findAccount(account_id)
-      //let refunds = await account.listRefunds()
-
-      /*for (let refund of refunds) {
-
-        console.log(refund)
-
-      }
-      */
-
-    } catch(e) {
-
-      console.log("error", e.message);
-    }
-
-  });
-
-program
-  .command('getaddress <invoice_uid>')
-  .action(async function(uid) {
-
-    try {
-
-      let invoice = await ensureInvoice(uid)
-
-      let result = await getAddressForInvoice(invoice)
-
-      console.log(result)
-
-    } catch(e) {
-
       console.log("error", e.message);
     }
 

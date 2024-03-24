@@ -2,12 +2,13 @@ require('dotenv').config()
 
 const bitcore = require('bsv')
 
+import { config } from '../../../lib'
 import { listUnspent } from './rpc'
 
 export async function buildPayment(paymentRequest) {
 
-  let privatekey = new bitcore.PrivateKey(process.env.BSV_SIMPLE_WALLET_WIF)
-  let address = new bitcore.PrivateKey(process.env.BSV_SIMPLE_WALLET_ADDRESS)
+  let privatekey = new bitcore.PrivateKey(config.get('BSV_SIMPLE_WALLET_WIF'))
+  let address = new bitcore.PrivateKey(config.get('BSV_SIMPLE_WALLET_ADDRESS'))
 
   let unspent = await listUnspent(address)
 

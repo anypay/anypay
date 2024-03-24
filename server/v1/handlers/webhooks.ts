@@ -27,9 +27,9 @@ export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
 async function notifyRocketchat({ uid }: { uid: string }) {
 
-  if (config.get('rocketchat_webhook_url')) {
+  if (config.get('ROCKETCHAT_WEBHOOK_URL')) {
 
-    let { data } = await axios.post(config.get('rocketchat_webhook_url'), {
+    let { data } = await axios.post(config.get('ROCKETCHAT_WEBHOOK_URL'), {
       "alias": "webhooks",
       "text": "Payment Webhook Received",
       "attachments": [

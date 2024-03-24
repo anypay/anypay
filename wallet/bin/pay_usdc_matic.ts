@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+import { config } from '../../lib'
 import { Cards, PaymentOption } from '../src'
 
 import axios from 'axios'
@@ -13,7 +14,7 @@ async function main() {
   const currency = 'USDC'
 
   const card = new Cards.USDC_MATIC({
-    phrase: process.env.anypay_wallet_phrase
+    phrase: config.get('anypay_wallet_phrase')
   })
 
   try {

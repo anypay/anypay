@@ -10,6 +10,7 @@ import oneSuccess from 'promise-one-success'
 import UTXO_Plugin from '../../lib/plugins/utxo'
 
 import axios from 'axios'
+import { config } from '../../lib';
 
 export default class DOGE extends UTXO_Plugin {
 
@@ -19,7 +20,7 @@ export default class DOGE extends UTXO_Plugin {
 
   decimals = 8;
 
-  providerURL = String(process.env.getblock_doge_url)
+  providerURL = String(config.get('GETBLOCK_DOGE_URL'))
 
   get bitcore() {
     return doge

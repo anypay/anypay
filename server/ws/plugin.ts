@@ -28,7 +28,7 @@ import { Actor } from 'rabbi'
 
 import { awaitChannel, channel, exchange } from '../../lib/amqp'
 
-import { models } from "../../lib";
+import { config, models } from "../../lib";
 
 class AliveSocket extends WebSocket {
   isAlive?: boolean;
@@ -97,7 +97,7 @@ export const plugin = (() => {
         socket.isAlive = true;
       }
 
-      const port = Number(process.env.WEBSOCKETS_PORT) || 5201
+      const port = Number(config.get('WEBSOCKETS_PORT')) || 5201
       
       const wsServer = new WebSocketServer({ port });
 

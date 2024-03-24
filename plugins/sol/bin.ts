@@ -11,6 +11,7 @@ import { Keypair, Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { createTransferInstruction, getOrCreateAssociatedTokenAccount } from '@solana/spl-token'
 
 import axios from 'axios'
+import { config } from '../../lib';
 
 const SOLANA_MAINNET_USDC_PUBKEY = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 //const SOLANA_MAINNET_USDT_PUBKEY = "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB"
@@ -25,10 +26,10 @@ program
 
     const amount = 1_000_000 * 0.05
 
-    const connection = new Connection(process.env.alchemy_url_solana)
+    const connection = new Connection(config.get('ALCHEMY_URL_SOLANA'))
 
     const fromWallet = Keypair.fromSeed(Uint8Array.from(
-      JSON.parse(process.env.solana_phantom_seed).slice(0, 32)
+      JSON.parse(config.get('SOLANA_PHANTOM_SEED')).slice(0, 32)
     ))
 
     const fromAccountInfo = await connection.getAccountInfo(fromWallet.publicKey)

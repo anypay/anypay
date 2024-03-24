@@ -210,8 +210,8 @@ export async function call(method: string, params: any): Promise<any> {
     params
   }, {
     auth: {
-      username: process.env.XMR_RPC_USER,
-      password: process.env.XMR_RPC_PASSWORD
+      username: config.get('XMR_RPC_USER'),
+      password: config.get('XMR_RPC_PASSWORD')
     }
   })
 
@@ -227,7 +227,7 @@ export async function callWalletRpc(method: string, params: any): Promise<any> {
 
   log.info('xmr.monero_wallet_rpc.call', { method, params, trace })
 
-  let response = await axios.post(config.get('monero_wallet_rpc_url'), {
+  let response = await axios.post(config.get('MONERO_WALLET_RPC_URL'), {
     jsonrpc:"2.0",
     id:"0",
     method,

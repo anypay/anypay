@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+import { config } from '../../../lib'
 import { call } from '../rpc'
 
 async function main() {
@@ -7,11 +8,11 @@ async function main() {
   try {
 
     let result1 = await call({
-      url: process.env.dash_rpc_url,
+      url: config.get('DASH_RPC_URL'),
       method: 'getblockcount',
       params: [],
-      username: process.env.dash_rpc_username,
-      password: process.env.dash_rpc_password
+      username: config.get('DASH_RPC_USERNAME'),
+      password: config.get('DASH_RPC_PASSWORD')
     })
 
     console.log(result1)

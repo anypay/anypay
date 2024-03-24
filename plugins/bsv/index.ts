@@ -10,7 +10,7 @@ import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transactio
 
 import oneSuccess from 'promise-one-success'
 
-import { blockchair, log } from '../../lib';
+import { blockchair, config, log } from '../../lib';
 
 import axios from 'axios'
 
@@ -26,7 +26,7 @@ export default class BSV extends UTXO_Plugin {
 
   decimals = 8
 
-  providerURL = String(process.env.getblock_bsv_url
+  providerURL = String(config.get('GETBLOCK_BSV_URL'))
     )
   get bitcore() {
 

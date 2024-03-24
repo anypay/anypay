@@ -14,13 +14,13 @@ export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
 
     log.info('btc.bitcoind.broadcastTx', { txhex })
 
-    const response = await axios.post(config.get('bitcoind_rpc_host'), {
+    const response = await axios.post(config.get('BITCOIND_RPC_HOST'), {
         method: 'send_raw_transaction',
         params: [txhex]
     }, {
         auth: {
-            username: config.get('bitcoind_rpc_username'),
-            password: config.get('bitcoind_rpc_password')
+            username: config.get('BITCOIND_RPC_USERNAME'),
+            password: config.get('BITCOIND_RPC_PASSWORD')
         }
     })
 

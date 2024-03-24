@@ -1,12 +1,13 @@
 require('dotenv').config()
 
+import { config } from '../../lib/config'
 import { Cards } from '../src'
 
 async function main() {
 
   const card = new Cards.BCH({
 
-    phrase: process.env.anypay_wallet_phrase
+    phrase: config.get('anypay_wallet_phrase')
 
   })
 

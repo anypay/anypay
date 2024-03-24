@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { ERC20 } from '../../lib/plugins/erc20'
 
 export default class USDC_AVAX extends ERC20 {
@@ -13,7 +14,7 @@ export default class USDC_AVAX extends ERC20 {
 
   chainID = 43114
 
-  providerURL = process.env.infura_avalanche_url
+  providerURL = config.get('INFURA_AVALANCHE_URL')
 
 }
 

@@ -9,11 +9,11 @@ import { createPaymentRequest } from '../../lib/payment_requests'
 
 import { buildSignedPayment, verifyPayment } from '../../lib/plugins'
 
-import { PaymentOption, Transaction } from '../../lib'
+import { PaymentOption, Transaction, config } from '../../lib'
 
 import { app } from '../utils'
 
-const mnemonic = process.env.anypay_wallet_mnemonic
+const mnemonic = config.get('anypay_wallet_mnemonic')
 
 describe("Sending USDC Payments on MATIC", () => {
 

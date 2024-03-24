@@ -1,13 +1,14 @@
 import {connect, Connection, Channel} from 'amqplib';
 
 import { Schema } from 'joi';
+import { config } from './config';
 
 var connection: Connection;
 var channel: Channel;
 
 var channelIsConnected = false;
 
-const exchange  = process.env.ANYPAY_AMQP_EXCHANGE ? String(process.env.ANYPAY_AMQP_EXCHANGE) : 'anypay';
+const exchange  = config.get("ANYPAY_AMQP_EXCHANGE");
 
 export { exchange }
 
@@ -74,13 +75,13 @@ export const getSchema = (name: string) => schemas[name];
 
 (async function() {
 
-  if (process.env.NODE_ENV === 'test') {
+  if (config.get('NODE_ENV') === 'test') {
 
-    connection = await connect(String(process.env.TEST_AMQP_URL));
+    connection = await connect(String(config.get('TEST_AMQP_URL')));
 
   } else {
 
-    connection = await connect(String(process.env.AMQP_URL));
+    connection = await connect(String(config.get('AMQP_URL')));
   }
  
   channel = await connection.createChannel();  

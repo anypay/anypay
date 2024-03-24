@@ -2,7 +2,6 @@
 
 const assert = require("assert");
 
-process.env.DATABASE_URL = "postgres://stevenzeiler:@127.0.0.1/anypay_dash_test";
 
 const Account = require("../../../../lib/models/account");
 const AccessToken = require("../../../../lib/models/access_token");

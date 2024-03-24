@@ -1,4 +1,5 @@
 
+import { config } from '../../../lib'
 import ERC20_Card from './_erc20'
 
 export default class USDC_MATIC extends ERC20_Card {
@@ -13,7 +14,7 @@ export default class USDC_MATIC extends ERC20_Card {
 
   chainID = 137
 
-  providerURL = process.env.INFURA_POLYGON_URL
+  providerURL = config.get('INFURA_POLYGON_URL')
 
 }
 

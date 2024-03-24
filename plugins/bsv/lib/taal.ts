@@ -2,7 +2,7 @@ require('dotenv').config()
 
 import axios from 'axios'
 
-import { log } from '../../../lib'
+import { config, log } from '../../../lib'
 
 import { BroadcastTxResult } from '../../../lib/plugin'
 
@@ -17,7 +17,7 @@ export async function getTransaction(txid: string): Promise<string> {
     "params": [txid]
   }, {
     headers: {
-      'Authorization': process.env.TAAL_API_KEY,
+      'Authorization': config.get('TAAL_API_KEY'),
       'Content-Type': 'application/json'
     }
   })
@@ -34,7 +34,7 @@ export async function broadcastTransaction(rawTx: string): Promise<BroadcastTxRe
     rawTx
   }, {
     headers: {
-      'Authorization': process.env.TAAL_API_KEY,
+      'Authorization': config.get('TAAL_API_KEY'),
       'Content-Type': 'application/json'
     }
   })

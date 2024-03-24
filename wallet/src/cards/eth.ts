@@ -1,4 +1,5 @@
 
+import { config } from '../../../lib'
 import EVM_Card from './_evm'
 
 export default class ETH extends EVM_Card {
@@ -11,7 +12,7 @@ export default class ETH extends EVM_Card {
 
   chainID = 1
 
-  providerURL = process.env.infura_ethereum_url
+  providerURL = config.get('INFURA_ETHEREUM_URL')
 
 }
 

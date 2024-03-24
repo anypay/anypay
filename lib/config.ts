@@ -17,7 +17,7 @@
 //==============================================================================
 require('dotenv').config()
 
-var config = require('nconf');
+import * as config from 'nconf'
 
 import { join } from 'path'
 
@@ -27,40 +27,384 @@ config.argv({ parseValues: true })
    .env({ parseValues: true })
    .file({ file });
 
-config.defaults({
-  'DOMAIN': 'anypayx.com',
-  'PORT': '5200',
-  'HOST': '127.0.0.1',
-  'API_BASE': 'https://api.anypayx.com',
-  'api_base': 'https://api.anypayx.com',
-  'AMQP_URL': 'amqp://guest:guest@localhost:5672/',
-  'DATABASE_URL': 'postgres://postgres@localhost:5432/anypay',
-  'EMAIL_SENDER': 'no-reply@anypayx.com',
-  'KRAKEN_PLUGIN': false,
+export const allowedVariables: EnvironmentVariable[] = []
 
-  // Dynamic fees for BTC transactions from mempool.space
-  'MEMPOOL_SPACE_FEES_ENABLED': true,
+interface EnvironmentVariable {
+  key: string;
+  required: boolean;
+  default?: string;
+}
 
-  // Send Events To Rocket Chat If Provided
-  'rocketchat_webhook_url': false,
+export function registerEnvironmentVariable(variable: EnvironmentVariable) {
+  allowedVariables.push(variable)
+}
 
-  // Enable Websockets Server and API for Wallet Bot
-  'wallet_bot_app_enabled': true,
+const variables: EnvironmentVariable[] = [
+  {
+    key: 'DOMAIN',
+    default: 'anypayx.com',
+    required: true
+  },
+  {
+    key: 'ANYPAY_AMQP_EXCHANGE',
+    required: false,
+    default: 'anypay'
+  }, {
+    key: 'AMQP_URL',
+    required: true
+  }, {    
+    key: 'HOST',
+    required: true,
+    default: '0.0.0.0'
+  },
+  {
+    key: 'PORT',
+    required: true,
+    default: '5200'
+  },
+  {
+    key: 'WEBSOCKETS_PORT',
+    required: true,
+    default: '5201'
+  },
+  {
+    key: 'NODE_ENV',
+    required: true,
+    default: 'development'
+  },
+  {
+    key: 'DATABASE_URL',
+    required: true
+  },
+  {
+    key: 'API_BASE',
+    required: true,
+    default: 'https://api.anypayx.com'
+  },
+  {
+    key: 'X509_DOMAIN_CERT_DER_PATH',
+    required: true
+  },
+  {
+    key: 'X509_PRIVATE_KEY_PATH',
+    required: true
+  },
+  {
+    key: 'X509_ROOT_CERT_DER_PATH',
+    required: true
+  },
+  {
+    key: 'FIREBASE_SERVER_KEY',
+    required: true
+  },
+  {
+    key: 'SENTRY_DSN',
+    required: true
+  },
+  {
+    key: 'LOKI_ENABLED',
+    required: true,
+    default: 'false'
+  },
+  {
+    key: 'LOKI_HOST',
+    required: true
+  },
+  {
+    key: 'LOKI_LABEL_APP',
+    required: true
+  },
+  {
+    key: 'LOKI_BASIC_AUTH',
+    required: true
+  },
+  {
+    key: 'KRAKEN_AUTOSELL_INTERVAL',
+    required: true
+  },
+  {
+    key: 'KRAKEN_WITHDRAWAL_KEY',
+    required: true
+  },
+  {
+    key: 'ANYPAY_FIXER_ACCESS_KEY',
+    required: true
+  },
+  {
+    key: 'ANYPAY_SLACK_CHANNEL_URL',
+    required: true
+  },
+  {
+    key: 'ROCKETCHAT_WEBHOOK_URL',
+    required: true
+  },
+  {
+    // Dynamic fees for BTC transactions from mempool.space
+    key: 'MEMPOOL_SPACE_FEES_ENABLED',
+    required: true,
+    default: 'true'
+  },
+  {
+    key: 'KRAKEN_PLUGIN',
+    required: false,
+    default: 'false'
+  },
+  {
+    key: 'ANYPAY_WEBSOCKETS_URL',
+    required: true,
+    default: 'wss://wss.anypayx.com'
+  },
+  {
+    key: 'JSONWEBTOKEN_PUBLIC_KEY_PATH',
+    required: false,
+    default: join(__dirname, '../config/jwt/jwtRS512.key.pub')
+  },
+  {
+    key: 'JSONWEBTOKEN_PRIVATE_KEY_PATH',
+    required: false,
+    default: join(__dirname, '../config/jwt/jwtRS512.key')
+  },
+  {
+    key: 'EMAIL_SENDER',
+    required: false,
+    default: 'no-reply@anypayx.com'
+  },
+  {
+    key: 'REQUIRE_BTC_CONFIRMATIONS',
+    required: false,
+    default: 'false'
+  },
+  {
+    key: "BLOCKCYPHER_TOKEN",
+    required: true
+  },
+  {
+    key: "BLOCKCYPHER_WEBHOOK_TOKEN",
+    required: true
+  },
+  {
+    key: 'COINMARKETCAP_API_KEY',
+    required: true,
+  },
+  {
+    key: 'CRYPTOAPIS_KEY',
+    required: true
+  },
+  {
+    key: 'INFURA_POLYGON_URL',
+    required: true
+  },
+  {
+    key: 'INFURA_ETHEREUM_URL',
+    required: true
+  },
+  {
+    key: 'INFURA_AVALANCHE_URL',
+    required: true
+  },
+  {
+    key: "NOWNODES_API_KEY",
+    required: true
+  },
+  {
+    key: 'TEST_AMQP_URL',
+    required: false
+  },
+  {
+    key: 'TEST_DATABASE_URL',
+    required: false
+  },
+  {
+    key: 'SUDO_PASSWORD_HASH',
+    required: false
+  },
+  {
+    key: 'JSON_PROTOCOL_IDENTITY_ADDRESS',
+    required: false
+  },
+  {
+    key: 'JSON_PROTOCOL_IDENTITY_WIF',
+    required: false
+  },
+  {
+    key: 'WALLET_BOT_APP_ENABLED',
+    required: false,
+    default: 'false'
+  },
+  {
+    key: 'ANYPAY_ACCESS_TOKEN',
+    required: false
+  },
+  {
+    key: 'NOWNODES_ENABLED',
+    default: 'false',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_LTC_URL',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_BTC_URL',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_BCH_URL',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_DASH_URL',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_BSV_URL',
+    required: false
+  },
+  {
+    key: 'GETBLOCK_DOGE_URL',
+    required: false
+  },
+  {
+    key: 'ALCHEMY_URL_SOLANA',
+    required: true
+  },
+  {
+    key: 'SOLANA_PHANTOM_SEED',
+    required: false
+  },
+  {
+    key: 'CHAIN_SO_BROADCAST_PROVIDER_ENABLED',
+    required: true,
+    default: 'true'
+  },
+  {
+    key: 'BLOCKCHAIR_BROADCAST_PROVIDER_BTC_ENABLED',
+    required: true,
+    default: 'true'
+  },
+  {
+    key: 'REQUIRE_BTC_CONFIRMATIONS',
+    required: true,
+    default: 'true'
+  },
+  {
+    key: 'BITCOIND_RPC_HOST',
+    required: false
+  },
+  {
+    key: 'BITCOIND_RPC_USERNAME',
+    required: false
+  },
+  {
+    key: 'BITCOIND_RPC_PASSWORD',
+    required: false
+  },
+  {
+    key: 'DASH_RPC_URL',
+    required: false
+  },
+  {
+    key: 'DASH_RPC_URL_2',
+    required: false
+  },
+  {
+    key: 'DASH_RPC_URL_3',
+    required: false
+  },
+  {
+    key: 'DASH_RPC_USERNAME',
+    required: false
+  },
+  {
+    key: 'DASH_RPC_PASSWORD',
+    required: false
+  },
+  {
+    key: 'BSV_SIMPLE_WALLET_WIF',
+    required: false
+  },
+  {
+    key: 'BSV_SIMPLE_WALLET_ADDRESS',
+    required: false
+  },
+  {
+    key: 'TAAL_API_KEY',
+    required: false
+  },
+  {
+    key: 'BSV_RPC_USER',
+    required: false
+  },
+  {
+    key: 'BSV_RPC_PASSWORD',
+    required: false
+  },
+  {
+    key: 'BSV_RPC_URL',
+    required: false
+  },
+  {
+    key: 'XMR_RPC_URL',
+    required: false
+  },
+  {
+    key: 'XMR_RPC_USER',
+    required: false
+  },
+  {
+    key: 'XMR_RPC_PASSWORD',
+    required: false
+  },
+  {
+    key: 'MONERO_WALLET_RPC_URL',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_BTC',
+    required: false
+  },  
+  {
+    key: 'REQUIRED_FEE_RATE_LTC',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_DOGE',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_DASH',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_LTC',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_BCH',
+    required: false
+  },
+  {
+    key: 'REQUIRED_FEE_RATE_BSV',
+    required: false
+  },
+  {
+    key: 'PROMETHEUS_PASSWORD',
+    required: false
+  }
+]
 
-  // Optionally require a confirmation for BTC payments -- eventually this will default to true
-  REQUIRE_BTC_CONFIRMATIONS: false,
+variables.forEach(registerEnvironmentVariable)
 
-  prometheus_auth_required: true,
-  
-  prometheus_password: '',
-  
-  amqp_url: process.env.AMQP_URL,
+export function initialize() {
+  // Restrict the allowed environment variables to ensure they are all documented here
+  config.env(variables.map(v => v.key))
 
-  JSONWEBTOKEN_PRIVATE_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key'),
+  // Ensure required environment variables are set
+  config.required(variables.filter(v => v.required).map(v => v.key))
 
-  JSONWEBTOKEN_PUBLIC_KEY_PATH: join(__dirname, '../config/jwt/jwtRS512.key.pub'),
+  // Set defaults for optional environment variables
+  config.defaults(variables.filter(v => !!v.default).reduce((acc: any, v) => acc[v.key] = v.default, {}))
 
-  anypay_websockets_url: 'wss://wss.anypayx.com',
-})
+}
 
 export { config } 

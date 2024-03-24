@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { ERC20 } from '../../lib/plugins/erc20'
 
 export default class USDT_MATIC extends ERC20 {
@@ -13,7 +14,7 @@ export default class USDT_MATIC extends ERC20 {
 
   chainID = 137
 
-  providerURL = process.env.INFURA_POLYGON_URL
+  providerURL = config.get('INFURA_POLYGON_URL')
 
 }
 

@@ -3,6 +3,7 @@ import ERC20_Card from './_erc20'
 import PaymentOption from '../payment_option'
 
 import Transaction from '../transaction'
+import { config } from '../../../lib'
 
 export default class USDC_AVAX extends ERC20_Card {
 
@@ -16,7 +17,7 @@ export default class USDC_AVAX extends ERC20_Card {
 
   chainID = 43114
 
-  providerURL = process.env.infura_avalanche_url
+  providerURL = config.get('INFURA_AVALANCHE_URL')
 
 }
 

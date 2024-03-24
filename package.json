@@ -83,6 +83,7 @@
     "@types/axios": "^0.14.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^8.5.9",
+    "@types/nconf": "^0.10.6",
     "@types/ws": "^8.5.4",
     "amqplib": "^0.10.3",
     "anypay": "^0.7.0",

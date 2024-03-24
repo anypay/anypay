@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+import { config } from '../../lib'
 import { Cards, PaymentOption, Transaction } from '../src'
 
 import axios from 'axios'
@@ -33,7 +34,7 @@ async function main() {
 
   const card = new Card({
 
-    phrase: process.env.anypay_wallet_phrase
+    phrase: config.get('anypay_wallet_phrase')
 
   })
 

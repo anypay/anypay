@@ -75,8 +75,8 @@ function responsesWithSuccess({ model }: { model: any }) {
 }
 
 const server = new Hapi.Server({
-  host: process.env.HOST || "0.0.0.0",
-  port: process.env.PORT || 8000,
+  host: config.get('HOST') || "0.0.0.0",
+  port: config.get('PORT') || 8000,
   //debug: { 'request': ['error', 'uncaught'] },
   routes: {
     cors: true,
@@ -180,12 +180,12 @@ async function Server() {
 
   await server.register(promsterPlugin())
 
-  if (process.env.SENTRY_DSN) {
+  if (config.get('SENTRY_DSN')) {
 
     await server.register({
       plugin: require('hapi-sentry'),
       options: {
-        client: { dsn: process.env.SENTRY_DSN },
+        client: { dsn: config.get('SENTRY_DSN') },
       },
     });
 
@@ -260,7 +260,7 @@ async function Server() {
 
   // BEGIN PUBLIC ROUTES
 
-  if (config.get('wallet_bot_app_enabled')) {
+  if (config.get('WALLET_BOT_APP_ENABLED')) {
 
     log.debug('apps.wallet-bot.enabled')
 

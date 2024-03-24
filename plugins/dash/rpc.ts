@@ -4,6 +4,7 @@ import  axios from 'axios'
 type RPC_Response = any
 
 import { BroadcastTxResult } from '../../lib/plugins'
+import { config } from '../../lib'
 
 export async function call({url,method,params,username,password}: {url: string, method: string, params: any[], username?: string, password?: string}): Promise<RPC_Response> {
 
@@ -36,11 +37,11 @@ export async function call({url,method,params,username,password}: {url: string, 
 export async function broadcastTx({ txhex }: {txhex: string}): Promise<BroadcastTxResult> {
 
   const txid = await call({
-    url: process.env.dash_rpc_url,
+    url: config.get('DASH_RPC_URL'),
     method: 'sendrawtransaction',
     params: [txhex],
-    username: process.env.dash_rpc_username,
-    password: process.env.dash_rpc_password
+    username: config.get('DASH_RPC_USERNAME'),
+    password: config.get('DASH_RPC_PASSWORD')
   })
 
   return {
@@ -55,11 +56,11 @@ export async function broadcastTx({ txhex }: {txhex: string}): Promise<Broadcast
 export async function broadcastTx2({ txhex }: {txhex: string}): Promise<BroadcastTxResult> {
 
   const txid = await call({
-    url: process.env.dash_rpc_url_2,
+    url: config.get('DASH_RPC_URL_2'),
     method: 'sendrawtransaction',
     params: [txhex],
-    username: process.env.dash_rpc_username,
-    password: process.env.dash_rpc_password
+    username: config.get('DASH_RPC_USERNAME'),
+    password: config.get('DASH_RPC_PASSWORD')
   })
 
   return {
@@ -74,11 +75,11 @@ export async function broadcastTx2({ txhex }: {txhex: string}): Promise<Broadcas
 export async function broadcastTx3({ txhex }: {txhex: string}): Promise<BroadcastTxResult> {
 
   const txid = await call({
-    url: process.env.dash_rpc_url_3,
+    url: config.get('DASH_RPC_URL_3'),
     method: 'sendrawtransaction',
     params: [txhex],
-    username: process.env.dash_rpc_username,
-    password: process.env.dash_rpc_password
+    username: config.get('DASH_RPC_USERNAME'),
+    password: config.get('DASH_RPC_PASSWORD')
   })
 
   return {

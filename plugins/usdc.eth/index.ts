@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { ERC20 } from '../../lib/plugins/erc20'
 
 export default class USDC_ETH extends ERC20 {
@@ -13,7 +14,7 @@ export default class USDC_ETH extends ERC20 {
 
   chainID = 1
 
-  providerURL = process.env.infura_ethereum_url
+  providerURL = config.get('INFURA_ETHEREUM_URL')
 
 }
 

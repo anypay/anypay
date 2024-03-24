@@ -102,6 +102,7 @@ export async function buildOutputs(payment_option: PaymentOption): Promise<Payme
 const BASE_URL = getBaseURL();
 
 import { PaymentRequest, PaymentRequestOptions } from './'
+import { config } from '../config';
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<PaymentRequest> {
 
@@ -128,8 +129,8 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   pd.set('payment_url', `${BASE_URL}/r/${paymentOption.invoice_uid}/pay/${paymentOption.currency}/bip70`);
 
-  if (process.env[`REQUIRED_FEE_RATE_${paymentOption.currency}`]) {
-    pd.set('required_fee_rate', parseInt(String(process.env[`REQUIRED_FEE_RATE_${String(paymentOption.currency)}`])));
+  if (config.get(`REQUIRED_FEE_RATE_${paymentOption.currency}`)) {
+    pd.set('required_fee_rate', parseInt(String(config.get(`REQUIRED_FEE_RATE_${String(paymentOption.currency)}`))));
   } else {
     pd.set('required_fee_rate', 1);
   }
@@ -142,12 +143,12 @@ export async function buildPaymentRequest(paymentOption: PaymentOption, options:
 
   paypro.set('serialized_payment_details', pd.toBuffer());
 
-  if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'test') {
+  if (config.get('NODE_ENV') !== 'development' && config.get('NODE_ENV') !== 'test') {
     try {
 
-      let domainDerPath = String(process.env.X509_DOMAIN_CERT_DER_PATH);
-      let rootDerPath = String(process.env.X509_ROOT_CERT_DER_PATH);
-      let keyPath = String(process.env.X509_PRIVATE_KEY_PATH);
+      let domainDerPath = String(config.get('X509_DOMAIN_CERT_DER_PATH'));
+      let rootDerPath = String(config.get('X509_ROOT_CERT_DER_PATH'));
+      let keyPath = String(config.get('X509_PRIVATE_KEY_PATH'));
 
       const file_with_x509_private_key = fs.readFileSync(keyPath);
 

@@ -1,7 +1,7 @@
 import {awaitChannel} from '../../../lib/amqp';
 import * as Boom from '@hapi/boom';
 
-import { log, models } from '../../../lib'
+import { config, log, models } from '../../../lib'
 
 import { find } from '../../../lib/plugins'
 
@@ -57,17 +57,16 @@ export async function show(request: Request, h: ResponseToolkit) {
 
   let response = h.response(paymentRequest.content.serialize());
 
-  if (process.env.JSON_PROTOCOL_IDENTITY_WIF) {
+  if (config.get('JSON_PROTOCOL_IDENTITY_WIF')) {
 
-    var privateKey = bitcoin.PrivateKey.fromWIF(process.env.JSON_PROTOCOL_IDENTITY_WIF);
+    var privateKey = bitcoin.PrivateKey.fromWIF(config.get('JSON_PROTOCOL_IDENTITY_WIF'));
     var signature = Message(digest).sign(privateKey);
     response.header('x-signature-type', 'ecc');
-    response.header('x-identity', String(process.env.JSON_PROTOCOL_IDENTITY_ADDRESS) );
+    response.header('x-identity', String(config.get('JSON_PROTOCOL_IDENTITY_ADDRESS')) );
     response.header('signature', Buffer.from(signature, 'base64').toString('hex'));
     response.header('digest', `SHA-256=${digest}`);
 
   }
-
 
   response.type(`application/${currency.name}-paymentrequest`);
 

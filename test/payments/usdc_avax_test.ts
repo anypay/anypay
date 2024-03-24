@@ -11,13 +11,13 @@ import { createPaymentRequest } from '../../lib/payment_requests'
 
 import { buildSignedPayment, verifyPayment } from '../../lib/plugins'
 
-import { PaymentOption, Transaction } from '../../lib'
+import { PaymentOption, Transaction, config } from '../../lib'
 
 import { app } from '../utils'
 
 import { expect } from 'chai'
 
-const mnemonic = process.env.anypay_wallet_mnemonic
+const mnemonic = config.get('anypay_wallet_mnemonic')
 
 describe("Sending USDC Payments on AVAX", () => {
 
@@ -37,7 +37,7 @@ describe("Sending USDC Payments on AVAX", () => {
 
     let amount = 0.001 * Math.pow(10, plugin.decimals)
 
-    const providerURL = process.env.infura_avalanche_url
+    const providerURL = config.get('INFURA_AVALANCHE_URL')
 
     const { txhex, txid } = await erc20.buildERC20Transfer({
       address,

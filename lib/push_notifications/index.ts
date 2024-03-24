@@ -1,4 +1,5 @@
 
+import { config } from '../config';
 import { models } from '../models';
 
 var FCM = require('fcm-node');
@@ -18,7 +19,7 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
     account_id: account.id
 
   }});
-  var serverKey = process.env.FIREBASE_SERVER_KEY; //put your server key here
+  var serverKey = config.get('FIREBASE_SERVER_KEY'); //put your server key here
   var fcm = new FCM(serverKey);
 
   if (firebaseTokens.length == 0) { throw new Error('no firebase token found') }

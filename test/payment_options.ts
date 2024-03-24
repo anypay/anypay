@@ -10,6 +10,7 @@ import { models } from '../lib/models'
 import { Account } from '../lib/account'
 
 import {refreshCoins}from '../lib/coins'
+import { config } from '../lib/config'
 
 const options = [{
   currency:'USDC',
@@ -68,7 +69,7 @@ async function main() {
 
   const account: Account = await Account.fromAccessToken({
 
-    token: process.env.anypay_access_token
+    token: config.get('ANYPAY_ACCESS_TOKEN')
 
   })
 

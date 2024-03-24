@@ -1,4 +1,5 @@
 
+import { config } from '../../lib'
 import { EVM } from '../../lib/plugins/evm'
 
 export default class AVAX extends EVM {
@@ -11,7 +12,7 @@ export default class AVAX extends EVM {
 
   chainID = 43114
 
-  providerURL = process.env.infura_avalanche_url
+  providerURL = config.get('INFURA_AVALANCHE_URL')
 
 }
 

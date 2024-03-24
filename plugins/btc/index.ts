@@ -44,7 +44,7 @@ export default class BTC extends UTXO_Plugin {
 
   decimals = 8;
 
-  providerURL = String(process.env.getblock_btc_url)
+  providerURL = String(config.get('GETBLOCK_BTC_URL'))
 
   get bitcore() {
 
@@ -60,7 +60,7 @@ export default class BTC extends UTXO_Plugin {
 
     const broadcastProviders: Promise<BroadcastTxResult>[] = []
 
-    if (config.get('blockchair_broadcast_provider_btc_enabled')) {
+    if (config.get('BLOCKCHAIR_BROADCAST_PROVIDER_BTC_ENABLED')) {
 
       broadcastProviders.push(
 
@@ -69,13 +69,13 @@ export default class BTC extends UTXO_Plugin {
 
     }
 
-    if (config.get('chain_so_broadcast_provider_enabled')) {
+    if (config.get('CHAIN_SO_BROADCAST_PROVIDER_ENABLED')) {
 
       broadcastProviders.push(chain_so.broadcastTx('BTC', txhex))
 
     }
 
-    if (config.get('bitcoind_rpc_host')) {
+    if (config.get('BITCOIND_RPC_HOST')) {
 
       broadcastProviders.push(
 

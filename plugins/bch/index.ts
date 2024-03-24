@@ -7,7 +7,7 @@ import { Plugin, Transaction, BroadcastTx, Confirmation, BroadcastTxResult, Veri
 
 import { buildOutputs, verifyOutput } from '../../lib/pay'
 
-import { log } from '../../lib';
+import { config, log } from '../../lib';
 
 const bch: any = require('bitcore-lib-cash');
 
@@ -205,7 +205,7 @@ interface GetRawTransactionResult {
 
 async function getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
 
-  const { data } = await axios.post(String(process.env.getblock_bch_url), {
+  const { data } = await axios.post(String(config.get('GETBLOCK_BCH_URL')), {
     method: 'getrawtransaction',
     params: [txid, true]
   })
@@ -222,7 +222,7 @@ interface GetBlockResult {
 
 async function getBlock(hash: string): Promise<GetBlockResult> {
 
-  const { data } = await axios.post(String(process.env.getblock_bch_url), {
+  const { data } = await axios.post(String(config.get('GETBLOCK_BCH_URL')), {
     method: 'getblock',
     params: [hash, 1]
   })

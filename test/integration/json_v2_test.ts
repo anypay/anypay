@@ -6,6 +6,7 @@ import { schema } from '../../lib/pay/json_v2'
 
 //@ts-ignore
 import * as bch from 'bitcore-lib-cash'
+import { config } from '../../lib/config'
 
 describe("JSON Payment Protocol V2", async () => {
 
@@ -228,7 +229,7 @@ describe("JSON Payment Protocol V2", async () => {
 
   })
 
-  if (process.env.run_e2e_payment_tests) {
+  if (config.get('run_e2e_payment_tests')) {
 
     it("POST /i/:uid should verify the payment is valid", async () => {
 

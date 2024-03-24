@@ -9,7 +9,9 @@ import { createInvoice } from '../../lib/invoices'
 
 import { TestClient } from 'payment-protocol'
 
-import { Transaction } from 'bsv'
+import { bsv } from 'scrypt-ts'
+
+const {Transaction} = bsv
 
 import delay from 'delay'
 

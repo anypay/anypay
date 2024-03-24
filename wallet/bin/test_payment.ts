@@ -24,7 +24,7 @@ async function main() {
     amount
   }, {
     auth: {
-      username: process.env.anypay_access_token,
+      username: process.env.ANYPAY_ACCESS_TOKEN,
       password: ''
     }
   })

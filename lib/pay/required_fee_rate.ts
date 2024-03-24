@@ -40,7 +40,7 @@ export async function getRequiredFeeRate({ chain, invoice }: {chain: string, inv
 
   const rate_env_variable = `REQUIRED_FEE_RATE_${chain}`
 
-  const feeFromEnv = process.env[rate_env_variable]
+  const feeFromEnv = config.get(rate_env_variable)
 
   if (feeFromEnv) {
 

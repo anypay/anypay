@@ -10,7 +10,7 @@ import  { Trace } from '../../lib/trace'
 import oneSuccess from 'promise-one-success'
 
 const rpcs = [{
-    url: config.get('monero_wallet_rpc_url')
+    url: config.get('MONERO_WALLET_RPC_URL')
 }]
 
 class MoneroWalletRPCPool {

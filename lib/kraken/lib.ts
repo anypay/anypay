@@ -1,5 +1,5 @@
 
-import { database, models, log } from '../../lib';
+import { database, models, log, config } from '../../lib';
 
 export async function getDASHBalance(kraken: any) {
 
@@ -141,7 +141,7 @@ export async function withdrawStatus(kraken: any, options={}) {
 
 }
 
-const USD_WITHDRAW_ACCOUNT_NAME = process.env.KRAKEN_WITHDRAW_KEY || '???'
+const USD_WITHDRAW_ACCOUNT_NAME = config.get('KRAKEN_WITHDRAW_KEY') || '???'
 
 export async function withdrawInfo(kraken: any, options={}) {
 
