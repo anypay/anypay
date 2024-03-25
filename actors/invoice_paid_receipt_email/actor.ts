@@ -22,8 +22,9 @@ require('dotenv').config();
 
 import { Actor } from 'rabbi';
 
-import {email, models} from '../../lib';
+import {email} from '../../lib';
 import { exchange } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
 
 export async function start() {
 
@@ -40,13 +41,11 @@ export async function start() {
 
     const { uid } = json
 
-    let invoice = await models.Invoice.findOne({
- 
+    const invoice = await prisma.invoices.findFirstOrThrow({
       where: { uid }
-
     });
 
-    await email.invoicePaidEmail(invoice.toJSON());
+    await email.invoicePaidEmail(invoice);
 
   });
 
@@ -63,27 +62,25 @@ export async function start() {
 
     let uid = msg.content.toString();
 
-    let invoice = await models.Invoice.findOne({
- 
-      where: { uid: uid }
-
+    const invoice = await prisma.invoices.findFirstOrThrow({
+      where: { uid }
     });
 
-    let invoices = await models.Invoice.findAll({
+
+    const invoices = await prisma.invoices.findMany({
       where: {
         account_id: invoice.account_id,
         status: 'paid'
       }
-    })
+    });
 
     if (invoices.length === 1) {
 
-      await email.firstInvoicePaidEmail(invoice.toJSON());
+      await email.firstInvoicePaidEmail(invoice);
 
     }
 
   });
-
 
 }
 

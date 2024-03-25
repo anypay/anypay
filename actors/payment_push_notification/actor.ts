@@ -22,10 +22,9 @@ require('dotenv').config();
 
 import { Actor, log } from 'rabbi';
 
-import { models } from '../../lib';
-
 import { sendMessage } from '../../lib/push_notifications';
 import { exchange } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
 
 
 export async function start() {
@@ -45,13 +44,13 @@ export async function start() {
 
     const { uid } = json
 
-    let invoice = await models.Invoice.findOne({ where: { uid }});
+    const invoice = await prisma.invoices.findFirstOrThrow({
+      where: { uid }
+    });
 
-    let account = await models.Account.findOne({ where: { id: invoice.account_id }});
-
-    if (!invoice) {
-      return
-    }
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: { id: Number(invoice.account_id) }
+    });
 
     try {
 

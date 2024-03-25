@@ -26,13 +26,13 @@ interface GetBlockResult {
 }
 export default abstract class UTXOPlugin extends Plugin {
 
-  providerURL: string;
+  providerURL: string | undefined;
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     const transaction = await this.getRawTransaction(txid)
 
-    if (!transaction.blockhash) { return }
+    if (!transaction.blockhash) { return null }
 
     const hash = transaction.blockhash
 
@@ -56,6 +56,10 @@ export default abstract class UTXOPlugin extends Plugin {
 
   async getRawTransaction(txid: string): Promise<GetRawTransactionResult> {
 
+    if (!this.providerURL) {
+      throw new Error('providerURL is not set')
+    }
+
     const { data } = await axios.post(this.providerURL, {
       method: 'getrawtransaction',
       params: [txid, true]
@@ -66,6 +70,10 @@ export default abstract class UTXOPlugin extends Plugin {
   }
 
   async getBlock(hash: string): Promise<GetBlockResult> {
+
+    if (!this.providerURL) {
+      throw new Error('providerURL is not set')
+    }
 
     const { data } = await axios.post(this.providerURL, {
       method: 'getblock',

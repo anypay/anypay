@@ -21,7 +21,6 @@
 require('dotenv').config();
 
 import { Actor } from 'rabbi';
-import { models } from '../../lib';
 
 import { sendWebhook } from '../../lib/webhooks';
 import { exchange } from '../../lib/amqp';
@@ -42,7 +41,7 @@ export default async function start() {
 
     console.log(json)
 
-    const event = await models.Event.findOne({
+    const event = await prisma.events.findFirstOrThrow({
       where: { id: json.id }
     })
 
@@ -53,7 +52,9 @@ export default async function start() {
         return
       }
 
-      const account = await models.Account.findOne({ where: { id: event.account_id } })
+      const account = await prisma.accounts.findFirstOrThrow({
+        where: { id: event.account_id }      
+      })
 
       if (account.webhook_url) {
 
@@ -65,7 +66,7 @@ export default async function start() {
             account_id: account.id,
             invoice_uid: event.invoice_uid,
             type: event.type,
-            payload: event.payload,
+            payload: event.payload as any,
             createdAt: new Date(),
             updatedAt: new Date()
           }

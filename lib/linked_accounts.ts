@@ -1,107 +1,123 @@
 
-import { Orm } from './orm'
 
-import { models } from './models'
 
-import { accounts as Account } from '@prisma/client'
+import {
+  accounts as Account,
+  LinkedAccounts as LinkedAccount
+} from '@prisma/client'
 
 import { log } from './log'
+import prisma from './prisma';
 
 interface AccountLinks {
   source: LinkedAccount[];
   target: LinkedAccount[];
 }
 
-export async function listLinkedAccounts(account: Account, options: any={}): Promise<AccountLinks> {
-
-  let source = await models.LinkedAccount.findAll({
+export async function listLinkedAccounts(account: { id: number }, options: any = {}): Promise<{ target: any[]; source: any[] }> {
+  const source = await prisma.linkedAccounts.findMany({
     where: {
       source: account.id
     },
-    include: [{
-      model: models.Account,
-      as: 'source_account',
-      attributes: ['id', 'email']
-    }, {
-      model: models.Account,
-      as: 'target_account',
-      attributes: ['id', 'email']
-    }],
-    attributes: ['id']
-  })
+    include: {
+      source_account: {
+        select: {
+          id: true,
+          email: true
+        }
+      },
+      target_account: {
+        select: {
+          id: true,
+          email: true
+        }
+      }
+    },
 
-  let target = await models.LinkedAccount.findAll({
+  });
+
+  const target = await prisma.linkedAccounts.findMany({
     where: {
       target: account.id
     },
-    include: [{
-      model: models.Account,
-      as: 'source_account',
-      attributes: ['id', 'email']
-    }, {
-      model: models.Account,
-      as: 'target_account',
-      attributes: ['id', 'email']
-    }],
-    attributes: ['id']
-  })
+    include: {
+      source_account: {
+        select: {
+          id: true,
+          email: true
+        }
+      },
+      target_account: {
+        select: {
+          id: true,
+          email: true
+        }
+      }
+    },
+
+  });
 
   return {
-    target: target.map((record: any) => new LinkedAccount(record)),
-    source: source.map((record: any) => new LinkedAccount(record))
-  }
-
+    target: target,
+    source: source
+  };
 }
 
 export async function linkAccount(account: Account, { email }: { email: string }): Promise<LinkedAccount> {
 
-  let target = await models.Account.findOne({ where: { email }})
+  const target = await prisma.accounts.findFirstOrThrow({
+    where: { email }
+  });
 
-  if (!target) { throw new Error(`account not found with email ${email}`) }
-
-  let [record] = await models.LinkedAccount.findOrCreate({
-
+  let record = await prisma.linkedAccounts.findFirst({
     where: {
-
-      target: target.id,
-
-      source: account.id
-
+      source: account.id,
+      target: target.id
     }
+  });
 
-  })
+  if (!record) {
 
-  return new LinkedAccount(record)
+    record = await prisma.linkedAccounts.create({
+      data: {
+        source: account.id,
+        target: target.id,
+        createdAt : new Date(),
+        updatedAt : new Date()
+      }
+    });
+  }
+
+  return record
 
 }
 
 export async function unlinkAccount(account: Account, {id}: {id: string}): Promise<void> {
 
-  let link = await models.LinkedAccount.findOne({ where: { id }})
+  const link = await prisma.linkedAccounts.findFirst({
+    where: { id: parseInt(id) }
+  })
 
   log.info('accounts.unlink', { account_id: account.id, account_link_id: id })
 
-  if (link.target === account.id || link.source === account.id) {
+  if (link && link.target === account.id || link && link.source === account.id) {
 
-    await link.destroy()
-
-  }
-
-}
-
-export async function getLink({ source, target }: { source: number, target: number }): Promise<LinkedAccount | void> {
-
-  let record = await models.LinkedAccount.findOne({ where: { source, target }})
-
-  if (record) {
-
-    return new LinkedAccount(record)
+    await prisma.linkedAccounts.delete({
+      where: { id: link.id }    
+    })
 
   }
 
 }
 
-class LinkedAccount extends Orm {
+export async function getLink({ source, target }: { source: number, target: number }): Promise<LinkedAccount | null> {
+
+  return await prisma.linkedAccounts.findFirst({
+    where: {
+      source,
+      target
+    }
+  });
 
 }
 

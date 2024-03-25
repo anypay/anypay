@@ -35,7 +35,7 @@ export default class USDT_SOL extends SolanaPlugin {
 
   }
 
-  async verifyPayment(params): Promise<boolean> {
+  async verifyPayment(params: { paymentOption: any; transaction: Transaction; protocol?: string }): Promise<boolean> {
 
     throw new Error()//TODO
 

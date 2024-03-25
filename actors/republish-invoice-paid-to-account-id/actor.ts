@@ -22,8 +22,8 @@ require('dotenv').config();
 
 import { Actor, log, getChannel } from 'rabbi';
 
-import { models } from '../../lib';
 import { exchange, publish } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
 
 export async function start() {
 
@@ -43,15 +43,18 @@ export async function start() {
   .start(async (channel, msg, json) => {
 
     const { uid } = json
- 
-    let invoice = await models.Invoice.findOne({ where: { uid }});
 
+    const invoice = await prisma.invoices.findFirstOrThrow({
+      where: { uid }
+    });
+ 
     let routingKey1 = `accounts.${invoice.account_id}.invoicepaid`;
+    
     let routingKey2 = `accounts.${invoice.account_id}.invoice.paid`;
 
     await channel.publish(routingKey1, msg.content);
 
-    publish(routingKey2, invoice.toJSON())
+    publish(routingKey2, invoice)
 
   });
 

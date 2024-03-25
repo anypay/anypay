@@ -3,13 +3,11 @@ import { expect, generateAccount, newInvoice } from '../utils'
 
 import { confirmPayment, confirmPaymentByTxid, revertPayment } from '../../lib/confirmations'
 
-import { recordPayment, Payment } from './../../lib/payments'
-
-import { Invoice } from './../../lib/invoices'
-
-import { findOne } from './../../lib/orm'
+import { recordPayment } from './../../lib/payments'
 
 import { randomBytes } from 'crypto'
+
+import prisma from '../../lib/prisma'
 
 describe("Confirmations", () => {
 
@@ -35,7 +33,11 @@ describe("Confirmations", () => {
 
       const confirmation_date = new Date()
 
-      payment = await findOne<Payment>(Payment, { where: { txid }})
+      payment = await prisma.payments.findFirstOrThrow({
+        where: {
+          txid
+        }
+      })
 
       await confirmPayment({
         payment,
@@ -46,7 +48,11 @@ describe("Confirmations", () => {
         }
       })
 
-      payment = await findOne<Payment>(Payment, { where: { txid }})
+      payment = await prisma.payments.findFirstOrThrow({
+        where: {
+          txid
+        }
+      })
 
       expect(payment.get('confirmation_hash')).to.be.equal(confirmation_hash)
 
@@ -76,7 +82,14 @@ describe("Confirmations", () => {
         txhex: randomBytes(128).toString('hex')
       })
 
-      await invoice.set('hash', txid)
+      await prisma.invoices.update({
+        where: {
+          id: invoice.id
+        },
+        data: {
+          hash: txid
+        }
+      })
 
       const confirmation_hash = randomBytes(32).toString('hex')
 
@@ -93,17 +106,17 @@ describe("Confirmations", () => {
         }
       })
   
-      payment = await findOne<Payment>(Payment, {
+      payment = await prisma.payments.findFirstOrThrow({
         where: {
           txid
         }
       })
 
-      expect(payment.get('confirmation_hash')).to.be.equal(confirmation_hash)
+      expect(payment.confirmation_hash).to.be.equal(confirmation_hash)
 
-      expect(payment.get('confirmation_height')).to.be.equal(confirmation_height)
+      expect(payment.confirmation_height).to.be.equal(confirmation_height)
 
-      expect(payment.get('confirmation_date').toString()).to.be.equal(confirmation_date.toString())
+      expect(payment.confirmation_date?.toString()).to.be.equal(confirmation_date.toString())
 
     })
 
@@ -119,7 +132,7 @@ describe("Confirmations", () => {
 
       const txid = randomBytes(32).toString('hex')
 
-      const uid = invoice.get('uid')
+      const uid = invoice.uid
 
       let payment = await recordPayment(invoice, {
         txid,
@@ -127,29 +140,35 @@ describe("Confirmations", () => {
         txhex: randomBytes(128).toString('hex')
       })
 
-      await invoice.set('status', 'paid')
-
-      await invoice.set('hash', txid)
+      await prisma.invoices.update({
+        where: {
+          id: invoice.id
+        },
+        data: {
+          hash: txid,
+          status: 'paid'
+        }
+      })
 
       await revertPayment({ txid: payment.txid })
 
-      invoice = await findOne<Invoice>(Invoice, {
+      invoice = await prisma.invoices.findFirstOrThrow({
         where: {
           uid
         }
       })
 
-      payment = await findOne<Payment>(Payment, {
+      payment = await prisma.payments.findFirstOrThrow({
         where: {
           txid: payment.txid
         }
       })
 
-      expect(invoice.get('status')).to.be.equal('unpaid')
+      expect(invoice.status).to.be.equal('unpaid')
 
-      expect(invoice.get('hash')).to.be.equal(null)
+      expect(invoice.hash).to.be.equal(null)
 
-      expect(payment.get('status')).to.be.equal('failed')
+      expect(payment.status).to.be.equal('failed')
 
     })
 

@@ -4,10 +4,11 @@ import axios from 'axios'
 
 import { BigNumber } from 'bignumber.js'
 
+import { config } from '../config';
+
 const apiKey = config.get('ANYPAY_FIXER_ACCESS_KEY');
 
 import { Price } from './price'
-import { config } from '../config';
 
 export async function fetchCurrencies(base='USD'): Promise<Price[]> {
 

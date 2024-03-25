@@ -64,7 +64,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'WEBSOCKETS_PORT',
-    required: true,
+    required: false,
     default: '5201'
   },
   {
@@ -78,7 +78,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'API_BASE',
-    required: true,
+    required: false,
     default: 'https://api.anypayx.com'
   },
   {
@@ -95,53 +95,53 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'FIREBASE_SERVER_KEY',
-    required: true
+    required: false
   },
   {
     key: 'SENTRY_DSN',
-    required: true
+    required: false
   },
   {
     key: 'LOKI_ENABLED',
-    required: true,
+    required: false,
     default: 'false'
   },
   {
     key: 'LOKI_HOST',
-    required: true
+    required: false
   },
   {
     key: 'LOKI_LABEL_APP',
-    required: true
+    required: false
   },
   {
     key: 'LOKI_BASIC_AUTH',
-    required: true
+    required: false
   },
   {
     key: 'KRAKEN_AUTOSELL_INTERVAL',
-    required: true
+    required: false
   },
   {
     key: 'KRAKEN_WITHDRAWAL_KEY',
-    required: true
+    required: false
   },
   {
     key: 'ANYPAY_FIXER_ACCESS_KEY',
-    required: true
+    required: false
   },
   {
     key: 'ANYPAY_SLACK_CHANNEL_URL',
-    required: true
+    required: false
   },
   {
     key: 'ROCKETCHAT_WEBHOOK_URL',
-    required: true
+    required: false
   },
   {
     // Dynamic fees for BTC transactions from mempool.space
     key: 'MEMPOOL_SPACE_FEES_ENABLED',
-    required: true,
+    required: false,
     default: 'true'
   },
   {
@@ -151,7 +151,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'ANYPAY_WEBSOCKETS_URL',
-    required: true,
+    required: false,
     default: 'wss://wss.anypayx.com'
   },
   {
@@ -180,15 +180,15 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: "BLOCKCYPHER_WEBHOOK_TOKEN",
-    required: true
+    required: false
   },
   {
     key: 'COINMARKETCAP_API_KEY',
-    required: true,
+    required: false,
   },
   {
     key: 'CRYPTOAPIS_KEY',
-    required: true
+    required: false
   },
   {
     key: 'INFURA_POLYGON_URL',
@@ -266,7 +266,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'ALCHEMY_URL_SOLANA',
-    required: true
+    required: false
   },
   {
     key: 'SOLANA_PHANTOM_SEED',
@@ -403,8 +403,13 @@ export function initialize() {
   config.required(variables.filter(v => v.required).map(v => v.key))
 
   // Set defaults for optional environment variables
-  config.defaults(variables.filter(v => !!v.default).reduce((acc: any, v) => acc[v.key] = v.default, {}))
+  config.defaults(variables.filter(v => !!v.default).reduce((acc: any, v) => {
+    acc[v.key] = v.default;
+    return acc;
+  }, {}))
 
 }
+
+initialize()
 
 export { config } 

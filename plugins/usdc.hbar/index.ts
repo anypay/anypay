@@ -45,7 +45,7 @@ export default class USDC_HBAR extends Plugin {
 
   }
 
-  async verifyPayment(params): Promise<boolean> {
+  async verifyPayment(params: { paymentOption: any; transaction: Transaction; protocol?: string }): Promise<boolean> {
 
     throw new Error()//TODO
 

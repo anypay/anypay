@@ -22,8 +22,8 @@ require('dotenv').config();
 
 import { Actor, log } from 'rabbi';
 
-import { models } from '../../lib/models'
 import { exchange } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
 
 export async function start() {
 
@@ -43,14 +43,9 @@ export async function start() {
 
     const { uid } = json
 
-    const refund = await models.Refund.findOne({
-
-      where: {
-
-        refund_invoice_uid: uid
-
-      }
-  
+    const refund = await prisma.refunds.findFirstOrThrow({
+          
+          where: { refund_invoice_uid: uid }
     })
 
     if (!refund || refund.status === 'paid') {
@@ -59,25 +54,26 @@ export async function start() {
 
     }
 
-    const original_invoice = await models.Invoice.findOne({
-
-      where: { uid: refund.original_invoice_uid }
-
+    const original_invoice = await prisma.invoices.findFirstOrThrow({
+        
+        where: { uid: refund.original_invoice_uid }
+  
     })
 
-    const refund_invoice = await models.Invoice.findOne({
-
-      where: { uid }
-
+    const refund_invoice = await prisma.invoices.findFirstOrThrow({
+        
+        where: { uid }
     })
 
-    refund.txid = refund_invoice.hash;
+    await prisma.refunds.update({
+      where: { id: refund.id },
+      data: {
+        txid: refund_invoice.hash,
+        status: 'paid'
+      }
+    })
 
-    refund.status = 'paid';
-
-    await refund.save()
-
-    log.info('refund.paid', Object.assign(refund.toJSON(), {
+    log.info('refund.paid', Object.assign(refund, {
       account_id: original_invoice.account_id,
       invoice_uid: refund.original_invoice_uid
     }))

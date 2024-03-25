@@ -212,6 +212,9 @@ model LinkedAccounts {
   target    Int
   createdAt DateTime @db.Timestamptz(6)
   updatedAt DateTime @db.Timestamptz(6)
+
+  source_account accounts @relation("LinkedAccountSource", fields: [source], references: [id])
+  target_account accounts @relation("LinkedAccountTarget", fields: [target], references: [id])
 }
 
 model LogEvents {
@@ -231,32 +234,6 @@ model Logins {
   user_agent  String?  @db.VarChar(255)
   createdAt   DateTime @db.Timestamptz(6)
   updatedAt   DateTime @db.Timestamptz(6)
-}
-
-model MoneybuttonOauths {
-  id            Int      @id @default(autoincrement())
-  state         String?  @db.VarChar(255)
-  access_token  String?  @db.VarChar(255)
-  token_type    String?  @db.VarChar(255)
-  expires_in    Int?
-  refresh_token String?  @db.VarChar(255)
-  scope         String?  @db.VarChar(255)
-  createdAt     DateTime @db.Timestamptz(6)
-  updatedAt     DateTime @db.Timestamptz(6)
-}
-
-model MoneybuttonUsers {
-  id               Int       @id @default(autoincrement())
-  mb_id            Int?
-  mb_created_at    DateTime? @db.Timestamptz(6)
-  name             String?   @db.VarChar(255)
-  default_currency String?   @db.VarChar(255)
-  default_language String?   @db.VarChar(255)
-  bio              String?
-  primary_paymail  String?   @db.VarChar(255)
-  avatar_url       String?   @db.VarChar(255)
-  createdAt        DateTime  @db.Timestamptz(6)
-  updatedAt        DateTime  @db.Timestamptz(6)
 }
 
 model OauthApps {
@@ -510,6 +487,9 @@ model accounts {
   access_tokens             access_tokens[]
   extended_public_keys      extended_public_keys[]
   pair_tokens               pair_tokens[]
+
+  linkedAccountsAsSource LinkedAccounts[] @relation("LinkedAccountSource")
+  linkedAccountsAsTarget LinkedAccounts[] @relation("LinkedAccountTarget")
 }
 
 model address_routes {

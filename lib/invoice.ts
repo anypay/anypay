@@ -12,8 +12,6 @@ import * as _ from 'underscore';
 
 import { log } from './log'
 
-import { models } from './models';
-
 import {convert} from './prices';
 
 import {getCoin} from './coins';
@@ -210,7 +208,7 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
   let addresses: Address[] = await listAvailableAddresses(account)
 
-  let paymentOptions: PaymentOption[] = await Promise.all(addresses.map(async (record: Address) => {
+  let unfilteredOptions: (PaymentOption | null )[] = await Promise.all(addresses.map(async (record: Address) => {
 
     const chain = String(record.chain);
     const currency = String(record.currency);
@@ -228,7 +226,7 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
       let address = await getNewAddress({ account, address: record, currency, chain })
 
-      if (!address) { return }
+      if (!address) { return null }
 
       if (address.match(':')) {
         address = address.split(':')[1]
@@ -274,22 +272,20 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
       }, new BigNumber(0)).toNumber()
 
-      let optionRecord = await models.PaymentOption.create({
-        invoice_uid: invoice.uid,
-        currency,
-        chain,
-        amount,
-        address,
-        outputs,
-        uri,
-        fee: fee.amount
+      const optionRecord = await prisma.payment_options.create({
+        data: {
+          invoice_uid: String(invoice.uid),
+          currency,
+          chain,
+          amount,
+          address,
+          outputs,
+          uri,
+          fee: fee.amount,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
       })
-
-      if (!optionRecord){
-        console.error('no payment option record created', {currency,chain,amount,address,uid:invoice.uid,outputs,uri})
-        throw new Error('no payment option record created')
-        return null
-      }
 
       return optionRecord
 
@@ -303,7 +299,9 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
   }));
 
-  return paymentOptions.filter(option => !!option)
+  const paymentOptions: PaymentOption[] = unfilteredOptions.filter(option => !!option) as PaymentOption[]
+
+  return paymentOptions
 }
 
 export function isExpired(invoice: Invoice) {
@@ -316,7 +314,11 @@ export function isExpired(invoice: Invoice) {
 
 export async function ensureInvoice(uid: string): Promise<any> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid }});
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid
+    }
+  })
 
   if (!invoice) {
     throw  new Error(`invoice ${uid} not found`)

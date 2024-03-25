@@ -271,11 +271,13 @@ export function authHeaders(username:string, password:string, headers: any = {})
 //import { Wallet } from '@anypay/simple-wallet'
 //import { Wallet } from '/Users/zyler/Github/@anypay/simple-wallet'
 import { getBitcore } from '../lib/bitcore';
-import { Payment, recordPayment } from '../lib/payments';
+import { recordPayment } from '../lib/payments';
 import { createHash } from 'crypto';
 import prisma from '../lib/prisma';
 import { generateAccountToken } from '../lib/jwt';
 import { Request } from '@hapi/hapi';
+
+import { payments as Payment } from '@prisma/client'
 
 const WIF = config.get('ANYPAY_SIMPLE_WALLET_WIF') || new bsv.PrivateKey().toWIF()
 

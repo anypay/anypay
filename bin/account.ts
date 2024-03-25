@@ -19,13 +19,13 @@
 
 require('dotenv').config();
 
-import { models, log, accounts } from '../lib';
-import { Op } from 'sequelize'
+import { log, accounts } from '../lib';
 import { getSupportedCoins, near } from '../lib/accounts';
 import { registerAccount, setPositionFromLatLng } from '../lib/accounts';
 import { setAddress } from '../lib/core';
 
 import { Command } from 'commander';
+import prisma from '../lib/prisma';
 
 const program = new Command();
 
@@ -58,14 +58,16 @@ program
   .command('setpositions')
   .action(async () => {
 
-    let accounts = await models.Account.findAll({ where: {
-      latitude: {
-        [Op.ne]: null
-      },
-      position: {
-        [Op.eq]: null
+    const accounts = await prisma.accounts.findMany({
+      where: {
+        latitude: {
+          not: null
+        },
+        longitude: {
+          not: null
+        },
       }
-    }})
+    })
 
     for (let account of accounts) {
 
@@ -83,7 +85,9 @@ program
   .command('listcoins <email>')
   .action(async (email) => {
 
-    let account = await models.Account.findOne({ where: { email }});
+    let account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    })
 
     let coins = await getSupportedCoins(account.id); 
 
@@ -95,9 +99,11 @@ program
   .command('afterregistered <email>')
   .action(async (email) => {
 
-    let account = await models.Account.findOne({ where: { email }});
+    let account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    })
 
-    log.debug('account', account.toJSON())
+    log.debug('account', account)
 
   });
 
@@ -108,15 +114,28 @@ program
 
     try {
 
-      let account = await accounts.findByEmail(email)
+      let account = await prisma.accounts.findFirstOrThrow({
+        where: { email }
+      })
 
-      let params = {}
+      if (!account) {
 
-      params[attr] = value;
+        console.log(`account not found for email ${email}`);
 
-      account = await accounts.updateAccount(account, params)
+        process.exit(0);
 
-      console.log(account.toJSON());
+      }
+
+      account = await prisma.accounts.update({
+        where: {
+          id: account.id
+        },
+        data: {
+          [attr]: value
+        }
+      });
+
+      console.log(account);
 
     } catch(error) {
 
@@ -135,18 +154,33 @@ program
   .action(async (email, tag) => {
     try {
 
-      let account = await models.Account.findOne({ where: { email }});
+      const account = await prisma.accounts.findFirstOrThrow({
+        where: { email }
+      });
 
-      let [isNew] = await models.AccountTag.findOrCreate({
+      var isNew = false;
+
+      let accountTag = await prisma.account_tags.findFirst({
         where: {
-          account_id: account.id,
-          tag
-        },
-        defaults: {
           account_id: account.id,
           tag
         }
       });
+
+      if (!accountTag) {
+
+        isNew = true
+
+
+        await prisma.account_tags.create({
+          data: {
+            account_id: account.id,
+            tag,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
+        });
+      }
 
       if (isNew) {
 
@@ -158,7 +192,7 @@ program
 
       }
 
-    } catch(error) {
+    } catch(error: any) {
       
       console.error(error.message);
 
@@ -173,19 +207,18 @@ program
   .action(async (email, tag) => {
     try {
 
-      let account = await models.Account.findOne({ where: { email }});
+      const account = await prisma.accounts.findFirstOrThrow({
+        where: { email }
+      });
 
-      let record = await models.AccountTag.findOne({ where: {
+      await prisma.account_tags.deleteMany({
+        where: {
+          account_id: account.id,
+          tag
+        }
+      });
 
-        account_id: account.id,
-
-        tag
-
-      }});
-
-      await record.destroy();
-
-    } catch(error) {
+    } catch(error: any) {
       
       console.error(error.message);
 
@@ -200,7 +233,9 @@ program
   .command('getaccount <email>')
   .action(async (email) => {
 
-    let account = await models.Account.findOne({ where: { email }});
+    let account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    })
 
     if (!account) {
 
@@ -208,7 +243,7 @@ program
 
     } else {
 
-      log.info(`account found`, account.toJSON());
+      log.info(`account found`, account);
 
     }
 
@@ -217,16 +252,22 @@ program
   });
 
 program
-  .command('setaddress <email> <currency> <address>')
-  .action(async (email, currency, address) => {
+  .command('setaddress <email> <currency> <address> [chain]')
+  .action(async (email, currency, address, chain) => {
 
-    let account = await models.Account.findOne({ where: { email }});
+
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    
+    })
 
     await setAddress({
 
       account_id: account.id,
 
       currency,
+
+      chain: chain || currency,
 
       address
 
@@ -242,7 +283,9 @@ program
   .command('getaddress <email> <currency>')
   .action(async (email, currency) => {
 
-    let account = await models.Account.findOne({ where: { email }});
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    });
 
     let accountCoins = await getSupportedCoins(account.id);
 
@@ -258,7 +301,7 @@ program
 
     let account = await registerAccount(email, password);
 
-    log.info(account.toJSON());
+    log.info('account', account);
 
     process.exit(0);
 

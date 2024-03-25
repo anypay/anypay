@@ -47,7 +47,7 @@ export default class USDC_XLM extends Plugin {
 
   }
 
-  async verifyPayment(params) {
+  async verifyPayment(params: { paymentOption: any; transaction: Transaction; protocol?: string }): Promise<boolean> {
 
     return false
 

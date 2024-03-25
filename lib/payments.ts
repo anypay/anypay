@@ -5,49 +5,13 @@ import { invoices as Invoice } from '@prisma/client'
 
 import { accounts as Account } from '@prisma/client'
 
-import { Orm } from './orm'
+import { payments as Payment } from '@prisma/client'
 
 interface PaymentDetails {
   txid: string;
   currency: string;
   txhex: string;
   txjson?: any;
-}
-
-export class Payment extends Orm {
-
-  static model = models.Payment;
-
-  toJSON() {
-
-    return { 
-
-      currency: this.currency,
-
-      txid: this.txid,
-
-      createdAt: this.get('createdAt'),
-
-      tx_hex: this.get('txhex'),
-
-      tx_json: this.get('txjson')
-
-    }
-
-  }
-
-  get currency() {
-    return this.get('currency')
-  }
-
-  get chain() {
-    return this.get('chain')
-  }
-
-  get txid() {
-    return this.get('txid')
-  }
-
 }
 
 export async function recordPayment(invoice: Invoice, details: PaymentDetails): Promise<Payment> {
@@ -81,7 +45,7 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
     account_id: invoice.account_id
   }))
 
-  return new Payment(record)
+  return record
 
 }
 
@@ -93,7 +57,7 @@ export async function getPayment(invoice: Invoice): Promise<Payment | null> {
 
   if (!record) { return null}
 
-  return new Payment(record)
+  return record
 
 }
 

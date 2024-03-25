@@ -4,37 +4,28 @@ import { account, expect, newInvoice } from '../utils'
 import { cancelInvoice, getInvoice } from '../../lib/invoices'
 import { createEmptyInvoice, ensureInvoice, isExpired, refreshInvoice } from '../../lib/invoice'
 import { createApp } from '../../lib/apps'
+import { invoices as Invoice } from '@prisma/client'
 
 describe('lib/invoices', () => {
 
   it('should get the account for an invoice', async () => {
 
-    const invoice = await newInvoice()
+    const invoice = await newInvoice({ account: account })
 
     expect(invoice.account_id).to.be.a('number')
-    expect(invoice.denomination).to.be.a('string')
-    expect(invoice.payment).to.be.equal(undefined)
-    expect(invoice.refund).to.be.equal(undefined)
+    expect(invoice.denomination_currency).to.be.a('string')
     expect(invoice.status).to.be.equal('unpaid')
     expect(invoice.webhook_url).to.be.a('string')
-
-    const invoiceAccount = await invoice.getAccount()
-
-    expect(invoiceAccount.id).to.be.equal(invoice.account_id)
-
-    const invoiceJSON = invoice.toJSON()
-
-    expect(invoiceJSON.uid).to.be.equal(invoice.get('uid'))
 
   })
 
   it('#cancelInvoice should cancel an invoice', async () => {
 
-    let invoice = await newInvoice()
+    let invoice: Invoice | null = await newInvoice({ account })
 
     await cancelInvoice(invoice)
 
-    invoice = await getInvoice(invoice.uid)
+    invoice = await getInvoice(String(invoice.uid))
 
     expect(invoice.get('status')).to.be.equal('cancelled')
 
@@ -42,7 +33,7 @@ describe('lib/invoices', () => {
 
   it('#ensureInvoice should get an invoice', async () => {
 
-    let invoice = await newInvoice()
+    let invoice = await newInvoice({ account })
 
     invoice = await ensureInvoice(invoice.uid)
 

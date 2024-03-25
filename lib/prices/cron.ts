@@ -1,4 +1,5 @@
 
+import { config } from '../config';
 import { log } from '../log'
 
 import { setAllFiatPrices, setAllCryptoPrices } from './'
@@ -12,19 +13,23 @@ export async function start() {
 
   log.info('prices.cron.start')
 
-  fiatInterval = setInterval(async () => {
+  if (config.get('ANYPAY_FIXER_ACCESS_KEY')) {
 
-    try {
+    fiatInterval = setInterval(async () => {
 
-      await setAllFiatPrices()
+      try {
 
-    } catch(error: any) {
+        await setAllFiatPrices()
 
-      log.error('prices.cron.fiat.error', error)
+      } catch(error: any) {
 
-    }
+        log.error('prices.cron.fiat.error', error)
 
-  }, ONE_HOUR)
+      }
+
+    }, ONE_HOUR)
+    
+  }
 
   await setAllFiatPrices()
 

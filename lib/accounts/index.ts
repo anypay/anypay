@@ -1,14 +1,15 @@
 const bcrypt = require('bcryptjs');
 
-import { models } from '../models';
-
 import { log } from '../log';
 
 import * as database from '../database';
 
 import {getAddress, getSupportedCoins} from './supported_coins';
 import { accounts as Account } from '@prisma/client';
+import { access_tokens as AccessToken } from '@prisma/client';
 import prisma from '../prisma';
+
+import { v4 as uuidv4 } from 'uuid';
 
 interface AccountAddress {
   account_id: number;
@@ -59,9 +60,9 @@ export async function updateAccount(account: Account, payload: any): Promise<Acc
 
 export async function findAllWithTags(tags: string[]): Promise<any> {
 
-  const groups = await Promise.all(tags.map(async (tag) => {
+  const groups: number[][] = await Promise.all(tags.map(async (tag) => {
 
-    let tags = await models.AccountTag.findAll({
+    const tags = await prisma.account_tags.findMany({
       where: { tag }
     })
 
@@ -69,7 +70,7 @@ export async function findAllWithTags(tags: string[]): Promise<any> {
 
   }));
 
-  var intersection = groups.shift();
+  var intersection: any = groups.shift();
 
   groups.forEach(group => {
 
@@ -122,13 +123,16 @@ export async function create(email: string, password: string): Promise<any>{
 
 }
 
-export async function createAccessToken(accountId: number): Promise<any> {
+export async function createAccessToken(accountId: number): Promise<AccessToken> {
 
-  let accessToken = models.AccessToken.create({
-    account_id: accountId
+  return prisma.access_tokens.create({
+    data: {
+      account_id: accountId,
+      uid: uuidv4(),
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
   });
-
-  return accessToken;
 
 }
 
@@ -160,13 +164,22 @@ export async function setPhysicalAddress(account: Account, address: string): Pro
 
 export async function setAddressNote(account_id: number, currency: string, note: string) {
 
-  await models.Address.update({
-    note 
-  }, {
+  const address = await prisma.addresses.findFirstOrThrow({
     where: {
       account_id,
       currency
     }
+  });
+
+  await prisma.addresses.update({
+    where: {
+      id: address.id  
+    },
+    data: {
+      note,
+      updatedAt: new Date()
+    }
+  
   })
 
 }
