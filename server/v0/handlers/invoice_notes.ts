@@ -1,17 +1,14 @@
 
 import { ResponseToolkit } from '@hapi/hapi';
-import { models } from '../../../lib';
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
+import prisma from '../../../lib/prisma';
 
 export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let invoice = await models.Invoice.findOne({
-
+  const invoice = await prisma.invoices.findFirstOrThrow({
     where: {
-
       uid: request.params.invoice_uid,
       account_id: request.account.id
-
     }
   })
 
@@ -19,10 +16,14 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
   const { note: content } = request.payload as { note: string }
 
-  let note = await models.InvoiceNote.create({
-    invoice_uid: invoice.uid,
-    content,
-  });
+  const note = await prisma.invoice_notes.create({
+    data: {
+      invoice_uid: String(invoice.uid),
+      content,
+      created_at: new Date(),
+      updated_at: new Date()
+    }
+  })
 
   return {
 

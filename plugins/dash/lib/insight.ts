@@ -34,7 +34,7 @@ export async function broadcastTx(txhex: string): Promise<BroadcastTxResult> {
       success: true
     }
     
-  } catch(error) {
+  } catch(error: any) {
 
     console.log(error)
 

@@ -213,6 +213,8 @@ async function submitPayment(request: RequestWithInvoice, h: ResponseToolkit) {
 
   } catch(error: any) {
 
+    console.log(error)
+
     log.error('pay.jsonv2.payment.error', error)
 
     return badRequest(error)

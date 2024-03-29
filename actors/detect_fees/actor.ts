@@ -28,6 +28,7 @@ import { getPayment } from '../../lib/payments'
 
 import { getMiningFee } from '../../lib/fees'
 import { exchange } from '../../lib/amqp';
+import prisma from '../../lib/prisma';
 
 export async function start() {
 ``
@@ -52,11 +53,18 @@ export async function start() {
 
     log.info(invoice);
 
-    let fee = await getMiningFee(payment.currency, payment.get('txhex'))
+    let fee = await getMiningFee(payment.currency, String(payment.txhex))
 
-    await payment.set('total_input', fee.total_input)
-    await payment.set('total_output', fee.total_output)
-    await payment.set('network_fee', fee.network_fee)
+    await prisma.payments.update({
+      where: {
+        id: payment.id
+      },
+      data: {
+        total_input: fee.total_input,
+        total_output: fee.total_output,
+        network_fee: fee.network_fee
+      }
+    })
 
   });
 

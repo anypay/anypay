@@ -1,8 +1,6 @@
 
 import * as Joi from 'joi'
 
-import { models } from '../../../lib'
-
 import { Server } from '@hapi/hapi'
 
 import { v0, failAction } from '../../handlers'
@@ -39,7 +37,6 @@ export async function register(server: Server) {
     options: {
       auth: "password",
       tags: ['v0', 'sessions'],
-      plugins: responsesWithSuccess({ model: models.AccessToken.Response })
     }
   });
 
@@ -304,7 +301,6 @@ export async function register(server: Server) {
     options: {
       auth: "token",
       tags: ['v0', 'accounts'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
     }
   });
 
@@ -325,7 +321,6 @@ export async function register(server: Server) {
     options: {
       tags: ['v0', 'coins'],
       auth: "token",
-      plugins: responsesWithSuccess({ model: v0.Coins.CoinsIndexResponse }),
     }
   });
 
@@ -431,10 +426,12 @@ export async function register(server: Server) {
     options: {
       tags: ['v0', 'accounts'],
       validate: {
-        payload: models.Account.Credentials,
+        payload: Joi.object({
+          email: Joi.string().email().required(),
+          password: Joi.string().required()
+        }).label('Credentials'),
         failAction
       },
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 

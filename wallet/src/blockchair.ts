@@ -113,6 +113,8 @@ export async function listUnspent(asset: string, address: string): Promise<Utxo[
 
 export async function getRawTx(asset: string, txid: string): Promise<any> {
 
+  console.log('blockchair.api.getRawTx', { asset, txid })
+
   try {
 
     const currency = currencies[asset]

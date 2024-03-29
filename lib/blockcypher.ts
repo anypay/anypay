@@ -27,17 +27,13 @@ import { BroadcastTxResult } from './plugin';
 
 import { config } from './config';
 
-import {models} from './models';
-
 import { publish as publishAMQP } from 'rabbi'
-
-import { Op } from 'sequelize'
 
 import { sendWebhookForInvoice } from './webhooks';
 
 import { registerSchema } from './amqp';
 
-import * as Joi from 'joi'
+import { z } from 'zod'
 
 const token = config.get('BLOCKCYPHER_TOKEN');
 
@@ -160,23 +156,16 @@ export async function getTransaction(chain: string, txid: string): Promise<GetTr
 
 }
 
-registerSchema('payment.confirmed', Joi.object({
-  uid: Joi.string().required(),
-  txid: Joi.string().required(),
-  currency: Joi.string().required(),
-  amount: Joi.number().required(),
-  invoice_uid: Joi.string().required(),
-  confirmation_date: Joi.string().required(),
-  confirmation_height: Joi.number().required(),
-  confirmation_hash: Joi.string().required()
-}).required())
-
-
-registerSchema('invoice.paid', Joi.object({
-  uid: Joi.string().required(),
-  status: Joi.string().valid('paid').required(),
-  timestamp: Joi.date().timestamp().required(),
-}).required())
+registerSchema('invoice.paid', z.object({
+  uid: z.string(),
+  txid: z.string(),
+  currency: z.string(),
+  amount: z.number(),
+  invoice_uid: z.string(),
+  confirmation_date: z.string(),
+  confirmation_height: z.number(),
+  confirmation_hash: z.string()
+}))
 
 export async function confirmTransaction(payment: Payment, transaction?: GetTransactionResult) {
 
@@ -249,11 +238,11 @@ export async function confirmTransactionsFromBlock(hash: string) {
     const { txids } = data
 
     newTransactions = txids
-  
-    const payments = await models.Payment.findAll({
+
+    const payments = await prisma.payments.findMany({
       where: {
         txid: {
-          [Op.in]: txids
+          in: txids
         }
       }
     })

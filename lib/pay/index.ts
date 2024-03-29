@@ -1,11 +1,10 @@
 //@ts-ignore
 import * as BIP70Protocol from 'bip70-payment-protocol';
 
-import * as Joi from 'joi'
-
 export { BIP70Protocol }
 
 import { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest, GetCurrency } from './types';
+
 export { VerifyPayment, PaymentOutput, PaymentOption, Currency, PaymentRequest }
 
 import { Transaction } from '../plugin'
@@ -15,14 +14,14 @@ import { log } from '../log'
 
 import { invoices as Invoice } from '@prisma/client'
 
-import { models } from '../models'
-
 import { getBitcore } from '../bitcore';
+
 import { sendWebhookForInvoice } from '../webhooks';
 
-
 import * as bip70 from './bip70';
+
 import * as bip270 from './bip_270';
+
 import * as jsonV2 from './json_v2';
 
 import * as fees from './fees';
@@ -153,21 +152,12 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
 
   log.info('paymentrequest.build', params)
 
-  let paymentOption = await models.PaymentOption.findOne({
+  const paymentOption = await prisma.payment_options.findFirstOrThrow({
     where: {
       invoice_uid: params.uid,
       currency: params.currency
     }
-  });
-
-  if (!paymentOption) {
-
-    const error = new Error('payment option not found')
-
-    log.error('payment-option.missing', error)
-
-    throw error
-  }
+  })
   
   let invoice = await prisma.invoices.findFirstOrThrow({
     where: {
@@ -175,12 +165,17 @@ export async function buildPaymentRequestForInvoice(params: PaymentRequestForInv
     }
   })
 
-  paymentOption = Object.assign(paymentOption, {
-    protocol: params.protocol
-  })
-
   let paymentRequest = await buildPaymentRequest({
-    paymentOption,
+    paymentOption: {
+      invoice_uid: paymentOption.invoice_uid,
+      chain: paymentOption.chain,
+      currency: paymentOption.currency,
+      address: String(paymentOption.address),
+      amount: Number(paymentOption.amount),
+      outputs: paymentOption.outputs as any[],
+      protocol: params.protocol,
+
+    },
     invoice
   });
 
@@ -318,17 +313,19 @@ export function verifyOutput(outputs: any[], targetAddress: any, targetAmount: n
 
 }
 
-registerSchema('payment.confirming', Joi.object({
-  txid: Joi.string().required(),
-  currency: Joi.string().required(),
-  chain: Joi.string().required(),
-  txjson: Joi.object().required(),
-  txhex: Joi.string().required(),
-  tx_key: Joi.string().required(),
-  payment_option_id: Joi.number().required(),
-  invoice_uid: Joi.string().required(),
-  account_id: Joi.number().required()
-}).required())
+import { z } from 'zod'
+
+registerSchema('payment.confirming', z.object({
+  txid: z.string(),
+  currency: z.string(),
+  chain: z.string(),
+  txjson: z.any(),
+  txhex: z.string(),
+  tx_key: z.string(),
+  payment_option_id: z.number(),
+  invoice_uid: z.string(),
+  account_id: z.number()
+}))
 
 export async function handleUnconfirmedPayment(paymentOption: { id?: any; amount?: any; currency: any; address?: any; chain?: any; invoice_uid?: any; }, transaction: Transaction) {
 
@@ -419,6 +416,8 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
       uid: invoice_uid
     }
   })
+  
+  console.log({invoice})
 
   const paymentRecord = await prisma.payments.create({
     data: {
@@ -434,6 +433,8 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
       updatedAt: new Date()
     }
   })
+
+  console.log({paymentRecord})
 
   await prisma.invoices.update({
     where: { id: invoice.id },

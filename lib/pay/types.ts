@@ -10,8 +10,8 @@ export interface PaymentOption {
   invoice_uid: string;
   chain: string;
   currency: string;
-  address?: string;
-  amount: number;
+  address: string | null;
+  amount?: number;
   protocol?: string;
   fee?: number;
   createdAt?: Date;

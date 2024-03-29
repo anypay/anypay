@@ -41,38 +41,9 @@ import { v0, failAction } from '../handlers'
 
 import * as Joi from 'joi';
 
-import { models } from '../../lib'
-
 import { register as merchant_app } from './plugins/merchant_app'
 
 import { schema } from 'anypay'
-
-const kBadRequestSchema = Joi.object({
-  statusCode: Joi.number().integer().required(),
-  error: Joi.string().required(),
-  message: Joi.string().required()
-}).label('BoomError')
-
-function responsesWithSuccess({ model }: { model: any }) {
-  return {
-    'hapi-swagger': {
-      responses: {
-        200: {
-          description: 'Success',
-          schema: model
-        },
-        400: {
-          description: 'Bad Request',
-          schema: kBadRequestSchema,
-        },
-        401: {
-          description: 'Unauthorized',
-          schema: kBadRequestSchema,
-        },
-      },
-    },
-  }
-}
 
 const server = new Hapi.Server({
   host: config.get('HOST') || "0.0.0.0",
@@ -371,7 +342,6 @@ async function Server() {
         }),
         failAction
       },
-      plugins: responsesWithSuccess({ model: models.Invoice.Response })
     }
   });
 
@@ -429,7 +399,6 @@ async function Server() {
     handler: v0.Accounts.showPublic,
     options: {
       tags: ['v0', 'accounts'],
-      plugins: responsesWithSuccess({ model: models.Account.Response }),
     },
   });
 
@@ -466,14 +435,6 @@ async function Server() {
     }
   });
 
-  server.route({
-    method: 'GET',
-    path: '/search/accounts/near/{latitude}/{longitude}',
-    handler: v0.Accounts.nearby,
-    options: {
-      tags: ['v0']
-    }
-  }); 
 
   await attachV1Routes(server)
 

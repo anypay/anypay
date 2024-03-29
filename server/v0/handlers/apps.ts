@@ -1,16 +1,17 @@
 
 import { ResponseToolkit } from '@hapi/hapi'
-import { models, apps } from '../../../lib'
+import { apps } from '../../../lib'
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { notFound } from '@hapi/boom'
+import prisma from '../../../lib/prisma'
 
 export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let apps = await models.App.findAll({ where: {
-  
-    account_id: request.account.id
-
-  }})
+  const apps = await prisma.apps.findMany({
+    where: {
+      account_id: request.account.id
+    }
+  })
 
   return  { apps }
 
@@ -18,13 +19,12 @@ export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
 export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let app = await models.App.findOne({ where: {
-  
-    account_id: request.account.id,
-
-    id: request.params.id
-
-  }})
+  const app = await prisma.apps.findFirst({
+    where: {
+      account_id: request.account.id,
+      id: request.params.id
+    }
+  })
 
   if (!app) {
 

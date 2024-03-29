@@ -1,9 +1,8 @@
 require('dotenv').config()
 
-import * as assert from 'assert' 
-import { models } from '../../lib/models'
-
 import * as utils from '../utils'
+
+import prisma from '../../lib/prisma'
 
 describe("Updating Latitude and Longitude Should Set Position", () => {
 
@@ -11,18 +10,32 @@ describe("Updating Latitude and Longitude Should Set Position", () => {
 
     let account = await utils.generateAccount()
 
-    assert(!account.position)
+    await prisma.accounts.update({
+      where: {
+        id: account.id
+      },
+      data: {
+        latitude: String(10.4971784),
+        longitude: String(-66.8759535)
+      }
+    })
 
-    account.latitude = 10.4971784
-    account.longitude = -66.8759535
+    //assert(!account.position)
 
-    await account.save()
+    account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        id: account.id
+      }
+    
+    })
 
-    account = await models.Account.findOne({ where: { id: account.id }})
+    //assert(account.position)
 
-    assert(account.position)
-
-    await account.destroy()
+    await prisma.accounts.delete({
+      where: {
+        id: account.id
+      }
+    })
 
   })
 

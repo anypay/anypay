@@ -1,15 +1,11 @@
 
 import { createAccount, expect } from '../utils'
 
-import { findOrCreateWalletBot } from '../../apps/wallet-bot'
+import { createInvoice, findOrCreateWalletBot } from '../../apps/wallet-bot'
 
 import { refreshInvoice } from '../../lib/invoice'
 
-import { findOne } from '../../lib/orm'
-
-import { Invoice } from '../../lib/invoices'
-
-import { models } from '../../lib/models'
+import prisma from '../../lib/prisma'
 
 describe("Refreshing Invoice Payment Options", () => {
 
@@ -19,7 +15,7 @@ describe("Refreshing Invoice Payment Options", () => {
 
       const { walletBot } = await findOrCreateWalletBot(account)
 
-      const paymentRequest = await walletBot.createInvoice({
+      const paymentRequest = await createInvoice(walletBot, {
         template: {
           currency: 'BSV',
           to: {
@@ -30,32 +26,40 @@ describe("Refreshing Invoice Payment Options", () => {
         }
       })
 
-      const invoice = await findOne<Invoice>(Invoice, {
-        where:{ uid: paymentRequest.invoice_uid }
-        
-      })
-
-      const originalPaymentOptions = await models.PaymentOption.findAll({
+      const invoice = await prisma.invoices.findFirstOrThrow({
         where: {
-          invoice_uid: paymentRequest.invoice_uid
+          uid: paymentRequest.invoice_uid
         }
       })
 
-      await refreshInvoice(invoice.uid)
-
-      const newPaymentOptions = await models.PaymentOption.findAll({
+      const originalPaymentOptions = await prisma.payment_options.findMany({
         where: {
-          invoice_uid: paymentRequest.invoice_uid
+          invoice_uid: String(paymentRequest.invoice_uid)
         }
       })
+
+      await refreshInvoice(String(invoice.uid))
+
+      const newPaymentOptions = await prisma.payment_options.findMany({
+        where: {
+          invoice_uid: String(paymentRequest.invoice_uid)
+        }
+      })
+
 
       expect(newPaymentOptions.length).equals(originalPaymentOptions.length)
 
       originalPaymentOptions.forEach((option, optionIndex) => {
 
-        option.outputs.forEach((oldOutput, outputIndex) => {
+        const outputs = option.outputs as Array<any> || []
 
-          const newOutput = newPaymentOptions[optionIndex].outputs[outputIndex]
+        outputs.forEach((oldOutput, outputIndex) => {
+
+          const newOption = newPaymentOptions[optionIndex]
+
+          const newOutputs = newOption.outputs as Array<any>
+
+          const newOutput = newOutputs[outputIndex]
 
           expect(oldOutput.address)
             .equals(newOutput.address)

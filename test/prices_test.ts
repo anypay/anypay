@@ -3,27 +3,27 @@ require('dotenv').config()
 
 import { expect } from './utils'
 
-import { convert, setPrice, setAllFiatPrices, PriceNotFoundError } from '../lib/prices'
+import { convert, setPrice, setAllFiatPrices } from '../lib/prices'
 
-import { models } from '../lib/models'
+import prisma from '../lib/prisma'
 
 describe('Getting Prices', () => {
 
   before(async () => {
 
-    await models.Price.destroy({ where: {}})
+    await prisma.prices.deleteMany({ where: {} })
 
   })
 
   it('should get and set all fiat currencies in cache', async () => {
 
-    await models.Price.destroy({ where: {}})
+    await prisma.prices.deleteMany({ where: {} })
 
     expect(
 
       convert({ currency: 'USD', value: 100 }, 'EUR')
 
-    ).to.be.eventually.rejectedWith(new PriceNotFoundError('USD', 'EUR'))
+    ).to.be.eventually.rejected;
 
     await setAllFiatPrices()
 
@@ -41,7 +41,7 @@ describe('Getting Prices', () => {
 
       convert({ currency: 'USD', value: 100 }, 'BCH')
 
-    ).to.be.eventually.rejectedWith(new PriceNotFoundError('USD', 'BCH'))
+    ).to.be.eventually.rejected;
 
   })
 

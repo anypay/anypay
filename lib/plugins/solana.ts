@@ -7,9 +7,9 @@ import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Plugin } fro
 
 export default abstract class SolanaPlugin extends Plugin {
 
-  providerURL: string;
+  providerURL: string = '';
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     let connection = new Connection(clusterApiUrl("mainnet-beta"), "finalized");
 
@@ -19,17 +19,17 @@ export default abstract class SolanaPlugin extends Plugin {
 
     console.log({ signatureStatus })
 
-    const slot = signatureStatus.value.slot
+    const slot = signatureStatus.value?.slot
 
     console.log({ slot })
 
-    if (!slot) { return }
+    if (!slot) { return null }
 
     let block: any = await connection.getBlock(slot, {
       maxSupportedTransactionVersion: 2
     });
 
-    if (!block || !block.blockhash) { return }
+    if (!block || !block.blockhash) { return null }
 
     return {
       confirmation_hash: block.blockhash,

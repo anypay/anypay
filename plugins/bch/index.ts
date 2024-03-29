@@ -98,9 +98,15 @@ export default class BCH extends Plugin {
     })
     .filter((n: null) => n != null)
 
-    console.log("payment.verify.txoutputs", txOutputs);
-
-    let outputs = await buildOutputs(params.paymentOption, 'JSONV2');
+    let outputs = await buildOutputs({
+      invoice_uid: params.paymentOption.invoice_uid,
+      chain: params.paymentOption.chain as string,
+      currency: params.paymentOption.currency,
+      address: params.paymentOption.address as string,
+      amount: Number(params.paymentOption.amount),
+      fee: Number(params.paymentOption.fee),
+      outputs: params.paymentOption.outputs as any
+    }, 'JSONV2');
 
     for (let output of outputs) {
 

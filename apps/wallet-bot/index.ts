@@ -6,18 +6,21 @@ import {
   access_tokens as AccessToken,
   invoices as Invoice,
   WalletBots,
+  WalletBots as WalletBot,
   AddressBalanceUpdates as AddressBalanceUpdate,
   
 } from '@prisma/client'
 
+export { WalletBot }
+
 import { log } from '../../lib/log'
 
-import { database } from '../../lib';
+//import { database } from '../../lib';
 
-import { createPaymentRequest } from '../../lib/payment_requests';
+import { createPaymentRequest as _createPaymentRequest } from '../../lib/payment_requests';
 import { PaymentRequests as PaymentRequest } from '@prisma/client'
 
-import { cancelInvoice, ensureInvoice } from '../../lib/invoices';
+import { cancelInvoice as _cancelInvoice } from '../../lib/invoices';
 
 import { BigNumber } from 'bignumber.js'
 
@@ -100,78 +103,61 @@ interface ListInvoices {
   limit?: number;
 }
 
-export class WalletBot {
+export async function createInvoice(walletBot: WalletBots, { template, options}: CreateInvoice): Promise<PaymentRequest> {
 
-  app_id?: number;
-  record: WalletBots
+  log.info('wallet-bot.createInvoice', { template, options })
 
-  constructor(record: WalletBots) {
+  const to = Array.isArray(template.to) ? template.to : [template.to]
+
+  if (!walletBot.app_id) {
       
-      this.record = record
+      throw new Error('WalletBotNotAuthorized')
   }
 
-  static async find(query: any): Promise<WalletBots[]> {
+  let result = await _createPaymentRequest(
+    walletBot.app_id,
+    [{
+      currency: template.currency,
+      to
+    }],
+    options
+  )
 
-    const records = await prisma.walletBots.findMany({
-      where: query
-    })
+  log.info('wallet-bot.createInvoice.result', { template, options, result })
 
-    return records
+  return result
 
-  }
+}
 
-  async getInvoice(uid: string): Promise<Invoice> {
+export async function getInvoice(walletBot: WalletBots, uid: string): Promise<Invoice> {
 
-    let invoice = await ensureInvoice(uid)
-
-
-    if (invoice.app_id !== this.record.app_id) {
-
-      throw new Error("WalletBotGetInvoiceNotAuthorized")
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid
     }
+  })
 
-    return invoice
-
-  }
-
-  async createInvoice({ template: invoiceTemplate, options}: CreateInvoice): Promise<PaymentRequest> {
-
-    log.info('wallet-bot.createInvoice', { template: invoiceTemplate, options })
-
-    const to = Array.isArray(invoiceTemplate.to) ? invoiceTemplate.to : [invoiceTemplate.to]
-
-    if (!this.record.app_id) {
-        
-        throw new Error('WalletBotNotAuthorized')
-    }
-
-    let result = await createPaymentRequest(
-      this.record.app_id,
-      [{
-        currency: invoiceTemplate.currency,
-        to
-      }],
-      options
-    )
-
-    log.info('wallet-bot.createInvoice.result', { template: invoiceTemplate, options, result })
+  if (invoice.app_id != walletBot.app_id) {
+      
+      throw new Error('WalletBotNotAuthorized')
   
-    return result
+    }
+  return invoice
 
-  }
+}
 
-  async listLatestBalances(): Promise<AddressBalanceUpdate[]> {
-
+export async function listLatestBalances(walletBot: WalletBots): Promise<AddressBalanceUpdate[]> {
+  
     const updates = await prisma.addressBalanceUpdates.groupBy({
       by: ['chain', 'currency'],
       _count: true,
     });
-
-    const balances = await Promise.all(updates.map(update => {
-
+  
+    const balances = await Promise.all(updates.map((update: any) => {
+  
       return prisma.addressBalanceUpdates.findFirstOrThrow({
         where: {
-          wallet_bot_id: this.record.id,
+          wallet_bot_id: walletBot.id,
           chain: update.chain,
           currency: update.currency
         },
@@ -179,139 +165,119 @@ export class WalletBot {
           createdAt: 'desc'
         }
       })
-
     }))
+  
 
     return balances
-    
+  
+}
+
+export async function listInvoices(walletBot: WalletBots, { status, currency, offset, limit }: ListInvoices = {}): Promise<Invoice[]> {
+
+  const where: {
+    status?: string,
+    currency?: string
+  } = {}
+
+  if (status) {
+    where['status'] = status
   }
 
-  async listInvoices({ status, currency, offset, limit }: ListInvoices = {}): Promise<Invoice[]> {
-
-    const where: {
-      status?: string,
-      currency?: string
-    } = {}
-
-    if (status) {
-      where['status'] = status
-    }
-
-    if (currency) {
-      where['currency'] = currency
-    }
-
-    return prisma.invoices.findMany({
-      where,
-      take: limit || 100,
-      skip: offset
-    })
-
+  if (currency) {
+    where['currency'] = currency
   }
 
-  async createPaymentRequest({ template, options}: any): Promise<PaymentRequest> {
+  return prisma.invoices.findMany({
+    where,
+    take: limit || 100,
+    skip: offset
+  })
 
-    log.info('wallet-bot.createPaymentRequest', { template, options })
+}
 
-    let result = await createPaymentRequest(
-        Number(this.record.app_id),
-        template,
-        options   
-    )
+export async function createPaymentRequest(walletBot: WalletBots, { template, options}: any): Promise<PaymentRequest> {
+  log.info('wallet-bot.createPaymentRequest', { template, options })
 
-    log.info('wallet-bot.createPaymentRequest.result', { template, options })
+  let result = await _createPaymentRequest(
+      Number(walletBot.app_id),
+      template,
+      options   
+  )
 
-    return result
-  }
+  log.info('wallet-bot.createPaymentRequest.result', { template, options })
 
+  return result
+}
 
-  async cancelInvoice(uid: string): Promise<Invoice> {
-
-    let invoice = await ensureInvoice(uid)
-
-    if (invoice.app_id !== this.record.app_id) {
-
-      throw new Error("WalletBotCancelInvoiceNotAuthorized")
-      
-    }
-
-    return cancelInvoice(invoice)
-  }
-
-  async getAddressHistory({
-    address,
-    currency,
-    chain,
-    limit=100,
-    offset=0,
-    order='desc'
-  }: {
-    address: string,
-    chain: string,
-    currency: string,
-    limit?: number;
-    offset?: number;
-    order?: string;
-  }): Promise<AddressBalanceUpdate[]> {
-
-    const updates = await prisma.addressBalanceUpdates.findMany({
+export async function cancelInvoice(walletbot: WalletBots, uid: string): Promise<Invoice> {
+  
+    let invoice = await prisma.invoices.findFirstOrThrow({
       where: {
-        address,
-        currency,
-        chain,
-        wallet_bot_id: this.record.id
-      },
-      take: limit,
-      skip: offset,
-      orderBy: {
-        createdAt: 'desc'
+        uid
       }
     })
+  
+    if (invoice.app_id !== walletbot.app_id) {
+  
+      throw new Error('WalletBotNotAuthorized')
+    }
+  
+    return _cancelInvoice(invoice)
+  
+}
 
-    return updates
+export async function getAddressHistory(walletBot: WalletBots, { address, currency, chain}: { address: string, currency: string, chain: string }): Promise<AddressBalanceUpdate[]> {
 
-  }
+  return prisma.addressBalanceUpdates.findMany({
+    where: {
+      address,
+      currency,
+      chain,
+      wallet_bot_id: walletBot.id
+    }
+  })
 
-  async setAddressBalance(params: SetAddressBalance): Promise<[AddressBalanceUpdate, boolean]> {
+}
 
-    const { chain, currency, balance, address } = params
+export async function setAddressBalance(walletBot: WalletBots, params: SetAddressBalance): Promise<[AddressBalanceUpdate, boolean]> {
 
-    const latest = await prisma.addressBalanceUpdates.findFirst({
-      where: {
-        chain,
-        currency,
-        address,
-        wallet_bot_id: this.record.id
-      }
-    })
+  const { chain, currency, balance, address } = params
 
-    if (latest) {
+  const latest = await prisma.addressBalanceUpdates.findFirst({
+    where: {
+      chain,
+      currency,
+      address,
+      wallet_bot_id: walletBot.id
+    }
+  })
 
-      let difference = new BigNumber(balance).minus(Number(latest.balance)).toNumber()
+  if (latest) {
 
-      if (difference === 0) {
+    let difference = new BigNumber(balance).minus(Number(latest.balance)).toNumber()
 
-        return [latest, false]
+    if (difference === 0) {
 
-      }
+      return [latest, false]
 
     }
 
-    const update = await prisma.addressBalanceUpdates.create({
-      data: {
-        chain,
-        currency,
-        address,
-        balance,
-        wallet_bot_id: this.record.id,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    })
-
-    return [update, true]
-
   }
+
+  const update = await prisma.addressBalanceUpdates.create({
+    data: {
+      chain,
+      currency,
+      address,
+      balance,
+      wallet_bot_id: walletBot.id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
+
+  return [update, true]
+
 
 }
 
@@ -320,6 +286,8 @@ export async function loadFromApp({ app }: { app: App }): Promise<WalletBots> {
   if (app.name !== APP_NAME) {
     throw new Error('Invalid Access Token')
   }
+
+  console.log('CORRECT APP NAME', app)
 
   return prisma.walletBots.findFirstOrThrow({
     where: {
@@ -458,12 +426,12 @@ export async function findOrCreateWalletBot(account: Account): Promise<{walletBo
 
 }
 
-export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken> {
+export async function getAccessToken(walletBot: WalletBots): Promise<AccessToken> {
 
   let record = await prisma.access_tokens.findFirst({
     where: {
-      account_id: Number(walletBot.record.account_id),
-      app_id: walletBot.record.app_id
+      account_id: Number(walletBot.account_id),
+      app_id: walletBot.app_id
     }
   })
 
@@ -471,8 +439,8 @@ export async function getAccessToken(walletBot: WalletBot): Promise<AccessToken>
       
       record = await prisma.access_tokens.create({
         data: {
-          account_id: Number(walletBot.record.account_id),
-          app_id: walletBot.record.app_id,
+          account_id: Number(walletBot.account_id),
+          app_id: walletBot.app_id,
           uid: uuid.v4(),
           createdAt: new Date(),
           updatedAt: new Date()
@@ -490,7 +458,15 @@ interface PaymentsCounts {
   unpaid: number;
 }
 
-export async function getPaymentCounts(walletBot: WalletBot): Promise<PaymentsCounts> {
+export async function getPaymentCounts(walletBot: WalletBots): Promise<PaymentsCounts> {
+
+  return {
+    cancelled: 0,
+    paid: 0,
+    unpaid: 0
+  }
+
+  /*
 
   let results = await database.query(`select count(*), status from invoices where app_id = ${walletBot.app_id} group by status`)
 
@@ -535,6 +511,8 @@ export async function getPaymentCounts(walletBot: WalletBot): Promise<PaymentsCo
     paid,
     unpaid
   }
+
+  */
 
 }
 

@@ -1,12 +1,15 @@
 
 import { buildPaymentRequestForInvoice, detectWallet } from '../../../lib/pay';
 
-import { log, models } from '../../../lib';
+import { log } from '../../../lib';
 
 import { submitPayment, SubmitPaymentResponse } from '../../../lib/pay/json_v2/protocol';
 import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from '../../../lib/prisma';
 
 export async function show(request: Request, h: ResponseToolkit) {
+
+  console.log('bsv.bip270.show', request.params.uid)
 
   let { content } = await buildPaymentRequestForInvoice({
     uid: request.params.uid,
@@ -30,9 +33,11 @@ export async function create(request: Request, h: ResponseToolkit) {
     headers: request.headers,
     payload: request.payload
   })
-
-  let invoice = await models.Invoice.findOne({
-    where: { uid: request.params.uid }
+  
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: request.params.uid
+    }
   })
 
   const payload = request.payload as {

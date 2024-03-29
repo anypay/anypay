@@ -4,8 +4,8 @@ import { resetPasswordByEmail, sendPasswordResetEmail } from '../../../lib/passw
 
 import * as Joi from 'joi'
 
-import { models } from '../../../lib';
 import { Request } from '@hapi/hapi';
+import prisma from '../../../lib/prisma';
 
 export async function reset (request: Request) {
 
@@ -19,8 +19,11 @@ export async function reset (request: Request) {
 
 export async function claim(request: Request) {
 
-  let passwordReset = await models.PasswordReset.findOne({ where:
-    { uid: request.params.uid }
+
+  const passwordReset = await prisma.password_resets.findFirst({
+    where: {
+      uid: request.params.uid
+    }
   })
 
   if (!passwordReset) {
@@ -29,7 +32,7 @@ export async function claim(request: Request) {
 
   const { password } = request.payload as { password: string }
 
-  await resetPasswordByEmail(passwordReset.email, password);
+  await resetPasswordByEmail(String(passwordReset.email), password);
 
   return { success: true };
 

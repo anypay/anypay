@@ -2,7 +2,6 @@
 import { setAddress } from '../../../lib/core';
 import { log } from '../../../lib';
 
-import { models } from '../../../lib';
 import { ResponseToolkit } from '@hapi/hapi';
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 import { badRequest } from '@hapi/boom';
@@ -12,14 +11,21 @@ import { addresses as Address } from '@prisma/client'
 
 export async function destroy(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let address = await models.Address.findOne({ where: {
-    account_id: request.account.id,
-    currency: request.params.currency,
-    chain: request.params.currency
-  }})
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: request.account.id,
+      currency: request.params.currency,
+      chain: request.params.currency
+    }
+  })
 
   if (address) {
-    await address.destroy()
+
+    await prisma.addresses.delete({
+      where: {
+        id: address.id
+      }
+    })
   }
 
   return { success: true };
@@ -51,12 +57,12 @@ export async function list(request: AuthenticatedRequest, h: ResponseToolkit) {
 
 export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  let addresses = await models.Address.findAll({
-
-    where: { account_id: request.account.id }
-
+  const addresses = await prisma.addresses.findMany({
+    where: {
+      account_id: request.account.id
+    }
   })
-  
+
   return { addresses };
 
 };

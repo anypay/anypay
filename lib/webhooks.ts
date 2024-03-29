@@ -1,6 +1,20 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
 
-import { models } from './models';
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
 
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 import { log } from './log';
 
 import { config } from './config'
@@ -104,11 +118,13 @@ export async function sendWebhook(webhook: Webhook) {
 
 export async function sendWebhookForInvoice(invoiceUid: string, type: string = 'default') {
 
-  let invoice = await models.Invoice.findOne({ where: {
-    uid: invoiceUid
-  }});;
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoiceUid
+    }
+  })
 
-  const payload = invoice.toJSON();
+  const payload = JSON.parse(JSON.stringify(invoice))
 
   let webhook = await prisma.webhooks.findFirst({
     where: { invoice_uid: invoice.uid }
@@ -289,16 +305,14 @@ interface ListOptions {
   offset?: number;
 }
 
-export async function listForAccount(account: Account, options: ListOptions = {}): Promise<any[]> {
+export async function listForAccount(account: Account, options: ListOptions = {}): Promise<Webhook[]> {
 
-  let webhooks = await models.Webhook.findAll({
-    where: { account_id: account.id },
-    offset: options.offset,
-    limit: options.limit,
-    include: [{
-      model: models.WebhookAttempt,
-      as: 'attempts'
-    }]
+  const webhooks = await prisma.webhooks.findMany({
+    where: {
+      account_id: account.id
+    },
+    take: options.limit,
+    skip: options.offset
   })
 
   return webhooks

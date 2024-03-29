@@ -3,32 +3,14 @@ var geoip = require('geoip-lite');
 
 import * as moment from 'moment'
 
-import { coins, models, accounts, log, utils } from '../../../lib';
+import { coins, accounts, log, utils } from '../../../lib';
 
-import { near } from '../../../lib/accounts'
 import { Request, ResponseToolkit } from '@hapi/hapi';
 import prisma from '../../../lib/prisma';
 import { badRequest } from '@hapi/boom';
 
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 
-export async function nearby(request: Request, h: ResponseToolkit) {
-
-  try {
-
-    let accounts = await near(request.params.latitude, request.params.longitude, request.query.limit)
-
-    return { accounts }
-
-  } catch(error: any) {
-
-    log.error('api.v0.Accounts.nearby', error)
-
-    return badRequest(error.message)
-
-  }
-
-}
 
 export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
@@ -216,15 +198,14 @@ export async function show (request: AuthenticatedRequest, h: ResponseToolkit) {
 
     try {
 
-    var account = request.account,
-        addresses
+    const addresses = await prisma.addresses.findMany({
+      where: {
+        account_id: request.account.id
+      }
+    })
 
-    addresses = await models.Address.findAll({ where: {
-      account_id: account.id
-    }});
 
     return  {
-      account,
       addresses
     }
     
@@ -245,7 +226,10 @@ export async function index(request: Request, h: ResponseToolkit) {
     
     let offset = parseInt(request.query.offset) || 0;
 
-    var accounts = await models.Account.findAll({ offset, limit });
+    const accounts = await prisma.accounts.findMany({
+      take: limit,
+      skip: offset
+    })
 
     return accounts;
 

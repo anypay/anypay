@@ -58,43 +58,6 @@ export async function start() {
 
   });
 
-  Actor.create({
-
-    exchange,
-
-    routingkey: 'models.Invoice.afterCreate',
-
-    queue: 'republish_invoice_created_as_account_id'
-
-  })
-  .start(async (channel, msg, json) => {
-
-    let routingKey = `accounts.${json.account_id}.invoicecreated`;
-
-    await channel.publish(exchange, routingKey, msg.content);
-
-    log.info(routingKey, { invoice: json });
-
-  });
-
-  Actor.create({
-
-    exchange,
-
-    routingkey: 'models.Invoice.afterUpdate',
-
-    queue: 'republish_invoice_updated_as_account_id'
-
-  })
-  .start(async (channel, msg, json) => {
-
-    let routingKey = `accounts.${json.account_id}.invoiceupdated`;
-
-    await channel.publish(exchange, routingKey, msg.content);
-
-    log.info(routingKey, { invoice: json });
-
-  });
 
 }
 

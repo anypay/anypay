@@ -1,6 +1,6 @@
 
+import prisma from '../../lib/prisma';
 import { chance, generateAccount } from '../utils';
-import { models } from '../../lib';
 import * as assert from 'assert';
 
 describe("Firebase Token Model", () => {
@@ -9,10 +9,14 @@ describe("Firebase Token Model", () => {
 
     let account = await generateAccount();
 
-    let record = await models.FirebaseToken.create({
-      token: chance.word(),
-      account_id: account.id
-    });
+    const record = await prisma.firebase_tokens.create({
+      data: {
+        token: chance.word(),
+        account_id: account.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(record.account_id, account.id)
     assert(record.id > 0);

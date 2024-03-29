@@ -26,7 +26,7 @@ export async function image(request: Request, h: ResponseToolkit) {
 
     let image = await getAccountSetting(request.params.account_id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
 
-    const url = files[image]
+    const url = files[image as string]
 
     const { data } = await axios.get(url, {
       responseType: 'arraybuffer'
@@ -52,7 +52,7 @@ export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
     let image = await getAccountSetting(request.account.id, 'woocommerce.checkout.image', { default: 'ANYPAY' })
 
-    const url = files[image]
+    const url = files[image as string]
 
     return h.response({
       image: {

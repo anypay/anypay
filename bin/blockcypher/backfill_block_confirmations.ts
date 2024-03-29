@@ -18,15 +18,14 @@
 
 require('dotenv').config() 
 
-import { models } from '../../lib/models'
-
 import { confirmTransaction, getTransaction } from '../../lib/blockcypher'
 
 import delay from 'delay'
+import prisma from '../../lib/prisma'
 
 export async function main() {
 
-    const payments = await models.Payment.findAll({
+    const payments = await prisma.payments.findMany({
         where: {
             currency: 'BTC',
             //confirmation_hash: null,
@@ -39,25 +38,29 @@ export async function main() {
 
         try {
 
-            console.log(payment.toJSON())
-
-            const result = await getTransaction(payment.txid)
+            const result = await getTransaction(String(payment.chain), payment.txid)
     
             console.log(result)
     
             let confirmationResult = await confirmTransaction(payment)
     
-            console.log(confirmationResult.toJSON())
+            console.log(confirmationResult)
     
             await delay(100)
 
-        } catch(error) {
+        } catch(error: any) {
 
             if (error.response.status === 404)
 
-            payment.status = 'expired'
-
-            await payment.save()
+            await prisma.payments.update({
+                where: {
+                    id: payment.id,                    
+                },
+                data: {
+                    status: 'expired',
+                    updatedAt: new Date()
+                }
+            })
 
             console.error(error)
         }

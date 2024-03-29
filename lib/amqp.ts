@@ -1,7 +1,25 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 import {connect, Connection, Channel} from 'amqplib';
 
-import { Schema } from 'joi';
 import { config } from './config';
+
+import { ZodObject } from 'zod';
 
 var connection: Connection;
 var channel: Channel;
@@ -42,13 +60,22 @@ export async function publish(routingKey: string, json={}) {
 
   if (schema) {
 
-    const { error } = schema.validate(json);
+    try {
 
-    if (error) {
+      schema.parse(json);
 
-      throw new Error(`Validation error: ${error.details.map((x: { message: any; }) => x.message).join(', ')}`);
+    } catch(error: any) {
+
+      console.log(error);
+
+      if (error) {
+
+        throw new Error(`Validation error: ${error.message}`);
+
+      }
 
     }
+
 
   } else {
       
@@ -62,9 +89,9 @@ export async function publish(routingKey: string, json={}) {
 }
 
 
-const schemas: { [key: string]: Schema } = {}
+const schemas: { [key: string]: ZodObject<any> } = {}
 
-export function registerSchema(name: string, schema: Schema) {
+export function registerSchema(name: string, schema: ZodObject<any>) {
     if (schemas[name]) {
         throw new Error(`Schema with name ${name} already exists`);
     }

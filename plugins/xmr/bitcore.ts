@@ -5,7 +5,7 @@ export class Transaction {
 
   hex: string;
 
-  constructor(hex) {
+  constructor(hex: string) {
 
     this.hex = hex
   }

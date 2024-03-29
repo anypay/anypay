@@ -53,7 +53,7 @@ export default class XLM extends Plugin {
 
   }
 
-  async verifyPayment(params) {
+  async verifyPayment(params: any) {
 
     return false
 

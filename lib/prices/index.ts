@@ -1,8 +1,4 @@
 
-import { log } from '../log';
-
-import { models, sequelize } from '../models';
-
 import * as fixer from './fixer';
 
 export { fixer }
@@ -13,12 +9,15 @@ import * as kraken from './kraken'
 
 export { kraken }
 
-import { Price } from './price'
-
-import { Op } from 'sequelize'
+import { SetPrice } from './price'
 
 import { getPrice } from '../plugins'
+
+import { prices as Price } from '@prisma/client'
+
 import prisma from '../prisma';
+
+import { Prisma } from '@prisma/client'
 
 import { coins as Coin } from '@prisma/client'
 
@@ -60,15 +59,15 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
   // output currency is the payment option currency
 
   let where = {
-    base: outputCurrency,
+    base_currency: outputCurrency,
     currency: inputAmount.currency
   };
 
-  let price = await models.Price.findOne({ where });
+  let price = await prisma.prices.findFirst({ where })
 
   if (price) {
 
-    let targetAmount = new BigNumber(inputAmount.value).times(price.value).dp(MAX_DECIMALS).toNumber();
+    let targetAmount = new BigNumber(inputAmount.value).times(price.value.toNumber()).dp(MAX_DECIMALS).toNumber();
 
     return {
       currency: outputCurrency,
@@ -77,10 +76,12 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
 
   } else {
 
-    let inverse = await models.Price.findOne({ where: {
-      base: inputAmount.currency,
-      currency: outputCurrency
-    }});
+    let inverse = await prisma.prices.findFirst({
+      where: {
+        base_currency: inputAmount.currency,
+        currency: outputCurrency
+      }
+    })
 
     if (!inverse) {
 
@@ -88,7 +89,7 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
 
     }
 
-    let price = new BigNumber(1).dividedBy(inverse.value)
+    let price = new BigNumber(1).dividedBy(inverse.value.toNumber())
 
     let targetAmount = price.times(inputAmount.value).dp(MAX_DECIMALS).toNumber()
 
@@ -100,64 +101,98 @@ async function convert(inputAmount: Amount, outputCurrency: string, precision: n
   }
 };
 
-export async function setPrice(price: Price): Promise<Price> {
+
+export async function setPrice(price: SetPrice): Promise<Price> {
 
   price.value = new BigNumber(price.value).dp(MAX_DECIMALS).toNumber()
 
-  log.debug("price.set", price);
+  var isNew = false;
 
-  var [record, isNew] = await models.Price.findOrCreate({
-
+  var record = await prisma.prices.findFirst({
     where: {
-
       currency: price.currency,
+      base_currency: price.base_currency
+    }
+  })
 
-      base: price.base
+  if (!record) {
 
-    },
+    isNew = true
+    record = await prisma.prices.create({
+      data: {
+        currency: price.currency,
+        base_currency: price.base_currency,
+        value: price.value,
+        source: price.source,
+        updatedAt: new Date(),
+        createdAt: new Date()
+      }
+    
+    })
+  }
 
-    defaults: price
-
-  });
-
-  await models.PriceRecord.create(price)
+  await prisma.priceRecords.create({
+    data: {
+      currency: price.currency,
+      base_currency: price.base_currency,
+      value: price.value,
+      source: price.source,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
 
   if (!isNew) {
 
-    record.value = price.value;
-
-    record.source = price.source;
-
-    await record.save();
+    await prisma.prices.update({
+      where: {
+        id: record.id
+      },
+      data: {
+        value: price.value,
+        source: price.source,
+        updatedAt: new Date()
+      }
+    })
 
   }
 
-  return price;
+  return record;
 
 }
 
 export async function updateUSDPrices() {
 
-  let prices: Price[] = await fixer.fetchCurrencies('USD');
+  let prices: SetPrice[] = await fixer.fetchCurrencies('USD');
 
-  await Promise.all(prices.map(async (price: Price) => {
+  await Promise.all(prices.map(async (price: SetPrice) => {
 
-    await setPrice(price)
+    return setPrice({
+      base_currency: price.currency,
+      currency: 'USD',
+      value: price.value,
+      source: String(price.source)
+    })
 
   }))
 
   return Promise.all(prices.map(price => {
 
     return {
-      base: price.currency,
-      currency: price.base,
+      base_currency: price.currency,
+      currency: price.base_currency,
       value: 1 / price.value,
-      source: price.source
+      source: String(price.source)
     }
   })
-  .map((price: Price) => {
+  .map((price: SetPrice) => {
 
-    return setPrice(price)
+    setPrice({
+      base_currency: price.currency,
+      currency: 'USD',
+      value: price.value,
+      source: String(price.source)
+    })
 
   }));
 
@@ -165,7 +200,7 @@ export async function updateUSDPrices() {
 
 export async function setAllCryptoPrices() {
 
-  const prices: Promise<Price>[] = [];
+  const prices: Promise<SetPrice>[] = [];
 
 
   prices.push(getPrice({ chain: 'BSV', currency: 'BSV' }))
@@ -187,7 +222,14 @@ export async function setAllCryptoPrices() {
 
     try {
 
-      return setPrice(await priceResult)
+      const result = await priceResult
+
+      return setPrice({
+        base_currency: 'USD',
+        currency: result.currency,
+        value: Number(result.value),
+        source: String(result.source)  
+      })
 
     } catch(error) {
 
@@ -200,11 +242,13 @@ export async function setAllCryptoPrices() {
 
 export async function setAllFiatPrices(): Promise<Price[]> {
 
-  let prices: Price[] = await fixer.fetchCurrencies('USD')
+  let newPrices: SetPrice[] = await fixer.fetchCurrencies('USD')
 
-  for (let price of prices) {
+  const prices: Price[] = []
 
-    await setPrice(price)
+  for (let price of newPrices) {
+
+    prices.push(await setPrice(price))
 
   }
 
@@ -216,40 +260,42 @@ export async function listPrices(): Promise<Price[]> {
 
   const coins = await prisma.coins.findMany()
 
-  return models.Price.findAll({
+  return prisma.prices.findMany({
     where: {
-      base: 'USD',
+      base_currency: 'USD',
       currency: {
-        [Op.in]: coins.map((c: Coin) => c.code)
-      }
+        in: coins.map((c: Coin) => c.code),
+      },
     },
-    order: [['currency', 'asc']]
-  })
+    orderBy: {
+      currency: 'asc',
+    },
+  });
 
 }
 
-export async function getPriceHistory(currency: string, days: number=30) {
-  // hourly average of price records for the past thirty days
+export async function getPriceHistory(currency: string, days: number = 30) {
+  // Calculate the start date based on the number of days
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
 
-  const query = `SELECT date_trunc('hour', "public"."PriceRecords"."createdAt") AS "createdAt", avg("public"."PriceRecords"."value") AS "avg"
-  FROM "public"."PriceRecords"
-  WHERE ("public"."PriceRecords"."currency" = '${currency}'
-     AND "public"."PriceRecords"."createdAt" >= CAST((now() + (INTERVAL '-${days} day')) AS date) AND "public"."PriceRecords"."createdAt" < CAST(now() AS date))
-  GROUP BY date_trunc('hour', "public"."PriceRecords"."createdAt")
-  ORDER BY date_trunc('hour', "public"."PriceRecords"."createdAt") ASC;`
+  const query = `
+    SELECT date_trunc('hour', "createdAt") AS "createdAt", avg("value") AS "avg"
+    FROM "public"."PriceRecords"
+    WHERE ("${currency}" = $1
+      AND "createdAt" >= CAST((now() + (INTERVAL '-${days} day')) AS date) AND "createdAt" < CAST(now() AS date))
+    GROUP BY date_trunc('hour', "createdAt")
+    ORDER BY date_trunc('hour', "createdAt") ASC;
+  `;
 
-  const [results] = await sequelize.query(query)
+  const results: any = await prisma.$queryRaw(Prisma.sql([query]))
 
-  return results.map((result: { createdAt: any; avg: string; }) => {
-
-    return {
-      createdAt: result.createdAt,
-      avg: parseFloat(result.avg)
-    }
-
-  })
-
+  return results.map((result: { createdAt: any; avg: string }) => ({
+    createdAt: result.createdAt,
+    avg: parseFloat(result.avg),
+  }));
 }
+
 
 export {
   convert, createConversion

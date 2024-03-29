@@ -1,9 +1,10 @@
 
-import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment, Price } from '../../lib/plugin'
+import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '../../lib/plugin'
 
 const xrpl =  require('xrpl')
 
 import axios from 'axios'
+import { SetPrice } from '../../lib/prices/price'
 
 //TODO: FinishPluginImplementation
 
@@ -82,13 +83,13 @@ export default class XRP extends Plugin {
 
   }
 
-  async verifyPayment(params) {
+  async verifyPayment(param: any) {
 
     return false
 
   }
 
-  async getPrice(): Promise<Price> {
+  async getPrice(): Promise<SetPrice> {
 
     const { data } = await axios.get(`https://data.gateapi.io/api2/1/ticker/xrp_usdt`)
 
@@ -96,7 +97,7 @@ export default class XRP extends Plugin {
 
     return {
       value,
-      base: 'USD',
+      base_currency: 'USD',
       currency: this.currency, 
       chain: this.chain, 
       source: 'gate.io'

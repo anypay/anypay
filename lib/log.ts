@@ -16,15 +16,11 @@
 */
 //==============================================================================
 
-const riverpig = require('riverpig')
-
-import { models } from './models'
-
 import { publish } from 'rabbi'
 
-import { config } from './config'
+import { asBoolean, config } from './config'
 
-const lokiEnabled = config.get('LOKI_ENABLED')
+import { events as Event } from '@prisma/client'
 
 interface NewLogger {
   namespace?: string;
@@ -41,12 +37,13 @@ interface LogQuery {
 }
 
 import * as winston from 'winston';
+import prisma from './prisma';
 
 const transports = [
   new winston.transports.Console({ level: 'debug' })
 ]
 
-if (config.get('LOKI_ENABLED') && config.get('LOKI_HOST')) {
+if (asBoolean('LOKI_ENABLED') && asBoolean('LOKI_HOST')) {
 
   const LokiTransport = require("winston-loki");
 
@@ -77,7 +74,7 @@ if (config.get('LOKI_ENABLED') && config.get('LOKI_HOST')) {
 
 }
 
-const loki = winston.createLogger({
+const winstonLogger = winston.createLogger({
   level: 'info',
   transports,
   format: winston.format.json()
@@ -93,7 +90,7 @@ export class Logger {
 
   constructor(params: NewLogger = {namespace: 'anypay'}) {
 
-    this.log = riverpig('anypay')
+    this.log = winstonLogger
 
     this.namespace = params.namespace || 'anypay'
 
@@ -112,21 +109,19 @@ export class Logger {
     if (this.env !== 'test') {
 
       this.log.info(type, payload)
-
-      if (lokiEnabled) {
-        loki.info(type, payload)
-      }
     }
       
-
-
-    const record = await models.Event.create({
-      namespace: this.namespace,
-      type,
-      payload,
-      account_id: payload.account_id,
-      invoice_uid: payload.invoice_uid,
-      error: false
+    const record = await prisma.events.create({
+      data: {
+        namespace: this.namespace,
+        type,
+        payload,
+        error: false,
+        account_id: payload.account_id,
+        invoice_uid: payload.invoice_uid,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
     })
 
     await publish(type, payload)
@@ -135,15 +130,15 @@ export class Logger {
 
       const routing_key = `accounts.${payload.account_id}.events`
 
-      await publish(routing_key, record.toJSON())    
+      await publish(routing_key, record)    
 
     }
 
     if (payload.app_id) {
 
-      const routing_key = `apps.${payload.app_id}.events`
+      const routing_key = `apps.${payload.app_id}.gs`
 
-      await publish(routing_key, record.toJSON())
+      await publish(routing_key, record)
 
     }
 
@@ -151,27 +146,29 @@ export class Logger {
 
       const routing_key = `invoices.${payload.invoice_uid}.events`
 
-      await publish(routing_key, record.toJSON())
+      await publish(routing_key, record)
 
     }
 
-    publish('event.created', record.toJSON())
+    publish('event.created', record)
 
     return record
 
   }
 
-  async error(error_type: string, error: Error) {
+  async error(error_type: string, error: Error): Promise<Event> {
 
     this.log.error(error_type, error.message)
 
-    loki.error(error_type, error.message)
-
-    let record = await models.Event.create({
-      namespace: this.namespace,
-      type: error_type,
-      payload: { error: error.message },
-      error: true
+    const record = await prisma.events.create({
+      data: {
+        namespace: this.namespace,
+        type: error_type,
+        payload: { error: error.message },
+        error: true,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
     })
 
     return record;
@@ -182,13 +179,9 @@ export class Logger {
 
     this.log.debug(type, payload)
 
-    if (lokiEnabled) {
-      loki.debug(type, payload)
-    }
-
   }
 
-  async read(query: LogQuery = {}): Promise<any[]> {
+  async read(query: LogQuery = {}): Promise<Event[]> {
 
     this.log.debug('log.read', query)
 
@@ -207,19 +200,14 @@ export class Logger {
 
     if (query.payload) { where['payload'] = query.payload }
 
-    const findAll = {
-
+    const records = await prisma.events.findMany({
       where,
-
-      limit: query.limit || 100,
-
-      offset: query.offset || 0,
-
-      order: [['createdAt', query.order || 'asc']]
-
-    }
-
-    let records = await models.Event.findAll(findAll)
+      take: query.limit || 100,
+      skip: query.offset || 0,
+      orderBy: {
+        createdAt: query.order || 'asc'
+      }
+    })
 
     return records;
 

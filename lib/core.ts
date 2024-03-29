@@ -1,8 +1,28 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 require('dotenv').config();
 
 import { find } from './plugins';
 
 import { log } from './log'
+import prisma from './prisma';
+
+import { addresses as Address } from '@prisma/client'
 
 interface DenominationChangeset {
   account_id: number;
@@ -20,9 +40,7 @@ interface AddressChangeSet {
   address_id?: number;
 }
 
-import {models} from "./models";
-
-export async function setAddress(changeset: AddressChangeSet): Promise<any> {
+export async function setAddress(changeset: AddressChangeSet): Promise<Address> {
 
   var isValid = true;
 
@@ -53,11 +71,13 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
   }
 
-  var address = await models.Address.findOne({ where: {
-    account_id: changeset.account_id,
-    currency: changeset.currency,
-    chain: changeset.chain
-  }});
+  var address = await prisma.addresses.findFirst({
+    where: {
+      account_id: changeset.account_id,
+      currency: changeset.currency,
+      chain: changeset.chain
+    }
+  })
 
   if (address) {
 
@@ -67,42 +87,53 @@ export async function setAddress(changeset: AddressChangeSet): Promise<any> {
 
     }
 
-    await address.update({
-      value: changeset.address,
-      paymail: changeset.paymail,
-      view_key: changeset.view_key,
-      note: null
-    });
+    address = await prisma.addresses.update({
+      where: {
+        id: address.id
+      },
+      data: {
+        value: changeset.address,
+        paymail: changeset.paymail,
+        view_key: changeset.view_key,
+        note: null    
+      }
+    })
+
 
   } else {
 
-    address = await models.Address.create({
-      account_id: changeset.account_id,
-      currency: changeset.currency,
-      chain: changeset.chain,
-      value: changeset.address,
-      view_key: changeset.view_key,
-      paymail: changeset.paymail
+    address = await prisma.addresses.create({
+      data: {
+        account_id: changeset.account_id,
+        currency: changeset.currency,
+        chain: changeset.chain,
+        value: changeset.address,
+        view_key: changeset.view_key,
+        paymail: changeset.paymail,
+        updatedAt: Date(),
+        createdAt: Date()
+      }
     });
 
   }
 
-  changeset.address_id = address.id;
-
-  log.info('address.set', changeset)
+  log.info('address.set', address)
 
   return address;
 
 };
 
-export async function unsetAddress(changeset: AddressChangeSet) {
+export async function unsetAddress(changeset: AddressChangeSet): Promise<void> {
 
-  var address = await models.Address.findOne({ where: {
-    account_id: changeset.account_id,
-    currency: changeset.currency
-  }});
 
-  if (address.locked) {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: changeset.account_id,
+      currency: changeset.currency   
+    }
+  })
+
+  if (address?.locked) {
 
     let error = new Error(`${changeset.currency} address locked`);
 
@@ -112,19 +143,30 @@ export async function unsetAddress(changeset: AddressChangeSet) {
 
   }
 
-  await address.destroy({ force: true });
 
-  log.info('address.unset', changeset)
+  await prisma.addresses.delete({
+    where: {
+      id: address.id
+    }
+  
+  })
+
+  log.info('address.removed', address)
 
 };
 
 export async function setDenomination(changeset: DenominationChangeset): Promise<any> {
 
-  await models.Account.update({
-    denomination: changeset.currency
-  }, {where: { id: changeset.account_id }});
+  await prisma.accounts.update({
+    where: {
+      id: changeset.account_id
+    },
+    data: {
+      denomination: changeset.currency
+    }
+  })
 
-  log.info('denomination.set', changeset)
+  log.info('account.quote.set', changeset)
 
   return;
 }

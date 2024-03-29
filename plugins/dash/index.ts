@@ -2,6 +2,7 @@
 
 import { blockchair, blockcypher, config } from '../../lib'
 
+//@ts-ignore
 import * as dash from '@dashevo/dashcore-lib';
 
 import * as insight from './lib/insight'

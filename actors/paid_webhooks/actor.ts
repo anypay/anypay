@@ -26,7 +26,6 @@ import { getPaidWebhookForInvoice, createWebhookForInvoice } from '../../lib/web
 
 import { ensureInvoice, Invoice } from '../../lib/invoices'
 
-import { Account } from '../../lib/account'
 import { exchange } from '../../lib/amqp';
 
 export async function start() {

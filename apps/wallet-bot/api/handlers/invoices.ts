@@ -5,37 +5,46 @@ import { log } from '../../../../lib/log'
 
 import { badRequest } from 'boom'
 
-import { findOrCreateWalletBot } from '../..'
+import { createPaymentRequest, findOrCreateWalletBot } from '../..'
 
-import { findAll } from '../../../../lib/orm'
+import {  ResponseToolkit } from '@hapi/hapi'
+import prisma from '../../../../lib/prisma'
 
-import { Invoice } from '../../../../lib/invoices'
-
-export async function create(req, h) {
+export async function create(req: any, h: ResponseToolkit) {
 
     try {
+
+        const payload = req.payload as {
+            to: {
+                address: string,
+                amount: number,
+                currency: string
+            },
+            currency: string,
+            options: any
+        };
 
         const {walletBot} = await findOrCreateWalletBot(req.account)
 
         const template = [{
-            currency: req.payload.currency,
+            currency: payload.currency,
             to: [{
-                address: req.payload.to.address,
-                amount: req.payload.to.amount,
-                currency: req.payload.to.currency
+                address: payload.to.address,
+                amount: payload.to.amount,
+                currency: payload.to.currency
             }]
         }]
 
-        const options = req.payload.options
+        const options = payload.options
 
-        let result = await walletBot.createPaymentRequest({
+        let result = await createPaymentRequest(walletBot, {
             template,
             options
         })
 
-        return h.response(result.toJSON()).code(201)
+        return h.response(JSON.parse(JSON.stringify(result))).code(201)
 
-    } catch(error) {
+    } catch(error: any) {
 
         log.error('apps.wallet-bot.api.handlers.invoices.create.error', error)
 
@@ -45,7 +54,7 @@ export async function create(req, h) {
 
 }
 
-export async function index(req, h) {
+export async function index(req: any) {
 
     const { app } = await findOrCreateWalletBot(req.account)
 
@@ -55,7 +64,7 @@ export async function index(req, h) {
 
     const status = req.query.status || 'unpaid'
 
-    const where = {
+    const where: any = {
         app_id: app.id,
         status
     }
@@ -66,7 +75,7 @@ export async function index(req, h) {
 
     }
 
-    const query = { where }
+    const query: any = { where }
 
     if (limit) {
         query['limit'] = limit || 100
@@ -80,13 +89,17 @@ export async function index(req, h) {
 
     log.info('wallet-bot.invoices.list', query)
 
-    const invoices = await findAll<Invoice>(Invoice, query)
+    const invoices = await prisma.invoices.findMany({
+        where: query.where,
+        take: query.limit,
+        skip: query.offset,
+    })
 
     log.info('wallet-bot.invoices.list.response')
 
     return {
         app: '@wallet-bot',
-        invoices: invoices.map(invoice => invoice.toJSON())
+        invoices
     }
 
 }

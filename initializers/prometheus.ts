@@ -16,12 +16,12 @@
 */
 //==============================================================================
 
-import { Anypay } from '../lib'
+import { log } from '../lib'
 import { createApp } from '../lib/apps'
 import prisma from '../lib/prisma'
 import * as uuid from 'uuid'
 
-export default async function({log}: Anypay) {
+export default async function() {
 
   log.info('initializers.prometheus')
 

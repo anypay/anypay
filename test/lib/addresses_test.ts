@@ -1,12 +1,13 @@
 require('dotenv').config();
 
-import { models, initialize } from '../../lib';
+import { initialize } from '../../lib';
 
 import {addresses} from '../../lib';
 import {registerAccount} from '../../lib/accounts';
 
 import * as assert from 'assert';
 import * as Chance from 'chance';
+import prisma from '../../lib/prisma';
 
 const chance = new Chance();
 
@@ -26,12 +27,16 @@ describe('Addresses Library', () => {
 
     let chain = 'DASH'
 
-    let address = await models.Address.create({
-      account_id: account.id,
-      value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
-      currency,
-      chain
-    });
+    let address = await prisma.addresses.create({
+      data: {
+        account_id: account.id,
+        value: 'XoLSiyuXbqTQGUuEze7Z3BB6JkCsPMmVA9',
+        currency,
+        chain,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
 
     assert(address.id > 0);
     assert(!address.locked);
@@ -42,7 +47,11 @@ describe('Addresses Library', () => {
       chain
     });
 
-    address = await models.Address.findOne({ where: { id: address.id }});
+    address = await prisma.addresses.findFirstOrThrow({
+      where: {
+        id: address.id
+      }
+    })
 
     assert(address.locked);
 
@@ -52,8 +61,12 @@ describe('Addresses Library', () => {
       chain
     });
 
-    address = await models.Address.findOne({ where: { id: address.id }});
-
+    address = await prisma.addresses.findFirstOrThrow({
+      where: {
+        id: address.id
+      }
+    })
+    
     assert(!address.locked);
 
   });

@@ -1,3 +1,20 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 
 require('dotenv').config()
 
@@ -7,9 +24,6 @@ import Web3 from 'web3'
 
 import { ethers } from 'ethers'
 
-import { Transaction } from './plugin'
-
-import ERC20_ABI from './erc20_abi';
 import { config } from './config'
 
 interface TransmitResult {
@@ -66,10 +80,10 @@ export function parseERC20Transfer(transaction: ethers.Transaction): {
     throw "NO ERC20 TRANSFER";
   }
   const receiver = `0x${transaction.data.slice(34, 74)}`;
-  const amount = hexToDec(transaction.data.slice(74));
-  const symbol = transaction.to;
-  const sender = transaction.from;
-  const hash = transaction.hash
+  const amount = Number(hexToDec(transaction.data.slice(74)));
+  const symbol = String(transaction.to);
+  const sender = String(transaction.from);
+  const hash = String(transaction.hash)
   return { receiver, amount, symbol, hash, sender };
 }
 
@@ -117,7 +131,7 @@ export async function fetchERC20Transfer({ txid }: { txid: string }): Promise<{
     throw "NO ERC20 TRANSFER";
   }
   const address = `0x${input.slice(34, 74)}`;
-  const amount = parseInt(hexToDec(input.slice(74)));
+  const amount = parseInt(String(hexToDec(input.slice(74))));
   const token = result.to.toLowerCase();
 
   return {

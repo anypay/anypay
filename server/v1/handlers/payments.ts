@@ -3,14 +3,13 @@ import * as Joi from 'joi'
 
 import { log } from '../../../lib/log'
 
-import { models } from '../../../lib/models'
-
 import { listPayments } from '../../../lib/payments'
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 import { ResponseToolkit } from '@hapi/hapi'
 
 import { payments as Payment } from '@prisma/client'
 import { badRequest } from '@hapi/boom'
+import prisma from '../../../lib/prisma'
 
 export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
@@ -82,22 +81,24 @@ interface Confirmation {
   
   chain: string;
 
-  block_hash: number;
+  block_hash: string;
 
   block_height: number;
 
   block_index?: number;
 
-  timestamp: number;
+  timestamp: Date;
 }
 
 export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   const { invoice_uid } = request.params
 
-  const payment = await models.Payment.findsOne({ where: {
-    invoice_uid
-  }})
+  const payment = await prisma.payments.findFirstOrThrow({
+    where: {
+      invoice_uid: String(invoice_uid)
+    }
+  })
 
   const response: any = { payment }
 
@@ -105,7 +106,7 @@ export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
 
     const confirmation: Confirmation = {
       block_hash: payment.confirmation_hash,
-      block_height: payment.confirmation_height,
+      block_height: Number(payment.confirmation_height),
       chain: payment.chain || payment.currency,
       timestamp: payment.createdAt
     };

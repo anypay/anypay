@@ -18,15 +18,13 @@
 
 require('dotenv').config()
 
-import { models } from '../../lib';
-
 import { confirmTransactionsFromBlockWebhook } from "../../lib/blockcypher"
 
 async function main() {
 
   const id = parseInt(process.argv[2])
 
-  const record = await models.Event.findOne({
+  const record = await prisma.events.findFirstOrThrow({
     where: { id }
   })
 

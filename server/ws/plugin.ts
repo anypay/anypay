@@ -28,20 +28,24 @@ import { Actor } from 'rabbi'
 
 import { awaitChannel, channel, exchange } from '../../lib/amqp'
 
-import { config, models } from "../../lib";
+import { config } from "../../lib";
 
 class AliveSocket extends WebSocket {
   isAlive?: boolean;
 }
 
 import { v4 } from 'uuid'
+import prisma from '../../lib/prisma'
 
 async function handleInvoiceWebsocket(invoice_uid: string, socket: WebSocket, req: Request) {
 
   await awaitChannel()
 
-
-  const invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
+  })
 
   if (!invoice) { return socket.close(1008, "InvoiceNotFound") }
 
@@ -105,6 +109,8 @@ export const plugin = (() => {
 
       wsServer.on("connection", async (socket: WebSocket, request: Request) => {
 
+        console.log('connection', request.headers)
+
         if (request.headers['anypay-invoice-uid']) {
 
           const invoice_uid = String(request.headers['anypay-invoice-uid'])
@@ -117,29 +123,17 @@ export const plugin = (() => {
         
         if (uid) {
 
-          const accessToken = await models.AccessToken.findOne({
+          const accessToken = await prisma.access_tokens.findFirstOrThrow({
             where: {
-              uid
+              uid: String(uid)
             }
           });
-        
-          if (!accessToken) {
 
-            log.error('websocket.auth.error', new Error('access token not found'))
-
-          }
-
-          const account = await models.Account.findOne({
+          const account = await prisma.accounts.findFirstOrThrow({
             where: {
               id: accessToken.account_id
-            }
+            }   
           })
-
-          if (!account) {
-
-            log.error('websocket.auth.error', new Error('account not found'))
-            
-          }
 
           const actor = await Actor.create({
 
@@ -188,19 +182,6 @@ export const plugin = (() => {
 
         })
       
-        // receive a message from the client
-        wsServer.on("message", (data) => {
-
-          log.info('websocket.message.received', {data})
-
-          const packet = JSON.parse(data);
-
-          switch (packet.type) {
-            case "hello from client":
-              // ...
-              break;
-          }
-        });
 
       });
 

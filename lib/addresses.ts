@@ -1,7 +1,22 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 
 import { log } from './log'
-
-import { models } from './models'
 
 import { setAddress as _setAddress } from './core'
 
@@ -20,55 +35,51 @@ export async function listAddresses(account: Account): Promise<Address[]> {
 
 }
 
-export async function lockAddress(args: {account_id: number, currency: string, chain: string}) {
+export async function lockAddress(args: {account_id: number, currency: string, chain: string}): Promise<Address> {
 
   const { account_id, chain, currency } = args
 
-  let address = await models.Address.findOne({ where: {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id,
+      currency,
+      chain
+    }
+  
+  })
 
-    account_id,
-
-    currency,
-    
-    chain
-
-  }});
-
-  if (!address) { 
-
-    throw new Error('address not found');
-
-  }
-
-  address.locked = true;
-
-  await address.save();
+  return prisma.addresses.update({
+    where: {
+      id: address.id
+    },
+    data: {
+      locked: true
+    }
+  })
 
 }
 
-export async function unlockAddress(args: {account_id: number, currency: string, chain: string}) {
+export async function unlockAddress(args: {account_id: number, currency: string, chain: string}): Promise<Address> {
 
   const { chain, currency, account_id } = args
 
-  let address = await models.Address.findOne({ where: {
+  const address = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id,
+      currency,
+      chain
+    }
+  
+  })
 
-    account_id,
-
-    currency,
-
-    chain
-
-  }});
-
-  if (!address) { 
-
-    throw new Error('address not found');
-
-  }
-
-  address.locked = false;
-
-  await address.save();
+  return prisma.addresses.update({
+    where: {
+      id: address.id
+    },
+    data: {
+      locked: false
+    }
+  })
 
 }
 
@@ -106,25 +117,22 @@ export async function removeAddress(args: {account: Account, currency: string, c
 
   const { account, chain, currency } = args
 
-  let record = await models.Address.findOne({ where: {
+  const record = await prisma.addresses.findFirstOrThrow({
+    where: {
+      account_id: account.id,
+      currency,
+      chain
+    }
+  
+  })
 
-    account_id: account.id,
+  await prisma.addresses.delete({
+    where: {
+      id: record.id
+    }
+  })
 
-    currency: currency,
-
-    chain: chain
-
-  }})
-
-  if (!record) {
-    throw new Error('attempted to remove address that does not exist')
-  }
-
-  let address = record.toJSON()
-
-  await record.destroy() 
-
-  log.info('address.removed', address)
+  log.info('address.removed', record)
 
 }
 

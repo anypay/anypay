@@ -1,10 +1,9 @@
 
-import { models } from '../../lib/models'
-
 import { log } from '../../lib/log'
 
 import * as AccountLogin from '../../lib/account_login'
 import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from '../../lib/prisma';
 
 export async function validate(request: Request, username: string, password: string, h: ResponseToolkit) {
 
@@ -17,11 +16,13 @@ export async function validate(request: Request, username: string, password: str
       };
     }
 
-    var account = await models.Account.findOne({
+
+    var account = await prisma.accounts.findFirst({
       where: {
         email: username.toLowerCase()
       }
-    });
+    
+    })
 
     if (!account) {
 

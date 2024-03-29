@@ -14,11 +14,11 @@ export async function index() {
 
       prices: prices.map(price => {
 
-        const { currency, value, base, updatedAt, source } = price
+        const { currency, value, base_currency, updatedAt, source } = price
 
         return {
           currency,
-          base,
+          base_currency,
           value,
           updatedAt,
           source

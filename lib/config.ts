@@ -23,20 +23,23 @@ import { join } from 'path'
 
 let file = join(process.cwd(), 'config', 'anypay.json')
 
-config.argv({ parseValues: true })
-   .env({ parseValues: true })
-   .file({ file });
+
 
 export const allowedVariables: EnvironmentVariable[] = []
+const variablesMap: {
+  [key: string]: EnvironmentVariable
+} = {}
 
 interface EnvironmentVariable {
   key: string;
   required: boolean;
-  default?: string;
+  default?: string | boolean | number;
+  type?: 'string' | 'boolean' | 'integer' | 'decimal'
 }
 
 export function registerEnvironmentVariable(variable: EnvironmentVariable) {
   allowedVariables.push(variable)
+  variablesMap[variable.key] = variable
 }
 
 const variables: EnvironmentVariable[] = [
@@ -147,7 +150,8 @@ const variables: EnvironmentVariable[] = [
   {
     key: 'KRAKEN_PLUGIN',
     required: false,
-    default: 'false'
+    default: false,
+    type: 'boolean'
   },
   {
     key: 'ANYPAY_WEBSOCKETS_URL',
@@ -230,6 +234,11 @@ const variables: EnvironmentVariable[] = [
     key: 'WALLET_BOT_APP_ENABLED',
     required: false,
     default: 'false'
+  },
+  {
+    key: 'WALLET_BOT_WEBSOCKET_PORT',
+    required: false,
+    default: '5202'
   },
   {
     key: 'ANYPAY_ACCESS_TOKEN',
@@ -393,7 +402,38 @@ const variables: EnvironmentVariable[] = [
   }
 ]
 
+export function asBoolean(key: string) {
+  const value = config.get(key)
+
+  if (value === 'false' || value === '0') {
+    return false
+  } else {
+    return value
+  }
+}
+
 variables.forEach(registerEnvironmentVariable)
+
+config.argv({ parseValues: true })
+   .env({
+    parseValues: true,
+    transform: function(obj: { key: string, value: any}) {
+      const variable = variablesMap[obj.key]
+      if (variable && variable.type === 'boolean') {
+        if (obj.value === 'false') {
+          return {
+            key: obj.key,
+            value: false
+          }
+        }
+        if (obj.value === '0') {
+          obj.value = false
+        }       
+      }
+      return obj;
+    }
+  })
+   .file({ file });
 
 export function initialize() {
   // Restrict the allowed environment variables to ensure they are all documented here

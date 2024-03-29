@@ -1,6 +1,4 @@
 
-import { models } from '../../../lib';
-
 import { log } from '../../../lib/log'
 
 import { badRequest } from '@hapi/boom'
@@ -8,6 +6,7 @@ import { badRequest } from '@hapi/boom'
 var geoip = require('geoip-lite');
 
 import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from '../../../lib/prisma';
 
 interface Token {
   account_id: number,
@@ -42,7 +41,14 @@ export async function create(request: Request, h: ResponseToolkit) {
 
     }
 
-    await models.Login.create(login)
+    await prisma.logins.create({
+      data : {
+        ...login,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+    })
 
     log.info('user.login', {
       payload: {

@@ -1,12 +1,11 @@
 const Boom = require('boom');
 
-import { Op } from 'sequelize';
-
-import { log, models, invoices } from '../../../lib';
+import { log, invoices } from '../../../lib';
 
 import {
   invoices as Invoice,
-  payment_options as PaymentOption
+  payment_options as PaymentOption,
+  Prisma
 } from '@prisma/client'
 
 import { createInvoice, cancelInvoice } from '../../../lib/invoices';
@@ -14,8 +13,6 @@ import { createInvoice, cancelInvoice } from '../../../lib/invoices';
 import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
 import { computeInvoiceURI } from '../../../lib/uri'
-
-import * as moment from 'moment';
 
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 
@@ -34,7 +31,7 @@ export async function cancel(request: AuthenticatedRequest, h: ResponseToolkit) 
     account_id: request.account.id
   }
 
-  let invoice = await models.Invoice.findOne({
+  let invoice = await prisma.invoices.findFirst({
     where
   })
 
@@ -81,100 +78,38 @@ export async function index (request: AuthenticatedRequest, h: ResponseToolkit) 
 
   */
 
-  let query: {
-    where: {
-      account_id: number,
-      status?: string,
-      complete?: boolean,
-      completed_at?: {
-        [Op.gte]?: Date,
-        [Op.lt]?: Date
-      },
-      createdAt?: {
-        [Op.gte]?: Date,
-        [Op.lt]?: Date
-      }
-    },
-    include: {
-      model: any,
-      as: string
-    }[],
-    order: any[],
-    offset: number,
-    limit: number
+
+  const startDateCreated = request.query.start_date_created;
+  const endDateCreated = request.query.end_date_created;
+  const take = request.query.limit || 100;
+  const skip = request.query.offset || 0;
   
-  } = {
-
-    where: {
-
-      account_id: request.account.id,
-
-    },
-
-    include: [{
-      model: models.InvoiceNote,
-      as: 'notes'
-    }],
-
-    order: [
-      ['createdAt', 'DESC']
-    ],
-
-    offset: request.query.offset || 0,
-
-    limit: request.query.limit
-
-  };
-
-  if (request.query.status) {
-
-    query.where['status'] = request.query.status;
-
+  const query: Prisma.invoicesFindManyArgs = {};
+  
+  if (startDateCreated) {
+    query.where = {
+      ...query.where,
+      createdAt: {
+        // Greater than or equal to the start date
+        gte: new Date(startDateCreated),
+      },
+    };
   }
-
-  if (request.query.complete) {
-
-    query.where['complete'] = request.query.complete;
-
+  
+  if (endDateCreated) {
+    query.where = {
+      ...query.where,
+      createdAt: {
+        // Less than the end date
+        lt: new Date(endDateCreated),
+      },
+    };
   }
-
-  if (request.query.start_date_completed) {
-
-    query.where['completed_at'] = {
-      [Op.gte]: moment(request.query.start_date_completed).toDate()
-    }
-
-  }
-
-  if (request.query.end_date_completed) {
-
-    if (!query.where['completed_at']) {
-
-
-      query.where['completed_at'] = {};
-    }
-
-    query.where['completed_at'][Op.lt] = moment(request.query.end_date_completed).toDate();
-
-  }
-
-  if (request.query.start_date_created) {
-
-    query.where['createdAt'] = {
-      [Op.gte]: moment(request.query.start_date_created).toDate()
-    }
-
-  }
-
-  if (request.query.end_date_created) {
-
-    query.where['createdAt'] = {
-      [Op.lt]: moment(request.query.end_date_created).toDate()
-    }
-
-  }
-
-  var invoices = await models.Invoice.findAll(query);
+  const invoices = await prisma.invoices.findMany({
+    where: query.where,
+    take,
+    skip
+  })
 
   return { invoices };
 
@@ -330,33 +265,35 @@ export async function showDeprecated(request: Request, h: ResponseToolkit) {
 
   let invoiceId = request.params.invoice_id;
 
-  let invoice = await models.Invoice.findOne({
+  let invoice = await prisma.invoices.findFirstOrThrow({
     where: {
       uid: invoiceId
     }
-  });
+  })
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-    invoice = await invoices.refreshInvoice(invoice.uid)
+    invoice = await invoices.refreshInvoice(String(invoice.uid))
 
   }
 
   if (invoice) {
 
-    log.debug('invoice.requested', invoice.toJSON());
+    log.debug('invoice.requested', invoice);
 
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
+    let payment_options = await getPaymentOptions(String(invoice.uid))
 
-    let notes = await models.InvoiceNote.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
+    let notes = await prisma.invoice_notes.findMany({
+      where: {
+        invoice_uid: String(invoice.uid)
+      }
+    })
 
     let sanitized = sanitizeInvoice(invoice);
 
     let resp = Object.assign({
       invoice: sanitized,
-      payment_options: invoice.payment_options,
+      payment_options,
       notes
     }, sanitized)
 
@@ -378,29 +315,31 @@ export async function show(request: Request, h: ResponseToolkit) {
 
     let invoiceId = request.params.invoice_id;
 
-    let invoice = await models.Invoice.findOne({
+    let invoice = await prisma.invoices.findFirstOrThrow({
       where: {
         uid: invoiceId
       }
-    });
+    })
 
     if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-      invoice = await invoices.refreshInvoice(invoice.uid)
+      invoice = await invoices.refreshInvoice(String(invoice.uid))
 
     }
 
     if (invoice) {
 
-      const payment_options = await getPaymentOptions(invoice.uid)
+      const payment_options = await getPaymentOptions(String(invoice.uid))
 
-      let notes = await models.InvoiceNote.findAll({where: {
-        invoice_uid: invoice.uid
-      }});
+      const notes = await prisma.invoice_notes.findMany({
+        where: {
+          invoice_uid: String(invoice.uid)
+        }
+      })
 
       const responseInvoice: any = {
         amount: invoice.amount,
-        currency: invoice.denomination,
+        currency: invoice.denomination_currency,
         status: invoice.status,
         uid: invoice.uid,
         uri: invoice.uri,
@@ -429,11 +368,15 @@ export async function show(request: Request, h: ResponseToolkit) {
 
       if (invoice.hash) {
 
-        let payment = await models.Payment.findOne({ where: { invoice_uid: invoice.uid }})
+        let payment = prisma.payments.findFirst({
+          where: {
+            invoice_uid: String(invoice.uid)
+          }
+        })
 
         if (payment) {
 
-          const { chain, currency, txid, txhex, confirmation_hash, confirmation_date, confirmation_height, status, createdAt, invoice_uid, block_explorer_url } = payment.toJSON()
+          const { chain, currency, txid, txhex, confirmation_hash, confirmation_date, confirmation_height, status, createdAt, invoice_uid, block_explorer_url } = JSON.parse(JSON.stringify(payment))
 
           response['payment'] = {
             invoice_uid,
@@ -476,33 +419,35 @@ export async function showLegacy(request: Request, h: ResponseToolkit) {
 
   let invoiceId = request.params.invoice_id;
 
-  let invoice = await models.Invoice.findOne({
+  let invoice = await prisma.invoices.findFirstOrThrow({
     where: {
       uid: invoiceId
     }
-  });
+  })
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-    invoice = await invoices.refreshInvoice(invoice.uid)
+    invoice = await invoices.refreshInvoice(String(invoice.uid))
 
   }
 
   if (invoice) {
 
-    log.debug('invoice.requested', invoice.toJSON());
+    log.debug('invoice.requested', invoice);
 
-    invoice.payment_options = await getPaymentOptions(invoice.uid)
+    const payment_options = await getPaymentOptions(String(invoice.uid))
 
-    let notes = await models.InvoiceNote.findAll({where: {
-      invoice_uid: invoice.uid
-    }});
+    const notes = await prisma.invoice_notes.findMany({
+      where: {
+        invoice_uid: String(invoice.uid)
+      }
+    })
 
     let sanitized = sanitizeInvoice(invoice);
 
     let resp = Object.assign({
       invoice: sanitized,
-      payment_options: invoice.payment_options,
+      payment_options,
       notes
     }, sanitized)
 

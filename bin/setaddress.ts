@@ -19,8 +19,8 @@
 
 require('dotenv').config();
 
-import { models } from '../lib';
 import {setAddress} from '../lib/core';
+import prisma from '../lib/prisma';
 
 const argv = require('yargs').argv;
 
@@ -50,18 +50,26 @@ const argv = require('yargs').argv;
 
   }
 
-  let account = await models.Account.findOne({ where: { email: argv.email }});
+  let account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      email: argv.email
+    }
+  })
 
   console.log('account found', account);
 
   await setAddress({
     currency: argv.currency,
     address: argv.address,
-    account_id: account.id
+    account_id: account.id,
+    chain: argv.chain || argv.currency
   });
 
-  account = await models.Account.findOne({ where: { email: argv.email }});
-
-  console.log(account.toJSON());
+  account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      email: argv.email
+    }
+  })
+  console.log(JSON.parse(JSON.stringify(account)));
 
 })();

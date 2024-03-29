@@ -17,9 +17,8 @@
 */
 //==============================================================================
 import { Command } from 'commander';
+import prisma from '../lib/prisma';
 const program = new Command();
-
-import { models } from '../lib';
 
 program
   .command('createitem <email> <name> <price>')
@@ -29,22 +28,25 @@ program
 
     try {
 
-
-      let account = await models.Account.findOne({
+      const account = await prisma.accounts.findFirstOrThrow({
         where: {
           email
         }
-      });
+      })
 
-      let item = await models.GrabAndGoItem.create({
-        name,
-        price,
-        account_id: account.id
-      });
+      const item = await prisma.grab_and_go_items.create({
+        data: {
+          name,
+          price,
+          account_id: account.id,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      })
 
-      console.log('item created', item.toJSON());
+      console.log('item created', item);
 
-    } catch(error) {
+    } catch(error: any) {
 
       console.error(error.message);
 

@@ -21,17 +21,19 @@ import { Command } from 'commander';
 
 const program = new Command();
 
-import { models, addresses } from '../lib';
+import { addresses } from '../lib';
+import prisma from '../lib/prisma';
 
 program
-  .command('lockaddress <email> <currency>')
-  .action(async (email, currency) => {
+  .command('lockaddress <email> <currency> [chain]')
+  .action(async (email, currency, chain) => {
 
-    let account = await models.Account.findOne({ where: {
 
-      email
-
-    }});
+    const account = await prisma.accounts.findFirst({
+      where: {
+        email
+      }
+    })
 
     if (!account) {
 
@@ -41,31 +43,28 @@ program
 
     }
 
-    await addresses.lockAddress(account.id, currency);
+    await addresses.lockAddress({
+      account_id: account.id, currency, chain: chain || currency
+    });
       
     process.exit()
 
   });
 
 program
-  .command('unlockaddress <email> <currency>')
-  .action(async (email, currency) => {
+  .command('unlockaddress <email> <currency> [chain]')
+  .action(async (email: string, currency: string, chain: string) => {
 
-    let account = await models.Account.findOne({ where: {
+    const account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        email
+      }
+    
+    })
 
-      email
-
-    }});
-
-    if (!account) {
-
-      console.log(`account ${email} not found`);
-
-      process.exit();
-
-    }
-
-    await addresses.unlockAddress(account.id, currency);
+    await addresses.unlockAddress({
+      account_id: account.id, currency, chain: chain || currency
+    });
 
   });
 

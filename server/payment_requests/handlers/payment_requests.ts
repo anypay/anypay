@@ -13,7 +13,7 @@ import { detectWallet } from '../../../lib/pay'
 
 import { paymentRequestToPaymentOptions } from '../../../lib/payment_options'
 
-import { listPaymentOptions, RequestWithInvoice } from '../../jsonV2/handlers/protocol'
+import { listPaymentOptions } from '../../jsonV2/handlers/protocol'
 
 import { createWebhookForInvoice } from '../../../lib/webhooks'
 
@@ -168,28 +168,30 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
 }
 
-export async function show(request: RequestWithInvoice, h: ResponseToolkit) {
-
-  //log.debug('pay.request.show', { uid: req.params.uid, headers: req.headers })
-
-  detectWallet(request.headers, request.params.uid)
-
-  request.invoice  = await prisma.invoices.findFirstOrThrow({
-    where: { uid: request.params.uid }
-  });
-
-  if (request.invoice.cancelled) {
-    
-    return badRequest('invoice cancelled')
-  }
-
-  if (request.invoice.status === 'unpaid' && invoices.isExpired(request.invoice)) {
-
-    request.invoice = await invoices.refreshInvoice(String(request.invoice.uid))
-
-  }
+export async function show(request: any, h: ResponseToolkit) {
 
   try {
+
+    console.log("pay.request.show", { uid: request.params })
+
+    //log.debug('pay.request.show', { uid: req.params.uid, headers: req.headers })
+  
+    detectWallet(request.headers, request.params.uid)
+  
+    request.invoice  = await prisma.invoices.findFirstOrThrow({
+      where: { uid: request.params.uid }
+    });
+  
+    if (request.invoice.cancelled) {
+      
+      return badRequest('invoice cancelled')
+    }
+  
+    if (request.invoice.status === 'unpaid' && invoices.isExpired(request.invoice)) {
+  
+      request.invoice = await invoices.refreshInvoice(String(request.invoice.uid))
+  
+    }
 
     let isBIP70 = /paymentrequest$/
 
@@ -222,6 +224,8 @@ export async function show(request: RequestWithInvoice, h: ResponseToolkit) {
     }
 
   } catch(error: any) {
+
+    console.log(error)
 
     log.error('pay.request.error', error);
 

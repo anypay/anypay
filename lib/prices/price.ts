@@ -3,9 +3,9 @@ export type PriceSource = string;
 
 export type BaseCurrency = string;
 
-export interface Price {
+export interface SetPrice {
 
-  base: BaseCurrency;
+  base_currency: BaseCurrency;
 
   currency: string;
 

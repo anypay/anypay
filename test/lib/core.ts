@@ -3,36 +3,36 @@ import { setAddress, unsetAddress } from '../../lib/core';
 
 import { lockAddress, unlockAddress  } from '../../lib/addresses';
 
-import { models } from '../../lib/models';
-
 import * as Chance from 'chance';
 import * as assert from 'assert';
+
+import { generateAccount } from '../utils'
+
+import { accounts as Account } from '@prisma/client'
+import prisma from '../../lib/prisma';
+import { prices } from '../../lib';
 
 var chance = new Chance();
 
 describe("Anypay Core", () => {
 
-  var account, address;
-
-  before(async function() {
-    let email = chance.email().toUpperCase();
-
-    account = await models.Account.create({
-      email: email
-    });
-
-  });
-
-  describe("Updating Account.models Address", () => {
+  describe("Updating Account Address", () => {
 
     it("#setAddress should fail if locked", async () => {
 
-      await lockAddress(account.id, 'DASH');
+      const account = await generateAccount();
+
+      await lockAddress({
+        account_id: Number(account?.id),
+        currency: 'DASH',
+        chain: 'DASH'
+      });
       
       try {
 
         await setAddress({
-          account_id: account.id,
+          account_id: Number(account?.id),
+          chain: 'DASH',
           currency: 'DASH',
           address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
         }); 
@@ -43,7 +43,11 @@ describe("Anypay Core", () => {
 
         assert.strictEqual(error.message, `DASH address locked`); 
 
-        await unlockAddress(account.id, 'DASH');
+        await unlockAddress({
+          account_id: Number(account?.id),
+          currency: 'DASH',
+          chain: 'DASH'
+        });
 
       }
 
@@ -51,18 +55,25 @@ describe("Anypay Core", () => {
 
     it("setAddress should set a DASH address", async () => {
 
+      const account = await generateAccount();
+
       let addressChangeset = {
         account_id: account.id,
         currency: 'DASH',
+        chain: 'DASH',
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
       };
 
       await setAddress(addressChangeset); 
+
+      const address = await prisma.addresses.findFirstOrThrow({
+        where: {
+          account_id: account.id,
+          currency: 'DASH',
+          chain: 'DASH'
+        }
       
-      address = await models.Address.findOne({ where: {
-        account_id: account.id,
-        currency:"DASH"
-      }});
+      })
 
       assert.strictEqual(address.value, addressChangeset.address);
 
@@ -70,18 +81,24 @@ describe("Anypay Core", () => {
 
     it("setAddress should set a BTC address", async () => {
 
+      const account = await generateAccount();
+
       let addressChangeset = {
         account_id: account.id,
         currency: 'BTC',
+        chain: 'BTC',
         address: '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K'
       };
 
       await setAddress(addressChangeset); 
 
-      address = await models.Address.findOne({ where: {
-        account_id: account.id,
-	currency: "BTC"
-      }});
+      const address = await prisma.addresses.findFirstOrThrow({
+        where: {
+          account_id: account.id,
+          currency: 'BTC',
+          chain: 'BTC'
+        }
+      })
 
       assert.strictEqual(address.value, addressChangeset.address);
 
@@ -89,20 +106,29 @@ describe("Anypay Core", () => {
 
     it("unsetAddress should remove a DASH address", async () => {
 
-      let addressChangeset = {
+      const account = await generateAccount();
+
+      await setAddress({
         account_id: account.id,
         currency: 'DASH',
+        chain: 'DASH',
         address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
-      };
+      });
 
-      await setAddress(addressChangeset);
-
-      await unsetAddress(addressChangeset); 
-
-      address = await models.Address.findOne({ where: {
+      await unsetAddress({
         account_id: account.id,
-	currency: "DASH"
-      }});
+        currency: 'DASH',
+        chain: 'DASH',
+        address: 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5'
+      }); 
+
+      const address = await prisma.addresses.findFirstOrThrow({
+        where: {
+          account_id: account.id,
+          currency: 'DASH',
+          chain: 'DASH'
+        }
+      })
 
       assert(!address);
 
@@ -114,37 +140,49 @@ describe("Anypay Core", () => {
 
     it("#setAddress should set a ZEN ZenCash address", async () => {
 
-      let addressChangeset = {
+      const account = await generateAccount();
+
+      await setAddress({
         account_id: account.id,
         currency: 'ZEN',
-        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
-      };
+        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk',
+        chain: 'ZEN'
+      }); 
 
-      await setAddress(addressChangeset); 
+      const address = await prisma.addresses.findFirstOrThrow({
+        where: {
+          account_id: account.id,
+          currency: 'ZEN'
+        }
+      })
 
-      var address = await models.Address.findOne({ where: {
-        account_id: account.id,
-        currency: 'ZEN'
-      }});
-
-      assert.strictEqual(address.value, addressChangeset.address);
+      assert.strictEqual(address.value, 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk');
 
     });
 
     it("#unsetAddress should set a ZEN ZenCash address", async () => {
 
+      const account = await generateAccount();
+
       let addressChangeset = {
         account_id: account.id,
         currency: 'ZEN',
         address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
       };
 
-      await unsetAddress(addressChangeset); 
-
-      var address = await models.Address.findOne({ where: {
+      await unsetAddress({
         account_id: account.id,
-        currency: 'ZEN'
-      }});
+        currency: 'ZEN',
+        chain: 'ZEN',
+        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
+      });
+
+      const address = await prisma.addresses.findFirstOrThrow({
+        where: {
+          account_id: account.id,
+          currency: 'ZEN'
+        }    
+      })
 
       assert(!address);
 

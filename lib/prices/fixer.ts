@@ -8,9 +8,9 @@ import { config } from '../config';
 
 const apiKey = config.get('ANYPAY_FIXER_ACCESS_KEY');
 
-import { Price } from './price'
+import { SetPrice } from './price'
 
-export async function fetchCurrencies(base='USD'): Promise<Price[]> {
+export async function fetchCurrencies(base='USD'): Promise<SetPrice[]> {
 
   base = base.toLowerCase();
 
@@ -23,7 +23,7 @@ export async function fetchCurrencies(base='USD'): Promise<Price[]> {
   return Object.keys(rates).map((currency) => {
 
      return {
-       base: base.toUpperCase(),
+       base_currency: base.toUpperCase(),
        currency: currency,
        value: new BigNumber(1).dividedBy(rates[currency]).toNumber(),
        source: 'data.fixer.io/api/latest'

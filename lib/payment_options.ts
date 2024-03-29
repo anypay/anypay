@@ -1,5 +1,20 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
 
-import { models } from './models';
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 
 import {  } from './log';
 
@@ -11,7 +26,12 @@ import { computeInvoiceURI } from './uri'
 
 import {getCoin} from './coins';
 
-import { PaymentRequests as PaymentRequest } from '@prisma/client';
+import {
+  PaymentRequests as PaymentRequest,
+  payment_options as PaymentOption
+} from '@prisma/client';
+
+import prisma from './prisma';
 
 export interface NewPaymentOption {
   invoice_uid: string;
@@ -20,7 +40,7 @@ export interface NewPaymentOption {
   amount?: number;
 }
 
-export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequest) {
+export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequest): Promise<PaymentOption[]> {
 
   const template = paymentRequest.template as Array<any> || [] 
 
@@ -58,7 +78,7 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
     let coin = getCoin(option.currency)
 
     return {
-      invoice_uid: paymentRequest.invoice_uid,
+      invoice_uid: String(paymentRequest.invoice_uid),
       currency: option.currency,
       chain: option.chain || option.currency,
       outputs,
@@ -71,7 +91,13 @@ export async function paymentRequestToPaymentOptions(paymentRequest: PaymentRequ
 
   return Promise.all(options.map(option => {
 
-    return models.PaymentOption.create(option)
+    return prisma.payment_options.create({
+      data: {
+        ...option,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
 
   }))
 

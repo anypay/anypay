@@ -1,19 +1,21 @@
 
 import { awaitChannel, channel } from '../../../lib/amqp'
 
-import { Socket } from 'socket.io'
+import { WebSocket } from 'ws'
 
 import { log } from '../../../lib/log'
 
 import * as uuid from 'uuid';
 
-import { WalletBot } from '..';
+import { ConsumeMessage } from 'amqplib'
+
+import { WalletBots as WalletBot } from '@prisma/client'
 
 export interface Context {
 
-    socket: Socket;
+    socket: WebSocket;
 
-    walletBot?: WalletBot;
+    walletBot: WalletBot;
 
     consumerTag?: string;
 
@@ -21,13 +23,11 @@ export interface Context {
 
 export async function bind(context: Context): Promise<Context> {
 
-    context.walletBot = context.socket.data.walletBot;
-
     const consumerTag = uuid.v4()
 
     context.consumerTag = consumerTag
 
-    const queue = `wallet-bot.${context.walletBot.get('id')}.events`
+    const queue = `wallet-bot.${context.walletBot.id}.events`
 
     const exchange = 'wallet-bot'
 
@@ -44,7 +44,9 @@ export async function bind(context: Context): Promise<Context> {
 
         channel.bindQueue(queue, exchange, queue)
 
-        channel.consume(queue, async (msg) => {
+        channel.consume(queue, async (msg: ConsumeMessage | null) => {
+
+            if (!msg) return;
 
             try {
 
@@ -58,7 +60,7 @@ export async function bind(context: Context): Promise<Context> {
 
                 }
 
-            } catch (error) {
+            } catch (error: any) {
 
                 log.error('wallet-bot.socket.io', error)
 
@@ -77,12 +79,20 @@ export async function bind(context: Context): Promise<Context> {
 
 export function unbind(context: Context) {
 
-    const queue = `wallet-bot.${context.walletBot.get('id')}.events`
+    if (context.walletBot) {
+            
+        const queue = `wallet-bot.${context.walletBot.id}.events`
 
-    const exchange = 'wallet-bot'
+        const exchange = 'wallet-bot'
+    
+        channel.unbindQueue(queue, exchange, queue)
 
-    channel.cancel(context.consumerTag);
+    }
 
-    channel.unbindQueue(queue, exchange, queue)
+    if (context.consumerTag) {
+
+        channel.cancel(context.consumerTag);
+
+    }
 
 }

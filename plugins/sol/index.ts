@@ -147,7 +147,7 @@ function getOrCreateAssociatedTokenAccount(connection: any, provider: Keypair, t
 
 
 interface ValidateUnsignedTx {
-    paymentOption; any;
+    paymentOption: any;
     transactions: any[];
 }
 

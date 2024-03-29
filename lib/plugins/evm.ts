@@ -5,9 +5,8 @@ import { Transaction, Confirmation, BroadcastTx, BroadcastTxResult, Payment, Ver
 
 import { ethers } from 'ethers'
 
-import { models } from '../models'
-
 import { confirmPaymentByTxid, revertPayment } from '../confirmations'
+import prisma from '../prisma';
 
 export abstract class EVM extends Plugin {
 
@@ -52,8 +51,10 @@ export abstract class EVM extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation | null> {
 
-    let record = await models.EvmTransactionReceipt.findOne({
-      where: { txid }
+    const record = await prisma.evmTransactionReceipts.findFirst({
+      where: {
+        txid
+      }
     })
 
     if (record) {
@@ -262,19 +263,31 @@ async function handleTransactionReceipt(web3: { eth: { getBlock: (arg0: string |
 
   console.log({ confirmResult })
 
-  const [record, isNew] = await models.EvmTransactionReceipt.findOrCreate({
+  var isNew = false;
+
+  let record = await prisma.evmTransactionReceipts.findFirst({
     where: {
       txid: receipt.transactionHash
-    },
-    defaults: {
-      txid: receipt.transactionHash,
-      receipt
     }
   })
 
+  if (!record) {
+
+    isNew = true
+    record = await prisma.evmTransactionReceipts.create({
+      data: {
+        txid: receipt.transactionHash,
+        receipt: String(receipt),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    
+    })
+  }
+
   if (isNew) {
 
-    console.log('evm.transactionReceipt.saved', record.toJSON())
+    console.log('evm.transactionReceipt.saved', record)
 
   }
 

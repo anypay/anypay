@@ -21,14 +21,13 @@ require('dotenv').config()
 import { Command } from 'commander';
 const program = new Command();
 
-import { models } from '../lib/models'
-
 import { join } from 'path'
 import * as fs from 'fs'
 
 import * as http from 'superagent'
 
 import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees } from '../lib/pay';
+import prisma from '../lib/prisma';
 
 program
   .command('decode_bip70_request <path>')
@@ -82,7 +81,7 @@ program
 
       console.log(resp.body)
 
-    } catch(error) {
+    } catch(error: any) {
 
       console.error(error.message)
       
@@ -99,7 +98,12 @@ program
 
     try {
 
-      let paymentOption = await models.PaymentOption.findOne({ where: { invoice_uid, currency }})
+      let paymentOption = await prisma.payment_options.findFirstOrThrow({
+        where: {
+          invoice_uid,
+          currency
+        }
+      })
 
       let payment = await completePayment(paymentOption, hex)
 
@@ -182,7 +186,13 @@ program
 
     try {
 
-      let payment_option = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
+      const payment_option = await prisma.payment_options.findFirstOrThrow({
+        where: {
+          currency,
+          invoice_uid
+        }
+
+      })
 
       let outputs = await buildOutputs(payment_option, protocol);
 
@@ -203,8 +213,12 @@ program
   .action(async (invoice_uid, currency, protocol) => {
 
     try {
-
-      let paymentOption = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
+      const paymentOption = await prisma.payment_options.findFirstOrThrow({
+        where: {
+          currency,
+          invoice_uid
+        }
+      })
 
       let paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol }));
 
@@ -219,36 +233,6 @@ program
     process.exit();
   
   });
-
-/*
-program
-  .command('verify <invoice_uid> <currency> <tx_hex>')
-  .action(async (invoice_uid, currency, hex) => {
-
-    try {
-
-      let payment_option = await models.PaymentOption.findOne({ where: { currency, invoice_uid }});
-
-      let verify = {
-        protocol: 'BIP70',
-        hex,
-        payment_option
-      }
-
-      let result = await verifyPayment(verify)
-
-      console.log(result);
-
-    } catch(error) {
-
-      console.log(error);
-
-    }
-
-    process.exit(0);
-
-  });
-  */
 
 program.parse(process.argv);
 

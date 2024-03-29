@@ -1,7 +1,7 @@
 
-import { Socket } from 'socket.io'
+import { WebSocket } from 'ws'
 
-import { WalletBot } from './'
+import { WalletBots as WalletBot } from '@prisma/client'
 
 /*
  *
@@ -11,13 +11,13 @@ import { WalletBot } from './'
 
 type LiveSockets = {
 
-  [key: string]: Socket
+  [key: string]: WebSocket
 
 }
 
 export const sockets: LiveSockets = {}
 
-export function getSocket(walletBot: WalletBot): Socket | null {
+export function getSocket(walletBot: WalletBot): WebSocket | null {
 
   const socket = sockets[walletBot.id]
 
@@ -25,7 +25,7 @@ export function getSocket(walletBot: WalletBot): Socket | null {
 
 }
 
-export function setSocket(walletBot: WalletBot, socket: Socket): Socket {
+export function setSocket(walletBot: WalletBot, socket: WebSocket): WebSocket {
 
   let existingSocket = getSocket(walletBot)
 
@@ -34,32 +34,29 @@ export function setSocket(walletBot: WalletBot, socket: Socket): Socket {
     throw new Error('Socket Already Connected For Wallet Bot')
   }
 
-  sockets[walletBot.get('id')] = socket
+  sockets[walletBot.id] = socket
 
   return socket
 
 }
 
 
-export function removeSocket(socket: Socket): void {
+export function removeSocket({socket, walletBot }: {socket: WebSocket, walletBot: WalletBot}): void {
 
-  if (socket.data && socket.data.walletBot) {
-
-    let existingSocket = getSocket(socket.data.walletBot)
+    let existingSocket = getSocket(walletBot)
 
     if (existingSocket) {
 
-      if (socket.connected) {
+      if (socket.OPEN) {
 
-        socket.disconnect()
+        socket.close()
 
       }
 
-      delete sockets[socket.data.walletBot.id]
+      delete sockets[walletBot.id]
 
     }
 
-  }
 
 }
 
@@ -67,7 +64,7 @@ interface LiveSocket {
 
   wallet_bot_id: string;
 
-  socket: Socket;
+  socket: WebSocket;
 }
 
 export function listSockets(): LiveSocket[] {
@@ -92,6 +89,6 @@ export const handlers = require('require-all')({
 
   filter:  /(.+)\.ts$/,
 
-  resolve: handler => handler.default
+  resolve: (handler: any) => handler.default
 
 });

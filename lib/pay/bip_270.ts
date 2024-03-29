@@ -5,8 +5,6 @@ import { getBitcore } from '../bitcore';
 
 import * as moment from 'moment';
 
-import { models } from '../models'
-
 import { config } from '../config'
 
 export function getCurrency(params: GetCurrency): Currency {
@@ -57,10 +55,17 @@ export async function getMerchantData(invoiceUid: string, account_id?: number): 
     return JSON.stringify({ invoiceUid })
   }
 
-  let invoice = await models.Invoice.findOne({ where: { uid: invoiceUid }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: String(invoiceUid)
+    }
+  })
 
-  let account = await models.Account.findOne({ where: { id: account_id }});
-
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: account_id
+    }
+  })
 
   if (invoice.metadata) {
 
@@ -81,12 +86,17 @@ export async function getMerchantData(invoiceUid: string, account_id?: number): 
 }
 
 import { PaymentRequestOptions } from './'
+import prisma from '../prisma';
 
 export async function buildPaymentRequest(paymentOption: PaymentOption, options: PaymentRequestOptions={}): Promise<Bip270PaymentRequest> {
 
-  let invoice = await models.Invoice.findOne({ where: { uid: paymentOption.invoice_uid }})
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: paymentOption.invoice_uid
+    }
+  })
 
-  let merchantData = await getMerchantData(invoice.uid, invoice.account_id)
+  let merchantData = await getMerchantData(String (invoice.uid), Number(invoice.account_id))
 
   let outputs = await buildOutputs(paymentOption)
 

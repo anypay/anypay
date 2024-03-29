@@ -9,8 +9,6 @@ import * as slack from '../slack'
 
 import * as utils from '../utils'
 
-import { models } from '../models'
-
 import { log } from '../log'
 
 import { compare } from '../bcrypt'
@@ -31,18 +29,26 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   log.debug('account.register.password.hash', { passwordHash })
 
-  let [account, isNew] = await models.Account.findOrCreate({
+  var isNew = false;
 
-    where: { email },
-
-    defaults: {
-
-      email,
-     
-      password_hash: passwordHash
-
+  var account = await prisma.accounts.findFirst({
+    where: {
+      email
     }
-  });
+  })
+
+  if (!account) {
+
+    isNew = true
+    account = await prisma.accounts.create({
+      data: {
+        email,
+        password_hash: String(passwordHash),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  }
 
   if (!isNew) {
 
@@ -112,13 +118,15 @@ export class AccountAlreadyRegisteredError implements Error {
 
 export async function loginAccount(params: NewAccount): Promise<Account> {
 
-  var account = await models.Account.findOne({
+
+  const account = await prisma.accounts.findFirstOrThrow({
     where: {
       email: params.email
     }
-  });
+  
+  })
 
-  if (!account) {
+  if (!account.password_hash) {
 
     log.info(`account.login.notfound`, { email: params.email });
 
@@ -127,7 +135,7 @@ export async function loginAccount(params: NewAccount): Promise<Account> {
 
   try {
 
-    await compare(params.password, account.password_hash);
+    await compare(params.password, String(account.password_hash));
 
   } catch(error) {
 

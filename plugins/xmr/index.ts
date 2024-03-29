@@ -20,6 +20,9 @@ export { bitcore }
 
 import axios from 'axios'
 
+import { payments as Payment } from '@prisma/client'
+
+//@ts-ignore
 import { Client } from 'payment-protocol'
 
 import { config } from '../../lib/config'
@@ -30,7 +33,7 @@ import { other_rpc } from './json_rpc'
 
 import { Invoice } from '../../lib/invoices'
 
-import { getPayment, Payment } from '../../lib/payments'
+import { getPayment } from '../../lib/payments'
 
 import get_block from './json_rpc/get_block'
 
@@ -53,11 +56,11 @@ export default class XMR extends Plugin {
   }
 
 
-  async getConfirmation(txid: string): Promise<Confirmation> {
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
 
     const transaction = await getTransaction(txid)
 
-    if (!transaction.block_height) { return }
+    if (!transaction.block_height) { return null }
 
     const height = transaction.block_height
 
@@ -65,7 +68,7 @@ export default class XMR extends Plugin {
 
     const block = await get_block({ height: transaction.block_height })
 
-    if (!block) { return }
+    if (!block) { return null  }
 
     const hash = block.block_header.hash
 
@@ -91,8 +94,6 @@ export default class XMR extends Plugin {
     //TODO
     throw new Error()
 
-    return null
-
   }
 
   async validateAddress(address: string): Promise<boolean> {
@@ -103,7 +104,7 @@ export default class XMR extends Plugin {
       ],
     };
 
-    const validateCryptonote = (address, chain) => {
+    const validateCryptonote = (address: string, chain: any) => {
       const {publicAddressBytes} = chain
 
       if (!publicAddressBytes || !Array.isArray(publicAddressBytes) && publicAddressBytes.length) {
@@ -127,7 +128,7 @@ export default class XMR extends Plugin {
 
 
     try {
-      validateCryptonote(address, chain)
+      validateCryptonote(address, String(chain))
 
       return true
     } catch (e) {
@@ -148,7 +149,7 @@ export default class XMR extends Plugin {
 
     console.log('BROADCAST TX', { txhex, txid, txkey })
 
-    const result = await send_raw_transaction({ tx_as_hex: txhex, do_not_relay: false })
+    const result: any = await send_raw_transaction({ tx_as_hex: txhex, do_not_relay: false })
 
     if (result['sanity_check_failed']) {
       throw new Error(result.reason)
@@ -168,7 +169,7 @@ export default class XMR extends Plugin {
 
     return {
       txhex,
-      txid,
+      txid: String(txid),
       success: true,
       result
     }
@@ -178,6 +179,7 @@ export default class XMR extends Plugin {
 }
 
 import { default as pool_send_raw_transaction, Outputs as SendRawTransactionResult, Inputs as SendRawTransaction } from './other_rpc/send_raw_transaction'
+import prisma from '../../lib/prisma'
 //import submit_transfer from './wallet_rpc/submit_transfer'
 
 export async function send_raw_transaction({tx_as_hex, do_not_relay}: SendRawTransaction): Promise<SendRawTransactionResult> {
@@ -305,7 +307,7 @@ export async function check_confirmations(invoice: Invoice): Promise<[Payment, b
     throw new Error('payment not found')
   }
 
-  if (payment.get('confirmation_height') && payment.get('confirmation_date')) {
+  if (payment.confirmation_height && payment.confirmation_date) {
 
     return [payment, true];
   }
@@ -322,23 +324,25 @@ export async function check_confirmations(invoice: Invoice): Promise<[Payment, b
 
     }
 
-    await payment.update({
+    await prisma.payments.update({
+      where: {
+        id: payment.id
+      },
+      data: {
+        confirmation_height: transaction.block_height,
+        confirmation_date: new Date(transaction.block_timestamp * 1000),
+        confirmation_hash: block_header.hash
 
-      confirmation_height: transaction.block_height,
-
-      confirmation_date: transaction.block_timestamp * 1000,
-
-      confirmation_hash: block_header.hash
-
+      }
     })
 
     log.info('payment.confirmation', {
 
       invoice_uid: invoice.uid,
 
-      confirmation_height: payment.get('confirmation_height'),
+      confirmation_height: payment.confirmation_height,
 
-      confirmation_date: payment.get('confirmation_date'),
+      confirmation_date: payment.confirmation_date,
 
       confirmation_hash: block_header.hash
 
@@ -443,7 +447,7 @@ export async function verifyPayment({paymentOption, transaction}: VerifyPayment)
         tx_key: String(transaction.txkey)
       })
 
-    } catch(error) {
+    } catch(error: any) {
 
       log.error('xmr.verifyPayment.error', error)
 

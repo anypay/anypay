@@ -1,13 +1,14 @@
 import {awaitChannel} from '../../../lib/amqp';
 import * as Boom from '@hapi/boom';
 
-import { config, log, models } from '../../../lib'
+import { config, log } from '../../../lib'
 
 import { find } from '../../../lib/plugins'
 
 import * as pay from '../../../lib/pay'
 import { Trace } from '../../../lib/trace';
 import { Request, ResponseToolkit } from '@hapi/hapi';
+import prisma from '../../../lib/prisma';
 
 const bitcoin = require('bsv'); 
 const Message = require('bsv/message'); 
@@ -30,28 +31,30 @@ export async function show(request: Request, h: ResponseToolkit) {
 
   log.info(`bip70.${currency.code.toLowerCase()}.paymentrequest.content`)
 
-  let hex = paymentRequest.content.serialize().toString('hex')
+  ;(async () => {
 
-  models.Bip70PaymentRequest.findOrCreate({
-    where: {
-      invoice_uid: request.params.uid,
-      currency: currency.code
-    },
-    defaults: {
-      invoice_uid: request.params.uid,
-      currency: currency.code,
-      hex
-    }
-  })
-  .then(([record, isNew]: [any, boolean]) => {
+    let hex = paymentRequest.content.serialize().toString('hex')
 
-    if (isNew) {
-      log.info('bip70.paymentrequest.recorded', record)
+    let record = await prisma.bip70PaymentRequests.findFirst({
+      where: {
+        invoice_uid: request.params.uid,
+        currency: currency.code
+      }
+    })
+
+    if (!record) {
+      prisma.bip70PaymentRequests.create({
+        data: {
+          invoice_uid: request.params.uid,
+          currency: currency.code,
+          hex,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }    
+      })
     }
-  })
-  .catch((error: any) => {
-    log.info('error recording paymentrequest', error.message)
-  })
+
+  })();
 
   let digest = bitcoin.crypto.Hash.sha256(Buffer.from(JSON.stringify(paymentRequest.content))).toString('hex');
 
@@ -96,18 +99,14 @@ export async function create(request: Request, h: ResponseToolkit) {
 
   log.info('bip70.payment.decoded', payment);
 
-  let payment_option = await models.PaymentOption.findOne({
-
+  let payment_option = await prisma.payment_options.findFirstOrThrow({
     where: {
-
       invoice_uid: request.params.uid,
-
       currency: currency.code
-
     }
   });
 
-  let invoice = await models.Invoice.findOne({
+  const invoice = await prisma.invoices.findFirstOrThrow({
     where: {
       uid: request.params.uid
     }
@@ -119,28 +118,29 @@ export async function create(request: Request, h: ResponseToolkit) {
     return Boom.badRequest('invoice cancelled')
   }
 
-  if (!payment_option) {
-    throw new Error(`${currency.code} payment option for invoice ${request.params.uid} not found`)
-  }
-
   for (let transaction of payment.transactions) {
 
     ;(async () => {
 
       try {
 
-        await models.PaymentSubmission.create({
-          invoice_uid: invoice.uid,
-          txhex: transaction.toString('hex'),
-          headers: request.headers,
-          wallet: null,
-          protocol: 'bip70',
-          currency: payment_option.currency
+        await prisma.paymentSubmissions.create({
+          data: {
+            invoice_uid: invoice.uid,
+            txhex: transaction.toString('hex'),
+            headers: request.headers,
+            wallet: null,
+            protocol: 'bip70',
+            currency: payment_option.currency,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          }
         })
+
   
       } catch(error: any) {
 
-        log.info('models.PaymentSubmission.create.error', {
+        log.info('PaymentSubmission.create.error', {
           invoice_uid: invoice.uid,
           txhex: transaction.toString('hex'),
           headers: request.headers,
@@ -150,7 +150,7 @@ export async function create(request: Request, h: ResponseToolkit) {
           error
         })
         
-        log.error('models.PaymentSubmission.create', error)
+        log.error('PaymentSubmission.create', error)
   
       }
 
@@ -163,7 +163,16 @@ export async function create(request: Request, h: ResponseToolkit) {
     let transaction: string = tx.toString('hex') 
 
     await pay.verifyPayment({
-      payment_option,
+      payment_option: {
+        invoice_uid: payment_option.invoice_uid,
+        chain: payment_option.chain,
+        currency: payment_option.currency,
+        address: payment_option.address,
+        amount: payment_option.amount?.toNumber(),
+        fee: Number(payment_option.fee),
+        outputs: payment_option.outputs as Array<any>
+
+      },
       transaction: {txhex: transaction},
       protocol: 'BIP70'
     })

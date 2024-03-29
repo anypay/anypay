@@ -150,11 +150,14 @@ export default abstract class BitcoreCard extends AbstractBitcoreCard {
         return utxo
       }
 
+      console.log("GET RAW TX", { txid: utxo.txid, chain: this.chain })
+
       const raw_transaction = await getRawTx(this.chain, utxo.txid)
 
       return Object.assign(utxo, {
         scriptPubKey: raw_transaction['vout'][utxo.vout].scriptPubKey.hex,
       })
+
     }))
 
     const coins = unspent.map(utxo => {

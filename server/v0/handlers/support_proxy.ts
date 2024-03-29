@@ -1,17 +1,26 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { log, models } from '../../../lib'
+import { log } from '../../../lib'
 
 import  * as slack from '../../../lib/slack'
+import prisma from '../../../lib/prisma'
 
 export async function show(request: Request, h: ResponseToolkit) {
 
-  let accessToken = await models.AccessToken.findOne({ where: { uid: request.params.token }})
+  const accessToken = await prisma.access_tokens.findFirstOrThrow({
+    where: {
+      uid: request.params.token
+    }
+  })
 
-  let account = await models.Account.findOne({ where: { id: accessToken.account_id }})
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      id: accessToken.account_id
+    }
+  })
 
   log.info(`linktracker.payscreen.help`, {
-    account: account.toJSON(),
+    account: account,
     access_token_id: accessToken
   })
 

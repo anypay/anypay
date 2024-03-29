@@ -21,19 +21,20 @@ require('dotenv').config()
 import { Command } from 'commander';
 const program = new Command();
 
-import { models } from '../lib/models'
-
 import { getMiningFee } from '../lib/fees'
+import prisma from '../lib/prisma';
 
 program 
   .command('miningfee <invoice_uid>')
   .action(async (invoice_uid) => {
 
-    let payment = await models.Payment.findOne({ where: { invoice_uid }})
+    const payment = await prisma.payments.findFirstOrThrow({
+      where: {
+        invoice_uid
+      }
+    })
 
-    if (!payment) throw new Error('payment for invoice not found')
-
-    let feeResult = await getMiningFee(payment.currency, payment.txhex)
+    let feeResult = await getMiningFee(payment.currency, String(payment.txhex))
 
     console.log(Object.assign({ txid: payment.txid }, feeResult))
 

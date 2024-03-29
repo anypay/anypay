@@ -1,13 +1,12 @@
 
 import { check_confirmations } from '../';
 
-import { models } from '../../../lib'
-
 import { ensureInvoice } from '../../../lib/invoices';
+import prisma from '../../../lib/prisma';
 
 (async () => {
 
-  const payments = await models.Payment.findAll({
+  const payments = await prisma.payments.findMany({
     where: {
       currency: 'XMR',
       confirmation_date: null

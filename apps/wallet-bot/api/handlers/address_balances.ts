@@ -1,21 +1,23 @@
 
 import { badRequest } from 'boom'
 
-import { loadFromApp, WalletBot } from '../..'
+import { Request, ResponseToolkit } from '@hapi/hapi'
 
-export async function index(req, h) {
+import { getAddressHistory, listLatestBalances, loadFromApp, setAddressBalance } from '../..'
+
+export async function index(req: Request, h: ResponseToolkit) {
   
-  const { app } = req
+  const { app }: { app: any } = req as any
 
-  const walletBot: WalletBot = await loadFromApp({ app })
+  const walletBot = await loadFromApp({ app })
 
-  const balances = await walletBot.listLatestBalances()
+  const balances = await listLatestBalances(walletBot)
 
   try {
 
-    return { balances }
+    return h.response({ balances })
 
-  } catch(error) {
+  } catch(error: any) {
 
     return badRequest(error)
 
@@ -23,23 +25,23 @@ export async function index(req, h) {
 
 }
 
-export async function show(req, h) {
+export async function show(req: Request, h: ResponseToolkit) {
 
   try {
 
-    const { chain, currency, address } = req.params
+    const { chain, currency, address } = req.params as any
 
-    const { app } = req
+    const { app }: { app: any } = req as any
 
-    const walletBot: WalletBot = await loadFromApp({ app })
+    const walletBot: any = await loadFromApp({ app })
 
-    const history = await walletBot.getAddressHistory({
+    const history = await getAddressHistory(walletBot, {
       chain, currency, address
     })
 
     return { chain, currency, address, history }
 
-  } catch(error) {
+  } catch(error: any) {
 
     return badRequest(error)
 
@@ -47,23 +49,23 @@ export async function show(req, h) {
 
 }
 
-export async function update(req, h) {
+export async function update(req: Request, h: ResponseToolkit) {
 
-  const { chain, currency, address, balance } = req.payload
+  const { chain, currency, address, balance } = req.payload as any
 
-  const { app } = req
+  const { app }: { app: any } = req as any
 
-  const walletBot: WalletBot = await loadFromApp({ app })
+  const walletBot: any = await loadFromApp({ app })
 
   try {
 
-    const [update, isChanged] = await walletBot.setAddressBalance({
+    const [update, isChanged] = await setAddressBalance(walletBot, {
       chain, currency, address, balance
     })
 
     return { update, isChanged }
 
-  } catch(error) {
+  } catch(error: any) {
 
     return badRequest(error)
 

@@ -22,25 +22,25 @@ import prices from './prices'
 import rabbi from './rabbi'
 import prometheus from './prometheus'
 import plugins from './plugins'
+import { log } from '../lib'
 
-import { Anypay } from '../lib/index'
 
-export async function initialize(anypay: Anypay) {
+export async function initialize() {
 
-  console.log('initialize plugins')
+  log.info('initialize plugins')
   await plugins()
 
-  console.log('initialize coins')
+  log.info('initialize coins')
   await coins()
 
-  console.log('initialize prices')
+  log.info('initialize prices')
   await prices()
 
-  console.log('initialize rabbi amqp actor system')
+  log.info('initialize rabbi amqp actor system')
   await rabbi()
 
-  console.log('initialize prometheus')
-  await prometheus(anypay)
+  log.info('initialize prometheus')
+  await prometheus()
 
-  console.log('initialization complete')
+  log.info('initialization complete')
 }

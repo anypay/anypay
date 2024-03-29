@@ -1,10 +1,12 @@
 import { Request, ResponseToolkit } from '@hapi/hapi'
-import { models } from '../../../lib'
+import prisma from '../../../lib/prisma'
 
 export async function show(request: Request, h: ResponseToolkit) {
 
-  let account = await models.Account.findOne({
-    where: { email: request.params.email }
+  const account = await prisma.accounts.findFirst({
+    where: {
+      email: request.params.email
+    }
   })
 
   if (account) {

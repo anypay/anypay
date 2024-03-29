@@ -39,7 +39,7 @@ describe("Confirming Transactions", () => {
             txhex: fixtures.BTC_Confirmation_Test.txid
         })
 
-        expect(payment.get('status')).to.be.equal('confirming')
+        expect(payment.status).to.be.equal('confirming')
 
         await prisma.invoices.update({
             where: {
@@ -51,20 +51,20 @@ describe("Confirming Transactions", () => {
             }
         })
 
-        await confirmTransactionsFromBlockWebhook(fixtures.BTC_Confirmation_Test.blockcpher_webhook_payload)        
-        payment = await models.Payment.findOne({
+        await confirmTransactionsFromBlockWebhook(fixtures.BTC_Confirmation_Test.blockcpher_webhook_payload)    
+        payment = await prisma.payments.findFirstOrThrow({
             where: {
-                invoice_uid: invoice.uid
+                invoice_uid: String(invoice.uid)
+            }
+        })    
+
+        invoice = await prisma.invoices.findFirstOrThrow({
+            where: {
+                uid: String(invoice.uid)
             }
         })
 
-        invoice = await models.Invoice.findOne({
-            where: {
-                uid: invoice.uid
-            }
-        })
-
-        expect(payment.get('status')).to.be.equal('confirmed')
+        expect(payment.status).to.be.equal('confirmed')
 
         expect(invoice.status).to.be.equal('paid')
 

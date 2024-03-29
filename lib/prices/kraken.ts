@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import { log } from '../log'
 
-import { Price as UnsavedPrice} from './price'
+import { SetPrice as UnsavedPrice} from './price'
 
 class InvalidPricePair implements Error {
   name = 'KrakenInvalidPricePair'
@@ -59,7 +59,7 @@ export async function getPrice(currency: string): Promise<UnsavedPrice> {
     }
 
     return {
-      base: 'USD',
+      base_currency: 'USD',
       currency,
       value,
       source: 'kraken'

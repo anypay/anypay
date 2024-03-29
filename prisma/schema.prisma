@@ -262,6 +262,7 @@ model PaymentSubmissions {
   invoice_uid String?  @db.VarChar(255)
   txhex       String?
   currency    String?  @db.VarChar(255)
+  chain       String?  @db.VarChar(255)
   headers     Json?    @db.Json
   wallet      String?  @db.VarChar(255)
   protocol    String?  @db.VarChar(255)
@@ -617,8 +618,6 @@ model events {
   namespace   String?  @db.VarChar(255)
   error       Boolean?
   app_id      Int?
-
-
 }
 
 model extended_public_keys {
@@ -755,7 +754,6 @@ model orders {
   egifter_order   Json?      @db.Json
   status          String?    @default("unpaid") @db.VarChar(255)
   token           Json?      @db.Json
-  payments        payments[]
   products        products   @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -792,7 +790,9 @@ model payment_options {
   outputs           Json?     @db.Json
   currency_name     String?   @db.VarChar(255)
   currency_logo_url String?   @db.VarChar(255)
-  chain             String   @db.VarChar(255)
+  chain             String    @db.VarChar(255)
+
+  payments payments[]
 }
 
 model payments {
@@ -817,8 +817,8 @@ model payments {
   tx_key              String?   @db.VarChar(255)
   status              String?   @default("confirming") @db.VarChar(255)
   chain               String?   @db.VarChar(255)
-  orders              orders?   @relation(fields: [ordersId], references: [id])
-  ordersId            Int?
+
+  payment_option payment_options? @relation(fields: [payment_option_id], references: [id])
 }
 
 model prices {

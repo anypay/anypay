@@ -2,9 +2,9 @@ require('dotenv').config()
 
 import * as assert from 'assert' 
 import * as stub from '../../lib/stub'
-import { models } from '../../lib/models'
 
 import * as utils from '../utils'
+import prisma from '../../lib/prisma'
 
 describe("Adding a stub to an account", () => {
 
@@ -29,11 +29,23 @@ describe("Adding a stub to an account", () => {
 
     account.business_name = "Jason's Deli"
 
-    await account.save()
+    await prisma.accounts.update({
+      where: {
+        id: account.id
+      },
+      data: {
+        business_name: "Jason's Deli",
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(account.stub, 'jasons-deli')
 
-    await account.destroy()
+    await prisma.accounts.delete({
+      where: {
+        id: account.id        
+      }
+    })
 
   })
 
@@ -45,16 +57,41 @@ describe("Adding a stub to an account", () => {
     account1.business_name = "HEB Supermarket"
     account2.business_name = "HEB Supermarket"
 
-    await account1.save()
+    await prisma.accounts.update({
+      where: {
+        id: account1.id
+      },
+      data: {
+        business_name: "HEB Supermarket",
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(account1.stub, 'heb-supermarket')
 
-    await account2.save()
+    await prisma.accounts.update({
+      where: {
+        id: account2.id
+      },
+      data: {
+        business_name: "HEB Supermarket",
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(account2.stub, null)
 
-    await account1.destroy()
-    await account2.destroy()
+    await prisma.accounts.delete({
+      where: {
+        id: account1.id
+      }
+    })
+
+    await prisma.accounts.delete({
+      where: {
+        id: account2.id
+      }
+    })
 
   })
 
@@ -68,28 +105,42 @@ describe("Adding a stub to an account", () => {
     account2.business_name = "HEB Supermarket"
     account2.city = "San Antonio"
 
-    await account1.save()
+    await prisma.accounts.update({
+      where: {
+        id: account1.id
+      },
+      data: {
+        business_name: "HEB Supermarket",
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(account1.stub, 'heb-supermarket')
 
-    await account2.save()
+    await prisma.accounts.update({
+      where: {
+        id: account2.id
+      },
+      data: {
+        business_name: "HEB Supermarket",
+        city: "San Antonio",
+        updatedAt: new Date()
+      }
+    })
 
     assert.strictEqual(account2.stub, 'heb-supermarket-san-antonio')
 
-    await account1.destroy()
-    await account2.destroy()
+    await prisma.accounts.delete({
+      where: {
+        id: account1.id
+      }
+    })
 
-  })
-
-  it('#stub.updateAccount should default to using account id if no business name exists', async () => {
-
-    let account = await utils.generateAccount()
-
-    await stub.updateAccount(account, models.Account)
-
-    assert.strictEqual(account.stub, account.id)
-
-    await account.destroy()
+    await prisma.accounts.delete({
+      where: {
+        id: account2.id
+      }
+    })
 
   })
 

@@ -3,7 +3,7 @@ import * as Hapi from '@hapi/hapi';
 
 import * as jwt from '../../lib/jwt';
 
-import { models, log } from '../../lib';
+import { log } from '../../lib';
 
 import { Request } from '@hapi/hapi';
 import AuthenticatedRequest from './AuthenticatedRequest';
@@ -37,18 +37,20 @@ async function validateToken (request: AuthenticatedRequest, username: string, p
     };
   }
 
-  var accessToken = await models.AccessToken.findOne({
+  var accessToken = await prisma.access_tokens.findFirst({
     where: {
       uid: username
     }
   });
 
   if (accessToken) {
-		var account = await models.Account.findOne({
-			where: {
-				id: accessToken.account_id
-			}
-		})
+
+    var account = await prisma.accounts.findFirstOrThrow({
+      where: {
+        id: accessToken.account_id
+      }
+    })
+
 		request.account = account;
 
     request.account_id = accessToken.account_id;
@@ -82,11 +84,11 @@ export async function validateAppToken (request: AuthenticatedRequest, username:
     };
   }
 
-  var accessToken = await models.AccessToken.findOne({
+  var accessToken = await prisma.access_tokens.findFirst({
     where: {
       uid: username
     }
-  });
+  })
 
   if (!accessToken) {
 

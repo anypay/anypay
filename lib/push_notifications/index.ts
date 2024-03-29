@@ -1,6 +1,6 @@
 
 import { config } from '../config';
-import { models } from '../models';
+import prisma from '../prisma';
 
 var FCM = require('fcm-node');
 
@@ -8,17 +8,20 @@ interface FirebaseOptions {
   path?: string;
 }
 
-export async function sendMessage(email, title, body, options: FirebaseOptions = {}) {
+export async function sendMessage(email: string, title: string, body: string, options: FirebaseOptions = {}) {
 
-  let account = await models.Account.findOne({ where: { email }});
+  const account = await prisma.accounts.findFirstOrThrow({
+    where: {
+      email
+    }
+  })
 
-  if (!account) { throw new Error('account not found') }
+  const firebaseTokens = await prisma.firebase_tokens.findMany({
+    where: {
+      account_id: account.id
+    }
+  })
 
-  let firebaseTokens = await models.FirebaseToken.findAll({ where: {
-
-    account_id: account.id
-
-  }});
   var serverKey = config.get('FIREBASE_SERVER_KEY'); //put your server key here
   var fcm = new FCM(serverKey);
 
@@ -42,7 +45,7 @@ export async function sendMessage(email, title, body, options: FirebaseOptions =
           }
       };
 
-      fcm.send(message, function(err, response){
+      fcm.send(message, function(err: Error | undefined, response: any){
           if (err) {
             //return reject(err);
             resolve(null);

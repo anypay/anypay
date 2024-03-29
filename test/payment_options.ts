@@ -4,13 +4,12 @@ require('dotenv').config()
 import { Invoice, createInvoice } from '../lib/invoices'
 
 //import { PaymentOption } from '../lib/payment_option'
-
-import { models } from '../lib/models'
-
-import { Account } from '../lib/account'
+import { accounts as Account } from '@prisma/client'
 
 import {refreshCoins}from '../lib/coins'
 import { config } from '../lib/config'
+import prisma from '../lib/prisma'
+import { generateAccount } from './utils'
 
 const options = [{
   currency:'USDC',
@@ -67,11 +66,9 @@ async function main() {
 
   await refreshCoins()
 
-  const account: Account = await Account.fromAccessToken({
 
-    token: config.get('ANYPAY_ACCESS_TOKEN')
 
-  })
+  const account: Account = await generateAccount()
 
   let invoice: Invoice = await createInvoice({
 
@@ -81,13 +78,24 @@ async function main() {
 
   })
 
-  const records = await models.PaymentOption.findAll({ where:{ invoice_uid: invoice.uid }})
+  const records = await prisma.payment_options.findMany({
+    where: {
+      invoice_uid: String(invoice.uid)
+    }
+  
+  })
 
   for (let option of records){
 
     const { chain, currency } = option
 
-    const paymentOption = await invoice.getPaymentOption({ chain, currency })
+    const paymentOption = await prisma.payment_options.findFirstOrThrow({
+      where: {
+        chain,
+        currency,
+        invoice_uid: String(invoice.uid)
+      }
+    })
 
     if (!paymentOption){
       console.log('payment option not found', { chain, currency })
@@ -101,21 +109,14 @@ async function main() {
 
     const { chain, currency } = option
 
-    const paymentOption = await invoice.getPaymentOption({ chain, currency })
+    const paymentOption = await prisma.payment_options.findFirstOrThrow({
+      where: {
+        chain,
+        currency,
+        invoice_uid: String(invoice.uid)
+      }
+    })
 
-    if (!paymentOption){
-      console.log('payment option not found', {chain, currency})
-     }
-
-    if (paymentOption.outputs) {
-
-      console.log(paymentOption.toJSON())
-
-   } else {
-
-      console.log(paymentOption, 'no outputs')
-
-    }
   
   } catch(error){
     console.error(error)

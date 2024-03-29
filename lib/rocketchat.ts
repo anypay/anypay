@@ -1,32 +1,34 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
+import { config } from './config';
 import { log } from './log';
 
-const http = require("superagent");
+import axios from 'axios'
 
-const base = 'https://chat.anypayinc.com/hooks';
-
-const channels = {
-  'misc': 'nbfWhcsDeXypz4RDu/AXqEGLCQbno7gotBTuipAwsZzuTTMtPZ3LHfRx86u3dHf6aY'
-}
-
-export function notify(channel, message: string) {
-
-  if (!channels[channel]) {
-    log.info(`rocketchat channel ${channel} not found`);
-    channel = 'misc';
-  }
+export async function notify(channel: string, message: string) {
 
   log.info(`notify slack ${message}`);
 
-  http
-    .post(`${base}/${channels[channel]}`)
-    .send({
-      text: message
-    })
-    .end((error, response) => {
-      if (error) {
-        log.error("rocketchat.error", error);
-      } else {
-        log.info("rocketchat.notified", response.body);
-      }
-    });
+  const { data } = await axios.post(`${config.get('ROCKETCHAT_WEBHOOK_URL')}`, {
+    text: message
+
+  })
+
+  return data
+
 }

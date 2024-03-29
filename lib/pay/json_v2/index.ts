@@ -121,7 +121,7 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
       fee.amount = paymentOption.fee;
     }
 
-    let amount = new BigNumber(paymentOption.amount);
+    let amount = new BigNumber(Number(paymentOption.amount));
     var address = paymentOption.address;
 
     if (address.match(/\:/)) {

@@ -1,5 +1,5 @@
 
-import { models } from '../../../lib'
+import prisma from '../../../lib/prisma'
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest'
 
 export async function create(request: AuthenticatedRequest) { 
@@ -9,21 +9,34 @@ export async function create(request: AuthenticatedRequest) {
     api_secret: string
   }
 
-  let [krakenAccount] = await models.KrakenAccount.findOrCreate({
+  let krakenAccount = await prisma.krakenAccounts.findFirst({
     where: {
-      account_id: request.account.id
-    },
-    defaults: {
-      api_key: payload.api_key,
-      api_secret: payload.api_secret,
       account_id: request.account.id
     }
   })
 
-  krakenAccount.api_key = payload.api_key
-  krakenAccount.api_secret = payload.api_secret
+  if (!krakenAccount) {
+    krakenAccount = await prisma.krakenAccounts.create({
+      data: {
+        api_key: payload.api_key,
+        api_secret: payload.api_secret,
+        account_id: request.account.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  }
 
-  await krakenAccount.save()
+  await prisma.krakenAccounts.update({
+    where: {
+      id: krakenAccount.id
+    },
+    data: {
+      api_key: payload.api_key,
+      api_secret: payload.api_secret,
+      updatedAt: new Date()
+    }
+  })
 
   return {
     api_key: krakenAccount.api_key,
@@ -34,10 +47,10 @@ export async function create(request: AuthenticatedRequest) {
 
 export async function show(request: AuthenticatedRequest) { 
 
-  let krakenAccount = await models.KrakenAccount.findOne({
+  let krakenAccount = await prisma.krakenAccounts.findFirst({
     where: {
       account_id: request.account.id
-    },
+    }
   })
 
   if (!krakenAccount) {
@@ -59,14 +72,18 @@ export async function show(request: AuthenticatedRequest) {
 
 export async function destroy(request: AuthenticatedRequest) { 
 
-  let krakenAccount = await models.KrakenAccount.findOne({
+  let krakenAccount = await prisma.krakenAccounts.findFirst({
     where: {
       account_id: request.account.id
-    },
+    }
   })
 
   if (krakenAccount) {
-    await krakenAccount.destroy()
+    await prisma.krakenAccounts.delete({
+      where: {
+        id: krakenAccount.id
+      }
+    })
   }
 
   return { success: true }

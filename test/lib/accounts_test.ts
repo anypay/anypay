@@ -2,9 +2,10 @@ require('dotenv').config();
 
 import * as assert from 'assert';
 
-import { accounts, models } from '../../lib';
+import { accounts } from '../../lib';
 
 import * as Chance from 'chance';
+import prisma from '../../lib/prisma';
 
 const chance = Chance();
 
@@ -20,7 +21,9 @@ describe("Accounts library", () => {
 
     await accounts.setName(account, businessName);
 
-    account = await models.Account.findOne({ where: { email }});
+    account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    })
 
     assert.strictEqual(account.business_name, businessName);
 
@@ -36,8 +39,10 @@ describe("Accounts library", () => {
 
     await accounts.setPhysicalAddress(account, physicalAddress);
 
-    account = await models.Account.findOne({ where: { email }});
-
+    account = await prisma.accounts.findFirstOrThrow({
+      where: { email }
+    })
+    
     assert.strictEqual(account.physical_address, physicalAddress);
 
   });

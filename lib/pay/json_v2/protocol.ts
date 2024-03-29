@@ -11,8 +11,6 @@ import { find } from '../../plugins'
 
 import { Transaction, Plugin } from '../../plugin'
 
-import { models } from '../../models'
-
 import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 import { getRequiredFeeRate } from '../required_fee_rate'
@@ -41,11 +39,11 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     log.info('payment.submit', payment);
 
-    let invoice = await models.Invoice.findOne({ where: { uid: invoice_uid }})
-
-    if (!invoice) {
-      throw new Error(`invoice ${payment.invoice_uid} not found`)
-    }
+    const invoice = await prisma.invoices.findFirstOrThrow({
+      where: {
+        uid: String(invoice_uid)
+      }
+    })
 
     if (invoice.status !== 'unpaid') {
       throw new Error(`Invoice With Status ${invoice.status} Cannot Be Paid`)
@@ -56,7 +54,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
       chain
     }
 
-    let paymentOption = await models.PaymentOption.findOne({ where })
+    const paymentOption = await prisma.payment_options.findFirst({ where })
 
     if (!paymentOption) {
 
@@ -82,6 +80,8 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       if (!verified) {
 
+        console.log({ paymentOption })      
+
         log.info(`pay.jsonv2.${chain}.${payment.currency}.verifyPayment.failed`, {
           invoice_uid: invoice.uid,
           transaction,
@@ -99,9 +99,15 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
         response = await plugin.broadcastTx(transaction)
 
-        invoice.hash = response
-
-        await invoice.save()
+        await prisma.invoices.update({
+          where: {
+            id: invoice.id
+          },
+          data: {
+            hash: String(response),
+            updatedAt: new Date()
+          }
+        })
 
       } else {
 
@@ -153,6 +159,8 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
   } catch(error: any) {
 
+    console.log(error)
+
     log.error('pay.jsonv2.payment.error', error)
 
     throw error
@@ -170,7 +178,11 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     console.log('payment.unsigned.verify', payment);
 
-    let invoice = await models.Invoice.findOne({ where: { uid: payment.invoice_uid }})
+    const invoice = await prisma.invoices.findFirstOrThrow({
+      where: {
+        uid: payment.invoice_uid
+      }
+    })
 
     if (invoice.cancelled) {
 
@@ -181,19 +193,14 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
       throw error
     }
 
-    if (!invoice) {
-      throw new Error(`invoice ${payment.invoice_uid} not found`)
-    }
+    const paymentOption = await prisma.payment_options.findFirstOrThrow({
+      where: {
+        invoice_uid: String(invoice.uid),
+        currency,
+        chain
+      }
+    })
 
-    let paymentOption = await models.PaymentOption.findOne({ where: {
-      invoice_uid: invoice.uid,
-      currency,
-      chain
-    }})
-
-    if (!paymentOption) {
-      throw new Error(`Unsupported Currency or Chain for Payment Option`)
-    }
 
     let plugin = find({ chain, currency })
 

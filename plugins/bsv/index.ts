@@ -6,7 +6,7 @@ import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, VerifyPayment, Transaction, Payment, Price } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '../../lib/plugin'
 
 import oneSuccess from 'promise-one-success'
 
@@ -15,6 +15,7 @@ import { blockchair, config, log } from '../../lib';
 import axios from 'axios'
 
 import UTXO_Plugin from '../../lib/plugins/utxo'
+import { SetPrice } from '../../lib/prices/price'
 
 const polynym = require('polynym');
 
@@ -27,16 +28,16 @@ export default class BSV extends UTXO_Plugin {
   decimals = 8
 
   providerURL = String(config.get('GETBLOCK_BSV_URL'))
-    )
+  
   get bitcore() {
 
     return bsv
 
   }
 
-  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
+  /*async parsePayments({txhex}: Transaction): Promise<Payment[]> {
     throw new Error() //TODO
-  }
+  }*/
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
@@ -84,11 +85,6 @@ export default class BSV extends UTXO_Plugin {
 
   }
 
-  async verifyPayment(params: VerifyPayment): Promise<boolean> {
-
-    return false
-  }
-
   async validateAddress(address: string): Promise<boolean> {
 
     try {
@@ -129,7 +125,7 @@ export default class BSV extends UTXO_Plugin {
 
   }
 
-  async getPrice(): Promise<Price> {
+  async getPrice(): Promise<SetPrice> {
 
     const { data } = await axios.get(`https://data.gateapi.io/api2/1/ticker/bsv_usdt`)
 
@@ -137,7 +133,7 @@ export default class BSV extends UTXO_Plugin {
 
     return {
       value,
-      base: 'USD',
+      base_currency: 'USD',
       currency: this.currency, 
       chain: this.chain, 
       source: 'gate.io'

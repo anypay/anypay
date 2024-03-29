@@ -1,3 +1,20 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
 
 require('dotenv').config();
 
@@ -12,9 +29,7 @@ import * as chain_so from './chain_so';
 import * as login from './account_login';
 import * as invoices from './invoice';
 import * as settings from './settings';
-import * as prices from './prices';
-import { models } from './models';
-import * as database from './database';
+import * as prices from './prices'; 
 import * as addresses from './addresses';
 import * as coins from './coins';
 import { log } from './log';
@@ -27,8 +42,6 @@ import * as pay from './pay';
 import * as access from './access_tokens';
 import * as mempool from './mempool.space'
 import * as nownodes from './nownodes'
-import { Payment } from './payments'
-import * as orm from './orm'
 
 import {
   payment_options as PaymentOption,
@@ -40,25 +53,15 @@ var initialized = false;
 
 import * as initializers from '../initializers'
 
-export interface Anypay {
-  models:        any;
-  log:           any;
-  orm:           any;
-  Payment:       any;
-}
-
 const anypay = {
   log,
-  models,
-  orm: orm,
-  Payment: Payment,
 }
 
 export default anypay
 
 ;(async function() {
 
-  await initializers.initialize(anypay);
+  await initializers.initialize();
 
   initialized = true;
 
@@ -77,12 +80,10 @@ export {
   chain_so,
   coins,
   config,
-  database,
   events,
   invoices,
   log,
   login,
-  models,
   nownodes,
   password,
   pay,

@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const socketio = require('socket.io')
+import { WebSocket } from 'ws';
 
 import { ResponseToolkit, Server } from '@hapi/hapi'
 
@@ -16,7 +16,7 @@ import { bind, unbind } from './socket.io/amqp_queue_socket_binding'
 
 import { config } from '../../lib/config'
 
-import { findOrCreateWalletBot, getAccessToken, getPaymentCounts } from './'
+import { findOrCreateWalletBot, getAccessToken, getPaymentCounts, listLatestBalances } from './'
 
 import { requireHandlersDirectory } from '../../lib/rabbi_hapi'
 
@@ -26,6 +26,21 @@ import { failAction } from '../../server/handlers'
 
 import { handlers as websocketsHandlers } from './sockets'
 
+import * as express from 'express'
+
+interface WalletBotBalances {
+      [wallet_bot_id: number]: any[]
+}
+
+const walletBotBalances: WalletBotBalances = []
+
+function getWalletBotBalance(walletBot: any): WalletBotBalances {
+  return walletBotBalances[walletBot.id] || []
+}
+
+import * as http from 'http';
+
+
 export const plugin = (() => {
 
   return {
@@ -34,23 +49,20 @@ export const plugin = (() => {
 
     register: async function(server: Server) {
 
-      const path = '/v1/apps/wallet-bot'
+      // create new nodejs http server on port process.env.WALLET_BOT_WEBSOCKET_PORT
 
-      const io = socketio(server.listener, { path })
+      const wsServer = http.createServer();
 
-      log.info('socket.io.started', { path })
+      const wss = new WebSocket.Server({ server: wsServer });
 
-      io.use(async (socket: any, next: Function) => {
-
+      // 
+      
+      wss.on('connection', async function (ws: WebSocket, request: express.Request) {
         try {
 
           log.info('wallet-bot.socket.io.connecting')
 
-          log.info('wallet-bot.socket.io.handshake', socket.handshake)
-
-          const { address } = socket.handshake
-
-          const { walletBot } = await authenticate(socket)
+          const { walletBot } = await authenticate(ws, request)
 
           if (!walletBot) {
 
@@ -58,75 +70,36 @@ export const plugin = (() => {
 
           }
 
-          socket.data.walletBot = walletBot
+          setSocket(walletBot, ws)
+ws
+          log.info('wallet-bot.socket.io.authenticated', { walletBot })
 
-          setSocket(walletBot, socket)
-
-          log.info('wallet-bot.socket.io.authenticated', { address, walletBot })
-
-          socket.emit('authenticated')
-
-          next()
-
-        } catch(error) {
-
-          socket.emit('error', error)
-
-          removeSocket(socket)
-
-        }
-
-      })
-
-      io.on('connection', async function(socket: any) {
-
-        try {
-
-          const { address } = socket.handshake
-
-          log.info('wallet-bot.socket.io.connection', { address })
-
-          const binding = await bind({ socket })
-
+          ws.emit('authenticated')
+          
+          const binding = await bind({ socket: ws, walletBot });
+          
           Object.keys(websocketsHandlers).forEach(event => {
-
-            socket.on(event, (message: any) => {
-
+            ws.on(event, (message: any) => {
               if (websocketsHandlers[event]) {
-
-                websocketsHandlers[event](socket, message)
-
+                websocketsHandlers[event](ws, message);
               }
-              
-            })
-          })
-
-          socket.on('disconnect', () => {
-
-            unbind(binding)
-
-            removeSocket(socket)
-
-            log.info('wallet-bot.socket.io.disconnect', socket.info)
-
-            const sockets = listSockets()
-
-            log.info('wallet-bot.socket.io.sockets', { count: sockets.length })
-
-          })
-
-          const sockets = listSockets()
-
-          log.info('wallet-bot.socket.io.sockets', { count: sockets.length })
-
-        } catch(error: any) {
-
-          log.error('io.connection.error', error)
-
+            });
+          });
+          
+          ws.on('close', () => {
+            unbind(binding);
+            removeSocket({socket: ws, walletBot});
+            
+            const sockets = listSockets();
+            log.info('wallet-bot.socket.io.sockets', { count: sockets.length });
+          });
+          
+          const sockets = listSockets();
+          log.info('wallet-bot.socket.io.sockets', { count: sockets.length });
+        } catch (error: any) {
+          log.error('io.connection.error', error);
         }
-
-
-      })
+      });   
 
       const base = '/v1/api/apps/wallet-bot'
 
@@ -155,7 +128,7 @@ export const plugin = (() => {
 
             }
 
-            const balances = socket ? socket.data.balances : null
+            const balances = getWalletBotBalance(walletBot)
 
             const access_token = accessToken.uid
 
@@ -199,7 +172,7 @@ export const plugin = (() => {
       server.route({
         path: `${base}/dashboard`,
         method: 'GET',
-        handler: async (req: AuthenticatedRequest, h) => {
+        handler: async (req: AuthenticatedRequest) => {
 
           try {
 
@@ -211,19 +184,19 @@ export const plugin = (() => {
 
             const socket = getSocket(walletBot)
 
-            const balances = await walletBot.listLatestBalances()
+            const balances = await listLatestBalances(walletBot)
 
             const status = socket ? 'connected' : 'disconnected'
 
             const wallet_bot = {
 
-              id: walletBot.get('id'),
+              id: walletBot.id,
 
               status
 
             }
 
-            const access_token = accessToken.get('uid')
+            const access_token = accessToken.uid
 
             return {
 
@@ -360,7 +333,12 @@ export const plugin = (() => {
         handler: handlers.V1Invoices.index
       })
 
+      wsServer.listen(config.get('WALLET_BOT_WEBSOCKET_PORT'), () => {
+        console.log(`WalletBot Websockets server listening on port ${config.get('WALLET_BOT_WEBSOCKET_PORT')}.`);
+      });
+
     }
+    
 
   }
 

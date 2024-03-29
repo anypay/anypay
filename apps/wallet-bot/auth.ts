@@ -1,30 +1,30 @@
 
-import { Socket } from 'socket.io'
+import { WebSocket } from 'ws'
 
 import { log } from '../../lib/log'
 
-import { getWalletBot, WalletBot } from './'
+import { getWalletBot } from './'
+
+import { WalletBots as WalletBot } from '@prisma/client'
 
 interface AuthorizedSocket {
-  socket: Socket;
+  socket: WebSocket;
   walletBot?: WalletBot;
 }
 
-export async function authenticate(socket: Socket): Promise<AuthorizedSocket> {
+import * as express from 'express';
+
+export async function authenticate(socket: WebSocket, request: express.Request): Promise<AuthorizedSocket> {
 
   try {
 
-    const { address } = socket.handshake
-
-    log.info('wallet-bot.socket.io.authenticate', { address })
-
-    if (!socket.handshake.headers.authorization) {
+    if (!request.headers['authorization']) {
 
       throw new Error('authorization header missing')
 
     }
 
-    const token = socket.handshake.headers['authorization'].split(' ')[1]
+    const token = request.headers['authorization'].split(' ')[1]
 
     log.info('wallet-bot.socket.io.authorization.bearer', {token})
 
@@ -34,7 +34,7 @@ export async function authenticate(socket: Socket): Promise<AuthorizedSocket> {
 
     return { socket, walletBot }
 
-  } catch(error) {
+  } catch(error: any) {
 
     socket.emit('authentication.error', { error: error.message })
 

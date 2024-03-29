@@ -1,11 +1,12 @@
 
 import { Request, ResponseToolkit } from '@hapi/hapi';
-import { models, log } from '../../../lib'
+import { log } from '../../../lib'
 
 import { detectWallet, buildPaymentRequestForInvoice, getCurrency } from '../../../lib/pay';
 
 import { submitPayment } from '../../../lib/pay/json_v2/protocol'
 import { badRequest } from '@hapi/boom';
+import prisma from '../../../lib/prisma';
 
 export async function show(request: Request, h: ResponseToolkit) {
 
@@ -58,14 +59,19 @@ export async function create(request: Request, h: ResponseToolkit) {
 
     for (let transaction of transactions) {
 
-      models.PaymentSubmission.create({
-        invoice_uid,
-        txhex: transaction,
-        headers: request.headers,
-        wallet,
-        currency,
-        chain
+      prisma.paymentSubmissions.create({
+        data: {
+          invoice_uid,
+          txhex: transaction,
+          headers: request.headers,
+          wallet,
+          currency,
+          chain,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
       })
+
     }
 
     let response = await submitPayment({

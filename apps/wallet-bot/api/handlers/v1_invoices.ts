@@ -1,13 +1,14 @@
 
-import { findOrCreateWalletBot } from "../.."
+import { cancelInvoice, findOrCreateWalletBot } from "../.."
 
-import { ensureInvoice, Invoice } from "../../../../lib/invoices"
-
-import { findAll } from "../../../../lib/orm"
+import { ensureInvoice } from "../../../../lib/invoices"
 
 import { unauthorized } from '@hapi/boom'
+import prisma from "../../../../lib/prisma"
+import { ResponseToolkit } from "@hapi/hapi"
+import boom = require("boom")
 
-export async function index (req, h) {
+export async function index (req: any) {
 
     const { app } = await findOrCreateWalletBot(req.account)
 
@@ -15,7 +16,7 @@ export async function index (req, h) {
 
     if (!limit) { limit = 100 }
 
-    const where = {
+    const where: any = {
         app_id: app.id,
         status: status || 'unpaid'
     }
@@ -26,7 +27,7 @@ export async function index (req, h) {
 
     }
 
-    const query = { where }
+    const query: any = { where }
 
     if (limit) {
         query['limit'] = limit || 100
@@ -36,16 +37,21 @@ export async function index (req, h) {
         query['offset'] = offset
     }
 
-    const invoices = await findAll<Invoice>(Invoice, query)
+    const invoices = await prisma.invoices.findMany({
+        where: query.where,
+        take: query.limit,
+        skip: query.offset,
+    })
+
 
     return {
         app: '@wallet-bot',
-        invoices: invoices.map(invoice => invoice.toJSON())
+        invoices
     }
 
   }
 
-  export async function cancel(req, h) {
+  export async function cancel(req: any, h: ResponseToolkit) {
 
     try {
 
@@ -54,30 +60,25 @@ export async function index (req, h) {
 
     const invoice = await ensureInvoice(req.params.invoice_uid)
 
-    if (invoice.get('app_id') !== app.get('id')) {
-
-        console.log('INVOICE APP ID', invoice.get('app_id'))
-
-        console.log('APP ID', app.id)
+    if (invoice.app_id !== app.id) {
 
         return unauthorized()
 
     }
 
-    const cancelled = await walletBot.cancelInvoice(invoice)
+    const cancelled = await cancelInvoice(walletBot, String(invoice.uid))
 
     return {
 
-        invoice: cancelled.toJSON()
+        invoice: cancelled
     }
 
 
-    } catch(error) {
+    } catch(error: any) {
 
         console.error(error)
-        console.error('_ERROR CANCEL', error.message)
 
-        return h.badRequest(error)
+        return boom.badRequest(error)
     }
 
 

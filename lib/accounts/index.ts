@@ -2,8 +2,6 @@ const bcrypt = require('bcryptjs');
 
 import { log } from '../log';
 
-import * as database from '../database';
-
 import {getAddress, getSupportedCoins} from './supported_coins';
 import { accounts as Account } from '@prisma/client';
 import { access_tokens as AccessToken } from '@prisma/client';
@@ -19,19 +17,6 @@ interface AccountAddress {
   enabled: boolean;
   name?: string;
   code?: string;
-}
-
-export async function near(latitude: number, longitude: number, limit=100) {
-let query = `SELECT *,
-	ST_Distance(
-    position,
-    'SRID=4326;POINT(${longitude} ${latitude})'::geometry
-    ) AS distance
-    from accounts where position is not null and business_name is not null order by distance limit ${limit};`
-
-  let result = await database.query(query)
-
-  return result[0]
 }
 
 export async function findByEmail(email: string): Promise<Account | null> {
