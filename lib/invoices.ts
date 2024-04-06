@@ -18,7 +18,7 @@
 
 import { log } from './log'
 
-import { createWebhookForInvoice } from './webhooks'
+import { InvoiceCancelledEvent, createAndSendWebhook, createWebhookForInvoice } from './webhooks'
 
 import {
   accounts as Account,
@@ -36,6 +36,8 @@ import { publish, registerSchema } from './amqp'
 import prisma from './prisma'
 
 export { Invoice }
+
+import { InvoiceCreatedEvent } from './webhooks'
 
 export async function ensureInvoice(uid: string): Promise<Invoice> {
 
@@ -78,6 +80,20 @@ export async function cancelInvoice(invoice: Invoice) {
     status: 'cancelled',
     timestamp: new Date()
   })
+
+  const webhookPayload: InvoiceCancelledEvent = {
+    topic: 'invoice.cancelled',
+    payload: {
+      app_id: invoice.app_id || undefined,
+      account_id: invoice.account_id || undefined,
+      invoice: {
+        uid: String(invoice.uid),
+        status: 'cancelled'
+      }
+    }
+  }
+
+  createAndSendWebhook('invoice.cancelled', webhookPayload)
 
   return invoice
 
@@ -210,6 +226,26 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
   log.info('paymentrequest.created', paymentRequest)
 
   log.info('invoice.created', invoice)
+
+  publish('invoice.created', invoice)
+
+  const webhookPayload: InvoiceCreatedEvent = {
+    topic: 'invoice.created',
+    payload: {
+      app_id: invoice.app_id || undefined,
+      account_id: invoice.account_id || undefined,
+      invoice: {
+        uid: String(invoice.uid),
+        status: String(invoice.status),
+        quote: {
+          amount: Number(invoice.amount),
+          currency: String(invoice.currency)
+        },
+      }
+    }
+  }
+
+  createAndSendWebhook('invoice.created', webhookPayload)
 
   return invoice;
 

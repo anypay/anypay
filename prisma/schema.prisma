@@ -29,17 +29,6 @@ model AddressBalanceUpdates {
   updatedAt     DateTime @db.Timestamptz(6)
 }
 
-model AppWebhooks {
-  id               Int      @id @default(autoincrement())
-  app_id           Int
-  url              String   @db.VarChar(255)
-  enabled          Boolean? @default(true)
-  events_whitelist Json?    @default("[\"*\"]") @db.Json
-  events_blacklist Json?    @default("[]") @db.Json
-  createdAt        DateTime @db.Timestamptz(6)
-  updatedAt        DateTime @db.Timestamptz(6)
-}
-
 model Apps {
   id          Int      @id @default(autoincrement())
   account_id  Int
@@ -396,7 +385,24 @@ model Webhooks {
   status        String?   @default("pending") @db.VarChar(255)
   retry_policy  String?   @default("no_retry") @db.VarChar(255)
   account_id    Int?
+  app_id        Int?
   payload       Json      @default("{}") @db.Json
+}
+
+model AppWebhooks {
+  id         Int       @id @default(autoincrement())
+  app_id     String
+  url        String
+  active     Boolean
+  topics     String[]
+}
+
+model AccountWebhooks {
+  id         Int       @id @default(autoincrement())
+  account_id String
+  url        String
+  active     Boolean
+  topics     String[]
 }
 
 model WoocommerceImages {
@@ -461,7 +467,6 @@ model accounts {
   image_url                 String?                  @db.VarChar(255)
   tipjar_enabled            Boolean?                 @default(false)
   allow_cashback_amount     Boolean?                 @default(false)
-  coordinates               Unsupported("geometry")?
   watch_address_webhook_url String?                  @db.VarChar(255)
   stub                      String?                  @db.VarChar(255)
   bank_account_id           Int?
@@ -482,7 +487,6 @@ model accounts {
   customer_pays_ambassador  Boolean?                 @default(true)
   registration_geolocation  Json?                    @db.Json
   registration_ip_address   String?                  @db.VarChar(255)
-  position                  Unsupported("geometry")?
   inserted_at               DateTime?                @db.Timestamptz(6)
   updated_at                DateTime?                @db.Timestamptz(6)
   access_tokens             access_tokens[]

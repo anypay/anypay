@@ -29,8 +29,6 @@ async function main() {
     }
   })
 
-  console.log(data, 'invoice.created')
-
   const uid = data.invoice.uid
 
   const url = `${base}/r/${uid}`

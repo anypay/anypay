@@ -28,6 +28,8 @@ import * as moment from 'moment'
 import { registerSchema } from './amqp'
 import prisma from './prisma'
 
+import { PaymentConfirmedEvent, createAndSendWebhook } from './webhooks'
+
 export interface Confirmation {
   confirmation_hash: string;
   confirmation_height: number;
@@ -75,6 +77,30 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
   })
 
   publish('payment.confirmed', payment)
+
+  const webhookPayload: PaymentConfirmedEvent = {
+    topic: 'payment.confirmed',
+    payload: {
+      account_id: invoice.account_id || undefined,
+      app_id: invoice.app_id || undefined,
+      payment: {
+        chain: String(payment.chain),
+        currency: payment.currency,
+        txid: payment.txid,
+        status: String(payment.status),
+      },
+      invoice: {
+        uid: String(invoice.uid),
+        status: String(invoice.status)
+      },
+      confirmation: {
+        hash: confirmation_hash,
+        height: confirmation_height
+      }
+    }      
+  }
+
+  await createAndSendWebhook('payment.confirmed', webhookPayload)
 
   return payment
 

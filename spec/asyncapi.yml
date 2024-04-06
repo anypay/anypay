@@ -1,0 +1,214 @@
+asyncapi: 2.0.0
+info:
+  title: Invoice and Payment Events
+  version: 1.0.0
+channels:
+  invoice.created:
+    description: Event triggered when an invoice is created.
+    subscribe:
+      operationId: subscribeToInvoiceCreated
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: F28WujS5Z
+                status:
+                  type: string
+                  pattern: ^unpaid$
+                  example: 'unpaid'
+                quote:
+                  type: object
+                  properties:
+                    amount:
+                      type: number
+                      example: 3550.22
+                    currency:
+                      type: string
+                      example: USD
+  invoice.cancelled:
+    description: Event triggered when an invoice is cancelled.
+    subscribe:
+      operationId: subscribeToInvoiceCancelled
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: 'F28WujS5Z'
+                status:
+                  type: string
+                  pattern: ^cancelled$
+                  example: "cancelled"
+  invoice.paid:
+    description: Event triggered when an invoice is paid.
+    subscribe:
+      operationId: subscribeToInvoicePaid
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: 'F28WujS5Z'
+                status:
+                  type: string
+                  pattern: ^paid$
+                  example: 'paid'
+            payment:
+              type: object
+              properties:
+                chain:
+                  type: string
+                  example: BTC
+                currency:
+                  type: string
+                  example: BTC
+                hash:
+                  type: string
+                  example: 6b185253b18d1a0ef038671b63b2806bb379ae4bd6435d061f5446d98bd0d5ff
+                status:
+                  type: string
+                  example: confirmed
+  payment.confirming:
+    description: Event triggered when a payment is confirming.
+    subscribe:
+      operationId: subscribeToPaymentConfirming
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: 'AKlkk29xx'
+                status:
+                  type: string
+                  example: 'confirming'
+            payment:
+              type: object
+              properties:
+                chain:
+                  type: string
+                  example: BTC
+                currency:
+                  type: string
+                  example: BTC
+                hash:
+                  type: string
+                  example: 6b185253b18d1a0ef038671b63b2806bb379ae4bd6435d061f5446d98bd0d5ff
+                status:
+                  type: string
+                  pattern: ^confirming$
+                  example: confirming
+  payment.confirmed:
+    description: Event triggered when a payment is confirmed.
+    subscribe:
+      operationId: subscribeToPaymentConfirmed
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: 'AKlkk29xx'
+                status:
+                  type: string
+                  pattern: ^paid$
+                  example: 'paid'
+            payment:
+              type: object
+              properties:
+                chain:
+                  type: string
+                  example: BTC
+                currency:
+                  type: string
+                  example: BTC
+                hash:
+                  type: string
+                  example: 6b185253b18d1a0ef038671b63b2806bb379ae4bd6435d061f5446d98bd0d5ff
+                status:
+                  type: string
+                  pattern: ^confirmed$
+                  example: confirmed
+            confirmation:
+              type: object
+              properties:
+                chain:
+                  type: string
+                  example: BTC
+                height:
+                  type: integer
+                  example: 837886
+                hash:
+                  type: string
+                  example: 50db4b268c737609efc5cc43d88d29d8837b573bfe0e696e56cc4adc60f68296
+  payment.failed:
+    description: Event triggered when a payment fails.
+    subscribe:
+      operationId: subscribeToPaymentFailed
+      bindings:
+        ws: websocket
+        http: http
+      message:
+        payload:
+          type: object
+          properties:
+            invoice:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  example: 'AKlkk29xx'
+                status:
+                  type: string
+                  pattern: ^unpaid$
+                  example: unpaid
+            payment:
+              type: object
+              properties:
+                chain:
+                  type: string
+                  example: BTC
+                currency:
+                  type: string
+                  example: BTC
+                hash:
+                  type: string
+                  example: 6b185253b18d1a0ef038671b63b2806bb379ae4bd6435d061f5446d98bd0d5ff
+                status:
+                  type: string
+                  pattern: ^failed$
+                  example: failed

@@ -33,6 +33,231 @@ import {
 
 import prisma from './prisma';
 
+import { z } from 'zod'
+
+export const PaymentConfirmingEvent = z.object({
+  topic: z.string().regex(/payment.confirming/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/confirming/)
+    }),
+    payment: z.object({
+      chain: z.string(),
+      currency: z.string(),
+      txid: z.string(),
+      status: z.string().regex(/confirming/)
+    })
+  })
+})
+
+export type PaymentConfirmingEvent = z.infer<typeof PaymentConfirmingEvent>
+
+export const InvoicePaidEvent = z.object({
+  topic: z.string().regex(/invoice.paid/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/paid/),
+    }),
+    payment: z.object({
+      chain: z.string(),
+      currency: z.string(),
+      txid: z.string(),
+      status: z.string()
+    })
+  })
+})
+
+export type InvoicePaidEvent = z.infer<typeof InvoicePaidEvent>
+
+export const InvoiceCancelledEvent = z.object({
+  topic: z.string().regex(/invoice.created/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/cancelled/),
+    })
+  })
+})
+
+export type InvoiceCancelledEvent = z.infer<typeof InvoiceCancelledEvent>
+
+export const InvoiceCreatedEvent = z.object({
+  topic: z.string().regex(/invoice.created/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/unpaid/),
+      quote: z.object({
+        amount: z.number(),
+        currency: z.string()
+      }),
+    })
+  })
+})
+
+export type InvoiceCreatedEvent = z.infer<typeof InvoiceCreatedEvent>
+
+const PaymentConfirmedEvent = z.object({
+  topic: z.string().regex(/payment.confirmed/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/paid/),
+    }),
+    payment: z.object({
+      chain: z.string(),
+      currency: z.string(),
+      txid: z.string(),
+      status: z.string().regex(/confirmed/)
+    }),
+    confirmation: z.object({
+      hash: z.string(),
+      height: z.number()
+    })
+  })
+})
+
+export type PaymentConfirmedEvent = z.infer<typeof PaymentConfirmedEvent>
+
+export const PaymentFailedEvent = z.object({
+  topic: z.string().regex(/payment.failed/),
+  payload: z.object({
+    account_id: z.number().optional(),
+    app_id: z.number().optional(),
+    invoice: z.object({
+      uid: z.string(),
+      status: z.string().regex(/unpaid/),
+    }),
+    payment: z.object({
+      chain: z.string(),
+      currency: z.string(),
+      txid: z.string(),
+      status: z.string().regex(/failed/)
+    })
+  })
+})
+
+export type PaymentFailedEvent = z.infer<typeof PaymentFailedEvent>
+
+const webhookSchemas: {
+  [topic: string]: z.ZodObject<any>
+} = {
+  'invoice.created': InvoiceCreatedEvent,
+  'invoice.cancelled': InvoiceCancelledEvent,
+  'invoice.paid': InvoicePaidEvent,
+  'payment.confirming': PaymentConfirmingEvent,
+  'payment.confirmed': PaymentConfirmedEvent,
+  'payment.failed': PaymentFailedEvent
+}
+
+export function validate({ topic, payload }: { topic: string, payload: any }): boolean {
+
+  try {
+
+    const schema = webhookSchemas[topic]
+
+    if (!schema) {
+      return false
+    }
+
+    // throws error for invalid schema
+    schema.parse(payload)
+
+    return true
+
+  } catch(error) {
+
+    return false
+
+  }
+
+}
+
+async function publish<T>({ topic, payload }: {topic: string, payload: T}) {
+
+  log.info('webhook.publish', { topic, payload })
+
+
+
+}
+
+export type WebhookTopic = 'invoice.created' | 'invoice.cancelled' | 'invoice.paid' | 'payment.confirming' | 'payment.confirmed' | 'payment.failed'
+
+export async function createAndSendWebhook(topic: WebhookTopic, payload: any) {
+
+  const schema = webhookSchemas[topic]
+
+  if (!schema) {
+    throw new Error('invalid webhook type')
+  }
+
+  const validated = schema.parse(payload) as z.infer<typeof schema>
+
+  const appWebhooks = await prisma.appWebhooks.findMany({
+    where: {
+      app_id: validated.app_id,
+      topics: {
+        has: topic    
+      }
+    }
+  })
+
+  const accountWebhooks = await prisma.accountWebhooks.findMany({
+    where: {
+      account_id: validated.account_id
+    }
+  })
+
+  for (let appWebhook of appWebhooks) {
+
+    const webhook = await prisma.webhooks.create({
+      data: {
+        app_id: appWebhook.app_id,
+        account_id: appWebhook.account_id,
+        url: appWebhook.url,
+        type: topic,
+        payload: validated,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  
+    sendWebhook(webhook)
+  }
+
+  for (let accountWebhook of accountWebhooks) {
+
+    const webhook = await prisma.webhooks.create({
+      data: {
+        account_id: accountWebhook.account_id,
+        url: accountWebhook.url,
+        type: topic,
+        payload: validated,
+        status: 'pending',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  
+    sendWebhook(webhook)
+  }
+
+
+}
+
 export const DEFAULT_WEBHOOK_URL = `${config.get('API_BASE')}/v1/api/test/webhooks`
 
 export async function sendWebhook(webhook: Webhook) {

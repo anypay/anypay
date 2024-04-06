@@ -15,6 +15,7 @@ import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 import { getRequiredFeeRate } from '../required_fee_rate'
 import prisma from '../../prisma'
+import { PaymentConfirmingEvent, createAndSendWebhook } from '../../webhooks'
 
 export interface SubmitPaymentRequest {
   currency: string;
@@ -124,6 +125,26 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
   
         log.info('payment.confirming', paymentRecord);
+
+        const webhookPayload: PaymentConfirmingEvent = {
+          topic: 'payment.confirming',
+          payload: {
+            app_id: invoice.app_id || undefined,
+            account_id: invoice.account_id || undefined,
+            invoice: {
+              uid: String(invoice.uid),
+              status: 'confirming'
+            },
+            payment: {
+              status: 'confirming',
+              txid: paymentRecord.txid,
+              chain: String(paymentRecord.chain),
+              currency: paymentRecord.currency,
+            }
+          }
+        }
+
+        createAndSendWebhook('payment.confirming', webhookPayload)
 
       } else if (['ETH', 'MATIC', 'AVAX', 'SOL', 'XRP', 'XLM'].includes(paymentOption.chain)) {
 

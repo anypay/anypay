@@ -110,7 +110,7 @@ describe('Getting Prices', () => {
       webhook_url
     })
 
-    let webhook: Webhook = await findWebhook({ invoice_uid: invoice.uid })
+    let webhook: Webhook = await findWebhook({ invoice_uid: String(invoice.uid) })
 
     expect(webhook.attempts.length).to.be.equal(0)
 

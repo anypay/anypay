@@ -16,7 +16,7 @@ import { invoices as Invoice } from '@prisma/client'
 
 import { getBitcore } from '../bitcore';
 
-import { sendWebhookForInvoice } from '../webhooks';
+import { InvoicePaidEvent, createAndSendWebhook, sendWebhookForInvoice } from '../webhooks';
 
 import * as bip70 from './bip70';
 
@@ -417,8 +417,6 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
     }
   })
   
-  console.log({invoice})
-
   const paymentRecord = await prisma.payments.create({
     data: {
       txid,
@@ -433,8 +431,6 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
       updatedAt: new Date()
     }
   })
-
-  console.log({paymentRecord})
 
   await prisma.invoices.update({
     where: { id: invoice.id },
@@ -464,6 +460,26 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
   publish('invoice.paid', invoice)
 
   sendWebhookForInvoice(String(invoice.uid), 'api_on_complete_payment')
+
+  const webhookPayload: InvoicePaidEvent = {
+    topic: 'invoice.paid',
+    payload: {
+      account_id: invoice.account_id || undefined,
+      app_id: invoice.app_id || undefined,
+      invoice: {
+        uid: String(invoice.uid),
+        status: String(invoice.status)
+      },
+      payment: {
+        chain: chain,
+        currency: currency,
+        txid: txid,
+        status: 'paid'
+      }
+    }
+  }
+
+  createAndSendWebhook('invoice.paid', webhookPayload)
 
   return paymentRecord
 
