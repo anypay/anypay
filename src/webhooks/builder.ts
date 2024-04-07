@@ -1,4 +1,3 @@
-#!/usr/bin/env ts-node
 /*
     This file is part of anypay: https://github.com/anypay/anypay
     Copyright (c) 2017 Anypay Inc, Steven Zeiler
@@ -70,7 +69,7 @@ export class WebhookBuilder {
       
       const { message } = error as Error
 
-      console.error('sendWebhook.error', error)
+      console.error('sendWebhook.error', message)
 
       throw new Error(`Failed to send webhook: ${message}`)
 
