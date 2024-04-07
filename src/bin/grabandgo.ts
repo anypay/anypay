@@ -1,3 +1,4 @@
+#!/usr/bin/env ts-node
 /*
     This file is part of anypay: https://github.com/anypay/anypay
     Copyright (c) 2017 Anypay Inc, Steven Zeiler
@@ -15,65 +16,58 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
+import { Command } from 'commander';
+import prisma from '../../lib/prisma';
+const program = new Command();
 
-import { bsv } from 'scrypt-ts'
+program
+  .command('createitem <email> <name> <price>')
+  .action(async (email, name, price) => {
 
-import {
-  Apps as App,
-  access_tokens as AccessToken
-} from '@prisma/client'
+    console.log('createitem');
 
-import prisma from './prisma';
+    try {
 
-interface NewApp {
-  name: string;
-  account_id: number;
-}
-export async function createApp(params: NewApp): Promise<App> {
+      const account = await prisma.accounts.findFirstOrThrow({
+        where: {
+          email
+        }
+      })
 
-  let privkey = new bsv.PrivateKey()
-
-      return  prisma.apps.create({
+      const item = await prisma.grab_and_go_items.create({
         data: {
-          name: params.name,
-          account_id: params.account_id,
-          public_key: privkey.toPublicKey().toString(),
-          private_key: privkey.toString(),
+          name,
+          price,
+          account_id: account.id,
           createdAt: new Date(),
           updatedAt: new Date()
         }
       })
 
-}
+      console.log('item created', item);
 
-export async function createAppToken(id: number): Promise<AccessToken> {
+    } catch(error: any) {
 
-  const app = await prisma.apps.findFirstOrThrow({
-    where: {
-      id
+      console.error(error.message);
+
     }
-  })
 
-  const token = await prisma.access_tokens.findFirst({
-    where: {
-      app_id: app.id
-    }
-  })
+  });
 
-  if (token) {
+program
+  .command('createsquareorder <invoice_uid>')
+  .action((invoiceUid) => {
 
-    return token
+    /*
+     * 1) Get Invoice from Database
+     * 2) Look up grab and go item from order information
+     * 3) Look up square item info from grab and go item record
+     * 4) Create square order using API, marked as COMPLETED
+     *
+     */
 
-  }
+  });
 
-  return prisma.access_tokens.create({
-    data: {
-      account_id: app.account_id,
-      app_id: app.id,
-      uid: new bsv.PrivateKey().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    }
-  })
+program
+  .parse(process.argv);
 
-}

@@ -35,121 +35,15 @@ import prisma from './prisma';
 
 import { z } from 'zod'
 
-export const PaymentConfirmingEvent = z.object({
-  topic: z.string().regex(/payment.confirming/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/confirming/)
-    }),
-    payment: z.object({
-      chain: z.string(),
-      currency: z.string(),
-      txid: z.string(),
-      status: z.string().regex(/confirming/)
-    })
-  })
-})
+import { publish as publishAmqp } from './amqp'
 
-export type PaymentConfirmingEvent = z.infer<typeof PaymentConfirmingEvent>
 
-export const InvoicePaidEvent = z.object({
-  topic: z.string().regex(/invoice.paid/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/paid/),
-    }),
-    payment: z.object({
-      chain: z.string(),
-      currency: z.string(),
-      txid: z.string(),
-      status: z.string()
-    })
-  })
-})
-
-export type InvoicePaidEvent = z.infer<typeof InvoicePaidEvent>
-
-export const InvoiceCancelledEvent = z.object({
-  topic: z.string().regex(/invoice.created/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/cancelled/),
-    })
-  })
-})
-
-export type InvoiceCancelledEvent = z.infer<typeof InvoiceCancelledEvent>
-
-export const InvoiceCreatedEvent = z.object({
-  topic: z.string().regex(/invoice.created/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/unpaid/),
-      quote: z.object({
-        amount: z.number(),
-        currency: z.string()
-      }),
-    })
-  })
-})
-
-export type InvoiceCreatedEvent = z.infer<typeof InvoiceCreatedEvent>
-
-const PaymentConfirmedEvent = z.object({
-  topic: z.string().regex(/payment.confirmed/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/paid/),
-    }),
-    payment: z.object({
-      chain: z.string(),
-      currency: z.string(),
-      txid: z.string(),
-      status: z.string().regex(/confirmed/)
-    }),
-    confirmation: z.object({
-      hash: z.string(),
-      height: z.number()
-    })
-  })
-})
-
-export type PaymentConfirmedEvent = z.infer<typeof PaymentConfirmedEvent>
-
-export const PaymentFailedEvent = z.object({
-  topic: z.string().regex(/payment.failed/),
-  payload: z.object({
-    account_id: z.number().optional(),
-    app_id: z.number().optional(),
-    invoice: z.object({
-      uid: z.string(),
-      status: z.string().regex(/unpaid/),
-    }),
-    payment: z.object({
-      chain: z.string(),
-      currency: z.string(),
-      txid: z.string(),
-      status: z.string().regex(/failed/)
-    })
-  })
-})
-
-export type PaymentFailedEvent = z.infer<typeof PaymentFailedEvent>
+import InvoicePaidEvent from '../src/webhooks/schemas/InvoicePaidEvent'
+import InvoiceCreatedEvent from '../src/webhooks/schemas/InvoiceCreatedEvent';
+import InvoiceCancelledEvent from '../src/webhooks/schemas/InvoiceCancelledEvent';
+import PaymentConfirmingEvent from '../src/webhooks/schemas/PaymentConfirmingEvent';
+import PaymentConfirmedEvent from '../src/webhooks/schemas/PaymentConfirmedEvent';
+import PaymentFailedEvent from '../src/webhooks/schemas/PaymentFailedEvent'
 
 const webhookSchemas: {
   [topic: string]: z.ZodObject<any>
@@ -164,20 +58,26 @@ const webhookSchemas: {
 
 export function validate({ topic, payload }: { topic: string, payload: any }): boolean {
 
+  console.log('webhook.validate', { topic, payload })
+
   try {
 
     const schema = webhookSchemas[topic]
+
+    console.log('schema', schema)
 
     if (!schema) {
       return false
     }
 
     // throws error for invalid schema
-    schema.parse(payload)
+    schema.parse({ topic, payload })
 
     return true
 
   } catch(error) {
+
+    console.error(error)
 
     return false
 
@@ -185,11 +85,11 @@ export function validate({ topic, payload }: { topic: string, payload: any }): b
 
 }
 
-async function publish<T>({ topic, payload }: {topic: string, payload: T}) {
+export async function publish<T>({ topic, payload }: {topic: string, payload: T}) {
 
   log.info('webhook.publish', { topic, payload })
 
-
+  publishAmqp(topic, {topic, payload})
 
 }
 
@@ -224,8 +124,7 @@ export async function createAndSendWebhook(topic: WebhookTopic, payload: any) {
 
     const webhook = await prisma.webhooks.create({
       data: {
-        app_id: appWebhook.app_id,
-        account_id: appWebhook.account_id,
+        app_id: Number(appWebhook.app_id),
         url: appWebhook.url,
         type: topic,
         payload: validated,
@@ -242,7 +141,7 @@ export async function createAndSendWebhook(topic: WebhookTopic, payload: any) {
 
     const webhook = await prisma.webhooks.create({
       data: {
-        account_id: accountWebhook.account_id,
+        account_id: Number(accountWebhook.account_id),
         url: accountWebhook.url,
         type: topic,
         payload: validated,

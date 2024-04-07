@@ -84,7 +84,7 @@ export class Logger {
 
   namespace: string;
 
-  log: any;
+  log: winston.Logger;
 
   env: string;
 
@@ -98,7 +98,7 @@ export class Logger {
 
   }
 
-  async info(type: string, payload: any = {}) {
+  async info(topic: string, payload: any = {}) {
     
     if (typeof payload.toJSON === 'function') {
 
@@ -108,13 +108,13 @@ export class Logger {
 
     if (this.env !== 'test') {
 
-      this.log.info(type, payload)
+      this.log.info(topic, payload)
     }
       
     const record = await prisma.events.create({
       data: {
         namespace: this.namespace,
-        type,
+        type: topic,
         payload,
         error: false,
         account_id: payload.account_id,
@@ -124,34 +124,42 @@ export class Logger {
       }
     })
 
-    await publish(type, payload)
+    publish('events.created', record);
 
+    await publish(topic, {topic, payload})
+
+    // Allows for account-specific consumers to receive all related events
+    // or only events for a particular topic based on the routing key
     if (payload.account_id) {
 
       const routing_key = `accounts.${payload.account_id}.events`
 
-      await publish(routing_key, record)    
+      await publish(routing_key, {topic, payload})
+      await publish(`${routing_key}.${topic}`, {topic, payload})
 
     }
 
+    // Allows for app-specific consumers to receive all related events
+    // or only events for a particular topic based on the routing key
     if (payload.app_id) {
 
-      const routing_key = `apps.${payload.app_id}.gs`
+      const routing_key = `apps.${payload.app_id}.events`
 
-      await publish(routing_key, record)
+      await publish(routing_key, {topic, payload})
+      await publish(`${routing_key}.${topic}`, {topic, payload})
 
     }
 
+    // Allows for invoice-specific consumers to receive all related events
+    // or only events for a particular topic based on the routing key
     if (payload.invoice_uid) {
 
       const routing_key = `invoices.${payload.invoice_uid}.events`
 
-      await publish(routing_key, record)
+      await publish(routing_key, {topic, payload})
+      await publish(`${routing_key}.${topic}`, {topic, payload})
 
     }
-
-    publish('event.created', record)
-
     return record
 
   }
@@ -159,6 +167,8 @@ export class Logger {
   async error(error_type: string, error: Error): Promise<Event> {
 
     this.log.error(error_type, error.message)
+
+    console.error(error_type, error.message)
 
     const record = await prisma.events.create({
       data: {

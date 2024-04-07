@@ -23,8 +23,6 @@ import { join } from 'path'
 
 let file = join(process.cwd(), 'config', 'anypay.json')
 
-
-
 export const allowedVariables: EnvironmentVariable[] = []
 const variablesMap: {
   [key: string]: EnvironmentVariable
