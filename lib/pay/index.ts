@@ -16,7 +16,9 @@ import { invoices as Invoice } from '@prisma/client'
 
 import { getBitcore } from '../bitcore';
 
-import { InvoicePaidEvent, createAndSendWebhook, sendWebhookForInvoice } from '../webhooks';
+import { sendWebhookForInvoice } from '../webhooks';
+
+import InvoicePaidEvent from '../../src/webhooks/schemas/InvoicePaidEvent';
 
 import * as bip70 from './bip70';
 
@@ -31,7 +33,7 @@ import { publish } from 'rabbi'
 export { fees, bip70, bip270, jsonV2 }
 
 import { parsePayments } from '../plugins'
-import { registerSchema } from '../amqp';
+import { publishEvent, registerSchema } from '../amqp';
 import prisma from '../prisma';
 
 export interface Payment{
@@ -313,19 +315,9 @@ export function verifyOutput(outputs: any[], targetAddress: any, targetAmount: n
 
 }
 
-import { z } from 'zod'
+import PaymentConfirmingEvent from '../../src/webhooks/schemas/PaymentConfirmingEvent';
 
-registerSchema('payment.confirming', z.object({
-  txid: z.string(),
-  currency: z.string(),
-  chain: z.string(),
-  txjson: z.any(),
-  txhex: z.string(),
-  tx_key: z.string(),
-  payment_option_id: z.number(),
-  invoice_uid: z.string(),
-  account_id: z.number()
-}))
+registerSchema('payment.confirming', PaymentConfirmingEvent)
 
 export async function handleUnconfirmedPayment(paymentOption: { id?: any; amount?: any; currency: any; address?: any; chain?: any; invoice_uid?: any; }, transaction: Transaction) {
 
@@ -455,13 +447,7 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
     }
   })
 
-  log.info('invoice.paid', invoice)
-
-  publish('invoice.paid', invoice)
-
-  sendWebhookForInvoice(String(invoice.uid), 'api_on_complete_payment')
-
-  const webhookPayload: InvoicePaidEvent = {
+  publishEvent<InvoicePaidEvent>('invoice.paid', {
     topic: 'invoice.paid',
     payload: {
       account_id: invoice.account_id || undefined,
@@ -477,9 +463,9 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
         status: 'paid'
       }
     }
-  }
+  })
 
-  createAndSendWebhook('invoice.paid', webhookPayload)
+  sendWebhookForInvoice(String(invoice.uid), 'api_on_complete_payment')
 
   return paymentRecord
 

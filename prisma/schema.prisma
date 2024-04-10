@@ -467,6 +467,7 @@ model accounts {
   image_url                 String?                  @db.VarChar(255)
   tipjar_enabled            Boolean?                 @default(false)
   allow_cashback_amount     Boolean?                 @default(false)
+  coordinates               Unsupported("geometry")?
   watch_address_webhook_url String?                  @db.VarChar(255)
   stub                      String?                  @db.VarChar(255)
   bank_account_id           Int?
@@ -487,6 +488,7 @@ model accounts {
   customer_pays_ambassador  Boolean?                 @default(true)
   registration_geolocation  Json?                    @db.Json
   registration_ip_address   String?                  @db.VarChar(255)
+  position                  Unsupported("geometry")?
   inserted_at               DateTime?                @db.Timestamptz(6)
   updated_at                DateTime?                @db.Timestamptz(6)
   access_tokens             access_tokens[]
@@ -622,6 +624,14 @@ model events {
   namespace   String?  @db.VarChar(255)
   error       Boolean?
   app_id      Int?
+
+  @@index([account_id], map: "events_by_account_id")
+  @@index([type, account_id], map: "events_by_account_id_and_type")
+  @@index([invoice_uid], map: "events_by_invoice_uid")
+  @@index([type, invoice_uid], map: "events_by_invoice_uid_and_type")
+  @@index([type], map: "events_by_type")
+  @@index([invoice_uid], map: "events_invoice_uid")
+  @@index([invoice_uid, createdAt], map: "events_invoice_uid_created_at")
 }
 
 model extended_public_keys {
@@ -796,7 +806,6 @@ model payment_options {
   currency_logo_url String?   @db.VarChar(255)
   chain             String    @db.VarChar(255)
 
-  payments payments[]
 }
 
 model payments {
@@ -806,7 +815,7 @@ model payments {
   txjson              Json?     @db.Json
   currency            String    @db.VarChar(255)
   invoice_uid         String    @db.VarChar(255)
-  payment_option_id   Int
+  payment_option_id   Int?
   createdAt           DateTime  @db.Timestamptz(6)
   updatedAt           DateTime  @db.Timestamptz(6)
   wallet              String?   @db.VarChar(255)
@@ -822,7 +831,6 @@ model payments {
   status              String?   @default("confirming") @db.VarChar(255)
   chain               String?   @db.VarChar(255)
 
-  payment_option payment_options? @relation(fields: [payment_option_id], references: [id])
 }
 
 model prices {

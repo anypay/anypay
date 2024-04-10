@@ -71,6 +71,7 @@
     ]
   },
   "dependencies": {
+    "@anypay/client": "^0.8.0",
     "@anypay/simple-wallet": "^0.6.6",
     "@anypay/walletbot": "^0.9.1",
     "@aws-sdk/client-s3": "^3.540.0",

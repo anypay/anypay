@@ -15,7 +15,9 @@ import { verifyPayment, completePayment, handleUnconfirmedPayment  } from '../'
 
 import { getRequiredFeeRate } from '../required_fee_rate'
 import prisma from '../../prisma'
-import { PaymentConfirmingEvent, createAndSendWebhook } from '../../webhooks'
+
+import PaymentConfirmingEvent from '../../../src/webhooks/schemas/PaymentConfirmingEvent'
+import { createAndSendWebhook } from '../../webhooks'
 
 export interface SubmitPaymentRequest {
   currency: string;

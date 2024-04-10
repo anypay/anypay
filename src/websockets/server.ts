@@ -64,20 +64,32 @@ export class AnypayWebsocketServer {
 
         this.wsServer.on('connection', async (websocket: WebSocket, request: Request) => {
 
-            const channel = await connect(this.props.amqp.url).then(conn => conn.createChannel());
+            try {
 
-            const session = new WebsocketClientSession({
-                websocket,
-                amqp: {
-                    channel,
-                    exchange: this.props.amqp.exchange
-                },
-                log: this.props.log
-            });
+                const channel = await connect(this.props.amqp.url).then(conn => conn.createChannel());
 
-            session.authenticate({ request })
+                const session = new WebsocketClientSession({
+                    websocket,
+                    amqp: {
+                        channel,
+                        exchange: this.props.amqp.exchange
+                    },
+                    log: this.props.log
+                });
 
-            this.props.log.info('websocket.client.connected', { uid: session.uid });
+                await session.authenticate({ request })
+
+                this.props.log.info('websocket.client.connected', { uid: session.uid });
+
+            } catch(error) {
+                
+                this.props.log.error('websocket.client.error',  error as Error);
+
+                websocket.close(1008, 'Internal Server Error');
+                
+                return;
+            }
+
 
         });
 

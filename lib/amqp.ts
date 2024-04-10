@@ -20,6 +20,7 @@ import {connect, Connection, Channel} from 'amqplib';
 import { config } from './config';
 
 import { ZodObject } from 'zod';
+import { log } from './log';
 
 var connection: Connection;
 var channel: Channel;
@@ -76,11 +77,6 @@ export async function publish(routingKey: string, json={}) {
 
     }
 
-
-  } else {
-      
-      throw new Error(`No schema found for routingKey: ${routingKey}`);
-      
   }
 
   return channel.publish(exchange, routingKey, Buffer.from(
@@ -88,6 +84,29 @@ export async function publish(routingKey: string, json={}) {
   ));
 }
 
+export async function publishEvent<T>(routingKey: string, event: T) {
+
+  log.info(routingKey, event)
+
+  let schema = getSchema(routingKey)
+
+  schema?.parse(event)
+
+  const { payload, topic } = (event as {topic: string, payload: any})
+
+  publish(routingKey, event as any)
+
+  if (payload.app_id) {
+    publish(`apps.${payload.app_id}.events`, event as any)
+    publish(`apps.${payload.app_id}.events.${topic}`, event as any)
+  }
+
+  if (payload.account_id) {
+    publish(`accounts.${payload.account_id}.events`, event as any)
+    publish(`accounts.${payload.account_id}.events.${topic}`, event as any)
+  }
+
+}
 
 const schemas: { [key: string]: ZodObject<any> } = {}
 

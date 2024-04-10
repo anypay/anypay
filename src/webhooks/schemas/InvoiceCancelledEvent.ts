@@ -20,7 +20,7 @@ import { z } from 'zod'
 import prisma from '../../../lib/prisma'
 
 const InvoiceCancelledEvent = z.object({
-    topic: z.string().regex(/invoice.created/),
+    topic: z.string().regex(/invoice.cancelled/),
     payload: z.object({
       account_id: z.number().optional(),
       app_id: z.number().optional(),

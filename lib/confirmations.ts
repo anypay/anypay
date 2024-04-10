@@ -28,7 +28,9 @@ import * as moment from 'moment'
 import { registerSchema } from './amqp'
 import prisma from './prisma'
 
-import { PaymentConfirmedEvent, createAndSendWebhook } from './webhooks'
+import { createAndSendWebhook } from './webhooks'
+
+import PaymentConfirmedEvent from '../src/webhooks/schemas/PaymentConfirmedEvent'
 
 export interface Confirmation {
   confirmation_hash: string;
@@ -144,12 +146,9 @@ interface RevertedPayment {
   payment: Payment;
 }
 
-import { z } from 'zod'
+import PaymentFailedEvent from '../src/webhooks/schemas/PaymentFailedEvent'
 
-registerSchema('payment.reverted', z.object({
-  invoice_uid: z.string(),
-  payment_id: z.string()
-}))
+registerSchema('payment.failed', PaymentFailedEvent)
 
 export async function revertPayment({ txid }: { txid: string }): Promise<RevertedPayment> {
 

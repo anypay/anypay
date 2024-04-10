@@ -33,14 +33,13 @@ import { sendWebhookForInvoice } from './webhooks';
 
 import { registerSchema } from './amqp';
 
-import { z } from 'zod'
-
 const token = config.get('BLOCKCYPHER_TOKEN');
 
 import {
   payments as Payment
 } from '@prisma/client'
 import prisma from './prisma';
+import InvoicePaidEvent from '../src/webhooks/schemas/InvoicePaidEvent';
 
 export async function publish(currency: string, hex: string): Promise<BroadcastTxResult> {
 
@@ -156,16 +155,7 @@ export async function getTransaction(chain: string, txid: string): Promise<GetTr
 
 }
 
-registerSchema('invoice.paid', z.object({
-  uid: z.string(),
-  txid: z.string(),
-  currency: z.string(),
-  amount: z.number(),
-  invoice_uid: z.string(),
-  confirmation_date: z.string(),
-  confirmation_height: z.number(),
-  confirmation_hash: z.string()
-}))
+registerSchema('invoice.paid', InvoicePaidEvent)
 
 export async function confirmTransaction(payment: Payment, transaction?: GetTransactionResult) {
 
