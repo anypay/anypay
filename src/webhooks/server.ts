@@ -111,17 +111,22 @@ export class WebhookServer {
             actor.start(async (channel: Channel, msg: Message, json: any) => {
 
                 try {
-                    console.log("JSON", json)
+
+                    const { topic, payload } = json as {
+                        topic: string,
+                        payload: any
+                    }
 
                     let invoice_uid;
 
-                    if (json.invoice_uid) {
+                    if (payload?.invoice?.uid) {
 
-                        invoice_uid = json.invoice_uid
+                        invoice_uid = payload.invoice.uid
 
-                    } else if (json.payload?.invoice_uid) {
+                    } else if (payload?.invoice?.uid) {
 
-                        invoice_uid = json.invoice_uid
+                        invoice_uid = payload.invoice.uid
+
                     } else {
 
                         throw new Error('no invoice_uid')

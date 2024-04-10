@@ -17,9 +17,11 @@ import { plugin as websockets } from './server/ws/plugin'
 
 import { start as refunds } from './actors/refunds/actor'
 
-import eventWebhooks from './actors/webhooks-events/actor'
-
 import { startConfirmingTransactions } from './lib/confirmations'
+
+import prisma from './lib/prisma';
+
+import { AnypayServer } from './src/anypay_server';
 
 (async () => {
 
@@ -47,7 +49,18 @@ import { startConfirmingTransactions } from './lib/confirmations'
 
   refunds()
 
-  eventWebhooks()
+  const anypayServer = new AnypayServer({
+    webhook_server: {
+      amqp: {
+          url: config.get('AMQP_URL'),
+          exchange: config.get('ANYPAY_AMQP_EXCHANGE')
+      },
+    },
+    log,
+    prisma
+  })
+
+  anypayServer.start()
 
   if (config.get('start_confirming_transactions')) {
 
