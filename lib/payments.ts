@@ -82,9 +82,6 @@ export async function listPayments(account: { id: number }, params: { limit: num
     },
     take: params.limit,
     skip: params.offset,
-    orderBy: { createdAt: 'desc' },
-    include: {
-      payment_option: true,
-    }
+    orderBy: { createdAt: 'desc' }
   });
 }

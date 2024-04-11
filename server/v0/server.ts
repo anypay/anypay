@@ -45,26 +45,27 @@ import { register as merchant_app } from './plugins/merchant_app'
 
 import { schema } from 'anypay'
 
-const server = new Hapi.Server({
-  host: config.get('HOST') || "0.0.0.0",
-  port: config.get('PORT') || 8000,
-  //debug: { 'request': ['error', 'uncaught'] },
-  routes: {
-    cors: true,
-    validate: {
-      options: {
-        stripUnknown: true
-      }
-    },
-    files: {
-        relativeTo: join(__dirname, '../../docs')
-    }
-  }
-});
-
 import { useJWT } from '../auth/jwt'
 
-async function Server() {
+async function NewServer(): Promise<Hapi.Server> {
+
+  const server = new Hapi.Server({
+    host: config.get('HOST') || "0.0.0.0",
+    port: config.get('PORT') || 8000,
+    //debug: { 'request': ['error', 'uncaught'] },
+    routes: {
+      cors: true,
+      validate: {
+        options: {
+          stripUnknown: true
+        }
+      },
+      files: {
+          relativeTo: join(__dirname, '../../docs')
+      }
+    }
+  });
+  
 
   server.ext('onRequest', (request: any, h: any) => {
 
@@ -466,9 +467,11 @@ if (require.main === module) {
   start();
 }
 
+var server: Hapi.Server;
+
 async function start () {
 
-  await Server();
+  server = await NewServer();
 
   // Start the server
   await server.start();
@@ -477,5 +480,5 @@ async function start () {
 
 }
 
-export { Server, start, server }
+export { NewServer, start, server }
 

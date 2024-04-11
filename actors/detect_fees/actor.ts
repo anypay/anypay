@@ -30,9 +30,9 @@ import { getMiningFee } from '../../lib/fees'
 import { exchange } from '../../lib/amqp';
 import prisma from '../../lib/prisma';
 
-export async function start() {
-``
-  Actor.create({
+export async function start(): Promise<Actor> {
+
+  const actor = Actor.create({
 
     exchange,
 
@@ -41,7 +41,8 @@ export async function start() {
     queue: 'cache_fees_after_payment'
 
   })
-  .start(async (_, msg, json) => {
+
+  actor.start(async (_, msg, json) => {
 
     let uid = msg.content.toString();
 
@@ -67,6 +68,8 @@ export async function start() {
     })
 
   });
+
+  return actor
 
 }
 

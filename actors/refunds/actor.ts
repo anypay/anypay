@@ -25,12 +25,12 @@ import { Actor, log } from 'rabbi';
 import { exchange } from '../../lib/amqp';
 import prisma from '../../lib/prisma';
 
-export async function start() {
+export async function start(): Promise<Actor> {
 
   // This actor should respond to invoice.paid events for invoices where
   // the app_id is set to the refunds app.
 
-  Actor.create({
+  const actor = Actor.create({
 
     exchange,
 
@@ -39,7 +39,8 @@ export async function start() {
     queue: 'update_refund_paid',
 
   })
-  .start(async (channel, msg, json) => {
+
+  actor.start(async (channel, msg, json) => {
 
     const { uid } = json
 
@@ -79,6 +80,8 @@ export async function start() {
     }))
 
   });
+
+  return actor;
 
 }
 

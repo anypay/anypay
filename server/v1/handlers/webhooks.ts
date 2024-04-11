@@ -25,7 +25,7 @@ export async function index(request: AuthenticatedRequest, h: ResponseToolkit) {
 
 }
 
-async function notifyRocketchat({ uid }: { uid: string }) {
+export async function notifyRocketchat({ uid }: { uid: string }) {
 
   if (config.get('ROCKETCHAT_WEBHOOK_URL')) {
 
@@ -51,12 +51,6 @@ async function notifyRocketchat({ uid }: { uid: string }) {
 export async function test(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   log.info('webhooks.test.received', request.payload)
-
-  const { uid } = request.payload as {
-    uid: string
-  }
-
-  notifyRocketchat({ uid }) 
 
   return { success: true }
 

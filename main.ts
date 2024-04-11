@@ -7,13 +7,9 @@ import { log } from './lib'
 
 import { init } from 'rabbi';
 
-import { server, start } from './server/v0/server'
-
 import { start as startPrices } from './lib/prices/cron'
 
 import { start as startFees } from './actors/detect_fees/actor'
-
-import { plugin as websockets } from './server/ws/plugin'
 
 import { start as refunds } from './actors/refunds/actor'
 
@@ -23,44 +19,36 @@ import prisma from './lib/prisma';
 
 import { AnypayServer } from './src/anypay_server';
 
+
 (async () => {
 
   await init()
 
-  startPrices()
-
-  startFees()
-
-  try {
-
-    await start()
-
-  } catch(error) {
-
-    console.error(error)
-
-  }
-
-  server.register({
-
-    plugin: websockets
-
-  })
-
-  refunds()
-
   const anypayServer = new AnypayServer({
-    webhook_server: {
-      amqp: {
-          url: config.get('AMQP_URL'),
-          exchange: config.get('ANYPAY_AMQP_EXCHANGE')
-      },
+    amqp: {
+      url: config.get('ANYPAY_AMQP_URL'),
+      exchange: config.get('ANYPAY_AMQP_EXCHANGE')
     },
+    http: {
+      port: config.get('ANYPAY_HTTP_PORT'),
+      host: config.get('ANYPAY_HTTP_HOST')
+    },
+    websockets: {
+      host: config.get('ANYPAY_WEBSOCKETS_HOST'),
+      port: config.get('ANYPAY_WEBSOCKETS_PORT')
+    },
+    webhooks: true,
     log,
     prisma
   })
 
   anypayServer.start()
+
+  startPrices()
+
+  startFees()
+
+  refunds()
 
   if (config.get('start_confirming_transactions')) {
 
