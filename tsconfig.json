@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "esModuleInterop": true,
     "lib": [
       "es6", "ES2015", "ES2016", "ES2017"
     ],

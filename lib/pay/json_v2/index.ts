@@ -6,7 +6,7 @@
 
 require('dotenv').config();
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { PaymentOption, GetCurrency, Currency } from '../types';
 

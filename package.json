@@ -1,5 +1,5 @@
 {
-  "name": "anypay-platform",
+  "name": "@anypay/server",
   "version": "1.8.1",
   "description": "Bitcoin Payments For Enterprises",
   "private": true,
@@ -165,8 +165,8 @@
     "uuid": "^3.2.1",
     "web3": "^1.10.0",
     "websocket": "^1.0.34",
-    "winston": "^3.3.3",
-    "winston-loki": "^6.0.6",
+    "winston": "^3.13.0",
+    "winston-loki": "^6.1.0",
     "ws": "^8.12.0",
     "xrpl": "^2.7.0",
     "yargs": "^12.0.5",

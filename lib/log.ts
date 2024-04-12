@@ -22,6 +22,8 @@ import { asBoolean, config } from './config'
 
 import { events as Event } from '@prisma/client'
 
+import LokiTransport from 'winston-loki'
+
 interface NewLogger {
   namespace?: string;
   env?: string; 
@@ -45,7 +47,7 @@ const transports = [
 
 if (asBoolean('LOKI_ENABLED') && asBoolean('LOKI_HOST')) {
 
-  const LokiTransport = require("winston-loki");
+  console.log('Loki logging enabled', config.get('LOKI_HOST'))
 
   const lokiConfig: {
     format: any;
@@ -68,8 +70,10 @@ if (asBoolean('LOKI_ENABLED') && asBoolean('LOKI_HOST')) {
     lokiConfig['basicAuth'] = config.get('LOKI_BASIC_AUTH')
   }
 
+  const lokiTransport = new LokiTransport(lokiConfig) as any
+
   transports.push(
-    new LokiTransport(lokiConfig)
+    lokiTransport
   )
 
 }

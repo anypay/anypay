@@ -15,7 +15,7 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
-import * as moment from 'moment';
+import moment from 'moment';
 
 import { join } from 'path';
 

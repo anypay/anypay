@@ -21,7 +21,7 @@ import { BigNumber } from 'bignumber.js';
 
 import { accounts as Account } from '@prisma/client'
 
-import * as moment from 'moment';
+import moment from 'moment';
 
 import * as pay from './pay';
 

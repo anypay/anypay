@@ -24,7 +24,7 @@ import {
 
 import { getConfirmation } from './plugins'
 
-import * as moment from 'moment'
+import moment from 'moment'
 import { registerSchema } from './amqp'
 import prisma from './prisma'
 

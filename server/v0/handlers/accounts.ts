@@ -1,7 +1,7 @@
 const Boom = require('boom');
 var geoip = require('geoip-lite');
 
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { coins, accounts, log, utils } from '../../../lib';
 

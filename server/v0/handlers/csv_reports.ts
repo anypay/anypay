@@ -1,5 +1,5 @@
 
-import * as moment from 'moment';
+import moment from 'moment';
 import * as Joi from 'joi';
 import * as Boom from '@hapi/boom';
 

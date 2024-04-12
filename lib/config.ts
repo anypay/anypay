@@ -17,7 +17,7 @@
 //==============================================================================
 require('dotenv').config()
 
-import * as config from 'nconf'
+import config from 'nconf'
 
 import { join } from 'path'
 
@@ -113,7 +113,8 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'LOKI_LABEL_APP',
-    required: false
+    required: false,
+    default: 'anypay'
   },
   {
     key: 'LOKI_BASIC_AUTH',
@@ -412,8 +413,7 @@ export function asBoolean(key: string) {
 
 variables.forEach(registerEnvironmentVariable)
 
-config.argv({ parseValues: true })
-   .env({
+config.argv({ parseValues: true }).env({
     parseValues: true,
     transform: function(obj: { key: string, value: any}) {
       const variable = variablesMap[obj.key]
