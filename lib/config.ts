@@ -44,7 +44,7 @@ const variables: EnvironmentVariable[] = [
   {
     key: 'DOMAIN',
     default: 'anypayx.com',
-    required: true
+    required: false
   },
   {
     key: 'ANYPAY_AMQP_EXCHANGE',
@@ -55,12 +55,12 @@ const variables: EnvironmentVariable[] = [
     required: true
   }, {    
     key: 'HOST',
-    required: true,
+    required: false,
     default: '0.0.0.0'
   },
   {
     key: 'PORT',
-    required: true,
+    required: false,
     default: '5200'
   },
   {
