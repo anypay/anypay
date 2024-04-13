@@ -28,7 +28,7 @@ describe("Refreshing Invoice Payment Options", () => {
 
       const invoice = await prisma.invoices.findFirstOrThrow({
         where: {
-          uid: paymentRequest.invoice_uid
+          uid: String(paymentRequest.invoice_uid)
         }
       })
 
@@ -38,7 +38,7 @@ describe("Refreshing Invoice Payment Options", () => {
         }
       })
 
-      await refreshInvoice(String(invoice.uid))
+      await refreshInvoice(invoice.uid)
 
       const newPaymentOptions = await prisma.payment_options.findMany({
         where: {

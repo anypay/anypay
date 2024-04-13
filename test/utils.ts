@@ -1,12 +1,12 @@
 require('dotenv').config();
 
-import * as Chance from 'chance';
+import Chance from 'chance';
 
 import * as uuid from 'uuid';
 
 const chance = new Chance();
 
-import * as assert from 'assert';
+import assert from 'assert';
 
 import { registerAccount } from '../lib/accounts';
 
@@ -14,7 +14,7 @@ import { ensureAccessToken } from '../lib/access_tokens'
 
 import { setAddress } from '../lib/addresses';
 
-import * as supertest from "supertest";
+import supertest from "supertest";
 
 import {
   accounts as Account,
@@ -31,6 +31,8 @@ import { findOrCreateWalletBot } from '../apps/wallet-bot';
 //import { initFromConfig } from '../lib/coins'
 
 import { config, initialize } from '../lib'
+
+let account: Account;
 
 export async function generateAccount(): Promise<Account>{
   return registerAccount(chance.email(), chance.word());
@@ -173,7 +175,7 @@ export async function generateKeypair(currency: string = 'BSV') {
 
 }
 
-import * as chai from 'chai'
+import chai from 'chai'
 
 export { chai }
 
@@ -200,14 +202,15 @@ export {
 
 export { log } from '../lib'
 
-var request: supertest.Agent, account, walletBot: WalletBot, app: App;
+var request: supertest.Agent, walletBot: WalletBot, app: App;
 
-import {Server, server } from '../server/v0/server';
+import { NewServer } from '../server/v0/server';
+
+import { Server } from '@hapi/hapi'
+
+var server: Server;
 
 export { server, request, account, walletBot, app }
-
-
-
 
 export async function authRequest(account: Account, params: any) {
 
@@ -299,20 +302,13 @@ beforeEach(() => {
 
 before(async () => {
 
-  console.log('initialize')
   await initialize()
 
-  console.log('initialized')
-
-  await Server();
-
-  //await initFromConfig()
+  server = await NewServer()
 
   request = supertest(server.listener)
 
   account = await createAccountWithAddresses()
-
-  //app await createApp({ name: 'test', account_id: account.id })
 
   walletBot = (await findOrCreateWalletBot(account)).walletBot
 

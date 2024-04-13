@@ -92,8 +92,8 @@ export async function confirmPayment({payment, confirmation}: {payment: Payment,
         status: String(payment.status),
       },
       invoice: {
-        uid: String(invoice.uid),
-        status: String(invoice.status)
+        uid: invoice.uid,
+        status: invoice.status
       },
       confirmation: {
         hash: confirmation_hash,

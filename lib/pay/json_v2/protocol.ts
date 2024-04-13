@@ -134,7 +134,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
             app_id: invoice.app_id || undefined,
             account_id: invoice.account_id || undefined,
             invoice: {
-              uid: String(invoice.uid),
+              uid: invoice.uid,
               status: 'confirming'
             },
             payment: {
@@ -218,7 +218,7 @@ export async function verifyUnsigned(payment: SubmitPaymentRequest): Promise<Sub
 
     const paymentOption = await prisma.payment_options.findFirstOrThrow({
       where: {
-        invoice_uid: String(invoice.uid),
+        invoice_uid: invoice.uid,
         currency,
         chain
       }
@@ -394,7 +394,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   const _paymentOptions = await prisma.payment_options.findMany({
     where: {
-      invoice_uid: String(invoice.uid)
+      invoice_uid: invoice.uid
     }
   })
 
@@ -430,7 +430,7 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
     paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
-    paymentId: String(invoice.uid),
+    paymentId: invoice.uid,
 
     paymentOptions
 
@@ -445,7 +445,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   const paymentOption = await prisma.payment_options.findFirstOrThrow({
     where: {
-      invoice_uid: String(invoice.uid),
+      invoice_uid: invoice.uid,
       currency: option.currency,
       chain: option.chain
     }
@@ -465,7 +465,7 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
     paymentUrl: `${config.get('API_BASE')}/r/${invoice.uid}`,
 
-    paymentId: String(invoice.uid),
+    paymentId: invoice.uid,
 
     chain: option.chain,
 
@@ -518,7 +518,7 @@ export async function verifyUnsignedPayment(invoice: Invoice, params: PaymentVer
   await Protocol.PaymentVerification.request.validateAsync(verifyParams, { allowUnknown: true })
 
   await verifyUnsigned({
-    invoice_uid: String(invoice.uid),
+    invoice_uid: invoice.uid,
     transactions: transactions,
     currency: params.currency,
     chain: params.chain
@@ -562,7 +562,7 @@ export async function sendSignedPayment(invoice: Invoice, params: PaymentVerific
       chain: params.chain,
       currency: params.currency,
       transactions: params.transactions,
-      invoice_uid: String(invoice.uid)
+      invoice_uid: invoice.uid
     })
 
     log.info('pay.jsonv2.payment.submit.response', Object.assign(response, {

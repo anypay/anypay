@@ -1,11 +1,12 @@
 
 require('dotenv').config();
 
+import prisma from '../../lib/prisma';
 import * as search from '../../lib/search'
 
 import { searchInvoiceExternalId, searchInvoiceHash, searchAccountEmail, searchInvoiceUid } from '../../lib/search'
 
-import { expect, spy, newInvoice } from '../utils';
+import { expect, spy, newInvoice, account } from '../utils';
 
 describe("Search", () => {
 
@@ -27,7 +28,7 @@ describe("Search", () => {
 
     it('should search for and return an invoice by uid', async  () => {
 
-        let invoice = await newInvoice({ amount: 5.25 })
+        let invoice = await newInvoice({ amount: 5.25, account })
         
         const [result] = await search.search(invoice.uid)
 
@@ -41,15 +42,22 @@ describe("Search", () => {
 
         const external_id = '12345'
         
-        let invoice = await newInvoice({ amount: 5.25 })
+        let invoice = await newInvoice({ amount: 5.25, account })
 
-        await invoice.set('external_id', external_id)
+        await prisma.invoices.update({
+            where: {
+                id: invoice.id
+            },
+            data: {
+                external_id
+            }            
+        })
 
         const [result] = await search.search(external_id)
 
         expect(result.type).to.be.equal('invoice')
 
-        expect(result.value.external_id).to.be.equal(external_id)
+        expect((result.value as any).external_id).to.be.equal(external_id)
 
     })
 
@@ -61,7 +69,7 @@ describe("Search", () => {
 
         expect(result.type).to.be.equal('invoice')
 
-        expect(result.value.hash).to.be.equal(hash)
+        expect((result.value as any).hash).to.be.equal(hash)
 
     })
 

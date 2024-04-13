@@ -2,8 +2,8 @@ require('dotenv').config();
 
 import {  accounts } from '../../lib';
 
-import * as assert from 'assert';
-import * as Chance from 'chance';
+import assert from 'assert';
+import Chance from 'chance';
 import prisma from '../../lib/prisma';
 
 const chance = new Chance();

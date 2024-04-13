@@ -103,7 +103,7 @@ export async function buildAccountCsvReport(account: Account): Promise<string> {
   let invoices = paidInvoices.map((invoice: Invoice) => {
 
     let data: ReportInvoice = {
-      invoice_uid: String(invoice.uid),
+      invoice_uid: invoice.uid,
       invoice_date: invoice.createdAt,
       invoice_amount: Number(invoice.denomination_amount),
       invoice_currency: String(invoice.denomination_currency),
@@ -168,7 +168,7 @@ export async function buildReportCsvFromDates(accountId: number, start: Date, en
   const formattedInvoices: ReportInvoice[] = invoices.map((invoice: Invoice) => {
       
       let data: ReportInvoice = {
-        invoice_uid: String(invoice.uid),
+        invoice_uid: invoice.uid,
         invoice_date: invoice.createdAt,
         invoice_amount: Number(invoice.denomination_amount),
         invoice_currency: String(invoice.denomination_currency),
@@ -218,7 +218,7 @@ export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<
   const formattedInvoices: ReportInvoice[] = invoices.map((invoice: Invoice) => {
         
         let data: ReportInvoice = {
-          invoice_uid: String(invoice.uid),
+          invoice_uid: invoice.uid,
           invoice_date: invoice.createdAt,
           invoice_amount: Number(invoice.denomination_amount),
           invoice_currency: String(invoice.denomination_currency),

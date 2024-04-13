@@ -4,10 +4,9 @@ import * as assert from 'assert';
 
 import { accounts } from '../../lib';
 
-import * as Chance from 'chance';
 import prisma from '../../lib/prisma';
 
-const chance = Chance();
+import { chance } from '../utils'
 
 describe("Accounts library", () => {
 

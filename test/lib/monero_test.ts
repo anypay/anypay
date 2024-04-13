@@ -8,17 +8,14 @@ import { setAddress } from '../../lib/addresses'
 
 import { createInvoice } from '../../lib/invoices'
 
-import { findPaymentOption } from '../../lib/payment_option'
-
 import * as PayProtocol from '../../lib/pay/json_v2/protocol'
 
-import * as utils from '../utils'
-
-import { expect, spy } from '../utils'
+import { expect, spy, account } from '../utils'
 
 import { Plugin } from '../../lib/plugin'
 
 import { find } from '../../lib/plugins'
+import prisma from '../../lib/prisma'
 
 describe("Monero XMR", () => {
 
@@ -34,8 +31,6 @@ describe("Monero XMR", () => {
 
     it('accepts  both address and view key', async () => {
 
-      let account = await utils.createAccount()
-
       let record = await setAddress(account, {
         currency: 'XMR',
         chain: 'XMR',
@@ -43,13 +38,13 @@ describe("Monero XMR", () => {
         value: address
       })
 
-      expect(record.get('id')).to.be.greaterThan(0)
+      expect(record.id).to.be.greaterThan(0)
 
-      expect(record.get('account_id')).to.be.equal(account.id)
+      expect(record.account_id).to.be.equal(account.id)
 
-      expect(record.get('view_key')).to.be.equal(view_key)
+      expect(record.view_key).to.be.equal(view_key)
 
-      expect(record.get('value')).to.be.equal(address)
+      expect(record.value).to.be.equal(address)
 
     })
 
@@ -57,11 +52,7 @@ describe("Monero XMR", () => {
 
   describe("Payments", () => {
 
-    var account;
-
     before(async () => {
-
-      account = await utils.createAccount()
 
       await setAddress(account, {
         currency: 'XMR',
@@ -79,15 +70,21 @@ describe("Monero XMR", () => {
         amount: 10
       })
 
-      let option = await findPaymentOption({invoice, currency: 'XMR', chain: 'XMR' })
+      const option = await prisma.payment_options.findFirstOrThrow({
+        where: {
+          invoice_uid: invoice.uid,
+          currency: 'XMR',
+          chain: 'XMR'
+        }
+      })
 
-      expect(option.get('id')).to.be.greaterThan(0)
+      expect(option.id).to.be.greaterThan(0)
 
       expect(option.amount).to.be.greaterThan(0)
 
-      expect(option.get('currency')).to.be.equal('XMR')
+      expect(option.currency).to.be.equal('XMR')
 
-      expect(option.get('outputs').length).to.be.equal(2)
+      expect((option.outputs as any[]).length).to.be.equal(2)
 
     })
 
@@ -193,7 +190,11 @@ describe("Monero XMR", () => {
         })
       } catch(error) {
 
-        console.error(error.message)
+        const { message } = error as {
+          message: string
+        }
+
+        console.error(message)
 
       }
 

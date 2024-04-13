@@ -9,7 +9,7 @@ describe('lib/webhooks', () => {
 
     try {
 
-    const invoice = await newInvoice()
+    const invoice = await newInvoice({ account })
 
     const webhook = await webhookForInvoice(invoice)
 
@@ -25,7 +25,7 @@ describe('lib/webhooks', () => {
 
   it('#findWebhook should return the webhook by invoice_uid', async () => {
 
-    const invoice = await newInvoice()
+    const invoice = await newInvoice({ account })
 
     const webhook = await findWebhook({ invoice_uid: invoice.uid })
 
@@ -43,7 +43,7 @@ describe('lib/webhooks', () => {
 
   it('#attemptWebhook should attempt to send a webhook', async () => {
 
-    const invoice = await newInvoice()
+    const invoice = await newInvoice({ account })
 
     const webhook = await findWebhook({ invoice_uid: invoice.uid })
 

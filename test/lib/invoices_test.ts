@@ -5,6 +5,7 @@ import { cancelInvoice, getInvoice } from '../../lib/invoices'
 import { createEmptyInvoice, ensureInvoice, isExpired, refreshInvoice } from '../../lib/invoice'
 import { createApp } from '../../lib/apps'
 import { invoices as Invoice } from '@prisma/client'
+import { getPaymentOptions } from '../../lib/invoices'
 
 describe('lib/invoices', () => {
 
@@ -21,13 +22,13 @@ describe('lib/invoices', () => {
 
   it('#cancelInvoice should cancel an invoice', async () => {
 
-    let invoice: Invoice | null = await newInvoice({ account })
+    let invoice: Invoice = await newInvoice({ account })
 
     await cancelInvoice(invoice)
 
-    invoice = await getInvoice(String(invoice.uid))
+    invoice = await getInvoice(invoice.uid)
 
-    expect(invoice.get('status')).to.be.equal('cancelled')
+    expect(invoice.status).to.be.equal('cancelled')
 
   })
 
@@ -53,7 +54,9 @@ describe('lib/invoices', () => {
 
   it('#refreshInvoice should update the invoice options',  async () => {
 
-    let invoice = await newInvoice()
+    let invoice = await newInvoice({
+      account
+    })
 
     await refreshInvoice(invoice.uid)
 
@@ -61,7 +64,7 @@ describe('lib/invoices', () => {
 
   it('#isExpired should determine whether an invoice is expired', async () => {
 
-    let invoice = await newInvoice()
+    let invoice = await newInvoice({ account })
 
     const expired = await isExpired(invoice)
 
@@ -96,9 +99,11 @@ describe('lib/invoices', () => {
 
   it('#getPaymentOptions should get the options for an invoice', async () => {
 
-    let invoice = await newInvoice()
+    let invoice = await newInvoice({
+      account
+    })
 
-    let options = await invoice.getPaymentOptions()
+    let options = await getPaymentOptions(invoice.uid)
 
     expect(options).to.be.an('array')
     

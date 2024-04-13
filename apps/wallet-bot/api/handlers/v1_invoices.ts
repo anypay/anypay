@@ -66,7 +66,7 @@ export async function index (req: any) {
 
     }
 
-    const cancelled = await cancelInvoice(walletBot, String(invoice.uid))
+    const cancelled = await cancelInvoice(walletBot, invoice.uid)
 
     return {
 

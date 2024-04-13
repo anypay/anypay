@@ -80,7 +80,7 @@ async function main() {
 
   const records = await prisma.payment_options.findMany({
     where: {
-      invoice_uid: String(invoice.uid)
+      invoice_uid: invoice.uid
     }
   
   })
@@ -93,7 +93,7 @@ async function main() {
       where: {
         chain,
         currency,
-        invoice_uid: String(invoice.uid)
+        invoice_uid: invoice.uid
       }
     })
 
@@ -113,7 +113,7 @@ async function main() {
       where: {
         chain,
         currency,
-        invoice_uid: String(invoice.uid)
+        invoice_uid: invoice.uid
       }
     })
 

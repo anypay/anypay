@@ -8,6 +8,7 @@ import { getRefund, Refund, RefundErrorInvoiceNotPaid } from '../../lib/refunds'
 import * as uuid from 'uuid'
 
 import { createHash } from 'crypto'
+import prisma from '../../lib/prisma'
 
 describe('lib/refunds', () => {
 
@@ -17,25 +18,28 @@ describe('lib/refunds', () => {
 
     log.debug('test.account.created', account)
 
-    await invoice.set('status', 'paid')
+    await prisma.invoices.update({
+      where: {
+        id: invoice.id
+      },
+      data: {
+        status: 'paid',
+        invoice_currency: 'BCH',
+        denomination_currency: 'USD',
 
-    await invoice.set('invoice_currency', 'DASH')
-
-    await invoice.set('denomination_currency', 'USD')
-
-    await invoice.set('denomination', 'USD')
-
-    await invoice.set('denomination_amount_paid', 52.00)
+        denomination_amount_paid: 52.00
+      }
+    })
 
     const refund: Refund = await getRefund(invoice, 'XxarAzZrvZdZfqWPwCqJCK3Fyd2PMg38wy')
 
-    expect(refund.get('refund_invoice_uid')).to.be.a('string')
+    expect(refund.refund_invoice_uid).to.be.a('string')
 
-    expect(refund.get('status')).to.be.equal('unpaid')
+    expect(refund.status).to.be.equal('unpaid')
 
-    expect(refund.get('address')).to.be.equal('XxarAzZrvZdZfqWPwCqJCK3Fyd2PMg38wy')
+    expect(refund.address).to.be.equal('XxarAzZrvZdZfqWPwCqJCK3Fyd2PMg38wy')
 
-    expect(refund.get('original_invoice_uid')).to.be.equal(invoice.get('uid'))
+    expect(refund.original_invoice_uid).to.be.equal(invoice.uid)
 
   })
 
@@ -47,25 +51,28 @@ describe('lib/refunds', () => {
 
     log.debug('test.account.created', account)
 
-    await invoice.update({
-      status: 'paid',
-      currency: 'BCH',
-      invoice_currency: 'BCH',
-      denomination_currency: 'USD',
-      denomination: 'USD',
-      denomination_amount_paid: '52.00',
-      hash: txid
+    await prisma.invoices.update({
+      where: {
+        id: invoice.id
+      },
+      data: {
+        status: 'paid',
+        invoice_currency: 'BCH',
+        denomination_currency: 'USD',
+        denomination_amount_paid: '52.00',
+        hash: txid.toString()
+      }
     })
 
-    const refund: Refund = await getRefund(invoice) // Omit explicit refund address
+    const refund: Refund = await getRefund(invoice) as Refund
 
-    expect(refund.get('refund_invoice_uid')).to.be.a('string')
+    expect(refund.refund_invoice_uid).to.be.a('string')
 
-    expect(refund.get('status')).to.be.equal('unpaid')
+    expect(refund.status).to.be.equal('unpaid')
 
-    expect(refund.get('address')).to.be.equal('bitcoincash:qrk5wv9yyxhs00xt7qwj8u6xm89mar3ucsv2gxessa')
+    expect(refund.address).to.be.equal('bitcoincash:qrk5wv9yyxhs00xt7qwj8u6xm89mar3ucsv2gxessa')
 
-    expect(refund.get('original_invoice_uid')).to.be.equal(invoice.get('uid'))
+    expect(refund.original_invoice_uid).to.be.equal(invoice.uid)
 
   })
 

@@ -33,7 +33,9 @@ describe('lib/linked_accounts', () => {
 
     expect(bob_target.length).to.be.equal(0)
 
-    await linkAccount(alice, bob)
+    await linkAccount(alice, {
+      email: String(bob.email)
+    })
 
     const { source: alice_source_new, target: alice_target_new } = await listLinkedAccounts(alice)
 
@@ -54,11 +56,13 @@ describe('lib/linked_accounts', () => {
 
     const targetAccount = await generateAccount()
 
-    const linkedAccount = await linkAccount(account, targetAccount)
+    const linkedAccount = await linkAccount(account, {
+      email: String(targetAccount.email)
+    })
 
-    expect(linkedAccount.get('source')).to.be.equal(account.id)
+    expect(linkedAccount.source).to.be.equal(account.id)
 
-    expect(linkedAccount.get('target')).to.be.equal(targetAccount.id)
+    expect(linkedAccount.target).to.be.equal(targetAccount.id)
 
   })
 
@@ -66,14 +70,20 @@ describe('lib/linked_accounts', () => {
 
     const targetAccount = await generateAccount()
 
-    await linkAccount(account, targetAccount)
+    await linkAccount(account, {
+      email: String(targetAccount.email)
+    })
 
     const link = await getLink({ 
         source: account.id,
         target: targetAccount.id
     })
 
-    await unlinkAccount(account, { id: link && link.get('id') })
+    if (!link) {
+      throw new Error('Link not found')
+    }
+
+    await unlinkAccount(account, { id: String(link.id) })
 
   })
 

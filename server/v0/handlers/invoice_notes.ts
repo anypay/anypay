@@ -18,7 +18,7 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
   const note = await prisma.invoice_notes.create({
     data: {
-      invoice_uid: String(invoice.uid),
+      invoice_uid: invoice.uid,
       content,
       created_at: new Date(),
       updated_at: new Date()

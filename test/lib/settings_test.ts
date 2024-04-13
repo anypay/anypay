@@ -4,12 +4,8 @@ import {
   settings,
 } from '../../lib';
 
-import * as assert from 'assert';
 
-import * as Chance from 'chance';
-import { generateAccount } from '../utils';
-
-const chance = new Chance();
+import { generateAccount, assert } from '../utils';
 
 describe("Settings", () => {
 

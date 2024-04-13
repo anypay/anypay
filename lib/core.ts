@@ -110,8 +110,8 @@ export async function setAddress(changeset: AddressChangeSet): Promise<Address> 
         value: changeset.address,
         view_key: changeset.view_key,
         paymail: changeset.paymail,
-        updatedAt: Date(),
-        createdAt: Date()
+        updatedAt: new Date(),
+        createdAt: new Date()
       }
     });
 

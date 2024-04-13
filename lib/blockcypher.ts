@@ -205,7 +205,7 @@ export async function confirmTransaction(payment: Payment, transaction?: GetTran
 
   }
 
-  sendWebhookForInvoice(String(invoice.uid), 'confirmTransaction')
+  sendWebhookForInvoice(invoice.uid, 'confirmTransaction')
 
   return payment
   

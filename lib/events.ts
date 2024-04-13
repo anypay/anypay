@@ -83,7 +83,7 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
   
   } = {
 
-    invoice_uid: String(invoice.uid)
+    invoice_uid: invoice.uid
 
   }
 

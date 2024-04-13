@@ -125,7 +125,7 @@ describe("Listing Available Webhooks", async () => {
     
     expect((response.result as any).webhooks[0].attempts.length).to.be.equal(0)
 
-    let webhook = await findWebhook({ invoice_uid: String(invoice.uid) })
+    let webhook = await findWebhook({ invoice_uid: invoice.uid })
 
     await attemptWebhook(webhook)
 

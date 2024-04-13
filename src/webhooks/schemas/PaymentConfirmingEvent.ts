@@ -68,7 +68,7 @@ export async function build(params: {
         payload: {
             invoice: {
                 uid: invoice_uid,
-                status: String(invoice.status)
+                status: invoice.status
             },
             payment: {
                 status: payment.status,

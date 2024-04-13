@@ -8,7 +8,6 @@ import * as fixtures from '../fixtures'
 import { recordPayment } from '../../lib/payments'
 
 import { setAddress } from '../../lib/core'
-import { models } from '../../lib'
 import prisma from '../../lib/prisma'
 
 describe("Confirming Transactions", () => {
@@ -54,13 +53,13 @@ describe("Confirming Transactions", () => {
         await confirmTransactionsFromBlockWebhook(fixtures.BTC_Confirmation_Test.blockcpher_webhook_payload)    
         payment = await prisma.payments.findFirstOrThrow({
             where: {
-                invoice_uid: String(invoice.uid)
+                invoice_uid: invoice.uid
             }
         })    
 
         invoice = await prisma.invoices.findFirstOrThrow({
             where: {
-                uid: String(invoice.uid)
+                uid: invoice.uid
             }
         })
 

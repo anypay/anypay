@@ -29,7 +29,8 @@ registerSchema('invoice.created', InvoiceCreatedEvent)
 
 import {
   accounts as Account,
-  invoices as Invoice
+  invoices as Invoice,
+  payment_options as PaymentOption
 } from '@prisma/client'
 
 import { computeInvoiceURI } from './uri'
@@ -40,6 +41,7 @@ import { createPaymentOptions } from './invoice'
 
 
 import prisma from './prisma'
+import { getPaymentRequest } from './pay/json_v2/protocol'
 
 export { Invoice }
 
@@ -48,11 +50,38 @@ export async function ensureInvoice(uid: string): Promise<Invoice> {
   return prisma.invoices.findFirstOrThrow({ where: { uid } })
 
 }
-export async function getInvoice(uid: string): Promise<Invoice | null> {
+export async function getInvoice(uid: string): Promise<Invoice> {
 
-  return prisma.invoices.findFirst({ where: { uid } })
+  return prisma.invoices.findFirstOrThrow({ where: { uid } })
 
 }
+
+
+export async function getPaymentOptions(invoice_uid: string): Promise<any[]> { 
+
+  const invoice = await prisma.invoices.findFirstOrThrow({
+    where: {
+      uid: invoice_uid
+    }
+  
+  })
+
+  const payment_options = await prisma.payment_options.findMany({
+    where: {
+      invoice_uid
+    }
+  })
+  
+  return Promise.all(payment_options.map(async (option: PaymentOption) => {
+
+    const request = await getPaymentRequest(invoice, { chain: String(option.chain), currency: option.currency })
+
+    return request
+
+  }))
+
+}
+
 
 registerSchema('invoice.cancelled', InvoiceCancelledEvent)
 
@@ -79,8 +108,8 @@ export async function cancelInvoice(invoice: Invoice) {
       app_id: invoice.app_id || undefined,
       account_id: invoice.account_id || undefined,
       invoice: {
-        uid: String(invoice.uid),
-        status: String(invoice.status)
+        uid: invoice.uid,
+        status: invoice.status
       }
     }
   })
@@ -224,8 +253,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
       app_id: invoice.app_id || undefined,
       account_id: invoice.account_id || undefined,
       invoice: {
-        uid: String(invoice.uid),
-        status: String(invoice.status),
+        uid: invoice.uid,
+        status: invoice.status,
         quote: {
           value: Number(invoice.amount),
           currency: String(invoice.currency)

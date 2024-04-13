@@ -20,26 +20,16 @@ import { createPaymentRequest } from './payment_requests'
 
 import { getDecodedTransaction, CURRENCIES } from './blockchair'
 
-import { invoices as Invoice } from '@prisma/client'
-
-import { Orm } from './orm'
+import {
+  invoices as Invoice,
+  Refunds as Refund
+ } from '@prisma/client'
 
 import { createApp } from './apps'
+
 import prisma from './prisma'
 
-export class Refund extends Orm {
-
-  original_invoice: Invoice;
-
-  constructor(original_invoice: Invoice, record: any) {
-
-    super(record);
-
-    this.original_invoice = original_invoice;
-
-  }
-
-}
+export { Refund }
 
 interface RefundAddress {
   currency: string;
@@ -104,7 +94,7 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
 
   }
 
-  return new Refund(invoice, record)
+  return record
 
 }
 

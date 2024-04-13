@@ -8,6 +8,7 @@ import { initialize } from '../../lib';
 import * as assert from 'assert';
 
 import { expect } from 'chai'
+import { Confirmation } from '../../lib/confirmations';
 
 describe("Plugins", () => {
 
@@ -37,7 +38,7 @@ describe("Plugins", () => {
 
       let txid = '4e51acd9be7d61955838cf4ec20a294465d612f485c6615c5777b7b52320ba4f'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -73,7 +74,7 @@ describe("Plugins", () => {
 
       let txid = 'ffa3a4e7169bdc61a509a1bbf8a560c21a04ee6783cdec23f3d28910d5407d02'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -107,7 +108,7 @@ describe("Plugins", () => {
 
       let txid = '1eb4e53d410c4a7e44e6d80484756791052a0c79c35151bffb1bed970323a6b1'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -141,7 +142,7 @@ describe("Plugins", () => {
 
       let txid = '6bab5b587ce5ea0938c1477c1f6c6cd38dc2cc58f9b52e7d93c24320ad1f0388'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -177,7 +178,7 @@ describe("Plugins", () => {
 
       let txid = '4c8adb87aa5d2c3c16880afea9b7c34040e064463f3a19341d838386bc859bd3'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -211,7 +212,7 @@ describe("Plugins", () => {
 
       let txid = 'de2b352e1849392a7fce7a8fa2f6295d922307303b007d3804f9589b66624028'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -248,7 +249,7 @@ describe("Plugins", () => {
 
       let txid = '58f8df857270cfc783c7dfb5e58c69e8dee5b9113242b52cefc62b4296fbcec3'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -282,7 +283,7 @@ describe("Plugins", () => {
 
       let txid = '0xcd43123eea81e3b9e2227d6468f6f6ad174e90e6f793b2302c7b03f04604381b'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -316,7 +317,7 @@ describe("Plugins", () => {
 
       let txid = '0x494011badb5faf691bc11027c96e154da6d8ee3ab2dd70ce346900b8153b4d1c'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -350,7 +351,7 @@ describe("Plugins", () => {
 
       let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -382,7 +383,7 @@ describe("Plugins", () => {
 
       let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -414,7 +415,7 @@ describe("Plugins", () => {
 
       let txid = 'f6fe081a567701931e01555e20cc8f00bcfdef056df92d262480620568d6f9cb'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -446,7 +447,7 @@ describe("Plugins", () => {
 
       let txid = '8F3A872BA256DAEAB6634E6CFE346DD0F02347C28DF37A3B4D26FB6D29CA9C2D'
 
-      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+      let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
       expect(confirmations).to.be.greaterThan(0)
 
@@ -527,7 +528,7 @@ describe("Plugins", () => {
 
         let txid = '0x49bfaf3135b1b8c1a45e334706ca089826e7043d7feb7326d3d02206e1eae5a6'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 
@@ -561,7 +562,7 @@ describe("Plugins", () => {
 
         let txid = '0x7fa214be78f449b5c2ce854688a4244bfa6039971edea30f46ee535636fed0a0'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 
@@ -595,7 +596,7 @@ describe("Plugins", () => {
 
         let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 
@@ -755,7 +756,7 @@ describe("Plugins", () => {
 
         let txid = '0xf24f352490d539085f2114ed1f35fe8a664f1a27f4587429cbcf7e56926b0eeb'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 
@@ -789,7 +790,7 @@ describe("Plugins", () => {
 
         let txid = '0x0d66c0c4a13e2c525fe9fa3929078e55df7d17cb3d58ad419f05449d0b56ec2c'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 
@@ -825,7 +826,7 @@ describe("Plugins", () => {
 
         let txid = '0x8cf9a0048f4536a6eec4f277ae4aa61e6569d7c3c3eb9d28a9d153ebe90683a2'
 
-        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid)
+        let { confirmations, confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
         expect(confirmations).to.be.greaterThan(0)
 

@@ -1,6 +1,6 @@
 
-import * as assert from 'assert';
 import { generateAdminToken, verifyToken } from '../../lib/jwt';
+import { assert } from '../utils'
 
 import { config } from '../../lib/config' 
 
@@ -33,7 +33,11 @@ describe("JWT Authentication", () => {
 
     } catch(error) {
 
-      assert.strictEqual(error.message, 'invalid signature');
+      const { message } = error as {
+        message: string
+      }
+
+      assert.strictEqual(message, 'invalid signature');
 
     }
 

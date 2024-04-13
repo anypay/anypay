@@ -56,7 +56,7 @@ export async function build(params: {
 
     const payment = await prisma.payments.findFirstOrThrow({
         where: {
-            invoice_uid: String(invoice.uid)
+            invoice_uid: invoice.uid
         }
     })
 

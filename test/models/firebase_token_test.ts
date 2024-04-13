@@ -1,7 +1,6 @@
 
 import prisma from '../../lib/prisma';
-import { chance, generateAccount } from '../utils';
-import * as assert from 'assert';
+import { chance, generateAccount, assert } from '../utils';
 
 describe("Firebase Token Model", () => {
 

@@ -39,7 +39,7 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
 
   const option = await prisma.payment_options.findFirstOrThrow({
     where: {
-      invoice_uid: String(invoice.uid),
+      invoice_uid: invoice.uid,
       currency: details.currency
     }
   })
@@ -47,7 +47,7 @@ export async function recordPayment(invoice: Invoice, details: PaymentDetails): 
   const record = await prisma.payments.create({
     data: {
       ...details,
-      invoice_uid: String(invoice.uid),
+      invoice_uid: invoice.uid,
       payment_option_id: option.id,
       currency: option.currency,
       chain: option.chain || option.currency,
@@ -65,7 +65,7 @@ export async function getPayment(invoice: Invoice): Promise<Payment | null> {
 
   const record = await prisma.payments.findFirst({
     where: {
-      invoice_uid: String(invoice.uid)
+      invoice_uid: invoice.uid
     }
   })
 

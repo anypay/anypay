@@ -4,13 +4,10 @@ import { log, invoices } from '../../../lib';
 
 import {
   invoices as Invoice,
-  payment_options as PaymentOption,
   Prisma
 } from '@prisma/client'
 
 import { createInvoice, cancelInvoice } from '../../../lib/invoices';
-
-import { getPaymentRequest } from '../../../lib/pay/json_v2/protocol'
 
 import { computeInvoiceURI } from '../../../lib/uri'
 
@@ -128,7 +125,7 @@ export async function createDeprecated(request: AuthenticatedRequest, h: Respons
 
     const json = JSON.parse(JSON.stringify(invoice))
 
-    const payment_options = await getPaymentOptions(String(invoice.uid))
+    const payment_options = await getPaymentOptions(invoice.uid)
 
     const responseInvoice = {
       amount: json['amount'],
@@ -192,7 +189,7 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
     const json = JSON.parse(JSON.stringify(invoice))
 
-    const payment_options = await getPaymentOptions(String(invoice.uid))
+    const payment_options = await getPaymentOptions(invoice.uid)
 
     const responseInvoice = {
       amount: json['amount'],
@@ -221,30 +218,7 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
 }
 
-async function getPaymentOptions(invoice_uid: string) { 
-
-  const invoice = await prisma.invoices.findFirstOrThrow({
-    where: {
-      uid: invoice_uid
-    }
-  
-  })
-
-  const payment_options = await prisma.payment_options.findMany({
-    where: {
-      invoice_uid
-    }
-  })
-  
-  return Promise.all(payment_options.map(async (option: PaymentOption) => {
-
-    const request = await getPaymentRequest(invoice, { chain: String(option.chain), currency: option.currency })
-
-    return request
-
-  }))
-
-}
+import { getPaymentOptions } from '../../../lib/invoices'
 
 function sanitizeInvoice(invoice: Invoice) {
 
@@ -273,7 +247,7 @@ export async function showDeprecated(request: Request, h: ResponseToolkit) {
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-    invoice = await invoices.refreshInvoice(String(invoice.uid))
+    invoice = await invoices.refreshInvoice(invoice.uid)
 
   }
 
@@ -281,11 +255,11 @@ export async function showDeprecated(request: Request, h: ResponseToolkit) {
 
     log.debug('invoice.requested', invoice);
 
-    let payment_options = await getPaymentOptions(String(invoice.uid))
+    let payment_options = await getPaymentOptions(invoice.uid)
 
     let notes = await prisma.invoice_notes.findMany({
       where: {
-        invoice_uid: String(invoice.uid)
+        invoice_uid: invoice.uid
       }
     })
 
@@ -323,17 +297,17 @@ export async function show(request: Request, h: ResponseToolkit) {
 
     if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-      invoice = await invoices.refreshInvoice(String(invoice.uid))
+      invoice = await invoices.refreshInvoice(invoice.uid)
 
     }
 
     if (invoice) {
 
-      const payment_options = await getPaymentOptions(String(invoice.uid))
+      const payment_options = await getPaymentOptions(invoice.uid)
 
       const notes = await prisma.invoice_notes.findMany({
         where: {
-          invoice_uid: String(invoice.uid)
+          invoice_uid: invoice.uid
         }
       })
 
@@ -370,7 +344,7 @@ export async function show(request: Request, h: ResponseToolkit) {
 
         let payment = prisma.payments.findFirst({
           where: {
-            invoice_uid: String(invoice.uid)
+            invoice_uid: invoice.uid
           }
         })
 
@@ -427,7 +401,7 @@ export async function showLegacy(request: Request, h: ResponseToolkit) {
 
   if (invoice.status === 'unpaid' && invoices.isExpired(invoice)) {
 
-    invoice = await invoices.refreshInvoice(String(invoice.uid))
+    invoice = await invoices.refreshInvoice(invoice.uid)
 
   }
 
@@ -435,11 +409,11 @@ export async function showLegacy(request: Request, h: ResponseToolkit) {
 
     log.debug('invoice.requested', invoice);
 
-    const payment_options = await getPaymentOptions(String(invoice.uid))
+    const payment_options = await getPaymentOptions(invoice.uid)
 
     const notes = await prisma.invoice_notes.findMany({
       where: {
-        invoice_uid: String(invoice.uid)
+        invoice_uid: invoice.uid
       }
     })
 

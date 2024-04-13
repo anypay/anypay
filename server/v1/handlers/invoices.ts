@@ -46,7 +46,7 @@ export async function show(request: Request, h: ResponseToolkit) {
     }
     
     const payment = await prisma.payments.findFirst({
-      where: { invoice_uid: String(invoice.uid) }
+      where: { invoice_uid: invoice.uid }
     })
 
     var response: {
@@ -63,7 +63,7 @@ export async function show(request: Request, h: ResponseToolkit) {
       invoice: {
         currency: String(invoice.denomination_currency),
         amount: Number(invoice.denomination_amount),
-        status: String(invoice.status),
+        status: invoice.status,
         createdAt: invoice.createdAt
       }
     }
@@ -169,7 +169,7 @@ async function getPaymentOptions(invoice: Invoice): Promise<{
 }[]> { 
 
   const payment_options = await prisma.payment_options.findMany({
-    where: { invoice_uid: String(invoice.uid) }
+    where: { invoice_uid: invoice.uid }
   })
 
   return payment_options.map(option => _.pick(option,

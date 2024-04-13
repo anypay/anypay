@@ -1,7 +1,7 @@
 
 import * as utils from '../utils'
 
-import { expect } from '../utils'
+import { expect, account } from '../utils'
 
 import { recordPayment, getPayment } from './../../lib/payments'
 
@@ -9,7 +9,7 @@ describe('Payments', () => {
 
   it('should have exactly one invoice always', async () => {
 
-    let invoice = await utils.newInvoice({ amount: 0.52 })
+    let invoice = await utils.newInvoice({ amount: 0.52, account })
 
     let payment = await recordPayment(invoice, {
       txid: '12345',
@@ -17,17 +17,17 @@ describe('Payments', () => {
       txhex: '11111111111'
     })
 
-    expect(payment.get('invoice_uid')).to.be.equal(invoice.uid)
+    expect(payment.invoice_uid).to.be.equal(invoice.uid)
 
     let invoicePayment = await getPayment(invoice)
 
-    expect(payment.get('id')).to.be.equal(invoicePayment.get('id'))
+    expect(payment.id).to.be.equal(invoicePayment?.id)
 
   })
 
   it('should prevent multiple payments for a single invoice', async () => {
 
-    let invoice = await utils.newInvoice({ amount: 0.52 })
+    let invoice = await utils.newInvoice({ account, amount: 0.52 })
 
     let payment = await recordPayment(invoice, {
       txid: '12345',
@@ -36,7 +36,7 @@ describe('Payments', () => {
       txjson: { some: 'json' }
     })
 
-    expect(payment.get('invoice_uid')).to.be.equal(invoice.uid);
+    expect(payment.invoice_uid).to.be.equal(invoice.uid);
 
     try {
 

@@ -5,11 +5,9 @@ import { initialize } from '../../lib';
 import {addresses} from '../../lib';
 import {registerAccount} from '../../lib/accounts';
 
-import * as assert from 'assert';
-import * as Chance from 'chance';
 import prisma from '../../lib/prisma';
 
-const chance = new Chance();
+import { assert, chance } from '../utils'
 
 describe('Addresses Library', () => {
   

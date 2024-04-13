@@ -690,13 +690,13 @@ model invoice_notes {
 
 model invoices {
   id                           Int                    @id @default(autoincrement())
-  uid                          String?                @db.VarChar(255)
+  uid                          String                 @db.VarChar(255)
   amount                       Decimal?               @db.Decimal
   address                      String?                @db.VarChar(255)
   account_id                   Int?
   access_token                 String?                @db.VarChar(255)
   hash                         String?                @unique(map: "unique_invoice_hash_constraint") @db.VarChar(255)
-  status                       String?                @db.VarChar(255)
+  status                       String                 @db.VarChar(255)
   createdAt                    DateTime               @db.Timestamptz(6)
   updatedAt                    DateTime               @db.Timestamptz(6)
   settledAt                    DateTime?              @db.Timestamptz(6)

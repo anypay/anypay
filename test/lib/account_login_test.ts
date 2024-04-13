@@ -1,11 +1,9 @@
 require("dotenv").config();
 
-import * as assert from 'assert';
-import * as Chance from 'chance';
 import {withEmailPassword} from '../../lib/account_login';
 import {registerAccount} from '../../lib/accounts';
 
-const chance = new Chance();
+import { assert, chance } from '../utils';
 
 describe('Account Login', () => {
 

@@ -453,8 +453,8 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
       account_id: invoice.account_id || undefined,
       app_id: invoice.app_id || undefined,
       invoice: {
-        uid: String(invoice.uid),
-        status: String(invoice.status)
+        uid: invoice.uid,
+        status: invoice.status
       },
       payment: {
         chain: chain,
@@ -465,7 +465,7 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
     }
   })
 
-  sendWebhookForInvoice(String(invoice.uid), 'api_on_complete_payment')
+  sendWebhookForInvoice(invoice.uid, 'api_on_complete_payment')
 
   return paymentRecord
 
