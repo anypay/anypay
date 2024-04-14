@@ -153,7 +153,13 @@ export async function create (request: AuthenticatedRequest, h: ResponseToolkit)
 
   return h.response({
 
-    invoice,
+    invoice: {
+      ...invoice,
+      amount: invoice.amount?.toNumber(),
+      currency: invoice.currency,
+      uid: invoice.uid,
+      status: invoice.status
+    },
 
     payment_options
 

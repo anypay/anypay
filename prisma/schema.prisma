@@ -514,7 +514,8 @@ model address_routes {
 model addresses {
   id           Int      @id @default(autoincrement())
   account_id   Int?
-  currency     String?  @db.VarChar(255)
+  currency     String  @db.VarChar(255)
+  chain        String  @db.VarChar(255)
   plugin       String?  @db.VarChar(255)
   value        String?  @db.VarChar(255)
   createdAt    DateTime @db.Timestamptz(6)
@@ -525,7 +526,6 @@ model addresses {
   price_scalar Decimal? @default(1) @db.Decimal
   note         String?  @db.VarChar(255)
   view_key     String?  @db.VarChar(255)
-  chain        String?  @db.VarChar(255)
 }
 
 model blockchain_receipts {

@@ -422,9 +422,9 @@ export async function listPaymentOptions(invoice: Invoice, options: LogOptions =
 
   return {
 
-    time: invoice.createdAt.toUTCString(),
+    time: invoice.createdAt.toISOString(),
 
-    expires: invoice.expiry?.toUTCString() || new Date(Date.now() + 15 * 60 * 1000).toUTCString(),
+    expires: invoice.expiry?.toISOString() || new Date(Date.now() + 15 * 60 * 1000).toISOString(),
 
     memo: String(invoice.memo),
 
@@ -457,9 +457,9 @@ export async function getPaymentRequest(invoice: Invoice, option: SelectPaymentR
 
   const result = {
 
-    time: invoice.createdAt.toUTCString(),
+    time: invoice.createdAt.toISOString(),
 
-    expires: invoice.expiry?.toUTCString() || new Date(Date.now() + 15 * 60 * 1000).toUTCString(),
+    expires: invoice.expiry?.toISOString() || new Date(Date.now() + 15 * 60 * 1000).toISOString(),
 
     memo: String(invoice.memo),
 

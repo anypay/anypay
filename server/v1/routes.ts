@@ -250,11 +250,13 @@ export async function attachV1Routes(server: Server) {
   });
 
 
-
-  const ListEventsOptions = (auth: string) => {
-    return {
+  server.route({
+    method: "GET",
+    path: "/v1/api/invoices/{invoice_uid}/events",
+    handler: v1.InvoiceEvents.index,
+    options: {
       tags: ['v1', 'invoices'],
-      auth,
+      auth: 'jwt',
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
@@ -262,9 +264,7 @@ export async function attachV1Routes(server: Server) {
         query: Joi.object({
           order: Joi.string().valid('asc', 'desc').optional()
         }),
-        failAction: (request: any, h: any, err: any) => {
-          throw err;
-        }
+        failAction
       },
       response: {
         schema: Joi.object({
@@ -281,24 +281,44 @@ export async function attachV1Routes(server: Server) {
             namespace: Joi.string().optional()
           }))
         }),
-        failAction: (request: any, h: any, err: any) => {
-          throw err;
-        }
+        failAction
       }
     }
-  }
-  server.route({
-    method: "GET",
-    path: "/v1/api/invoices/{invoice_uid}/events",
-    handler: v1.InvoiceEvents.index,
-    options: ListEventsOptions('jwt'),
   });
   server.route({
     method: "GET",
     path: "/api/v1/invoices/{invoice_uid}/events",
     handler: v1.InvoiceEvents.index,
-    options: ListEventsOptions('token')
-  });
+    options: {
+      tags: ['v1', 'invoices'],
+      auth: 'jwt',
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        }),
+        query: Joi.object({
+          order: Joi.string().valid('asc', 'desc').optional()
+        }),
+        failAction
+      },
+      response: {
+        schema: Joi.object({
+          invoice_uid: Joi.string().required(),
+          events: Joi.array().items(Joi.object({
+            id: Joi.number().required(),
+            app_id: Joi.any().optional(),
+            account_id: Joi.any().optional(),
+            invoice_uid: Joi.string().optional(),
+            type: Joi.string().required(),
+            payload: Joi.object().optional(),
+            createdAt: Joi.date().required(),
+            updatedAt: Joi.date().required(),
+            namespace: Joi.string().optional()
+          }))
+        }),
+        failAction
+      }
+    }  });
 
   server.route({
     method: "GET",

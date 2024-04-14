@@ -3,6 +3,7 @@ import {accounts} from '../../../lib';
 import * as Joi from 'joi';
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 import { ResponseToolkit } from '@hapi/hapi';
+import { find } from '../../../lib/plugins';
 
 type Coin = {
     currency: string
@@ -36,20 +37,25 @@ type Coin = {
  *       }]
  *     }
  */
+
 export async function list(request: AuthenticatedRequest, h: ResponseToolkit) {
 
   let accountCoins = await accounts.getSupportedCoins(request.account.id);
 
   let coins = Object.values(accountCoins).map((coin: Coin) => {
-      let coinName = coin.currency.toLowerCase();
 
-      if (coin.currency != coin.chain) {
-          coinName = `${coin.currency.toLowerCase()}.${coin.chain.toLowerCase()}`
+      if (coin.chain && coin.currency) {
+
+        const plugin = find({currency: coin.currency, chain: coin.chain})
+
+        return ({...coin, decimals: plugin.decimals})
+
+      } else {
+
+        return ({...coin, decimals: 0})
+
       }
 
-      const plugin = require('../../../plugins/' + coinName)
-
-      return ({...coin, decimals: new plugin.default().decimals})
   });
 
   return h.response({

@@ -238,6 +238,22 @@ export async function setAllCryptoPrices() {
 
   }))
 
+  // TODO: Fetch USDC price from exchange
+  await setPrice({
+    base_currency: 'USD',
+    currency: 'USDC',
+    value: 1,
+    source: 'hardcoded'  
+  })
+
+  // TODO: Fetch USDT price from exchange
+  await setPrice({
+    base_currency: 'USD',
+    currency: 'USDT',
+    value: 1,
+    source: 'hardcoded'  
+  })
+
 }
 
 export async function setAllFiatPrices(): Promise<Price[]> {

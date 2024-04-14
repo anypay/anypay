@@ -21,10 +21,10 @@ export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
    
     let refund = await getRefund(invoice)
 
-    let refund_invoice = await ensureInvoice(refund.get('refund_invoice_uid'))
+    let refund_invoice = await ensureInvoice(refund.refund_invoice_uid)
 
     return h.response({
-      refund: refund.toJSON(),
+      refund: refund,
       original_invoice: invoice,
       refund_invoice: refund_invoice
     })

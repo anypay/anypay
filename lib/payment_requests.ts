@@ -140,6 +140,9 @@ export async function createPaymentRequest(app_id: number, template: any, option
       }
     })
 
+    paymentRequest = await prisma.paymentRequests.findFirstOrThrow({
+      where: { id: paymentRequest.id }
+    })
 
     await paymentRequestToPaymentOptions(paymentRequest)
 

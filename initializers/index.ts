@@ -21,26 +21,22 @@ import coins from './coins'
 import prices from './prices'
 import rabbi from './rabbi'
 import prometheus from './prometheus'
-import plugins from './plugins'
 import { log } from '../lib'
 
 
 export async function initialize() {
 
-  log.info('initialize plugins')
-  await plugins()
-
-  log.info('initialize coins')
+  log.debug('initialize coins')
   await coins()
 
-  log.info('initialize prices')
+  log.debug('initialize prices')
   await prices()
 
-  log.info('initialize rabbi amqp actor system')
+  log.debug('initialize rabbi amqp actor system')
   await rabbi()
 
-  log.info('initialize prometheus')
+  log.debug('initialize prometheus')
   await prometheus()
 
-  log.info('initialization complete')
+  log.debug('initialization complete')
 }

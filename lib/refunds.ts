@@ -58,11 +58,17 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
       address = result.value 
     }
 
+    const payment = await prisma.payments.findFirstOrThrow({
+      where: {
+        invoice_uid: invoice.uid
+      }
+    })
+
     const template = [{
-      currency: invoice.invoice_currency,
+      currency: payment.currency,
       to: [{
         address,
-        amount: invoice.denomination_amount_paid,
+        amount: invoice.denomination_amount || invoice.denomination_amount_paid,
         currency: invoice.denomination_currency || invoice.invoice_currency
       }]
     }]

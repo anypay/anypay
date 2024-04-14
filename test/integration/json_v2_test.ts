@@ -1,6 +1,24 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
+
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
+
 import * as utils from '../utils'
 
-import { expect, server } from '../utils'
+import { expect, server, account } from '../utils'
 
 import { schema } from '../../lib/pay/json_v2'
 
@@ -11,8 +29,6 @@ import { config } from '../../lib/config'
 describe("JSON Payment Protocol V2", async () => {
 
   it.skip("GET /i/:uid requires accept and x-paypro-2 headers", async () => {
-
-    const account = await utils.generateAccount()
 
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
@@ -26,8 +42,6 @@ describe("JSON Payment Protocol V2", async () => {
   })
 
   it("GET /i/:uid returns payment options for invoice", async () => {
-
-    const account = await utils.generateAccount()
 
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
@@ -50,8 +64,6 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("GET /r/:uid returns payment options for invoice", async () => {
 
-    const account = await utils.generateAccount()
-
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     let response = await server.inject({
@@ -73,8 +85,6 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("POST /i/:uid requires Content-Type and x-paypro-version", async () => {
     
-    const account = await utils.generateAccount()
-
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     let { result }: { result: any } = await server.inject({
@@ -119,8 +129,6 @@ describe("JSON Payment Protocol V2", async () => {
 
   it("POST /i/:uid returns a payment request for chosen option", async () => {
 
-    let account = await utils.generateAccount()
-
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     let { result }: { result: any } = await server.inject({
@@ -151,8 +159,6 @@ describe("JSON Payment Protocol V2", async () => {
   })
 
   it("POST /r/:uid returns a payment request for chosen option", async () => {
-
-    let account = await utils.generateAccount()
 
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
@@ -203,8 +209,6 @@ describe("JSON Payment Protocol V2", async () => {
   
   it("POST /i/:uid should rejects invalid un-signed transaction upon payment verification", async () => {
 
-    const account = await utils.generateAccount()
-
     let invoice = await utils.newInvoice({ amount: 0.02, account })
 
     const transaction = new bch.Transaction()
@@ -233,8 +237,6 @@ describe("JSON Payment Protocol V2", async () => {
 
     it("POST /i/:uid should verify the payment is valid", async () => {
 
-      let account = await utils.generateAccount()
-
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let response = await server.inject({
@@ -251,8 +253,6 @@ describe("JSON Payment Protocol V2", async () => {
     })
 
     it("POST /r/:uid should verify the payment is valid", async () => {
-
-      let account = await utils.generateAccount()
 
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 

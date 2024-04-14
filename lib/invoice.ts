@@ -308,8 +308,6 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
     } catch(error) {
 
-      console.error('create payment option error---', error)
-
       return null
 
     }

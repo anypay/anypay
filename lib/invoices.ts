@@ -211,7 +211,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
   const invoice = await prisma.invoices.create({ data: newInvoice })
 
   createWebhookForInvoice(invoice)
-
+  
   const paymentOptions = await createPaymentOptions(account, invoice)
 
   const paymentRequest = await prisma.paymentRequests.create({

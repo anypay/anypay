@@ -94,8 +94,9 @@ export async function registerAccount(email: string, password: string): Promise<
     data: {
       email,
       password_hash: passwordHash,
+      denomination: 'USD',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }
   });
 

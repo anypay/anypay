@@ -104,10 +104,12 @@ export default class XMR extends Plugin {
       ],
     };
 
-    const validateCryptonote = (address: string, chain: any) => {
+    const validateCryptonote = (address: string, chain: {
+      publicAddressBytes: number[]    
+    }) => {
       const {publicAddressBytes} = chain
 
-      if (!publicAddressBytes || !Array.isArray(publicAddressBytes) && publicAddressBytes.length) {
+      if (!publicAddressBytes || !Array.isArray(publicAddressBytes)) {
         throw new Error('Array of numbers accepted for network bytes are accepted')
       }
 
@@ -128,10 +130,11 @@ export default class XMR extends Plugin {
 
 
     try {
-      validateCryptonote(address, String(chain))
+      validateCryptonote(address, chain)
 
       return true
     } catch (e) {
+      console.log('XMR.validateAddress.error', e)
       return false
     }
   }

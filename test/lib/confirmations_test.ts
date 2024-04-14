@@ -1,5 +1,24 @@
+/*
+    This file is part of anypay: https://github.com/anypay/anypay
+    Copyright (c) 2017 Anypay Inc, Steven Zeiler
 
-import { expect, generateAccount, newInvoice } from '../utils'
+    Permission to use, copy, modify, and/or distribute this software for any
+    purpose  with  or without fee is hereby granted, provided that the above
+    copyright notice and this permission notice appear in all copies.
+
+    THE  SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+    WITH  REGARD  TO  THIS  SOFTWARE  INCLUDING  ALL  IMPLIED  WARRANTIES  OF
+    MERCHANTABILITY  AND  FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+    ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+    WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
+    ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+    OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+*/
+//==============================================================================
+
+import { expect, newInvoice, account } from '../utils'
+
+import { createInvoice } from '../../lib/invoices'
 
 import { confirmPayment, confirmPaymentByTxid, revertPayment } from '../../lib/confirmations'
 
@@ -8,16 +27,31 @@ import { recordPayment } from './../../lib/payments'
 import { randomBytes } from 'crypto'
 
 import prisma from '../../lib/prisma'
+import { setAddress } from '../../lib/core'
 
 describe("Confirmations", () => {
 
   describe('#confirmPayment', () => {
 
     it('should update the payment with confirmation data', async () => {
+      
+      await setAddress({
+        account_id: account.id,
+        chain: 'BSV',
+        currency: 'BSV',
+        address: '1SbmHpETuDdkLPAaFoY9GqMiHToCwMUNJ'
+      })
 
-      const account = await generateAccount()
+      let invoice = await createInvoice({ amount: 0.52, account })
 
-      let invoice = await newInvoice({ amount: 0.52, account })
+      /*const payment_options = await prisma.payment_options.findMany({
+        where: {
+          invoice_uid: invoice.uid
+        }
+      })*/
+
+      //console.log(payment_options, 'payment_options')
+
 
       let payment: any = await recordPayment(invoice, {
         txid: randomBytes(32).toString('hex'),
@@ -25,7 +59,7 @@ describe("Confirmations", () => {
         txhex: randomBytes(128).toString('hex')
       })
 
-      const txid = payment.get('txid')
+      const txid = payment.txid
 
       const confirmation_hash = randomBytes(32).toString('hex')
 
@@ -35,11 +69,13 @@ describe("Confirmations", () => {
 
       payment = await prisma.payments.findFirstOrThrow({
         where: {
-          txid
+          id: payment.id
         }
       })
 
-      await confirmPayment({
+      console.log(payment, '2')
+
+      let result = await confirmPayment({
         payment,
         confirmation: {
           confirmation_hash,
@@ -48,19 +84,21 @@ describe("Confirmations", () => {
         }
       })
 
+      console.log('payment.conformed', result)
+
       payment = await prisma.payments.findFirstOrThrow({
         where: {
           txid
         }
       })
 
-      expect(payment.get('confirmation_hash')).to.be.equal(confirmation_hash)
+      expect(payment.confirmation_hash).to.be.equal(confirmation_hash)
 
-      expect(payment.get('confirmation_height')).to.be.equal(confirmation_height)
+      expect(payment.confirmation_height).to.be.equal(confirmation_height)
 
-      expect(payment.get('confirmation_date').toString()).to.be.equal(confirmation_date.toString())
+      expect(payment.confirmation_date.toString()).to.be.equal(confirmation_date.toString())
 
-      expect(payment.get('status')).to.be.equal('confirmed')
+      expect(payment.status).to.be.equal('confirmed')
 
     })
 
@@ -70,7 +108,12 @@ describe("Confirmations", () => {
 
     it('should update the invoice and payment accordingly', async () => {
 
-      const account = await generateAccount()
+      await setAddress({
+        account_id: account.id,
+        chain: 'BSV',
+        currency: 'BSV',
+        address: '1SbmHpETuDdkLPAaFoY9GqMiHToCwMUNJ'
+      })
 
       let invoice = await newInvoice({ amount: 0.52, account })
 
@@ -126,7 +169,12 @@ describe("Confirmations", () => {
 
     it('#revertPayment should mark payment as failed and invoice as unpaid', async () => {
 
-      const account = await generateAccount()
+      await setAddress({
+        account_id: account.id,
+        chain: 'BSV',
+        currency: 'BSV',
+        address: '1SbmHpETuDdkLPAaFoY9GqMiHToCwMUNJ'
+      })
 
       let invoice = await newInvoice({ amount: 0.52, account })
 

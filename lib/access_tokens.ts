@@ -18,6 +18,7 @@
 
 import { accounts as Account, access_tokens as AccessToken } from '@prisma/client'
 import prisma from './prisma'
+import { v4 } from 'uuid'
 
 export async function ensureAccessToken(account: Account): Promise<AccessToken> {
 
@@ -25,6 +26,7 @@ export async function ensureAccessToken(account: Account): Promise<AccessToken> 
       
       data: {
         account_id: account.id,
+        uid: v4(),
         createdAt: new Date(),
         updatedAt: new Date()
       }

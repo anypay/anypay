@@ -41,7 +41,7 @@ interface AddressChangeSet {
 }
 
 export async function setAddress(changeset: AddressChangeSet): Promise<Address> {
-
+  
   var isValid = true;
 
   let plugin = find({ chain: changeset.chain, currency: changeset.currency });
@@ -62,12 +62,15 @@ export async function setAddress(changeset: AddressChangeSet): Promise<Address> 
 
     isValid = await plugin.validateAddress(changeset.address);
 
+  } else {
+      
+      console.log("NO VALIDATE ADDRESS DEFINED", changeset)
   }
 
 
   if(!isValid){
   
-    throw(`invalid ${changeset.currency} address`)
+    throw(new Error(`invalid ${changeset.currency} address`))
 
   }
 

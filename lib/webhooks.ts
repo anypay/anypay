@@ -358,7 +358,7 @@ export async function attemptWebhook(webhook: Webhook): Promise<WebhookAttempt> 
   })
 
   const invoice = await prisma.invoices.findFirstOrThrow({
-    where: { uid: webhook.invoice_uid }
+    where: { uid: String(webhook.invoice_uid) }
   })
 
   let json = JSON.parse(JSON.stringify(invoice))

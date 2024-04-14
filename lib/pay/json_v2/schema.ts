@@ -18,8 +18,8 @@ const PaymentOption = Joi.object({
 })
 
 const PaymentOptions = Joi.object({
-  time: Joi.date().timestamp().required(),
-  expires: Joi.date().timestamp().required(),
+  time: Joi.date().required(),
+  expires: Joi.date().required(),
   memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
@@ -44,8 +44,8 @@ const AuthHeaders = Joi.object({
 })
 
 const PaymentRequest = Joi.object({
-  time: Joi.date().timestamp(),
-  expires: Joi.date().timestamp(),
+  time: Joi.date(),
+  expires: Joi.date(),
   memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
