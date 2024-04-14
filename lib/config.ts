@@ -84,15 +84,15 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'X509_DOMAIN_CERT_DER_PATH',
-    required: true
+    required: false
   },
   {
     key: 'X509_PRIVATE_KEY_PATH',
-    required: true
+    required: false
   },
   {
     key: 'X509_ROOT_CERT_DER_PATH',
-    required: true
+    required: false
   },
   {
     key: 'FIREBASE_SERVER_KEY',
@@ -179,7 +179,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: "BLOCKCYPHER_TOKEN",
-    required: true
+    required: false
   },
   {
     key: "BLOCKCYPHER_WEBHOOK_TOKEN",
@@ -195,15 +195,15 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'INFURA_POLYGON_URL',
-    required: true
+    required: false
   },
   {
     key: 'INFURA_ETHEREUM_URL',
-    required: true
+    required: false
   },
   {
     key: 'INFURA_AVALANCHE_URL',
-    required: true
+    required: false
   },
   {
     key: "NOWNODES_API_KEY",
@@ -282,18 +282,13 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'CHAIN_SO_BROADCAST_PROVIDER_ENABLED',
-    required: true,
-    default: 'true'
+    required: false,
+    default: true
   },
   {
     key: 'BLOCKCHAIR_BROADCAST_PROVIDER_BTC_ENABLED',
-    required: true,
-    default: 'true'
-  },
-  {
-    key: 'REQUIRE_BTC_CONFIRMATIONS',
-    required: true,
-    default: 'true'
+    required: false,
+    default: true
   },
   {
     key: 'BITCOIND_RPC_HOST',
