@@ -207,7 +207,7 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: "NOWNODES_API_KEY",
-    required: true
+    required: false
   },
   {
     key: 'TEST_AMQP_URL',
