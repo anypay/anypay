@@ -34,7 +34,7 @@ jobs:
           - 5672/tcp
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x, 20.x]
     steps:
       - uses: actions/checkout@v2
       - name: Node.js
