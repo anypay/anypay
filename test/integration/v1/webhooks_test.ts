@@ -16,7 +16,7 @@
 */
 //==============================================================================
 
-import { server, expect, spy, auth, newAccountWithInvoice } from '../../utils'
+import { server, expect, spy, newAccountWithInvoice, jwt } from '../../utils'
 
 import { log } from '../../../lib/log'
 import { config } from '../../../lib/config'
@@ -38,7 +38,7 @@ describe("Webhooks Default Endpoint", async () => {
     var response = await server.inject({
       method: 'POST',
       url: `/v1/api/test/webhooks`,
-      payload: invoice.toJSON()
+      payload: invoice
     })
 
     expect(response.statusCode).to.be.equal(200);
@@ -54,9 +54,12 @@ describe("Webhooks Default Endpoint", async () => {
 
     log.info('test.account.created', account)
 
-    var response = await auth(account)({
+    var response = await server.inject({
       method: 'POST',
-      url: `/v1/api/webhooks/${invoice.uid}/attempts`
+      url: `/v1/api/webhooks/${invoice.uid}/attempts`,
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
     })
 
     expect(response.statusCode).to.be.equal(201);
@@ -69,14 +72,19 @@ describe("Webhooks Default Endpoint", async () => {
 
     log.info('test.account.created', account)
 
-    var response = await auth(account)({
+    var response = await server.inject({
       method: 'GET',
-      url: `/v1/api/webhooks`
+      url: `/v1/api/webhooks`,
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
     })
+
+    const result = response.result as any
 
     expect(response.statusCode).to.be.equal(200);
 
-    expect(response.result.webhooks).to.be.an('array');
+    expect(result.webhooks).to.be.an('array');
 
   })
 

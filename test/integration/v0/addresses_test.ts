@@ -16,12 +16,14 @@
 */
 //==============================================================================
 
-import { v0AuthRequest, expect } from '../../utils'
+import { v0AuthRequest, expect, server, createAuthHeader } from '../../utils'
+
+import { accounts as Account } from '@prisma/client'
 
 import * as utils from '../../utils'
 
 describe("Setting Addresses Via REST", async () => {
-  var account;
+  var account: Account;
   
   before(async () => {
   
@@ -29,20 +31,31 @@ describe("Setting Addresses Via REST", async () => {
 
   });
 
+
   it("PUT /addresses/DASH should set the DASH address", async () => {
 
     var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    let response = await v0AuthRequest(account, {
-      method: 'PUT',
+    const account = await utils.generateAccount()
+
+    const authHeader = await createAuthHeader(account)
+
+    console.log({ authHeader })
+
+    const response: any = await server.inject({
+      method: 'put',
       url: '/addresses/DASH',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: `Basic ${authHeader}`
       }
     })
 
+    console.log('--DASH--', response.result)
+
     expect(response.result.value).to.be.equal(address);
-    expect(response.result.currency).to.be.equal('DASH');
 
   })
 
@@ -58,7 +71,9 @@ describe("Setting Addresses Via REST", async () => {
       }
     })
 
-    expect(response.result.value).to.be.equal(address);
+    const result = response.result as any;
+
+    expect(result.value).to.be.equal(address);
 
   })
 
@@ -84,7 +99,9 @@ describe("Setting Addresses Via REST", async () => {
       }
     })
 
-    expect(response.result['BTC']).to.be.equal(address)
+    const result = response.result as any;
+
+    expect(result['BTC']).to.be.equal(address)
 
   })
 

@@ -18,7 +18,7 @@
 
 import { find } from '../../lib/plugins'
 
-import { Payment } from '../../lib/plugin'
+import { Confirmation, Payment } from '../../lib/plugin'
 
 import { expect } from 'chai'
 
@@ -42,15 +42,13 @@ describe('USDC on ETH', () => {
 
     let txid = '0xcd43123eea81e3b9e2227d6468f6f6ad174e90e6f793b2302c7b03f04604381b'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let { confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
-    expect(depth).to.be.greaterThan(0)
+    expect(confirmation_hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
 
-    expect(hash).to.be.equal('0x5b192061e9a046cb05f7f72f5d71bcca2d53cc7083d3a738163f7e155ec6fa05')
+    expect(confirmation_height).to.be.equal(17255716)
 
-    expect(height).to.be.equal(17255716)
-
-    expect(timestamp).to.be.a('date')
+    expect(confirmation_date).to.be.a('date')
 
   })
 
@@ -86,7 +84,7 @@ describe('USDC on ETH', () => {
 
     let txhex = '0xf8ad8308f1b7850af16b16008302bf2094a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4880b844a9059cbb00000000000000000000000063fc765a644d31f87a2284fd4bf728c9d767d92100000000000000000000000000000000000000000000000000000000004dcb1e25a09bfc24a2e5068063333d1846203b17567e7651c8d1a3694c9d9e34b4675c2c52a07812262351929c7d17d6ae3304f74041263316f1cd271e1c91c21bdeddb3e23e'
 
-    let payments: Payment[] = await plugin.parsePayments(txhex)
+    let payments: Payment[] = await plugin.parsePayments({txhex})
 
     expect(payments.length).to.be.equal(1)
 

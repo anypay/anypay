@@ -6,6 +6,7 @@ import { ensureAccessToken } from '../../../lib/access_tokens'
 import { log } from '../../../lib/log'
 import AuthenticatedRequest from '../../auth/AuthenticatedRequest';
 import { ResponseToolkit } from '@hapi/hapi';
+import { generateAccountToken } from '../../../lib/jwt';
 
 export async function create(request: AuthenticatedRequest, h: ResponseToolkit) {
 
@@ -34,11 +35,16 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
 
   const accessToken = await ensureAccessToken(account)
 
+  const jwt: string = await generateAccountToken({
+    account_id: account.id,
+    uid: String(accessToken.uid)
+  })
+
   return h.response({
 
     user: account,
 
-    accessToken,
+    accessToken: jwt,
 
   }).code(200)
 

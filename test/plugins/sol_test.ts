@@ -19,6 +19,7 @@
 import { expect } from 'chai'
 
 import { find } from '../../lib/plugins'
+import { Confirmation } from '../../lib/confirmations'
 
 describe('SOL', () => {
 
@@ -38,15 +39,13 @@ describe('SOL', () => {
 
     let txid = 'sva4wpWvkuE2vLeGDHdDdxorYNWVz8p74uyR1i1FnHUudK94hCgh7qKWrRW6hnFaVAFkUQp9AX6jVD5BkuNNFvv'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let { confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
-    expect(depth).to.be.greaterThan(0)
+    expect(confirmation_hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
 
-    expect(hash).to.be.equal('6whs717Kr48RW3j2ocsWrW9BiGkSeLFNfnMXN23WAAHL')
+    expect(confirmation_height).to.be.equal(176768846)
 
-    expect(height).to.be.equal(176768846)
-
-    expect(timestamp).to.be.a('date')
+    expect(confirmation_date).to.be.a('date')
 
   })
 
@@ -94,7 +93,7 @@ describe('SOL', () => {
 
     let txhex = ''
 
-    let payments: Payment[] = await plugin.parsePayments(txhex)
+    let payments = await plugin.parsePayments({txhex})
 
     expect(payments.length).to.be.equal(1)
 

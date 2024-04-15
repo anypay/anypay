@@ -20,7 +20,7 @@ require('dotenv').config()
 
 import { expect } from './utils'
 
-import { convert, setPrice, setAllFiatPrices } from '../lib/prices'
+import { convert, setAllFiatPrices } from '../lib/prices'
 
 import prisma from '../lib/prisma'
 

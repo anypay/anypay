@@ -16,28 +16,11 @@
 */
 //==============================================================================
 
-import {Server} from '../../servers/rest_api/server';
-import * as assert from 'assert';
-import {hash} from '../../lib/password';
-
-import { generateAccount } from '../utils';
-
-import { settings, database, models, accounts } from "../../lib";
-
-import * as Chance from 'chance';
-const chance = new Chance();
+import prisma from '../../lib/prisma';
+import { server, assert, account, uuid, accessToken } from '../utils'
 
 describe("Setting Firebase Token via REST", async () => {
-  var accessToken, account, server;
-  
-  before(async () => {
-    server = await Server();
 
-    account = await generateAccount();
-
-    accessToken = await accounts.createAccessToken(account.id);
-
-  });
 
   it("PUT /firebase_token should add multiple tokens", async () => {
     try {
@@ -50,10 +33,12 @@ describe("Setting Firebase Token via REST", async () => {
         payload: {
           firebase_token: token
         },
-        headers: headers(accessToken.uid)
+        headers: headers(String(accessToken.uid))
       });
 
-      assert.strictEqual(response.result.firebase_token.token, token);
+      const result = response.result as any;
+
+      assert.strictEqual(result.firebase_token.token, token);
 
       // A second token can also be added
       await server.inject({
@@ -62,18 +47,22 @@ describe("Setting Firebase Token via REST", async () => {
         payload: {
           firebase_token: uuid.v4()
         },
-        headers: headers(accessToken.uid)
+        headers: headers(String(accessToken.uid))
       });
 
-      assert.strictEqual(models.FirebaseToken.findAll({
+      const allTokens = await prisma.firebase_tokens.findMany({
         where: {
           account_id: account.id
         }
-      }).length, 2)
+      })
+
+      assert.strictEqual(allTokens.length, 2)
 
     } catch(error) {
 
-      console.error('ERROR', error.message);
+      const { message } = error as Error;
+
+      console.error('ERROR', message);
 
       throw error;
     }
@@ -90,31 +79,36 @@ describe("Setting Firebase Token via REST", async () => {
         payload: {
           firebase_token: token
         },
-        headers: headers(accessToken.uid)
+        headers: headers(String(accessToken.uid))
       });
 
       response = await server.inject({
         method: 'GET',
         url: '/firebase_token',
-        headers: headers(accessToken.uid)
+        headers: headers(String(accessToken.uid))
       });
 
-      assert.strictEqual(response.result.firebase_token.token, token);
+      const { result } = response as any
+
+      assert.strictEqual(result.firebase_token.token, token);
 
     } catch(error) {
 
-      console.error('ERROR', error.message);
+      const { message } = error as Error;
+
+      console.error('ERROR', message);
+
       throw error;
     }
   });
 
 })
 
-function auth(username, password) {
+function auth(username: string, password: string) {
   return `Basic ${new Buffer(username + ':' + password).toString('base64')}`;
 }
 
-function headers(token) {
+function headers(token: string) {
 
   return {
     'Authorization': auth(token, "")

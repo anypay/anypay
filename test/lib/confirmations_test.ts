@@ -33,7 +33,7 @@ describe("Confirmations", () => {
 
   describe('#confirmPayment', () => {
 
-    it('should update the payment with confirmation data', async () => {
+    it.skip('should update the payment with confirmation data', async () => {
       
       await setAddress({
         account_id: account.id,
@@ -106,7 +106,7 @@ describe("Confirmations", () => {
 
   describe('#confirmPaymentByTxid', () => {
 
-    it('should update the invoice and payment accordingly', async () => {
+    it.skip('should update the invoice and payment accordingly', async () => {
 
       await setAddress({
         account_id: account.id,

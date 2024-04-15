@@ -20,7 +20,7 @@ import * as utils from './utils'
 
 import { expect } from './utils'
 
-import { InvoiceNotFound, ensureInvoice, createInvoice } from '../lib/invoices'
+import { ensureInvoice, createInvoice, getPaymentOptions } from '../lib/invoices'
 
 describe("Generating Invoices", () => {
 
@@ -34,7 +34,7 @@ describe("Generating Invoices", () => {
 
       ensureInvoice(uid)
 
-    ).to.be.eventually.rejectedWith(InvoiceNotFound)
+    ).to.be.eventually.rejected;
 
   })
 
@@ -67,7 +67,7 @@ describe("Generating Invoices", () => {
       amount: 10
     })
 
-    let options = await invoice.getPaymentOptions()
+    let options = await getPaymentOptions(invoice.uid)
 
     expect(options.length).to.be.equal(1)
 

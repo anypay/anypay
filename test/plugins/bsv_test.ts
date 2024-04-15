@@ -19,6 +19,7 @@
 import { expect } from 'chai'
 
 import { find } from '../../lib/plugins'
+import { Confirmation } from '../../lib/confirmations'
 
 describe("BSV", () => {
 
@@ -38,15 +39,13 @@ describe("BSV", () => {
 
     let txid = 'de2b352e1849392a7fce7a8fa2f6295d922307303b007d3804f9589b66624028'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let { confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
-    expect(depth).to.be.greaterThan(0)
+    expect(confirmation_hash).to.be.equal('0000000000000000003a7c1fa88eb6134c0f8b4027e1b1e753079181a462d99a')
 
-    expect(hash).to.be.equal('0000000000000000003a7c1fa88eb6134c0f8b4027e1b1e753079181a462d99a')
+    expect(confirmation_height).to.be.equal(791940)
 
-    expect(height).to.be.equal(791940)
-
-    expect(timestamp).to.be.a('date')
+    expect(confirmation_date).to.be.a('date')
 
   })
 

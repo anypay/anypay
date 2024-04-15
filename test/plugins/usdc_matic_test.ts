@@ -18,7 +18,7 @@
 
 import { find } from '../../lib/plugins'
 
-import { Payment } from '../../lib/plugin'
+import { Confirmation, Payment } from '../../lib/plugin'
 
 import { expect } from 'chai'
 
@@ -42,15 +42,13 @@ describe('USDC on MATIC', () => {
 
     let txid = '0x7fa214be78f449b5c2ce854688a4244bfa6039971edea30f46ee535636fed0a0'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let { confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
-    expect(depth).to.be.greaterThan(0)
+    expect(confirmation_hash).to.be.equal('0x01a9acc2827368254847ff96169257db4c756e08647db003c808e99306382df3')
 
-    expect(hash).to.be.equal('0x01a9acc2827368254847ff96169257db4c756e08647db003c808e99306382df3')
+    expect(confirmation_height).to.be.equal(42679642)
 
-    expect(height).to.be.equal(42679642)
-
-    expect(timestamp).to.be.a('date')
+    expect(confirmation_date).to.be.a('date')
 
   })
 
@@ -86,7 +84,7 @@ describe('USDC on MATIC', () => {
 
     let txhex = '0x02f8b28189808522bfb85e118522bfb85e1182d20e942791bca1f2de4661ed88a30c99a7a9449aa8417480b844a9059cbb0000000000000000000000004dc29377f2ae10bec4c956296aa5ca7de47692a20000000000000000000000000000000000000000000000000000000000002710c001a092522ee630e5bd3aa82c5be3d2bd35050c2b91b2d7fe40f86558e1794e5a114fa06a23a77fb76a758c8b8bc6fda5d507fff14fc16583fe86dde6e246328b0a77bf'
 
-    let payments: Payment[] = await plugin.parsePayments(txhex)
+    let payments: Payment[] = await plugin.parsePayments({txhex})
 
     expect(payments.length).to.be.equal(1)
 

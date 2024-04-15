@@ -16,30 +16,27 @@
 */
 //==============================================================================
 
+import { getAddressHistory, setAddressBalance } from "../../../apps/wallet-bot"
 import { expect, walletBot } from "../../utils"
 
-import { AddressBalanceUpdate } from '../../../apps/wallet-bot'
-
-import { PrivateKey } from 'scrypt-ts'
+import { bsv } from 'scrypt-ts'
 
 describe("Tracking Wallet Bot Balances", () => {
 
 
     it('#getAddressBalanceHistory should show the history of balances for a given address', async () => {
 
-      const address = new PrivateKey().toAddress().toString()
+      const address = new bsv.PrivateKey().toAddress().toString()
 
-      const history: AddressBalanceUpdate[] = await walletBot.getAddressHistory({
+      const history = await getAddressHistory(walletBot, {
         address,
         currency: 'USDC',
-        chain: 'BSV',
-        offset: 0,
-        limit: 10
+        chain: 'BSV'
       })
 
       expect(history.length).to.be.equal(0)
 
-      await walletBot.setAddressBalance({
+      await setAddressBalance(walletBot, {
         address,
         balance: 1,
         currency: 'USDC',
@@ -48,7 +45,7 @@ describe("Tracking Wallet Bot Balances", () => {
 
       expect(history.length).to.be.equal(1)
 
-      await walletBot.setAddressBalance({
+      await setAddressBalance( walletBot, {
         address,
         balance: 1,
         currency: 'USDC',
@@ -57,7 +54,7 @@ describe("Tracking Wallet Bot Balances", () => {
 
       expect(history.length).to.be.equal(1)
 
-      await walletBot.setAddressBalance({
+      await setAddressBalance(walletBot, {
         address,
         balance: 0.5,
         currency: 'USDC',
@@ -74,9 +71,9 @@ describe("Tracking Wallet Bot Balances", () => {
 
     it('#updateAddressBalance should record a new entry when the balance changes', async () => {
 
-      const address = new PrivateKey().toAddress().toString()
+      const address = new bsv.PrivateKey().toAddress().toString()
 
-      const [firstEntry, isChanged] = await walletBot.setAddressBalance({
+      const [firstEntry, isChanged] = await setAddressBalance(walletBot, {
         address,
         balance: 1,
         currency: 'USDC',
@@ -86,7 +83,7 @@ describe("Tracking Wallet Bot Balances", () => {
       expect(firstEntry.balance).to.be.equal(1)
       expect(isChanged).to.be.equal(true)
 
-      const [secondEntry, isChanged2] = await walletBot.setAddressBalance({
+      const [secondEntry, isChanged2] = await setAddressBalance(walletBot, {
         address,
         balance: 1,
         currency: 'USDC',
@@ -96,7 +93,7 @@ describe("Tracking Wallet Bot Balances", () => {
       expect(secondEntry.balance).to.be.equal(1)
       expect(isChanged2).to.be.equal(false)
 
-      const [thirdEntry, isChanged3] = await walletBot.setAddressBalance({
+      const [thirdEntry, isChanged3] = await setAddressBalance(walletBot, {
         address,
         balance: 0.5,
         currency: 'USDC',

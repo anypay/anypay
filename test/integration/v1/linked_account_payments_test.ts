@@ -16,7 +16,8 @@
 */
 //==============================================================================
 
-import { auth, expect, account, generateAccount } from '../../utils'
+import { generateAccountToken } from '../../../lib/jwt'
+import { expect, account, generateAccount, server, jwt } from '../../utils'
 
 describe("Linked Account Payments", async () => {
 
@@ -24,17 +25,25 @@ describe("Linked Account Payments", async () => {
 
         const targetAccount = await generateAccount()
 
-        await auth(account)({
+        await server.inject({
           method: 'POST',
           url: '/v1/api/linked-accounts',
+          headers: {
+            Authorization: `Bearer ${jwt}`
+          },
           payload: {
             email: targetAccount.email
           }
         })
+
+        const targetJwt = await generateAccountToken({account_id: targetAccount.id, uid: String(targetAccount.id)})
      
-        let response = await auth(targetAccount)({
+        let response = await server.inject({
           method: 'GET',
-          url: `/v1/api/linked-accounts/${account.id}/payments`
+          url: `/v1/api/linked-accounts/${account.id}/payments`,
+          headers: {
+            Authorization: `Bearer ${targetJwt}`
+          },
         })
     
         expect(response.statusCode).to.be.equal(200)
@@ -46,17 +55,25 @@ describe("Linked Account Payments", async () => {
 
         const targetAccount = await generateAccount()
 
-        await auth(account)({
+        await server.inject({
           method: 'POST',
           url: '/v1/api/linked-accounts',
+          headers: {
+            Authorization: `Bearer ${jwt}`
+          },
           payload: {
             email: targetAccount.email
           }
         })
-     
-        let response = await auth(targetAccount)({
+
+        const targetJwt = await generateAccountToken({account_id: targetAccount.id, uid: String(targetAccount.id)})
+             
+        let response = await server.inject({
           method: 'GET',
-          url: `/v1/api/linked-accounts/7777777/payments`
+          url: `/v1/api/linked-accounts/7777777/payments`,
+          headers: {
+            Authorization: `Bearer ${targetJwt}`
+          },
         })
     
         expect(response.statusCode).to.be.equal(401)

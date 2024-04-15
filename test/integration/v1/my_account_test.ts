@@ -16,15 +16,18 @@
 */
 //==============================================================================
 
-import { auth, expect, account } from '../../utils'
+import { expect, server, jwt } from '../../utils'
 
 describe("api/v1/my_account", async () => {
 
   it('should return my account with success', async () => {
 
-    const response = await auth(account)({
+    const response = await server.inject({
       method: 'GET',
-      url: '/v1/api/account/my-account'
+      url: '/v1/api/account/my-account',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
     })
 
     expect(response.statusCode).to.be.equal(200)

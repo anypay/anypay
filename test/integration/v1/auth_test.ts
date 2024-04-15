@@ -107,7 +107,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(401);
 
-    expect(response.body.error).to.be.equal('Unauthorized');
+    expect(response.body.payload.message).to.be.equal('Missing authentication');
 
     response = await request
       .get('/v1/api/account/my-account')
@@ -115,7 +115,7 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(401);
 
-    expect(response.body.error).to.be.equal('Unauthorized');
+    expect(response.body.payload.message).to.be.equal('Bad token');
 
     response = await request
       .get('/v1/api/account/my-account')
@@ -149,8 +149,6 @@ describe("Listing Available Webhooks", async () => {
 
     expect(response.statusCode).to.be.equal(200)
 
-
   })
 
 })
-

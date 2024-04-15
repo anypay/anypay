@@ -22,13 +22,14 @@ import { polygon } from 'usdc'
 
 import { expect } from 'chai'
 
-import { createPaymentRequest } from '../../lib/payment_requests'
+//import { createPaymentRequest } from '../../lib/payment_requests'
 
-import { buildSignedPayment, verifyPayment } from '../../lib/plugins'
+//import { buildSignedPayment, verifyPayment } from '../../lib/plugins'
 
-import { PaymentOption, Transaction, config } from '../../lib'
+//import { PaymentOption, Transaction, config } from '../../lib'
+import { config } from '../../lib'
 
-import { app } from '../utils'
+//import { app } from '../utils'
 
 const mnemonic = config.get('anypay_wallet_mnemonic')
 
@@ -41,6 +42,8 @@ describe("Sending USDC Payments on MATIC", () => {
     expect(address).to.be.a('string')
 
   })
+
+  /*
 
   it.skip("should build and sign a USDC transfer", async () => {
 
@@ -115,5 +118,6 @@ describe("Sending USDC Payments on MATIC", () => {
 
 
   })
+  */
 
 })

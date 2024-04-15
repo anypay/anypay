@@ -19,6 +19,7 @@
 import { expect } from 'chai'
 
 import { find } from '../../lib/plugins'
+import { Confirmation } from '../../lib/confirmations';
 
 describe('XMR', () => {
 
@@ -40,15 +41,13 @@ describe('XMR', () => {
 
     let txid = '58f8df857270cfc783c7dfb5e58c69e8dee5b9113242b52cefc62b4296fbcec3'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let { confirmation_hash, confirmation_height, confirmation_date } = await plugin.getConfirmation(txid) as Confirmation
 
-    expect(depth).to.be.greaterThan(0)
+    expect(confirmation_hash).to.be.equal('cc3d8eace4332c99e13aa915c1f7521490c3f91054cfc7500fce6ec58f66c98a')
 
-    expect(hash).to.be.equal('cc3d8eace4332c99e13aa915c1f7521490c3f91054cfc7500fce6ec58f66c98a')
+    expect(confirmation_height).to.be.equal(2885963)
 
-    expect(height).to.be.equal(2885963)
-
-    expect(timestamp).to.be.a('date')
+    expect(confirmation_date).to.be.a('date')
 
   })
 

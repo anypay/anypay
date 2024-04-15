@@ -16,7 +16,7 @@
 */
 //==============================================================================
 
-import { auth, v0AuthRequest, expect } from '../../utils'
+import { v0AuthRequest, expect } from '../../utils'
 
 import * as utils from '../../utils'
 

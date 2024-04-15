@@ -56,7 +56,7 @@ describe('USDC on AVAX', () => {
 
     let txhex = '0x02f8b382a86a808505d21dba008505d21dba0082be2a94b97ef9ef8734c71904d8002f8b6bc66dd9c48a6e80b844a9059cbb0000000000000000000000004dc29377f2ae10bec4c956296aa5ca7de47692a200000000000000000000000000000000000000000000000000000000000003e8c080a0b851b93f9fea4f7a114c4436335ad6beb12a37df774c53481737deaef7d48d0ea010b4b53c2ccf11c2d61cf58f059e7b976b24ad1978ad3a08655082b0c0103771'
 
-    let payments: Payment[] = await plugin.parsePayments(txhex)
+    let payments: Payment[] = await plugin.parsePayments({txhex})
 
     expect(payments.length).to.be.equal(1)
 

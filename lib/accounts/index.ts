@@ -100,6 +100,19 @@ export async function registerAccount(email: string, password: string): Promise<
     }
   });
 
+  await prisma.events.create({
+    data: {
+      account_id: account.id,
+      type: 'account.created',
+      payload: {
+        email,
+        id: account.id,
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+  })
+
   return account;
 }
 

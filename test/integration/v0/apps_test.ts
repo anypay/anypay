@@ -57,10 +57,11 @@ describe("API V0", async () => {
       }
     })
 
+    const result = response.result as any
 
     let { statusCode } = await auth(account, {
       method: 'GET',
-      url: `/apps/${response.result.app.id}`
+      url: `/apps/${result.app.id}`
     })
 
     expect(statusCode).to.be.equal(200)

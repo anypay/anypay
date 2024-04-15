@@ -17,7 +17,7 @@
 */
 //==============================================================================
 
-import { auth, expect, account } from '../../utils'
+import { expect, account, jwt, server } from '../../utils'
 
 import * as passwords from '../../../lib/password'
 
@@ -29,9 +29,12 @@ describe("/v1/api/account/password-reset", async () => {
 
     spy.on(passwords, ['sendPasswordResetEmail'])
 
-    await auth(account)({
+    await server.inject({
       method: 'POST',
       url: '/v1/api/account/password-reset',
+      headers: {
+        Authorization: `Bearer ${jwt}`      
+      },
       payload: {
         email: account.email
       }

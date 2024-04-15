@@ -18,7 +18,7 @@
 
 import { find } from '../../lib/plugins'
 
-import { Payment } from '../../lib/plugin'
+import {  Payment } from '../../lib/plugin'
 
 import { expect } from 'chai'
 
@@ -42,15 +42,19 @@ describe('AVAX', () => {
 
     let txid = '0x08374e97eb817fdbd8eb8eddb6e2f4693436dafbdfb7dd2adb4c07300c7a253e'
 
-    let { depth, hash, height, timestamp } = await plugin.getConfirmation(txid)
+    let confirmation = await plugin.getConfirmation(txid)
 
-    expect(depth).to.be.greaterThan(0)
+    if (!confirmation) {
+      throw new Error('No confirmation found')
+    }
 
-    expect(hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
+    expect(confirmation.confirmation_height).to.be.greaterThan(0)
 
-    expect(height).to.be.equal(29994194)
+    expect(confirmation.confirmation_hash).to.be.equal('0x195e761cecea1cf5d9faf4540a87b685449439f9df65216536b1dddbd1ec3544')
 
-    expect(timestamp).to.be.a('date')
+    expect(confirmation.confirmation_height).to.be.equal(29994194)
+
+    expect(confirmation.confirmation_date).to.be.a('date')
 
   })
 

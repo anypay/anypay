@@ -18,7 +18,7 @@
 
 import * as utils from '../../utils'
 
-import { expect } from '../../utils'
+import { expect, jwt, server } from '../../utils'
 
 import { recordPayment } from '../../../lib/payments'
 
@@ -31,13 +31,16 @@ describe("Listing Available Webhooks", async () => {
 
     let [account, invoice] = await utils.newAccountWithInvoice()
 
-    var response = await utils.authRequest(account, {
+    var response = await server.inject({
       method: 'GET',
-      url: '/v1/api/account/payments'
+      url: '/v1/api/account/payments',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      }
     })
 
     expect(response.statusCode).to.be.equal(200)
-    expect(response.result.payments.length).to.be.equal(0)
+    expect((response.result as any).payments.length).to.be.equal(0)
 
     await recordPayment(invoice, {
       txid: '12345',
@@ -50,13 +53,15 @@ describe("Listing Available Webhooks", async () => {
       url: '/v1/api/account/payments'
     })
 
-    let payment = response.result.payments[0]
+    const result = response.result as any
+
+    let payment = result.payments[0]
 
     await Schema.listPayments.validate(payment)
 
     expect(response.statusCode).to.be.equal(200)
 
-    expect(response.result.payments.length).to.be.equal(1)
+    expect(result.payments.length).to.be.equal(1)
 
     expect(payment.invoice.uid).to.be.equal(invoice.uid)
 

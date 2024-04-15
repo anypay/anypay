@@ -16,7 +16,8 @@
 */
 //==============================================================================
 
-import { auth, expect, account, newInvoice } from '../../utils'
+import { expect, account, newInvoice, jwt, server } from '../../utils'
+import prisma from '../../../lib/prisma'
 
 const tx = {
   currency: 'BSV',
@@ -29,13 +30,23 @@ describe("Searching", async () => {
 
   it('should find an invoice by txid with the library', async () => {
 
-    let invoice = await newInvoice({ amount: 0.52 })
+    let invoice = await newInvoice({ account, amount: 0.52 })
 
-    await invoice.set('hash', tx.tx_id)
+    await prisma.invoices.update({
+      where: {
+        id: invoice.id
+      },
+      data: {
+        hash: tx.tx_id
+      }
+    })
 
-    const { result } = await auth(account)({
+    const { result }: any = await server.inject({
       method: 'POST',
       url: '/v1/api/search',
+      headers: {
+        'Authorization': `Bearer ${jwt}`
+      },
       payload: {
         search: tx.tx_id
       }

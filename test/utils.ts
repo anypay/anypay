@@ -318,6 +318,12 @@ beforeEach(() => {
 
 })
 
+import { access_tokens as AccessToken } from '@prisma/client'
+
+var jwt: string, accessToken: AccessToken;
+
+export { jwt, accessToken } 
+
 before(async () => {
 
   await initialize()
@@ -327,6 +333,10 @@ before(async () => {
   request = supertest(server.listener)
 
   account = await createAccountWithAddresses()
+
+  accessToken = await ensureAccessToken(account)
+
+  jwt = await generateAccountToken({ account_id: account.id, uid: String(account.uid) })
 
   walletBot = (await findOrCreateWalletBot(account)).walletBot
 

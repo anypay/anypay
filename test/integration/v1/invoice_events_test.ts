@@ -16,22 +16,29 @@
 */
 //==============================================================================
 
-import { auth, expect, account, newAccountWithInvoice, log } from '../../utils'
+import { createInvoice } from '../../../lib/invoices'
+import { expect, newAccountWithInvoice, log, jwt, server, account } from '../../utils'
 
 describe("Invoice Events", async () => {
 
   it("GET /v1/api/invoices/{invoice_uid}/events should list events for invoice", async () => {
 
-    const [newAccount, invoice] = await newAccountWithInvoice()
+    const invoice = await createInvoice({
+      amount: 100,
+      account
+    })
 
-    let response = await auth(newAccount)({
+    let response = await server.inject({
       method: 'GET',
       url: `/v1/api/invoices/${invoice.uid}/events`,
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
     })
 
     expect(response.statusCode).to.be.equal(200)
 
-    expect(response.result.events).to.be.an('array')
+    expect((response.result as any).events).to.be.an('array')
     
   })
 
@@ -42,9 +49,12 @@ describe("Invoice Events", async () => {
 
     log.debug('test.account.another.created', another)
 
-    let response = await auth(account)({
+    let response = await server.inject({
       method: 'GET',
       url: `/v1/api/invoices/${invoice.uid}/events`,
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
     })
 
     expect(response.statusCode).to.be.equal(401)

@@ -16,7 +16,7 @@
 */
 //==============================================================================
 
-import { auth, expect, account } from '../../utils'
+import { expect, server, jwt } from '../../utils'
 
 describe("Setting Addresses Via REST", async () => {
 
@@ -24,11 +24,14 @@ describe("Setting Addresses Via REST", async () => {
 
     var address = '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K';
 
-    var response = await auth(account)({
-      method: 'GET',
+    var response = await server.inject({
+      method: 'get',
       url: '/v1/api/account/addresses',
       payload: {
         address: address
+      },
+      headers: {
+        Authorization: `Bearer ${jwt}`
       }
     })
 
@@ -36,32 +39,44 @@ describe("Setting Addresses Via REST", async () => {
 
     const address2 = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    await auth(account)({
-      method: 'POST',
+    await server.inject({
+      method: 'post',
       url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
       payload: {
         address: address,
         currency: "BTC"
       }
     })
 
-    response = await auth(account)({
-      method: 'GET',
-      url: '/v1/api/account/addresses'
+    response = await server.inject({
+      method: 'get',
+      url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
     })
 
-    var response = await auth(account)({
-      method: 'POST',
+    var response = await server.inject({
+      method: 'post',
       url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
       payload: {
         address: address2,
         currency: 'BTC'
       }
     })
 
-    response = await auth(account)({
-      method: 'GET',
-      url: '/v1/api/account/addresses'
+    response = await server.inject({
+      method: 'get',
+      url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
     })
 
     expect(response.statusCode).to.be.equal(200);
@@ -70,9 +85,12 @@ describe("Setting Addresses Via REST", async () => {
 
   it("POST /v1/api/account/addresses should set an address", async () => {
 
-    await auth(account)({
-      method: 'POST',
+    await server.inject({
+      method: 'post',
       url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
       payload: {
         value: '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K',
         currency: 'BSV'
@@ -84,17 +102,23 @@ describe("Setting Addresses Via REST", async () => {
 
   it("DELETE /v1/api/account/addresses should remove an address", async () => {
 
-    await auth(account)({
-      method: 'POST',
+    await server.inject({
+      method: 'post',
       url: '/v1/api/account/addresses',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
       payload: {
         value: '1KNk3EWYfue2Txs1MThR1HLzXjtpK45S3K',
         currency: 'BSV'
       }
     })
 
-    await auth(account)({
-      method: 'DELETE',
+    await server.inject({
+      method: 'delete',
+      headers: {
+        Authorization: `Bearer ${jwt}`
+      },
       url: `/v1/api/account/addresses/BSV`
     })
 

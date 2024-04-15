@@ -16,6 +16,7 @@
 */
 //==============================================================================
 
+import { cancelInvoice, createInvoice, getInvoice, listInvoices } from "../../../apps/wallet-bot"
 import { ensureInvoice } from "../../../lib/invoices"
 import { expect, walletBot } from "../../utils"
 
@@ -27,7 +28,7 @@ describe("Wallet Bot Library", () => {
 
         it('#createPaymentRequest should create an invoice with the currency', async () => {
 
-            const { invoice_uid } = await walletBot.createInvoice({
+            const { invoice_uid } = await createInvoice(walletBot, {
                 template: {
 
                     currency: 'DASH',
@@ -40,16 +41,16 @@ describe("Wallet Bot Library", () => {
                 }
             })
 
-            const invoice = await ensureInvoice(invoice_uid)
+            const invoice = await ensureInvoice(String(invoice_uid))
 
-            expect(invoice.get('currency')).to.be.equal('DASH')
+            expect(invoice.currency).to.be.equal('DASH')
         })
 
         it('#createPaymentRequest should add webhook_url to the underlying invoice', async () => {
 
             const webhook_url = 'https://webhooks.lol/anypay'
 
-            const { invoice_uid } = await walletBot.createInvoice({
+            const { invoice_uid } = await createInvoice(walletBot, {
 
                 template: {
 
@@ -67,9 +68,9 @@ describe("Wallet Bot Library", () => {
                 }
             })
 
-            const invoice = await ensureInvoice(invoice_uid)
+            const invoice = await ensureInvoice(String(invoice_uid))
 
-            expect(invoice.get('webhook_url')).to.be.equal(webhook_url)
+            expect(invoice.webhook_url).to.be.equal(webhook_url)
 
         })
 
@@ -79,7 +80,7 @@ describe("Wallet Bot Library", () => {
 
         it("#listUnpaid should return all unpaid invoices", async () => {
 
-            const [invoice] = await walletBot.listInvoices()
+            const [invoice] = await listInvoices(walletBot)
 
             expect(invoice.status).to.be.equal('unpaid')
 
@@ -87,7 +88,7 @@ describe("Wallet Bot Library", () => {
 
         it("#listUnpaid should return only invoices of specified currency", async () => {
 
-            const [invoice] = await walletBot.listInvoices({ currency: 'BSV' })
+            const [invoice] = await listInvoices(walletBot, { currency: 'BSV' })
 
             expect(invoice.status).to.be.equal('unpaid')
 
@@ -97,7 +98,7 @@ describe("Wallet Bot Library", () => {
 
         it("#getInvoice should return the details of an invoice", async () => {
 
-            const { invoice_uid } = await walletBot.createInvoice({
+            const { invoice_uid } = await createInvoice(walletBot, {
                 
                 template: {
 
@@ -111,7 +112,7 @@ describe("Wallet Bot Library", () => {
                 }
             })
 
-            const invoice = await walletBot.getInvoice(invoice_uid)
+            const invoice = await getInvoice(walletBot, String(invoice_uid))
 
             expect(invoice.currency).to.be.equal('DASH')
 
@@ -119,11 +120,11 @@ describe("Wallet Bot Library", () => {
 
         it.skip("#cancelInvoice should cancel an invoice", async () => {
 
-            const [invoice] = await walletBot.listInvoices()
+            const [invoice] = await listInvoices(walletBot)
 
-            await walletBot.cancelInvoice(invoice.uid)
+            await cancelInvoice(walletBot, invoice.uid)
 
-            let cancelled = await walletBot.getInvoice(invoice.uid)
+            let cancelled = await getInvoice(walletBot, invoice.uid)
 
             expect(cancelled.status).to.be.equal('cancelled')
 
@@ -131,7 +132,7 @@ describe("Wallet Bot Library", () => {
 
         it("#listInvoices should list all invoices by status", async () => {
 
-            const invoices = await walletBot.listInvoices()
+            const invoices = await listInvoices(walletBot)
 
             expect(invoices).to.be.an('array')
 

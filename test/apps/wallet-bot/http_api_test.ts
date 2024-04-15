@@ -23,9 +23,11 @@ import { createServer } from "../../../apps/wallet-bot/plugin";
 import { findOrCreateWalletBot, getAccessToken } from '../../../apps/wallet-bot'
 import { ensureInvoice } from '../../../lib/invoices';
 
+import { Server } from '@hapi/hapi'
+
 describe('Wallet Bot API', () => {
 
-  var walletBotServer;
+  var walletBotServer: Server;
 
   before(async () => {
 
@@ -41,7 +43,7 @@ describe('Wallet Bot API', () => {
 
       const accessToken = await getAccessToken(walletBot)
 
-      const token = await accessToken.get('uid')
+      const token = await accessToken.uid
 
       const response = await walletBotServer.inject({
         url: '/v1/api/apps/wallet-bot/invoices',
@@ -64,11 +66,11 @@ describe('Wallet Bot API', () => {
 
       expect(response.statusCode).to.be.equal(201)
 
-      const invoice = await ensureInvoice(response.result.invoice_uid)
+      const invoice = await ensureInvoice((response.result as any).invoice_uid)
 
       expect(invoice.status).to.be.equal('unpaid')
 
-      expect(invoice.get('currency')).to.be.equal('BSV')
+      expect(invoice.currency).to.be.equal('BSV')
 
     })
 
@@ -78,7 +80,7 @@ describe('Wallet Bot API', () => {
 
       const accessToken = await getAccessToken(walletBot)
 
-      const token = await accessToken.get('uid')
+      const token = await accessToken.uid
 
       const response = await walletBotServer.inject({
         url: '/v1/api/apps/wallet-bot/invoices',
@@ -99,20 +101,22 @@ describe('Wallet Bot API', () => {
         }
       })
 
+      const json = response.result as any
+
       let optionsResponse = await server.inject({
         method: 'GET',
-        url: `/r/${response.result.invoice_uid}`,
+        url: `/r/${json.invoice_uid}`,
         headers: {
           'Accept': 'application/payment-options',
           'x-paypro-version': 2
         }
       })
 
-      expect(optionsResponse.result.paymentOptions.length).to.be.equal(1)
+      expect((optionsResponse.result as any).paymentOptions.length).to.be.equal(1)
 
-      expect(optionsResponse.result.paymentOptions[0].currency).to.be.equal('BSV')
+      expect((optionsResponse.result as any).paymentOptions[0].currency).to.be.equal('BSV')
 
-      expect(optionsResponse.result.paymentOptions[0].chain).to.be.equal('BSV')
+      expect((optionsResponse.result as any).paymentOptions[0].chain).to.be.equal('BSV')
 
       expect(response.statusCode).to.be.equal(201)
 
@@ -126,7 +130,7 @@ describe('Wallet Bot API', () => {
 
       const accessToken = await getAccessToken(walletBot)
 
-      const token = await accessToken.get('uid')
+      const token = await accessToken.uid
 
       await walletBotServer.inject({
         url: '/v1/api/apps/wallet-bot/invoices',
@@ -155,9 +159,9 @@ describe('Wallet Bot API', () => {
         },
       })
 
-      expect(dashResponse.result.invoices).to.be.an('array')
+      expect((dashResponse.result as any).invoices).to.be.an('array')
 
-      expect(dashResponse.result.invoices.length).to.be.equal(0)
+      expect((dashResponse.result as any).invoices.length).to.be.equal(0)
 
       const bsvResponse = await walletBotServer.inject({
         url: `/v0/api/apps/wallet-bot/invoices?status=unpaid&currency=BSV`,
@@ -168,9 +172,9 @@ describe('Wallet Bot API', () => {
       })
 
 
-      expect(bsvResponse.result.invoices).to.be.an('array')
+      expect((bsvResponse.result as any).invoices).to.be.an('array')
 
-      expect(bsvResponse.result.invoices.length).to.be.equal(1)
+      expect((bsvResponse.result as any).invoices.length).to.be.equal(1)
 
     })
 
@@ -184,7 +188,7 @@ describe('Wallet Bot API', () => {
 
       const accessToken = await getAccessToken(walletBot)
 
-      const token = await accessToken.get('uid')
+      const token = await accessToken.uid
 
       const response = await walletBotServer.inject({
         url: '/v1/api/apps/wallet-bot/invoices',
@@ -205,11 +209,11 @@ describe('Wallet Bot API', () => {
         }
       })
 
-      const unpaid = await ensureInvoice(response.result.invoice_uid)
+      const unpaid = await ensureInvoice((response.result as any).invoice_uid)
 
       expect(unpaid.status).to.be.equal('unpaid')
 
-      const { invoice_uid } = response.result
+      const { invoice_uid } = response.result as any
 
       const cancelResponse = await walletBotServer.inject({
         url: `/v1/api/apps/wallet-bot/invoices/${invoice_uid}`,
@@ -219,7 +223,7 @@ describe('Wallet Bot API', () => {
         }
       })
 
-      const cancelled = await ensureInvoice(response.result.invoice_uid)
+      const cancelled = await ensureInvoice((cancelResponse.result as any).invoice_uid)
 
       expect(cancelled.status).to.be.equal('cancelled')
 

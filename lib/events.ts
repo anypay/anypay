@@ -105,7 +105,7 @@ export async function listInvoiceEvents(invoice: Invoice, type?: string): Promis
 
 interface EventLogOptions {
   type?: string;
-  order?: string;
+  order?: 'asc' | 'desc';
   limit?: number;
   offset?: number;
 }
@@ -145,7 +145,7 @@ export async function listAccountEvents(account: Account, options: EventLogOptio
   return prisma.events.findMany({
     where: query.where,
     orderBy: {
-      createdAt: 'desc'
+      createdAt: options.order || 'desc'
     },
     take: query.limit,
     skip: query.offset

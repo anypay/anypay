@@ -56,7 +56,7 @@ describe('USDT on AVAX', () => {
 
     let txhex = ''
 
-    let payments: Payment[] = await plugin.parsePayments(txhex)
+    let payments: Payment[] = await plugin.parsePayments({txhex})
 
     expect(payments.length).to.be.equal(1)
 

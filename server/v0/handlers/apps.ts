@@ -22,7 +22,7 @@ export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
   const app = await prisma.apps.findFirst({
     where: {
       account_id: request.account.id,
-      id: request.params.id
+      id: Number(request.params.id)
     }
   })
 
