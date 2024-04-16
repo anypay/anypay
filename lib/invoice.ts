@@ -243,6 +243,7 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
       let address = await getNewAddress({ account, address: record, currency, chain })
 
+
       if (!address) { return null }
 
       if (address.match(':')) {
@@ -307,6 +308,8 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
       return optionRecord
 
     } catch(error) {
+
+      console.error(error)
 
       return null
 

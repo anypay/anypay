@@ -125,15 +125,22 @@ async function updateFees() {
   
   for (let key of Object.keys(feesFiat)) {
 
-    let [currency, chain] = key.split('_')
+    try {
 
-    if (!chain) { chain = currency }
+      let [currency, chain] = key.split('_')
 
-    const fee = await convert(feesFiat[key], currency);
+      if (!chain) { chain = currency }
 
-    fees[key] = toSatoshis({ decimal: fee.value, currency, chain })
+      const fee = await convert(feesFiat[key], currency);
+
+      fees[key] = toSatoshis({ decimal: fee.value, currency, chain })
+
+    } catch(error) {
+
+      console.error(error)
+
+    }
 
   }
 
 }
-

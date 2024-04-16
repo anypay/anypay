@@ -32,7 +32,7 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
-import { expect, request } from '../utils'
+import { expect, request, account } from '../utils'
 
 import * as utils from '../utils'
 
@@ -41,8 +41,6 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
   describe("BCH", () => {
 
     it('should return a valid BIP70 payment request', async () => {
-
-      const account = await utils.generateAccount()
 
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 
@@ -85,8 +83,6 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
 
     it('should return a valid BIP70 payment request', async () => {
 
-      const account = await utils.generateAccount()
-
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 
       let resp = await request
@@ -95,6 +91,8 @@ describe("End To End Payment Requests With BIP70 Protobufs", () => {
           'Accept': 'application/dash-paymentrequest',
           'x-currency': 'DASH'
         })
+
+      console.log(resp)
 
       expect(resp.statusCode).to.be.equal(200)
 

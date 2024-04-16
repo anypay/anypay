@@ -26,12 +26,86 @@ import {
 } from '@prisma/client'
 
 import prisma from './prisma'
+import { getCoins } from './coins'
+import { convert } from './prices'
 
-export async function listAddresses(account: Account): Promise<Address[]> {
+interface AddressesMap {
+  [key: string]: Address
+}
+
+interface AddressConfig {
+  currency: string;
+  chain: string;
+  code: string;
+  name: string;
+  enabled: boolean;
+  icon: string;
+  supported: boolean;
+  price?: number;
+  wallet?: string;
+  note?: string;
+  address?: string;
+  paymail?: string;
+}
+
+export async function listAddresses(account: Account): Promise<AddressConfig[]> {
+
+  // should combine all available coins plus current addresses set 
 
   let records: Address[] = await prisma.addresses.findMany({ where: { account_id: account.id }})
 
-  return records
+
+  const recordsMap: AddressesMap = records.reduce((map: AddressesMap, record: Address) => {
+    const code = `${record.currency}_${record.chain}`
+    map[code] = record
+    return map;
+  }, {})
+
+  let coins = await getCoins()
+
+  return Promise.all(coins.map(async coin => {
+
+    const code = `${coin.currency}_${coin.chain}`
+
+    const addressConfig: AddressConfig = {
+      currency: String(coin.currency),
+      chain: String(coin.chain),
+      code,
+      name: coin.name,
+      enabled: Boolean(coin.supported),
+      icon: String(coin.logo_url),
+      supported: Boolean(coin.supported),
+    }
+
+    let record = recordsMap[code]
+
+    if (record) {
+      if (record.value) {
+        addressConfig.address = record.value
+      }
+      if (record.paymail) {
+        addressConfig.paymail = record.paymail
+      }
+
+      if (record.note) {
+        addressConfig.note = record.note
+      }
+    
+    }
+
+    try {
+
+      const { value } = await convert ({ currency: String(coin.currency), value: 1 }, 'USD')
+
+      addressConfig.price = value
+
+    } catch(error) {
+
+    }
+
+    return addressConfig
+
+  }))
 
 }
 

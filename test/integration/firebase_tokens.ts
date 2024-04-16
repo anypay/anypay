@@ -16,57 +16,10 @@
 */
 //==============================================================================
 
-import prisma from '../../lib/prisma';
-import { server, assert, account, uuid, accessToken } from '../utils'
+import { server, assert, uuid, accessToken } from '../utils'
 
 describe("Setting Firebase Token via REST", async () => {
 
-
-  it("PUT /firebase_token should add multiple tokens", async () => {
-    try {
-
-      var token = uuid.v4();
-
-      let response = await server.inject({
-        method: 'PUT',
-        url: '/firebase_token',
-        payload: {
-          firebase_token: token
-        },
-        headers: headers(String(accessToken.uid))
-      });
-
-      const result = response.result as any;
-
-      assert.strictEqual(result.firebase_token.token, token);
-
-      // A second token can also be added
-      await server.inject({
-        method: 'PUT',
-        url: '/firebase_token',
-        payload: {
-          firebase_token: uuid.v4()
-        },
-        headers: headers(String(accessToken.uid))
-      });
-
-      const allTokens = await prisma.firebase_tokens.findMany({
-        where: {
-          account_id: account.id
-        }
-      })
-
-      assert.strictEqual(allTokens.length, 2)
-
-    } catch(error) {
-
-      const { message } = error as Error;
-
-      console.error('ERROR', message);
-
-      throw error;
-    }
-  });
 
   it("GET /firebase_token should display the firebase token", async () => {
     try {

@@ -34,6 +34,7 @@ export async function refreshCoins(): Promise<Coin[]> {
 interface CoinConfig {
   code: string;
   currency: string;
+  chain: string;
   name: string;
   enabled: boolean;
   supported: boolean;
@@ -55,6 +56,7 @@ export async function initFromConfig(coinsConfig: CoinConfig[]): Promise<Coin[]>
       await prisma.coins.create({
         data: {
           code: coin.code,
+          chain: coin.chain,
           currency: coin.currency,
           name: coin.name,
           supported: coin.supported,

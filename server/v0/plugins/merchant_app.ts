@@ -216,7 +216,7 @@ export async function register(server: Server) {
     path: "/api/v1/addresses",
     handler: v0.Addresses.update,
     options: {
-      auth: "token",
+      auth: "jwt",
       tags: ['v0', 'addresses'],
       validate: {
         payload: Joi.object({
@@ -369,6 +369,16 @@ export async function register(server: Server) {
     options: {
       tags: ['v0', 'accounts'],
       auth: "token"
+    }
+  });
+
+  server.route({
+    method: "GET",
+    path: "/firebase_token",
+    options: {
+      auth: "token",
+      tags: ['v0', 'firebase'],
+      handler: v0.FirebaseTokens.show
     }
   });
 

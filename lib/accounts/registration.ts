@@ -52,7 +52,7 @@ export async function registerAccount(params: NewAccount): Promise<Account> {
 
   if (!isNew) {
 
-    throw new AccountAlreadyRegisteredError(params.email)
+    throw new Error(`account already registered with email ${params.email}`)
 
   }
 

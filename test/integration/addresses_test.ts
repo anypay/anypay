@@ -16,7 +16,7 @@
 */
 //==============================================================================
 
-import {  createAuthHeader, expect, server  } from '../utils'
+import {  createAuthHeader, expect, jwt, server, account  } from '../utils'
 
 import * as utils from '../utils'
 
@@ -27,8 +27,6 @@ describe("Setting Addresses Via REST", async () => {
 
     var address = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    const account = await utils.generateAccount()
-
     const response: any = await server.inject({
       method: 'put',
       url: '/addresses/DASH',
@@ -36,7 +34,7 @@ describe("Setting Addresses Via REST", async () => {
         address: address
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
@@ -58,7 +56,7 @@ describe("Setting Addresses Via REST", async () => {
         address: address
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
@@ -77,30 +75,25 @@ describe("Setting Addresses Via REST", async () => {
         address: address
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
-    expect(response.result).to.deep.equal({});
+    console.log(response.result, '--putBTCResult')
+
+    expect(response.result).to.deep.equal({
+      value: address,
+      currency: "BTC"
+    });
 
     const address2 = 'XojEkmAPNzZ6AxneyPxEieMkwLeHKXnte5';
 
-    await server.inject({
-      method: 'put',
-      url: '/addresses/BTC',
-      payload: {
-        address: address
-      },
-      headers: {
-        Authorization: await createAuthHeader(account)
-      }
-    })
 
     response = await server.inject({
       method: 'get',
       url: '/addresses',
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
@@ -113,7 +106,7 @@ describe("Setting Addresses Via REST", async () => {
         address: address2
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
@@ -121,7 +114,7 @@ describe("Setting Addresses Via REST", async () => {
       method: 'GET',
       url: '/addresses',
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Basic ${await createAuthHeader(account)}`
       }
     })
 
@@ -143,9 +136,6 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'DASH'
 
-    const account = await utils.generateAccount()
-
-
     const response: any = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
@@ -155,7 +145,7 @@ describe("Setting Addresses Via REST", async () => {
         currency
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Bearer ${jwt}`
       }
     })
 
@@ -173,9 +163,6 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'USDC'
 
-    const account = await utils.generateAccount()
-
-
     const response: any = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
@@ -185,7 +172,7 @@ describe("Setting Addresses Via REST", async () => {
         currency
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Bearer ${jwt}`
       }
     })
 
@@ -203,9 +190,6 @@ describe("Setting Addresses Via REST", async () => {
 
     const currency = 'DASH'
 
-    const account = await utils.generateAccount()
-
-
     const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
@@ -214,7 +198,7 @@ describe("Setting Addresses Via REST", async () => {
         currency
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Bearer ${jwt}`
       }
     })
 
@@ -230,9 +214,6 @@ describe("Setting Addresses Via REST", async () => {
 
     const chain = 'BTC'
 
-    const account = await utils.generateAccount()
-
-
     const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
@@ -242,7 +223,7 @@ describe("Setting Addresses Via REST", async () => {
         currency
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Bearer ${jwt}`
       }
     })
 
@@ -259,9 +240,6 @@ describe("Setting Addresses Via REST", async () => {
 
     const chain = 'BTC'
 
-    const account = await utils.generateAccount()
-
-
     const response = await server.inject({
       method: 'POST',
       url: '/api/v1/addresses',
@@ -271,7 +249,7 @@ describe("Setting Addresses Via REST", async () => {
         currency
       },
       headers: {
-        Authorization: await createAuthHeader(account)
+        Authorization: `Bearer ${jwt}`
       }
     })
 

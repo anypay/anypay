@@ -8,6 +8,9 @@ export async function show(request: AuthenticatedRequest, h: ResponseToolkit) {
   const firebase_token = await prisma.firebase_tokens.findFirst({
     where: {
       account_id: request.account.id
+    },
+    orderBy: {
+      id: 'asc'
     }
   })
 
@@ -34,7 +37,9 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
   let firebase_token = await prisma.firebase_tokens.findFirst({
     where: {
       account_id: request.account.id,
-      token
+    },
+    orderBy: {
+      id: 'asc'
     }
   })
 
@@ -45,6 +50,19 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
         account_id: request.account.id,
         token,
         createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  }
+
+  if (firebase_token.token !== token) {
+
+    firebase_token = await prisma.firebase_tokens.update({
+      where: {
+        id: firebase_token.id
+      },
+      data: {
+        token,
         updatedAt: new Date()
       }
     })

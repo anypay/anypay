@@ -7,9 +7,19 @@ import { ResponseToolkit } from '@hapi/hapi'
 
 export async function update(request: AuthenticatedRequest, h: ResponseToolkit) {
 
-  log.debug('server.v1.handlers.addresses.update', request.payload)
+  const body = request.payload as {
+    chain?: string,
+    currency: string,
+    value: string
+  }
 
-  let address = await setAddress(request.account, request.payload as {
+  console.log("--PAYLOAD--", body)
+
+  if (!body.chain) { body.chain = body.currency }
+
+  log.debug('server.v1.handlers.addresses.update', body)
+
+  let address = await setAddress(request.account, body as {
     chain: string,
     currency: string,
     value: string

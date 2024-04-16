@@ -18,7 +18,7 @@
 
 require('dotenv').config()
 
-import { expect, request } from '../utils'
+import { expect, request, account } from '../utils'
 
 import * as utils from '../utils'
 
@@ -30,8 +30,6 @@ describe("BIP270 Payment Requests", () => {
   describe("BSV", () => {
 
     it('should return a valid BIP270 payment request', async () => {
-
-      const account = await utils.generateAccount()
 
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 
@@ -54,8 +52,6 @@ describe("BIP270 Payment Requests", () => {
 
       it('an invalid payment should be rejected', async () => {
 
-        const account = await utils.generateAccount()
-
         let invoice = await utils.newInvoice({ amount: 0.02, account })
 
         let resp = await request
@@ -66,10 +62,6 @@ describe("BIP270 Payment Requests", () => {
         expect(transaction).to.be.a('string')
 
         let url = (() => { // convert url into local url with no host for test
-
-          console.log('RESP BODY', resp.body)
-
-          console.log('--payment url--', resp.body.paymentUrl)
 
           let url = resp.body.paymentUrl.replace('undefined', '')
 
@@ -154,8 +146,6 @@ describe("BIP270 Payment Requests", () => {
     }*/
 
     it.skip('should reject payment for an invoice that was cancelled', async () => {
-
-      const account = await utils.generateAccount()
 
       let invoice = await utils.newInvoice({ amount: 0.02, account })
 

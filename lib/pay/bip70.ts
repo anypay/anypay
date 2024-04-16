@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 
 //@ts-ignore
-import * as PaymentProtocol from 'bip70-payment-protocol'
+import PaymentProtocol from 'bip70-payment-protocol'
 
 import { getBitcore } from '../bitcore'
 

@@ -63,8 +63,6 @@ describe('Payment Requests With Edge Wallet', () => {
 
     let response = await wallet.fetchPaymentRequest(invoice, server)
 
-    console.log(response, 'response-edge')
-
     expect(response.statusCode).to.be.equal(200)
 
   })
