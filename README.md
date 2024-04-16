@@ -30,3 +30,11 @@ docker run -d -p 5200:5200 anypay/anypay
 
 - SENTRY_DSN
 
+### Devepment
+
+```
+git clone https://github.com/anypay/anypay
+cd anypay
+npm install
+npm start
+```
