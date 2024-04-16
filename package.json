@@ -1,8 +1,8 @@
 {
   "name": "@anypay/server",
-  "version": "1.8.1",
-  "description": "Bitcoin Payments For Enterprises",
-  "private": true,
+  "version": "1.8.2",
+  "description": "Peer to Peer Payments APIs for Developers",
+  "public": true,
   "main": "main.ts",
   "engines": {
     "node": ">=14.0"
@@ -205,6 +205,10 @@
     "sinon": "^14.0.0",
     "supertest": "^6.3.4",
     "ts-node": "^6.2.0",
-    "typedoc": "^0.23.24"
+    "typedoc": "^0.23.24",
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }
