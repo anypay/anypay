@@ -49,9 +49,9 @@ jobs:
       - name: install, build and test
         env:
           SKIP_E2E_PAYMENTS_TESTS: true
-          DEV_DATABASE_URL: postgres://postgres_user:postgres_password@localhost:5432/postgres_db
-          DATABASE_URL: postgres://postgres_user:postgres_password@localhost:5432/postgres_db
-          TEST_DATABASE_URL: postgres://postgres_user:postgres_password@localhost:5432/postgres_db
+          DEV_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
+          DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
+          TEST_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
           AMQP_URL: amqp://guest:guest@localhost:5672/
           ANYPAY_AMQP_URL: amqp://guest:guest@localhost:5672/
           TEST_AMQP_URL: amqp://guest:guest@localhost:5672/
