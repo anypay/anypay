@@ -29,9 +29,14 @@ jobs:
           --health-timeout 5s
           --health-retries 5
       rabbitmq:
-        image: rabbitmq:3
+        image: rabbitmq:latest
+        options: --health-cmd "rabbitmqctl wait /var/lib/rabbitmq/mnesia/rabbit@localhost.pid"
         ports:
-          - 5672/tcp
+          - 5672:5672
+          - 15672:15672
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
     strategy:
       matrix:
         node-version: [18.x, 20.x]
