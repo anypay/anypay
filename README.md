@@ -9,20 +9,22 @@
 <h1 style="text-align: center;">Peer to Peer Payments APIs for Developers</h1>
 
 <div style="text-align: center">
-<img src="https://anypayinc.s3.amazonaws.com/icons/btc.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/bsv.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/bch.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/doge.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/ltc.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/dash.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/xmr.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/xrp.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/eth.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/sol.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/avax.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/matic.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/usdc_sol.png"/ style="width:50px">
-<img src="https://anypayinc.s3.amazonaws.com/icons/usdt_sol.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/btc_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/bch_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/bsv_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/doge_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/ltc_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/dash_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/xrp_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/xmr_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/eth_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/sol_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/matic_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/avax_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/usdc_sol_50x50.png"/ style="width:50px">
+<img src="https://anypayx.s3.amazonaws.com/coin_icons/50x50/usdt_sol_50x50.png"/ style="width:50px">
+
+
 </div>
 
 
@@ -107,5 +109,4 @@ ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
 ```

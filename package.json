@@ -1,6 +1,6 @@
 {
   "name": "@anypay/server",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Peer to Peer Payments APIs for Developers",
   "public": true,
   "main": "main.ts",
