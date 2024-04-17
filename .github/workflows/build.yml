@@ -63,16 +63,16 @@ jobs:
           AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
           ANYPAY_AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
           TEST_AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
-          INFURA_POLYGON_URL: ${{ env.INFURA_POLYGON_URL }}
-          INFURA_ETHEREUM_URL: ${{ env.INFURA_ETHEREUM_URL }}
-          INFURA_AVALANCHE_URL: ${{ env.INFURA_AVALANCHE_URL }}
-          GETBLOCK_BCH_URL: ${{ env.GETBLOCK_BCH_URL }}
-          GETBLOCK_LTC_URL: ${{ env.GETBLOCK_LTC_URL }}
-          GETBLOCK_DOGE_URL: ${{ env.GETBLOCK_DOGE_URL }}
-          GETBLOCK_DASH_URL: ${{ env.GETBLOCK_DASH_URL }}
-          GETBLOCK_BTC_URL: ${{ env.GETBLOCK_BTC_URL }}
-          GETBLOCK_XMR_URL: ${{ env.GETBLOCK_XMR_URL }}
-          GETBLOCK_BSV_URL: ${{ env.GETBLOCK_BSV_URL }}
+          INFURA_POLYGON_URL: ${{ secrets.INFURA_POLYGON_URL }}
+          INFURA_ETHEREUM_URL: ${{ secrets.INFURA_ETHEREUM_URL }}
+          INFURA_AVALANCHE_URL: ${{ secrets.INFURA_AVALANCHE_URL }}
+          GETBLOCK_BCH_URL: ${{ secrets.GETBLOCK_BCH_URL }}
+          GETBLOCK_LTC_URL: ${{ secrets.GETBLOCK_LTC_URL }}
+          GETBLOCK_DOGE_URL: ${{ secrets.GETBLOCK_DOGE_URL }}
+          GETBLOCK_DASH_URL: ${{ secrets.GETBLOCK_DASH_URL }}
+          GETBLOCK_BTC_URL: ${{ secrets.GETBLOCK_BTC_URL }}
+          GETBLOCK_XMR_URL: ${{ secrets.GETBLOCK_XMR_URL }}
+          GETBLOCK_BSV_URL: ${{ secrets.GETBLOCK_BSV_URL }}
         run: |
           npm install
           npx prisma generate
