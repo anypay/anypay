@@ -1,6 +1,8 @@
 
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/anypay/anypay?style=for-the-badge)
+![NPM Version](https://img.shields.io/npm/v/%40anypay%2Fserver?style=for-the-badge)
 ![Docker Pulls](https://img.shields.io/docker/pulls/anypay/anypay?style=for-the-badge)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/anypay/anypay/build.yml?branch=main&style=for-the-badge)
 ![CircleCI](https://img.shields.io/circleci/build/github/anypay/anypay?label=Circle%20CI%20Build&style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/anypay/anypay?style=for-the-badge&label=coverage)
 ![Uptime Robot ratio (30 days)](https://img.shields.io/uptimerobot/ratio/m796758888-c4f5729105cfd766ba733696?style=for-the-badge)
