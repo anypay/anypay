@@ -364,31 +364,38 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'REQUIRED_FEE_RATE_BTC',
-    required: false
+    required: false,
+    default: 1
   },  
   {
     key: 'REQUIRED_FEE_RATE_LTC',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'REQUIRED_FEE_RATE_DOGE',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'REQUIRED_FEE_RATE_DASH',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'REQUIRED_FEE_RATE_LTC',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'REQUIRED_FEE_RATE_BCH',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'REQUIRED_FEE_RATE_BSV',
-    required: false
+    required: false,
+    default: 1
   },
   {
     key: 'PROMETHEUS_PASSWORD',
