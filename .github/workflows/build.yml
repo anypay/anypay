@@ -58,6 +58,7 @@ jobs:
         run: |
           npm install
           npx prisma generate
+          npx prisma db push
           npm test
       - uses: codecov/codecov-action@v3
 
