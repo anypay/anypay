@@ -11,37 +11,23 @@ jobs:
           POSTGRES_DB: anypay_test
           POSTGRES_PASSWORD: "letmein"
       - image: rabbitmq:3
-    services:
-      rabbitmq:
-        image: rabbitmq:latest
-        options: -p 5672:5672 -p 15672:15672
-        ports:
-          - 5672:5672
-          - 15672:15672
-        env:
-          RABBITMQ_DEFAULT_USER: guest
-          RABBITMQ_DEFAULT_PASS: guest
-        options: --health-cmd "rabbitmqctl wait /var/lib/rabbitmq/mnesia/rabbit@localhost.pid"
     steps:
       - checkout
       - run:
           name: Install Dependencies
           command: npm install
       - run:
-          name: Migrate & Seed Test Database
-          command: npm run db:migrate
+          name: Generate database schema and model typings
+          command: npx prisma generate
+      - run:
+          name: Push prisma schema to database
+          command: npx prisma db push
       - run:
           name: Seed Prices
           command: npm run db:seed:prices
       - run:
           name: Run Model Tests
-          command: npm run test:models
-      - run:
-          name: Run Lib Tests
-          command: npm run test:lib
-      - run:
-          name: Run Integration Tests
-          command: npm run test:integration
+          command: npm run test
       - run:
           name: Report Code Coverage
           command: |
@@ -54,7 +40,7 @@ jobs:
     steps:
       - run:
           name: Deploy to Web Servers
-          command: ssh root@anypayx.com "/opt/deploy_anypay_api_production.sh"
+          command: ssh ubuntu@api.next.anypayx.com "sudo chef-client -o recipe[anypay::api_next]"
 
   deploy_develop:
     machine: true
@@ -82,4 +68,3 @@ workflows:
             branches:
               only:
                 - develop
-
