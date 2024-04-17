@@ -57,6 +57,7 @@ jobs:
           TEST_AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
         run: |
           npm install
+          npx prisma generate
           npm test
       - uses: codecov/codecov-action@v3
 
