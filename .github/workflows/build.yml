@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:14
+        image: postgis/postgis
         env:
           # optional (defaults to `postgres`)
           POSTGRES_DB: postgres_db
@@ -45,11 +45,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Enable PostGIS extension
-        env:
-          PGPASSWORD: postgres_password
-        run: |
-          psql -h 127.0.0.1 -U postgres_user -d postgres_db -p ${{ job.services.postgres.ports['5432'] }} -c "CREATE EXTENSION postgis;"
       - run: npm install -g typescript tsc
       - name: install, build and test
         env:
