@@ -25,12 +25,30 @@ export default async function() {
 
   log.info('initializers.prometheus')
 
+  let account = await prisma.accounts.findFirst({
+    where: {
+      email: 'prometheus'
+    }
+  })
+
+  if (!account) {
+
+    account = await prisma.accounts.create({
+      data: {
+        email: 'prometheus',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+
+  }
+
   try {
 
     let app = await prisma.apps.findFirst({
       where: {
         name: 'prometheus',
-        account_id: 1
+        account_id: account.id
       }
     })
 
@@ -40,7 +58,7 @@ export default async function() {
         
         app = await createApp({
           name: 'prometheus',
-          account_id: 1,
+          account_id: account.id,
         })
 
     }
@@ -50,7 +68,7 @@ export default async function() {
       const accessToken = await prisma.access_tokens.create({
         data: {
           app_id: app.id,
-          account_id: 1,
+          account_id: account.id,
           uid: uuid.v4(),
           createdAt: new Date(),
           updatedAt: new Date()

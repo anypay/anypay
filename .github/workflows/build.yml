@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.10
+        image: postgis/postgis
         env:
           # optional (defaults to `postgres`)
           POSTGRES_DB: postgres_db
@@ -49,14 +49,16 @@ jobs:
       - name: install, build and test
         env:
           SKIP_E2E_PAYMENTS_TESTS: true
-          DEV_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
-          DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
-          TEST_DATABASE_URL: postgres://postgres_user:postgres_password@postgres:5432/postgres_db
-          AMQP_URL: amqp://guest:guest@localhost:5672/
-          ANYPAY_AMQP_URL: amqp://guest:guest@localhost:5672/
-          TEST_AMQP_URL: amqp://guest:guest@localhost:5672/
+          DEV_DATABASE_URL: postgres://postgres_user:postgres_password@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/postgres_db
+          DATABASE_URL: postgres://postgres_user:postgres_password@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/postgres_db
+          TEST_DATABASE_URL: postgres://postgres_user:postgres_password@127.0.0.1:${{ job.services.postgres.ports['5432'] }}/postgres_db
+          AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
+          ANYPAY_AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
+          TEST_AMQP_URL: amqp://guest:guest@127.0.0.1:${{ job.services.rabbitmq.ports['5672'] }}/
         run: |
           npm install
+          npx prisma generate
+          npx prisma db push
           npm test
       - uses: codecov/codecov-action@v3
 

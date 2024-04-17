@@ -3,7 +3,11 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/anypay/anypay?style=for-the-badge)
 ![CircleCI](https://img.shields.io/circleci/build/github/anypay/anypay?label=Circle%20CI%20Build&style=for-the-badge)
 ![Codecov](https://img.shields.io/codecov/c/github/anypay/anypay?style=for-the-badge&label=coverage)
+![Uptime Robot ratio (30 days)](https://img.shields.io/uptimerobot/ratio/m796758888-c4f5729105cfd766ba733696?style=for-the-badge)
+
+
 ![](https://anypayx.s3.eu-west-3.amazonaws.com/anypay_icon_rectangle_round.png)
+
 
 
 <h1 style="text-align: center;">Peer to Peer Payments APIs for Developers</h1>
@@ -109,4 +113,5 @@ ANY  SPECIAL ,  DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
 WHATSOEVER  RESULTING  FROM  LOSS  OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION  OF  CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 ```
