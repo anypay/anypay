@@ -11,7 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
+<<<<<<< HEAD
         image: postgis/postgis
+=======
+        image: postgres:14
+>>>>>>> 1e538ac9 ([CI] Upgrade postgres to 14 from 10.10 in github actions)
         env:
           # optional (defaults to `postgres`)
           POSTGRES_DB: postgres_db
