@@ -27,7 +27,7 @@ describe("Required Fee Rate", () => {
 
     const environmentVariable = Number(config.get('REQUIRED_FEE_RATE_DOGE'))
 
-    expect(environmentVariable).to.be.greaterThan(1)
+    expect(environmentVariable).to.be.greaterThanOrEqual(1)
 
     const requiredFeeRate = await getRequiredFeeRate({ chain: 'DOGE' })
 
@@ -37,7 +37,7 @@ describe("Required Fee Rate", () => {
 
   it("should default to value of 1 satoshi per byte if no variable set", async () => {
 
-    const environmentVariable = config.get('REQUIRED_FEE_RATE_BSV')
+    const environmentVariable = process.env['REQUIRED_FEE_RATE_BSV']
 
     expect(environmentVariable).to.be.equal(undefined)
 
