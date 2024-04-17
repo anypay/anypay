@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:10.10
+        image: postgres:14
         env:
           # optional (defaults to `postgres`)
           POSTGRES_DB: postgres_db
