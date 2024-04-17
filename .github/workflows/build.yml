@@ -49,7 +49,7 @@ jobs:
         env:
           PGPASSWORD: postgres_password
         run: |
-          psql -h 127.0.0.1 -U postgres_user -d postgres_db -c "CREATE EXTENSION postgis;"
+          psql -h 127.0.0.1 -U postgres_user -d postgres_db -p ${{ job.services.postgres.ports['5432'] }} -c "CREATE EXTENSION postgis;"
       - run: npm install -g typescript tsc
       - name: install, build and test
         env:
