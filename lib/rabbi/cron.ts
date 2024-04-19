@@ -16,7 +16,9 @@ interface CronJob extends CronModule {
 
 const requireAll = require('require-all')
 
-const tasks = {}
+const tasks: {
+    [name: string]: CronJob
+} = {}
 
 export function startTask(name: string) {
 
@@ -46,7 +48,7 @@ const requireCronModules = function(dirname: string): CronModule[] {
       
         filter:  /(.+)\.ts$/,
       
-        resolve: (cronModule) => {
+        resolve: (cronModule: any) => {
 
             return {
                 taskFunction: cronModule.default,
@@ -79,7 +81,7 @@ function startCronJob(cronModule: CronModule): CronJob {
             
         } catch(error){ 
 
-            core.log.error(`rabbi.cron.${name}.error`, error)
+            core.log.error(`rabbi.cron.${name}.error`, error as Error)
 
             return error
             
@@ -109,7 +111,7 @@ export function startCronFile(filePath: string, pattern?: string): CronJob {
 
     const fileModule = require(filePath)
 
-    const fileName = filePath.split('/').pop()
+    const fileName = filePath.split('/').pop() as string
 
     const name = fileName.split('.').slice(0, -1).join('.')
 

@@ -42,9 +42,14 @@ program
       const { email } = program.opts()
 
       const account = await findByEmail(email)
+      
+      if (!account) {
+        throw new Error('Account not found')
+      }
 
       let result = await setAddress(account, {
         currency,
+        chain: currency,
         value: address
       })
 

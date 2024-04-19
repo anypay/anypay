@@ -19,15 +19,19 @@
 import { Command } from 'commander';
 const program = new Command();
 
-import { broadcast } from '../../lib/pay'
+import { broadcastTx } from '../../lib/plugins';
 
 program
-  .command('tx <currency> <hex>')
-  .action(async (currency, hex) => {
+  .command('tx <chain> <currency> <hex>')
+  .action(async (chain: string, currency: string, txhex: string) => {
 
     try {
 
-      let resp = await broadcast(currency, hex)
+      let resp = await broadcastTx({
+        chain,
+        currency,
+        txhex
+      })
 
       console.log(resp)
 

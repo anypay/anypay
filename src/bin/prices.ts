@@ -23,7 +23,7 @@ const program = new Command();
 
 import { log } from '../../lib/log';
 
-import { getCryptoPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../../lib/prices';
+import { createConversion, updateUSDPrices } from '../../lib/prices';
 
 program
   .command('seed_prices')
@@ -33,10 +33,6 @@ program
       log.info('updating USD prices');
 
       await updateUSDPrices();
-
-      log.info('updating crypto prices');
-
-      await updateCryptoUSDPrice('BSV');
 
       log.info('updated crypto prices');
 
@@ -95,48 +91,6 @@ program
 
   });
 
-program
-  .command('getcmcprices')
-  .action(async () => {
-
-    try {
-
-      let prices = await getCryptoPrices('USD');
-
-      console.log(prices);
-
-    } catch(error) {
-
-      console.error('getcmcprices.error', error);
-
-    }
-
-    process.exit(0);
-
-  });
-
-
-program
-  .command('update_crypto_usd <currency>')
-  .action(async (currency) => {
-
-    try {
-
-      log.info('updating crypto usd price', currency);
-
-      await updateCryptoUSDPrice(currency);
-
-      log.info('updated crypto usd price', currency);
-
-    } catch(error) {
-
-      console.error(`update_crypto_usd.${currency}.error`, error);
-
-    }
-
-    process.exit(0);
-
-  });
 
 program
   .command('convert <baseamount> <basecurrency> <targetcurrency>')

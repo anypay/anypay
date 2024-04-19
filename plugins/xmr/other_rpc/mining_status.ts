@@ -25,5 +25,5 @@ export interface Outputs {
     status: string;
     threads_count: number;
     untrusted: boolean;
-    wide_difficulty; string;
+    wide_difficulty: string;
 }

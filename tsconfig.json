@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es6",
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "lib": [
       "es6", "ES2015", "ES2016", "ES2017"
     ],
@@ -12,10 +13,10 @@
 		"sourceMap": true,
 		"sourceRoot": ".",
     "noUnusedLocals": true,
-    "noEmit": true,
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "wallet"
   ]
 }

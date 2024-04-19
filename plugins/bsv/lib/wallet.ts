@@ -5,7 +5,14 @@ const bitcore = require('bsv')
 import { config } from '../../../lib'
 import { listUnspent } from './rpc'
 
-export async function buildPayment(paymentRequest) {
+export async function buildPayment(paymentRequest: {
+  instructions: [{
+    outputs: [{
+      address: string,
+      amount: number
+    }]
+  }]
+}) {
 
   let privatekey = new bitcore.PrivateKey(config.get('BSV_SIMPLE_WALLET_WIF'))
   let address = new bitcore.PrivateKey(config.get('BSV_SIMPLE_WALLET_ADDRESS'))

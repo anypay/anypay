@@ -5,6 +5,7 @@ require('dotenv').config()
 import { Command } from 'commander';
 const program = new Command();
 
+//@ts-ignore
 import { Client } from 'payment-protocol'
 
 import { transfer, call, callWalletRpc, send_raw_transaction, verify } from '../'
@@ -30,7 +31,7 @@ program
 
     } catch(error) {
 
-      log.error('xmr.bin.monero_wallet_cli.error', error)
+      log.error('xmr.bin.monero_wallet_cli.error', error as Error)
 
       process.exit(1)
     }
@@ -84,7 +85,7 @@ program
 
       } catch(error) {
 
-        log.error('xmr.bin.monero_wallet_cli.error', error)
+        log.error('xmr.bin.monero_wallet_cli.error', error as Error)
 
         process.exit(1)
       }

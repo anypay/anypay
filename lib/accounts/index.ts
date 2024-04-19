@@ -19,6 +19,13 @@ interface AccountAddress {
   code?: string;
 }
 
+
+export async function findAccountById(id: number): Promise<Account> {
+  
+    return prisma.accounts.findFirstOrThrow({ where: { id }});
+  
+  }
+
 export async function findByEmail(email: string): Promise<Account | null> {
 
   return prisma.accounts.findFirst({ where: { email }});

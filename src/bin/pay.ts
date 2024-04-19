@@ -26,8 +26,11 @@ import * as fs from 'fs'
 
 import * as http from 'superagent'
 
-import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees } from '../../lib/pay';
+import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees, PaymentOption } from '../../lib/pay';
 import prisma from '../../lib/prisma';
+
+import { payment_options as PrismaPaymentOption } from '@prisma/client'
+import { Decimal } from '@prisma/client/runtime/library';
 
 program
   .command('decode_bip70_request <path>')
@@ -194,7 +197,24 @@ program
 
       })
 
-      let outputs = await buildOutputs(payment_option, protocol);
+      if (!payment_option.outputs) {
+        throw new Error('No outputs found for payment option')
+      }
+
+      const buildOutputsOption: PaymentOption = {
+        invoice_uid,
+        chain: currency,
+        currency,
+        address: payment_option.address,
+        outputs: (payment_option.outputs as any[]).map((output: PrismaPaymentOption) => {
+          return {
+            amount: (output.amount as Decimal).toNumber(),
+            address: String(output.address)
+          }
+        })
+      }
+
+      let outputs = await buildOutputs(buildOutputsOption, protocol);
 
       console.log(outputs);
 
@@ -220,7 +240,29 @@ program
         }
       })
 
-      let paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol }));
+      const invoice = await prisma.invoices.findFirstOrThrow({
+        where: {
+          uid: invoice_uid
+        }
+      })
+
+      const buildOutputsOption: PaymentOption = {
+        invoice_uid,
+        chain: currency,
+        currency,
+        address: paymentOption.address,
+        outputs: (paymentOption.outputs as any[]).map((output: PrismaPaymentOption) => {
+          return {
+            amount: (output.amount as Decimal).toNumber(),
+            address: String(output.address)
+          }
+        })
+      }
+
+      let paymentRequest = await buildPaymentRequest({
+        paymentOption: buildOutputsOption,
+        invoice
+      })
 
       console.log(paymentRequest);
 

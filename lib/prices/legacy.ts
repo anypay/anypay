@@ -18,8 +18,6 @@
 
 import { config } from "../config";
 
-const http = require('superagent');
-
 import axios from 'axios'
 
 const apiKey = config.get('ANYPAY_FIXER_ACCESS_KEY')

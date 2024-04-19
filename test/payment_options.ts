@@ -20,11 +20,9 @@ require('dotenv').config()
 
 import { Invoice, createInvoice } from '../lib/invoices'
 
-//import { PaymentOption } from '../lib/payment_option'
 import { accounts as Account } from '@prisma/client'
 
 import {refreshCoins}from '../lib/coins'
-import { config } from '../lib/config'
 import prisma from '../lib/prisma'
 import { generateAccount } from './utils'
 
@@ -126,7 +124,7 @@ async function main() {
 
     const { chain, currency } = option
 
-    const paymentOption = await prisma.payment_options.findFirstOrThrow({
+    await prisma.payment_options.findFirstOrThrow({
       where: {
         chain,
         currency,
@@ -134,9 +132,10 @@ async function main() {
       }
     })
 
-  
   } catch(error){
+
     console.error(error)
+    
   }
 
   }

@@ -15,21 +15,21 @@ export default abstract class Card {
 
   seed: Buffer;
 
-  currency: string;
+  abstract currency: string;
 
-  chain: string;
+  abstract chain: string;
 
-  decimals: number;
+  abstract decimals: number;
 
-  token: string;
+  token?: string;
 
-  chainID: number;
+  chainID?: number;
 
-  providerURL: string;
+  abstract providerURL: string;
 
-  privateKey: PrivateKey;
+  abstract privateKey: PrivateKey;
 
-  address: string;
+  address?: string;
 
   abstract getPrivateKey(): PrivateKey
 

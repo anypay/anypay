@@ -20,7 +20,7 @@
 
 require('dotenv').config();
 
-import { Actor, log, getChannel } from 'rabbi';
+import { Actor, getChannel } from 'rabbi';
 
 import { exchange, publish } from '../../lib/amqp';
 import prisma from '../../lib/prisma';

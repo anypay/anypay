@@ -19,9 +19,14 @@
 const http = require('superagent');
 
 import { config } from '../config';
-import { Price } from '../price'
 
-export async function getPrice(currency: string): Promise<Price> {
+export async function getPrice(currency: string): Promise<{
+  base: string,
+  currency: string,
+  value: number,
+  source: string
+
+}> {
 
   if (!config.get('COINMARKETCAP_API_KEY')) {
 

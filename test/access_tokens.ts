@@ -20,7 +20,7 @@ import { expect } from './utils'
 
 import * as utils from './utils'
 
-import { AccessTokenV1, ensureAccessToken, Versions } from '../lib/access_tokens'
+import { ensureAccessToken } from '../lib/access_tokens'
 
 describe("Access Tokens", () => {
 
@@ -30,13 +30,11 @@ describe("Access Tokens", () => {
 
       const account = await utils.generateAccount()  
 
-      const token: AccessTokenV1 = await ensureAccessToken(account, Versions.AccessTokenV1);
+      const token = await ensureAccessToken(account);
 
-      const json = token.toJSON()
+      expect(token.account_id).to.be.equal(account.id)
 
-      expect(json.account_id).to.be.equal(account.id)
-
-      expect(token.get('account_id')).to.be.equal(account.id)
+      expect(token.account_id).to.be.equal(account.id)
     
     })
 

@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
-    "outDir": "./dist/",
-    "noImplicitAny": true,
-    "module": "commonjs",
-    "target": "es2020",
-    "jsx": "react",
+    "skipLibCheck": true,
+    "target": "es6",
+    "esModuleInterop": true,
+    "lib": [
+      "es6", "esnext"
+    ],
+    "strict": true,
     "allowJs": true,
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
-  }
+    "module": "commonjs",
+    "outDir": "dist",
+		"sourceMap": true,
+		"sourceRoot": ".",
+    "noUnusedLocals": true,
+    "noEmit": true,
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

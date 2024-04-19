@@ -2,7 +2,7 @@
 
 require('dotenv').config()
 
-import { submitPayment } from './lib/pay/json_v2/protocol'
+import { submitPayment } from '../../lib/pay/json_v2/protocol'
 
 ;(async () => {
 
@@ -18,7 +18,7 @@ import { submitPayment } from './lib/pay/json_v2/protocol'
       currency,
       invoice_uid,
       transactions: [{
-        tx: txhex
+        txhex: txhex
       }]
     })
 

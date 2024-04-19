@@ -47,7 +47,7 @@ export async function start() {
       
     } catch(error) {
 
-      log.error('webhook.failed', error);
+      log.error('webhook.failed', error as Error);
 
     }
 

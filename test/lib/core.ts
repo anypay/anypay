@@ -20,16 +20,9 @@ import { setAddress, unsetAddress } from '../../lib/core';
 
 import { lockAddress, unlockAddress  } from '../../lib/addresses';
 
-import * as Chance from 'chance';
-import * as assert from 'assert';
+import { generateAccount, account, assert } from '../utils'
 
-import { generateAccount } from '../utils'
-
-import { accounts as Account } from '@prisma/client'
 import prisma from '../../lib/prisma';
-import { prices } from '../../lib';
-
-var chance = new Chance();
 
 describe("Anypay Core", () => {
 
@@ -58,7 +51,9 @@ describe("Anypay Core", () => {
 
       } catch(error) {
 
-        assert.strictEqual(error.message, `DASH address locked`); 
+        const { message } = error as Error
+
+        assert.strictEqual(message, `DASH address locked`); 
 
         await unlockAddress({
           account_id: Number(account?.id),
@@ -178,14 +173,6 @@ describe("Anypay Core", () => {
     });
 
     it("#unsetAddress should set a ZEN ZenCash address", async () => {
-
-      const account = await generateAccount();
-
-      let addressChangeset = {
-        account_id: account.id,
-        currency: 'ZEN',
-        address: 'zszpcLB6C5B8QvfDbF2dYWXsrpac5DL9WRk'
-      };
 
       await unsetAddress({
         account_id: account.id,

@@ -31,8 +31,11 @@ program
 
       console.log('password reset email sent successfully!');
 
-    } catch(e) {
-      console.log("error", e.message);
+    } catch(error) {
+      
+      const { message } = error as Error
+
+      console.log("error", message);
     }
 
   });

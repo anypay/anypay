@@ -22,9 +22,7 @@ import { Command } from 'commander'
 
 import { find } from '../../lib/plugins'
 
-import { Confirmation } from '../../lib/plugin'
-
-import { Payment } from '../../lib/payments'
+import { payments as Payment } from '@prisma/client'
 
 import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid, startConfirmingTransactions, revertPayment } from '../../lib/confirmations'
 
@@ -92,7 +90,7 @@ program
 
     let payment = await getConfirmationForTxid({ txid })
 
-    console.log({ payment: payment.toJSON() })
+    console.log({ payment })
 
   })
   
@@ -112,11 +110,7 @@ program
 
       try {
 
-        console.log(payment.toJSON())
-
-        const confirmation: Confirmation = await plugin.getConfirmation(payment.txid)
-
-        console.log({ confirmation })
+        const confirmation = await plugin.getConfirmation(payment.txid)
 
         if (confirmation) {
 
@@ -128,11 +122,13 @@ program
 
       } catch(error) {
 
+        const { response } = error as any
+
         console.error(error, 'CONFIRM ERROR')
 
-        if (error.response) {
+        if (response) {
 
-          console.log(error.response.data)
+          console.log(response.data)
 
         }
 

@@ -19,7 +19,9 @@ async function main() {
 
   } catch(error) {
 
-    console.error('could not sendrawtransaction for rpc1', error.response.data.error)
+    const { response } = error as any
+
+    console.error('could not sendrawtransaction for rpc1', response.data.error)
 
   }
 

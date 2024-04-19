@@ -16,23 +16,15 @@
 */
 //==============================================================================
 
-import * as utils from '../utils'
+//import * as utils from '../utils'
 
-import { expect, server } from '../utils'
+//import { expect, server } from '../utils'
 
 //import { TestClient } from 'anypay-simple-wallet'
 
-import { ensureInvoice, createInvoice } from '../../lib/invoices'
+//import { ensureInvoice, createInvoice } from '../../lib/invoices'
 
-import { setAddress } from '../../lib/addresses'
-
-const wallet = {
-
-  async buildPayment(outputs: any) {
-
-  }
-
-}
+//import { setAddress } from '../../lib/addresses'
 
 describe("XMR End To End Payments", async () => {
 

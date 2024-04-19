@@ -1,7 +1,7 @@
 
 import { join } from 'path';
 
-export function startActors(actorNames) {
+export function startActors(actorNames: string[]) {
 
   actorNames.map(actorName => {
 

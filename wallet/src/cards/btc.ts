@@ -1,4 +1,4 @@
-import BitcoreCard, { Bitcore, Utxo } from './_bitcore'
+import BitcoreCard, { Bitcore } from './_bitcore'
 
 //@ts-ignore
 import * as btc from 'bitcore-lib'

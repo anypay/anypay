@@ -4,6 +4,8 @@ import axios from 'axios'
 //const host = `http://localhost:5200`
 const host = `https://api.anypayx.com`
 
+import { config } from '../../lib/config'
+
 export async function main() {
 
 

@@ -23,7 +23,7 @@ const program = new Command();
 
 import { buildAccountCsvReport } from '../../lib/csv'
 
-import { findAccount } from '../lib/account'
+import { findAccountById } from '../../lib/accounts'
 
 program
   .command('payments <account_id>')
@@ -31,7 +31,7 @@ program
 
     try {
 
-      let account = await findAccount(account_id)
+      let account = await findAccountById(account_id)
 
       let report = await buildAccountCsvReport(account)
 

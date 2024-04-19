@@ -1,7 +1,7 @@
 
 import * as http from 'superagent';
 
-export async function lookupHandle(handle) {
+export async function lookupHandle(handle: string): Promise<string> {
 
   let name = handle.substring(1); // remove $ from beginning
 
@@ -12,4 +12,3 @@ export async function lookupHandle(handle) {
   return resp.body.receivingAddress;
 
 }
-

@@ -22,7 +22,9 @@ import { plugins } from "../config/plugins";
 
 export { plugins }
 
-import { Transaction } from './plugin'
+import { BroadcastTxResult, Transaction } from './plugin'
+
+export { BroadcastTxResult }
 
 import {
   addresses as Address,
@@ -51,6 +53,17 @@ export function find({currency, chain }: {currency: string, chain: string}) {
 
 }
 
+export async function broadcastTx({
+  chain, currency, txhex
+}: {
+  chain: string, currency: string, txhex: string
+}): Promise<BroadcastTxResult> {
+
+  let plugin = await find({ chain, currency }) 
+
+  return plugin.broadcastTx({txhex})
+
+}
 
 export async function getTransaction({ txid, chain, currency }: { txid: string, chain: string, currency: string }): Promise<Transaction> {
 

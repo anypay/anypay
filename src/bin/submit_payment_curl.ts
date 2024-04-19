@@ -48,7 +48,9 @@ const axios = require('axios')
 
   } catch(error) {
 
-    console.error(error.response.data)
+    const { response } = error as any
+
+    console.error(response.data)
 
   }
 

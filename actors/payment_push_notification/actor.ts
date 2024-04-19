@@ -54,7 +54,7 @@ export async function start() {
 
     try {
 
-      await sendMessage(account.email, `Payment Received ${invoice.denomination_amount_paid} ${invoice.denomination_currency}`, invoice.currency, {
+      await sendMessage(String(account.email), `Payment Received ${invoice.denomination_amount_paid} ${invoice.denomination_currency}`, String(invoice.currency), {
         path: `/payments/${uid}`,
       });
 

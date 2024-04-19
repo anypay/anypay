@@ -1,5 +1,5 @@
 
-import * as WebSocket from 'ws';
+import {WebSocket} from 'ws';
 
 import { config }  from '../../lib'
 

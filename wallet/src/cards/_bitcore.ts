@@ -5,8 +5,6 @@ namespace Bitcore {
 
 export type Bitcore = any;
 
-import * as bip39 from 'bip39'
-
 import Transaction from '../transaction'
 
 import PaymentOption from '../payment_option'
@@ -18,8 +16,6 @@ import Card from './_base'
 import axios from 'axios'
 
 import { getRawTx } from '../blockchair'
-
-type PrivateKey = any;
 
 export abstract class AbstractBitcoreCard extends Card {
 

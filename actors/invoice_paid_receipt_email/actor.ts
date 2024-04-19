@@ -22,7 +22,7 @@ require('dotenv').config();
 
 import { Actor } from 'rabbi';
 
-import {email} from '../../lib';
+import * as email from '../../lib/email';
 import { exchange } from '../../lib/amqp';
 import prisma from '../../lib/prisma';
 
