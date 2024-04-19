@@ -8,7 +8,11 @@ import  { Trace } from '../../lib/trace'
 
 import oneSuccess from 'promise-one-success'
 
-const { monerod_rpcs } = require('./config.json')
+const monerod_rpcs = [{
+    "host": "127.0.0.1",
+    "port": 18081,
+    "labels": ["anypay"]
+}]
 
 export class MonerodRPCPool {
 

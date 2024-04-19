@@ -159,13 +159,11 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'JSONWEBTOKEN_PUBLIC_KEY_PATH',
-    required: false,
-    default: join(__dirname, '../config/jwt/jwtRS512.key.pub')
+    required: false
   },
   {
     key: 'JSONWEBTOKEN_PRIVATE_KEY_PATH',
-    required: false,
-    default: join(__dirname, '../config/jwt/jwtRS512.key')
+    required: false
   },
   {
     key: 'EMAIL_SENDER',
