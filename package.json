@@ -34,7 +34,8 @@
     "cover:integration": "nyc --silent --no-clean npm run test:integration",
     "cover:report": "nyc report --reporter=lcov --reporter=text",
     "typedoc": "npx typedoc -out typedoc",
-    "docs-asyncapi": "npx @asyncapi/generator spec/asyncapi.yml @asyncapi/html-template -o documentation/asyncapi"
+    "docs-asyncapi": "npx @asyncapi/generator spec/asyncapi.yml @asyncapi/html-template -o documentation/asyncapi",
+    "heroku-postbuild": "tsc",
   },
   "keywords": [],
   "author": "Anypay",

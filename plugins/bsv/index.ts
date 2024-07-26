@@ -6,7 +6,7 @@ import * as taal from './lib/taal'
 
 import * as whatsonchain from './lib/whatsonchain'
 
-import { BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '../../lib/plugin'
+import { BroadcastTx, BroadcastTxResult, Confirmation, Transaction } from '../../lib/plugin'
 
 import oneSuccess from 'promise-one-success'
 
@@ -33,14 +33,6 @@ export default class BSV extends UTXO_Plugin {
 
     return bsv
 
-  }
-
-  /*async parsePayments({txhex}: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
-  }*/
-
-  async getPayments(txid: string): Promise<Payment[]> {
-    throw new Error() //TODO
   }
 
   async getConfirmation(txid: string): Promise<Confirmation> {
@@ -162,5 +154,3 @@ export async function transformAddress(alias: string){
   }
 
 }
-
-
