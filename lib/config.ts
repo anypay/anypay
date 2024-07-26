@@ -75,8 +75,8 @@ const variables: EnvironmentVariable[] = [
   },
   {
     key: 'NODE_ENV',
-    required: true,
-    default: 'development'
+    required: false,
+    default: 'production'
   },
   {
     key: 'DATABASE_URL',

@@ -80,7 +80,6 @@ docker run -d -p 5200:5200 anypay/anypay
 
 ### Required Environment Variables
 
-- HOST
 - PORT
 - DATABASE_URL
 - AMQP_URL
