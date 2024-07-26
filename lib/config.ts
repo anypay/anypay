@@ -69,6 +69,11 @@ const variables: EnvironmentVariable[] = [
     default: '5201'
   },
   {
+    key: 'WEBSOCKETS_HOST',
+    required: false,
+    default: '0.0.0.0'
+  },
+  {
     key: 'NODE_ENV',
     required: true,
     default: 'development'

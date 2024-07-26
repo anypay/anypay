@@ -64,9 +64,6 @@ const defaultAnypayServerProps: AnypayServerParams = {
     log,
 }
 
-
-
-
 export class AnypayServer {
 
     log: Logger;

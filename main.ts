@@ -19,23 +19,22 @@ import prisma from './lib/prisma';
 
 import { AnypayServer } from './src/anypay_server';
 
-
 (async () => {
 
   await init()
 
   const anypayServer = new AnypayServer({
     amqp: {
-      url: config.get('ANYPAY_AMQP_URL'),
-      exchange: config.get('ANYPAY_AMQP_EXCHANGE')
+      url: config.get('AMQP_URL'),
+      exchange: config.get('AMQP_EXCHANGE')
     },
     http: {
-      port: config.get('ANYPAY_HTTP_PORT'),
-      host: config.get('ANYPAY_HTTP_HOST')
+      port: config.get('PORT'),
+      host: config.get('HOST')
     },
     websockets: {
-      host: config.get('ANYPAY_WEBSOCKETS_HOST'),
-      port: config.get('ANYPAY_WEBSOCKETS_PORT')
+      host: config.get('WEBSOCKETS_HOST'),
+      port: config.get('WEBSOCKETS_PORT')
     },
     webhooks: true,
     log,
