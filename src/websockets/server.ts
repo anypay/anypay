@@ -121,6 +121,8 @@ export async function startServer({ port, host }: {
     host: string
 }): Promise<AnypayWebsocketServer> {
 
+    console.log("START SERVER---", {port, host})
+
     const server = Hapi.server({
         port,
         host

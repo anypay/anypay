@@ -5,8 +5,6 @@ import { config } from './lib/config'
 
 import { log } from './lib'
 
-import { init } from 'rabbi';
-
 import { start as startPrices } from './lib/prices/cron'
 
 import { start as startFees } from './actors/detect_fees/actor'
@@ -20,8 +18,6 @@ import prisma from './lib/prisma';
 import { AnypayServer } from './src/anypay_server';
 
 (async () => {
-
-  await init()
 
   const anypayServer = new AnypayServer({
     amqp: {
