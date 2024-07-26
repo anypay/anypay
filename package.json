@@ -33,7 +33,8 @@
     "cover:integration": "nyc --silent --no-clean npm run test:integration",
     "cover:report": "nyc report --reporter=lcov --reporter=text",
     "typedoc": "npx typedoc -out typedoc",
-    "docs-asyncapi": "npx @asyncapi/generator spec/asyncapi.yml @asyncapi/html-template -o documentation/asyncapi"
+    "docs-asyncapi": "npx @asyncapi/generator spec/asyncapi.yml @asyncapi/html-template -o documentation/asyncapi",
+    "install-postgis": "node install-postgis.js"
   },
   "keywords": [],
   "author": "Anypay",

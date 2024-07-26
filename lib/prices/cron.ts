@@ -21,7 +21,7 @@ import { log } from '../log'
 
 import { setAllFiatPrices, setAllCryptoPrices } from './'
 
-var fiatInterval: NodeJS.Timeout, cryptoInterval: NodeJS.Timeout;
+var fiatInterval: Timer, cryptoInterval: Timer;
 
 const ONE_MINUTE = 1000 * 60;
 const ONE_HOUR = ONE_MINUTE * 60;

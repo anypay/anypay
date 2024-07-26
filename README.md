@@ -96,6 +96,7 @@ git clone https://github.com/anypay/anypay
 cd anypay
 npm install
 npm start
+npm run install-postgis
 ```
 
 ### License
