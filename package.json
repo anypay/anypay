@@ -16,7 +16,6 @@
   },
   "scripts": {
     "anypay": "./bin/anypay.ts",
-    "build": "tsc",
     "commit": "npx cz",
     "console": "ts-node --experimental-repl-await",
     "db:migrate": "node_modules/sequelize-cli/lib/sequelize db:migrate --url=$DATABASE_URL",
