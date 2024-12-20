@@ -18,9 +18,9 @@
 require('dotenv').config()
 
 
-import { republishEventToRoutingKeys } from '../../lib/events'
+import { republishEventToRoutingKeys } from '@/lib/events'
 
-import prisma from '../../lib/prisma'
+import prisma from '@/lib/prisma'
 
 async function main() {
 

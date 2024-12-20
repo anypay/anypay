@@ -1,8 +1,8 @@
 import { Actor } from "rabbi"
 
-import { start as startFees } from '../../actors/detect_fees/actor'
+import { start as startFees } from '@/actors/detect_fees/actor'
 
-import { start as refunds } from '../../actors/refunds/actor'
+import { start as refunds } from '@/actors/refunds/actor'
 
 export class ActorSystem {
 

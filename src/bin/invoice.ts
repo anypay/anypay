@@ -20,11 +20,11 @@ require('dotenv').config();
 import { Command } from 'commander';
 const program = new Command();
 
-import { coins, log, invoices } from '../../lib';
+import { coins, log, invoices } from '@/lib';
 
-import { listInvoiceEvents } from '../../lib/events'
+import { listInvoiceEvents } from '@/lib/events'
 
-import { ensureInvoice } from '../../lib/invoices'
+import { ensureInvoice } from '@/lib/invoices'
 
 
 program

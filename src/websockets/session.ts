@@ -19,11 +19,11 @@
 import { WebSocket } from 'ws'
 import { Channel } from 'amqplib'
 import { v4 as uuid } from 'uuid';
-import { exchange } from '../../lib/amqp';
-import { Logger } from '../../lib/log';
+import { exchange } from '@/lib/amqp';
+import { Logger } from '@/lib/log';
 import { Request } from 'express';
-import prisma from '../../lib/prisma';
-import { validate } from '../../lib/webhooks';
+import prisma from '@/lib/prisma';
+import { validate } from '@/lib/webhooks';
 
 interface WebsocketClientSessionProps {
     amqp: {

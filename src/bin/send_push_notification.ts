@@ -21,7 +21,7 @@ require('dotenv').config();
 import { Command } from 'commander';
 const program = new Command();
 
-import { sendMessage } from '../../lib/push_notifications';
+import { sendMessage } from '@/lib/push_notifications';
 
 program
   .command('sendmessage <email> <title> <body>') 

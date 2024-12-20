@@ -18,7 +18,7 @@
 
 require('dotenv').config()
 
-import { confirmTransactionsFromBlock } from "../../../lib/blockcypher"
+import { confirmTransactionsFromBlock } from "@/lib/blockcypher"
 
 async function main() {
 

@@ -1,6 +1,6 @@
 import { Server } from "@hapi/hapi";
-import { NewServer } from "../server/v0/server";
-import { Logger } from "../lib/log";
+import { NewServer } from "@/server/v0/server";
+import { Logger } from "@/lib/log";
 
 interface HttpApiServerParams {
     http: {
@@ -19,6 +19,7 @@ export class HttpApiServer {
     log: Logger;
     
     constructor(params: HttpApiServerParams) {
+
         this.props = params;
         this.log = params.log
     }
@@ -26,6 +27,7 @@ export class HttpApiServer {
     async start() {
 
         this.server = await NewServer()
+
         await this.server.start();
 
         this.log.info(`http.server.started`, this.server.info)

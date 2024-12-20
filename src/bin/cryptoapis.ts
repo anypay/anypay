@@ -21,7 +21,7 @@ require("dotenv").config()
 import * as http from 'superagent'
 
 import { Command } from 'commander';
-import { config } from '../../lib';
+import { config } from '@/lib';
 const program = new Command();
 
 program

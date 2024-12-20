@@ -18,7 +18,7 @@
 
 require('dotenv').config()
 
-import { deleteNewBlockWebhook } from "../../../lib/blockcypher"
+import { deleteNewBlockWebhook } from "@/lib/blockcypher"
 
 async function main() {
 

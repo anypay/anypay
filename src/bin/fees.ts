@@ -21,8 +21,8 @@ require('dotenv').config()
 import { Command } from 'commander';
 const program = new Command();
 
-import { getMiningFee } from '../../lib/fees'
-import prisma from '../../lib/prisma';
+import { getMiningFee } from '@/lib/fees'
+import prisma from '@/lib/prisma';
 
 program 
   .command('miningfee <invoice_uid>')

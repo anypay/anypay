@@ -24,9 +24,9 @@ const program = new Command();
 
 import { v4 } from 'uuid';
 
-import { hash } from '../../lib/password';
+import { hash } from '@/lib/password';
 
-import { log } from '../../lib';
+import { log } from '@/lib';
 
 program
 

@@ -18,7 +18,7 @@
 //==============================================================================
 require('dotenv').config();
 
-import { search } from '../../lib/search';
+import { search } from '@/lib/search';
 
 const argv = require('yargs').argv;
 
@@ -36,7 +36,7 @@ const argv = require('yargs').argv;
 
   for (let item of result) {
 
-    console.log(item.value.toJSON())
+    console.log(item.value)
   }
 
   console.log(result)

@@ -17,7 +17,7 @@
 //==============================================================================
 
 import { z } from 'zod'
-import prisma from '../../../lib/prisma'
+import prisma from '@/lib/prisma'
 
 const PaymentConfirmingEvent = z.object({
     topic: z.string().regex(/payment.confirming/),

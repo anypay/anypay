@@ -26,8 +26,8 @@ import * as fs from 'fs'
 
 import * as http from 'superagent'
 
-import { BIP70Protocol, buildOutputs, buildPaymentRequest, completePayment, fees } from '../../lib/pay';
-import prisma from '../../lib/prisma';
+import { BIP70Protocol, completePayment, fees } from '@/lib/pay';
+import prisma from '@/lib/prisma';
 
 program
   .command('decode_bip70_request <path>')
@@ -131,109 +131,4 @@ program
 
   });
 
-program
-  .command('submitexample <currency> [isvalid]')
-  .action(async (currency, isValid=true) => {
-
-    /*
-    let payment = getPayment(currency, isValid)
-
-    try {
-
-      let response = await submitPayment({
-        invoice_uid: payment.invoice_uid,
-        currency,
-        transactions: [payment.transaction]
-      });
-
-    } catch(error) {
-      console.log(error);
-    }
-
-    process.exit(0);
-    */
-
-  })
-
-
-program
-  .command('submitpayment <invoice_uid> <currency> <hex>')
-  .action(async (invoice_uid, currency, transaction) => {
-
-/*
-    try {
-
-      let response = await submitPayment({
-        invoice_uid,
-        currency,
-        transactions: [transaction]
-      });
-
-    } catch(error) {
-
-      console.error(error);
-
-    }
-
-    process.exit(0)
-    */
-
-  });
-
-program
-  .command('buildoutputs <invoice_uid> <currency> <protocol>')
-  .action(async (invoice_uid, currency, protocol) => {
-
-    try {
-
-      const payment_option = await prisma.payment_options.findFirstOrThrow({
-        where: {
-          currency,
-          invoice_uid
-        }
-
-      })
-
-      let outputs = await buildOutputs(payment_option, protocol);
-
-      console.log(outputs);
-
-    } catch(error) {
-
-      console.error(error);
-
-    }
-
-    process.exit();
-  
-  });
-
-program
-  .command('buildpaymentrequest <invoice_uid> <currency> <protocol>')
-  .action(async (invoice_uid, currency, protocol) => {
-
-    try {
-      const paymentOption = await prisma.payment_options.findFirstOrThrow({
-        where: {
-          currency,
-          invoice_uid
-        }
-      })
-
-      let paymentRequest = await buildPaymentRequest(Object.assign(paymentOption, { protocol }));
-
-      console.log(paymentRequest);
-
-    } catch(error) {
-
-      console.error(error);
-
-    }
-
-    process.exit();
-  
-  });
-
 program.parse(process.argv);
-
-

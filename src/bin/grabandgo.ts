@@ -17,7 +17,7 @@
 */
 //==============================================================================
 import { Command } from 'commander';
-import prisma from '../../lib/prisma';
+import prisma from '@/lib/prisma';
 const program = new Command();
 
 program

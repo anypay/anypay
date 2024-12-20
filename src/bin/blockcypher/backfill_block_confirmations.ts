@@ -18,10 +18,10 @@
 
 require('dotenv').config() 
 
-import { confirmTransaction, getTransaction } from '../../../lib/blockcypher'
+import { confirmTransaction, getTransaction } from '@/lib/blockcypher'
 
 import delay from 'delay'
-import prisma from '../../../lib/prisma'
+import prisma from '@/lib/prisma'
 
 export async function main() {
 

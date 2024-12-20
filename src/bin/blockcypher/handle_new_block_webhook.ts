@@ -18,7 +18,8 @@
 
 require('dotenv').config()
 
-import { confirmTransactionsFromBlockWebhook } from "../../../lib/blockcypher"
+import { confirmTransactionsFromBlockWebhook } from "@/lib/blockcypher"
+import prisma from "@/lib/prisma"
 
 async function main() {
 
@@ -30,7 +31,7 @@ async function main() {
 
   console.log('webhook', record.payload)
 
-  const result = await confirmTransactionsFromBlockWebhook(record.payload)
+  const result = await confirmTransactionsFromBlockWebhook(record.payload as any)
 
   console.log('result', result)
 }

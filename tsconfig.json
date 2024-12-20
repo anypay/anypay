@@ -3,19 +3,30 @@
     "target": "es6",
     "esModuleInterop": true,
     "lib": [
-      "es6", "ES2015", "ES2016", "ES2017"
+      "es6", "ES2015", "ES2016", "ES2017", "ES2020"
     ],
     "strict": true,
     "allowJs": true,
     "module": "commonjs",
-    "outDir": "dist",
-		"sourceMap": true,
-		"sourceRoot": ".",
+    "outDir": "./dist",
+    "sourceMap": true,
+    "sourceRoot": ".",
     "noUnusedLocals": true,
-    "noEmit": true,
+    "useUnknownInCatchVariables": false,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@test/*": ["src/test/*"],
+    }
   },
   "exclude": [
     "node_modules",
     "dist"
+  ],
+  "include": [
+    "src/**/*"
   ]
 }

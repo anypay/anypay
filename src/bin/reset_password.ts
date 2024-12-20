@@ -18,7 +18,7 @@
 //==============================================================================
 require('dotenv').config();
 
-import * as password from '../../lib/password';
+import * as password from '@/lib/password';
 import { Command } from 'commander';
 const program = new Command();
 

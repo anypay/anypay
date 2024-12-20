@@ -16,9 +16,9 @@
 */
 //==============================================================================
 import { WebhookServer } from "./server"
-import { log } from '../../lib/log'
-import { config } from '../../lib/config'
-import prisma from "../../lib/prisma"
+import { log } from '@/lib/log'
+import { config } from '@/lib/config'
+import prisma from "@/lib/prisma"
 
 if (require.main === module) {
 

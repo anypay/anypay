@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
-import { WebhookServer } from "./webhooks/server";
-import { Logger, log } from "../lib/log";
-import { HttpApiServer } from "./http_api_server";
-import prisma from '../lib/prisma'
+import { WebhookServer } from "@/webhooks/server";
+import { Logger, log } from "@/lib/log";
+import { HttpApiServer } from "@/http_api_server";
+import prisma from '@/lib/prisma'
 
 import { merge } from "ts-deepmerge";
 
@@ -106,7 +106,10 @@ export class AnypayServer {
     }
   
     start() {
+
       this.webhook_server.start()
+
       this.http_api_server.start()
+
     }
   }

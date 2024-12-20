@@ -18,11 +18,11 @@
 
 import * as WebSocket from 'ws';
 import { connect, Connection } from 'amqplib';
-import { log } from '../../lib'; 
-import WebsocketClientSession from './session';
+import { log } from '@/lib/log'; 
+import WebsocketClientSession from '@/websockets/session';
 import { Server } from 'http'
 import * as Hapi from '@hapi/hapi';
-import { Logger } from '../../lib/log'
+import { Logger } from '@/lib/log'
 import { Request } from 'express'
 
 const RABBITMQ_URL = 'amqp://localhost'; // RabbitMQ connection URL

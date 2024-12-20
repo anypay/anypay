@@ -23,7 +23,7 @@ import { Command } from 'commander';
 
 const program = new Command();
 
-import { publish } from '../../lib/blockchair'
+import { publish } from '@/lib/blockchair'
 
 program
   .command('broadcast <currency> <rawtx>')

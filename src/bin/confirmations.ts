@@ -20,15 +20,13 @@ require('dotenv').config()
 
 import { Command } from 'commander'
 
-import { find } from '../../lib/plugins'
+import { find } from '@/lib/plugins'
 
-import { Confirmation } from '../../lib/plugin'
+import { Confirmation } from '@/lib/plugin'
 
-import { Payment } from '../../lib/payments'
+import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid, startConfirmingTransactions, revertPayment } from '@/lib/confirmations'
 
-import { listUnconfirmedPayments, confirmPayment, getConfirmationForTxid, confirmPaymentByTxid, startConfirmingTransactions, revertPayment } from '../../lib/confirmations'
-
-import { initialize } from '../../lib'
+import { initialize } from '@/lib'
 
 const program = new Command();
 
@@ -92,7 +90,7 @@ program
 
     let payment = await getConfirmationForTxid({ txid })
 
-    console.log({ payment: payment.toJSON() })
+    console.log({ payment: payment })
 
   })
   
@@ -104,7 +102,7 @@ program
 
     const plugin = find({ chain, currency })
 
-    const unconfirmed: Payment[] = await listUnconfirmedPayments({ chain, currency })
+    const unconfirmed = await listUnconfirmedPayments({ chain, currency })
 
     console.log(`${unconfirmed.length} unconfirmed payments of ${currency} on ${chain}`)
 
@@ -112,9 +110,9 @@ program
 
       try {
 
-        console.log(payment.toJSON())
+        console.log(payment)
 
-        const confirmation: Confirmation = await plugin.getConfirmation(payment.txid)
+        const confirmation: Confirmation = await plugin.getConfirmation(payment.txid) as Confirmation
 
         console.log({ confirmation })
 

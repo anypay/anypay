@@ -16,7 +16,7 @@
     OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 //==============================================================================
-const password = require('../lib/password');
+import * as password from '@/lib/password';
 import { Command } from 'commander';
 const program = new Command();
 

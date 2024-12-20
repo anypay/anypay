@@ -21,7 +21,7 @@ import { join } from 'path'
 
 import { Schema } from '@hapi/joi'
 
-import WebsocketClientSession from './session';
+import WebsocketClientSession from '@/websockets/session';
 
 export interface WebsocketMessage {
     topic: string;

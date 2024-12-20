@@ -21,8 +21,8 @@ import { Command } from 'commander';
 
 const program = new Command();
 
-import { addresses } from '../../lib';
-import prisma from '../../lib/prisma';
+import { addresses } from '@/lib';
+import prisma from '@/lib/prisma';
 
 program
   .command('lockaddress <email> <currency> [chain]')

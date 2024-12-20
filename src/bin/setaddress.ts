@@ -19,8 +19,8 @@
 
 require('dotenv').config();
 
-import {setAddress} from '../../lib/core';
-import prisma from '../../lib/prisma';
+import {setAddress} from '@/lib/core';
+import prisma from '@/lib/prisma';
 
 const argv = require('yargs').argv;
 

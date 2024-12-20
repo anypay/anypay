@@ -22,7 +22,7 @@ require("dotenv").config()
 import { Command } from 'commander';
 const program = new Command();
 
-import { createApp, createAppToken } from '../../lib/apps';
+import { createApp, createAppToken } from '@/lib/apps';
 
 program
   .command('create <account_id> <name>')

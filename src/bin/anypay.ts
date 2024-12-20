@@ -22,16 +22,16 @@ require('dotenv').config()
 import { Command } from 'commander';
 const program = new Command();
 
-import { setAddress } from '../../lib/addresses'
+import { setAddress } from '@/lib/addresses'
 
-import { findByEmail } from '../../lib/accounts'
+import { findByEmail } from '@/lib/accounts'
 
 program
   .option('-e, --email <string>')
 
 program
-  .command('set-address <currency> <address>')
-  .action(async (currency, address, options) => {
+  .command('set-address <currency> <address> [chain]')
+  .action(async (currency, address, chain, options) => {
 
     try {
 
@@ -43,12 +43,17 @@ program
 
       const account = await findByEmail(email)
 
-      let result = await setAddress(account, {
-        currency,
-        value: address
-      })
+      if (account) {
+        let result = await setAddress(account, {
+          currency,
+          chain: chain || currency,
+          value: address
+        })
+  
+        console.log(result)
+      }
 
-      console.log(result)
+
 
     } catch(error) {
 

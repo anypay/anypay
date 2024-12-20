@@ -19,13 +19,13 @@
 
 require('dotenv').config();
 
-import { log, accounts } from '../../lib';
-import { getSupportedCoins } from '../../lib/accounts';
-import { registerAccount } from '../../lib/accounts';
-import { setAddress } from '../../lib/core';
+import { log, accounts } from '@/lib';
+import { getSupportedCoins } from '@/lib/accounts';
+import { registerAccount } from '@/lib/accounts';
+import { setAddress } from '@/lib/core';
 
 import { Command } from 'commander';
-import prisma from '../../lib/prisma';
+import prisma from '@/lib/prisma';
 
 const program = new Command();
 

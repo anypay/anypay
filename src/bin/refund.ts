@@ -21,9 +21,9 @@ require('dotenv').config();
 import { Command } from 'commander';
 const program = new Command();
 
-import { getAddressForInvoice, getRefund } from '../../lib/refunds'
+import { getAddressForInvoice, getRefund } from '@/lib/refunds'
 
-import { ensureInvoice } from '../../lib/invoices'
+import { ensureInvoice } from '@/lib/invoices'
 
 //import { findAccount } from '../lib/account'
 

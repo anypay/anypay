@@ -23,7 +23,7 @@ import { Command } from 'commander';
 const program = new Command();
 
 
-import { publish } from '../../lib/blockcypher'
+import { publish } from '@/lib/blockcypher'
 
 program
   .command('broadcast <currency> <rawtx>')

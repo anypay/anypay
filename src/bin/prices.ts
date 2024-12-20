@@ -21,34 +21,9 @@ require('dotenv').config();
 import { Command } from 'commander';
 const program = new Command();
 
-import { log } from '../../lib/log';
+import { log } from '@/lib/log';
 
-import { getCryptoPrices, createConversion, updateCryptoUSDPrice, updateUSDPrices } from '../../lib/prices';
-
-program
-  .command('seed_prices')
-  .action(async () => { 
-    try {
-
-      log.info('updating USD prices');
-
-      await updateUSDPrices();
-
-      log.info('updating crypto prices');
-
-      await updateCryptoUSDPrice('BSV');
-
-      log.info('updated crypto prices');
-
-    } catch(error) {
-
-      const { message } = error as Error;
-
-      console.error(message, error);
-
-    }
-
-  });
+import { createConversion, updateUSDPrices } from '@/lib/prices';
 
 program
   .command('update_crypto_prices')
@@ -96,49 +71,6 @@ program
   });
 
 program
-  .command('getcmcprices')
-  .action(async () => {
-
-    try {
-
-      let prices = await getCryptoPrices('USD');
-
-      console.log(prices);
-
-    } catch(error) {
-
-      console.error('getcmcprices.error', error);
-
-    }
-
-    process.exit(0);
-
-  });
-
-
-program
-  .command('update_crypto_usd <currency>')
-  .action(async (currency) => {
-
-    try {
-
-      log.info('updating crypto usd price', currency);
-
-      await updateCryptoUSDPrice(currency);
-
-      log.info('updated crypto usd price', currency);
-
-    } catch(error) {
-
-      console.error(`update_crypto_usd.${currency}.error`, error);
-
-    }
-
-    process.exit(0);
-
-  });
-
-program
   .command('convert <baseamount> <basecurrency> <targetcurrency>')
   .action(async (value, currency, targetCurrency) => {
 
@@ -162,4 +94,3 @@ program
 
 program
   .parse(process.argv);
-

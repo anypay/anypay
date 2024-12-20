@@ -22,9 +22,9 @@ require('dotenv').config();
 import { Command } from 'commander';
 const program = new Command();
 
-import { sendWebhookForInvoice } from '../../lib/webhooks';
+import { sendWebhookForInvoice } from '@/lib/webhooks';
 
-import { WebhookBuilder } from '../../src/webhooks/builder'
+import { WebhookBuilder } from '@/webhooks/builder'
 
 program
   .option('-d --dry-run')

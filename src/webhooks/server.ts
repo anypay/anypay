@@ -33,8 +33,8 @@
 
 import { Channel, Connection, Message, connect } from 'amqplib'
 import { Actor } from 'rabbi'
-import { WebhookBuilder } from './builder'
-import { Logger } from '../../lib/log'
+import { WebhookBuilder } from '@/webhooks/builder'
+import { Logger } from '@/lib/log'
 import winston = require('winston')
 import { PrismaClient } from '@prisma/client'
 
