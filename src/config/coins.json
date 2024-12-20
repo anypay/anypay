@@ -7,7 +7,7 @@
       "name": "DASH",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDC_ETH",
@@ -16,7 +16,7 @@
       "name": "USD Coin on Ethereum",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDT_ETH",
@@ -25,7 +25,7 @@
       "name": "Tether USD on Ethereum",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDC_ETH",
@@ -34,7 +34,7 @@
       "name": "USD Coin on Polygon",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDT_ETH",
@@ -43,7 +43,7 @@
       "name": "Tether USD on Polygon",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDC_ETH",
@@ -52,7 +52,7 @@
       "name": "USD Coin on Avalanche",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "USDT_ETH",
@@ -61,7 +61,7 @@
       "name": "Tether USD on Avalanche",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "XMR",
@@ -70,7 +70,7 @@
       "name": "Monero",
       "enabled": true,
       "supported": true,
-      "icon_url": "https://:"
+      "icon": ""
     },
     {
       "code": "LTC",
@@ -79,7 +79,7 @@
       "name": "Litecoin",
       "enabled": true,
       "supported": true,
-      "icon_url": "https://app.anypayinc.com/ltc.png"
+      "icon": ""
     },
     {
       "code": "BCH",
@@ -88,7 +88,7 @@
       "name": "Bitcoin Cash",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "BTC",
@@ -97,7 +97,7 @@
       "name": "Bitcoin",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "DOGE",
@@ -106,7 +106,7 @@
       "name": "Dogecoin",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     },
     {
       "code": "BSV",
@@ -115,10 +115,7 @@
       "name": "BitCoin SV",
       "enabled": true,
       "supported": true,
-      "icon_url": ""
+      "icon": ""
     }
   ]
-
 }
-
-

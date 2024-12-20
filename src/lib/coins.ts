@@ -31,7 +31,7 @@ export async function refreshCoins(): Promise<Coin[]> {
 
 }
 
-interface CoinConfig {
+export interface CoinConfig {
   code: string;
   currency: string;
   chain: string;

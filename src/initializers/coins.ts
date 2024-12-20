@@ -18,10 +18,14 @@
 
 import { coins } from '@/lib';
 
-let coinsConfig = require('../config/coins')['coins'];
+import config from '@/config/coins.json'
+
+let coinsConfig = config['coins'];
+
+import { CoinConfig } from '@/lib/coins'
 
 export default async function initialize() {
 
-  await coins.initFromConfig(coinsConfig);
+  await coins.initFromConfig(coinsConfig as CoinConfig[]);
 
 }

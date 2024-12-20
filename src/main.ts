@@ -17,7 +17,11 @@ import prisma from '@/lib/prisma';
 
 import { AnypayServer } from './anypay_server';
 
+import { initialize } from './initializers'
+
 (async () => {
+
+  await initialize()
 
   console.log("Starting anypay server")
 

@@ -463,7 +463,6 @@ model accounts {
   physical_address          String?                  @db.VarChar(255)
   latitude                  String?                  @db.VarChar(255)
   longitude                 String?                  @db.VarChar(255)
-  authenticator_secret      String?                  @db.VarChar(255)
   image_url                 String?                  @db.VarChar(255)
   tipjar_enabled            Boolean?                 @default(false)
   allow_cashback_amount     Boolean?                 @default(false)
