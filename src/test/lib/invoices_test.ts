@@ -31,7 +31,7 @@ describe('lib/invoices', () => {
     const invoice = await newInvoice({ account: account })
 
     expect(invoice.account_id).to.be.a('number')
-    expect(invoice.denomination_currency).to.be.a('string')
+    expect(invoice.currency).to.be.a('string')
     expect(invoice.status).to.be.equal('unpaid')
     expect(invoice.webhook_url).to.be.a('string')
 
@@ -107,7 +107,9 @@ describe('lib/invoices', () => {
 
     expect (
 
-        createEmptyInvoice(-1)
+        createEmptyInvoice(-1, {
+          currency: 'USD'
+        })
 
     )
     .to.be.eventually.rejected

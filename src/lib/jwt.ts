@@ -16,22 +16,39 @@
 */
 //==============================================================================
 import { log } from '@/lib/log'
-
-import { readFileSync } from 'fs'
-
 import { sign, verify, Algorithm } from 'jsonwebtoken'
-
 import { config } from '@/lib/config'
+import { generateKeyPairSync } from 'crypto'
 
-const privateKey = readFileSync(config.get('JSONWEBTOKEN_PRIVATE_KEY_PATH'), 'utf8')
+let privateKey: string;
+let publicKey: string;
 
-const publicKey = readFileSync(config.get('JSONWEBTOKEN_PUBLIC_KEY_PATH'), 'utf8')
+// Try to get keys from environment variables first
+if (config.get('JWT_PRIVATE_KEY') && config.get('JWT_PUBLIC_KEY')) {
+  privateKey = config.get('JWT_PRIVATE_KEY');
+  publicKey = config.get('JWT_PUBLIC_KEY');
+} else {
+  // Generate random keys if neither env vars nor files are provided
+  log.info('JWT keys not found in config. Generating random keys in memory.');
+  const keys = generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: {
+      type: 'spki',
+      format: 'pem'
+    },
+    privateKeyEncoding: {
+      type: 'pkcs8',
+      format: 'pem'
+    }
+  });
+  privateKey = keys.privateKey;
+  publicKey = keys.publicKey;
+}
 
-const issuer  = config.get('DOMAIN');          // Issuer 
-const subject  = `auth@${config.get('DOMAIN')}`;        // Subject 
-const audience  = `https://${config.get('DOMAIN')}`; // Audience/ PRIVATE and PUBLIC key
-
-const algorithm: Algorithm = 'RS512'
+const issuer = config.get('DOMAIN');
+const subject = `auth@${config.get('DOMAIN')}`;
+const audience = `https://${config.get('DOMAIN')}`;
+const algorithm: Algorithm = 'RS512';
 
 export async function generateAdminToken() {
 

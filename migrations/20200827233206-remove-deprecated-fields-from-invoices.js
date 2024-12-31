@@ -2,19 +2,19 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn('invoices', 'invoice_amount', {
+    await queryInterface.changeColumn('invoices', 'amount', {
       type: Sequelize.DECIMAL,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'invoice_currency', {
+    await queryInterface.changeColumn('invoices', 'currency', {
       type: Sequelize.STRING,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'denomination_amount', {
+    await queryInterface.changeColumn('invoices', 'amount', {
       type: Sequelize.DECIMAL,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'denomination_currency', {
+    await queryInterface.changeColumn('invoices', 'currency', {
       type: Sequelize.STRING,
       allowNull: true
     });
@@ -29,19 +29,19 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.changeColumn('invoices', 'invoice_amount', {
+    await queryInterface.changeColumn('invoices', 'amount', {
       type: Sequelize.DECIMAL,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'invoice_currency', {
+    await queryInterface.changeColumn('invoices', 'currency', {
       type: Sequelize.STRING,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'denomination_amount', {
+    await queryInterface.changeColumn('invoices', 'amount', {
       type: Sequelize.DECIMAL,
       allowNull: true
     });
-    await queryInterface.changeColumn('invoices', 'denomination_currency', {
+    await queryInterface.changeColumn('invoices', 'currency', {
       type: Sequelize.STRING,
       allowNull: true
     });

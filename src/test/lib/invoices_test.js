@@ -35,7 +35,7 @@ describe('lib/invoices', () => {
     it('should get the account for an invoice', () => __awaiter(void 0, void 0, void 0, function* () {
         const invoice = yield (0, utils_1.newInvoice)({ account: utils_1.account });
         (0, utils_1.expect)(invoice.account_id).to.be.a('number');
-        (0, utils_1.expect)(invoice.denomination_currency).to.be.a('string');
+        (0, utils_1.expect)(invoice.currency).to.be.a('string');
         (0, utils_1.expect)(invoice.status).to.be.equal('unpaid');
         (0, utils_1.expect)(invoice.webhook_url).to.be.a('string');
     }));

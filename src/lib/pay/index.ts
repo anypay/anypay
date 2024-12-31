@@ -359,11 +359,8 @@ export async function handleUnconfirmedPayment(paymentOption: { id?: any; amount
   await prisma.invoices.update({
     where: { id: invoice.id },
     data: {
-      invoice_amount: paymentOption.amount,
-      invoice_amount_paid: paymentOption.amount,
-      invoice_currency: currency,
-      denomination_amount_paid: invoice.denomination_amount,
-      currency: paymentOption.currency,
+      currency: currency,
+      amount: invoice.amount,
       address: paymentOption.address,
       hash: txid,
       status: 'confirming',
@@ -429,11 +426,6 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
   await prisma.invoices.update({
     where: { id: invoice.id },
     data: {
-      invoice_amount: paymentOption.amount,
-      invoice_amount_paid: paymentOption.amount,
-      invoice_currency: currency,
-      denomination_amount_paid: invoice.denomination_amount,
-      currency: paymentOption.currency,
       address: paymentOption.address,
       hash: txid,
       status: confirming ? 'confirming' : 'paid',

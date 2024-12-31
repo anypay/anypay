@@ -313,7 +313,7 @@ export async function show(request: Request | AuthenticatedRequest, h: ResponseT
 
       const responseInvoice: any = {
         amount: invoice.amount,
-        currency: invoice.denomination_currency,
+        currency: invoice.currency,
         status: invoice.status,
         uid: invoice.uid,
         uri: invoice.uri,

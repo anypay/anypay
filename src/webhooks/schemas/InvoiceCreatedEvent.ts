@@ -63,7 +63,7 @@ export async function build(params: {
                 status: 'unpaid',
                 quote: {
                     value: Number(invoice.amount),
-                    currency: String(invoice.denomination_currency)
+                    currency: String(invoice.currency)
                 }
             }
         }

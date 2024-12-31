@@ -93,7 +93,9 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
         }
       })
 
-      let invoice = await invoices.createEmptyInvoice(request.app_id)
+      let invoice = await invoices.createEmptyInvoice(request.app_id, {
+        currency: payload.template[0].currency,
+      })
 
       const update: {
         currency?: string;

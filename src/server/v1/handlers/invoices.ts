@@ -61,8 +61,8 @@ export async function show(request: Request, h: ResponseToolkit) {
     
     } = {
       invoice: {
-        currency: String(invoice.denomination_currency),
-        amount: Number(invoice.denomination_amount),
+        currency: String(invoice.currency),
+        amount: Number(invoice.amount),
         status: invoice.status,
         createdAt: invoice.createdAt
       }

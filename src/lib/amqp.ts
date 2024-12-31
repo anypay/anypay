@@ -119,15 +119,31 @@ export function registerSchema(name: string, schema: ZodObject<any>) {
 
 export const getSchema = (name: string) => schemas[name];
 
+export async function awaitConnection() {
+
+  while (!connection) {
+    await wait(100);
+  }
+
+  return connection;
+}
+
 (async function() {
 
   if (config.get('NODE_ENV') === 'test') {
 
-    connection = await connect(String(config.get('TEST_AMQP_URL')));
+    connection = await connect(String(config.get('TEST_AMQP_URL')), {
+      tls: true,
+      rejectUnauthorized: false
+    });
 
   } else {
 
-    connection = await connect(String(config.get('AMQP_URL')));
+    connection = await connect(String(config.get('AMQP_URL')), {
+      tls: true,
+      rejectUnauthorized: false
+    });
+
   }
  
   channel = await connection.createChannel();  

@@ -1,8 +1,6 @@
 
 export default interface InvoiceCreated {
   amount: number;
-  denomination_amount: number;
-  denomination: string
   memo: string;
   cancelled: boolean;
   is_public_request: boolean;
@@ -12,7 +10,6 @@ export default interface InvoiceCreated {
   complete: boolean;
   locked: boolean;
   id: number;
-  denomination_currency: string
   currency: string;
   account_id: number;
   webhook_url: string;
@@ -42,7 +39,7 @@ export default interface InvoiceCreated {
       tags: null,
       completed_at: null,
       redirect_url: null,
-      invoice_currency: null,
+      currency: null,
       address: null,
       energycity_account_id: null,
       access_token: null,

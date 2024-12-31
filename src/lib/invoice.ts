@@ -47,7 +47,7 @@ import prisma from '@/lib/prisma';
 
 interface EmptyInvoiceOptions {
   uid?: string;
-  currency?: string;
+  currency: string;
   amount?: number;
   webhook_url?: string;
   secret?: string;
@@ -56,7 +56,7 @@ interface EmptyInvoiceOptions {
   redirect_url?: string;
 }
 
-export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions = {}) {
+export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions) {
 
   var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url } = options
 
@@ -77,6 +77,19 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     uid
   })
 
+  console.log("CREATE INVOICE 2", {
+    app_id,
+    account_id: app.account_id,
+    uid,
+    uri,
+    currency,
+    amount,
+    webhook_url,
+    memo,
+    secret,
+    metadata,
+    redirect_url
+  })
 
   const record = await prisma.invoices.create({
     data: {

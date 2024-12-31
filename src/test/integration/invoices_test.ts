@@ -47,7 +47,7 @@ describe('Integration | Invoices', () => {
 
       expect(invoice.amount).to.be.equal(10)
 
-      expect(invoice.denomination_currency).to.be.equal('USD')
+      expect(invoice.currency).to.be.equal('USD')
 
     })
 
@@ -75,7 +75,7 @@ describe('Integration | Invoices', () => {
 
     it('gets the invoice events list from the API', async () => {
 
-      const invoice = await createInvoice({ amount: 10, account })
+      const invoice = await createInvoice({ amount: 10, currency: 'USD', account })
 
       let response = await utils.authRequest(account, {
         method: 'GET',

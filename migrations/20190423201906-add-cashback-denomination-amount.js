@@ -3,7 +3,7 @@
 module.exports = {
   up: function (queryInterface, Sequelize) {
 
-    return queryInterface.addColumn('invoices', 'cashback_denomination_amount', {
+    return queryInterface.addColumn('invoices', 'cashback_amount', {
       type: Sequelize.DECIMAL,
       allowNull: true
     });
@@ -12,7 +12,7 @@ module.exports = {
 
   down: function (queryInterface, Sequelize) {
 
-    return queryInterface.removeColumn('invoices', 'cashback_denomination_amount');
+    return queryInterface.removeColumn('invoices', 'cashback_amount');
 
   }
 };

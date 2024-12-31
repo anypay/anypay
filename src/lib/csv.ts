@@ -75,8 +75,8 @@ interface ReportInvoice {
 
   invoice_uid: string;
   invoice_date: Date;
-  invoice_amount: number;
-  invoice_currency: string;
+  amount: number;
+  currency: string;
   invoice_external_id?: string;
 
   payment_date?: Date;
@@ -105,14 +105,14 @@ export async function buildAccountCsvReport(account: Account): Promise<string> {
     let data: ReportInvoice = {
       invoice_uid: invoice.uid,
       invoice_date: invoice.createdAt,
-      invoice_amount: Number(invoice.denomination_amount),
-      invoice_currency: String(invoice.denomination_currency),
+      amount: Number(invoice.amount),
+      currency: String(invoice.currency),
       invoice_external_id: String(invoice.external_id)
     }
 
     data['payment_date'] = invoice.paidAt as Date
-    data['payment_currency'] = String(invoice.invoice_currency)
-    data['payment_amount'] = Number(invoice.invoice_amount)
+    data['payment_currency'] = String(invoice.currency)
+    data['payment_amount'] = Number(invoice.amount)
     data['payment_txid'] = String(invoice.hash)
 
     return data
@@ -130,8 +130,8 @@ export async function buildReportCsv(invoices: ReportInvoice[], filepath: string
     path: filepath,
     header: [
       {id: 'invoice_date', title: 'Date Invoiced'},
-      {id: 'invoice_amount', title: 'Amount Invoiced'},
-      {id: 'invoice_currency', title: 'Currency Invoiced'},
+      {id: 'amount', title: 'Amount Invoiced'},
+      {id: 'currency', title: 'Currency Invoiced'},
       {id: 'invoice_uid', title: 'Invoice ID'},
       {id: 'payment_currency', title: 'Payment Currency'},
       {id: 'payment_amount', title: 'Payment Amount'},
@@ -170,14 +170,14 @@ export async function buildReportCsvFromDates(accountId: number, start: Date, en
       let data: ReportInvoice = {
         invoice_uid: invoice.uid,
         invoice_date: invoice.createdAt,
-        invoice_amount: Number(invoice.denomination_amount),
-        invoice_currency: String(invoice.denomination_currency),
+        amount: Number(invoice.amount),
+        currency: String(invoice.currency),
         invoice_external_id: String(invoice.external_id)
       }
   
       data['payment_date'] = invoice.paidAt as Date
-      data['payment_currency'] = String(invoice.invoice_currency)
-      data['payment_amount'] = Number(invoice.invoice_amount)
+      data['payment_currency'] = String(invoice.currency)
+      data['payment_amount'] = Number(invoice.amount)
       data['payment_txid'] = String(invoice.hash)
   
       return data
@@ -220,14 +220,14 @@ export async function buildReportCsvFromInvoiceUID(invoiceUid: string): Promise<
         let data: ReportInvoice = {
           invoice_uid: invoice.uid,
           invoice_date: invoice.createdAt,
-          invoice_amount: Number(invoice.denomination_amount),
-          invoice_currency: String(invoice.denomination_currency),
+          amount: Number(invoice.amount),
+          currency: String(invoice.currency),
           invoice_external_id: String(invoice.external_id)
         }
     
         data['payment_date'] = invoice.paidAt as Date
-        data['payment_currency'] = String(invoice.invoice_currency)
-        data['payment_amount'] = Number(invoice.invoice_amount)
+        data['payment_currency'] = String(invoice.currency)
+        data['payment_amount'] = Number(invoice.amount)
         data['payment_txid'] = String(invoice.hash)
     
         return data

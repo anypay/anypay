@@ -91,9 +91,7 @@ export async function payInvoice(invoice: Invoice): Promise<Payment> {
   await prisma.invoices.update({
     where: { id: invoice.id },
     data: {
-      invoice_currency: 'BSV',
-      denomination_currency: 'USD',
-      denomination_amount_paid: 52.00,
+      currency: 'USD',
       status: 'paid',
       hash: createHash('sha256').update(uuid.v4()).digest().toString('hex')    }
   })
@@ -156,7 +154,8 @@ export async function newAccountWithInvoice(params: NewAccountInvoice = {}): Pro
 
   let invoice = await createInvoice({
     account,
-    amount: params.amount || 10
+    amount: params.amount || 10,
+    currency: 'USD'
   })
 
   return [ account, invoice ]
@@ -168,6 +167,7 @@ export async function newInvoice(params: NewInvoice): Promise<Invoice> {
   let invoice = await createInvoice({
     account: params.account,
     amount: params.amount || 52.00,
+    currency: 'USD',
     webhook_url: 'https://anypayx.com/api/v1/test/webhooks'
   })
 

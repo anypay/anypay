@@ -68,8 +68,8 @@ export async function getRefund(invoice: Invoice, address?: string): Promise<Ref
       currency: payment.currency,
       to: [{
         address,
-        amount: invoice.denomination_amount || invoice.denomination_amount_paid,
-        currency: invoice.denomination_currency || invoice.invoice_currency
+        amount: invoice.amount,
+        currency: invoice.currency
       }]
     }]
 
@@ -112,7 +112,7 @@ export async function getAddressForInvoice(invoice: Invoice): Promise<RefundAddr
   }
   
 
-  const currency = CURRENCIES[invoice.invoice_currency ? String(invoice.invoice_currency) : String(invoice.currency)]
+  const currency = CURRENCIES[invoice.currency ? String(invoice.currency) : String(invoice.currency)]
 
   let rawtx = await getDecodedTransaction(currency, String(invoice.hash))
 

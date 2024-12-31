@@ -68,7 +68,7 @@ describe('Integration | Invoices', () => {
             (0, utils_1.expect)(invoice.uid).to.be.a('string');
             (0, utils_1.expect)(invoice.status).to.be.equal('unpaid');
             (0, utils_1.expect)(invoice.amount).to.be.equal(10);
-            (0, utils_1.expect)(invoice.denomination_currency).to.be.equal('USD');
+            (0, utils_1.expect)(invoice.currency).to.be.equal('USD');
         }));
         it("should include payment options for invoice", () => __awaiter(void 0, void 0, void 0, function* () {
             let [account] = yield utils.createAccountWithAddress();

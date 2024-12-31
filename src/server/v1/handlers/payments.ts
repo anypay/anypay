@@ -43,9 +43,9 @@ export async function index(request: AuthenticatedRequest | Request, h: Response
 
             uid: payment.invoice.uid,
 
-            amount: payment.invoice.denomination_amount,
+            amount: payment.invoice.amount,
 
-            currency: payment.invoice.denomination_currency
+            currency: payment.invoice.currency
 
           }
 

@@ -110,9 +110,8 @@ function payInvoice(invoice) {
         yield prisma_1.default.invoices.update({
             where: { id: invoice.id },
             data: {
-                invoice_currency: 'BSV',
-                denomination_currency: 'USD',
-                denomination_amount_paid: 52.00,
+                currency: 'BSV',
+                currency: 'USD',
                 status: 'paid',
                 hash: (0, crypto_1.createHash)('sha256').update(uuid.v4()).digest().toString('hex')
             }

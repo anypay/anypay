@@ -11,10 +11,10 @@ module.exports = {
       invoice_uid: {
         type: Sequelize.STRING
       },
-      invoice_amount_paid: {
+      amount_paid: {
         type: Sequelize.DECIMAL
       },
-      invoice_currency: {
+      currency: {
         type: Sequelize.STRING
       },
       order_id: {

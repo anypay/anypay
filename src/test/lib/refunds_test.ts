@@ -41,10 +41,7 @@ describe('lib/refunds', () => {
       },
       data: {
         status: 'paid',
-        invoice_currency: 'DASH',
-        denomination_currency: 'USD',
-
-        denomination_amount_paid: 52.00
+        currency: 'USD',
       }
     })
 
@@ -82,9 +79,7 @@ describe('lib/refunds', () => {
       },
       data: {
         status: 'paid',
-        invoice_currency: 'BCH',
-        denomination_currency: 'USD',
-        denomination_amount_paid: '52.00',
+        currency: 'USD',
         hash: txid.toString()
       }
     })

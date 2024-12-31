@@ -162,11 +162,7 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   const newInvoice: any = {
 
-    denomination_currency: currency || account.denomination,
-
-    denomination_amount: amount,
-
-    currency: currency || account.denomination,
+    currency: currency || account.denomination || 'USD',
 
     amount: amount,
 
@@ -208,6 +204,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
 
   }
 
+  console.log("CREATE INVOICE 1", newInvoice)
+
   const invoice = await prisma.invoices.create({ data: newInvoice })
 
   createWebhookForInvoice(invoice)
@@ -225,8 +223,8 @@ export async function createInvoice(params: CreateInvoice): Promise<Invoice> {
           return {
             currency: option.currency,
             to: [{
-              currency: invoice.denomination_currency,
-              amount: invoice.denomination_amount,
+              currency: invoice.currency,
+              amount: invoice.amount,
               address: option.address
             }]
   

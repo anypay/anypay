@@ -3,11 +3,11 @@
 module.exports = {
   up: async function (queryInterface, Sequelize) {
 
-    await queryInterface.addColumn('invoices', 'invoice_amount_paid', {
+    await queryInterface.addColumn('invoices', 'amount_paid', {
       type: Sequelize.DECIMAL
     });
 
-    await queryInterface.addColumn('invoices', 'denomination_amount_paid', {
+    await queryInterface.addColumn('invoices', 'amount_paid', {
       type: Sequelize.DECIMAL
     });
 
@@ -15,8 +15,8 @@ module.exports = {
 
   down: async function (queryInterface, Sequelize) {
 
-    await queryInterface.removeColumn('invoices', 'invoice_amount_paid');
-    await queryInterface.removeColumn('invoices', 'denomination_amount_paid');
+    await queryInterface.removeColumn('invoices', 'amount_paid');
+    await queryInterface.removeColumn('invoices', 'amount_paid');
 
   }
 };
