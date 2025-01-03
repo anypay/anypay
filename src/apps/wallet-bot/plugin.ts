@@ -274,7 +274,7 @@ ws
               currency: Joi.string(),
               address: Joi.string(),
               balance: Joi.number()
-            })
+            }).label('UpdateAddressBalanceRequest') 
           }
         }
       }); 
@@ -301,7 +301,7 @@ ws
               chain: Joi.string(),
               currency: Joi.string(),
               address: Joi.string()
-            })
+            }).label('ShowAddressBalanceRequest')
           }
         }
       }); 
@@ -314,7 +314,7 @@ ws
           validate: {
             params: Joi.object({
               invoice_uid: Joi.string().required()
-            }).required()
+            }).required().label('CancelInvoiceRequest')
           },
           auth: 'app',
           tags: ['api', 'wallet-bot'],

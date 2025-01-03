@@ -49,9 +49,68 @@ import * as Joi from 'joi';
 
 import { register as merchant_app } from '@/server/v0/plugins/merchant_app'
 
-import { schema } from 'anypay'
-
 import { useJWT } from '@/server/auth/jwt'
+
+
+const AddressSchema = Joi.object({
+  address: Joi.string(),
+  script: Joi.string(),
+  amount: Joi.number().required()
+}).or('address', 'script').required().label('Address');
+
+const PaymentInstructionSchema = Joi.object({
+  type: Joi.string().optional(),
+  requiredFeeRate: Joi.number().optional(),
+  outputs: Joi.array().items(AddressSchema).required().label('PaymentInstructionOutputs')
+}).label('PaymentInstruction');
+
+const PaymentOptionSchema = Joi.object({
+  time: Joi.string().required(),
+  expires: Joi.string().required(),
+  memo: Joi.string().optional(),
+  paymentUrl: Joi.string().required(),
+  paymentId: Joi.string().required(),
+  chain: Joi.string().required(),
+  currency: Joi.string().required(),
+  network: Joi.string().required(),
+  instructions: Joi.array().items(PaymentInstructionSchema).required().label('PaymentOptionInstructions')
+}).label('PaymentOption');
+
+const PaymentOptionsSchema = Joi.object({
+  payment_options: Joi.array().items(PaymentOptionSchema).label('PaymentOptions').required(),
+}).label('PaymentOptionsResponse')
+
+const InvoiceSchema = Joi.object({
+  uid: Joi.string().required(),
+  uri: Joi.string().required(),
+  status: Joi.string().required(),
+  currency: Joi.string().required(),
+  amount: Joi.number().required(),
+  hash: Joi.string().optional(),
+  payment_options: PaymentOptionsSchema,
+  notes: Joi.array().items(Joi.string().label('InvoiceNote')).optional().label('InvoiceNotes')
+}).label('Invoice');
+
+const InvoiceResponseSchema = Joi.object({
+  invoice: InvoiceSchema.required()
+}).label('InvoiceResponse');
+
+// Parameter validation schemas
+const UidParamsSchema = Joi.object({
+  uid: Joi.string().required()
+}).label('UidParams');
+
+const PaymentDestinationSchema = Joi.object({
+  address: Joi.string().required(),
+  amount: Joi.number().required(),
+  currency: Joi.string()
+}).label('PaymentDestination');
+
+const PaymentRequestTemplateSchema = Joi.object({
+  chain: Joi.string(),
+  currency: Joi.string().required(),
+  to: Joi.array().items(PaymentDestinationSchema).required().label('PaymentRequestTemplateTo')
+}).label('PaymentRequestTemplate');
 
 async function NewServer(): Promise<Hapi.Server> {
 
@@ -220,7 +279,7 @@ async function NewServer(): Promise<Hapi.Server> {
           type: 'basic',
         },
       },
-      host: 'anypayx.com',
+      host: 'api.anypayx.com',
       schemes: ['https'],
       documentationPath: '/api',
       security: [{
@@ -241,11 +300,7 @@ async function NewServer(): Promise<Hapi.Server> {
 
   await server.register(AuthBearer)
 
-  console.log("SERVER REGISTERING JWT")
-
   server.auth.strategy("jwt", "bearer-access-token", useJWT());
-
-  console.log("SERVER REGISTERING HEALTH PLUGIN")
 
   await server.register({
     plugin: HealthPlugin,
@@ -254,21 +309,11 @@ async function NewServer(): Promise<Hapi.Server> {
     }
   })
 
-  console.log("SERVER REGISTERING PAYREQ")
-
   payreq.attach(server)
 
-  console.log("SERVER REGISTERING JSON V2")
-
   attachJsonV2(server)
-  
-  console.log("SERVER REGISTERING MERCHANT APP")
-
+ 
   await merchant_app(server)
-
-  // BEGIN PUBLIC ROUTES
-
-  console.log("SERVER REGISTERING WALLET BOT APP")
 
   if (config.get('WALLET_BOT_APP_ENABLED')) {
 
@@ -307,14 +352,17 @@ async function NewServer(): Promise<Hapi.Server> {
       tags: ['api', 'platform'],
       validate: {
         payload: Joi.object({
-          template: schema.PaymentRequestTemplate.required(),
+          template: PaymentRequestTemplateSchema.required(),
           options: Joi.object({
             webhook: Joi.string().optional(),
             redirect: Joi.string().optional(),
             secret: Joi.string().optional(),
-            metadata: Joi.object().optional()
-          }).optional()
-        })
+            metadata: Joi.object().optional().label('CreatePaymentRequestMetadata')
+          }).optional().label('CreatePaymentRequestOptions')
+        }).label('CreatePaymentRequestParams')
+      },
+      response: {
+        schema: InvoiceResponseSchema
       }
     }
   })
@@ -326,6 +374,11 @@ async function NewServer(): Promise<Hapi.Server> {
     options: {
       auth: "app",
       tags: ['api', 'platform'],
+      response: {
+        schema: Joi.object({
+          success: Joi.boolean().required()
+        }).label('DeleteResponse')
+      }
     }
   })
 
@@ -338,14 +391,17 @@ async function NewServer(): Promise<Hapi.Server> {
       tags: ['api', 'platform'],
       validate: {
         payload: Joi.object({
-          template: schema.PaymentRequestTemplate.required(),
+          template: PaymentRequestTemplateSchema.required(),
           options: Joi.object({
             webhook: Joi.string().optional(),
             redirect: Joi.string().optional(),
             secret: Joi.string().optional(),
-            metadata: Joi.object().optional()
-          }).optional()
+            metadata: Joi.object().optional().label('CreatePaymentRequestMetadata')
+          }).optional().label('CreatePaymentRequestOptions')
         }).label('CreatePaymentRequest')
+      },
+      response: {
+        schema: InvoiceResponseSchema
       }
     }
   })
@@ -376,9 +432,7 @@ async function NewServer(): Promise<Hapi.Server> {
     options: {
       tags: ['api', 'v0'],
       validate: {
-        params: Joi.object({
-          invoice_id: Joi.string().required()
-        }),
+        params: UidParamsSchema,
         failAction
       },
     }
@@ -391,43 +445,12 @@ async function NewServer(): Promise<Hapi.Server> {
     options: {
       tags: ['api', 'invoices'],
       validate: {
-        params: Joi.object({
-          invoice_id: Joi.string().required()
-        }),
+        params: UidParamsSchema,
         failAction
       },
       response: {
         failAction: 'log',
-        schema: Joi.object({
-          invoice: Joi.object({
-            uid: Joi.string().required(),
-            uri: Joi.string().required(),
-            status: Joi.string().required(),
-            currency: Joi.string().required(),
-            amount: Joi.number().required(),
-            hash: Joi.string().optional(),
-            payment_options: Joi.array().items(Joi.object({
-              time: Joi.string().required(),
-              expires: Joi.string().required(),
-              memo: Joi.string().optional(),
-              paymentUrl: Joi.string().required(),
-              paymentId: Joi.string().required(),
-              chain: Joi.string().required(),
-              currency: Joi.string().required(),
-              network: Joi.string().required(),
-              instructions: Joi.array().items(Joi.object({
-                type: Joi.string().optional(),
-                requiredFeeRate: Joi.number().optional(),
-                outputs: Joi.array().items(Joi.object({
-                  address: Joi.string(),
-                  script: Joi.string(),
-                  amount: Joi.number().required() 
-                }).or('address', 'script').required()),
-              })).required(),
-            })).required(),
-            notes: Joi.array().optional()
-          }).required().label('Invoice')
-        }).required()
+        schema: InvoiceResponseSchema
       },
     }
   });

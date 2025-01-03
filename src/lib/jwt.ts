@@ -19,6 +19,7 @@ import { log } from '@/lib/log'
 import { sign, verify, Algorithm } from 'jsonwebtoken'
 import { config } from '@/lib/config'
 import { generateKeyPairSync } from 'crypto'
+import { readFileSync } from 'fs';
 
 let privateKey: string;
 let publicKey: string;
@@ -27,6 +28,9 @@ let publicKey: string;
 if (config.get('JWT_PRIVATE_KEY') && config.get('JWT_PUBLIC_KEY')) {
   privateKey = config.get('JWT_PRIVATE_KEY');
   publicKey = config.get('JWT_PUBLIC_KEY');
+} else if (config.get('JWT_PRIVATE_KEY_PATH') && config.get('JWT_PUBLIC_KEY_PATH')) {
+  privateKey = readFileSync(config.get('JWT_PRIVATE_KEY_PATH'), 'utf8');
+  publicKey = readFileSync(config.get('JWT_PUBLIC_KEY_PATH'), 'utf8');
 } else {
   // Generate random keys if neither env vars nor files are provided
   log.info('JWT keys not found in config. Generating random keys in memory.');

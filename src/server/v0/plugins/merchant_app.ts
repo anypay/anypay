@@ -46,7 +46,7 @@ export async function register(server: Server) {
       validate: {
         payload: Joi.object({
           note: Joi.string().required()
-        }),
+        }).label('CreateInvoiceNoteRequest'),
         failAction
       },
       auth: "token",
@@ -81,8 +81,8 @@ export async function register(server: Server) {
             'hourFee',
             'economyFee',
             'minimumFee'
-          ).optional()
-        }).label('InvoiceRequest'),
+          ).optional().label('RequiredFeeRate')
+        }).label('CreateInvoiceRequestV0'),
         failAction: 'log'
       },
       response: {
@@ -101,7 +101,7 @@ export async function register(server: Server) {
               currency: Joi.string().required(),
               amount: Joi.number().required(),
               chain: Joi.string().required()
-            })).label('PaymentOptions').required()
+            }).label('InvoicePaymentOption')).label('InvoicePaymentOptions').required()
           }).label('Invoice').required()
         })
       }
@@ -137,7 +137,7 @@ export async function register(server: Server) {
             'hourFee',
             'economyFee',
             'minimumFee'
-          ).optional()
+          ).optional().label('RequiredFeeRate')
         }).label('CreateInvoice'),
         failAction: 'log'
       },
@@ -167,12 +167,12 @@ export async function register(server: Server) {
                   address: Joi.string(),
                   script: Joi.string(),
                   amount: Joi.number().required() 
-                }).or('address', 'script').required()),
-              })).required(),
-            })).required(),
-            notes: Joi.array().optional()
-          }).required()
-        }).required()
+                }).or('address', 'script').required().label('PaymentOptionsInstructionOutput')).label('PaymentOptionsInstructionOutputs').required().label('PaymentOptionsInstructionOutputs')
+              }).label('PaymentOptionsInstruction')).required().label('InvoicePaymentInstructions'),
+            }).label('FullInvoicePaymentOption')).required().label('FullInvoicePaymentOptions'),
+            notes: Joi.array().optional().label('InvoiceNotes')
+          }).required().label('FullInvoiceResponse')
+        }).required().label('FullCreateInvoiceResponse')
       }
     }
   });
@@ -199,10 +199,10 @@ export async function register(server: Server) {
       validate: {
         params: Joi.object({
           currency: Joi.string().required()
-        }),
+        }).label('UpdateAddressRequestParams'),
         payload: Joi.object({
           address: Joi.string().required()
-        }),
+        }).label('UpdateAddressRequestPayload'),
         failAction: 'log'
       }
     }
@@ -221,7 +221,7 @@ export async function register(server: Server) {
           address: Joi.string().required(),
           currency: Joi.string().required(),
           chain: Joi.string().required()
-        }),
+        }).label('UpdateAddressRequestPayload'),
         failAction: 'log'
       }
     }
@@ -267,10 +267,10 @@ export async function register(server: Server) {
       validate: {
         params: Joi.object({
           id: Joi.number().required()
-        }),
+        }).label('UpdateAddressNoteRequestParams'),
         payload: Joi.object({
           note: Joi.string().required()
-        }),
+        }).label('UpdateAddressNoteRequestPayload'),
         failAction: 'log'
       }
     }
@@ -286,7 +286,7 @@ export async function register(server: Server) {
       validate: {
         payload: Joi.object({
           search: Joi.string().required()
-        }),
+        }).label('CreateSearchRequest'),
         failAction: 'log'
       }
     }
@@ -434,7 +434,7 @@ export async function register(server: Server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        }).label('Credentials'),
+        }).label('CreateAccountRequest'),
         failAction
       },
     },

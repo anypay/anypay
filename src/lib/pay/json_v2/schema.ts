@@ -15,7 +15,7 @@ const PaymentOption = Joi.object({
   minerFee: Joi.number().integer().required(),
   decimals: Joi.number().integer().required(),
   selected: Joi.boolean().required()
-})
+}).label('PaymentOption')
 
 const PaymentOptions = Joi.object({
   time: Joi.date().required(),
@@ -23,25 +23,25 @@ const PaymentOptions = Joi.object({
   memo: Joi.string().optional().allow('', null),
   paymentUrl: Joi.string().required(),
   paymentId: Joi.string().required(),
-  paymentOptions: Joi.array().required().items(PaymentOption)
-})
+  paymentOptions: Joi.array().required().items(PaymentOption).label('PaymentOptions')
+}).label('PaymentOptionsResponse')
 
 const PaymentRequestHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).optional(),
   'x-content-type': Joi.string().pattern(/application\/payment-request/).optional()
-})
+}).label('PaymentRequestHeaders')
 
 const PaymentRequestReq = Joi.object({
   chain: Joi.string().required(),
   currency: Joi.string().required()
-})
+}).label('PaymentRequestRequest')
 
 const AuthHeaders = Joi.object({
   'digest': Joi.string().required(),
   'x-identity': Joi.string().required(),
   'x-signature-type': Joi.string().required(),
   'x-signature': Joi.string().required()
-})
+}).label('AuthHeaders')
 
 const PaymentRequest = Joi.object({
   time: Joi.date(),
@@ -52,13 +52,13 @@ const PaymentRequest = Joi.object({
   chain: Joi.string().required(),
   currency: Joi.string().required(),
   network: Joi.string().required(),
-  instructions: Joi.array()
-})
+  instructions: Joi.array().label('PaymentRequestInstructions')
+}).label('PaymentRequestResponse')
 
 const PaymentVerificationHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).optional(),
   'x-content-type': Joi.string().pattern(/application\/payment-verification/).optional()
-})
+}).label('PaymentVerificationHeaders')
 
 const PaymentVerificationReq = Joi.object({
   chain: Joi.string().required(),
@@ -67,7 +67,7 @@ const PaymentVerificationReq = Joi.object({
     weightedSize: Joi.number().optional()
   })),
   currency: Joi.string().required()
-})
+}).label('PaymentVerificationRequest')
 
 const PaymentVerification = Joi.object({
   payment: Joi.object({
@@ -78,12 +78,12 @@ const PaymentVerification = Joi.object({
     }))
   }),
   memo: Joi.string().optional().allow('', null)
-})
+}).label('PaymentVerificationResponse')
 
 const PaymentHeaders = Joi.object({
   'x-paypro-version': Joi.number().integer().greater(1).less(3).optional(),
   'x-content-type': Joi.string().pattern(/application\/payment/).optional()
-})
+}).label('PaymentHeaders')
 
 const Payment = Joi.object({
   payment: Joi.object({
@@ -101,7 +101,7 @@ const Payment = Joi.object({
     currency: Joi.string().required()
   }).required(),
   memo: Joi.string().optional().allow('', null)
-})
+}).label('PaymentResponse')
 
 export const Protocol = {
 

@@ -133,7 +133,7 @@ const Payment = Joi.object({
 
     amount: Joi.number().required()
 
-  })),
+  })).label('PaymentInstructionOutputs'),
 
   invoice: Joi.object({
 
@@ -145,19 +145,19 @@ const Payment = Joi.object({
 
   })
 
-})
+}).label('Payment')
 
 export const Schema = {
 
   showPayment: Joi.object({
 
-    payment: Payment
+    payment: Payment.required().label('ShowPaymentResponse')
 
   }),
 
   listPayments: Joi.object({
 
-    payments: Joi.array().items(Payment)
+    payments: Joi.array().items(Payment).label('ListPaymentsResponse')
 
   })
 

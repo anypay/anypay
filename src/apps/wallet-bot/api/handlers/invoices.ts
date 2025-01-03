@@ -114,13 +114,13 @@ export const schema = {
             address: Joi.string().required(),
             amount: Joi.number().required(),
             currency: Joi.string().required()
-        }).required(),
+        }).required().label('WalletBotCreatePaymentRequestTo'),
 
         options: Joi.object({
             webhook_url: Joi.string().optional(),
             memo: Joi.string().optional()
-        }).optional()
-    }),
+        }).optional().label('WalletBotCreatePaymentRequestOptions')
+    }).label('WalletBotCreatePaymentRequestParams'),
 
-    response: Joi.any()
+    response: Joi.any().label('WalletBotCreatePaymentRequestResponse')
 }

@@ -17,10 +17,10 @@ export async function attachRoutes(server: Server) {
         headers: Joi.object({
           'x-paypro-version': Joi.number().integer().optional(),
           'accept': Joi.string().pattern(/application\/payment-options/).required()
-        }).unknown(),
+        }).unknown().label('ListPaymentOptionsRequest'),
         params: Joi.object({
           uid: Joi.string().required()
-        }),
+        }).label('ListPaymentOptionsRequest'),
         failAction
       }
     },
@@ -40,10 +40,10 @@ export async function attachRoutes(server: Server) {
             Joi.string().pattern(/application\/payment-verification/).required(),
             Joi.string().pattern(/application\/payment/).required(),
           ]).required()
-        }).unknown(),
+        }).unknown().label('HandlePostRequest'),
         params: Joi.object({
           uid: Joi.string().required()
-        }),
+        }).label('HandlePostRequest'),
         failAction
       }
     },
@@ -63,10 +63,10 @@ export async function attachRoutes(server: Server) {
             Joi.string().pattern(/application\/payment-verification/).required(),
             Joi.string().pattern(/application\/payment/).required(),
           ]).required()
-        }),
+        }).label('HandlePostRequest'),
         params: Joi.object({
           uid: Joi.string().required()
-        }),
+        }).label('HandlePostRequest') ,
         failAction
       }
     },

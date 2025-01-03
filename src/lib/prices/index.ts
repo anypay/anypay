@@ -65,6 +65,11 @@ async function createConversion(inputAmount: Amount, outputCurrency: string): Pr
 
 async function convert(inputAmount: Amount, outputCurrency: string, precision: number = 2): Promise<Amount> {
 
+  console.log("CONVERT", {
+    inputAmount,
+    outputCurrency
+  })
+
   // Normalize input to USD if neither input or output is USD 
   if (inputAmount.currency !== 'USD' && outputCurrency !== 'USD') {
 

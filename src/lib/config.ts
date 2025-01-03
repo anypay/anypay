@@ -163,14 +163,20 @@ const variables: EnvironmentVariable[] = [
     default: 'wss://wss.anypayx.com'
   },
   {
-    key: 'JSONWEBTOKEN_PUBLIC_KEY_PATH',
-    required: false,
-    default: join(__dirname, '../config/jwt/jwtRS512.key.pub')
+    key: 'JWT_PUBLIC_KEY_PATH',
+    required: false
   },
   {
-    key: 'JSONWEBTOKEN_PRIVATE_KEY_PATH',
-    required: false,
-    default: join(__dirname, '../config/jwt/jwtRS512.key')
+    key: 'JWT_PRIVATE_KEY_PATH',
+    required: false
+  },
+  {
+    key: 'JWT_PUBLIC_KEY',
+    required: false
+  },
+  {
+    key: 'JWT_PRIVATE_KEY',
+    required: false
   },
   {
     key: 'EMAIL_SENDER',

@@ -17,7 +17,7 @@ export async function attachV1Routes(server: Server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        }).required(),
+        }).label('CreateAccountRequest'),
         failAction
       }
     },
@@ -33,7 +33,7 @@ export async function attachV1Routes(server: Server) {
         payload: Joi.object({
           email: Joi.string().email().required(),
           password: Joi.string().required()
-        }),
+        }).label('LoginRequest'),
         failAction
       },
     },
@@ -48,7 +48,7 @@ export async function attachV1Routes(server: Server) {
       validate: {
         payload: Joi.object({
           email: Joi.string().email().required()
-        }),
+        }).label('PasswordResetRequest'),
         failAction
       },
     },
@@ -94,7 +94,7 @@ export async function attachV1Routes(server: Server) {
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        }),
+        }).label('ListPaymentsRequest'),
         failAction
       },
       response: {
@@ -115,7 +115,7 @@ export async function attachV1Routes(server: Server) {
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        }),
+        }).label('ListLinkedAccountsRequest'),
         failAction
       }
     },
@@ -131,7 +131,7 @@ export async function attachV1Routes(server: Server) {
       validate: {
         payload: Joi.object({
           email: Joi.string().optional()
-        }),
+        }).label('CreateLinkedAccountRequest'),
         failAction
       }
     },
@@ -148,7 +148,7 @@ export async function attachV1Routes(server: Server) {
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        }),
+        }).label('ListLinkedAccountPaymentsRequest'),
         failAction
       }
     },
@@ -164,11 +164,11 @@ export async function attachV1Routes(server: Server) {
       validate: {
         params: Joi.object({
           account_id: Joi.number().required()
-        }),
+        }).label('ListLinkedAccountPaymentsRequest'),
         query: Joi.object({
           limit: Joi.number().optional(),
           offset: Joi.number().optional()
-        }),
+        }).label('ListLinkedAccountPaymentsRequest'),
         failAction
       },
       response: {
@@ -184,7 +184,13 @@ export async function attachV1Routes(server: Server) {
     path: '/v1/api/webhooks/{invoice_uid}/attempts',
     options: {
       tags: ['v1', 'webhooks'],
-      auth: "jwt"
+      auth: "jwt",
+      validate: {
+        params: Joi.object({
+          invoice_uid: Joi.string().required()
+        }).label('WebhookAttemptRequest'),
+        failAction
+      }
     },
     handler: v1.Webhooks.attempt
   }); 
@@ -209,14 +215,14 @@ export async function attachV1Routes(server: Server) {
           business_id: Joi.string().optional(),
           location_id: Joi.string().optional(),
           register_id: Joi.string().optional(),
-          metadata: Joi.object().optional(),
+          metadata: Joi.object().optional().label('CreateInvoiceMetadata'),
           required_fee_rate: Joi.string().allow(
             'fastestFee',
             'halfHourFee',
             'hourFee',
             'economyFee',
             'minimumFee'
-          ).optional()
+          ).optional().label('RequiredFeeRate')
         }).label('InvoiceRequest'),
         failAction
       }
@@ -260,10 +266,10 @@ export async function attachV1Routes(server: Server) {
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
-        }),
+        }).label('ListInvoiceEventsRequest'),
         query: Joi.object({
           order: Joi.string().valid('asc', 'desc').optional()
-        }),
+        }).label('ListInvoiceEventsRequest'),
         failAction
       },
       response: {
@@ -279,8 +285,8 @@ export async function attachV1Routes(server: Server) {
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required(),
             namespace: Joi.string().optional()
-          }))
-        }),
+          }).label('InvoiceEvent')).label('InvoiceEvents')
+        }).label('ListInvoiceEventsResponse'),
         failAction
       }
     }
@@ -295,10 +301,10 @@ export async function attachV1Routes(server: Server) {
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
-        }),
+        }).label('ListInvoiceEventsRequest'),
         query: Joi.object({
           order: Joi.string().valid('asc', 'desc').optional()
-        }),
+        }).label('ListInvoiceEventsRequest'),
         failAction
       },
       response: {
@@ -314,8 +320,8 @@ export async function attachV1Routes(server: Server) {
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required(),
             namespace: Joi.string().optional()
-          }))
-        }),
+          }).label('InvoiceEvent')).label('InvoiceEvents')
+        }).label('ListInvoiceEventsResponse'),
         failAction
       }
     }  });
@@ -340,8 +346,8 @@ export async function attachV1Routes(server: Server) {
             createdAt: Joi.date().required(),
             updatedAt: Joi.date().required(),
             namespace: Joi.string().optional()
-          }))
-        })
+          }).label('AccountEvent')).label('AccountEvents')
+        }).label('ListAccountEventsResponse'),
       }
     },
   });
@@ -358,7 +364,7 @@ export async function attachV1Routes(server: Server) {
           currency: Joi.string().required(),
           value: Joi.string().required(),
           label: Joi.string().optional()
-        }),
+        }).label('CreateAddressRequest'),
         failAction: 'log'
       },
       response: {
@@ -368,8 +374,8 @@ export async function attachV1Routes(server: Server) {
             currency: Joi.string().required(),
             value: Joi.string().required(),
             label: Joi.string().optional()
-          })
-        })
+          }).label('Address')
+        }).label('CreateAddressResponse')
       }
     },
     handler: v1.Addresses.update
@@ -384,7 +390,7 @@ export async function attachV1Routes(server: Server) {
       validate: {
         params: Joi.object({
           code: Joi.string().required()
-        }),
+        }).label('DeleteAddressRequest'),
         failAction
       },
       response: {
@@ -393,7 +399,7 @@ export async function attachV1Routes(server: Server) {
           address: Joi.object({
             success: Joi.boolean()
           })
-        })
+        }).label('DeleteAddressResponse')
       }
     },
     handler: v1.Addresses.remove
@@ -420,8 +426,8 @@ export async function attachV1Routes(server: Server) {
             supported: Joi.boolean().required(),
             wallet: Joi.string().optional(),
             note: Joi.string().optional()
-          }))
-        })
+          }).label('Address')).label('Addresses')
+        }).label('ListAddressesResponse')
       }
     },
     handler: v1.Addresses.index
@@ -449,8 +455,8 @@ export async function attachV1Routes(server: Server) {
             supported: Joi.boolean().required(),
             wallet: Joi.string().optional(),
             note: Joi.string().optional()
-          }))
-        })
+          }).label('Address')).label('Addresses')
+        }).label('ListAccountAddressesResponse')
       }
     },
     handler: v1.Addresses.index
@@ -470,8 +476,8 @@ export async function attachV1Routes(server: Server) {
             enabled: Joi.boolean().required(),
             price: Joi.number().required(),
             icon: Joi.string().required()
-          }))
-        })
+          }).label('Coin')).label('Coins' )
+        }).label('ListCoinsResponse')
       }
     },
     handler: v1.Coins.index
@@ -495,10 +501,10 @@ export async function attachV1Routes(server: Server) {
       validate: {
         query: Joi.object({
           error: Joi.string().required()
-        }).required(),
+        }).label('FailRequest'),  
         headers: Joi.object({
           'fail': Joi.string().required()
-        }),
+        }).label('FailHeaders'),
         //failAction
       }
     }
@@ -533,7 +539,7 @@ export async function attachV1Routes(server: Server) {
       validate: {
         payload: Joi.object({
           name: Joi.string()
-        })
+        }).label('UpdateCheckoutImageRequest'),
       }
     }
   })
@@ -557,7 +563,7 @@ export async function attachV1Routes(server: Server) {
       validate: {
         payload: Joi.object({
           search: Joi.string().required()
-        }),
+        }).label('SearchRequest'),
         failAction
       }
     }
@@ -573,7 +579,8 @@ export async function attachV1Routes(server: Server) {
       validate: {
         params: Joi.object({
           invoice_uid: Joi.string().required()
-        })
+        }).label('ShowRefundRequest'),
+        failAction
       },
       /*response: {
         schema: Joi.object({
@@ -597,7 +604,7 @@ export async function attachV1Routes(server: Server) {
         payload: Joi.object({
           chain: Joi.string().required(),
           transaction: Joi.string().required()
-        }),
+        }).label('CreateTransactionRequest'),
         failAction
       }
     },
@@ -619,15 +626,7 @@ export async function attachV1Routes(server: Server) {
     options: {
       tags: ['v1', 'api', 'prices'],
       response: {
-        schema: Joi.object({
-          prices: Joi.array().items(Joi.object({
-            currency: Joi.string().required(),
-            base: Joi.string().required(),
-            value: Joi.number().required(),
-            updatedAt: Joi.date().required(),
-            source: Joi.string().required() 
-          }).label('Price')).label('Prices')
-        }),
+        schema: PricesSchema,
         failAction
       }
     },
@@ -640,13 +639,23 @@ export async function attachV1Routes(server: Server) {
     options: {
       tags: ['v1', 'prices'],
       response: {
-        schema: Joi.object({
-        }),
+        schema: PricesSchema,
         failAction
       }
     },
   })
 
-
-
 }
+
+const PriceSchema = Joi.object({
+  currency: Joi.string().required(),
+  base: Joi.string().required(),
+  value: Joi.number().required(),
+  updatedAt: Joi.date().required(),
+  source: Joi.string().required() 
+}).label('Price')
+
+const PricesSchema = Joi.object({
+  prices: Joi.array().items(PriceSchema).label('Prices')
+}).label('PricesResponse')
+

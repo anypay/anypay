@@ -236,7 +236,16 @@ async function listAvailableAddresses(account: Account): Promise<Address[]> {
 // TODO: Only create options from existing options coins if options exist
 export async function createPaymentOptions(account: Account, invoice: Invoice): Promise<PaymentOption[]> {
 
+  console.log("CREATE PAYMENT OPTIONS", {
+    account,
+    invoice
+  })
+
   let addresses: Address[] = await listAvailableAddresses(account)
+
+  console.log("LISTED AVAILABLE ADDRESSES", {
+    addresses
+  })
 
   let unfilteredOptions: (PaymentOption | null )[] = await Promise.all(addresses.map(async (record: Address) => {
 
@@ -250,7 +259,7 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
       const coin = getCoin(currency)
 
       let { value: amount } = await convert({
-        currency: String(account.denomination),
+        currency: String(account.denomination || 'USD'),
         value: Number(value)
       }, currency, Number(coin?.precision));
 
