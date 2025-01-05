@@ -128,7 +128,8 @@ export default class BSV extends UTXO_Plugin {
       base_currency: 'USD',
       currency: this.currency, 
       chain: this.chain, 
-      source: 'gate.io'
+      source: 'gate.io',
+      change_24hr: parseFloat(data.percentChange)
     }
 
   }

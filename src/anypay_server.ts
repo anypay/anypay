@@ -3,6 +3,7 @@ import { WebhookServer } from "@/webhooks/server";
 import { Logger, log } from "@/lib/log";
 import { HttpApiServer } from "@/http_api_server";
 import prisma from '@/lib/prisma'
+import { AnypayWebsocketServer, buildServer } from "@/websockets/server";
 
 import { merge } from "ts-deepmerge";
 
@@ -79,6 +80,8 @@ export class AnypayServer {
         exchange: string
     }
   
+    websocket_server?: AnypayWebsocketServer;
+
     constructor(params: AnypayServerParams) {
 
       const props = merge(defaultAnypayServerProps, params) as AnypayServerProps
@@ -102,7 +105,7 @@ export class AnypayServer {
         },
         log: this.log
       })
-
+      
     }
   
     start() {
@@ -110,6 +113,10 @@ export class AnypayServer {
       this.webhook_server.start()
 
       this.http_api_server.start()
+
+      this.websocket_server = buildServer({ listener: this.http_api_server.server!.listener })
+
+      this.websocket_server.start()
 
     }
   }

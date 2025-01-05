@@ -58,45 +58,56 @@ export default class WebsocketClientSession {
         this.onOpen();
     }
 
-    async authenticate({ request }: { request: Request }) {
+    async authenticate({ request }: { request: Request }): Promise<{ account_id: number, app_id: number | null } | undefined> {
+        let token: string | undefined;
 
-        const [bearer, token] = request.headers.authorization?.split(' ') || [];
+        // Check Authorization header
+        const [bearer, headerToken] = request.headers.authorization?.split(' ') || [];
+        if (bearer === 'Bearer') {
+            token = headerToken;
+        }
 
-        if (bearer !== 'Bearer') {
+        // Check query parameter if no valid header token
+        if (!token) {
+            const url = new URL(request.url, `http://${request.headers.host}`);
+            token = url.searchParams.get('token') || undefined;
+        }
 
-            this.closeSession(new Error('invalid authorization header'));
+        if (!token) {
+            this.closeSession(new Error('no valid token provided'));
             return;
         }
 
         const accessToken = await prisma.access_tokens.findFirstOrThrow({
             where: {
-              uid: String(token)
+                uid: String(token)
             }
-          });
+        });
 
-          const account = await prisma.accounts.findFirstOrThrow({
+        const account = await prisma.accounts.findFirstOrThrow({
             where: {
-              id: accessToken.account_id
+                id: accessToken.account_id
             }   
-          })
+        });
 
-          if (accessToken.app_id) {
+        if (accessToken.app_id) {
             const app = await prisma.apps.findFirstOrThrow({
-              where: {
-                id: accessToken.app_id
-              }   
-            })
+                where: {
+                    id: accessToken.app_id
+                }   
+            });
 
             this.app_id = app.id;
+            this.subscribeToAppEvents();
+        }
 
-            this.subscribeToAppEvents()
-          }
-
-        
         this.account_id = account.id;
+        this.subscribeToAccountEvents();
 
-        this.subscribeToAccountEvents()
-        
+        return {
+            account_id: account.id,
+            app_id: accessToken.app_id
+        }
     }
 
     private subscribeToAccountEvents() {
