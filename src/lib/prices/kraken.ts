@@ -49,23 +49,38 @@ export async function getPrice(currency: string): Promise<UnsavedPrice> {
 
     var value: number;
 
+    var resultKey;
+
     if (data.result[pair]) {
 
       value = parseFloat(data.result[`${currency}USD`]['a'][0])
+
+      resultKey = pair
 
     } else if (data.result[`X${currency}ZUSD`]) {
 
       value = parseFloat(data.result[`X${currency}ZUSD`]['a'][0])
 
+      resultKey = `X${currency}ZUSD`
+
     } else if (data.result[`X${currency}USD`]) {
 
       value = parseFloat(data.result[`X${currency}USD`]['a'][0])
+
+      resultKey = `X${currency}USD`
 
     } else {
 
       throw new Error(`kraken pair ${pair} not supported`)
 
     }
+
+
+    const resultPair = data.result[resultKey]
+
+    const price_24hr_ago = parseFloat(resultPair['o'])
+
+    const price_change_24hr = (value - price_24hr_ago) / price_24hr_ago * 100
 
     if (currency === 'XDG') {
       currency = 'DOGE'
@@ -79,7 +94,8 @@ export async function getPrice(currency: string): Promise<UnsavedPrice> {
       base_currency: 'USD',
       currency,
       value,
-      source: 'kraken'
+      source: 'kraken',
+      change_24hr: price_change_24hr
     }
 
   } catch(error) {

@@ -30,6 +30,8 @@ export interface SetPrice {
 
   value: number;
 
+  change_24hr?: number;
+
   source: PriceSource;
 
   updatedAt?: Date;

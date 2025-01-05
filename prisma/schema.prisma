@@ -265,6 +265,7 @@ model PriceRecords {
   value         Decimal  @db.Decimal
   base_currency String   @db.VarChar(255)
   source        String   @db.VarChar(255)
+  change_24hr   Decimal? @db.Decimal
   createdAt     DateTime @db.Timestamptz(6)
   updatedAt     DateTime @db.Timestamptz(6)
 }
@@ -798,6 +799,7 @@ model prices {
   createdAt     DateTime @db.Timestamptz(6)
   updatedAt     DateTime @db.Timestamptz(6)
   source        String?  @db.VarChar(255)
+  change_24hr   Decimal? @db.Decimal
 }
 
 model products {

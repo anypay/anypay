@@ -1,7 +1,7 @@
 
 import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '@/lib/plugin'
 
-const xrpl =  require('xrpl')
+import { Client } from 'xrpl'
 
 import axios from 'axios'
 import { SetPrice } from '@/lib/prices/price'
@@ -26,7 +26,7 @@ export default class XRP extends Plugin {
 
   async getConfirmation(txid: string): Promise<Confirmation> {
 
-    const client = new xrpl.Client("wss://s1.ripple.com");
+    const client = new Client("wss://s1.ripple.com");
     await client.connect();
 
     const { result } = await client.request({
@@ -42,7 +42,7 @@ export default class XRP extends Plugin {
 
     const hash = ledgerResult.ledger_hash
 
-    const height = parseInt(ledgerResult.ledger_index)
+    const height = ledgerResult.ledger_index
 
     const timestamp = new Date(ledgerResult.ledger.close_time * 1000)
 
@@ -77,9 +77,18 @@ export default class XRP extends Plugin {
 
   }
 
-  async validateAddress(address: string) {
+  async validateAddress(address: string): Promise<boolean> {
 
-    return false
+    const client = new Client("wss://s1.ripple.com");
+    await client.connect();
+
+    const balance = await client.getXrpBalance(address)
+
+    console.log({ balance })
+
+    client.disconnect();
+
+    return parseFloat(balance) > 0
 
   }
 
@@ -100,7 +109,8 @@ export default class XRP extends Plugin {
       base_currency: 'USD',
       currency: this.currency, 
       chain: this.chain, 
-      source: 'gate.io'
+      source: 'gate.io',
+      change_24hr: parseFloat(data.percentChange)
     }
 
   }
