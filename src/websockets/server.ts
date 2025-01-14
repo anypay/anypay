@@ -25,7 +25,7 @@ import * as Hapi from '@hapi/hapi';
 import { Logger } from '@/lib/log'
 import { Request } from 'express'
 
-const RABBITMQ_URL = 'amqp://localhost'; // RabbitMQ connection URL
+const RABBITMQ_URL = process.env.AMQP_URL || 'amqp://localhost';
 
 export interface AnypayWebsocketServerParams {
     listener: Server
@@ -77,7 +77,18 @@ export class AnypayWebsocketServer {
                     log: this.props.log
                 });
 
-                await session.authenticate({ request })
+                const auth = await session.authenticate({ request })
+
+                if (!auth) {
+                    websocket.close(1008, 'Unauthorized');
+                    return;
+                }
+
+                // send message to the client
+                websocket.send(JSON.stringify({
+                    topic: 'websocket.authenticated',
+                    data: auth
+                }));
 
                 this.props.log.info('websocket.client.connected', { uid: session.uid });
 
@@ -103,7 +114,7 @@ export class AnypayWebsocketServer {
 
 }
 
-export async function buildServer({ listener }: { listener: Server }): Promise<AnypayWebsocketServer> {
+export function buildServer({ listener }: { listener: Server }): AnypayWebsocketServer {
 
     return new AnypayWebsocketServer({
         listener,
@@ -128,7 +139,7 @@ export async function startServer({ port, host }: {
         host
     });
 
-    const wsServer: AnypayWebsocketServer = await buildServer({ listener: server.listener });
+    const wsServer: AnypayWebsocketServer = buildServer({ listener: server.listener });
     
     wsServer.start()
     

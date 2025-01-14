@@ -89,6 +89,31 @@ async function handleInvoiceWebsocket(invoice_uid: string, socket: WebSocket, re
    
 }
 
+async function handlePricesWebsocket(socket: WebSocket, req: Request) {
+  await awaitChannel()
+
+  const queue = `websocket_price_events_${v4()}`
+
+  const actor = await Actor.create({
+    exchange,
+    routingkey: `price.updated`,
+    queue
+  })
+
+  actor.start(async (channel, msg, json) => {
+    socket.send(JSON.stringify(json))
+  });
+
+  socket.on('close', () => {            
+    actor.stop()
+    channel.deleteQueue(queue)
+  })
+
+  socket.on('error', () => {            
+    log.info('websocket.error', { socket })
+  })
+}
+
 export const plugin = (() => {
 
   return {
@@ -104,6 +129,8 @@ export const plugin = (() => {
       const port = Number(config.get('WEBSOCKETS_PORT')) || 5201
       
       const wsServer = new WebSocketServer({ port });
+
+      console.log("WEBSOCKETS SERVER STARTED")
 
       log.info('websockets.server.started', { port })
 
@@ -177,6 +204,10 @@ export const plugin = (() => {
           if (json.type === 'invoice.subscribe' && json.payload.uid) {
 
             handleInvoiceWebsocket(json.payload.uid, socket, request)
+
+          } else if (json.type === 'prices.subscribe') {
+
+            handlePricesWebsocket(socket, request)
 
           }
 

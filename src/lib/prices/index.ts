@@ -37,6 +37,7 @@ import prisma from '@/lib/prisma';
 import { Prisma } from '@prisma/client'
 
 import { coins as Coin } from '@prisma/client'
+import { publishEvent } from '../amqp';
 
 const MAX_DECIMALS = 8;
 
@@ -146,6 +147,7 @@ export async function setPrice(price: SetPrice): Promise<Price> {
         base_currency: price.base_currency,
         value: price.value,
         source: price.source,
+        change_24hr: price.change_24hr,        
         updatedAt: new Date(),
         createdAt: new Date()
       }
@@ -159,6 +161,8 @@ export async function setPrice(price: SetPrice): Promise<Price> {
       base_currency: price.base_currency,
       value: price.value,
       source: price.source,
+      // @ts-ignore
+      change_24hr: price.change_24hr,
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -173,11 +177,25 @@ export async function setPrice(price: SetPrice): Promise<Price> {
       data: {
         value: price.value,
         source: price.source,
+        // @ts-ignore
+        change_24hr: price.change_24hr,
         updatedAt: new Date()
       }
     })
 
   }
+
+  const updatedRecord = await prisma.prices.findFirst({
+    where: {
+      currency: price.currency,
+      base_currency: price.base_currency
+    }
+  })
+
+  publishEvent<{topic: string, payload: Price}>('price.updated', {
+    topic: 'price.updated',
+    payload: updatedRecord!
+  })
 
   return record;
 
@@ -193,7 +211,9 @@ export async function updateUSDPrices() {
       base_currency: price.currency,
       currency: 'USD',
       value: price.value,
-      source: String(price.source)
+      source: String(price.source),
+      // @ts-ignore
+      change_24hr: price.change_24hr
     })
 
   }))
@@ -204,7 +224,8 @@ export async function updateUSDPrices() {
       base_currency: price.currency,
       currency: price.base_currency,
       value: 1 / price.value,
-      source: String(price.source)
+      source: String(price.source),
+      change_24hr: price.change_24hr
     }
   })
   .map((price: SetPrice) => {
@@ -213,7 +234,8 @@ export async function updateUSDPrices() {
       base_currency: price.currency,
       currency: 'USD',
       value: price.value,
-      source: String(price.source)
+      source: String(price.source),
+      change_24hr: price.change_24hr
     })
 
   }));
@@ -250,7 +272,8 @@ export async function setAllCryptoPrices() {
         base_currency: 'USD',
         currency: result.currency,
         value: Number(result.value),
-        source: String(result.source)  
+        source: String(result.source),
+        change_24hr: result.change_24hr
       })
 
     } catch(error) {
@@ -265,7 +288,8 @@ export async function setAllCryptoPrices() {
     base_currency: 'USD',
     currency: 'USDC',
     value: 1,
-    source: 'hardcoded'  
+    source: 'hardcoded',
+    change_24hr: 0
   })
 
   // TODO: Fetch USDT price from exchange
@@ -273,7 +297,8 @@ export async function setAllCryptoPrices() {
     base_currency: 'USD',
     currency: 'USDT',
     value: 1,
-    source: 'hardcoded'  
+    source: 'hardcoded',
+    change_24hr: 0
   })
 
 }
