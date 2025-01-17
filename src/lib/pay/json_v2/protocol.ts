@@ -83,8 +83,6 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
       if (!verified) {
 
-        console.log({ paymentOption })      
-
         log.info(`pay.jsonv2.${chain}.${payment.currency}.verifyPayment.failed`, {
           invoice_uid: invoice.uid,
           transaction,
