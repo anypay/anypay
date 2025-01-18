@@ -44,7 +44,7 @@ export async function attachRoutes(server: Server) {
         params: Joi.object({
           uid: Joi.string().required()
         }).label('HandlePostRequest'),
-        failAction
+        failAction: 'log'
       }
     },
   });
@@ -67,7 +67,7 @@ export async function attachRoutes(server: Server) {
         params: Joi.object({
           uid: Joi.string().required()
         }).label('HandlePostRequest') ,
-        failAction
+        failAction: 'log'
       }
     },
   });

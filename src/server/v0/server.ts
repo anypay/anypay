@@ -400,10 +400,12 @@ async function NewServer(): Promise<Hapi.Server> {
             secret: Joi.string().optional(),
             metadata: Joi.object().optional().label('CreatePaymentRequestMetadata')
           }).optional().label('CreatePaymentRequestOptions')
-        }).label('CreatePaymentRequest')
+        }).label('CreatePaymentRequestParams'),
+        failAction: 'log'
       },
       response: {
-        schema: InvoiceResponseSchema
+        schema: InvoiceResponseSchema,
+        failAction: 'log'
       }
     }
   })

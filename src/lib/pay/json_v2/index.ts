@@ -131,10 +131,10 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
     return [{
       "amount": amount.times(100000000).toNumber(),
       "address": address
-    }, {
+    }/*, {
       "amount": fee.amount,
       "address": fee.address
-    }]
+    }*/]
 
   }
 
