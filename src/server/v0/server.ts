@@ -213,27 +213,15 @@ async function NewServer(): Promise<Hapi.Server> {
     }
   })
 
-  console.log("SERVER REGISTERING BASIC")
-
   await server.register(HapiBasic);
-
-  console.log("SERVER REGISTERING INERT")
 
   await server.register(Inert);
 
-  console.log("SERVER REGISTERING VISION")
-
   await server.register(Vision);
-
-  console.log("SERVER REGISTERING BOOM DECORATORS")
 
   await server.register(HapiBoomDecorators)
 
-  console.log("SERVER REGISTERING PROMSTER")
-
   await server.register(promsterPlugin())
-
-  console.log("SERVER REGISTERING SENTRY")
 
   if (config.get('SENTRY_DSN')) {
 

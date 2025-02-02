@@ -312,7 +312,8 @@ export async function show(request: Request | AuthenticatedRequest, h: ResponseT
       })
 
       const responseInvoice: any = {
-        amount: invoice.amount,
+        // if invoice.amount is a string, convert it to a number
+        amount: parseFloat(String(invoice.amount)),
         currency: invoice.currency,
         status: invoice.status,
         uid: invoice.uid,

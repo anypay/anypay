@@ -229,17 +229,61 @@ export async function attachV1Routes(server: Server) {
     }
   });
 
+  const OutputSchema = Joi.object({
+    amount: Joi.number().required(),
+    address: Joi.string().required()
+  }).label('Output');
+
+  const InstructionSchema = Joi.object({
+    type: Joi.string().required(),
+    requiredFeeRate: Joi.number().required(),
+    outputs: Joi.array().items(OutputSchema).required()
+  }).label('Instruction');
+
+  const PaymentOptionSchema = Joi.object({
+    time: Joi.date().iso().required(),
+    expires: Joi.date().iso().required(),
+    memo: Joi.string().allow(null),
+    paymentUrl: Joi.string().uri().required(),
+    paymentId: Joi.string().required(),
+    chain: Joi.string().required(),
+    currency: Joi.string().required(),
+    network: Joi.string().required(),
+    instructions: Joi.array().items(InstructionSchema).required()
+  }).label('PaymentOption');
+
+  const InvoiceSchema = Joi.object({
+    amount: Joi.number().required().strict(),
+    currency: Joi.string().required(),
+    status: Joi.string().required(),
+    uid: Joi.string().required(),
+    uri: Joi.string().required(),
+    createdAt: Joi.date().iso().required(),
+    expiresAt: Joi.date().iso().allow(null),
+    payment_options: Joi.array().items(PaymentOptionSchema).required(),
+    notes: Joi.array().items(Joi.string()).required()
+  }).label('Invoice');
+
+  const InvoiceResponseSchema = Joi.object({
+    invoice: InvoiceSchema.required()
+  }).label('InvoiceResponse');
+
   server.route({
-    method: "GET",
-    path: "/v1/api/invoices/{invoice_uid}",
-    handler: v1.Invoices.show,
+    method: 'GET',
+    path: '/v1/api/invoices/{uid}',
     options: {
       tags: ['v1', 'invoices'],
-      auth: "jwt",
       validate: {
-        failAction
+        params: Joi.object({
+          uid: Joi.string().required()
+        }).label('GetInvoiceParams')
+      },
+      response: {
+        schema: InvoiceResponseSchema,
+        failAction: 'log'
       }
     },
+    handler: v1.Invoices.show
   });
 
   server.route({

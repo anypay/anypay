@@ -62,7 +62,8 @@ export async function show(request: Request, h: ResponseToolkit) {
     } = {
       invoice: {
         currency: String(invoice.currency),
-        amount: Number(invoice.amount),
+        // if invoice.amount is a string, convert it to a number
+        amount: parseFloat(String(invoice.amount)),
         status: invoice.status,
         createdAt: invoice.createdAt
       }
