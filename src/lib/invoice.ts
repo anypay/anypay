@@ -23,8 +23,6 @@ import { accounts as Account } from '@prisma/client'
 
 import moment from 'moment';
 
-import * as pay from '@/lib/pay';
-
 import * as _ from 'underscore';
 
 import { log } from '@/lib/log'
@@ -276,30 +274,10 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
 
       let outputs = []
 
-      let fee = await pay.fees.getFee(String(currency), paymentAmount)
-
-      if (!['MATIC', 'ETH', 'AVAX'].includes(String(chain))) { // multiple outputs disallowed
-
-        paymentAmount = new BigNumber(paymentAmount).minus(fee.amount).toNumber();
-
-        outputs.push({
-          address,
-          amount: paymentAmount
-        })
-
-        outputs.push({
-          address: fee.address,
-          amount: fee.amount
-        })
-
-      } else {
-
-        outputs.push({
-          address,
-          amount: paymentAmount
-        })
-
-      }
+      outputs.push({
+        address,
+        amount: paymentAmount
+      })
 
       let uri = computeInvoiceURI({
         currency: String(currency),
@@ -321,7 +299,6 @@ export async function createPaymentOptions(account: Account, invoice: Invoice): 
           address,
           outputs,
           uri,
-          fee: fee.amount,
           createdAt: new Date(),
           updatedAt: new Date()
         }

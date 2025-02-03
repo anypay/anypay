@@ -14,8 +14,6 @@ import { nameFromCode } from '@/lib/pay/currencies';
 
 import { BigNumber } from 'bignumber.js';
 
-import { getFee, Fee } from '@/lib/pay/fees';
-
 import { getBaseURL } from '../environment';
 
 import { getRequiredFeeRate } from '../required_fee_rate'
@@ -115,12 +113,6 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
       throw new Error('address is required if outputs are not explicitly provided')
     }
 
-    let fee: Fee = await getFee(paymentOption.currency);
-
-    if (paymentOption.fee) {
-      fee.amount = paymentOption.fee;
-    }
-
     let amount = new BigNumber(Number(paymentOption.amount));
     var address = paymentOption.address;
 
@@ -131,9 +123,6 @@ export async function buildOutputs(paymentOption: PaymentOption): Promise<JsonV2
     return [{
       "amount": amount.times(100000000).toNumber(),
       "address": address
-    }, {
-      "amount": fee.amount,
-      "address": fee.address
     }]
 
   }
