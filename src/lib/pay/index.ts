@@ -410,7 +410,7 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
   
   const paymentRecord = await prisma.payments.create({
     data: {
-      txid,
+      txid: transaction.txid || txid,
       currency,
       chain: chain || currency,
       txhex: txhex,
@@ -427,7 +427,7 @@ export async function completePayment(paymentOption: { id?: any; amount?: any; c
     where: { id: invoice.id },
     data: {
       address: paymentOption.address,
-      hash: txid,
+      hash: transaction.txid || txid,
       status: confirming ? 'confirming' : 'paid',
       paidAt: new Date(),
       complete: true,

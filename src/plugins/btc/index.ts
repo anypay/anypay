@@ -19,7 +19,8 @@
 require('dotenv').config()
 const btc = require('bitcore-lib')
 
-const bitcoinJsLib = require('bitcoinjs-lib')
+import * as bitcoin from 'bitcoinjs-lib';
+
 
 import {
   blockchair,
@@ -28,13 +29,14 @@ import {
   nownodes
 } from '@/lib'
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Payment } from '@/lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Payment, ValidateUnsignedTx } from '@/lib/plugin'
 
 import * as bitcoind_rpc from '@/plugins/btc/bitcoind_rpc'
 
 import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '@/lib/plugins/utxo'
+import { buildOutputs, verifyOutput } from '@/lib/pay';
 
 export default class BTC extends UTXO_Plugin {
 
@@ -54,6 +56,40 @@ export default class BTC extends UTXO_Plugin {
 
   async getPayments(txid: string): Promise<Payment[]> {
     throw new Error() //TODO
+  }
+
+  async parsePayments({txhex}: Transaction): Promise<Payment[]> {
+
+    console.log("BTC Plugin parsePayments")
+
+    const tx = bitcoin.Transaction.fromHex(txhex);
+    
+    const txOutputs = tx.outs.map(output => {
+
+      console.log("BTC Plugin parsePayments output", output)
+      try {
+        // Get address from output script
+        const address = bitcoin.address.fromOutputScript(
+          output.script,
+          bitcoin.networks.bitcoin
+        );
+
+        console.log("BTC Plugin parsePayments address", address)
+  
+        return {
+          address: address.toString(),
+          amount: output.value,
+          currency: this.currency,
+          chain: this.chain,
+          txid: tx.getId()
+        };
+      } catch(error) {
+        return null;
+      }
+    })
+    .filter((n): n is Payment => n !== null);
+  
+    return txOutputs;
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
@@ -99,7 +135,7 @@ export default class BTC extends UTXO_Plugin {
 
     try {
 
-      bitcoinJsLib.address.toOutputScript(address, bitcoinJsLib.networks.bitcoin)
+      bitcoin.address.toOutputScript(address, bitcoin.networks.bitcoin)
 
       return true
 
@@ -116,6 +152,54 @@ export default class BTC extends UTXO_Plugin {
     return { txhex: '' } //TODO
   }
 
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
+    // Parse the transaction
+    const tx = bitcoin.Transaction.fromHex(params.transactions[0].txhex);
+    
+    // Get outputs from transaction
+    const txOutputs = tx.outs.map(output => {
+      try {
+        const address = bitcoin.address.fromOutputScript(
+          output.script,
+          bitcoin.networks.bitcoin
+        );
+
+        return {
+          address,
+          amount: output.value
+        };
+      } catch(error) {
+        return null;
+      }
+    }).filter((n): n is { address: string, amount: number } => n !== null);
+
+    // Build expected outputs
+    const buildOutputsParams = {
+      chain: params.paymentOption.chain as string,
+      currency: params.paymentOption.currency,
+      address: params.paymentOption.address as string,
+      amount: Number(params.paymentOption.amount),
+      fee: Number(params.paymentOption.fee),
+      outputs: params.paymentOption.outputs as any[],
+      invoice_uid: params.paymentOption.invoice_uid
+    };
+
+    const expectedOutputs = await buildOutputs(buildOutputsParams, 'JSONV2');
+
+    // Verify each expected output exists in transaction
+    for (const output of expectedOutputs) {
+      const address = output.script ? 
+        bitcoin.address.fromOutputScript(
+          Buffer.from(output.script, 'hex'),
+          bitcoin.networks.bitcoin
+        ) : 
+        output.address;
+
+      verifyOutput(txOutputs, address, output.amount);
+    }
+
+    return true;
+  }
 
 }
 

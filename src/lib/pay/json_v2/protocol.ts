@@ -71,7 +71,7 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
     let plugin: Plugin = find({ chain, currency })
 
-    for (const transaction of payment.transactions) {
+    for (let transaction of payment.transactions) {
 
       const verify: Function = plugin.verifyPayment ? plugin.verifyPayment.bind(plugin) : verifyPayment
 
@@ -112,6 +112,30 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
           }
         })
 
+      } else if (paymentOption.chain === 'XRP') {
+
+        response = await plugin.broadcastTx(transaction)
+
+        console.log("XRP Plugin broadcastTx response 22", response)
+
+        transaction.txid = response.txid
+
+        const updateParams = {
+          where: {
+            id: invoice.id
+          },
+          data: {
+            hash: String(response.txid),
+            updatedAt: new Date()
+          }
+        }
+
+        console.log("XRP Plugin updateParams", updateParams)
+
+        const updateResult = await prisma.invoices.update(updateParams)
+
+        console.log("XRP Plugin updateResult", updateResult)
+
       } else {
 
         response = await plugin.broadcastTx(transaction)
@@ -148,11 +172,17 @@ export async function submitPayment(payment: SubmitPaymentRequest): Promise<Subm
 
         createAndSendWebhook('payment.confirming', webhookPayload)
 
-      } else if (['ETH', 'MATIC', 'AVAX', 'SOL', 'XRP', 'XLM'].includes(paymentOption.chain)) {
+      } else if (['ETH', 'MATIC', 'AVAX', 'SOL', 'XLM'].includes(paymentOption.chain)) {
 
         paymentRecord = await completePayment(paymentOption, transaction, true)
 
         log.info('payment.confirming', paymentRecord);
+
+      } else if (paymentOption.chain === 'XRP') {
+
+        paymentRecord = await completePayment(paymentOption, transaction, false)
+
+        log.info('payment.confirmed', paymentRecord);
          
       } else {
 

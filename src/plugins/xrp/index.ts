@@ -1,10 +1,9 @@
-
 import { Plugin, BroadcastTx, BroadcastTxResult, Confirmation, Transaction, Payment } from '@/lib/plugin'
-
-import { Client } from 'xrpl'
 
 import axios from 'axios'
 import { SetPrice } from '@/lib/prices/price'
+import BigNumber from 'bignumber.js'
+import { decode, BroadcastClient, Client } from 'xrpl'
 
 //TODO: FinishPluginImplementation
 
@@ -14,13 +13,40 @@ export default class XRP extends Plugin {
 
   currency = 'XRP'
 
-  decimals = 0 //TODO
+  decimals = 6
+
+  toSatoshis = (decimal: number) => {
+    return parseInt(new BigNumber(decimal).times(10 ** this.decimals).toNumber().toFixed(0))
+  }
 
   async parsePayments(transaction: Transaction): Promise<Payment[]> {
-    throw new Error() //TODO
+    if (!transaction.txhex) {
+      throw new Error('Transaction hex required for parsing XRP payments')
+    }
+
+    const decoded = decode(transaction.txhex)
+    
+    // Only handle Payment type transactions
+    if (decoded.TransactionType !== 'Payment') {
+      return []
+    }
+
+    // Convert from drops to XRP (1 XRP = 1,000,000 drops)
+    const amount = Number(decoded.Amount)
+
+    return [{
+      txid: decoded.TxnSignature as string,
+      currency: this.currency,
+      chain: this.chain,
+      amount,
+      address: decoded.Destination as string
+    }]
   }
 
   async getPayments(txid: string): Promise<Payment[]> {
+
+    console.log("XRP Plugin getPayments", txid)
+
     throw new Error() //TODO
   }
 
@@ -66,7 +92,26 @@ export default class XRP extends Plugin {
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {
 
-    throw new Error()//TODO
+    console.log("XRP Plugin broadcastTx", txhex)
+
+    const broadcastClient = new BroadcastClient(['wss://s1.ripple.com'])
+
+    await broadcastClient.connect()
+
+    const broadcastResult = await broadcastClient.submit(txhex)
+
+    console.log("XRP Plugin broadcastTx result", broadcastResult)
+
+    if (broadcastResult.result.engine_result !== 'tesSUCCESS') {
+      throw new Error('XRP broadcastTx consensus failed')
+    }
+
+    return {
+      txid: broadcastResult!.result!.tx_json!.hash!,
+      txhex,
+      success: true,
+      result: broadcastResult!.result!.tx_json!
+    }
 
   }
 
@@ -92,10 +137,42 @@ export default class XRP extends Plugin {
 
   }
 
-  async verifyPayment(param: any) {
+  async verifyPayment({ paymentOption, transaction }: { 
+    paymentOption: any, 
+    transaction: { txhex: string }
+  }): Promise<boolean> {
+    try {
+      // Parse the actual payments from the transaction
+      const payments = await this.parsePayments({
+        txhex: transaction.txhex
+      });
 
-    return false
+      console.log("XRP Plugin verifyPayment payments", payments)
 
+      if (payments.length === 0) {
+        return false;
+      }
+
+      // Get the expected output from payment option
+      const expectedOutput = paymentOption.outputs[0];
+      const payment = payments[0];
+
+      // Verify destination address matches
+      if (payment.address !== expectedOutput.address) {
+        return false;
+      }
+
+      // Verify amount matches
+      if (payment.amount !== expectedOutput.amount) {
+        return false;
+      }
+
+      return true;
+
+    } catch (error) {
+      console.error('XRP verify payment error:', error);
+      return false;
+    }
   }
 
   async getPrice(): Promise<SetPrice> {

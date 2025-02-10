@@ -214,6 +214,8 @@ export abstract class Plugin extends AbstractPlugin {
 
   async parsePayments({txhex}: Transaction): Promise<Payment[]> {
 
+    console.log("Plugin parsePayments")
+
     let tx = new this.bitcore.Transaction(txhex);
 
     let txOutputs = tx.outputs.map((output: { script: any; satoshis: any }) => {
