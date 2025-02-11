@@ -195,26 +195,9 @@ export default class BTC extends UTXO_Plugin {
     return { txhex: '' } //TODO
   }
 
-  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {
-    // Parse the transaction
-    const tx = bitcoin.Transaction.fromHex(params.transactions[0].txhex);
-    
+  async validateUnsignedTx(params: ValidateUnsignedTx): Promise<boolean> {    
     // Get outputs from transaction
-    const txOutputs = tx.outs.map(output => {
-      try {
-        const address = bitcoin.address.fromOutputScript(
-          output.script,
-          bitcoin.networks.bitcoin
-        );
-
-        return {
-          address,
-          amount: output.value
-        };
-      } catch(error) {
-        return null;
-      }
-    }).filter((n): n is { address: string, amount: number } => n !== null);
+    const payments = await this.parsePayments({ txhex: params.transactions[0].txhex })
 
     // Build expected outputs
     const buildOutputsParams = {
@@ -238,7 +221,7 @@ export default class BTC extends UTXO_Plugin {
         ) : 
         output.address;
 
-      verifyOutput(txOutputs, address, output.amount);
+      verifyOutput(payments, address, output.amount);
     }
 
     return true;
