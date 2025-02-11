@@ -27,5 +27,24 @@ describe('BTC Plugin', () => {
         }
       ])
     })
+
+    it('should parse payment to specific Taproot address', async () => {
+      const plugin = new BTC()
+      
+      const tx: Transaction = {
+        txhex: '02000000000101e4c0fc53c8e58a50d8699e796dcc9ecffcdcf5d4266e15b1e82e403dfcd768b70100000000fdffffff0119130000000000002251206807819ba761b4827a9b4b5323d43cb9929bd520aeaf14583a919ad7b25883490140d8cf50ff4f30a008237a975d426afce3ed296448d0232575aff4c8544d6fdd6c3705b26d13d2956f5373cac75fecf23cdb3910efffbed353061b2ac9d06d3998be0f0c00'
+      }
+
+      const payments = await plugin.parsePayments(tx)
+
+      expect(payments).toEqual([
+        {
+          address: 'bc1pdqrcrxa8vx6gy75mfdfj84puhxffh4fq46h3gkp6jxdd0vjcsdyspfxcv6',
+          amount: 4889,
+          chain: 'BTC',
+          currency: 'BTC'
+        },
+      ])
+    })
   })
 }) 

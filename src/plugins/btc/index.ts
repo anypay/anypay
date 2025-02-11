@@ -21,6 +21,7 @@ const btc = require('bitcore-lib')
 
 import * as bitcoin from 'bitcoinjs-lib';
 
+import { Address, Script } from '@cmdcode/tapscript'
 
 import {
   blockchair,
@@ -58,21 +59,64 @@ export default class BTC extends UTXO_Plugin {
     throw new Error() //TODO
   }
 
+  getTaprootAddressFromOutput(outputScript: Buffer): string | null {
+
+    try {      
+
+      console.log("getTaprootAddressFromOutput", outputScript)
+      const script = Script.decode(outputScript)
+
+      if (script[0] === 'OP_1') {
+        const scriptPubKey = script[1]
+
+        const address = Address.p2tr.fromPubKey(scriptPubKey)
+
+        if (address) {
+          return address.toString()
+        }
+
+        return null
+      }
+
+      console.log("getTaprootAddressFromOutput script", script)
+      const address = Address.fromScriptPubKey(outputScript)
+
+      if (address) {
+        return address.toString()
+      } else {
+        return null
+      }
+
+    } catch(error) {
+
+      console.error("getTaprootAddressFromOutput error", error)
+
+      return null
+    }
+
+  }
+  
+
   async parsePayments({txhex}: Transaction): Promise<Payment[]> {
 
     console.log("BTC Plugin parsePayments")
 
     const tx = bitcoin.Transaction.fromHex(txhex);
     
-    const txOutputs = tx.outs.map(output => {
+    const txOutputs = tx.outs.map((output) => {
 
       console.log("BTC Plugin parsePayments output", output)
       try {
+
+        let address = this.getTaprootAddressFromOutput(output.script)
+      
         // Get address from output script
-        const address = bitcoin.address.fromOutputScript(
-          output.script,
-          bitcoin.networks.bitcoin
-        );
+        if (!address) {
+          address = bitcoin.address.fromOutputScript(
+            output.script,
+            bitcoin.networks.bitcoin
+          );
+        }
 
         console.log("BTC Plugin parsePayments address", address)
   
@@ -87,9 +131,8 @@ export default class BTC extends UTXO_Plugin {
         return null;
       }
     })
-    .filter((n): n is Payment => n !== null);
   
-    return txOutputs;
+    return txOutputs.filter((n): n is Payment => n !== null);
   }
 
   async broadcastTx({ txhex }: BroadcastTx): Promise<BroadcastTxResult> {

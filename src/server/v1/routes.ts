@@ -655,6 +655,23 @@ export async function attachV1Routes(server: Server) {
   });
 
   server.route({
+    method: "POST",
+    path: "/v1/api/transactions/decode",
+    handler: v1.Transactions.decode,
+    options: {
+      tags: ['api', 'v1', 'transactions'],
+      validate: {
+        payload: Joi.object({
+          currency: Joi.string().required(),
+          chain: Joi.string().required(),
+          txhex: Joi.string().required()
+        }).label('DecodeTransactionRequest'),
+        failAction
+      }
+    },
+  });
+
+  server.route({
     method: 'POST',
     path: '/api/v1/blockcypher/webhooks',
     handler: v1.BlockcypherWebhooks.create,
