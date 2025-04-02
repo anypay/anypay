@@ -94,11 +94,7 @@ export async function publishEvent<T>(routingKey: string, event: T) {
 
   const { payload, topic } = (event as {topic: string, payload: any})
 
-
-
   publish(routingKey, event as any)
-
-  console.log("PUBLISHED", event)
 
   if (payload.app_id) {
     publish(`apps.${payload.app_id}.events`, event as any)

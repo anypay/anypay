@@ -103,6 +103,7 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
         redirect_url?: string;
         secret?: string;
         metadata?: any;
+        fee_rate_level?: string;
       
       } = {
       }
@@ -118,6 +119,8 @@ export async function create(request: AuthenticatedRequest, h: ResponseToolkit) 
         update.secret = payload.options.secret
 
         update.metadata = payload.options.metadata
+
+        update.fee_rate_level = payload.options.fee_rate_level
 
       }
 

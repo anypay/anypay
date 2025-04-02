@@ -51,12 +51,13 @@ interface EmptyInvoiceOptions {
   secret?: string;
   metadata?: any;
   memo?: string;
+  fee_rate_level?: string;
   redirect_url?: string;
 }
 
 export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOptions) {
 
-  var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url } = options
+  var { uid, currency, amount, webhook_url, memo, secret, metadata, redirect_url, fee_rate_level } = options
 
   uid = !!uid ? uid : shortid.generate();
 
@@ -83,6 +84,7 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
     currency,
     amount,
     webhook_url,
+    fee_rate_level,
     memo,
     secret,
     metadata,
@@ -102,6 +104,7 @@ export async function createEmptyInvoice(app_id: number, options: EmptyInvoiceOp
       secret,
       metadata,
       redirect_url,
+      fee_rate_level,
       createdAt: new Date(),
       updatedAt: new Date(),
       status: 'unpaid'

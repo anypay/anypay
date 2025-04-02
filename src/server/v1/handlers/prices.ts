@@ -1,4 +1,3 @@
-
 import { badRequest } from '@hapi/boom'
 
 import { listPrices, getPriceHistory } from '@/lib/prices'
@@ -19,7 +18,8 @@ export async function index() {
         return {
           currency,
           base_currency,
-          value,
+          // Parse the value to ensure it's a number, not a string
+          value: parseFloat(value.toString()),
           updatedAt,
           source
         }

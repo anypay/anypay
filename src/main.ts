@@ -1,4 +1,3 @@
-
 require('dotenv').config()
 
 import { config } from '@/lib'
@@ -12,6 +11,8 @@ import { start as startFees } from '@/actors/detect_fees/actor'
 import { start as refunds } from '@/actors/refunds/actor'
 
 import { startConfirmingTransactions } from '@/lib/confirmations'
+
+import { startBlockbookClient } from '@/lib/blockbook'
 
 import prisma from '@/lib/prisma';
 
@@ -77,6 +78,9 @@ import { initialize } from './initializers'
     startConfirmingTransactions()
 
   }
+
+  // Start Blockbook client if configured
+  await startBlockbookClient();
 
 })()
 

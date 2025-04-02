@@ -27,6 +27,7 @@ import USDT_AVAX from '@/plugins/usdt.avax'
 import USDT_MATIC from '@/plugins/usdt.matic'
 import USDT_ETH from '@/plugins/usdt.eth'
 import USDT_SOL from '@/plugins/usdt.sol'
+import FB from '@/plugins/fb'
 
 export const plugins: Plugins = {
   BTC: new BTC(),
@@ -49,5 +50,6 @@ export const plugins: Plugins = {
   'USDT.AVAX': new USDT_AVAX(),
   'USDT.MATIC': new USDT_MATIC(),
   'USDT.ETH': new USDT_ETH(),
-  'USDT.SOL': new USDT_SOL()  
+  'USDT.SOL': new USDT_SOL(),
+  FB: new FB()  
 }

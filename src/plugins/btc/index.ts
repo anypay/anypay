@@ -30,7 +30,7 @@ import {
   nownodes
 } from '@/lib'
 
-import { BroadcastTxResult, BroadcastTx, Transaction, Payment, ValidateUnsignedTx } from '@/lib/plugin'
+import { BroadcastTxResult, BroadcastTx, Transaction, Payment, ValidateUnsignedTx, Confirmation } from '@/lib/plugin'
 
 import * as bitcoind_rpc from '@/plugins/btc/bitcoind_rpc'
 
@@ -38,6 +38,9 @@ import oneSuccess from 'promise-one-success'
 
 import UTXO_Plugin from '@/lib/plugins/utxo'
 import { buildOutputs, verifyOutput } from '@/lib/pay';
+
+import axios from 'axios';
+import { log } from '@/lib/log';
 
 export default class BTC extends UTXO_Plugin {
 
@@ -225,6 +228,34 @@ export default class BTC extends UTXO_Plugin {
     }
 
     return true;
+  }
+
+  async getConfirmation(txid: string): Promise<Confirmation | null> {
+    try {
+      const response = await axios.get(
+        `https://mempool.space/api/tx/${txid}`
+      );
+
+      console.log("BTC Plugin getConfirmation response", response.data)
+
+      const { status } = response.data;
+
+      if (!status.confirmed) {
+        log.info('Transaction not yet confirmed', { txid });
+        return null;
+      }
+
+      return {
+        confirmation_hash: status.block_hash,
+        confirmation_height: status.block_height,
+        confirmation_date: new Date(status.block_time * 1000), // Convert Unix timestamp to Date
+        confirmations: 1 // Mempool API doesn't return confirmations count
+      };
+
+    } catch (error) {
+      log.error('Error getting BTC confirmation', error);
+      return null;
+    }
   }
 
 }

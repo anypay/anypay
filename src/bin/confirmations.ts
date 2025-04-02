@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node --require ts-node/register --require tsconfig-paths/register 
 /*
     This file is part of anypay: https://github.com/anypay/anypay
     Copyright (c) 2017 Anypay Inc, Steven Zeiler
@@ -82,8 +82,6 @@ program
 
   });
 
-
-
 program
   .command('confirm-payment <txid>')
   .action(async (txid) => {
@@ -146,6 +144,3 @@ program
  
 program
   .parse(process.argv);
-
-
-

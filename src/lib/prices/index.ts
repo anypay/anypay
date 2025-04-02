@@ -249,6 +249,7 @@ export async function setAllCryptoPrices() {
 
   prices.push(getPrice({ chain: 'BSV', currency: 'BSV' }))
   prices.push(getPrice({ chain: 'XRP', currency: 'XRP' }))
+  prices.push(getPrice({ chain: 'FB', currency: 'FB' }))
 
   prices.push(kraken.getPrice('XMR'))
   prices.push(kraken.getPrice('DASH'))

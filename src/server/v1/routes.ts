@@ -2,6 +2,7 @@ require('dotenv').config()
 
 import { Server } from '@hapi/hapi';
 import { v1, failAction } from '@/server/handlers'
+import * as routes from '@/server/routes'
 
 import * as Joi from 'joi'
 
@@ -705,6 +706,8 @@ export async function attachV1Routes(server: Server) {
       }
     },
   })
+
+  server.route(routes.invoiceConfirm)
 
 }
 

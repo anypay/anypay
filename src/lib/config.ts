@@ -411,6 +411,18 @@ const variables: EnvironmentVariable[] = [
   {
     key: 'PROMETHEUS_PASSWORD',
     required: false
+  },
+  {
+    key: 'BLOCKBOOK_WS_URL',
+    required: false
+  },
+  {
+    key: 'BLOCKBOOK_API_KEY',
+    required: false
+  },
+  {
+    key: 'BLOCKBOOK_HTTP_URL',
+    required: false
   }
 ]
 

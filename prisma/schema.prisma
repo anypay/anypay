@@ -709,6 +709,8 @@ model invoices {
   register_id                  String?                @db.VarChar(255)
   memo                         String?                @db.VarChar(255)
   fee_rate_level               String?                @default("fastestFee") @db.VarChar(255)
+  fee_rate                     Decimal?               @default(0) @db.Decimal
+  fee                          Decimal?               @default(0) @db.Decimal
 
   @@index([account_id], map: "invoice_account_id")
 }

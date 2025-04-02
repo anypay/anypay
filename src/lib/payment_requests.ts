@@ -78,6 +78,9 @@ interface PaymentRequestOptions {
   memo?: string;
   secret?: string;
   metadata?: any;
+  fee_rate_level?: string;
+  fee_rate?: number;
+  fee?: number;
 }
 
 export async function createPaymentRequest(app_id: number, template: any, options: PaymentRequestOptions = {}): Promise<PaymentRequest> {
@@ -107,7 +110,7 @@ export async function createPaymentRequest(app_id: number, template: any, option
       }
     })
 
-    let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount })
+    let invoice = await invoices.createEmptyInvoice(app_id, { currency, amount, ...options })
 
     if (template.length === 1) {
 
@@ -123,7 +126,10 @@ export async function createPaymentRequest(app_id: number, template: any, option
           webhook_url: options.webhook_url,
           redirect_url: options.redirect_url,
           secret: options.secret,
-          metadata: options.metadata
+          metadata: options.metadata,
+          fee_rate_level: options.fee_rate_level,
+          //fee_rate: options.fee_rate,
+          //fee: options.fee
         }
       })
 

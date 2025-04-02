@@ -345,7 +345,10 @@ async function NewServer(): Promise<Hapi.Server> {
             webhook: Joi.string().optional(),
             redirect: Joi.string().optional(),
             secret: Joi.string().optional(),
-            metadata: Joi.object().optional().label('CreatePaymentRequestMetadata')
+            metadata: Joi.object().optional().label('CreatePaymentRequestMetadata'),
+            fee_rate_level: Joi.string().optional().label('CreatePaymentRequestFeeRateLevel'),
+            fee_rate: Joi.number().optional().label('CreatePaymentRequestFeeRate'),
+            fee: Joi.number().optional().label('CreatePaymentRequestFee')
           }).optional().label('CreatePaymentRequestOptions')
         }).label('CreatePaymentRequestParams'),
         failAction: 'log'
