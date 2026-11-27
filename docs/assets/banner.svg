@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1280" height="360" viewBox="0 0 1280 360" role="img"
+     aria-labelledby="title desc">
+  <!--
+    Anypay README hero banner (1280×360).
+    Custom for anypay/anypay - Core Invoice & Payments API Server
+    No <script>. CSS @keyframes + SMIL only, so GitHub can render via:
+      <img src="docs/assets/banner.svg" alt="..." width="100%" />
+  -->
+  <title id="title">Anypay Core Server — Anypay</title>
+  <desc id="desc">Bitcoin & Stablecoin Invoice and Payments API Platform</desc>
+
+  <defs>
+    <linearGradient id="anypay-mark-a" x1="100%" x2="50%" y1="5.663%" y2="50%">
+      <stop offset="0" stop-color="#007B55"/>
+      <stop offset="1" stop-color="#00AB55"/>
+    </linearGradient>
+    <linearGradient id="anypay-mark-b" x1="50%" x2="50%" y1="0%" y2="100%">
+      <stop offset="0" stop-color="#5BE584"/>
+      <stop offset="1" stop-color="#00AB55"/>
+    </linearGradient>
+    <linearGradient id="anypay-bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#005249"/>
+      <stop offset="0.35" stop-color="#00AB55"/>
+      <stop offset="0.7" stop-color="#5BE584"/>
+      <stop offset="1" stop-color="#007B55"/>
+    </linearGradient>
+    <linearGradient id="anypay-glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#00AB55" stop-opacity="0.28"/>
+      <stop offset="0.55" stop-color="#00AB55" stop-opacity="0.06"/>
+      <stop offset="1" stop-color="#111111" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="anypay-orb" cx="82%" cy="42%" r="42%">
+      <stop offset="0" stop-color="#00AB55" stop-opacity="0.32"/>
+      <stop offset="0.45" stop-color="#007B55" stop-opacity="0.12"/>
+      <stop offset="1" stop-color="#111111" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="anypay-flow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5BE584" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#5BE584" stop-opacity="1"/>
+      <stop offset="1" stop-color="#00AB55" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="anypay-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#00AB55" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+    <clipPath id="anypay-frame">
+      <rect x="0" y="0" width="1280" height="360" rx="16" ry="16"/>
+    </clipPath>
+    <filter id="anypay-soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style><![CDATA[
+      .ap-grid { animation: ap-grid-pan 18s linear infinite; }
+      .ap-pulse { animation: ap-pulse 3.6s ease-in-out infinite; }
+      .ap-pulse-slow { animation: ap-pulse 5.5s ease-in-out infinite; }
+      .ap-dash { stroke-dasharray: 8 16; animation: ap-dash 2.8s linear infinite; }
+      .ap-dash-slow { stroke-dasharray: 4 18; animation: ap-dash 5.2s linear infinite; }
+      .ap-sheen { animation: ap-sheen 4.8s ease-in-out infinite; }
+      .ap-float { animation: ap-float 6s ease-in-out infinite; }
+      .ap-ring { animation: ap-ring 3.2s ease-out infinite; transform-origin: 110px 180px; }
+      .ap-badge-glow { animation: ap-badge 2.8s ease-in-out infinite; }
+      @keyframes ap-grid-pan {
+        from { transform: translate(0,0); }
+        to   { transform: translate(-40px,-40px); }
+      }
+      @keyframes ap-pulse {
+        0%, 100% { opacity: 0.35; }
+        50%      { opacity: 0.9; }
+      }
+      @keyframes ap-dash {
+        to { stroke-dashoffset: -120; }
+      }
+      @keyframes ap-sheen {
+        0%   { transform: translateX(-60%); opacity: 0; }
+        20%  { opacity: 0.55; }
+        50%  { opacity: 0.15; }
+        100% { transform: translateX(180%); opacity: 0; }
+      }
+      @keyframes ap-float {
+        0%, 100% { transform: translateY(0); }
+        50%      { transform: translateY(-8px); }
+      }
+      @keyframes ap-ring {
+        0%   { opacity: 0.55; transform: scale(0.85); }
+        100% { opacity: 0;    transform: scale(1.55); }
+      }
+      @keyframes ap-badge {
+        0%, 100% { stroke-opacity: 0.45; }
+        50%      { stroke-opacity: 1; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .ap-grid, .ap-pulse, .ap-pulse-slow, .ap-dash, .ap-dash-slow,
+        .ap-sheen, .ap-float, .ap-ring, .ap-badge-glow {
+          animation: none !important;
+        }
+      }
+    ]]></style>
+  </defs>
+
+  <g clip-path="url(#anypay-frame)">
+    <!-- Dark-first canvas -->
+    <rect width="1280" height="360" fill="#111111"/>
+    <rect width="1280" height="360" fill="url(#anypay-orb)"/>
+    <rect x="720" y="-20" width="640" height="420" fill="url(#anypay-glow)"/>
+
+    <!-- Animated grid, oversized so the pan doesn't show edges -->
+    <g class="ap-grid">
+      <rect x="-40" y="-40" width="1360" height="440" fill="url(#anypay-grid)"/>
+    </g>
+
+    <!-- Soft vignette / framing -->
+    <rect x="1.5" y="1.5" width="1277" height="357" rx="14.5" ry="14.5"
+          fill="none" stroke="#212B36" stroke-width="2"/>
+    <rect x="8" y="8" width="1264" height="344" rx="10" ry="10"
+          fill="none" stroke="#00AB55" stroke-opacity="0.22" stroke-width="1"/>
+
+    <!-- Corner ticks -->
+    <g stroke="#5BE584" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.85">
+      <path d="M24 48 V28 H44"/>
+      <path d="M1256 48 V28 H1236"/>
+      <path d="M24 312 V332 H44"/>
+      <path d="M1256 312 V332 H1236"/>
+    </g>
+
+    <!-- Flow paths behind typography -->
+    <g fill="none" stroke="url(#anypay-flow)" stroke-width="1.5" opacity="0.7">
+      <path class="ap-dash" d="M210 300 C 420 300, 520 210, 780 210 S 1100 280, 1240 220"/>
+      <path class="ap-dash-slow" d="M210 318 C 400 330, 560 250, 840 260 S 1120 200, 1240 250"/>
+    </g>
+
+    <!-- Logo pulse rings + official mark -->
+    <circle class="ap-ring" cx="110" cy="180" r="64" fill="none" stroke="#00AB55" stroke-width="1.5"/>
+    <circle class="ap-pulse-slow" cx="110" cy="180" r="58" fill="#00AB55" fill-opacity="0.06" stroke="#00AB55" stroke-opacity="0.25" stroke-width="1"/>
+    <g class="ap-float" transform="translate(62 132)">
+      <svg width="96" height="96" viewBox="0 0 512 512" overflow="visible">
+        <g fill="none" fill-rule="evenodd" transform="translate(14 128)">
+          <path fill="url(#anypay-mark-a)" d="m92.8065878 83.1065019c44.2888442 22.8889511 46.3079382 23.9345951 46.4006692 23.9799821.012248.008728.642121.333419 44.792743 23.152545-26.071507 48.53952-42.693165 77.265922-49.868472 86.179207-10.758587 13.369926-22.495227 23.492946-36.929824 29.333888-30.3458978 14.261953-68.070062 14.928791-97.201704-2.704011z"/>
+          <g fill="url(#anypay-mark-b)">
+            <path d="m430.310491 101.726093c-46.270793-80.9559274-94.100378-157.2284394-149.043472-45.3437359-7.516227 14.3833977-12.994566 42.3366008-25.267019 42.3366008v-.1420279c-12.272453 0-17.749057-27.9532032-25.265283-42.3366009-54.94483-111.8847034-102.774415-35.6121915-149.0452076 45.3437359-3.4821132 6.105448-6.8270943 11.9321-9.6895094 16.99601 106.037811-67.1266136 97.11034 135.666494 184 137.277897v.142028c86.891396-1.611403 77.962189-204.4045106 184-137.27965-2.860679-5.062157-6.20566-10.888809-9.689509-16.994257"/>
+            <path d="m436 256c26.5088 0 48-21.4912 48-48s-21.4912-48-48-48-48 21.4912-48 48 21.4912 48 48 48"/>
+          </g>
+        </g>
+      </svg>
+    </g>
+
+    <!-- Category badge -->
+    <g transform="translate(950 36)">
+      <rect x="0" y="0" width="290" height="36" rx="18" fill="#161C24" stroke="#00AB55" stroke-width="1.5" class="ap-badge-glow"/>
+      <circle class="ap-pulse" cx="22" cy="18" r="5" fill="#5BE584"/>
+      <text x="36" y="23"
+            font-family="ui-sans-serif, system-ui, 'Public Sans', Inter, 'Helvetica Neue', Arial, sans-serif"
+            font-size="13" font-weight="700" letter-spacing="1.6" fill="#C8FACD">CORE · PLATFORM</text>
+    </g>
+
+    <!-- Title + tagline -->
+    <text x="184" y="175"
+          font-family="ui-sans-serif, system-ui, 'Public Sans', Inter, 'Helvetica Neue', Arial, sans-serif"
+          font-size="44" font-weight="700" fill="#FFFFFF" letter-spacing="-0.5">Anypay Core Server</text>
+    <text x="184" y="218"
+          font-family="ui-sans-serif, system-ui, 'Public Sans', Inter, 'Helvetica Neue', Arial, sans-serif"
+          font-size="18" font-weight="400" fill="#919EAB">Bitcoin &amp; Stablecoin Invoice and Payments API Platform</text>
+    <text x="184" y="252"
+          font-family="ui-sans-serif, system-ui, 'Public Sans', Inter, 'Helvetica Neue', Arial, sans-serif"
+          font-size="13" font-weight="600" letter-spacing="2.2" fill="#00AB55">BITCOIN &amp; STABLECOIN PAYMENTS FOR BUSINESS</text>
+
+    <!-- Sheen across the bottom bar -->
+    <rect x="0" y="348" width="1280" height="12" fill="url(#anypay-bar)"/>
+    <rect class="ap-sheen" x="0" y="348" width="280" height="12" fill="#FFFFFF" fill-opacity="0.28"/>
+  </g>
+</svg>
