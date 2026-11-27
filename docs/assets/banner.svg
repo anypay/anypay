@@ -4,12 +4,12 @@
      aria-labelledby="title desc">
   <!--
     Anypay README hero banner (1280×360).
-    Custom for anypay/anypay - Core Invoice & Payments API Server
+    Custom for anypay/anypay - Core Invoice &amp; Payments API Server
     No <script>. CSS @keyframes + SMIL only, so GitHub can render via:
       <img src="docs/assets/banner.svg" alt="..." width="100%" />
   -->
   <title id="title">Anypay Core Server — Anypay</title>
-  <desc id="desc">Bitcoin & Stablecoin Invoice and Payments API Platform</desc>
+  <desc id="desc">Bitcoin &amp; Stablecoin Invoice and Payments API Platform</desc>
 
   <defs>
     <linearGradient id="anypay-mark-a" x1="100%" x2="50%" y1="5.663%" y2="50%">
